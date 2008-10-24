@@ -1,0 +1,11 @@
+available:
+  name: Available
+  duration: 0
+  
+unavailable:
+  name: Unavailable
+  duration: 0
+  
+haircut:
+  name: Haircut
+  duration: 30

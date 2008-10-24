@@ -1,0 +1,13 @@
+<p>
+  <b>Name:</b>
+  <%=h @job.name %>
+</p>
+
+<p>
+  <b>Duration:</b>
+  <%=h @job.duration %>
+</p>
+
+
+<%= link_to 'Edit', edit_job_path(@job) %> |
+<%= link_to 'Back', jobs_path %>

@@ -12,4 +12,15 @@ class ApplicationController < ActionController::Base
   # Uncomment this to filter the contents of submitted sensitive data parameters
   # from your application log (in this case, all fields with names like "password"). 
   # filter_parameter_logging :password
+  
+  private
+  
+  def init_current_company
+    @current_company = Company.find_by_subdomain(current_subdomain)
+    unless @current_company
+      flash[:notice] = "Invalid company"
+      redirect_to root_path
+    end
+  end
+  
 end
