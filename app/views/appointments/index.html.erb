@@ -3,6 +3,8 @@
 <table>
   <tr>
     <th>Company</th>
+    <th>Job</th>
+    <th>Resource</th>
     <th>Start at</th>
     <th>End at</th>
   </tr>
@@ -10,6 +12,8 @@
 <% for appointment in @appointments %>
   <tr>
     <td><%=h appointment.company_id %></td>
+    <td><%=h appointment.job.name %></td>
+    <td><%=h appointment.resource.name %></td>
     <td><%=h appointment.start_at %></td>
     <td><%=h appointment.end_at %></td>
     <td><%= link_to 'Show', appointment %></td>

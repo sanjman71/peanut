@@ -53,11 +53,13 @@ class AppointmentTest < ActiveSupport::TestCase
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
+
+    job           = jobs(:haircut)
+    job_start_at  = "20080801120000"
+    job_end_at    = "20080801123000" # 30 minutes
+    
     assert_no_difference('Appointment.count') do
-      # split appointment
-      job           = jobs(:haircut)
-      job_start_at  = "20080801120000"
-      job_end_at    = "20080801123000" # 30 minutes
+      # split appointment, no commit
       appts         = available_appt.split(job, job_start_at, job_end_at)
     
       # should now have 3 appointments
@@ -81,6 +83,11 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal new_appt.end_at, end_appt.start_at
       assert_equal available_appt.end_at, end_appt.end_at
     end
+    
+    assert_difference('Appointment.count', 2) do
+      # split, commit appointment
+      appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
+    end
   end
   
   def test_should_schedule_job_at_start_of_available_timeslot
@@ -92,11 +99,12 @@ class AppointmentTest < ActiveSupport::TestCase
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
+    # split appointment, no commit
+    job           = jobs(:haircut)
+    job_start_at  = "20080801000000"
+    job_end_at    = "20080801003000" # 30 minutes
+    
     assert_no_difference('Appointment.count') do
-      # split appointment
-      job           = jobs(:haircut)
-      job_start_at  = "20080801000000"
-      job_end_at    = "20080801003000" # 30 minutes
       appts         = available_appt.split(job, job_start_at, job_end_at)
     
       # should now have 2 appointments
@@ -115,6 +123,11 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal new_appt.end_at, end_appt.start_at
       assert_equal available_appt.end_at, end_appt.end_at
     end
+
+    assert_difference('Appointment.count', 1) do
+      # split, commit appointment
+      appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
+    end
   end
   
   def test_should_schedule_job_at_start_of_available_timeslot
@@ -126,12 +139,12 @@ class AppointmentTest < ActiveSupport::TestCase
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
-    assert_no_difference('Appointment.count') do
-      # split appointment
-      job           = jobs(:haircut)
-      job_start_at  = "20080801002330"
-      job_end_at    = "20080802000000" # 30 minutes
+    # split appointment
+    job           = jobs(:haircut)
+    job_start_at  = "20080801002330"
+    job_end_at    = "20080802000000" # 30 minutes
       
+    assert_no_difference('Appointment.count') do
       appts         = available_appt.split(job, job_start_at, job_end_at)
   
       # should now have 2 appointments
@@ -150,25 +163,11 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal Time.zone.parse(job_start_at), new_appt.start_at
       assert_equal Time.zone.parse(job_end_at), new_appt.end_at
     end
-  end
-  
-  def test_should_commit_job_in_middle_of_available_timeslot
-    # create big available timeslot
-    available_appt = Appointment.create(:company => companies(:company1), 
-                                        :job => jobs(:available),
-                                        :resource => resources(:johnny),
-                                        :customer => customers(:cameron),
-                                        :start_at => "20080801000000",
-                                        :end_at =>   "20080802000000")  # available all day
-    
-    # split, commit appointment changes
-    job           = jobs(:haircut)
-    job_start_at  = "20080801120000"
-    job_end_at    = "20080801130000" # 60 minutes
-    
-    assert_difference('Appointment.count', 2) do
+
+    assert_difference('Appointment.count', 1) do
+      # split, commit appointment
       appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
     end
   end
-  
+    
 end
