@@ -20,43 +20,64 @@ class Appointment < ActiveRecord::Base
     end
   end
 
-  # split an available timeslot into available and busy timeslots
-  def split(start_at, end_at)
-    # check that the current timeslot is available
+  # split an available appointment into multiple appointments with the specified job and time range
+  def split(job, job_start_at, job_end_at, options={})
+    # check that the current appointment is available
     raise ArgumentError if self.job.name != Job.available
+
+    # validate job argument
+    raise ArgumentError if job.blank? or !job.is_a?(Job)
     
-    # time arguments should be strings
-    raise ArgumentError if !start_at.is_a?(String) or !end_at.is_a?(String)
+    # convert argument Strings to ActiveSupport::TimeWithZones
+    job_start_at = Time.zone.parse(job_start_at) if job_start_at.is_a?(String)
+    job_end_at   = Time.zone.parse(job_end_at) if job_end_at.is_a?(String)
     
-    # convert strings to TimeZone objects
-    tz_start_at = Time.zone.parse(start_at)
-    tz_end_at   = Time.zone.parse(end_at)
-    
-    # check that the start_at and end_at times fall within the appointment timeslot
-    raise ArgumentError unless tz_start_at.between?(self.start_at, self.end_at) and tz_end_at.between?(self.start_at, self.end_at)
+    # time arguments should be a ActiveSupport::TimeWithZone
+    raise ArgumentError if !job_start_at.is_a?(ActiveSupport::TimeWithZone) or !job_end_at.is_a?(ActiveSupport::TimeWithZone)
+        
+    # check that the job_start_at and job_end_at times fall within the appointment timeslot
+    raise ArgumentError unless job_start_at.between?(self.start_at, self.end_at) and job_end_at.between?(self.start_at, self.end_at)
     
     # build new appointment
     new_appt = Appointment.new(self.attributes)
-    new_appt.start_at = tz_start_at
-    new_appt.end_at   = tz_end_at
+    new_appt.job      = job
+    new_appt.start_at = job_start_at
+    new_appt.end_at   = job_end_at
     
     # build new start, end appointments
   
-    unless tz_start_at == self.start_at
+    unless job_start_at == self.start_at
       # the start appoint starts at the same time but ends when the new appoint starts
       start_appt = Appointment.new(self.attributes)
       start_appt.start_at = self.start_at
       start_appt.end_at   = new_appt.start_at
     end
     
-    unless tz_end_at == self.end_at
+    unless job_end_at == self.end_at
       # the end appointment ends at the same time, but starts when the new appointment ends
       end_appt = Appointment.new(self.attributes)
       end_appt.start_at = new_appt.end_at
       end_appt.end_at   = self.end_at
     end
     
-    [start_appt, new_appt, end_appt].compact
+    appointments = [start_appt, new_appt, end_appt].compact
+    
+    if options[:commit].to_i == 1
+      
+      # commit the apointment changes
+      transaction do
+        self.destroy
+        appointments.each do |appointment|
+          appointment.save
+          if !appointment.valid?
+            raise ActiveRecord::Rollback
+          end
+        end
+      end
+      
+    end
+    
+    appointments
   end
   
   private
