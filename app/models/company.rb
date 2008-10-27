@@ -1,7 +1,7 @@
 class Company < ActiveRecord::Base
-  validates_uniqueness_of :name
-  validates_presence_of :name
-  before_save :init_subdomain
+  validates_uniqueness_of   :name
+  validates_presence_of     :name
+  before_save               :init_subdomain
   
   private
   

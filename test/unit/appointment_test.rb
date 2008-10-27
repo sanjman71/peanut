@@ -10,38 +10,77 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :customer_id
   should_require_attributes :start_at
   should_require_attributes :end_at
-
-  def test_should_not_allow_start_at_equal_end_at
+  
+  def test_should_set_end_at_on_new_appointment
     appt = Appointment.create(:company => companies(:company1), 
-                                      :job => jobs(:available),
-                                      :resource => resources(:johnny),
-                                      :customer => customers(:cameron),
-                                      :start_at => "20080802000000",
-                                      :end_at =>   "20080802000000")
+                              :job => jobs(:haircut),
+                              :resource => resources(:johnny),
+                              :customer => customers(:cameron),
+                              :start_at_string => "today 2 pm")
+    assert appt.valid?
+    assert_equal Chronic.parse("today 2 pm"), appt.start_at
+    assert_equal Chronic.parse("today 2:30 pm").to_i, appt.end_at.to_i
+  end
+  
+  def test_should_not_allow_when_start_at_equals_end_at
+    appt = Appointment.create(:company => companies(:company1), 
+                              :job => jobs(:available),
+                              :resource => resources(:johnny),
+                              :customer => customers(:cameron),
+                              :start_at => "20080802000000",
+                              :end_at =>   "20080802000000")
     assert !appt.valid?
-    assert_match /appointment start time/, appt.errors[:base]
+    assert_match /Appointment start time/, appt.errors[:base]
   end
 
   def test_should_not_allow_start_at_after_end_at
     appt = Appointment.create(:company => companies(:company1), 
-                                      :job => jobs(:available),
-                                      :resource => resources(:johnny),
-                                      :customer => customers(:cameron),
-                                      :start_at => "20080802000000",
-                                      :end_at =>   "20080801010000")
+                              :job => jobs(:available),
+                              :resource => resources(:johnny),
+                              :customer => customers(:cameron),
+                              :start_at => "20080802000000",
+                              :end_at =>   "20080801010000")
     assert !appt.valid?
-    assert_match /appointment start time/, appt.errors[:base]
+    assert_match /Appointment start time/, appt.errors[:base]
   end
   
   def test_should_set_duration
     appt = Appointment.create(:company => companies(:company1), 
-                                      :job => jobs(:available),
-                                      :resource => resources(:johnny),
-                                      :customer => customers(:cameron),
-                                      :start_at => "20080801000000",
-                                      :end_at =>   "20080801010000") # 1 hour
+                              :job => jobs(:available),
+                              :resource => resources(:johnny),
+                              :customer => customers(:cameron),
+                              :start_at => "20080801000000",
+                              :end_at =>   "20080801010000") # 1 hour
     assert appt.valid?
     assert_equal 60, appt.duration
+  end
+  
+  def test_should_build_customer_association
+    # should create a new customer when building the new appointment
+    assert_difference('Customer.count', 1) do
+      appt = Appointment.new(:company => companies(:company1), 
+                             :job => jobs(:haircut),
+                             :resource => resources(:johnny),
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :start_at_string => "today 2 pm")
+    
+      assert appt.valid?
+    end
+    
+    # should use the existing customer when building the new appointment
+    assert_no_difference('Customer.count') do
+      appt = Appointment.new(:company => companies(:company1), 
+                             :job => jobs(:haircut),
+                             :resource => resources(:johnny),
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :start_at_string => "today 2 pm")
+    
+      assert appt.valid?
+    end
+  end
+  
+  def test_should_not_allow_appointment_in_busy_timeslot
+    
   end
   
   def test_should_schedule_job_in_middle_of_available_timeslot

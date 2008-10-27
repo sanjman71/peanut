@@ -5,7 +5,7 @@ class AppointmentsController < ApplicationController
   # GET /appointments.xml
   def index
     @appointments = Appointment.find(:all)
-
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @appointments }
@@ -26,8 +26,10 @@ class AppointmentsController < ApplicationController
   # GET /appointments/new
   # GET /appointments/new.xml
   def new
+    # build new appointment and customer objects
     @appointment = Appointment.new
-
+    @appointment.customer = Customer.new
+    
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @appointment }

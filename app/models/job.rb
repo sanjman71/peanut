@@ -1,17 +1,21 @@
 class Job < ActiveRecord::Base
-  validates_presence_of :name, :duration
-  validates_uniqueness_of :name
-  before_save :titleize_name
+  validates_presence_of       :name, :duration
+  validates_uniqueness_of     :name
+  has_many                    :appointments
+  before_save                 :titleize_name
   
-  # required available, unavailable jobs
-  def self.available
-    "Available"
+  # job name constants
+  AVAILABLE     = "Available"
+  UNAVAILABLE   = "Unavailable"
+  
+  named_scope :available,     { :conditions => {:name => AVAILABLE} }
+  named_scope :unavailable,   { :conditions => {:name => UNAVAILABLE} }
+  
+  named_scope :names,         { :select => :name, :order => :name }
+  
+  def duration_to_seconds
+    self.duration * 60
   end
-  
-  def self.unavailable
-    "Unavailabe"
-  end
-  
   
   private
   

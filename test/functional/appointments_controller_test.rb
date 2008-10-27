@@ -1,6 +1,8 @@
-require 'test_helper'
+require 'test/test_helper'
 
 class AppointmentsControllerTest < ActionController::TestCase
+  fixtures :companies, :jobs, :resources
+  
   def test_should_get_index
     get :index
     assert_response :success
@@ -14,7 +16,9 @@ class AppointmentsControllerTest < ActionController::TestCase
 
   def test_should_create_appointment
     assert_difference('Appointment.count') do
-      post :create, :appointment => { }
+      post :create, :appointment => {
+                          "customer_attributes"=>{"name"=>"Customer 1", "phone"=>"6503876818", "email"=>"customer1@getfave.com"}
+                      }
     end
 
     assert_redirected_to appointment_path(assigns(:appointment))

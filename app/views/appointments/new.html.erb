@@ -2,19 +2,39 @@
 
 <% form_for(@appointment) do |f| %>
   <%= f.error_messages %>
-
+  <%= f.hidden_field :company_id, :value => @current_company.id %>
+  
   <p>
-    <%= f.label :company_id %><br />
-    <%= f.text_field :company_id %>
+    <%= f.label :job_id %><br />
+    <%= select_tag 'appointment[job_id]', options_for_select(Job.all.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>
+  </p>
+  <p>
+    <%= f.label :resource_id %><br />
+    <%= select_tag 'appointment[resource_id]', options_for_select(Resource.all.collect{ |r| [r.name, r.id]}, @appointment.resource_id) %>
   </p>
   <p>
     <%= f.label :start_at %><br />
-    <%= f.datetime_select :start_at %>
+    <%= f.text_field :start_at_string %>
   </p>
-  <p>
-    <%= f.label :end_at %><br />
-    <%= f.datetime_select :end_at %>
-  </p>
+  
+  <% # show customer fields %>
+  <h2>Customer</h2>
+  <% fields_for "appointment[customer_attributes]", @appointment.customer do |customer_form| %>
+    <%= customer_form.error_messages %>
+    <p>
+      <%= customer_form.label :name %><br />
+      <%= customer_form.text_field :name %>
+    </p>
+    <p>
+      <%= customer_form.label :email %><br />
+      <%= customer_form.text_field :email %>
+    </p>
+    <p>
+      <%= customer_form.label :phone %><br />
+      <%= customer_form.text_field :phone %>
+    </p>
+  <% end %>
+  
   <p>
     <%= f.submit "Create" %>
   </p>

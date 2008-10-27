@@ -1,8 +1,7 @@
-<h1><%= @current_company.name %>: Appointments</h1>
+<h1><%= @current_company.name %>: All Appointments</h1>
 
 <table>
   <tr>
-    <th>Company</th>
     <th>Job</th>
     <th>Resource</th>
     <th>Start at</th>
@@ -11,11 +10,10 @@
 
 <% for appointment in @appointments %>
   <tr>
-    <td><%=h appointment.company_id %></td>
     <td><%=h appointment.job.name %></td>
     <td><%=h appointment.resource.name %></td>
-    <td><%=h appointment.start_at %></td>
-    <td><%=h appointment.end_at %></td>
+    <td><%=h appointment.start_at_string %></td>
+    <td><%=h appointment.end_at_string %></td>
     <td><%= link_to 'Show', appointment %></td>
     <td><%= link_to 'Edit', edit_appointment_path(appointment) %></td>
     <td><%= link_to 'Destroy', appointment, :confirm => 'Are you sure?', :method => :delete %></td>
