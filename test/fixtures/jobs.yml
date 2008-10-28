@@ -1,11 +1,14 @@
 available:
   name: Available
   duration: 0
+  schedule_as: free
   
 unavailable:
   name: Unavailable
   duration: 0
+  schedule_as: busy
   
 haircut:
   name: Haircut
   duration: 30
+  schedule_as: busy

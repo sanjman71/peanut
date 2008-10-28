@@ -12,8 +12,8 @@
   <tr>
     <td><%=h appointment.job.name %></td>
     <td><%=h appointment.resource.name %></td>
-    <td><%=h appointment.start_at_string %></td>
-    <td><%=h appointment.end_at_string %></td>
+    <td><%=h appointment.start_at.to_s(:appt_time) %></td>
+    <td><%=h appointment.end_at.to_s(:appt_time) %></td>
     <td><%= link_to 'Show', appointment %></td>
     <td><%= link_to 'Edit', edit_appointment_path(appointment) %></td>
     <td><%= link_to 'Destroy', appointment, :confirm => 'Are you sure?', :method => :delete %></td>

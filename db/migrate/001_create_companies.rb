@@ -10,7 +10,8 @@ class CreateCompanies < ActiveRecord::Migration
     create_table :jobs do |t|
       t.string :name
       t.integer :duration
-
+      t.string :schedule_as
+      
       t.timestamps
     end
   
@@ -37,6 +38,7 @@ class CreateCompanies < ActiveRecord::Migration
       t.datetime :start_at
       t.datetime :end_at
       t.integer :duration
+      t.string :mark_as
       
       t.timestamps
     end

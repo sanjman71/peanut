@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 1) do
     t.datetime "start_at"
     t.datetime "end_at"
     t.integer  "duration"
+    t.string   "mark_as"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -41,6 +42,7 @@ ActiveRecord::Schema.define(:version => 1) do
   create_table "jobs", :force => true do |t|
     t.string   "name"
     t.integer  "duration"
+    t.string   "schedule_as"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

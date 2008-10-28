@@ -4,30 +4,38 @@ class Appointment < ActiveRecord::Base
   belongs_to              :resource
   belongs_to              :customer
   validates_presence_of   :company_id, :job_id, :resource_id, :customer_id, :start_at, :end_at
-  before_save             :init_duration
+  validates_inclusion_of  :mark_as, :in => %w(free busy)
   
   named_scope :company,     lambda { |id| { :conditions => {:company_id => id} }}
   named_scope :job,         lambda { |id| { :conditions => {:job_id => id} }}
   named_scope :resource,    lambda { |id| { :conditions => {:resource_id => id} }}
   named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
 
-  # find appointments within time ranges
-  named_scope :after,       lambda { |at| { :conditions => ["start_at > ?", at] }}
-  named_scope :before,      lambda { |at| { :conditions => ["end_at < ?", at] }}
+  # find appointments spanning a time range
+  named_scope :span,        lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR (start_at >= ? AND end_at <= ?)", 
+                                                                           start_at, start_at, end_at, end_at, start_at, end_at] }}
 
-  # find available time ranges
-  named_scope :available,   { :conditions => {:job_id => ((job = Job.available.first) ? job.id : 0)} }
+  # find free appointments
+  named_scope :free,        { :conditions => {:mark_as => 'free'} }
   
   def after_initialize
-    if self.start_at and self.job_id and self.end_at.nil?
+    if self.start_at and self.job_id and self.end_at.blank?
       # initialize end_at
       self.end_at = self.start_at + self.job.duration_to_seconds
+    end
+    
+    # initialize duration
+    self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
+    
+    if self.job
+      # initialize mark_as field with job.schedule_as
+      self.mark_as = self.job.schedule_as
     end
   end
   
   def validate
     if self.start_at and self.end_at
-      # only check if we have valid times
+      # check that start_at happens before end_at
       if !(start_at.to_i < end_at.to_i)
         errors.add_to_base("Appointment start time must be earlier than the apointment end time")
       end
@@ -104,7 +112,9 @@ class Appointment < ActiveRecord::Base
       
       # commit the apointment changes
       transaction do
+        # remove this appointment first
         self.destroy
+        # add new appointments
         appointments.each do |appointment|
           appointment.save
           if !appointment.valid?
@@ -118,11 +128,4 @@ class Appointment < ActiveRecord::Base
     appointments
   end
   
-  private
-  
-  # initialize duration to minutes
-  def init_duration
-    self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
-  end
-
 end

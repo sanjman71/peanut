@@ -10,9 +10,14 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :customer_id
   should_require_attributes :start_at
   should_require_attributes :end_at
+  should_allow_values_for :mark_as, "free", "busy"
   
-  def test_should_set_end_at_on_new_appointment
-    appt = Appointment.create(:company => companies(:company1), 
+  def test_span
+    # clear database
+    Appointment.delete_all
+    
+    # create appointment
+    appt = Appointment.create(:company => companies(:company1),
                               :job => jobs(:haircut),
                               :resource => resources(:johnny),
                               :customer => customers(:cameron),
@@ -20,9 +25,50 @@ class AppointmentTest < ActiveSupport::TestCase
     assert appt.valid?
     assert_equal Chronic.parse("today 2 pm"), appt.start_at
     assert_equal Chronic.parse("today 2:30 pm").to_i, appt.end_at.to_i
+
+    # test appointment that ends at start time
+    appts = Appointment.span(Chronic.parse("today 1 pm").utc, Chronic.parse("today 2 pm").utc)
+    assert_equal 0, appts.size
+
+    # test appointment that starts at end time
+    appts = Appointment.span(Chronic.parse("today 2:30 pm").utc, Chronic.parse("today 3 pm").utc)
+    assert_equal 0, appts.size
+
+    # test span that overlaps appointment start time
+    appts = Appointment.span(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 2:15 pm").utc)
+    assert_equal 1, appts.size
+    assert_equal appt, appts.first
+
+    # test span that overlaps appointment end time
+    appts = Appointment.span(Chronic.parse("today 2:15 pm").utc, Chronic.parse("today 2:45 pm").utc)
+    assert_equal 1, appts.size
+    assert_equal appt, appts.first
+    
+    # test span that envelopes the appointment
+    appts = Appointment.span(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 3 pm").utc)
+    assert_equal 1, appts.size
+    assert_equal appt, appts.first
+
+    # test span that is within the appointment
+    appts = Appointment.span(Chronic.parse("today 2:05 pm").utc, Chronic.parse("today 2:15 pm").utc)
+    assert_equal 1, appts.size
+    assert_equal appt, appts.first
   end
   
-  def test_should_not_allow_when_start_at_equals_end_at
+  def test_should_set_end_at_on_new_appointment
+    assert_difference('Appointment.count') do
+      appt = Appointment.create(:company => companies(:company1),
+                                :job => jobs(:haircut),
+                                :resource => resources(:johnny),
+                                :customer => customers(:cameron),
+                                :start_at_string => "today 2 pm")
+      assert appt.valid?
+      assert_equal Chronic.parse("today 2 pm"), appt.start_at
+      assert_equal Chronic.parse("today 2:30 pm").to_i, appt.end_at.to_i
+    end
+  end
+  
+  def test_should_not_allow_when_start_at_is_same_as_end_at
     appt = Appointment.create(:company => companies(:company1), 
                               :job => jobs(:available),
                               :resource => resources(:johnny),
@@ -34,25 +80,29 @@ class AppointmentTest < ActiveSupport::TestCase
   end
 
   def test_should_not_allow_start_at_after_end_at
-    appt = Appointment.create(:company => companies(:company1), 
-                              :job => jobs(:available),
-                              :resource => resources(:johnny),
-                              :customer => customers(:cameron),
-                              :start_at => "20080802000000",
-                              :end_at =>   "20080801010000")
-    assert !appt.valid?
-    assert_match /Appointment start time/, appt.errors[:base]
+    assert_no_difference('Appointment.count') do
+      appt = Appointment.create(:company => companies(:company1), 
+                                :job => jobs(:available),
+                                :resource => resources(:johnny),
+                                :customer => customers(:cameron),
+                                :start_at => "20080802000000",
+                                :end_at =>   "20080801010000")
+      assert !appt.valid?
+      assert_match /Appointment start time/, appt.errors[:base]
+    end
   end
   
   def test_should_set_duration
-    appt = Appointment.create(:company => companies(:company1), 
-                              :job => jobs(:available),
-                              :resource => resources(:johnny),
-                              :customer => customers(:cameron),
-                              :start_at => "20080801000000",
-                              :end_at =>   "20080801010000") # 1 hour
-    assert appt.valid?
-    assert_equal 60, appt.duration
+    assert_difference('Appointment.count') do
+      appt = Appointment.create(:company => companies(:company1), 
+                                :job => jobs(:available),
+                                :resource => resources(:johnny),
+                                :customer => customers(:cameron),
+                                :start_at => "20080801000000",
+                                :end_at =>   "20080801010000") # 1 hour
+      assert appt.valid?
+      assert_equal 60, appt.duration
+    end
   end
   
   def test_should_build_customer_association
@@ -78,11 +128,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert appt.valid?
     end
   end
-  
-  def test_should_not_allow_appointment_in_busy_timeslot
     
-  end
-  
   def test_should_schedule_job_in_middle_of_available_timeslot
     # create big available timeslot
     available_appt = Appointment.create(:company => companies(:company1), 
