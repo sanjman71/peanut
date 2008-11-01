@@ -1,0 +1,10 @@
+if @partial == :free
+  # show free appointments
+  page[:free].replace_html :partial => @partial.to_s, 
+                           :locals => {:free_appointments => @free_appointments, :free_appointment_days => @free_appt_days}
+  page[:free].highlight
+elsif @partial == :customer
+  # show customer form
+  page[:free].replace_html :partial => @partial.to_s, 
+                           :locals => {:appointment => @appointment}
+end

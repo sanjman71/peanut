@@ -6,7 +6,7 @@
   
   <p>
     <%= f.label :job_id %><br />
-    <%= select_tag 'appointment[job_id]', options_for_select(Job.busy.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>
+    <%= select_tag 'appointment[job_id]', options_for_select(Job.work.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>
   </p>
   <p>
     <%= f.label :resource_id %><br />

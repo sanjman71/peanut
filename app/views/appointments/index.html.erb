@@ -1,26 +1,29 @@
 <h1><%= @current_company.name %>: All Appointments</h1>
 
-<table>
-  <tr>
-    <th>Job</th>
-    <th>Resource</th>
-    <th>Start at</th>
-    <th>End at</th>
-  </tr>
-
-<% for appointment in @appointments %>
-  <tr>
-    <td><%=h appointment.job.name %></td>
-    <td><%=h appointment.resource.name %></td>
-    <td><%=h appointment.start_at.to_s(:appt_time) %></td>
-    <td><%=h appointment.end_at.to_s(:appt_time) %></td>
-    <td><%= link_to 'Show', appointment %></td>
-    <td><%= link_to 'Edit', edit_appointment_path(appointment) %></td>
-    <td><%= link_to 'Destroy', appointment, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
+<% @appt_days.each do |day, appointments| %>
+  <h3><%= day.to_s(:appt_day) %></h3>
+  <table>
+    <tr>
+      <th>Job</th>
+      <th>Resource</th>
+      <th>Start at</th>
+      <th>End at</th>
+    </tr>
+  <% appointments.each do |appointment| %>
+    <tr>
+      <td><%=h appointment.job.name %></td>
+      <td><%=h appointment.resource.name %></td>
+      <td><%=h appointment.start_at.to_s(:appt_time) %></td>
+      <td><%=h appointment.end_at.to_s(:appt_time) %></td>
+      <td><%= link_to 'Show', appointment %></td>
+      <td><%= link_to 'Edit', edit_appointment_path(appointment) %></td>
+      <td><%# link_to 'Destroy', appointment, :confirm => 'Are you sure?', :method => :delete %></td>
+    </tr>
+  <% end # each appointment %>
+  </table>
+<% end # appointment days %>
 
 <br />
 
-<%= link_to 'New appointment', new_appointment_path %>
+<%= link_to 'New appointment', new_appointment_path %> |
+<%= link_to 'Schedule an appointment', schedule_appointments_path %>

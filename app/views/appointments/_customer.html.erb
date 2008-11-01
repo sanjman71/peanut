@@ -1,0 +1,33 @@
+We have you scheduled for a <%= appointment.job.name %> with <%= appointment.resource.name %> on <%= appointment.start_at.to_s(:appt_date_time) %>
+<p/>
+Before we finalize your appointment, we need some information about you
+
+<% form_for(appointment) do |f| %>
+  <% # fill in appointment attributes %>
+  <%= f.hidden_field :company_id, :value => @current_company.id %>
+  <%= f.hidden_field :job_id, :value => appointment.job_id %>
+  <%= f.hidden_field :resource_id, :value => appointment.resource_id %>
+  <%= f.hidden_field :start_at, :value => appointment.start_at %>
+  <%= f.hidden_field :end_at, :value => appointment.end_at %>
+  
+  <% # show customer fields %>
+  <% fields_for "appointment[customer_attributes]", appointment.customer do |customer_form| %>
+    <% # customer_form.error_messages %>
+    <p>
+      <%= customer_form.label :name %><br />
+      <%= customer_form.text_field :name %>
+    </p>
+    <p>
+      <%= customer_form.label :email %><br />
+      <%= customer_form.text_field :email %>
+    </p>
+    <p>
+      <%= customer_form.label :phone %><br />
+      <%= customer_form.text_field :phone %>
+    </p>
+  <% end %>
+  
+  <p>
+    <%= f.submit "Create" %>
+  </p>
+<% end %>
