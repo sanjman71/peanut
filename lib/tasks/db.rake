@@ -24,5 +24,34 @@ namespace :db do
       puts "#{Time.now}: completed"
     end
     
-  end
-end
+    namespace :freetime do
+      
+      # Initialize some free time
+      desc "Initialize freetime for companies, resources"
+      task :init, :days do |t, args|
+        days = args.days.to_i
+        days = 1 if days == 0
+        
+        puts "#{Time.now}: adding #{days} days of free time for all companies, resources ..."
+        
+        Company.all.each do |company|
+          company.resources.each do |resource|
+            1.upto(days) do |i|
+              start_at = (Time.now + 1.day).beginning_of_day
+              end_at   = start_at + 24.hours
+              begin
+                Appointment.create_free_time(company, resource, start_at, end_at)
+              rescue TimeslotNotEmpty
+                # skip
+              end
+            end
+          end
+        end
+        
+        puts "#{Time.now}: completed"
+      end
+      
+    end # freetime namespace
+    
+  end # peanut namespace
+end # db namespace

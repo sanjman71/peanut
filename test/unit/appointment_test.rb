@@ -24,8 +24,12 @@ class AppointmentTest < ActiveSupport::TestCase
                               :start_at_string => "today 2 pm")
     assert appt.valid?
     assert_equal Chronic.parse("today 2 pm"), appt.start_at
-    assert_equal Chronic.parse("today 2:30 pm").to_i, appt.end_at.to_i
+    assert_equal Chronic.parse("today 2:30 pm"), appt.end_at
 
+    # test appointment that matches exact start and end times
+    # appts = Appointment.span(Chronic.parse("today 2 pm").utc, Chronic.parse("today 2:30 pm").utc)
+    # assert_equal 1, appts.size
+    
     # test appointment that ends at start time
     appts = Appointment.span(Chronic.parse("today 1 pm").utc, Chronic.parse("today 2 pm").utc)
     assert_equal 0, appts.size
@@ -145,7 +149,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     assert_no_difference('Appointment.count') do
       # split appointment, no commit
-      appts         = available_appt.split(job, job_start_at, job_end_at)
+      appts         = available_appt.split_free_time(job, job_start_at, job_end_at)
     
       # should now have 3 appointments
       assert_equal 3, appts.size
@@ -159,19 +163,23 @@ class AppointmentTest < ActiveSupport::TestCase
       # start appointment should end when new appointment starts
       assert_equal available_appt.start_at, start_appt.start_at
       assert_equal new_appt.start_at, start_appt.end_at
-    
+      assert_equal 'free', start_appt.mark_as
+      
       # new appointment should match job start, end times
       assert_equal Time.zone.parse(job_start_at), new_appt.start_at
       assert_equal Time.zone.parse(job_end_at), new_appt.end_at
+      # new appointment should be marked as work
+      assert_equal 'work', new_appt.mark_as
     
       # end appointment should start when new appointment ends
       assert_equal new_appt.end_at, end_appt.start_at
       assert_equal available_appt.end_at, end_appt.end_at
+      assert_equal 'free', end_appt.mark_as
     end
     
     assert_difference('Appointment.count', 2) do
       # split, commit appointment
-      appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
+      appts = available_appt.split_free_time(job, job_start_at, job_end_at, :commit => 1)
     end
   end
   
@@ -190,7 +198,7 @@ class AppointmentTest < ActiveSupport::TestCase
     job_end_at    = "20080801003000" # 30 minutes
     
     assert_no_difference('Appointment.count') do
-      appts         = available_appt.split(job, job_start_at, job_end_at)
+      appts         = available_appt.split_free_time(job, job_start_at, job_end_at)
     
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -203,15 +211,18 @@ class AppointmentTest < ActiveSupport::TestCase
       # new appointment should match job start, end time
       assert_equal Time.zone.parse(job_start_at), new_appt.start_at
       assert_equal Time.zone.parse(job_end_at), new_appt.end_at
+      # new appointment should be marked as busy
+      assert_equal 'busy', new_appt.mark_as
 
       # end appointment should start when new appointment ends
       assert_equal new_appt.end_at, end_appt.start_at
       assert_equal available_appt.end_at, end_appt.end_at
+      assert_equal 'free', end_appt.mark_as
     end
 
     assert_difference('Appointment.count', 1) do
       # split, commit appointment
-      appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
+      appts = available_appt.split_free_time(job, job_start_at, job_end_at, :commit => 1)
     end
   end
   
@@ -230,7 +241,7 @@ class AppointmentTest < ActiveSupport::TestCase
     job_end_at    = "20080802000000" # 30 minutes
       
     assert_no_difference('Appointment.count') do
-      appts         = available_appt.split(job, job_start_at, job_end_at)
+      appts         = available_appt.split_free_time(job, job_start_at, job_end_at)
   
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -243,16 +254,106 @@ class AppointmentTest < ActiveSupport::TestCase
       # start appointment should end when new appointment starts
       assert_equal available_appt.start_at, start_appt.start_at
       assert_equal new_appt.start_at, start_appt.end_at
+      assert_equal 'free', start_appt.mark_as
   
       # new appointment should match job start, end time
       assert_equal Time.zone.parse(job_start_at), new_appt.start_at
       assert_equal Time.zone.parse(job_end_at), new_appt.end_at
+      # new appointment should be marked as work
+      assert_equal 'work', new_appt.mark_as
     end
 
     assert_difference('Appointment.count', 1) do
       # split, commit appointment
-      appts = available_appt.split(job, job_start_at, job_end_at, :commit => 1)
+      appts = available_appt.split_free_time(job, job_start_at, job_end_at, :commit => 1)
     end
   end
     
+  def test_should_create_free_time
+    # should create free time for the entire day
+    company1  = companies(:company1)
+    johnny    = resources(:johnny)
+    lisa      = resources(:lisa)
+    
+    start_at  = Time.now.beginning_of_day
+    end_at    = start_at + 24.hours
+    appt      = Appointment.create_free_time(company1, johnny, start_at, end_at)
+    assert appt.valid?
+    assert_equal 24 * 60, appt.duration
+    
+    assert_raise TimeslotNotEmpty do
+      # should throw error
+      Appointment.create_free_time(company1, johnny, start_at, end_at)
+    end
+    
+    # should create free time for another resource
+    appt  = Appointment.create_free_time(company1, lisa, start_at, end_at)
+    assert appt.valid?
+    assert_equal 24 * 60, appt.duration
+  end
+  
+  def test_should_find_free_timeslots
+    # create free time from 8 am to noon
+    company1  = companies(:company1)
+    johnny    = resources(:johnny)
+    start_at  = Time.now.beginning_of_day + 8.hours
+    end_at    = start_at + 4.hours
+    appt      = Appointment.create_free_time(company1, johnny, start_at, end_at)
+    
+    # create appointment object, with range from 10 am to 2 pm
+    job       = jobs(:haircut)
+    range     = Appointment.new(:start_at => start_at + 2.hours, :end_at => end_at + 2.hours, :company => company1, :job => job, :resource => johnny, :customer_id => 0)
+    
+    # find all free time slots within the time range
+    free_time_collection = range.find_free_time
+    
+    # should find 4 slots of 30 minutes each, with start times incremented by 30 minutes
+    assert_equal 4, free_time_collection.size
+    assert_equal 30, free_time_collection[0].duration
+    assert_equal Chronic.parse("today 10:00 am"), free_time_collection[0].start_at
+    assert_equal 30, free_time_collection[1].duration
+    assert_equal Chronic.parse("today 10:30 am"), free_time_collection[1].start_at
+    assert_equal 30, free_time_collection[2].duration
+    assert_equal Chronic.parse("today 11 am"), free_time_collection[2].start_at
+    assert_equal 30, free_time_collection[3].duration
+    assert_equal Chronic.parse("today 11:30 am"), free_time_collection[3].start_at
+    
+    # should find 1 item in free time collection
+    free_time_collection = range.find_free_time(:limit => 1)
+    assert_equal 1, free_time_collection.size
+    assert_equal 30, free_time_collection[0].duration
+    assert_equal Chronic.parse("today 10:00 am"), free_time_collection[0].start_at
+
+    # create appointment object, with range from 7 am to 5 pm
+    job       = jobs(:haircut)
+    range     = Appointment.new(:start_at => start_at - 1.hour, :end_at => end_at + 5.hours, :company => company1, :job => job, :resource => johnny, :customer_id => 0)
+    
+    # find all free time slots within the time range
+    free_time_collection = range.find_free_time
+
+    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes
+    assert_equal 8, free_time_collection.size
+    assert_equal 30, free_time_collection[0].duration
+    assert_equal Chronic.parse("today 8:00 am"), free_time_collection[0].start_at
+
+    # find all free time slots within the range, with the job_id set
+    free_time_collection = range.find_free_time(:job_id => job.id)
+
+    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes
+    assert_equal 8, free_time_collection.size
+    assert_equal 30, free_time_collection[0].duration
+    assert_equal Chronic.parse("today 8:00 am"), free_time_collection[0].start_at
+    assert_equal job, free_time_collection[0].job
+    
+    # create appointment object, with range from noon to 5 pm
+    job       = jobs(:haircut)
+    range     = Appointment.new(:start_at => start_at + 4.hours, :end_at => end_at + 5.hours, :company => company1, :job => job, :resource => johnny, :customer_id => 0)
+    
+    # find all free time slots within the time range
+    free_time_collection = range.find_free_time
+    
+    # should find 0 items in free time collection
+    assert_equal 0, free_time_collection.size
+  end
+  
 end

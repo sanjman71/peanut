@@ -6,6 +6,9 @@ class AppointmentsController < ApplicationController
   def index
     @appointments = Appointment.find(:all)
     
+    # group appointments by day
+    @appt_days   = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @appointments }
@@ -84,6 +87,34 @@ class AppointmentsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(appointments_url) }
       format.xml  { head :ok }
+    end
+  end
+  
+  # GET /appointments/schedule
+  def schedule
+    if request.post?
+      begin
+        # find free appointments for a job and resource within a time range
+        @appointment        = Appointment.new(params[:appointment])
+        @partial            = :free
+        @free_appointments  = @appointment.find_free_time(:limit => 3, :job_id => @appointment.job.id)
+        @free_appt_days     = @free_appointments.group_by { |appt| appt.start_at.beginning_of_day }
+      rescue Exception => e
+        @free_appointments  = []
+        logger.debug("*** exception: #{e}")
+      end
+    elsif request.put?
+      # schedule the appointment
+      @appointment  = Appointment.new(params[:appointment])
+      @partial      = :customer
+    else
+      @appointment = Appointment.new
+    end
+    
+    respond_to do |format|
+      format.html 
+      format.xml  { render :xml => @appointment }
+      format.js   
     end
   end
 end

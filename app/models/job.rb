@@ -10,13 +10,13 @@ class Job < ActiveRecord::Base
   UNAVAILABLE   = "Unavailable"
   
   # job schedule_as constants
-  FREE          = 'free'
-  BUSY          = 'busy'
+  FREE          = 'free'      # free jobs show up as free/available time and can be scheduled
+  BUSY          = 'busy'      # busy jobs can not be scheduled
+  WORK          = 'work'      # work jobs are work items that can be scheduled in free timeslots
   
   named_scope :free,          { :conditions => {:schedule_as => FREE} }
   named_scope :busy,          { :conditions => {:schedule_as => BUSY} }
-  
-  named_scope :names,         { :select => :name, :order => :name }
+  named_scope :work,          { :conditions => {:schedule_as => WORK} }
   
   def duration_to_seconds
     self.duration * 60
