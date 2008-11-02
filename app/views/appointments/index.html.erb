@@ -1,4 +1,4 @@
-<h1><%= @current_company.name %>: All Appointments</h1>
+<h1>All Appointments</h1>
 
 <% @appt_days.each do |day, appointments| %>
   <h3><%= day.to_s(:appt_day) %></h3>
@@ -25,5 +25,4 @@
 
 <br />
 
-<%= link_to 'New appointment', new_appointment_path %> |
-<%= link_to 'Schedule an appointment', schedule_appointments_path %>
+<%= link_to 'New appointment', new_appointment_path %>

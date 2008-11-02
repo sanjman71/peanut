@@ -6,10 +6,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :customers
 
   # map the company root to the appointments controller
-  map.company_root  '', :controller => 'appointments', :action => 'index', :conditions => { :subdomain => /.+/ }
+  map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }
 
   # map the root to the companies controller
-  map.root          :controller => 'companies', :action => 'index'
+  map.root          :controller => 'dashboard', :action => 'index'
+  
+  # configure the dashboard route
+  map.dashboard     'dashboard', :controller => 'dashboard', :action => 'index'
   
   # The priority is based upon order of creation: first created -> highest priority.
 

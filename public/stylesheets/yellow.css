@@ -1,0 +1,5 @@
+/* Header, Tabs */
+
+div#header                                        { background-color: #FFCC00; }
+
+div#tabs a                                        { border-color: #FFCC00; background-color: #FFCC00; border-bottom-color: #FFCC00; }

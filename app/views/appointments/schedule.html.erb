@@ -3,9 +3,9 @@
   <br />
   <% remote_form_for(@appointment, :url => schedule_appointments_path, :method => :post) do |f| %>
     What: 
-    <%= select_tag 'appointment[job_id]', options_for_select(Job.work.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>&nbsp;
+    <%= select_tag 'appointment[job_id]', options_for_select(@jobs.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>&nbsp;
     With:
-    <%= select_tag 'appointment[resource_id]', options_for_select(Resource.all.collect{ |r| [r.name, r.id]}, @appointment.resource_id) %>&nbsp;
+    <%= select_tag 'appointment[resource_id]', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @appointment.resource_id) %>&nbsp;
     When:
     <%= f.text_field :when_range %>
     <%= f.hidden_field :customer_id, :value => 0 %>

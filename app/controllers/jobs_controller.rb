@@ -1,4 +1,6 @@
 class JobsController < ApplicationController
+  layout 'admin'
+  
   # GET /jobs
   # GET /jobs.xml
   def index

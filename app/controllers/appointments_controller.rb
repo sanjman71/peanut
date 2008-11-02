@@ -1,10 +1,12 @@
 class AppointmentsController < ApplicationController
   before_filter :init_current_company
+  layout 'default'
   
   # GET /appointments
   # GET /appointments.xml
   def index
-    @appointments = Appointment.find(:all)
+    # find all appointments scoped by current company
+    @appointments = Appointment.company(@current_company.id)
     
     # group appointments by day
     @appt_days   = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
@@ -108,7 +110,9 @@ class AppointmentsController < ApplicationController
       @appointment  = Appointment.new(params[:appointment])
       @partial      = :customer
     else
-      @appointment = Appointment.new
+      @appointment  = Appointment.new
+      @jobs         = Job.work
+      @resources    = Resource.company(@current_company.id)
     end
     
     respond_to do |format|

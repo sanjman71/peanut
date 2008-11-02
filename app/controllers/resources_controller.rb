@@ -1,10 +1,12 @@
 class ResourcesController < ApplicationController
   before_filter :init_current_company
+  layout 'default'
   
   # GET /resources
   # GET /resources.xml
   def index
-    @resources = Resource.find(:all)
+    # find all resources scoped by current company
+    @resources = Resource.company(@current_company.id)
 
     respond_to do |format|
       format.html # index.html.erb

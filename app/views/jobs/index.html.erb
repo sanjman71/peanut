@@ -4,12 +4,14 @@
   <tr>
     <th>Name</th>
     <th>Duration</th>
+    <th>Schedule As</th>
   </tr>
 
 <% for job in @jobs %>
   <tr>
     <td><%=h job.name %></td>
     <td><%=h job.duration %></td>
+    <td><%=h job.schedule_as %></td>
     <td><%= link_to 'Show', job %></td>
     <td><%= link_to 'Edit', edit_job_path(job) %></td>
     <td><%= link_to 'Destroy', job, :confirm => 'Are you sure?', :method => :delete %></td>

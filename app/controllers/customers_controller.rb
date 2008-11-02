@@ -1,5 +1,5 @@
 class CustomersController < ApplicationController
-  before_filter :init_current_company
+  layout 'admin'
   
   # GET /customers
   # GET /customers.xml
