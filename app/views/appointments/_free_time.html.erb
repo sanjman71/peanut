@@ -1,5 +1,3 @@
-We found <%= pluralize(free_appointments.size, 'available appointment') %>.
-
 <% unless free_appointments.blank? %>
   <% # show appointments by day %>
   <p />
@@ -8,9 +6,8 @@ We found <%= pluralize(free_appointments.size, 'available appointment') %>.
     <table>
       <% appointments.each do |appointment| %>
         <tr>
-          @
-          <%= appointment.start_at.to_s(:appt_time) %>
-          <%= link_to_remote "Select", :url => schedule_appointments_path(:subdomain => @current_company.subdomain, :appointment => appointment.attributes), :method => :put %>
+          <% appointment.customer_id = nil %>
+          <%= link_to appointment.start_at.to_s(:appt_time), confirm_appointments_path(:subdomain => @subdomain, :appointment => appointment.attributes), {:method => :post} %>
         </tr>
       <% end # appointments %>
     </table>

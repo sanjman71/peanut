@@ -5,7 +5,7 @@ class ResourcesController < ApplicationController
   # GET /resources
   # GET /resources.xml
   def index
-    # find all resources scoped by current company
+    # find all resources for the current company
     @resources = Resource.company(@current_company.id)
 
     respond_to do |format|

@@ -21,6 +21,7 @@ class ApplicationController < ActionController::Base
       flash[:notice] = "Invalid company"
       redirect_to root_path
     end
+    @subdomain = @current_company.subdomain
   end
   
 end

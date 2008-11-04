@@ -1,9 +1,5 @@
-We have you scheduled for a <%= appointment.job.name %> with <%= appointment.resource.name %> on <%= appointment.start_at.to_s(:appt_date_time) %>
-<p/>
-Before we finalize your appointment, we need some information about you
-
 <% form_for(appointment) do |f| %>
-  <% # fill in appointment attributes %>
+  <% # fill in already selected appointment attributes %>
   <%= f.hidden_field :company_id, :value => @current_company.id %>
   <%= f.hidden_field :job_id, :value => appointment.job_id %>
   <%= f.hidden_field :resource_id, :value => appointment.resource_id %>
@@ -28,6 +24,6 @@ Before we finalize your appointment, we need some information about you
   <% end %>
   
   <p>
-    <%= f.submit "Create" %>
+    <%= f.submit "Schedule" %>
   </p>
 <% end %>

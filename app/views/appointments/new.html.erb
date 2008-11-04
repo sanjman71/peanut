@@ -1,43 +1,32 @@
-<h1>New appointment</h1>
-
-<% form_for(@appointment) do |f| %>
-  <%= f.error_messages %>
-  <%= f.hidden_field :company_id, :value => @current_company.id %>
-  
-  <p>
-    <%= f.label :job_id %><br />
-    <%= select_tag 'appointment[job_id]', options_for_select(Job.work.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>
-  </p>
-  <p>
-    <%= f.label :resource_id %><br />
-    <%= select_tag 'appointment[resource_id]', options_for_select(Resource.all.collect{ |r| [r.name, r.id]}, @appointment.resource_id) %>
-  </p>
-  <p>
-    <%= f.label :start_at %><br />
-    <%= f.text_field :start_at_string %>
-  </p>
-  
-  <% # show customer fields %>
-  <h2>Customer</h2>
-  <% fields_for "appointment[customer_attributes]", @appointment.customer do |customer_form| %>
-    <%= customer_form.error_messages %>
-    <p>
-      <%= customer_form.label :name %><br />
-      <%= customer_form.text_field :name %>
-    </p>
-    <p>
-      <%= customer_form.label :email %><br />
-      <%= customer_form.text_field :email %>
-    </p>
-    <p>
-      <%= customer_form.label :phone %><br />
-      <%= customer_form.text_field :phone %>
-    </p>
+<div class='page_header' id='schedule'>
+  <h1 class='index'>Schedule an appointment</h1>
+  <p/>
+  <% remote_form_for(@appointment, :url => new_appointment_path, :method => :post) do |f| %>
+    What:
+    <span id='what' style='padding: 2px;'>
+      <%= select_tag 'appointment[job_id]', options_for_select(@jobs.collect{ |j| [j.name, j.id]}, @appointment.job_id) %>&nbsp;
+    </span>
+    With:
+    <span id='with' style='padding: 2px;'>
+      <%= select_tag 'appointment[resource_id]', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @appointment.resource_id) %>&nbsp;
+    </span>
+    When:
+    <span id='when' style='padding: 7px;'>
+      <%= f.text_field :when, :value => @appointment.when %>
+    </span>
+    <%= f.hidden_field :customer_id, :value => 0 %>
+    <%= f.hidden_field :company_id, :value => @current_company.id %>
+    <span id='search' style='padding: 5px;'>
+      <%= f.submit "Search" %>
+    </span>
+    or <%= link_to_remote "suggest some times", :url => new_appointment_path(:subdomain => @subdomain, :suggest => 1), :submit => 'new_appointment', :html => {:method => :post} %> 
   <% end %>
-  
-  <p>
-    <%= f.submit "Create" %>
-  </p>
-<% end %>
+</div>
 
-<%= link_to 'Back', appointments_path %>
+<p/>
+
+<div id='free_time_message'>
+</div>
+
+<div id='free_time'>
+</div>

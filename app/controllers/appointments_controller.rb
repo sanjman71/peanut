@@ -5,11 +5,14 @@ class AppointmentsController < ApplicationController
   # GET /appointments
   # GET /appointments.xml
   def index
-    # find all appointments scoped by current company
-    @appointments = Appointment.company(@current_company.id)
+    # scope appointments by 'when'
+    @when         = params[:when] ? params[:when ].to_sym : :upcoming
+    
+    # find appointments
+    @appointments = Appointment.company(@current_company.id).send(@when)
     
     # group appointments by day
-    @appt_days   = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    @appt_days    = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
     
     respond_to do |format|
       format.html # index.html.erb
@@ -31,13 +34,34 @@ class AppointmentsController < ApplicationController
   # GET /appointments/new
   # GET /appointments/new.xml
   def new
-    # build new appointment and customer objects
-    @appointment = Appointment.new
-    @appointment.customer = Customer.new
+    if request.post?
+      @appointment  = Appointment.new(params[:appointment])
+      @suggest      = params[:suggest].to_i == 1
+      
+      begin
+        if @suggest
+          # suggest a time range
+          @appointment.when = "next week"
+        end
+        
+        # find free appointments for a job and resource within a time range
+        @free_appointments  = @appointment.find_free_time(:limit => 3, :job => @appointment.job)
+        @free_appt_days     = @free_appointments.group_by { |appt| appt.start_at.beginning_of_day }
+      rescue Exception => e
+        @free_appointments  = []
+        logger.debug("*** exception: #{e}, #{@appointment.errors.full_messages}")
+      end
+    elsif request.get?
+      # show form to search for free time
+      @appointment  = Appointment.new
+      @jobs         = Job.work
+      @resources    = Resource.company(@current_company.id)
+    end
     
     respond_to do |format|
-      format.html # new.html.erb
+      format.html 
       format.xml  { render :xml => @appointment }
+      format.js   
     end
   end
 
@@ -57,7 +81,7 @@ class AppointmentsController < ApplicationController
         format.html { redirect_to(@appointment) }
         format.xml  { render :xml => @appointment, :status => :created, :location => @appointment }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => "confirm" }
         format.xml  { render :xml => @appointment.errors, :status => :unprocessable_entity }
       end
     end
@@ -92,33 +116,25 @@ class AppointmentsController < ApplicationController
     end
   end
   
-  # GET /appointments/schedule
-  def schedule
-    if request.post?
-      begin
-        # find free appointments for a job and resource within a time range
-        @appointment        = Appointment.new(params[:appointment])
-        @partial            = :free
-        @free_appointments  = @appointment.find_free_time(:limit => 3, :job_id => @appointment.job.id)
-        @free_appt_days     = @free_appointments.group_by { |appt| appt.start_at.beginning_of_day }
-      rescue Exception => e
-        @free_appointments  = []
-        logger.debug("*** exception: #{e}")
-      end
-    elsif request.put?
-      # schedule the appointment
-      @appointment  = Appointment.new(params[:appointment])
-      @partial      = :customer
-    else
-      @appointment  = Appointment.new
-      @jobs         = Job.work
-      @resources    = Resource.company(@current_company.id)
+  # POST /appointments/confirm
+  # POST /appointments/confirm.xml
+  def confirm
+    @appointment = Appointment.new(params[:appointment])
+
+    if @appointment.errors.size > 0
+      logger.debug("*** we have errors")
     end
     
     respond_to do |format|
-      format.html 
-      format.xml  { render :xml => @appointment }
-      format.js   
+      if @appointment.save
+        flash[:notice] = 'Appointment was successfully created.'
+        format.html { redirect_to(@appointment) }
+        format.xml  { render :xml => @appointment, :status => :created, :location => @appointment }
+      else
+        format.html { render :action => "confirm" }
+        format.xml  { render :xml => @appointment.errors, :status => :unprocessable_entity }
+      end
     end
   end
+  
 end

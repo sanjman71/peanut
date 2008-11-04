@@ -16,14 +16,20 @@ class Appointment < ActiveRecord::Base
   named_scope :resource,    lambda { |id| { :conditions => {:resource_id => id} }}
   named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
+
+  # find appointments based on a named time range
+  named_scope :upcoming,    { :conditions => ["start_at >= ?", Time.now.beginning_of_day] }
+  named_scope :past,        { :conditions => ["start_at <= ?", Time.now.beginning_of_day] }
   
   # find appointments spanning a time range
   named_scope :span,        lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
                                                                            (start_at >= ? AND end_at <= ?)", 
                                                                            start_at, start_at, end_at, end_at, start_at, end_at] }}
 
-  # find free appointments
+  # find free, busy, work appointments
   named_scope :free,        { :conditions => {:mark_as => Job::FREE} }
+  named_scope :busy,        { :conditions => {:mark_as => Job::BUSY} }
+  named_scope :work,        { :conditions => {:mark_as => Job::WORK} }
     
   def after_initialize
     if self.start_at and self.job_id and self.end_at.blank?
@@ -66,16 +72,27 @@ class Appointment < ActiveRecord::Base
     self.end_at = Chronic.parse(s)
   end
   
-  def when_range=(s)
-    @when_range = Chronic.parse(s, :guess => false)
-    if @when_range
-      self.start_at = @when_range.first
-      self.end_at   = @when_range.last
-    end 
+  def when=(s)
+    if s.blank?
+      @when = nil
+      errors.add_to_base("When string is empty")
+    else
+      # parse when string
+      range = Chronic.parse(s, :guess => false)
+    
+      if range
+        @when         = s
+        self.start_at = range.first
+        self.end_at   = range.last
+      else
+        @when = nil
+        errors.add_to_base("When string is invalid")
+      end
+    end
   end
   
-  def when_range
-    @when_range
+  def when
+    @when
   end
   # END: time virtual attributes
   
@@ -88,13 +105,13 @@ class Appointment < ActiveRecord::Base
   # find free time slots based on appointment [start_at, end_at]
   # valid options:
   #  :limit => limit the number of free time slots returned
-  #  :job_id => return free time slots using the specified job id
+  #  :job => initialize free time slots with job attributes
   def find_free_time(options={})
     raise AppointmentInvalid if !self.valid?
     
     # parse options
     limit   = options[:limit].to_i if options[:limit]
-    job_id  = options[:job_id].to_i if options[:job_id]
+    job     = options[:job] if options[:job]
     
     # find free timeslots with duration >= job's duration
     duration  = self.job.duration
@@ -106,9 +123,12 @@ class Appointment < ActiveRecord::Base
       timeslot.start_at = self.start_at if timeslot.start_at < self.start_at
       timeslot.end_at   = self.end_at if timeslot.end_at > end_at
       timeslot.duration = (timeslot.end_at.to_i - timeslot.start_at.to_i) / 60
-      
-      # apply job id
-      timeslot.job_id   = job_id if job_id
+
+      # apply job
+      if job
+        timeslot.job_id   = job.id
+        timeslot.mark_as  = job.schedule_as
+      end
       
       # break timeslot into chunks based on job duration
       chunks = timeslot.duration / duration
@@ -209,7 +229,7 @@ class Appointment < ActiveRecord::Base
     job  = Job.free.first
     
     # create appointment - use 0 for customer_id
-    appt = Appointment.create(:start_at => start_at, :end_at => end_at, :mark_as => Job::FREE, :job => job, :company => company,
+    appt = Appointment.create(:start_at => start_at, :end_at => end_at, :mark_as => job.schedule_as, :job => job, :company => company,
                               :resource => resource, :customer_id => 0)
   end
 end

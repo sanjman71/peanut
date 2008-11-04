@@ -18,8 +18,8 @@
   <div id='tabs'>
     <ul>
       <li style='float: right;'><%= link_to 'Admin Console', dashboard_path(:subdomain => nil) %></li>
-      <li class='with_space'><%= link_to 'Appointments', appointments_path %></li>
-      <li class='with_space'><%= link_to 'Schedule', schedule_appointments_path %></li>
+      <li class='with_space'><%= link_to 'Appointments', appointments_path, :class => 'current' %></li>
+      <li class='with_space'><%= link_to 'Schedule', new_appointment_path %></li>
       <li class='with_space'><%= link_to 'Resources', resources_path %></li>
     </ul>
   </div>

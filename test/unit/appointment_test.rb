@@ -109,6 +109,13 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
+  def test_should_validate_when_attribute
+    appt = Appointment.new(:when => '')
+    assert !appt.valid?
+    
+    assert_equal "", appt.errors.full_messages
+  end
+  
   def test_should_build_customer_association
     # should create a new customer when building the new appointment
     assert_difference('Customer.count', 1) do
@@ -276,7 +283,7 @@ class AppointmentTest < ActiveSupport::TestCase
     lisa      = resources(:lisa)
     
     start_at  = Time.now.beginning_of_day
-    end_at    = start_at + 24.hours
+    end_at    = start_at + 1.day
     appt      = Appointment.create_free_time(company1, johnny, start_at, end_at)
     assert appt.valid?
     assert_equal 24 * 60, appt.duration
@@ -307,22 +314,27 @@ class AppointmentTest < ActiveSupport::TestCase
     # find all free time slots within the time range
     free_time_collection = range.find_free_time
     
-    # should find 4 slots of 30 minutes each, with start times incremented by 30 minutes
+    # should find 4 slots of 30 minutes each, with start times incremented by 30 minutes, and each timeslot should be marked as 'free'
     assert_equal 4, free_time_collection.size
     assert_equal 30, free_time_collection[0].duration
     assert_equal Chronic.parse("today 10:00 am"), free_time_collection[0].start_at
+    assert_equal 'free', free_time_collection[0].mark_as
     assert_equal 30, free_time_collection[1].duration
     assert_equal Chronic.parse("today 10:30 am"), free_time_collection[1].start_at
+    assert_equal 'free', free_time_collection[1].mark_as
     assert_equal 30, free_time_collection[2].duration
     assert_equal Chronic.parse("today 11 am"), free_time_collection[2].start_at
+    assert_equal 'free', free_time_collection[2].mark_as
     assert_equal 30, free_time_collection[3].duration
     assert_equal Chronic.parse("today 11:30 am"), free_time_collection[3].start_at
+    assert_equal 'free', free_time_collection[3].mark_as
     
-    # should find 1 item in free time collection
+    # should find 1 item in free time collection, each timeslot should be marked as 'free'
     free_time_collection = range.find_free_time(:limit => 1)
     assert_equal 1, free_time_collection.size
     assert_equal 30, free_time_collection[0].duration
     assert_equal Chronic.parse("today 10:00 am"), free_time_collection[0].start_at
+    assert_equal 'free', free_time_collection[0].mark_as
 
     # create appointment object, with range from 7 am to 5 pm
     job       = jobs(:haircut)
@@ -331,19 +343,21 @@ class AppointmentTest < ActiveSupport::TestCase
     # find all free time slots within the time range
     free_time_collection = range.find_free_time
 
-    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes
+    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes, each timeslot should be marked as 'free'
     assert_equal 8, free_time_collection.size
     assert_equal 30, free_time_collection[0].duration
     assert_equal Chronic.parse("today 8:00 am"), free_time_collection[0].start_at
+    assert_equal 'free', free_time_collection[0].mark_as
 
     # find all free time slots within the range, with the job_id set
-    free_time_collection = range.find_free_time(:job_id => job.id)
+    free_time_collection = range.find_free_time(:job => job)
 
-    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes
+    # should find 8 slots of 30 minutes each, with start times incremented by 30 minutes, each timeslot should be marked as 'work'
     assert_equal 8, free_time_collection.size
     assert_equal 30, free_time_collection[0].duration
     assert_equal Chronic.parse("today 8:00 am"), free_time_collection[0].start_at
     assert_equal job, free_time_collection[0].job
+    assert_equal 'work', free_time_collection[0].mark_as
     
     # create appointment object, with range from noon to 5 pm
     job       = jobs(:haircut)

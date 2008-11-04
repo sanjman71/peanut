@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
-  map.resources :appointments, :collection => {:schedule => :any}
+  map.resources :appointments, :collection => {:confirm => :post}
   map.resources :resources
   map.resources :jobs
   map.resources :customers

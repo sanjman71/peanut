@@ -1,4 +1,11 @@
-<h1>All Appointments</h1>
+<div class='page_header short_width'>
+  <span class='other_indexes'>
+    <%= link_to "Upcoming", appointments_path(:subdomain => @subdomain), :class => add_class_if(@when == :upcoming, 'current') %> |
+    <%= link_to "All", appointments_path(:subdomain => @subdomain, :when => 'all'), :class => add_class_if(@when == :all, 'current') %> |
+    <%= link_to "Past", appointments_path(:subdomain => @subdomain, :when => 'past'), :class => add_class_if(@when == :past, 'current')%>
+  </span>
+  <h1 class='index'>Appointments</h1>
+</div>
 
 <% @appt_days.each do |day, appointments| %>
   <h3><%= day.to_s(:appt_day) %></h3>
@@ -6,6 +13,7 @@
     <tr>
       <th>Job</th>
       <th>Resource</th>
+      <th>Mark As</th>
       <th>Start at</th>
       <th>End at</th>
     </tr>
@@ -13,6 +21,7 @@
     <tr>
       <td><%=h appointment.job.name %></td>
       <td><%=h appointment.resource.name %></td>
+      <td><%=h appointment.mark_as %></td>
       <td><%=h appointment.start_at.to_s(:appt_time) %></td>
       <td><%=h appointment.end_at.to_s(:appt_time) %></td>
       <td><%= link_to 'Show', appointment %></td>
@@ -22,7 +31,3 @@
   <% end # each appointment %>
   </table>
 <% end # appointment days %>
-
-<br />
-
-<%= link_to 'New appointment', new_appointment_path %>

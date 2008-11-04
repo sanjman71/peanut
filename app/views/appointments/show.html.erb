@@ -10,12 +10,12 @@
 
 <p>
   <b>Start at:</b>
-  <%=h @appointment.start_at %>
+  <%=h @appointment.start_at.to_s(:appt_date_time) %>
 </p>
 
 <p>
   <b>End at:</b>
-  <%=h @appointment.end_at %>
+  <%=h @appointment.end_at.to_s(:appt_date_time) %>
 </p>
 
 

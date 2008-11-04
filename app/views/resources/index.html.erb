@@ -1,14 +1,14 @@
-<h1>Listing resources</h1>
+<div class='page_header short_width'>
+  <h1 class='index'>Resources</h1>
+</div>
 
 <table>
   <tr>
-    <th>Company</th>
     <th>Name</th>
   </tr>
 
 <% for resource in @resources %>
   <tr>
-    <td><%=h resource.company_id %></td>
     <td><%=h resource.name %></td>
     <td><%= link_to 'Show', resource %></td>
     <td><%= link_to 'Edit', edit_resource_path(resource) %></td>
