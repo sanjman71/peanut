@@ -1,0 +1,25 @@
+/* calendar styles */
+
+h1.free_time_header                               { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 10px; margin: 0; 
+                                                    padding: 3px; text-align: left; }
+                                                    
+h2.subheader                                      { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; margin: 15px 0 5px; 
+                                                    padding: 0 0 2px;}
+table.layout                                      { border-collapse: collapse; clear: left; width: 100%; }
+
+table.calendar                                    { background: #E1E0E0 none repeat scroll 0 0; margin-bottom: 15px; width: 100%; text-align: left;}
+
+table.calendar th                                 { background: transparent none repeat scroll 0 0; color: #666666; font-size: 10px; padding: 3px;
+                                                    text-align: left;}
+                                                    
+table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 9px; padding: 3px;
+                                                    vertical-align: top;}
+                                            
+table.calendar td.free                            { background: #FFFFFF none repeat scroll 0 0; color: #333333; border: 2px solid #AA5555; 
+                                                    font-weight: bold; }
+                                                    
+table.calendar ul                                 { margin: 3px 0 0; padding: 0; }
+
+table.calendar li                                 { font-size: 10px; font-weight: normal; line-height: 11px; list-style-type: none; 
+                                                    margin: 3px 0 0 0; padding 0;}
+

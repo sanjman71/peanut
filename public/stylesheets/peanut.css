@@ -1,18 +1,16 @@
-body {
-  font-family: "Lucida Grande",verdana,arial,helvetica,sans-serif;
-}
+body                                              { font-family: "Lucida Grande",verdana,arial,helvetica,sans-serif; }
 
-/* General Link Styles */
+/* link styles */
 
 a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0;}
 
 a:hover                                           { background-color: #0033BB; color: #FFFFFF; text-decoration: none; }
 
-/* Error Styles */
+/* error styles */
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
 
-/* Header, Tab Styles */
+/* header, tab styles */
 
 div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 10px 23px 0px 30px; 
                                                     position: relative; text-align: left; }
@@ -32,14 +30,16 @@ div#tabs a                                        { text-decoration: none; }
 
 div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; }
 
-/* Wrapper, Body */
+/* body styles */
 
 div.wrapper                                       { margin: 0 auto; min-width: 800px; padding: 5px 23px 0px 30px; }
 
 div.page_header                                   { background: #EDF3FE; margin: 0px; padding: 13px 30px 13px 24px; }
 
-div.short_width                                   { width: 500px; }
+div.half_width                                    { width: 500px; }
 
 div.page_header h1.index                          { color: #000000; font-size: 14px; margin: 0; paddin: 0;}
 
 div.page_header span.other_indexes                { float: right; font-size: 11px; text-align: right; color: #CCCCCC; }
+
+div.page_indent                                   { padding: 20px 60px 20px 20px;}

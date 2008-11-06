@@ -8,19 +8,20 @@
   
   <% # show customer fields %>
   <% fields_for "appointment[customer_attributes]", appointment.customer do |customer_form| %>
-    <% # customer_form.error_messages %>
-    <p>
-      <%= customer_form.label :name %><br />
-      <%= customer_form.text_field :name %>
-    </p>
-    <p>
-      <%= customer_form.label :email %><br />
-      <%= customer_form.text_field :email %>
-    </p>
-    <p>
-      <%= customer_form.label :phone %><br />
-      <%= customer_form.text_field :phone %>
-    </p>
+    <table>
+      <tr>
+        <td><%= customer_form.label :name %></td>
+        <td><%= customer_form.text_field :name %></td>
+      </tr>
+      <tr>
+        <td><%= customer_form.label :email %></td>
+        <td><%= customer_form.text_field :email %></td>
+      </tr>
+      <tr>
+        <td><%= customer_form.label :phone %></td>
+        <td><%= customer_form.text_field :phone %></td>
+      </tr>
+    </table>
   <% end %>
   
   <p>

@@ -10,7 +10,7 @@ class CreateCompanies < ActiveRecord::Migration
     create_table :jobs do |t|
       t.string :name
       t.integer :duration
-      t.string :schedule_as
+      t.string :mark_as
       
       t.timestamps
     end

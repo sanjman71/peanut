@@ -1,0 +1,15 @@
+<% unless free_timeslots.blank? %>
+  <% # show timeslots by day %>
+  <p />
+  <% free_by_days.each do |day, timeslots| %>
+    <h3><%= day.to_s(:appt_day) %></h3>  
+    <table>
+      <% timeslots.each do |timeslot| %>
+        <tr>
+          <% #appointment.customer_id = nil %>
+          <%= link_to timeslot.start_at.to_s(:appt_time), confirm_appointments_path(:subdomain => @subdomain), {:method => :post} %>
+        </tr>
+      <% end # appointments %>
+    </table>
+  <% end # free appointments %>
+<% end %>

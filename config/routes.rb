@@ -1,10 +1,18 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
   map.resources :appointments, :collection => {:confirm => :post}
-  map.resources :resources
+  map.resources :free_time
+  
+  map.resources :resources do |resource|
+    # nested appointments routes
+    resource.resources :appointments
+    # nested free time routes
+    resource.resources :free_time
+  end
+  
   map.resources :jobs
   map.resources :customers
-
+  
   # map the company root to the appointments controller
   map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }
 

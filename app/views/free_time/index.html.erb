@@ -1,0 +1,45 @@
+<% content_for :stylesheets do %>
+  <%= stylesheet_link_tag 'calendar' %>
+<% end %>
+
+<div class='page_header'>
+  <span class='other_indexes'>
+  </span>
+  <h1 class='index'>
+    Free Time for
+    <%= select_tag 'resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :onchange => "window.location = '/resources/' + $F(this) + '/free_time'" %>
+  </h1>
+</div>
+
+<div class='page_indent'>
+  <div class='free_time_block'>
+    <h1 class='free_time_header'>Upcoming</h1>
+    <h2 class='subheader'>Next <%= pluralize(@total_days, 'day') %></h2>
+  
+    <table class='calendar'>
+      <tbody>
+        <% # only need first week for calendar days %>
+        <% week = Array(0..@total_days-1).in_groups_of(7).first.compact %>
+        <tr>
+          <% week.each do |day_i| %>
+            <th><%= (@start_day + day_i.days).strftime("%a") %></th>
+          <% end %>
+        </tr>
+      
+        <% Array(0..@total_days-1).in_groups_of(7).each do |week| %>
+        <tr>
+          <% week.compact.each do |day_i| %>
+            <% day = @start_day + day_i.days %>
+            <% # check if day has any free time %>
+            <% free = @free_appointments.select { |appt| appt.start_at.beginning_of_day == day } %>
+            <% klass = free.blank? ? '' : 'free' %>
+            <td class=<%= klass %>>
+              <%= day == @today ? 'Today' : day.strftime("%b %d") %>
+            </td>
+          <% end %>
+        </tr>
+        <% end # in_groups_of %>
+      </tbody>
+    </table>
+  </div>
+</div>

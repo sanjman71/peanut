@@ -4,15 +4,35 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments
   # GET /appointments.xml
+  # GET /resources/1/appointments
+  # GET /resources/1//appointments.xml
   def index
-    # scope appointments by 'when'
-    @when         = params[:when] ? params[:when ].to_sym : :upcoming
+    if params[:resource_id] == "0"
+      # /resources/0/appointments is canonicalized to /appointments
+      # preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => @subdomain, :resource_id => nil)))
+    end
     
-    # find appointments
-    @appointments = Appointment.company(@current_company.id).send(@when)
+    # find resource if specified
+    @resource = Resource.find(params[:resource_id]) if params[:resource_id]
+    
+    # scope appointments by 'when'
+    @when     = params[:when] ? params[:when ].to_sym : :upcoming
+    
+    if @resource
+      # find resource appointments 
+      @appointments = Appointment.company(@current_company.id).resource(@resource.id).send(@when)
+    elsif
+      # find all appointments
+      @appointments = Appointment.company(@current_company.id).send(@when)
+      @resource     = Resource.anyone
+    end
     
     # group appointments by day
-    @appt_days    = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    @appt_days = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    
+    # find resources collection
+    @resources = Resource.all + Array(Resource.anyone)
     
     respond_to do |format|
       format.html # index.html.erb
@@ -35,21 +55,21 @@ class AppointmentsController < ApplicationController
   # GET /appointments/new.xml
   def new
     if request.post?
-      @appointment  = Appointment.new(params[:appointment])
+      @appt_request = AppointmentRequest.new(params[:appointment])
       @suggest      = params[:suggest].to_i == 1
       
       begin
         if @suggest
           # suggest a time range
-          @appointment.when = "next week"
+          @appt_request.when = "this week"
         end
         
         # find free appointments for a job and resource within a time range
-        @free_appointments  = @appointment.find_free_time(:limit => 3, :job => @appointment.job)
-        @free_appt_days     = @free_appointments.group_by { |appt| appt.start_at.beginning_of_day }
+        @free_timeslots   = @appt_request.find_free_timeslots(:limit => 3)
+        @free_by_days     = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
       rescue Exception => e
-        @free_appointments  = []
-        logger.debug("*** exception: #{e}, #{@appointment.errors.full_messages}")
+        @free_timeslots  = []
+        logger.debug("*** exception: #{e}, #{@appt_request.errors.full_messages}")
       end
     elsif request.get?
       # show form to search for free time

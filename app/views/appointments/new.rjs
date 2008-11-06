@@ -1,16 +1,16 @@
-if @appointment.errors.size > 0 
+if @appt_request.errors.size > 0 
   # there were errors finding free time
 
   # clear fields
   page[:free_time_message].replace_html ''
   page[:free_time].replace_html ''
   
-  if @appointment.errors.full_messages.any? { |s| s.match(/When/) }
+  if @appt_request.errors.full_messages.any? { |s| s.match(/When/) }
     # mark when field with a visual error
     page[:when].addClassName('field_error')
   else
     # whoops, we need to fix this
-    page[:free_time_message].replace_html "Whoops ... #{@appointment.errors.full_messages.join(",")}"
+    page[:free_time_message].replace_html "Whoops ... #{@appt_request.errors.full_messages.join(",")}"
 
     # mark when field with a visual error
     page[:when].addClassName('field_error')
@@ -22,26 +22,26 @@ else
 
   if @suggest
     # fill in when field with suggestion value
-    page[:appointment_when].value = @appointment.when.to_s
+    page[:appointment_when].value = @appt_request.when.to_s
   
-    if @free_appointments.size == 0
+    if @free_timeslots.size == 0
       # no free time, bad suggestion
       page[:free_time_message].replace_html "We could not find any available appointments."
     else
       # found free time based on suggestion
-      page[:free_time_message].replace_html "Here are #{pluralize(@free_appointments.size, 'appointment suggestion')}."
+      page[:free_time_message].replace_html "Here are #{pluralize(@free_timeslots.size, 'appointment suggestion')}."
     end
   else
-    if @free_appointments.size == 0
+    if @free_timeslots.size == 0
       # no free time
       page[:free_time_message].replace_html "We found no available appointments."
     else
       # found free time based on user query
-      page[:free_time_message].replace_html "Here are #{pluralize(@free_appointments.size, 'available appointment')}."
+      page[:free_time_message].replace_html "Here are #{pluralize(@free_timeslots.size, 'available appointment')}."
     end
   end
 
   # show free appointments
-  page[:free_time].replace_html :partial => 'free_time', 
-                                :locals => {:free_appointments => @free_appointments, :free_appointment_days => @free_appt_days}
+  page[:free_time].replace_html :partial => 'free_timeslots', 
+                                :locals => {:free_timeslots => @free_timeslots, :free_by_days => @free_by_days}
 end

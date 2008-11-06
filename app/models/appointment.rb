@@ -18,8 +18,8 @@ class Appointment < ActiveRecord::Base
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
   # find appointments based on a named time range
-  named_scope :upcoming,    { :conditions => ["start_at >= ?", Time.now.beginning_of_day] }
-  named_scope :past,        { :conditions => ["start_at <= ?", Time.now.beginning_of_day] }
+  named_scope :upcoming,    { :conditions => ["start_at >= ?", Time.now] }
+  named_scope :past,        { :conditions => ["start_at <= ?", Time.now] }
   
   # find appointments spanning a time range
   named_scope :span,        lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
@@ -41,14 +41,20 @@ class Appointment < ActiveRecord::Base
     self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     
     if self.job
-      # initialize mark_as field with job.schedule_as
-      self.mark_as = self.job.schedule_as
+      # initialize mark_as field with job.mark_as
+      self.mark_as = self.job.mark_as
     end
   end
   
   def validate
+    if @when == :error
+      errors.add_to_base("When string is invalid")
+    elsif @when == :blank
+      errors.add_to_base("When string is empty")
+    end
+    
     if self.start_at and self.end_at
-      # check that start_at happens before end_at
+      # start_at must be before end_at
       if !(start_at.to_i < end_at.to_i)
         errors.add_to_base("Appointment start time must be earlier than the apointment end time")
       end
@@ -74,8 +80,7 @@ class Appointment < ActiveRecord::Base
   
   def when=(s)
     if s.blank?
-      @when = nil
-      errors.add_to_base("When string is empty")
+      @when = :blank
     else
       # parse when string
       range = Chronic.parse(s, :guess => false)
@@ -85,8 +90,7 @@ class Appointment < ActiveRecord::Base
         self.start_at = range.first
         self.end_at   = range.last
       else
-        @when = nil
-        errors.add_to_base("When string is invalid")
+        @when = :error
       end
     end
   end
@@ -101,61 +105,12 @@ class Appointment < ActiveRecord::Base
   def customer_attributes=(customer_attributes)
     self.customer = Customer.find_by_name(customer_attributes["name"]) || self.create_customer(customer_attributes)
   end
-  
-  # find free time slots based on appointment [start_at, end_at]
-  # valid options:
-  #  :limit => limit the number of free time slots returned
-  #  :job => initialize free time slots with job attributes
-  def find_free_time(options={})
-    raise AppointmentInvalid if !self.valid?
     
-    # parse options
-    limit   = options[:limit].to_i if options[:limit]
-    job     = options[:job] if options[:job]
-    
-    # find free timeslots with duration >= job's duration
-    duration  = self.job.duration
-    timeslots = Appointment.resource(resource_id).span(start_at, end_at).duration_gt(duration).free
-    
-    # iterate through all available timeslots
-    timeslots = timeslots.inject([]) do |array, timeslot|
-      # resize timeslot if its larger than the requested free timeslot
-      timeslot.start_at = self.start_at if timeslot.start_at < self.start_at
-      timeslot.end_at   = self.end_at if timeslot.end_at > end_at
-      timeslot.duration = (timeslot.end_at.to_i - timeslot.start_at.to_i) / 60
-
-      # apply job
-      if job
-        timeslot.job_id   = job.id
-        timeslot.mark_as  = job.schedule_as
-      end
-      
-      # break timeslot into chunks based on job duration
-      chunks = timeslot.duration / duration
-      
-      # apply limit based on current array size
-      chunks = (limit - array.size) if limit
-      
-      0.upto(chunks-1) do |i|
-        # clone timeslot, then increment start_at based on chunk index
-        timeslot_i = timeslot.clone
-        timeslot_i.start_at = timeslot.start_at + (i * duration).minutes
-        timeslot_i.end_at   = timeslot_i.start_at + duration.minutes
-        timeslot_i.duration = duration
-        array << timeslot_i
-      end
-      
-      array
-    end
-    
-    timeslots
-  end
-  
-  # split a free appointment into multiple appointments with the specified job and time range
+  # split a free appointment into multiple appointments using the specified job and time
   def split_free_time(job, job_start_at, job_end_at, options={})
     # validate job argument
     raise ArgumentError if job.blank? or !job.is_a?(Job)
-    raise ArgumentError if self.job.schedule_as != Job::FREE
+    raise ArgumentError if self.job.mark_as != Job::FREE
 
     # check that the current appointment is free
     raise AppointmentNotFree if self.mark_as != Job::FREE
@@ -175,7 +130,7 @@ class Appointment < ActiveRecord::Base
     new_appt.job      = job
     new_appt.start_at = job_start_at
     new_appt.end_at   = job_end_at
-    new_appt.mark_as  = job.schedule_as
+    new_appt.mark_as  = job.mark_as
     
     # build new start, end appointments
     unless job_start_at == self.start_at
@@ -215,7 +170,7 @@ class Appointment < ActiveRecord::Base
     
     appointments
   end
-  
+    
   # create free time in the specified timeslot
   def self.create_free_time(company, resource, start_at, end_at)
     # make sure the timeslot is empty
@@ -229,7 +184,7 @@ class Appointment < ActiveRecord::Base
     job  = Job.free.first
     
     # create appointment - use 0 for customer_id
-    appt = Appointment.create(:start_at => start_at, :end_at => end_at, :mark_as => job.schedule_as, :job => job, :company => company,
+    appt = Appointment.create(:start_at => start_at, :end_at => end_at, :mark_as => job.mark_as, :job => job, :company => company,
                               :resource => resource, :customer_id => 0)
   end
 end

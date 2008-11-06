@@ -13,9 +13,9 @@ namespace :db do
       Company.create(:name => "Company 3")
     
       # create basic jobs
-      Job.create(:name => Job::AVAILABLE, :duration => 0, :schedule_as => "free")
-      Job.create(:name => Job::UNAVAILABLE, :duration => 0, :schedule_as => "busy")
-      Job.create(:name => "Haircut", :duration => 30, :schedule_as => "busy")
+      Job.create(:name => Job::AVAILABLE, :duration => 0, :mark_as => "free")
+      Job.create(:name => Job::UNAVAILABLE, :duration => 0, :mark_as => "busy")
+      Job.create(:name => "Haircut", :duration => 30, :mark_as => "busy")
     
       # create basic resources
       Resource.create(:name => "Johnny", :company => Company.find_by_name("Company 1"))
@@ -37,10 +37,11 @@ namespace :db do
         Company.all.each do |company|
           company.resources.each do |resource|
             1.upto(days) do |i|
-              start_at = (Time.now + 1.day).beginning_of_day
+              start_at = (Time.now + i.day).beginning_of_day
               end_at   = start_at + 24.hours
               begin
                 Appointment.create_free_time(company, resource, start_at, end_at)
+                puts "#{Time.now}: added #{company.name}, #{resource.name} free time from #{start_at}-#{end_at}"
               rescue TimeslotNotEmpty
                 # skip
               end
