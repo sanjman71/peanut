@@ -1,7 +1,17 @@
 == Getting Started
 
 1. Run the rake task <tt>rake db:peanut:init</tt> to initialize the database with some test data.
-2. Go to http://localhost:3000/companies to view/add companies.
-3. Go to http://company1.localhost:3000/appointments to see appointments for a company.
+
+2. Run the rake task <tt>rake db:peanut:freetime:init[days] to setup from freetime.
+
+3. Edit your /etc/hosts file by adding the following lines:
+    127.0.0.1     www.localhost
+    127.0.0.1     company1.localhost
+    127.0.0.1     company2.localhost
+    127.0.0.1     company3.localhost
+  
+4. Go to http://localhost:3000/companies to view/add companies.
+
+5. Go to http://company1.localhost:3000/appointments to see appointments for a company.
 
 
