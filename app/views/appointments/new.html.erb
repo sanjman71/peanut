@@ -19,6 +19,11 @@
     <span id='search' style='padding: 5px;'>
       <%= f.submit "Search" %>
     </span>
+    or 
+    <%= link_to_remote "today", :url => new_appointment_path(:subdomain => @subdomain, :when => 'today'), :submit => 'new_appointment', :html => {:method => :post} %>,
+    <%= link_to_remote "this week", :url => new_appointment_path(:subdomain => @subdomain, :when => 'this week'), :submit => 'new_appointment', :html => {:method => :post} %>,
+    <%= link_to_remote "next week", :url => new_appointment_path(:subdomain => @subdomain, :when => 'next week'), :submit => 'new_appointment', :html => {:method => :post} %>,
+    <%= link_to_remote "later", :url => new_appointment_path(:subdomain => @subdomain, :when => 'later'), :submit => 'new_appointment', :html => {:method => :post} %>
     or <%= link_to_remote "suggest some times", :url => new_appointment_path(:subdomain => @subdomain, :suggest => 1), :submit => 'new_appointment', :html => {:method => :post} %> 
   <% end %>
 </div>

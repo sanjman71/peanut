@@ -1,16 +1,26 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
   map.resources :appointments, :collection => {:confirm => :post}
-  map.resources :free_time
+  map.resources :free
   
   map.resources :resources do |resource|
     # nested appointments routes
     resource.resources :appointments
     # nested free time routes
-    resource.resources :free_time
+    resource.resources :free
+    
+    # nested job routes
+    resource.resources :jobs do |job|
+      job.resources :appointments
+      job.resources :free
+    end
   end
   
-  map.resources :jobs
+  map.resources :jobs do |job|
+    job.resources :appointments
+    job.resources :free
+  end
+  
   map.resources :customers
   
   # map the company root to the appointments controller

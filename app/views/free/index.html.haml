@@ -1,0 +1,47 @@
+- content_for :stylesheets do
+  = stylesheet_link_tag 'calendar'
+
+%div.page_header
+  %h1.index
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
+      What:
+      %span#what= select_tag('job_id', options_for_select(@jobs.collect{ |j| [j.name, j.id]}, @job.id))
+      &nbsp;
+      Who:
+      %span#who= select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id))
+      &nbsp;
+      When:
+      %span#when= select_tag('when', options_for_select(Appointment::WHENS, @when))
+      %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
+      
+%div.page_indent
+  %div.free_time_block
+    %h1.free_time_header 
+      == Available appointments with #{@resource.name}
+      %h2.subheader== #{@when.titleize}
+      
+      %table.calendar
+        %tbody
+          -# only need first week for calendar days
+          - week = Array(0..@total_days-1).in_groups_of(7).first.compact
+          %tr
+            - week.each do |day_i|
+              %th= (@start_day + day_i.days).strftime("%a")
+            - Array(0..@total_days-1).in_groups_of(7).each do |week|
+              %tr
+                - week.compact.each do |day_i|
+                  - day = @start_day + day_i.days
+                  -# check if day has any free time
+                  - free = @free_appointments.select { |appt| appt.start_at.beginning_of_day == day }
+                  - klass = free.blank? ? '' : 'free'
+                  %td{:class => klass}
+                    = (day == @today) ? 'Today' : day.strftime("%b %d")
+                    
+      %h2.subheader== #{pluralize(@free_timeslots.size, 'available appointment')} with #{@resource.name}
+      %div.free_appointments
+        - @free_days.each do |day, appointments|
+          %h2== #{day.to_s(:appt_day)}
+          - appointments.each do |appointment|
+            %div.appointment
+              == #{@job.name} at #{appointment.start_at.to_s(:appt_time)}
+      

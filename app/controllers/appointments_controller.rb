@@ -64,6 +64,10 @@ class AppointmentsController < ApplicationController
           @appt_request.when = "this week"
         end
         
+        if params[:when]
+          @appt_request.when = params[:when]
+        end
+        
         # find free appointments for a job and resource within a time range
         @free_timeslots   = @appt_request.find_free_timeslots(:limit => 3)
         @free_by_days     = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }

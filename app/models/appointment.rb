@@ -31,6 +31,9 @@ class Appointment < ActiveRecord::Base
   named_scope :busy,        { :conditions => {:mark_as => Job::BUSY} }
   named_scope :work,        { :conditions => {:mark_as => Job::WORK} }
     
+  # valid when values
+  WHENS                     = ['today', 'tomorrow', 'this week', 'next week', 'later']
+  
   def after_initialize
     if self.start_at and self.job_id and self.end_at.blank?
       # initialize end_at
@@ -81,16 +84,34 @@ class Appointment < ActiveRecord::Base
   def when=(s)
     if s.blank?
       @when = :blank
+    elsif !WHENS.include?(s)
+      @when = :unsupported
+    elsif s == 'later'
+      # special case, range should be 2 weeks after next week, adjusted by a day
+      range         = Chronic.parse('next week', :guess => false)
+      @when         = s
+      self.start_at = range.last + 1.day
+      self.end_at   = range.last + 1.day + 2.weeks
     else
       # parse when string
       range = Chronic.parse(s, :guess => false)
-    
-      if range
-        @when         = s
-        self.start_at = range.first
-        self.end_at   = range.last
-      else
+      
+      if range.blank?
         @when = :error
+        return
+      end
+
+      @when         = s
+      self.start_at = range.first
+      self.end_at   = range.last
+
+      if s == 'this week'
+        # make 'this week' end on monday 12am
+        self.end_at += 1.day
+      elsif s == 'next week'
+        # make 'next week' go from monday to monday
+        self.start_at += 1.day
+        self.end_at   += 1.day
       end
     end
   end

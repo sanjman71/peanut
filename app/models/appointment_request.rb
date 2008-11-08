@@ -15,12 +15,14 @@ class AppointmentRequest < Appointment
   # find free time slots based on appointment request [start_at, end_at]
   # valid options:
   #  :limit => limit the number of free time slots returned
+  #  :appointments => use the appointments collection instead of building it
   def find_free_timeslots(options={})
     # parse options
     limit       = options[:limit].to_i if options[:limit]
     
     # find free appointments with duration >= job's duration
-    collection  = self.find_free_appointments
+    collection  = options[:appointments] || self.find_free_appointments
+    collection  = Array(collection)
     
     # iterate over free appointments
     duration    = self.job.duration
