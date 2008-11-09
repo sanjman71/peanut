@@ -23,8 +23,10 @@ table.calendar ul                                 { margin: 3px 0 0; padding: 0;
 table.calendar li                                 { font-size: 10px; font-weight: normal; line-height: 11px; list-style-type: none; 
                                                     margin: 3px 0 0 0; padding 0;}
                                                     
-div.free_appointments                             { font-family: verdana; font-size: 10px; font-weight: bold; margin: 0; padding 0 0 3px; }
+div.timeslots                                     { font-family: verdana; font-size: 11px; font-weight: bold; margin: 0; padding 0 0 3px; }
 
-div.free_appointments h2                          { color: #CC9933; }
+div.timeslots h2                                  { color: #CC9933; font-size: 12px; }
 
-div.free_appointments .appointment                { color: #000000; font-weight: bold; }
+div.timeslots h3                                  { color: #CC9933; font-size: 11px; }
+
+div.timeslots .timeslot                           { color: #000000; font-size: 10px; }

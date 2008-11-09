@@ -28,8 +28,7 @@ class AppointmentRequest < Appointment
     duration    = self.job.duration
     timeslots   = collection.inject([]) do |array, appointment|
       # create timeslot
-      timeslot = Timeslot.new(appointment.start_at, appointment.duration)
-      timeslot.appointment_id = appointment.id
+      timeslot = Timeslot.new(appointment)
       
       # resize timeslot if free appointment is larger than requested appointment
       timeslot.start_at = self.start_at if appointment.start_at < self.start_at

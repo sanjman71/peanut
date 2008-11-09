@@ -34,6 +34,8 @@ div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; }
 
 div.wrapper                                       { margin: 0 auto; min-width: 800px; padding: 5px 23px 0px 30px; }
 
+div.container                                     { margin: 0 auto; }
+
 div.page_header                                   { background: #EDF3FE; margin: 0px; padding: 13px 30px 13px 24px; }
 
 div.half_width                                    { width: 500px; }
@@ -43,3 +45,17 @@ div.page_header h1.index                          { color: #000000; font-size: 1
 div.page_header span.other_indexes                { float: right; font-size: 11px; text-align: right; color: #CCCCCC; }
 
 div.page_indent                                   { padding: 20px 60px 20px 20px;}
+
+/* column styles */
+
+div.left                                          { float: left; margin: 0; padding: 0; text-align: left; width: 70%; }
+
+div.right                                         { float: left; margin: 0 0 0; padding: 0; text-align: left; width: 30%; }
+
+div.col                                           { min-width: 200px; padding: 0 0 0 12px;}
+
+/* instruction styles */
+
+div.instructions                                  { background: #FFFFCC; padding: 5px; font-size: 12px; }
+
+div.instructions ul                               { font-size: 12px; }

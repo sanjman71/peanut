@@ -18,23 +18,36 @@ class FreeController < ApplicationController
     @resource = Resource.find(params[:resource_id]) if params[:resource_id]
     @resource = Resource.anyone if @resource.blank?
     
-    # initialize when, default to 'this week'
-    @when     = params[:when] || 'this week'
+    # initialize when, no default
+    @when     = params[:when]
     
     # initialize job, default to first work job
     @job      = Job.find_by_id(params[:job_id].to_i) || Job.work.first
         
-    logger.debug("*** finding free time #{@when}")
-    
     # build appointment request for the timespan we're looking for
     @query      = AppointmentRequest.new(:when => @when, :job => @job, :resource => @resource, :company => @current_company)
 
+    # find resources collection
+    @resources  = Resource.all + Array(Resource.anyone)
+    
+    # find jobs collection
+    @jobs       = Job.work
+
+    if @when.blank?
+      # render empty page with help text
+      return render
+    end
+    
     # initialize calendar days
     @start_day  = @query.start_at.beginning_of_day #Time.now.beginning_of_day
     @end_day    = @query.end_at.end_of_day
     @total_days = (@end_day - @start_day).to_i / (60 * 60 * 24)
     @today      = Time.now.beginning_of_day
+    # group days into weeks
+    @weeks      = Array(0..@total_days-1).in_groups_of(7)
 
+    logger.debug("*** finding free time #{@when}")
+    
     # find free appointments and free timeslots for each free apppointment
     @free_appointments  = @query.find_free_appointments
     @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|
@@ -43,13 +56,7 @@ class FreeController < ApplicationController
     @free_days          = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
     
     logger.debug("*** found #{@free_appointments.size} free appointments, #{@free_timeslots.size} free timeslots")
-        
-    # find resources collection
-    @resources  = Resource.all + Array(Resource.anyone)
-    
-    # find jobs collection
-    @jobs       = Job.work
-    
+            
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @appointments }
