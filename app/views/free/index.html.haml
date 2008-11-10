@@ -40,9 +40,9 @@
                         - klass = free.blank? ? '' : 'free'
                         %td{:class => klass}
                           -# special case for 'Today'
-                          = (day == @today) ? 'Today' : day.strftime("%b %d")
+                          %span= (day == @today) ? 'Today' : day.strftime("%b %d")
                           - unless klass.blank?
-                            %ul= @job.name
+                            %span== - #{@job.name}
                       
             %h2.subheader== #{pluralize(@free_timeslots.size, 'available appointment')}
             %div.timeslots
@@ -53,7 +53,7 @@
                   %h3= resource.name
                   - timeslots.each do |timeslot|
                     %div.timeslot
-                      == #{@job.name} at #{timeslot.start_at.to_s(:appt_time)}
+                      = link_to("#{@job.name} at #{timeslot.start_at.to_s(:appt_time)}", schedule_path(:subdomain => @subdomain, :resource_id => resource, :job_id => @job.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
       
   %div.right
     %div.col
@@ -61,13 +61,13 @@
         - if @when.blank?
           == How do I schedule an appointment?
           %ul
-            %li== Fill in the parameters for your appointment and click on the search button
+            %li== Select your appointment criteria and click on 'Search'
         - elsif !@free_timeslots.blank?
           == What can I do here?
           %ul
             %li== Select an available appointment
-            %li== Try a different time range for your appointment
+            %li== Select different appointment criteria and search again
         - else
           == What can I do here?
           %ul
-            %li== Try a different time range or resource if possible
+            %li== Select different appointment criteria and search again

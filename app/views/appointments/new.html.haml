@@ -1,0 +1,29 @@
+%div.container
+  %div.left
+    %div.page_header
+      %h1.index
+        == Confirm your appointment
+        %p.schedule_header== #{@appointment.job.name} with #{@appointment.resource.name} on #{@appointment.start_at.to_s(:appt_date_time)}
+        
+    %div.page_indent
+      %div.schedule_message
+        == Before we finalize your appointment, we need some information about you. 
+      %p
+      %div.schedule_form
+        - form_for(@appointment, :url => schedule_path(:subdomain => @subdomain)) do |f|
+          - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
+            %table
+              %tr
+                %td= customer_form.label :name
+                %td= customer_form.text_field :name
+              %tr
+                %td= customer_form.label :email
+                %td= customer_form.text_field :email
+              %tr
+                %td= customer_form.label :phone
+                %td= customer_form.text_field :phone
+          %p= f.submit "Schedule"
+        
+        
+        
+    

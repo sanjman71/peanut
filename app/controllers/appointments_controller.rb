@@ -51,44 +51,28 @@ class AppointmentsController < ApplicationController
     end
   end
 
-  # GET /appointments/new
-  # GET /appointments/new.xml
+  # GET /schedule/resources/1/jobs/1/20081231T000000
+  # POST /schedule/resources/1/jobs/1/20081231T000000
   def new
-    if request.post?
-      @appt_request = AppointmentRequest.new(params[:appointment])
-      @suggest      = params[:suggest].to_i == 1
-      
-      begin
-        if @suggest
-          # suggest a time range
-          @appt_request.when = "this week"
-        end
-        
-        if params[:when]
-          @appt_request.when = params[:when]
-        end
-        
-        # find free appointments for a job and resource within a time range
-        @free_timeslots   = @appt_request.find_free_timeslots(:limit => 3)
-        @free_by_days     = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
-      rescue Exception => e
-        @free_timeslots  = []
-        logger.debug("*** exception: #{e}, #{@appt_request.errors.full_messages}")
-      end
-    elsif request.get?
-      # show form to search for free time
-      @appointment  = Appointment.new
-      @jobs         = Job.work
-      @resources    = Resource.company(@current_company.id)
-    end
+    # parse schedule request
+
+    # build appointment hash
+    hash = {:job_id => params[:job_id], :resource_id => params[:resource_id], :start_at => params[:start_at], :company_id => @current_company.id}
+    hash.update(params["appointment"]) if params["appointment"]
     
-    respond_to do |format|
-      format.html 
-      format.xml  { render :xml => @appointment }
-      format.js   
+
+    # build appointment object
+    @appointment  = Appointment.new(hash)
+    
+    logger.debug("valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
+    
+    if @appointment.valid?
+      # ask for custoemr info
+    else
+      
     end
   end
-
+  
   # GET /appointments/1/edit
   def edit
     @appointment = Appointment.find(params[:id])
@@ -139,26 +123,5 @@ class AppointmentsController < ApplicationController
       format.xml  { head :ok }
     end
   end
-  
-  # POST /appointments/confirm
-  # POST /appointments/confirm.xml
-  def confirm
-    @appointment = Appointment.new(params[:appointment])
-
-    if @appointment.errors.size > 0
-      logger.debug("*** we have errors")
-    end
     
-    respond_to do |format|
-      if @appointment.save
-        flash[:notice] = 'Appointment was successfully created.'
-        format.html { redirect_to(@appointment) }
-        format.xml  { render :xml => @appointment, :status => :created, :location => @appointment }
-      else
-        format.html { render :action => "confirm" }
-        format.xml  { render :xml => @appointment.errors, :status => :unprocessable_entity }
-      end
-    end
-  end
-  
 end
