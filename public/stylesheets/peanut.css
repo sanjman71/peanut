@@ -1,8 +1,12 @@
+/* general body styles */
+
 body                                              { font-family: "Lucida Grande",verdana,arial,helvetica,sans-serif; }
 
 /* link styles */
 
-a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0;}
+a                                                 { color: #000000; background: transparent none repeat scroll 0 0; }
+
+a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0; }
 
 a:hover                                           { background-color: #0033BB; color: #FFFFFF; text-decoration: none; }
 
@@ -36,15 +40,19 @@ div.wrapper                                       { margin: 0 auto; min-width: 8
 
 div.container                                     { margin: 0 auto; }
 
-div.page_header                                   { background: #EDF3FE; margin: 0px; padding: 13px 30px 13px 24px; }
+div.section_header                                { background: #EDF3FE; margin: 0px; padding: 13px 30px 13px 24px; }
 
-div.half_width                                    { width: 500px; }
+div.section_header h1.index                       { color: #000000; font-size: 14px; margin: 0; paddin: 0;}
 
-div.page_header h1.index                          { color: #000000; font-size: 14px; margin: 0; paddin: 0;}
+div.section_header span.other_indexes             { float: right; font-size: 11px; text-align: right; color: #CCCCCC; }
 
-div.page_header span.other_indexes                { float: right; font-size: 11px; text-align: right; color: #CCCCCC; }
+div.section_body                                  { padding: 20px 60px 20px 20px;}
 
-div.page_indent                                   { padding: 20px 60px 20px 20px;}
+div.section_body h1                               { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; margin: 0; 
+                                                    padding: 3px; text-align: left; }
+
+div.section_body h2                               { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; margin: 15px 0 5px; 
+                                                    padding: 0 0 2px;}
 
 /* column styles */
 

@@ -1,9 +1,6 @@
-- content_for :stylesheets do
-  = stylesheet_link_tag 'calendar'
-
 %div.container
   %div.left
-    %div.page_header
+    %div.section_header
       %h1.index
         == Schedule an Appointment
         %p
@@ -18,42 +15,22 @@
           %span#when= select_tag('when', options_for_select(Appointment::WHENS, @when))
           %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
     - unless @when.blank?
-      %div.page_indent
+      %div.section_body
         %div.free_time_block
-          %h1.free_time_header 
-            == Available appointments
-            %h2.subheader== #{@when.titleize}
-    
-            %table.calendar
-              %tbody
-                -# only need first week for calendar days
-                - week = @weeks.first.compact
-                %tr
-                  - week.each do |day_i|
-                    %th= (@start_day + day_i.days).strftime("%a")
-                  - @weeks.each do |week|
-                    %tr
-                      - week.compact.each do |day_i|
-                        - day = @start_day + day_i.days
-                        -# check if day has any free time
-                        - free = @free_timeslots.select { |timeslot| timeslot.start_at.beginning_of_day == day }
-                        - klass = free.blank? ? '' : 'free'
-                        %td{:class => klass}
-                          -# special case for 'Today'
-                          %span= (day == @today) ? 'Today' : day.strftime("%b %d")
-                          - unless klass.blank?
-                            %span== - #{@job.name}
-                      
-            %h2.subheader== #{pluralize(@free_timeslots.size, 'available appointment')}
-            %div.timeslots
-              - @free_days.each do |day, timeslots|
-                %h2== #{day.to_s(:appt_day)}
-                -# group timeslots by resource
-                - timeslots.group_by { |timeslot| timeslot.resource }.each do |resource, timeslots|
-                  %h3= resource.name
-                  - timeslots.each do |timeslot|
-                    %div.timeslot
-                      = link_to("#{@job.name} at #{timeslot.start_at.to_s(:appt_time)}", schedule_path(:subdomain => @subdomain, :resource_id => resource, :job_id => @job.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
+          %h1== Available appointments
+          %h2== #{@when.titleize}
+          = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @total_days, :start_day => @start_day, :today => @today, :markings => @calendar_markings})
+            
+          %h2== #{pluralize(@free_timeslots.size, 'available appointment')}
+          %div.timeslots
+            - @free_days.each do |day, timeslots|
+              %h2== #{day.to_s(:appt_day)}
+              -# group timeslots by resource
+              - timeslots.group_by { |timeslot| timeslot.resource }.each do |resource, timeslots|
+                %h3= resource.name
+                - timeslots.each do |timeslot|
+                  %div.timeslot
+                    = link_to("#{@job.name} at #{timeslot.start_at.to_s(:appt_time)}", schedule_path(:subdomain => @subdomain, :resource_id => resource, :job_id => @job.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
       
   %div.right
     %div.col
@@ -61,11 +38,12 @@
         - if @when.blank?
           == How do I schedule an appointment?
           %ul
-            %li== Select your appointment criteria and click on 'Search'
+            %li== Select appointment criteria and click on 'Search'
         - elsif !@free_timeslots.blank?
           == What can I do here?
           %ul
             %li== Select an available appointment
+            %span== or
             %li== Select different appointment criteria and search again
         - else
           == What can I do here?

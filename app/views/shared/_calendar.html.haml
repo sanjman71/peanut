@@ -1,0 +1,28 @@
+-# total_days => number of days to show
+-# start_day => start calendar with start_day
+-# today => day to show as 'Today'
+-# markings => hash mapping days to markings for that day
+
+-# split days into weeks, use first week to show calendar header fields
+- weeks = Array(0..total_days-1).in_groups_of(7)
+- week0 = weeks.first.compact
+
+%table.calendar
+  %tbody
+    %tr
+      - week0.each do |day_i|
+        -# show Mon-Sun header fields
+        %th= (start_day + day_i.days).strftime("%a")
+      -# show appointments for each day
+      - weeks.each do |week|
+        %tr
+          - week.compact.each do |day_i|
+            -# compute the day we're on
+            - day   = start_day + day_i.days
+            -# check for markings on this day
+            - key   = day.to_s(:appt_schedule)
+            - klass = markings[key]
+            %td{:class => klass}
+              -# special case for 'Today'
+              %span= (day == today) ? 'Today' : day.strftime("%b %d")
+              

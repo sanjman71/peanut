@@ -1,0 +1,40 @@
+- content_for :stylesheets do
+  = stylesheet_link_tag 'calendar'
+
+%div.container
+  %div.left
+    %div.section_header
+      %span.other_indexes
+        -#= link_to "Upcoming", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id), :class => add_class_if(@when == :upcoming, 'current')
+        -#%span= "|"
+        -#= link_to "All", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id, :when => 'all'), :class => add_class_if(@when == :all, 'current')
+        -#= "|"
+        -#= link_to "Past", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id, :when => 'past'), :class => add_class_if(@when == :past, 'current')
+      %h1.index
+        == Show Appointments
+        %p
+        - form_for(Appointment.new, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
+          Who:
+          %span.who= select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id))
+          &nbsp;
+          When:
+          %span#when= select_tag('when', options_for_select(Appointment::WHENS_EXTENDED, @when))
+          %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
+        
+    %div.section_body
+      %h1== Work schedule for #{@resource.name}
+      %p
+      %h2== #{@when.to_s.titleize}
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @total_days, :start_day => @start_day, :today => @today, :markings => @calendar_markings})
+                 
+      %h2== #{pluralize(@appointments.size, 'appointment')}
+      %div.appointments
+        - @appt_days.each do |day, appointments|
+          %h3== #{day.to_s(:appt_day)}
+          -# group appointments by resource
+          - appointments.group_by { |appointment| appointment.resource }.each do |resource, appointments|
+            %h3= resource.name
+            - appointments.each do |appointment|
+              %div.appointment
+                == #{appointment.mark_as}
+        

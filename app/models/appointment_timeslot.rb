@@ -1,4 +1,4 @@
-class Timeslot
+class AppointmentTimeslot
   attr_accessor :appointment, :start_at, :end_at, :duration
   
   def initialize(appointment)

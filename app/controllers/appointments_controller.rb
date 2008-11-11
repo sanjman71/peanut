@@ -13,31 +13,54 @@ class AppointmentsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => @subdomain, :resource_id => nil)))
     end
     
-    # find resource if specified
-    @resource = Resource.find(params[:resource_id]) if params[:resource_id]
+    # find resource, default to anyone
+    @resource   = params[:resource_id] ? Resource.find(params[:resource_id]) : Resource.anyone
     
-    # scope appointments by 'when'
-    @when     = params[:when] ? params[:when ].to_sym : :upcoming
+    # scope appointments by 'when', default to :upcoming
+    @when       = params[:when] ? params[:when] : 'this week'
+    @daterange  = DateRange.new(@when)
     
-    if @resource
-      # find resource appointments 
-      @appointments = Appointment.company(@current_company.id).resource(@resource.id).send(@when)
-    elsif
+    if @resource.anyone?
       # find all appointments
-      @appointments = Appointment.company(@current_company.id).send(@when)
-      @resource     = Resource.anyone
+      @appointments = Appointment.company(@current_company.id).span(@daterange.start_at, @daterange.end_at)
+    else
+      # find appointments for a resource
+      @appointments = Appointment.company(@current_company.id).resource(@resource.id).span(@daterange.start_at, @daterange.end_at)
+    end
+        
+    # initialize calendar params
+    @start_day  = @daterange.start_at
+    @total_days = @daterange.days
+    @today      = Time.now.beginning_of_day
+    
+    logger.debug("*** found #{@appointments.size} appointments over #{@total_days} days")
+
+    # build hash of calendar markings
+    @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
+      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule)] = appointment.mark_as
+      hash
     end
     
+    logger.debug("*** calendar markings: #{@calendar_markings}")
+    
     # group appointments by day
-    @appt_days = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    @appt_days  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
     
     # find resources collection
-    @resources = Resource.all + Array(Resource.anyone)
+    @resources  = Resource.all + Array(Resource.anyone)
     
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @appointments }
     end
+  end
+
+  # temporary fix to format problem
+  # why does params have 'authenticity_token' ???
+  def search
+    # remove 'authenticity_token' params
+    params.delete('authenticity_token')
+    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
   end
 
   # GET /appointments/1

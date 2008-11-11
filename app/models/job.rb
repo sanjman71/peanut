@@ -18,6 +18,13 @@ class Job < ActiveRecord::Base
   named_scope :busy,          { :conditions => {:mark_as => BUSY} }
   named_scope :work,          { :conditions => {:mark_as => WORK} }
   
+  def self.nothing(options={})
+    r = Job.new do |o|
+      o.name = options[:name] || ""
+      o.id   = 0
+    end
+  end
+  
   def duration_to_seconds
     self.duration * 60
   end

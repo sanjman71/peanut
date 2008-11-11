@@ -13,4 +13,9 @@ class Resource < ActiveRecord::Base
     end
   end
   
+  # return true if its the special resource 'anyone'
+  def anyone?
+    self.id == 0
+  end
+  
 end

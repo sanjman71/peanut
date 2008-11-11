@@ -1,0 +1,17 @@
+%div.container
+  %div.left
+    %div.section_header
+      %h1.index
+        == Create Free Time
+        %p
+        - form_for(@resource, :url => new_resource_free_path(:subdomain => @subdomain), :html => {:method => :get}) do |f|
+          When:
+          %span#when= select_tag('when', options_for_select(Appointment::WHENS, @when))
+          %span#search{:style => "padding: 5px;" }= f.submit 'Show', :name => nil
+        
+    %div.section_body
+      %h1== #{@resource.name}
+      %h2== #{@when.titleize}
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => Hash.new})
+      
+
