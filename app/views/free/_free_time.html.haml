@@ -1,0 +1,10 @@
+- fields_for("free_times[]", free_time) do |free_time_form|
+  %div#free_time
+    = free_time_form.hidden_field('company_id', :value => company_id)
+    = free_time_form.hidden_field('customer_id', :value => 0)
+    = free_time_form.hidden_field('resource_id', :value => resource_id)
+    = free_time_form.hidden_field('day', :value => day)
+    %span#free_time_start== Start: #{free_time_form.text_field('start_at', :size => 20)}
+    %span#free_time_end== End: #{free_time_form.text_field('end_at', :size => 20)}
+    
+

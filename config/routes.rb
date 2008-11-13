@@ -1,11 +1,11 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
   map.resources :appointments
-  map.resources :free
+  map.resources :free, :collection => { :manage => :get }
   
   # override 'appointments/new' path
-  map.schedule  'schedule/resources/:resource_id/jobs/:job_id/:start_at', :controller => 'appointments', :action => 'new'
-  
+  map.schedule        'schedule/resources/:resource_id/jobs/:job_id/:start_at', :controller => 'appointments', :action => 'new'
+    
   map.resources :resources do |resource|
     # nested appointments routes
     resource.resources :appointments

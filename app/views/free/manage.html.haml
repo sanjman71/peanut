@@ -1,0 +1,6 @@
+%div.container
+  %div.left
+    %div.section_header
+      %h1.index
+        == Schedule for
+        = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, nil), :onchange => "window.location = '/resources/' + $F(this) + '/free/new'")

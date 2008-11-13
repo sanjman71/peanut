@@ -1,0 +1,17 @@
+%div.container
+  %div.left
+    %div.section_header
+      %h1.index== Free Time: #{@time.to_s(:appt_day)}
+      
+    %div.section_body
+      - form_for(@resource, :url => resource_free_path(:subdomain => @subdomain, :id => @day), :method => :post) do |f|
+        %div#free_times
+          = render(:partial => 'free_time', :locals => {:free_time => FreeTime.new, :resource_id => @resource.id, :day => @day, :company_id => @current_company.id})
+        %p
+        %div#add_free_time
+          = link_to_function image_tag('add.png') do |page|
+            - page.insert_html :bottom, :free_times, :partial => 'free_time', :locals => {:free_time => FreeTime.new, :resource_id => @resource.id, :day => @day, :company_id => @current_company.id}
+        %p
+        %div.save_free_time
+          = f.submit 'Save'
+          %span.cancel== or #{link_to 'Cancel', new_resource_free_path(:subdomain => @subdomain)}

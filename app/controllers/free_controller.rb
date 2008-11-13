@@ -2,6 +2,11 @@ class FreeController < ApplicationController
   before_filter :init_current_company
   layout 'default'
   
+  # GET /free/manage
+  def manage
+    @resources = [Resource.nobody(:name => "Select a Person")] + Resource.all
+  end
+  
   # GET /free
   # GET /free.xml
   # GET /resources/1/free
@@ -9,7 +14,7 @@ class FreeController < ApplicationController
   # GET /resources/1/jobs/3/free?when=tomorrow
   def index
     if params[:resource_id].to_s == "0"
-      # /resources/0/free_time is canonicalized to /free_time; preserve subdomain on redirect
+      # /resources/0/free is canonicalized to /free; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => @subdomain, :resource_id => nil)))
     elsif params[:job_id].to_s == "0"
       # /jobs/0/free is redirected to force the user to select a job; preserve subdomain on redirect
@@ -22,7 +27,7 @@ class FreeController < ApplicationController
     
     # initialize when, no default
     @when       = params[:when]
-    @daterange  = DateRange.new(@when) unless @when.blank?
+    @daterange  = DateRange.new(:when => @when) unless @when.blank?
     
     # initialize job, default to first work job
     @job        = Job.find_by_id(params[:job_id].to_i) || Job.nothing
@@ -78,17 +83,70 @@ class FreeController < ApplicationController
     params.delete('authenticity_token')
     redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
   end
-  
+
   # GET /resources/1/free/new
   def new
     # initialize resource, default to anyone
-    @resource = Resource.find(params[:resource_id])
+    @resource     = Resource.find_by_id(params[:resource_id]) || Resource.anyone
+    @when         = params[:when] || 'this week'
+    @daterange    = DateRange.new(:when => @when)
     
-    raise ArgumentError, "missing resource" if @resource.blank?
+    # find free appointments for a resource
+    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free.span(@daterange.start_at, @daterange.end_at)
+        
+    # initialize calendar params
+    @start_day    = @daterange.start_at
+    @total_days   = @daterange.days
+    @today        = Time.now.beginning_of_day
     
-    @when       = params[:when] || 'this week'
-    @daterange  = DateRange.new(@when)
+    logger.debug("*** found #{@appointments.size} appointments over #{@total_days} days")
     
+    # build hash of calendar markings
+    @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
+      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = appointment.mark_as
+      hash
+    end
+
+    logger.debug("*** calendar markings: #{@calendar_markings}")
+    
+    # build hash of calendar appointments
+    @calendar_appointments = @appointments.inject(Hash.new(Array.new)) do |hash, appointment|
+      key = appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)
+      logger.debug("*** hash key: #{key}")
+      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] += [appointment]
+      logger.debug("*** hash: #{hash}")
+      hash
+    end
+
+    logger.debug("*** calendar appointments: #{@calendar_appointments}")
+    
+    # group appointments by day
+    @appt_days  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+  end
+  
+  # GET /resources/1/free/20081231T060000/edit
+  def edit
+    # initialize resource
+    @resource   = Resource.find(params[:resource_id])
+    @day        = params[:id]
+    @time       = Time.parse(params[:id])
+  end
+
+  def update
+    # build appointments from free time collection
+    @appointments = params[:free_times].collect do |free_time|
+      free_time = FreeTime.new(free_time)
+      free_time.to_appointment
+    end
+    
+    logger.debug("*** #{@appointments.size} appointments")
+    
+    # save appointments
+    @appointments.each do |appointment|
+      appointment.save
+    end
+
+    redirect_to new_resource_free_path(:subdomain => @subdomain)
   end
   
 end

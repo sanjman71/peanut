@@ -20,7 +20,7 @@
             -# compute the day we're on
             - day   = start_day + day_i.days
             -# check for markings on this day
-            - key   = day.to_s(:appt_schedule)
+            - key   = day.to_s(:appt_schedule_day)
             - klass = markings[key]
             %td{:class => klass}
               -# special case for 'Today'

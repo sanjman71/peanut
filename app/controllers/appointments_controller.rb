@@ -18,7 +18,7 @@ class AppointmentsController < ApplicationController
     
     # scope appointments by 'when', default to :upcoming
     @when       = params[:when] ? params[:when] : 'this week'
-    @daterange  = DateRange.new(@when)
+    @daterange  = DateRange.new(:when => @when)
     
     if @resource.anyone?
       # find all appointments
@@ -37,7 +37,7 @@ class AppointmentsController < ApplicationController
 
     # build hash of calendar markings
     @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
-      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule)] = appointment.mark_as
+      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = appointment.mark_as
       hash
     end
     

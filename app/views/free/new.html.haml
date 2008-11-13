@@ -2,16 +2,24 @@
   %div.left
     %div.section_header
       %h1.index
-        == Create Free Time
-        %p
-        - form_for(@resource, :url => new_resource_free_path(:subdomain => @subdomain), :html => {:method => :get}) do |f|
-          When:
-          %span#when= select_tag('when', options_for_select(Appointment::WHENS, @when))
-          %span#search{:style => "padding: 5px;" }= f.submit 'Show', :name => nil
+        == Schedule for
+        = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when), :onchange => "window.location = '#{new_resource_free_path(:subdomain => @subdomain)}' + '?' + 'when=' + $F(this)")
         
     %div.section_body
       %h1== #{@resource.name}
       %h2== #{@when.titleize}
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => Hash.new})
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings || Hash.new})
+      
+      %h2== #{pluralize(@appointments.size, 'Free Time Slot')}
+      %div.appointments
+        - @daterange.each do |day|
+          -# find appointments for the day
+          - appointments = @calendar_appointments[day.to_s(:appt_schedule_day)]
+          - link_name = appointments.blank? ? 'Add' : 'Change'
+          %h3== #{day.to_s(:appt_day)} #{link_to(link_name, edit_resource_free_path(:subdomain => @subdomain, :id => day.to_s(:appt_schedule_day)), :style => 'margin-left: 2px; color: #008800;')}
+          - appointments.sort_by { |appt| appt.start_at }.each do |appointment|
+            %div.appointment
+              == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+          
       
 

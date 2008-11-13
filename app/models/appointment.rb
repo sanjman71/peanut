@@ -33,6 +33,7 @@ class Appointment < ActiveRecord::Base
     
   # valid when values
   WHENS                     = ['today', 'tomorrow', 'this week', 'next week', 'later']
+  WHEN_WEEKS                = ['this week', 'next week', 'later']
   WHENS_EXTENDED            = ['today', 'tomorrow', 'this week', 'next week', 'next 2 weeks', 'this month', 'later']
   
   def after_initialize
