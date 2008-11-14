@@ -1,6 +1,48 @@
 %div.container
   %div.left
     %div.section_header
+      %span.other_indexes
+        - Appointment::WHEN_WEEKS.each do |s|
+          = link_to s.titleize, manage_resource_free_path(:subdomain => @subdomain, :resource_id => @resource.id, :when => s)
+          = '&nbsp;|&nbsp;' unless s == Appointment::WHEN_WEEKS.last
       %h1.index
         == Schedule for
-        = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, nil), :onchange => "window.location = '/resources/' + $F(this) + '/free/new'")
+        = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, @resource.id), :onchange => "window.location = '/resources/' + $F(this) + '/free/manage'")
+        
+    %div.section_body
+      %h2== #{@when.titleize}
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings || Hash.new})
+      
+      %h2== #{pluralize(@appointments.size, 'Free Time Slot')}
+      %div.appointments
+        - @daterange.each do |day|
+          -# find appointments for the day
+          - appointments = @calendar_appointments[day.to_s(:appt_schedule_day)]
+          - unless appointments.blank?
+            %h3== #{day.to_s(:appt_day)}
+            - appointments.sort_by { |appt| appt.start_at }.each do |appointment|
+              %div.appointment
+                == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+              
+              
+  %div.right
+    %div.col
+      %div.sidebar_form
+        %div.sidebar_header
+          %h1== Add Free Time
+          - remote_form_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'free', :action => 'create', :resource_id => @resource.id), :method => :post) do |f|
+            %p
+              %span{:style => 'font-size: 11px; padding: 2px;'}== When
+              = select_tag('appointment[when]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+            %p
+              %span{:style => 'font-size: 11px; padding: 4px;' }== Start
+              = text_field :appointment, 'start_at', :size => 10
+            %p
+              %span{:style => 'font-size: 11px; padding: 6px;' }== End
+              = text_field :appointment, 'end_at', :size => 10
+            %p
+              = f.submit 'Add'
+  
+          
+      
+

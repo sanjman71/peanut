@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
     # nested appointments routes
     resource.resources :appointments
     # nested free time routes
-    resource.resources :free
+    resource.resources :free, :collection => { :manage => :get }
     
     # nested job routes
     resource.resources :jobs do |job|

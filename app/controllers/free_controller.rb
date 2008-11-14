@@ -2,11 +2,6 @@ class FreeController < ApplicationController
   before_filter :init_current_company
   layout 'default'
   
-  # GET /free/manage
-  def manage
-    @resources = [Resource.nobody(:name => "Select a Person")] + Resource.all
-  end
-  
   # GET /free
   # GET /free.xml
   # GET /resources/1/free
@@ -84,12 +79,20 @@ class FreeController < ApplicationController
     redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
   end
 
-  # GET /resources/1/free/new
-  def new
+  # GET /resources/1/free/manage
+  def manage
+    if params[:resource_id].blank?
+      # redirect to a specific resource
+      resource = @current_company.resources.first
+      redirect_to url_for(params.update(:subdomain => @subdomain, :resource_id => resource.id))
+    end
+    
     # initialize resource, default to anyone
-    @resource     = Resource.find_by_id(params[:resource_id]) || Resource.anyone
+    @resource     = Resource.find_by_id(params[:resource_id])
     @when         = params[:when] || 'this week'
     @daterange    = DateRange.new(:when => @when)
+    
+    @resources    = Resource.all
     
     # find free appointments for a resource
     @appointments = Appointment.company(@current_company.id).resource(@resource.id).free.span(@daterange.start_at, @daterange.end_at)
@@ -132,6 +135,14 @@ class FreeController < ApplicationController
     @time       = Time.parse(params[:id])
   end
 
+  # POST /resources/1/free/
+  def create
+    @resource     = Resource.find(params[:resource_id])
+    
+    # build new appointment
+    @appointment  = Appointment.new(params[:appointment])
+  end
+  
   def update
     # build appointments from free time collection
     @appointments = params[:free_times].collect do |free_time|

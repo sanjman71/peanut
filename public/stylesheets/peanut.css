@@ -82,3 +82,10 @@ div.col                                           { min-width: 200px; padding: 0
 div.instructions                                  { background: #FFFFCC; padding: 5px; font-size: 12px; }
 
 div.instructions ul                               { font-size: 12px; }
+
+/* sidebar styles */
+
+div.sidebar_form                                  { background: #F2F5FB none repeat scroll 0 0; border: 1px solid #C0D1EC; 
+                                                    padding: 6px 10px 2px; }
+
+div.sidebar_header h1                             { font-size: 14px; font-weight: bold; }
