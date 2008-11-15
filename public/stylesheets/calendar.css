@@ -26,6 +26,8 @@ div.appointments h3, div.timeslots h3             { color: #CC9933; font-size: 1
 
 div.appointments .timeslot, div.timeslots .timeslot, div.appointments .appointment
                                                   { color: #000000; font-size: 10px; background: #FFFFCC; }
+                                                  
+div.appointments .free                            { color: #000000; }
 
 div.timeslots .timeslot a                         { color: #0000FF; }
 

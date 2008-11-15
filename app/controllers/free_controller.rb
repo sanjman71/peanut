@@ -87,22 +87,65 @@ class FreeController < ApplicationController
       redirect_to url_for(params.update(:subdomain => @subdomain, :resource_id => resource.id))
     end
     
+    manage_shared
+  end
+    
+  # GET /resources/1/free/20081231T060000/edit
+  # def edit
+  #   # initialize resource
+  #   @resource   = Resource.find(params[:resource_id])
+  #   @day        = params[:id]
+  #   @time       = Time.parse(params[:id])
+  # end
+
+  # POST /resources/1/free/
+  def create
+    # build new appointment
+    job_free      = Job.free.first
+    @appointment  = Appointment.new(params[:appointment].merge(:resource_id => params[:resource_id], 
+                                                               :job_id => job_free.id,
+                                                               :company_id => @current_company.id,
+                                                               :customer_id => 0))
+    
+    # check if appointment is valid                                                           
+    if !@appointment.valid?
+      @error      = true
+      @error_text = ''
+      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      return
+    end
+
+    # check for conflicts
+    if @appointment.conflicts?
+      @error      = true
+      @error_text = "Appointment conflict"
+      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      return
+    end
+    
+    # save appointment
+    @appointment.save  
+    @add_text = "Created appointment"
+
+    logger.debug("*** created free time")
+        
+    manage_shared
+  end
+  
+  # shared method for managing free time used by manage action and create rjs action
+  def manage_shared
     # initialize resource, default to anyone
     @resource     = Resource.find_by_id(params[:resource_id])
+    @resources    = Resource.all
+
+    # initialize time parameters
     @when         = params[:when] || 'this week'
     @daterange    = DateRange.new(:when => @when)
     
-    @resources    = Resource.all
-    
     # find free appointments for a resource
-    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free.span(@daterange.start_at, @daterange.end_at)
+    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
-    # initialize calendar params
-    @start_day    = @daterange.start_at
-    @total_days   = @daterange.days
-    @today        = Time.now.beginning_of_day
-    
-    logger.debug("*** found #{@appointments.size} appointments over #{@total_days} days")
+    logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
     # build hash of calendar markings
     @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
@@ -112,52 +155,8 @@ class FreeController < ApplicationController
 
     logger.debug("*** calendar markings: #{@calendar_markings}")
     
-    # build hash of calendar appointments
-    @calendar_appointments = @appointments.inject(Hash.new(Array.new)) do |hash, appointment|
-      key = appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)
-      logger.debug("*** hash key: #{key}")
-      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] += [appointment]
-      logger.debug("*** hash: #{hash}")
-      hash
-    end
-
-    logger.debug("*** calendar appointments: #{@calendar_appointments}")
-    
     # group appointments by day
-    @appt_days  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
-  end
-  
-  # GET /resources/1/free/20081231T060000/edit
-  def edit
-    # initialize resource
-    @resource   = Resource.find(params[:resource_id])
-    @day        = params[:id]
-    @time       = Time.parse(params[:id])
-  end
-
-  # POST /resources/1/free/
-  def create
-    @resource     = Resource.find(params[:resource_id])
-    
-    # build new appointment
-    @appointment  = Appointment.new(params[:appointment])
-  end
-  
-  def update
-    # build appointments from free time collection
-    @appointments = params[:free_times].collect do |free_time|
-      free_time = FreeTime.new(free_time)
-      free_time.to_appointment
-    end
-    
-    logger.debug("*** #{@appointments.size} appointments")
-    
-    # save appointments
-    @appointments.each do |appointment|
-      appointment.save
-    end
-
-    redirect_to new_resource_free_path(:subdomain => @subdomain)
+    @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
   
 end

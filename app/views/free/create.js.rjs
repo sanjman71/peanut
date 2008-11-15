@@ -1,0 +1,24 @@
+if @error
+  page[:start_at_label].addClassName 'highlight'
+  page[:end_at_label].addClassName 'highlight'
+  page[:add_message].removeClassName 'notice'
+  page[:add_message].replace_html @error_text
+else
+  page[:add_free_time_form].reset
+  page[:start_at_label].removeClassName 'highlight'
+  page[:end_at_label].removeClassName 'highlight'
+  page[:add_message].addClassName 'notice'
+  page[:add_message].replace_html @add_text
+  
+  # update calendar
+  page[:free_calendar].replace_html :partial => 'shared/calendar.html.haml', 
+                                    :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}
+
+  # update appointment count
+  page[:appointments_count].replace_html :partial => 'appointments_count.html.haml',
+                                         :locals => {:count => @appointments.size}
+  
+  # update schedule
+  page[:free_schedule].replace_html :partial => 'schedule.html.haml',
+                                    :locals => {:appointments_by_day => @appointments_by_day}
+end  

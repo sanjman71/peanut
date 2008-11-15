@@ -32,9 +32,10 @@ class Appointment < ActiveRecord::Base
   named_scope :work,        { :conditions => {:mark_as => Job::WORK} }
     
   # valid when values
-  WHENS                     = ['today', 'tomorrow', 'this week', 'next week', 'later']
-  WHEN_WEEKS                = ['this week', 'next week', 'later']
-  WHENS_EXTENDED            = ['today', 'tomorrow', 'this week', 'next week', 'next 2 weeks', 'this month', 'later']
+  WHEN_THIS_WEEK            = 'this week'
+  WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
+  WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
+  WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'this month', 'later']
   
   def after_initialize
     if self.start_at and self.job_id and self.end_at.blank?
@@ -121,6 +122,12 @@ class Appointment < ActiveRecord::Base
   def when
     @when
   end
+  
+  def time_range=(attributes)
+    time_range      = TimeRange.new(attributes)
+    self.start_at   = time_range.start_at
+    self.end_at     = time_range.end_at
+  end
   # END: time virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
@@ -129,6 +136,11 @@ class Appointment < ActiveRecord::Base
     self.customer = Customer.find_by_name(customer_attributes["name"]) || self.create_customer(customer_attributes)
   end
     
+  # returns true if the appointment conflicts with any other
+  def conflicts?
+    Appointment.company(company.id).resource(resource.id).span(start_at, end_at).size > 0
+  end
+  
   # split a free appointment into multiple appointments using the specified job and time
   def split_free_time(job, job_start_at, job_end_at, options={})
     # validate job argument
@@ -196,18 +208,20 @@ class Appointment < ActiveRecord::Base
     
   # create free time in the specified timeslot
   def self.create_free_time(company, resource, start_at, end_at)
-    # make sure the timeslot is empty
-    appts = Appointment.company(company.id).resource(resource.id).span(start_at, end_at)
-    
-    if !appts.blank?
+    # find first job scheduled as 'free'
+    job         = Job.free.first
+
+    # create a new appointment object
+    appointment = Appointment.new(:start_at => start_at, :end_at => end_at, :mark_as => job.mark_as, :job => job, :company => company,
+                                  :resource => resource, :customer_id => 0)
+                              
+    if appointment.conflicts?
       raise TimeslotNotEmpty
     end
     
-    # find first job scheduled as 'free'
-    job  = Job.free.first
+    # save appointment
+    appointment.save
     
-    # create appointment - use 0 for customer_id
-    appt = Appointment.create(:start_at => start_at, :end_at => end_at, :mark_as => job.mark_as, :job => job, :company => company,
-                              :resource => resource, :customer_id => 0)
+    appointment
   end
 end

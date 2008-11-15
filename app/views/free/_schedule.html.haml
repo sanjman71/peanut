@@ -1,0 +1,6 @@
+- appointments_by_day.each do |day, appointments|
+  %h3
+    == #{day.to_s(:appt_day)}
+  - appointments.each do |appointment|
+    .appointment{:class => appointment.mark_as}
+      == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}

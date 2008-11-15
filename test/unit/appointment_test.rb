@@ -116,6 +116,13 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_equal ["When string is empty"], appt.errors.full_messages.select { |s| s.match(/When/) }
   end
   
+  def test_should_validate_time_range_attribute
+    today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+    appt  = Appointment.new(:time_range => {:day => today, :start_at => "1 pm", :end_at => "3 pm"})
+    assert_equal Chronic.parse("today 1 pm"), appt.start_at
+    assert_equal Chronic.parse("today 3 pm"), appt.end_at
+  end
+  
   def test_should_build_customer_association
     # should create a new customer when building the new appointment
     assert_difference('Customer.count', 1) do

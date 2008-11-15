@@ -52,7 +52,8 @@ div.section_header span.other_indexes             { float: right; font-size: 11p
 
 div.section_body                                  { padding: 20px 60px 20px 20px;}
 
-div.section_body h1                               { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; margin: 0; 
+div.section_body h1, div.section_body div.notice                              
+                                                  { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; margin: 0; 
                                                     padding: 3px; text-align: left; }
 
 div.section_body h2                               { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; margin: 15px 0 5px; 
@@ -89,3 +90,13 @@ div.sidebar_form                                  { background: #F2F5FB none rep
                                                     padding: 6px 10px 2px; }
 
 div.sidebar_header h1                             { font-size: 14px; font-weight: bold; }
+
+/* highlight styles */
+
+.highlight                                        { padding: 0px; background-color: #FFCC00; }
+
+/* color styles */
+
+.red                                              { color: #FF0000; font-style: bold; font-size: 12px; }
+
+.green                                            { color: #FF6600; font-style: bold; font-size: 12px; }

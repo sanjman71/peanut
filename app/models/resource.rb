@@ -13,14 +13,6 @@ class Resource < ActiveRecord::Base
     end
   end
   
-  # the special nobody resource
-  def self.nobody(options={})
-    r = Resource.new do |o|
-      o.name = options[:name] || ""
-      o.id   = 0
-    end
-  end
-  
   # return true if its the special resource 'anyone'
   def anyone?
     self.id == 0
