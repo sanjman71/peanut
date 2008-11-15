@@ -22,17 +22,4 @@ module FreeHelper
     end
   end
   
-  # map each collection object to  link_name, link_parameter, and css class names
-  def build_links(collection, options={})
-    default = options[:default]
-    param   = options[:param]
-    current = options[:current]
-    
-    collection.each do |s|
-      link_title  = s
-      link_param  = (s == default) ? {} : Hash[param => s]
-      klass_name  = (s == current) ? 'current' : ''
-      yield link_title, link_param, klass_name
-    end
-  end
 end
