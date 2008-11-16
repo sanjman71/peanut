@@ -9,7 +9,7 @@
         Schedule for
         = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, @resource.id), :onchange => "window.location = '/resources/' + $F(this) + '/free/manage'")
     .section_body
-      #add_message
+      #appointment_flash
       %h2
         == #{@when.titleize}
       #free_calendar
@@ -17,7 +17,7 @@
       %h2#appointments_count
         = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
       .appointments#free_schedule
-        = render(:partial => 'schedule.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
+        = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
         
   .right
     .col

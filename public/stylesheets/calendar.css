@@ -10,11 +10,9 @@ table.calendar th                                 { background: transparent none
 table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 9px; padding: 3px;
                                                     vertical-align: top;}
                                             
-table.calendar td.free                            { background: #FFCC00 none repeat scroll 0 0; color: #333333; border: 2px solid #AA5555; 
-                                                    font-weight: bold; }
+table.calendar td.free                            { background: #FFCC00 none repeat scroll 0 0; color: #333333; font-weight: bold; }
 
-table.calendar td.work                            { background: #FFCC00 none repeat scroll 0 0; color: #333333; border: 2px solid #AA5555; 
-                                                    font-weight: bold; }
+table.calendar td.work                            { background: #FFCC00 none repeat scroll 0 0; color: #333333; font-weight: bold; }
 
 table.calendar span                               { margin: 3px 0 0; padding: 0; font-size: 9px;}
                                                     
@@ -25,7 +23,11 @@ div.appointments h2, div.timeslots h2             { color: #CC9933; font-size: 1
 div.appointments h3, div.timeslots h3             { color: #CC9933; font-size: 11px; border: none; }
 
 div.appointments .timeslot, div.timeslots .timeslot, div.appointments .appointment
-                                                  { color: #000000; font-size: 10px; background: #FFFFCC; }
+                                                  { color: #000000; font-size: 10px; background: #FFFFFF; }
+
+div.appointments .hover                           { background: #FFFFCC; }
+
+div.appointments .hover_content                   { padding: 5px; }
                                                   
 div.appointments .free                            { color: #000000; }
 

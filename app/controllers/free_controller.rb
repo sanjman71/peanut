@@ -90,15 +90,7 @@ class FreeController < ApplicationController
     manage_shared
   end
     
-  # GET /resources/1/free/20081231T060000/edit
-  # def edit
-  #   # initialize resource
-  #   @resource   = Resource.find(params[:resource_id])
-  #   @day        = params[:id]
-  #   @time       = Time.parse(params[:id])
-  # end
-
-  # POST /resources/1/free/
+  # POST /resources/1/create
   def create
     # build new appointment
     job_free      = Job.free.first
@@ -124,10 +116,21 @@ class FreeController < ApplicationController
     end
     
     # save appointment
-    @appointment.save  
-    @add_text = "Created appointment"
+    @appointment.save
+    @notice_text = "Created appointment"
 
     logger.debug("*** created free time")
+        
+    manage_shared
+  end
+  
+  # DELETE /resources/1/destroy
+  def destroy
+    @appointment  = Appointment.find(params[:id])
+    @appointment.destroy
+    @notice_text  = "Deleted appointment"
+    
+    logger.debug("*** deleted appointment #{@appointment.id}")
         
     manage_shared
   end

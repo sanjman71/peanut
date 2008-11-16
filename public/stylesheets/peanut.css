@@ -63,11 +63,11 @@ div.section_header span.other_indexes             { float: right; font-size: 11p
 div.section_body                                  { padding: 20px 60px 20px 20px;}
 
 div.section_body h1, div.section_body div.notice                              
-                                                  { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; margin: 0; 
-                                                    padding: 3px; text-align: left; }
+                                                  { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; font-weight: bold; 
+                                                    margin: 0; padding: 3px; text-align: left; }
 
-div.section_body h2                               { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; margin: 15px 0 5px; 
-                                                    padding: 0 0 2px;}
+div.section_body h2                               { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; font-weight: bold; 
+                                                    margin: 15px 0 5px; padding: 0 0 2px; }
 
 div#free_times                                    { font-size: 11px; padding: 0; margin: 0; }
 
