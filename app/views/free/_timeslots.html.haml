@@ -1,0 +1,13 @@
+- timeslots_by_day.each do |day, timeslots|
+  %h2== #{day.to_s(:appt_day)}
+  -# group timeslots by resource
+  - timeslots.group_by { |timeslot| timeslot.resource }.each do |resource, timeslots|
+    - timeslots.each_with_index do |timeslot, i|
+      - id = "#{timeslot.start_at.to_s(:appt_schedule)}_#{resource.name.downcase}_#{i}"
+      .timeslot{:id => "timeslot_#{id}", :onmouseover => "$('hover_timeslot_#{id}').show();$('timeslot_#{id}').addClassName('hover')", :onmouseout => "$('hover_timeslot_#{id}').hide();$('timeslot_#{id}').removeClassName('hover')"}
+        %span.resource= resource.name
+        %span.job= job.name
+        at
+        %span.time== #{timeslot.start_at.to_s(:appt_time)}
+        %span.hover_region{:id => "hover_timeslot_#{id}", :style => 'display: none'}
+          = link_to('Book It', schedule_path(:subdomain => @subdomain, :resource_id => resource.id, :job_id => job.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))

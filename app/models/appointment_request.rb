@@ -4,11 +4,11 @@ class AppointmentRequest < Appointment
     # find free appointments with duration >= this request's job duration
     duration    = self.job.duration
     if resource_id.blank?
-      # find free appointments for any resource
-      collection = Appointment.company(company_id).span(start_at, end_at).duration_gt(duration).free
+      # find free appointments for any resource, order by start times
+      collection = Appointment.company(company_id).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     else
-      # find free appointments for a specific resource
-      collection = Appointment.company(company_id).resource(resource_id).span(start_at, end_at).duration_gt(duration).free
+      # find free appointments for a specific resource, order by start times
+      collection = Appointment.company(company_id).resource(resource_id).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     end
   end
   

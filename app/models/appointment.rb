@@ -30,7 +30,8 @@ class Appointment < ActiveRecord::Base
   named_scope :free,        { :conditions => {:mark_as => Job::FREE} }
   named_scope :busy,        { :conditions => {:mark_as => Job::BUSY} }
   named_scope :work,        { :conditions => {:mark_as => Job::WORK} }
-    
+  named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", Job::FREE, Job::WORK]}
+  
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
   WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
@@ -136,9 +137,33 @@ class Appointment < ActiveRecord::Base
     self.customer = Customer.find_by_name(customer_attributes["name"]) || self.create_customer(customer_attributes)
   end
     
-  # returns true if the appointment conflicts with any other
+  # returns true if this appointment conflicts with any other
   def conflicts?
-    Appointment.company(company.id).resource(resource.id).span(start_at, end_at).size > 0
+    self.conflicts.size > 0
+  end
+
+  # returns all appointment conflicts
+  def conflicts
+    @conflicts ||= Appointment.company(company.id).resource(resource.id).span(start_at, end_at)
+  end
+  
+  # schedule this work appointment
+  def schedule_work
+    raise AppointmentInvalid if !self.valid?
+    
+    # should be a job that is not free
+    raise AppointmentInvalid if self.job.mark_as != Job::WORK
+    
+    # should have exactly 1 conflict
+    raise TimeslotNotEmpty if self.conflicts.size != 1
+    
+    # conflict should be free time
+    raise TimeslotNotEmpty if self.conflicts.first.job.mark_as != Job::FREE
+    
+    # split the free appointment into multiple appointments
+    free_appointment  = self.conflicts.first
+    new_appointments  = free_appointment.split_free_time(self.job, self.start_at, self.end_at, :commit => 1)
+    work_appointment  = new_appointments.select { |a| a.mark_as == Job::WORK }.first
   end
   
   # split a free appointment into multiple appointments using the specified job and time
@@ -166,6 +191,7 @@ class Appointment < ActiveRecord::Base
     new_appt.start_at = job_start_at
     new_appt.end_at   = job_end_at
     new_appt.mark_as  = job.mark_as
+    new_appt.duration = job.duration
     
     # build new start, end appointments
     unless job_start_at == self.start_at
@@ -174,6 +200,7 @@ class Appointment < ActiveRecord::Base
       start_appt.start_at = self.start_at
       start_appt.end_at   = new_appt.start_at
       start_appt.mark_as  = Job::FREE
+      start_appt.duration -= job.duration
     end
     
     unless job_end_at == self.end_at
@@ -182,6 +209,7 @@ class Appointment < ActiveRecord::Base
       end_appt.start_at   = new_appt.end_at
       end_appt.end_at     = self.end_at
       end_appt.mark_as    = Job::FREE
+      end_appt.duration   -= job.duration
     end
     
     appointments = [start_appt, new_appt, end_appt].compact
@@ -212,8 +240,9 @@ class Appointment < ActiveRecord::Base
     job         = Job.free.first
 
     # create a new appointment object
+    customer    = Customer.nobody
     appointment = Appointment.new(:start_at => start_at, :end_at => end_at, :mark_as => job.mark_as, :job => job, :company => company,
-                                  :resource => resource, :customer_id => 0)
+                                  :resource => resource, :customer_id => customer.id)
                               
     if appointment.conflicts?
       raise TimeslotNotEmpty

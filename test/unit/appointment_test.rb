@@ -147,6 +147,36 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
     
+  def test_should_schedule_work
+    # create big fee timeslot
+    free_appointment = Appointment.create(:company => companies(:company1), 
+                                          :job => jobs(:available),
+                                          :resource => resources(:johnny),
+                                          :customer => customers(:cameron),
+                                          :start_at => "20080801000000",
+                                          :end_at =>   "20080802000000")  # free all day
+                                        
+    # create new appointment object for a haircut
+    job             = jobs(:haircut)
+    new_appointment = Appointment.new(:company => companies(:company1),
+                                      :job => job,
+                                      :resource => resources(:johnny),
+                                      :customer => customers(:cameron),
+                                      :start_at => "20080801000000",
+                                      :duration =>  job.duration)
+                                      
+    assert new_appointment.valid?
+    
+    # should be conflicts
+    assert new_appointment.conflicts?
+    
+    assert_difference('Appointment.count', 1) do
+      # schedule the work appointment, the free appointment should be split into free/work time
+      work_appointment = new_appointment.schedule_work
+      assert work_appointment.valid?
+    end
+  end
+  
   def test_should_schedule_job_in_middle_of_available_timeslot
     # create big available timeslot
     available_appt = Appointment.create(:company => companies(:company1), 
@@ -156,7 +186,6 @@ class AppointmentTest < ActiveSupport::TestCase
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
-
     job           = jobs(:haircut)
     job_start_at  = "20080801120000"
     job_end_at    = "20080801123000" # 30 minutes
@@ -168,27 +197,32 @@ class AppointmentTest < ActiveSupport::TestCase
       # should now have 3 appointments
       assert_equal 3, appts.size
       start_appt    = appts[0]
-      new_appt      = appts[1]
+      work_appt     = appts[1]
       end_appt      = appts[2]
     
       # new appointment should have the specified job
-      assert_equal job, new_appt.job
+      assert_equal job, work_appt.job
     
       # start appointment should end when new appointment starts
       assert_equal available_appt.start_at, start_appt.start_at
-      assert_equal new_appt.start_at, start_appt.end_at
+      assert_equal work_appt.start_at, start_appt.end_at
       assert_equal 'free', start_appt.mark_as
+      # free time duration should be adjusted
+      assert_equal 1440-30, start_appt.duration
       
-      # new appointment should match job start, end times
-      assert_equal Time.zone.parse(job_start_at), new_appt.start_at
-      assert_equal Time.zone.parse(job_end_at), new_appt.end_at
-      # new appointment should be marked as work
-      assert_equal 'work', new_appt.mark_as
-    
+      # work appointment should match job start, end times
+      assert_equal Time.zone.parse(job_start_at), work_appt.start_at
+      assert_equal Time.zone.parse(job_end_at), work_appt.end_at
+      # work appointment should be marked as work
+      assert_equal 'work', work_appt.mark_as
+      assert_equal 30, work_appt.duration
+      
       # end appointment should start when new appointment ends
-      assert_equal new_appt.end_at, end_appt.start_at
+      assert_equal work_appt.end_at, end_appt.start_at
       assert_equal available_appt.end_at, end_appt.end_at
       assert_equal 'free', end_appt.mark_as
+      # free time duration should be adjusted
+      assert_equal 1440-30, end_appt.duration
     end
     
     assert_difference('Appointment.count', 2) do
@@ -251,8 +285,8 @@ class AppointmentTest < ActiveSupport::TestCase
     
     # split appointment
     job           = jobs(:haircut)
-    job_start_at  = "20080801002330"
-    job_end_at    = "20080802000000" # 30 minutes
+    job_start_at  = "20080801002330" # 11:30 pm
+    job_end_at    = "20080802000000" # 12:00 am, 30 minutes
       
     assert_no_difference('Appointment.count') do
       appts         = available_appt.split_free_time(job, job_start_at, job_end_at)

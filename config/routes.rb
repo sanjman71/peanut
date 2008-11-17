@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
-  map.resources :appointments
+  map.resources :appointments, :member => { :confirmation => :get }
   map.resources :free, :collection => { :manage => :get }
   
   # override 'appointments/new' path

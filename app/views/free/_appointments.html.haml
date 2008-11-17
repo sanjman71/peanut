@@ -3,7 +3,10 @@
     == #{day.to_s(:appt_day)}
   - appointments.each do |appointment|
     .appointment{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
-      == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+      %span.job= appointment.job.name
+      %span.time== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
       %span.hover_region{:id => 'hover_appointment_'+appointment.id.to_s, :style => 'display: none'}
         %span.hover_content
-          = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'free', :action => 'destroy', :resource_id => @resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")
+          -# not allowed to delete work appointment
+          - unless appointment.job.mark_as == Job::WORK
+            = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'free', :action => 'destroy', :resource_id => @resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")

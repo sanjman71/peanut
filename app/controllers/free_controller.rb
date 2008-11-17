@@ -48,20 +48,13 @@ class FreeController < ApplicationController
     @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|
       timeslots += @query.find_free_timeslots(:appointments => free_appointment, :limit => 2)
     end
-    @free_days          = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
+    @free_timeslots_by_day = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
     
-    logger.debug("*** found #{@free_appointments.size} free appointments, #{@free_timeslots.size} free timeslots")
-            
-    # initialize calendar params
-    @start_day  = @daterange.start_at
-    @total_days = @daterange.days
-    @today      = Time.now.beginning_of_day
-    
-    logger.debug("*** total days #{@daterange.days}")
+    logger.debug("*** found #{@free_appointments.size} free appointments, #{@free_timeslots.size} free timeslots over #{@daterange.days} days")
     
     # build hash of calendar markings
     @calendar_markings = @free_timeslots.inject(Hash.new) do |hash, timeslot|
-      hash[timeslot.start_at.beginning_of_day.utc.to_s(:appt_schedule)] = 'free'
+      hash[timeslot.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = 'free'
       hash
     end
     
@@ -94,10 +87,11 @@ class FreeController < ApplicationController
   def create
     # build new appointment
     job_free      = Job.free.first
+    customer      = Customer.nobody
     @appointment  = Appointment.new(params[:appointment].merge(:resource_id => params[:resource_id], 
                                                                :job_id => job_free.id,
                                                                :company_id => @current_company.id,
-                                                               :customer_id => 0))
+                                                               :customer_id => customer.id))
     
     # check if appointment is valid                                                           
     if !@appointment.valid?
@@ -117,7 +111,7 @@ class FreeController < ApplicationController
     
     # save appointment
     @appointment.save
-    @notice_text = "Created appointment"
+    @notice_text = "Created free time"
 
     logger.debug("*** created free time")
         
@@ -145,8 +139,8 @@ class FreeController < ApplicationController
     @when         = params[:when] || 'this week'
     @daterange    = DateRange.new(:when => @when)
     
-    # find free appointments for a resource
-    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    # find free, work appointments for a resource
+    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
