@@ -1,40 +1,44 @@
-- content_for :stylesheets do
-  = stylesheet_link_tag 'calendar'
-
-%div.container
-  %div.left
-    %div.section_header
+.container
+  .left
+    .section_header
       %span.other_indexes
-        -#= link_to "Upcoming", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id), :class => add_class_if(@when == :upcoming, 'current')
-        -#%span= "|"
-        -#= link_to "All", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id, :when => 'all'), :class => add_class_if(@when == :all, 'current')
-        -#= "|"
-        -#= link_to "Past", resource_appointments_path(:subdomain => @subdomain, :resource_id => @resource.id, :when => 'past'), :class => add_class_if(@when == :past, 'current')
+        - build_when_links(Appointment::WHEN_WEEKS, @when) do |link, separator|
+          = link
+          = separator
       %h1.index
-        == Show Appointments
-        %p
-        - form_for(Appointment.new, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
-          Who:
-          %span.who= select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id))
-          &nbsp;
-          When:
-          %span#when= select_tag('when', options_for_select(Appointment::WHENS_EXTENDED, @when))
-          %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
+        Schedule for
+        = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, @resource.id), :onchange => "window.location = '/resources/' + $F(this) + '/appointments'")
+    .section_body
+      #appointment_flash
+      %h2
+        == #{@when.titleize}
+      #free_calendar
+        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      %h2#appointments_count
+        = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
+      #free_schedule
+        = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
         
-    %div.section_body
-      %h1== Work schedule for #{@resource.name}
-      %p
-      %h2== #{@when.to_s.titleize}
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @total_days, :start_day => @start_day, :today => @today, :markings => @calendar_markings})
-                 
-      %h2== #{pluralize(@appointments.size, 'appointment')}
-      %div.appointments
-        - @appt_days.each do |day, appointments|
-          %h3== #{day.to_s(:appt_day)}
-          -# group appointments by resource
-          - appointments.group_by { |appointment| appointment.resource }.each do |resource, appointments|
-            %h3= resource.name
-            - appointments.each do |appointment|
-              %div.appointment
-                == #{appointment.mark_as}
-        
+  .right
+    .col
+      .sidebar_form
+        .sidebar_header
+          %h1
+            Add Free Time
+          - form_remote_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :resource_id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+            = hidden_field_tag :when, @when
+            %p
+              %span{:style => 'font-size: 11px; padding: 2px;'}== When
+              %span= select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+            %p
+              %span#start_at_label{:style => 'font-size: 11px; padding: 4px;' }== Start
+              %span= text_field 'appointment[time_range]', 'start_at', :size => 12
+            %p
+              %span#end_at_label{:style => 'font-size: 11px; padding: 6px;' }== End
+              %span= text_field 'appointment[time_range]', 'end_at', :size => 12
+            %p
+              = f.submit 'Add'
+  
+          
+      
+

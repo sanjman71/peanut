@@ -5,20 +5,20 @@ module ApplicationHelper
 
     # 'Schedules' link
     name = 'Schedules'
-    if current_controller.controller_name == 'free' and current_controller.action_name == 'manage'
-      link = link_to(name, manage_free_path, :class => 'current')
+    if current_controller.controller_name == 'appointments' and current_controller.action_name == 'index'
+      link = link_to(name, appointments_path, :class => 'current')
     else
-      link = link_to(name, manage_free_path)
+      link = link_to(name, appointments_path)
     end
     
     yield link
 
     # 'Openings' link
     name = 'Openings'
-    if current_controller.controller_name == 'free' and current_controller.action_name == 'index'
-      link = link_to(name, free_index_path, :class => 'current')
+    if current_controller.controller_name == 'openings' and current_controller.action_name == 'index'
+      link = link_to(name, openings_path, :class => 'current')
     else
-      link = link_to(name, free_index_path)
+      link = link_to(name, openings_path)
     end
     
     yield link

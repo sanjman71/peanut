@@ -2,66 +2,97 @@ class AppointmentsController < ApplicationController
   before_filter :init_current_company
   layout 'default'
   
-  # GET /appointments
-  # GET /appointments.xml
   # GET /resources/1/appointments
-  # GET /resources/1//appointments.xml
   def index
-    if params[:resource_id] == "0"
-      # /resources/0/appointments is canonicalized to /appointments
-      # preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => @subdomain, :resource_id => nil)))
+    if params[:resource_id].blank?
+      # redirect to a specific resource
+      resource = @current_company.resources.first
+      redirect_to url_for(params.update(:subdomain => @subdomain, :resource_id => resource.id))
     end
     
-    # find resource, default to anyone
-    @resource   = params[:resource_id] ? Resource.find(params[:resource_id]) : Resource.anyone
+    manage_appointments
+  end
     
-    # scope appointments by 'when', default to 'this week'
-    @when       = params[:when] ? params[:when] : 'this week'
-    @daterange  = DateRange.new(:when => @when)
+  # POST /resources/1/create
+  def create
+    # build new appointment
+    job_free      = Job.free.first
+    customer      = Customer.nobody
+    @appointment  = Appointment.new(params[:appointment].merge(:resource_id => params[:resource_id], 
+                                                               :job_id => job_free.id,
+                                                               :company_id => @current_company.id,
+                                                               :customer_id => customer.id))
     
-    if @resource.anyone?
-      # find all appointments
-      @appointments = Appointment.company(@current_company.id).span(@daterange.start_at, @daterange.end_at)
-    else
-      # find appointments for a resource
-      @appointments = Appointment.company(@current_company.id).resource(@resource.id).span(@daterange.start_at, @daterange.end_at)
+    # check if appointment is valid                                                           
+    if !@appointment.valid?
+      @error      = true
+      @error_text = ''
+      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      return
     end
-        
-    # initialize calendar params
-    @start_day  = @daterange.start_at
-    @total_days = @daterange.days
-    @today      = Time.now.beginning_of_day
-    
-    logger.debug("*** found #{@appointments.size} appointments over #{@total_days} days")
 
+    # check for conflicts
+    if @appointment.conflicts?
+      @error      = true
+      @error_text = "Appointment conflict"
+      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      return
+    end
+    
+    # save appointment
+    @appointment.save
+    @notice_text = "Created free time"
+
+    logger.debug("*** created free time")
+        
+    manage_appointments
+  end
+  
+  # DELETE /resources/1/destroy
+  def destroy
+    @appointment  = Appointment.find(params[:id])
+    @appointment.destroy
+    @notice_text  = "Deleted appointment"
+    
+    logger.debug("*** deleted appointment #{@appointment.id}")
+        
+    manage_appointments
+  end
+  
+  # shared method for managing free/work appointments
+  def manage_appointments
+    # initialize resource, default to anyone
+    @resource     = Resource.find_by_id(params[:resource_id])
+    @resources    = Resource.all
+
+    # initialize time parameters
+    @when         = params[:when] || 'this week'
+    @daterange    = DateRange.new(:when => @when)
+    
+    # find free, work appointments for a resource
+    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+        
+    logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
+    
     # build hash of calendar markings
     @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
       hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = appointment.mark_as
       hash
     end
-    
+
     logger.debug("*** calendar markings: #{@calendar_markings}")
     
     # group appointments by day
-    @appt_days  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
-    
-    # find resources collection
-    @resources  = Resource.all + Array(Resource.anyone)
-    
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @appointments }
-    end
+    @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
   # temporary fix to format problem
   # why does params have 'authenticity_token' ???
-  def search
-    # remove 'authenticity_token' params
-    params.delete('authenticity_token')
-    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
-  end
+  # def search
+  #   # remove 'authenticity_token' params
+  #   params.delete('authenticity_token')
+  #   redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
+  # end
 
   # GET /appointments/1
   # GET /appointments/1.xml
@@ -152,16 +183,4 @@ class AppointmentsController < ApplicationController
   #   end
   # end
 
-  # DELETE /appointments/1
-  # DELETE /appointments/1.xml
-  # def destroy
-  #   @appointment = Appointment.find(params[:id])
-  #   @appointment.destroy
-  # 
-  #   respond_to do |format|
-  #     format.html { redirect_to(appointments_url) }
-  #     format.xml  { head :ok }
-  #   end
-  # end
-    
 end
