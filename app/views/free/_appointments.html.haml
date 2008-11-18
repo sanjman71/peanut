@@ -1,12 +1,14 @@
 - appointments_by_day.each do |day, appointments|
-  %h3
+  %h3.appointments
     == #{day.to_s(:appt_day)}
-  - appointments.each do |appointment|
-    .appointment{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
-      %span.job= appointment.job.name
-      %span.time== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-      %span.hover_region{:id => 'hover_appointment_'+appointment.id.to_s, :style => 'display: none'}
-        %span.hover_content
-          -# not allowed to delete work appointment
-          - unless appointment.job.mark_as == Job::WORK
+  %table.appointments
+    - appointments.each do |appointment|
+      %tr.appointment{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
+        %td.time== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+        %td.job{:class => appointment.mark_as}= appointment.job.name
+        %td.customer
+          = appointment.customer.name if appointment.customer
+        %td.hover_region{:id => 'hover_appointment_'+appointment.id.to_s, :style => 'display: none; width: 45px; text-align: right;'}
+          - if appointment.job.mark_as == Job::FREE
+            -# free appointments can be deleted
             = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'free', :action => 'destroy', :resource_id => @resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")

@@ -16,30 +16,42 @@ table.calendar td.work                            { background: #FFCC00 none rep
 
 table.calendar span                               { margin: 3px 0 0; padding: 0; font-size: 9px;}
                                                     
-div.appointments, div.timeslots                   { font-family: verdana; font-size: 11px; font-weight: bold; margin: 0; padding 0 0 3px; }
+div.appointments, div.timeslots, table.appointments, table.timeslots                   
+                                                  { font-family: verdana; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 
-div.appointments h2, div.timeslots h2             { color: #CC9933; font-size: 12px; border: none; }
+div.appointments h2, div.timeslots h2, h2.appointments             
+                                                  { color: #CC9933; font-size: 12px; font-weight: bold; border: none; }
 
-div.appointments h3, div.timeslots h3             { color: #CC9933; font-size: 11px; border: none; }
+div.appointments h3, div.timeslots h3, h3.appointments             
+                                                  { color: #CC9933; font-size: 11px; font-weight: bold; border: none; }
 
 div.appointments .timeslot, div.timeslots .timeslot, div.appointments .appointment
                                                   { color: #000000; font-size: 10px; background: #FFFFFF; padding: 3px; }
 
-div.appointments .hover, div.timeslots .hover     { background: #FFFFCC; }
+div.appointments .hover, div.timeslots .hover, table.appointments .hover     
+                                                  { background: #FFFFCC; }
 
-div.appointments .hover_content                   { padding: 5px; }
-                                                  
-div.appointments .free                            { color: #000000; }
+table.appointments td.job                         { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; 
+                                                    padding: 2px 5px; width: 80px; text-align: left; }
 
-div.appointment span.job                          { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; margin-right: 2px; padding: 2px 5px;}
+table.appointments td.work                        { background: #FF6600 none repeat scroll 0 0; }
+                                                    
+table.appointments td.time                        { text-align: left; width: 130px; padding: 0; }
 
-div.timeslot span.resource                        { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; margin-right: 2px; padding: 2px 4px;}
-div.timeslot span.job                             { }
-div.timeslot span.time                            { }
+table.appointments td.customer                    { text-align: left; width: 100px; font-size: 10px; padding-left: 5px; }
 
-div.timeslots .timeslot a, div.appointments .appointment a
+table.timeslots td.resource                       { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; margin-right: 2px; 
+                                                     padding: 2px 5px; text-align: right; width: 60px;}
+                                                     
+table.timeslots td.time                           { text-align: right; width: 60px; padding: 0 5px; }
+
+table.timeslots td.job                            { }
+
+div.timeslots .timeslot a, div.appointments .appointment a, table.appointments .appointment a
                                                   { color: #5500BB; }
-div.timeslots .timeslot a:hover, div.appointments .appointment a:hover
+                                                  
+div.timeslots .timeslot a:hover, div.appointments .appointment a:hover, table.appointments .appointment a:hover
                                                   { color: #5500BB; background-color: #FF6600; }
-div.timeslots .timeslot a:visited, div.appointments .appointment a:visited
+                                                  
+div.timeslots .timeslot a:visited, div.appointments .appointment a:visited, table.appointments .appointment a:visited
                                                   { color: #5500BB; }

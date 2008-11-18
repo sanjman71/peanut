@@ -152,7 +152,7 @@ class AppointmentTest < ActiveSupport::TestCase
     free_appointment = Appointment.create(:company => companies(:company1), 
                                           :job => jobs(:available),
                                           :resource => resources(:johnny),
-                                          :customer => customers(:cameron),
+                                          :customer_id => 0,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
                                         
@@ -174,6 +174,9 @@ class AppointmentTest < ActiveSupport::TestCase
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = new_appointment.schedule_work
       assert work_appointment.valid?
+      # work appointment should have correct attributes
+      assert_equal customers(:cameron), work_appointment.customer
+      assert_equal job, work_appointment.job
     end
   end
   

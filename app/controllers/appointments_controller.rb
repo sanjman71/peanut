@@ -79,7 +79,7 @@ class AppointmentsController < ApplicationController
   def new
     # build appointment hash
     hash = {:job_id => params[:job_id], :resource_id => params[:resource_id], :start_at => params[:start_at], :company_id => @current_company.id}
-    hash.update(params["appointment"]) if params["appointment"]
+    hash.update(params[:appointment]) if params[:appointment]
     
     # build appointment object
     @appointment  = Appointment.new(hash)

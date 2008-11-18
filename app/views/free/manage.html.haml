@@ -16,7 +16,7 @@
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
       %h2#appointments_count
         = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
-      .appointments#free_schedule
+      #free_schedule
         = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
         
   .right

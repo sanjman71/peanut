@@ -162,7 +162,7 @@ class Appointment < ActiveRecord::Base
     
     # split the free appointment into multiple appointments
     free_appointment  = self.conflicts.first
-    new_appointments  = free_appointment.split_free_time(self.job, self.start_at, self.end_at, :commit => 1)
+    new_appointments  = free_appointment.split_free_time(self.job, self.start_at, self.end_at, :commit => 1, :customer => self.customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Job::WORK }.first
   end
   
@@ -192,6 +192,7 @@ class Appointment < ActiveRecord::Base
     new_appt.end_at   = job_end_at
     new_appt.mark_as  = job.mark_as
     new_appt.duration = job.duration
+    new_appt.customer = options[:customer] if options[:customer]
     
     # build new start, end appointments
     unless job_start_at == self.start_at

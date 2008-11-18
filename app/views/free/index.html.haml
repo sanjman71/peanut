@@ -22,7 +22,7 @@
           = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
           
         %h2#timeslots_count
-          == #{pluralize(@free_timeslots.size, 'available appointment')}
+          %span.count== #{pluralize(@free_timeslots.size, 'available appointment')}
         .timeslots#free_timeslots
           = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :job => @job})
       
