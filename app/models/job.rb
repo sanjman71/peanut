@@ -21,7 +21,7 @@ class Job < ActiveRecord::Base
   def self.nothing(options={})
     r = Job.new do |o|
       o.name = options[:name] || ""
-      o.id   = 0
+      o.send(:id=, 0)
     end
   end
   

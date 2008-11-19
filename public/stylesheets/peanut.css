@@ -94,6 +94,16 @@ div.instructions                                  { background: #FFFFCC; padding
 
 div.instructions ul                               { font-size: 12px; }
 
+/* confirmation styles */
+
+div.confirmation                                  { font-size: 12px; font-weight: normal; }
+
+div.confirmation span.description                 { background: #FFFFCC; }
+
+div.confirmation span.confirmation_code           { background: #FFFFCC; }
+
+div.confirmation span.email                       { background: #FFFFCC; }
+
 /* sidebar styles */
 
 div.sidebar_form                                  { background: #F2F5FB none repeat scroll 0 0; border: 1px solid #C0D1EC; 

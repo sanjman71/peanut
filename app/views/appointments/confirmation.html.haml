@@ -5,5 +5,19 @@
         == Appointment confirmation
         
     .section_body
-      %h1== #{@appointment.job.name} with #{@appointment.resource.name} on #{@appointment.start_at.to_s(:appt_day_date_time)}
+      .confirmation
+        == Your appointment for a 
+        %span.description
+          == #{@appointment.job.name} with #{@appointment.resource.name} on #{@appointment.start_at.to_s(:appt_day_date_time)}
+        == has been confirmed.
+        %p
+        == Your confirmation code is 
+        %span.confirmation_code
+          ==#{@appointment.confirmation_code}
+        == . You will need this code to reference your appointment.
+        %p
+        == A confirmation email has also been sent to
+        %span.email
+          = @appointment.customer.email
+        == .
       

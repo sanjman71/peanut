@@ -9,7 +9,7 @@ class Resource < ActiveRecord::Base
   def self.anyone
     r = Resource.new do |o|
       o.name = "Anyone"
-      o.id   = 0
+      o.send(:id=, 0)
     end
   end
   

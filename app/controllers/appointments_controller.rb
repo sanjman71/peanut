@@ -128,7 +128,11 @@ class AppointmentsController < ApplicationController
       logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
       
       begin
+        # create work appointment by resolving the conflicting and re-arrange the free time
         @work_appointment = @appointment.schedule_work
+        
+        # send appointment confirmation
+        MailWorker.async_appointment_confirmation(:id => @work_appointment.id)
       rescue Exception => e
         logger.debug("*** could not schedule appointment: #{e.message}")
         return

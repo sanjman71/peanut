@@ -10,6 +10,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :customer_id
   should_require_attributes :start_at
   should_require_attributes :end_at
+  should_require_attributes :confirmation_code
   should_allow_values_for :mark_as, "free", "busy"
   
   def test_span
@@ -174,7 +175,7 @@ class AppointmentTest < ActiveSupport::TestCase
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = new_appointment.schedule_work
       assert work_appointment.valid?
-      # work appointment should have correct attributes
+      # work appointment should have the correct customer and job
       assert_equal customers(:cameron), work_appointment.customer
       assert_equal job, work_appointment.job
     end

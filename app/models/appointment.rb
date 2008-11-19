@@ -8,7 +8,7 @@ class Appointment < ActiveRecord::Base
   belongs_to              :job
   belongs_to              :resource
   belongs_to              :customer
-  validates_presence_of   :company_id, :job_id, :resource_id, :customer_id, :start_at, :end_at
+  validates_presence_of   :company_id, :job_id, :resource_id, :customer_id, :start_at, :end_at, :confirmation_code
   validates_inclusion_of  :mark_as, :in => %w(free busy work)
   
   named_scope :company,     lambda { |id| { :conditions => {:company_id => id} }}
@@ -51,6 +51,9 @@ class Appointment < ActiveRecord::Base
       # initialize mark_as field with job.mark_as
       self.mark_as = self.job.mark_as
     end
+
+    # initialize confirmation code
+    self.make_confirmation_code
   end
   
   def validate
@@ -160,7 +163,7 @@ class Appointment < ActiveRecord::Base
     # conflict should be free time
     raise TimeslotNotEmpty if self.conflicts.first.job.mark_as != Job::FREE
     
-    # split the free appointment into multiple appointments
+    # split the free appointment into free/work appointments
     free_appointment  = self.conflicts.first
     new_appointments  = free_appointment.split_free_time(self.job, self.start_at, self.end_at, :commit => 1, :customer => self.customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Job::WORK }.first
@@ -254,4 +257,11 @@ class Appointment < ActiveRecord::Base
     
     appointment
   end
+  
+  protected
+  
+  def make_confirmation_code
+    self.confirmation_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
+  end
+  
 end

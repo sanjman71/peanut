@@ -39,6 +39,7 @@ class CreateCompanies < ActiveRecord::Migration
       t.datetime :end_at
       t.integer :duration
       t.string :mark_as
+      t.string :confirmation_code
       
       t.timestamps
     end
