@@ -15,3 +15,13 @@
 5. Go to http://company1.localhost:3000/appointments to see appointments for a company.
 
 
+== Configuring/Starting Starling and Workling
+
+1. Start the starling daemon: 
+   - sudo starling -d -p 22122
+
+2. Start the workling client and monitor
+   - ./script/workling_client start
+
+
+
