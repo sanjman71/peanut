@@ -16,16 +16,10 @@
           %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
     - unless @when.blank?
       .section_body
-        %h1== Available appointments
+        %h1== #{pluralize(@free_timeslots.size, 'Available Appointment')}
         %h2== #{@when.titleize}
         #free_calendar
           = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-          
-        %h2#free_timeslots_count
-          %span.job
-            = @job.name
-          %span.count
-            == #{pluralize(@free_timeslots.size, 'available appointment')}
         .timeslots#free_timeslots
           = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :job => @job})
       

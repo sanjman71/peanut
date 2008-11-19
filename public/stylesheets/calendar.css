@@ -34,7 +34,7 @@ div.appointments .hover, div.timeslots .hover, table.appointments .hover
 table.appointments td.job                         { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; 
                                                     padding: 2px 5px; width: 80px; text-align: left; }
 
-table.appointments td.work                        { background: #FF6600 none repeat scroll 0 0; }
+table.appointments td.work                        { background: #663333 none repeat scroll 0 0; }
                                                     
 table.appointments td.time                        { text-align: left; width: 130px; padding: 0; }
 
