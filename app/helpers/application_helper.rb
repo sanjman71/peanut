@@ -23,6 +23,16 @@ module ApplicationHelper
     
     yield link
 
+    # 'Customers' link
+    name = 'Customers'
+    if current_controller.controller_name == 'customers' and current_controller.action_name == 'index'
+      link = link_to(name, customers_path, :class => 'current')
+    else
+      link = link_to(name, customers_path)
+    end
+
+    yield link
+
     # 'Resources' link
     name = 'Resources'
     if current_controller.controller_name == 'resources' and current_controller.action_name == 'index'
@@ -30,7 +40,7 @@ module ApplicationHelper
     else
       link = link_to(name, resources_path)
     end
-    
+
     yield link
   end
   

@@ -1,14 +1,26 @@
 class CustomersController < ApplicationController
-  layout 'admin'
+  before_filter :init_current_company
+  layout 'default'
   
   # GET /customers
   # GET /customers.xml
   def index
-    @customers = Customer.find(:all)
-
+    @search     = params[:search]
+    
+    # TODO: restrict search to customers within the current company
+    
+    if @search
+      @customers    = Customer.search_name(@search).all(:order => "name ASC")
+      @search_text  = "Customers matching '#{@search}'"
+    else
+      @customers    = Customer.all(:order => "name ASC")
+      @search_text  = "All Customers"
+    end
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @customers }
+      format.js
     end
   end
 

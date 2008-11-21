@@ -1,0 +1,17 @@
+/* customer styles */
+        
+        
+div.customers_header                              { color: #333333; font-size: 12px; font-weight: bold; margin: 10px 0 10px; }
+                                            
+table.customers                                   { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 70%; clear: left; }
+
+table.customers td                                { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
+                                                    vertical-align: top; width: 50%; }
+
+table.customers td.contact_info                   { padding-left: 10px; }
+
+div.customer_name                                 { margin-left: 20px; }
+
+div.customer h1                                   { color: #000000; font-size: 16px; margin: 0 0 5px; padding: 0; }
+
+div.customer h2                                   { color: #333333; font-size: 12px; margin: 0 0 7px; padding: 0; }

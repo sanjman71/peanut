@@ -1,0 +1,11 @@
+%table.customers
+  - customers.each do |customer|
+    %tr{:id => "row_customer_#{customer.id}"}
+      %td
+        .customer{:id => "customer_#{customer.id}"}
+          %h1= customer.name
+      %td.contact_info
+        .customer
+          %h2= customer.email
+        .customer
+          %h2= customer.phone
