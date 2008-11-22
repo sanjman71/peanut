@@ -4,7 +4,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings
   
   # override 'appointments/new' path
-  map.schedule        'schedule/resources/:resource_id/jobs/:job_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule        'schedule/resources/:resource_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
   map.resources :resources do |resource|
     # nested appointments routes
@@ -12,16 +12,12 @@ ActionController::Routing::Routes.draw do |map|
     # nested openings routes
     resource.resources :openings
     
-    # nested job routes
-    resource.resources :jobs do |job|
-      # deeply nested appointment, opening routes
-      job.resources :appointments
-      job.resources :openings
-    end
+    # nested services routes
+    resource.resources :services,   :has_many => [:appointments, :openings]
   end
   
-  # jobs with nested resources
-  map.resources :jobs,              :has_many => [:appointments, :openings]
+  # services with nested resources
+  map.resources :services,          :has_many => [:appointments, :openings]
   
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]

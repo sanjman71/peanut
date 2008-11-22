@@ -6,15 +6,15 @@
       - hover_id = 'appointment_'+appointment.id.to_s
       %tr.appointment.hover_region{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
         %td.time{:hover_region => hover_id}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-        %td.job{:class => appointment.mark_as, :hover_region => hover_id}= appointment.job.name
+        %td.service{:class => appointment.mark_as, :hover_region => hover_id}= appointment.service.name
         - if appointment.customer
           %td.customer{:hover_region => hover_id}
             = appointment.customer.name
         %td.hover_region{:id => 'hover_'+hover_id, :style => 'display: none; padding-left: 10px; text-align: left;'}
-          - if appointment.job.mark_as == Job::FREE
+          - if appointment.service.mark_as == Appointment::FREE
             -# free appointments can be deleted
             = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'destroy', :resource_id => @resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")
-          - elsif appointment.job.mark_as == Job::WORK
+          - elsif appointment.service.mark_as == Appointment::WORK
             -# work appointments can be changed
             = link_to "Change", appointment_path(appointment)
           

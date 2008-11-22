@@ -2,6 +2,7 @@ class Company < ActiveRecord::Base
   validates_uniqueness_of   :name
   validates_presence_of     :name
   has_many                  :resources
+  has_many                  :services
   has_many                  :appointments
   has_many                  :customers, :through => :appointments, :uniq => true
   before_save               :init_subdomain

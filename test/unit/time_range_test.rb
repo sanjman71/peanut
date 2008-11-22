@@ -1,7 +1,7 @@
 require 'test/test_helper'
 
 class TimeRangeTest < ActiveSupport::TestCase
-  fixtures :resources, :jobs, :companies
+  fixtures :resources, :services, :companies
   
   def test_time_range
     tomorrow  = (Time.now + 1.day).to_s(:appt_schedule_day) # e.g. 20081201

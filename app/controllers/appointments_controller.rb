@@ -21,11 +21,11 @@ class AppointmentsController < ApplicationController
     
   # POST /resources/1/create
   def create
-    # build new appointment
-    job_free      = Job.free.first
+    # build new free appointment
+    service       = Service.free.first
     customer      = Customer.nobody
     @appointment  = Appointment.new(params[:appointment].merge(:resource_id => params[:resource_id], 
-                                                               :job_id => job_free.id,
+                                                               :service_id => service.id,
                                                                :company_id => @current_company.id,
                                                                :customer_id => customer.id))
     
@@ -103,11 +103,11 @@ class AppointmentsController < ApplicationController
     end
   end
 
-  # GET /schedule/resources/1/jobs/1/20081231T000000
-  # POST /schedule/resources/1/jobs/1/20081231T000000
+  # GET /schedule/resources/1/services/1/20081231T000000
+  # POST /schedule/resources/1/services/1/20081231T000000
   def new
     # build appointment hash
-    hash = {:job_id => params[:job_id], :resource_id => params[:resource_id], :start_at => params[:start_at], :company_id => @current_company.id}
+    hash = {:service_id => params[:service_id], :resource_id => params[:resource_id], :start_at => params[:start_at], :company_id => @current_company.id}
     hash.update(params[:appointment]) if params[:appointment]
     
     # build appointment object
@@ -144,6 +144,11 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1/confirmation
   def confirmation
     @appointment = Appointment.find(params[:id])
+  end
+  
+  # GET /appointments/search
+  def search
+    
   end
   
   # GET /appointments/1/edit

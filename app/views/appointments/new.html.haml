@@ -5,7 +5,7 @@
         == Confirm your appointment
         
     .section_body
-      %h1== #{@appointment.job.name} with #{@appointment.resource.name} on #{@appointment.start_at.to_s(:appt_day_date_time)}
+      %h1= appointment_description(@appointment)
       %p
       .schedule_message
         == Before we finalize your appointment, we need some information about you. 

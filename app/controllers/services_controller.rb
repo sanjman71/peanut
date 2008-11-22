@@ -1,21 +1,21 @@
-class JobsController < ApplicationController
+class ServicesController < ApplicationController
   layout 'admin'
   
   # GET /jobs
   # GET /jobs.xml
   def index
-    @jobs = Job.find(:all)
+    @services = Service.find(:all)
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @jobs }
+      format.xml  { render :xml => @services }
     end
   end
 
   # GET /jobs/1
   # GET /jobs/1.xml
   def show
-    @job = Job.find(params[:id])
+    @service = Service.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -26,7 +26,7 @@ class JobsController < ApplicationController
   # GET /jobs/new
   # GET /jobs/new.xml
   def new
-    @job = Job.new
+    @service = Service.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -36,22 +36,22 @@ class JobsController < ApplicationController
 
   # GET /jobs/1/edit
   def edit
-    @job = Job.find(params[:id])
+    @service = Service.find(params[:id])
   end
 
   # POST /jobs
   # POST /jobs.xml
   def create
-    @job = Job.new(params[:job])
+    @service = Service.new(params[:service])
 
     respond_to do |format|
-      if @job.save
+      if @service.save
         flash[:notice] = 'Job was successfully created.'
-        format.html { redirect_to(@job) }
-        format.xml  { render :xml => @job, :status => :created, :location => @job }
+        format.html { redirect_to(@service) }
+        format.xml  { render :xml => @service, :status => :created, :location => @job }
       else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @job.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @service.errors, :status => :unprocessable_entity }
       end
     end
   end

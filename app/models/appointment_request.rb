@@ -1,8 +1,9 @@
 class AppointmentRequest < Appointment
 
   def find_free_appointments(options={})
-    # find free appointments with duration >= this request's job duration
-    duration    = self.job.duration
+    # find free appointments with duration >= this request's service duration
+    duration    = self.service.duration
+    
     if resource_id.blank?
       # find free appointments for any resource, order by start times
       collection = Appointment.company(company_id).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
@@ -20,12 +21,12 @@ class AppointmentRequest < Appointment
     # parse options
     limit       = options[:limit].to_i if options[:limit]
     
-    # find free appointments with duration >= job's duration
+    # find free appointments with duration >= service's duration
     collection  = options[:appointments] || self.find_free_appointments
     collection  = Array(collection)
     
     # iterate over free appointments
-    duration    = self.job.duration
+    duration    = self.service.duration
     timeslots   = collection.inject([]) do |array, appointment|
       # create appointment timeslot
       timeslot = AppointmentTimeslot.new(appointment)
@@ -35,7 +36,7 @@ class AppointmentRequest < Appointment
       timeslot.end_at   = self.end_at if appointment.end_at > self.end_at
       timeslot.duration = (timeslot.end_at.to_i - timeslot.start_at.to_i) / 60
 
-      # break timeslot into chunks based on job duration
+      # break timeslot into chunks based on service duration
       chunks = timeslot.duration / duration
       
       # apply limit based on current array size

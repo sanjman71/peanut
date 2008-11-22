@@ -19,7 +19,7 @@ table.appointments                                {  }
 
 table.appointments tr                             { margin: 5px 0 0; padding: 2px 5px 2px; }
 
-table.appointments td.job                         { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; 
+table.appointments td.service                     { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; 
                                                     padding: 2px 5px; width: 100px; text-align: left; }
 
 table.appointments td.work                        { background: #663333 none repeat scroll 0 0; }
@@ -33,7 +33,7 @@ table.timeslots td.resource                       { background: #5500BB none rep
                                                      
 table.timeslots td.time                           { text-align: right; width: 60px; padding: 0 5px; }
 
-table.timeslots td.job                            { background: #FF6600 none repeat scroll 0 0; margin-right: 5px; padding: 1px 5px; }
+table.timeslots td.service                        { background: #FF6600 none repeat scroll 0 0; margin-right: 5px; padding: 1px 5px; }
 
 div.timeslots .timeslot a, div.appointments .appointment a, table.appointments .appointment a
                                                   { color: #5500BB; font-weight: bold; }

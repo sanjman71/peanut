@@ -8,18 +8,18 @@ namespace :db do
       puts "#{Time.now}: adding test data ..."
       
       # create test companies
-      Company.create(:name => "Company 1")
-      Company.create(:name => "Company 2")
-      Company.create(:name => "Company 3")
+      company1 = Company.create(:name => "Company 1")
+      company2 = Company.create(:name => "Company 2")
+      company3 = Company.create(:name => "Company 3")
     
-      # create basic jobs
-      Job.create(:name => Job::AVAILABLE, :duration => 0, :mark_as => "free")
-      Job.create(:name => Job::UNAVAILABLE, :duration => 0, :mark_as => "busy")
-      Job.create(:name => "Haircut", :duration => 30, :mark_as => "busy")
+      # create basic services
+      company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
+      company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
+      company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
     
       # create basic resources
-      Resource.create(:name => "Johnny", :company => Company.find_by_name("Company 1"))
-      Resource.create(:name => "Mary", :company => Company.find_by_name("Company 1"))
+      company1.resources.create(:name => "Johnny")
+      company1.resources.create(:name => "Mary")
 
       puts "#{Time.now}: completed"
     end

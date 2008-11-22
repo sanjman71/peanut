@@ -33,22 +33,22 @@ module ApplicationHelper
 
     yield link
 
+    # 'Appointments' link
+    name = 'Appointments'
+    if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
+      link = link_to(name, search_appointments_path, :class => 'current')
+    else
+      link = link_to(name, search_appointments_path)
+    end
+
+    yield link
+
     # 'Resources' link
     name = 'Resources'
     if current_controller.controller_name == 'resources' and current_controller.action_name == 'index'
       link = link_to(name, resources_path, :class => 'current')
     else
       link = link_to(name, resources_path)
-    end
-
-    yield link
-
-    # 'Appointments' link
-    name = 'Appointments'
-    if current_controller.controller_name == 'appointments' and current_controller.action_name == 'show'
-      link = link_to(name, search_appointments_path, :class => 'current')
-    else
-      link = link_to(name, search_appointments_path)
     end
 
     yield link

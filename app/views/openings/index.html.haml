@@ -6,7 +6,7 @@
         %p
         - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
           What:
-          %span#what= select_tag('job_id', options_for_select(@jobs.collect{ |j| [j.name, j.id]}, @job.id))
+          %span#what= select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
           &nbsp;
           Who:
           %span#who= select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id))
@@ -21,7 +21,7 @@
         #free_calendar
           = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
         .timeslots#free_timeslots
-          = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :job => @job})
+          = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
       
   .right
     .col
