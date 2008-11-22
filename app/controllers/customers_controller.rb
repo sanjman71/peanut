@@ -5,11 +5,11 @@ class CustomersController < ApplicationController
   # GET /customers
   # GET /customers.xml
   def index
-    @search     = params[:search]
+    @search = params[:search]
     
     # TODO: restrict search to customers within the current company
     
-    if @search
+    if !@search.blank?
       @customers    = Customer.search_name(@search).all(:order => "name ASC")
       @search_text  = "Customers matching '#{@search}'"
     else

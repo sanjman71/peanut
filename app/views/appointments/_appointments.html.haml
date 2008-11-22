@@ -3,12 +3,18 @@
     == #{day.to_s(:appt_day)}
   %table.appointments
     - appointments.each do |appointment|
-      %tr.appointment{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
-        %td.time== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-        %td.job{:class => appointment.mark_as}= appointment.job.name
-        %td.customer
-          = appointment.customer.name if appointment.customer
-        %td.hover_region{:id => 'hover_appointment_'+appointment.id.to_s, :style => 'display: none; width: 45px; text-align: right;'}
+      - hover_id = 'appointment_'+appointment.id.to_s
+      %tr.appointment.hover_region{:class => appointment.mark_as, :id => 'appointment_'+appointment.id.to_s, :onmouseover => "$('hover_appointment_#{appointment.id}').show();$('appointment_#{appointment.id}').addClassName('hover')", :onmouseout => "$('hover_appointment_#{appointment.id}').hide();$('appointment_#{appointment.id}').removeClassName('hover')"}
+        %td.time{:hover_region => hover_id}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+        %td.job{:class => appointment.mark_as, :hover_region => hover_id}= appointment.job.name
+        - if appointment.customer
+          %td.customer{:hover_region => hover_id}
+            = appointment.customer.name
+        %td.hover_region{:id => 'hover_'+hover_id, :style => 'display: none; padding-left: 10px; text-align: left;'}
           - if appointment.job.mark_as == Job::FREE
             -# free appointments can be deleted
             = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'destroy', :resource_id => @resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")
+          - elsif appointment.job.mark_as == Job::WORK
+            -# work appointments can be changed
+            = link_to "Change", appointment_path(appointment)
+          

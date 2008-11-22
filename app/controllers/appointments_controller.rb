@@ -4,6 +4,12 @@ class AppointmentsController < ApplicationController
   
   # GET /resources/1/appointments
   def index
+    if params[:customer_id]
+      @customer     = Customer.find(params[:customer_id])
+      @appointments = @customer.appointments
+      raise Exception, "show customer appointments: #{@appointments.size}"
+    end
+    
     if params[:resource_id].blank?
       # redirect to a specific resource
       resource = @current_company.resources.first
@@ -86,24 +92,16 @@ class AppointmentsController < ApplicationController
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
-  # temporary fix to format problem
-  # why does params have 'authenticity_token' ???
-  # def search
-  #   # remove 'authenticity_token' params
-  #   params.delete('authenticity_token')
-  #   redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
-  # end
-
   # GET /appointments/1
   # GET /appointments/1.xml
-  # def show
-  #   @appointment = Appointment.find(params[:id])
-  # 
-  #   respond_to do |format|
-  #     format.html # show.html.erb
-  #     format.xml  { render :xml => @appointment }
-  #   end
-  # end
+  def show
+    @appointment = Appointment.find(params[:id])
+  
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @appointment }
+    end
+  end
 
   # GET /schedule/resources/1/jobs/1/20081231T000000
   # POST /schedule/resources/1/jobs/1/20081231T000000

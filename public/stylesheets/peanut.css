@@ -120,3 +120,11 @@ div.sidebar_header h1                             { font-size: 14px; font-weight
 .red                                              { color: #FF0000; font-style: bold; font-size: 12px; }
 
 .green                                            { color: #FF6600; font-style: bold; font-size: 12px; }
+
+/* test hover regions */
+
+div.nubbin                                        { height: 0; left: -4px; position: relative; top: -4px; width: 0; }
+
+div.nubbin_content                                { font-size: 11px; height: 19px; line-height: 10px; margin: 0; padding: 7px 0 0 7px;
+                                                    position: absolute; right: 0; width: 59px; }
+  

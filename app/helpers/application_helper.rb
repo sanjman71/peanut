@@ -42,6 +42,16 @@ module ApplicationHelper
     end
 
     yield link
+
+    # 'Appointments' link
+    name = 'Appointments'
+    if current_controller.controller_name == 'appointments' and current_controller.action_name == 'show'
+      link = link_to(name, search_appointments_path, :class => 'current')
+    else
+      link = link_to(name, search_appointments_path)
+    end
+
+    yield link
   end
   
 end

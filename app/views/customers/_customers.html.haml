@@ -3,9 +3,12 @@
     %tr{:id => "row_customer_#{customer.id}"}
       %td
         .customer{:id => "customer_#{customer.id}"}
-          %h1= customer.name
+          %h1= link_to customer.name, customer_path(customer)
       %td.contact_info
         .customer
           %h2= customer.email
         .customer
           %h2= customer.phone
+      %td
+        .customer
+          %h2= link_to "Appointments", customer_appointments_path(customer)

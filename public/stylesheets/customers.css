@@ -1,12 +1,12 @@
 /* customer styles */
         
         
-div.customers_header                              { color: #333333; font-size: 12px; font-weight: bold; margin: 10px 0 10px; }
+div.customers_header                              { color: #666666; font-size: 12px; font-weight: bold; margin: 10px 0 10px; }
                                             
-table.customers                                   { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 70%; clear: left; }
+table.customers                                   { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; clear: left; }
 
 table.customers td                                { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
-                                                    vertical-align: top; width: 50%; }
+                                                    vertical-align: top; width: 30%; }
 
 table.customers td.contact_info                   { padding-left: 10px; }
 

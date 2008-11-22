@@ -1,6 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :companies
-  map.resources :appointments, :member => { :confirmation => :get }
+  map.resources :appointments, :member => { :confirmation => :get }, :collection => { :search => :any }
   map.resources :openings
   
   # override 'appointments/new' path
@@ -25,7 +25,10 @@ ActionController::Routing::Routes.draw do |map|
     job.resources :openings
   end
   
-  map.resources :customers
+  map.resources :customers do |resource|
+    # nested appointments routes
+    resource.resources :appointments
+  end
   
   # map the company root to the appointments controller
   map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }

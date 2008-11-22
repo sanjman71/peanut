@@ -1,0 +1,10 @@
+.container
+  .left
+    .section_header
+      Appointment Details
+    .section_body
+      .appointment
+        .description
+          = appointment_description(@appointment)
+        .customer
+          = @appointment.customer.name
