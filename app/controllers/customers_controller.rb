@@ -7,13 +7,11 @@ class CustomersController < ApplicationController
   def index
     @search = params[:search]
     
-    # TODO: restrict search to customers within the current company
-    
     if !@search.blank?
-      @customers    = Customer.search_name(@search).all(:order => "name ASC")
+      @customers    = @current_company.customers.search_name(@search).all(:order => "name ASC")
       @search_text  = "Customers matching '#{@search}'"
     else
-      @customers    = Customer.all(:order => "name ASC")
+      @customers    = @current_company.customers.all(:order => "name ASC")
       @search_text  = "All Customers"
     end
     

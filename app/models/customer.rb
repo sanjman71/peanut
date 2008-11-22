@@ -2,11 +2,9 @@ class Customer < ActiveRecord::Base
   validates_presence_of       :name, :email, :phone
   validates_uniqueness_of     :name
   has_many                    :appointments
-
-  named_scope :search_name, lambda { |s| { :conditions => ["LOWER(name) REGEXP '%s'", s.downcase] }}
+  has_many                    :companies, :through => :appointments, :uniq => true
   
-  # TODO: search customers associated with a company
-  named_scope :company_appointments, :include => :appointments, :conditions => ["appointments.company_id != '0'"]
+  named_scope                 :search_name, lambda { |s| { :conditions => ["LOWER(name) REGEXP '%s'", s.downcase] }}
   
   def self.nobody(options={})
     c = Customer.new do |o|

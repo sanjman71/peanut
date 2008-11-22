@@ -15,20 +15,16 @@ ActionController::Routing::Routes.draw do |map|
     # nested job routes
     resource.resources :jobs do |job|
       # deeply nested appointment, opening routes
-      job.resources :appointments, :collection => {:schedule => :get}
+      job.resources :appointments
       job.resources :openings
     end
   end
   
-  map.resources :jobs do |job|
-    job.resources :appointments
-    job.resources :openings
-  end
+  # jobs with nested resources
+  map.resources :jobs,              :has_many => [:appointments, :openings]
   
-  map.resources :customers do |resource|
-    # nested appointments routes
-    resource.resources :appointments
-  end
+  # customers with nested resources
+  map.resources :customers,         :has_many => [:appointments]
   
   # map the company root to the appointments controller
   map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }
