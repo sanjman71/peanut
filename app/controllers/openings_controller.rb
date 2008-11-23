@@ -4,21 +4,21 @@ class OpeningsController < ApplicationController
   
   # GET /free
   # GET /free.xml
-  # GET /resources/1/free
-  # GET /resources/1/services/3/free
-  # GET /resources/1/services/3/free?when=tomorrow
+  # GET /people/1/free
+  # GET /people/1/services/3/free
+  # GET /people/1/services/3/free?when=tomorrow
   def index
-    if params[:resource_id].to_s == "0"
-      # /resources/0/free is canonicalized to /free; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => @subdomain, :resource_id => nil)))
+    if params[:person_id].to_s == "0"
+      # /people/0/free is canonicalized to /free; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => @subdomain, :person_id => nil)))
     elsif params[:service_id].to_s == "0"
       # /services/0/free is redirected to force the user to select a service; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => @subdomain, :service_id => nil, :when => nil)))
     end
     
-    # initialize resource, default to anyone
-    @resource = Resource.find(params[:resource_id]) if params[:resource_id]
-    @resource = Resource.anyone if @resource.blank?
+    # initialize person, default to anyone
+    @person   = @current_company.people.find(params[:person_id]) if params[:person_id]
+    @person   = Person.anyone if @person.blank?
     
     # initialize when, no default
     @when       = params[:when]
@@ -28,10 +28,10 @@ class OpeningsController < ApplicationController
     @service    = Service.find_by_id(params[:service_id].to_i) || Service.nothing
         
     # build appointment request for the timespan we're looking for
-    @query      = AppointmentRequest.new(:when => @when, :service => @service, :resource => @resource, :company => @current_company)
+    @query      = AppointmentRequest.new(:when => @when, :service => @service, :person => @person, :company => @current_company)
 
-    # find resources collection
-    @resources  = Resource.all + Array(Resource.anyone)
+    # build people collection
+    @people     = Person.all + Array(Person.anyone)
     
     # find services collection
     @services   = Array(Service.nothing(:name => "Select a service")) + Service.work

@@ -29,6 +29,7 @@ Rails::Initializer.run do |config|
   config.gem "chronic", :version => '0.2.3'
   config.gem "haml", :version => '2.0.4'
   config.gem "starling", :version => '0.9.8'
+  config.gem 'has_many_polymorphs'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

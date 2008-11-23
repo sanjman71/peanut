@@ -6,10 +6,10 @@ class AppointmentInvalid < Exception; end
 class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
-  belongs_to              :resource
+  belongs_to              :person
   belongs_to              :service
   belongs_to              :customer
-  validates_presence_of   :company_id, :service_id, :resource_id, :customer_id, :start_at, :end_at, :confirmation_code
+  validates_presence_of   :company_id, :service_id, :person_id, :customer_id, :start_at, :end_at, :confirmation_code
   validates_inclusion_of  :mark_as, :in => %w(free busy work)
   
   # appointment mark_as constants
@@ -18,9 +18,8 @@ class Appointment < ActiveRecord::Base
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
   
   
-  named_scope :company,     lambda { |id| { :conditions => {:company_id => id} }}
   named_scope :service,     lambda { |id| { :conditions => {:service_id => id} }}
-  named_scope :resource,    lambda { |id| { :conditions => {:resource_id => id} }}
+  named_scope :person,      lambda { |id| { :conditions => {:person_id => id} }}
   named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
@@ -77,10 +76,17 @@ class Appointment < ActiveRecord::Base
       end
     end
     
+    if self.person
+      # person must belong to the same company
+      if !self.person.companies.include?(self.company)
+        errors.add_to_base("Person is not associated to this company")
+      end
+    end
+    
     if self.service
       # service must belong to the same company
       if self.service.company_id != self.company_id
-        errors.add_to_base("Appointment service is not offered by this company")
+        errors.add_to_base("Service is not offered by this company")
       end
     end
   end
@@ -149,9 +155,9 @@ class Appointment < ActiveRecord::Base
   # END: time virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
-  # will only create a new customer if it doesn't already exist based on the 'name' field
+  # will only create a new customer if it doesn't already exist based on the 'email' field
   def customer_attributes=(customer_attributes)
-    self.customer = Customer.find_by_name(customer_attributes["name"]) || self.create_customer(customer_attributes)
+    self.customer = Customer.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
   end
     
   # returns true if this appointment conflicts with any other
@@ -161,115 +167,7 @@ class Appointment < ActiveRecord::Base
 
   # returns all appointment conflicts
   def conflicts
-    @conflicts ||= Appointment.company(company.id).resource(resource.id).span(start_at, end_at)
-  end
-  
-  # schedule this work appointment
-  def schedule_work
-    raise AppointmentInvalid if !self.valid?
-    
-    # should be a service that is not marked as free
-    raise AppointmentInvalid if self.service.mark_as != Appointment::WORK
-    
-    # should have exactly 1 conflict
-    raise TimeslotNotEmpty if self.conflicts.size != 1
-    
-    # conflict should be free time
-    raise TimeslotNotEmpty if self.conflicts.first.service.mark_as != Appointment::FREE
-    
-    # split the free appointment into free/work appointments
-    free_appointment  = self.conflicts.first
-    new_appointments  = free_appointment.split_free_time(self.service, self.start_at, self.end_at, :commit => 1, :customer => self.customer)
-    work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
-  end
-  
-  # split a free appointment into multiple appointments using the specified service and time
-  def split_free_time(service, service_start_at, service_end_at, options={})
-    # validate service argument
-    raise ArgumentError if service.blank? or !service.is_a?(Service)
-    raise ArgumentError if self.service.mark_as != Appointment::FREE
-
-    # check that the current appointment is free
-    raise AppointmentNotFree if self.mark_as != Appointment::FREE
-    
-    # convert argument Strings to ActiveSupport::TimeWithZones
-    service_start_at = Time.zone.parse(service_start_at) if service_start_at.is_a?(String)
-    service_end_at   = Time.zone.parse(service_end_at) if service_end_at.is_a?(String)
-    
-    # time arguments should now be ActiveSupport::TimeWithZone objects
-    raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
-        
-    # check that the service_start_at and service_end_at times fall within the appointment timeslot
-    raise ArgumentError unless service_start_at.between?(self.start_at, self.end_at) and service_end_at.between?(self.start_at, self.end_at)
-    
-    # build new appointment
-    new_appt          = Appointment.new(self.attributes)
-    new_appt.service  = service
-    new_appt.start_at = service_start_at
-    new_appt.end_at   = service_end_at
-    new_appt.mark_as  = service.mark_as
-    new_appt.duration = service.duration
-    new_appt.customer = options[:customer] if options[:customer]
-    
-    # build new start, end appointments
-    unless service_start_at == self.start_at
-      # the start appoint starts at the same time but ends when the new appoint starts
-      start_appt          = Appointment.new(self.attributes)
-      start_appt.start_at = self.start_at
-      start_appt.end_at   = new_appt.start_at
-      start_appt.mark_as  = Appointment::FREE
-      start_appt.duration -= service.duration
-    end
-    
-    unless service_end_at == self.end_at
-      # the end appointment ends at the same time, but starts when the new appointment ends
-      end_appt            = Appointment.new(self.attributes)
-      end_appt.start_at   = new_appt.end_at
-      end_appt.end_at     = self.end_at
-      end_appt.mark_as    = Appointment::FREE
-      end_appt.duration   -= service.duration
-    end
-    
-    appointments = [start_appt, new_appt, end_appt].compact
-    
-    if options[:commit].to_i == 1
-      
-      # commit the apointment changes
-      transaction do
-        # remove this appointment first
-        self.destroy
-        # add new appointments
-        appointments.each do |appointment|
-          appointment.save
-          if !appointment.valid?
-            raise ActiveRecord::Rollback
-          end
-        end
-      end
-      
-    end
-    
-    appointments
-  end
-    
-  # create free time in the specified timeslot
-  def self.create_free_time(company, resource, start_at, end_at)
-    # find first service scheduled as 'free'
-    service     = company.services.free.first
-
-    # create a new appointment object
-    customer    = Customer.nobody
-    appointment = Appointment.new(:start_at => start_at, :end_at => end_at, :mark_as => service.mark_as, :service => service, :company => company,
-                                  :resource => resource, :customer_id => customer.id)
-                              
-    if appointment.conflicts?
-      raise TimeslotNotEmpty
-    end
-    
-    # save appointment
-    appointment.save
-    
-    appointment
+    @conflicts ||= self.company.appointments.person(person.id).span(start_at, end_at)
   end
   
   protected

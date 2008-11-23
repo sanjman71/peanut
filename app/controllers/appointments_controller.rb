@@ -10,21 +10,21 @@ class AppointmentsController < ApplicationController
       raise Exception, "show customer appointments: #{@appointments.size}"
     end
     
-    if params[:resource_id].blank?
-      # redirect to a specific resource
-      resource = @current_company.resources.first
-      redirect_to url_for(params.update(:subdomain => @subdomain, :resource_id => resource.id))
+    if params[:person_id].blank?
+      # redirect to a specific person
+      person = @current_company.people.first
+      redirect_to url_for(params.update(:subdomain => @subdomain, :person_id => person.id))
     end
     
     manage_appointments
   end
     
-  # POST /resources/1/create
+  # POST /people/1/create
   def create
     # build new free appointment
     service       = Service.free.first
     customer      = Customer.nobody
-    @appointment  = Appointment.new(params[:appointment].merge(:resource_id => params[:resource_id], 
+    @appointment  = Appointment.new(params[:appointment].merge(:person_id => params[:person_id], 
                                                                :service_id => service.id,
                                                                :company_id => @current_company.id,
                                                                :customer_id => customer.id))
@@ -67,16 +67,16 @@ class AppointmentsController < ApplicationController
   
   # shared method for managing free/work appointments
   def manage_appointments
-    # initialize resource, default to anyone
-    @resource     = Resource.find_by_id(params[:resource_id])
-    @resources    = Resource.all
+    # initialize person, default to anyone
+    @person       = @current_company.people.find_by_id(params[:person_id])
+    @people       = @current_company.people.all
 
     # initialize time parameters
     @when         = params[:when] || 'this week'
     @daterange    = DateRange.new(:when => @when)
     
-    # find free, work appointments for a resource
-    @appointments = Appointment.company(@current_company.id).resource(@resource.id).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    # find free, work appointments for a person
+    @appointments = @current_company.appointments.person(@person.id).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
@@ -103,11 +103,11 @@ class AppointmentsController < ApplicationController
     end
   end
 
-  # GET /schedule/resources/1/services/1/20081231T000000
-  # POST /schedule/resources/1/services/1/20081231T000000
+  # GET /schedule/people/1/services/1/20081231T000000
+  # POST /schedule/people/1/services/1/20081231T000000
   def new
     # build appointment hash
-    hash = {:service_id => params[:service_id], :resource_id => params[:resource_id], :start_at => params[:start_at], :company_id => @current_company.id}
+    hash = {:service_id => params[:service_id], :person_id => params[:person_id], :start_at => params[:start_at], :company_id => @current_company.id}
     hash.update(params[:appointment]) if params[:appointment]
     
     # build appointment object
@@ -126,8 +126,8 @@ class AppointmentsController < ApplicationController
       logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
       
       begin
-        # create work appointment by resolving the conflicting and re-arrange the free time
-        @work_appointment = @appointment.schedule_work
+        # create work appointment
+        @work_appointment = AppointmentScheduler.create_work_appointment(@appointment)
         
         # send appointment confirmation
         MailWorker.async_appointment_confirmation(:id => @work_appointment.id)
@@ -148,7 +148,18 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments/search
   def search
-    
+    if request.post?
+      # check confirmation code
+      @code         = params[:appointment][:code]
+      @appointment  = Appointment.find_by_confirmation_code(@code)
+      
+      if @appointment
+        # redirect to appointment show
+        @redirect = redirect_to(appointment_path(@appointment))
+      else
+        # show error message?
+      end
+    end
   end
   
   # GET /appointments/1/edit

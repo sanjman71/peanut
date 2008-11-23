@@ -1,7 +1,7 @@
 class Service < ActiveRecord::Base
   validates_presence_of       :company_id, :name, :duration
   validates_uniqueness_of     :name, :scope => :company_id
-  validates_inclusion_of      :mark_as, :in => %w(free busy), :message => "services can only be scheduled as free or busy"
+  validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "services can only be scheduled as free, busy or work"
   belongs_to                  :company
   has_many                    :appointments
   before_save                 :titleize_name

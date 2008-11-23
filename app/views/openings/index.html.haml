@@ -6,14 +6,19 @@
         %p
         - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
           What:
-          %span#what= select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
+          %span#what
+            = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
           &nbsp;
           Who:
-          %span#who= select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id))
+          %span#who
+            = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
           &nbsp;
           When:
-          %span#when= select_tag('when', options_for_select(Appointment::WHENS, @when))
-          %span#search{:style => "padding: 5px;" }= f.submit 'Search', :name => nil
+          %span#when
+            = select_tag('when', options_for_select(Appointment::WHENS, @when))
+          %span#search{:style => "padding: 5px;"}
+            = f.submit 'Search', :name => nil
+            
     - unless @when.blank?
       .section_body
         %h1== #{pluralize(@free_timeslots.size, 'Available Appointment')}

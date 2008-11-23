@@ -7,7 +7,7 @@
           = separator
       %h1.index
         Schedule for
-        = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, o.id]}, @resource.id), :onchange => "window.location = '/resources/' + $F(this) + '/appointments'")
+        = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :onchange => "window.location = '/people/' + $F(this) + '/appointments'")
     .section_body
       #appointment_flash
       %h2
@@ -25,7 +25,7 @@
         .sidebar_header
           %h1
             Add Free Time
-          - form_remote_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :resource_id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+          - form_remote_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
             = hidden_field_tag :when, @when
             %p
               %span{:style => 'font-size: 11px; padding: 2px;'}== When

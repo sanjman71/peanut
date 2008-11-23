@@ -1,0 +1,5 @@
+if @redirect
+  page.redirect_to(@redirect)
+else
+  page[:appointment_code].addClassName('highlight')
+end

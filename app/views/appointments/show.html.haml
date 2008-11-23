@@ -5,6 +5,9 @@
     .section_body
       .appointment
         .description
+          == Appointment:
           = appointment_description(@appointment)
+        %p
         .customer
-          = @appointment.customer.name
+          == Customer:
+          = @appointment.customer.name unless @appointment.customer.blank?

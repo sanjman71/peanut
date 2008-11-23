@@ -43,12 +43,12 @@ module ApplicationHelper
 
     yield link
 
-    # 'Resources' link
-    name = 'Resources'
-    if current_controller.controller_name == 'resources' and current_controller.action_name == 'index'
-      link = link_to(name, resources_path, :class => 'current')
+    # 'People' link
+    name = 'People'
+    if current_controller.controller_name == 'people' and current_controller.action_name == 'index'
+      link = link_to(name, people_path, :class => 'current')
     else
-      link = link_to(name, resources_path)
+      link = link_to(name, people_path)
     end
 
     yield link

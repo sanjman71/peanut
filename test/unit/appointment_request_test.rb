@@ -1,20 +1,21 @@
 require 'test/test_helper'
 
 class AppointmentRequestTest < ActiveSupport::TestCase
-  fixtures :companies, :services, :resources
   
   def test_should_find_free_time
     # create free time from 8 am to noon
-    company1  = companies(:company1)
-    johnny    = resources(:johnny)
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    free      = Factory(:free_service, :company => company)
+    
     start_at  = Time.now.beginning_of_day + 8.hours
     end_at    = start_at + 4.hours
-    appt      = Appointment.create_free_time(company1, johnny, start_at, end_at)
+    appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
     assert appt.valid?
     
     # create appointment request, with range from 10 am to 2 pm
-    haircut   = services(:haircut)
-    request   = AppointmentRequest.new(:start_at => start_at + 2.hours, :end_at => end_at + 2.hours, :company => company1, :service => haircut, :resource => johnny, :customer_id => 0)
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company)
+    request   = AppointmentRequest.new(:start_at => start_at + 2.hours, :end_at => end_at + 2.hours, :company => company, :service => haircut, :person => johnny, :customer_id => 0)
     
     # should find free appointment created above
     appts     = request.find_free_appointments
@@ -45,8 +46,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     assert_equal Chronic.parse("today 10:30 am"), timeslots[0].end_at
     
     # create appointment object, with range from 7 am to 5 pm
-    haircut   = services(:haircut)
-    request   = AppointmentRequest.new(:start_at => start_at - 1.hour, :end_at => end_at + 5.hours, :company => company1, :service => haircut, :resource => johnny, :customer_id => 0)
+    request   = AppointmentRequest.new(:start_at => start_at - 1.hour, :end_at => end_at + 5.hours, :company => company, :service => haircut, :person => johnny, :customer_id => 0)
     
     # find all free time slots within the time range
     timeslots = request.find_free_timeslots
@@ -58,8 +58,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     assert_equal Chronic.parse("today 8:30 am"), timeslots[0].end_at
       
     # create appointment object, with range from noon to 5 pm
-    haircut   = services(:haircut)
-    request   = AppointmentRequest.new(:start_at => start_at + 4.hours, :end_at => end_at + 5.hours, :company => company1, :service => haircut, :resource => johnny, :customer_id => 0)
+    request   = AppointmentRequest.new(:start_at => start_at + 4.hours, :end_at => end_at + 5.hours, :company => company, :service => haircut, :person => johnny, :customer_id => 0)
     
     # find all free time slots within the time range
     timeslots = request.find_free_timeslots

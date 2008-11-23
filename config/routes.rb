@@ -4,9 +4,9 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings
   
   # override 'appointments/new' path
-  map.schedule        'schedule/resources/:resource_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
-  map.resources :resources do |resource|
+  map.resources :people do |resource|
     # nested appointments routes
     resource.resources :appointments
     # nested openings routes

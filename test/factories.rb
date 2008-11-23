@@ -1,0 +1,35 @@
+require 'factory_girl'
+
+Factory.define :company do |c|
+  c.name "Company Name"
+end
+
+Factory.define :person do |p|
+  p.name "Person Name"
+end
+
+Factory.define :work_service, :class => Service do |s|
+  s.name "Work"
+  s.mark_as "work"
+  s.duration 30
+end
+
+Factory.define :free_service, :class => Service do |s|
+  s.name "Available"
+  s.mark_as "free"
+  s.duration 0
+end
+
+Factory.define :customer do |c|
+  c.name { |s| Factory.next :name }
+  c.email { |s| Factory.next :email }
+  c.phone "6505551212"
+end
+
+Factory.sequence :name do |n|
+  "user#{n}"
+end
+
+Factory.sequence :email do |n|
+  "user#{n}@peanut.com"
+end

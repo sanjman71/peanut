@@ -9,10 +9,10 @@ module AppointmentsHelper
       
       if s == default
         # no when parameter for the default value
-        link  = link_to(s.titleize, resource_appointments_path(:subdomain => @subdomain), :class => klass)
+        link  = link_to(s.titleize, person_appointments_path(:subdomain => @subdomain), :class => klass)
       else
         # use when parameter
-        link  = link_to(s.titleize, resource_appointments_path(:subdomain => @subdomain, :when => s), :class => klass)
+        link  = link_to(s.titleize, person_appointments_path(:subdomain => @subdomain, :when => s), :class => klass)
       end
       
       # use separator unless its the last element
@@ -23,7 +23,7 @@ module AppointmentsHelper
   end
   
   def appointment_description(appointment)
-    "#{appointment.service.name} with #{appointment.resource.name} on #{appointment.start_at.to_s(:appt_day_date_time)}"
+    "#{appointment.service.name} with #{appointment.person.name} on #{appointment.start_at.to_s(:appt_day_date_time)}"
   end
   
 end

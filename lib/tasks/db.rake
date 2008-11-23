@@ -17,10 +17,14 @@ namespace :db do
       company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
       company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
     
-      # create basic resources
-      company1.resources.create(:name => "Johnny")
-      company1.resources.create(:name => "Mary")
+      # create people
+      company1.people.create(:name => "Johnny")
+      company1.people.create(:name => "Mary")
 
+      # create customers
+      Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818")
+      Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")
+      
       puts "#{Time.now}: completed"
     end
     
