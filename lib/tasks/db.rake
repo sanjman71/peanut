@@ -15,7 +15,7 @@ namespace :db do
       # create basic jobs
       Job.create(:name => Job::AVAILABLE, :duration => 0, :mark_as => "free")
       Job.create(:name => Job::UNAVAILABLE, :duration => 0, :mark_as => "busy")
-      Job.create(:name => "Haircut", :duration => 30, :mark_as => "busy")
+      Job.create(:name => "Haircut", :duration => 30, :mark_as => "work")
     
       # create basic resources
       Resource.create(:name => "Johnny", :company => Company.find_by_name("Company 1"))

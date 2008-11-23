@@ -1,7 +1,7 @@
 class Job < ActiveRecord::Base
   validates_presence_of       :name, :duration
   validates_uniqueness_of     :name
-  validates_inclusion_of      :mark_as, :in => %w(free busy), :message => "jobs can only be scheduled as free or busy"
+  validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "jobs can only be scheduled as free, busy or work"
   has_many                    :appointments
   before_save                 :titleize_name
   
