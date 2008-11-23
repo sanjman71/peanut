@@ -12,12 +12,12 @@ namespace :db do
       company2 = Company.create(:name => "Company 2")
       company3 = Company.create(:name => "Company 3")
     
-      # create basic services
+      # create some services
       company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
       company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
       company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
     
-      # create people
+      # create some people
       company1.people.create(:name => "Johnny")
       company1.people.create(:name => "Mary")
 
@@ -39,13 +39,15 @@ namespace :db do
         puts "#{Time.now}: adding #{days} days of free time for all companies, resources ..."
         
         Company.all.each do |company|
-          company.resources.each do |resource|
+          company.people.each do |person|
             1.upto(days) do |i|
-              start_at = (Time.now + i.day).beginning_of_day
-              end_at   = start_at + 24.hours
+              # free times from 8 am to 4 pm each day
+              free_start_at = (Time.now + i.day).beginning_of_day + 8.hours
+              free_end_at   = free_start_at + 8.hours
+              
               begin
-                Appointment.create_free_time(company, resource, start_at, end_at)
-                puts "#{Time.now}: added #{company.name}, #{resource.name} free time from #{start_at}-#{end_at}"
+                AppointmentScheduler.create_free_appointment(company, person, free_start_at, free_end_at)
+                puts "#{Time.now}: added #{company.name}, #{person.name} free time from #{free_start_at}-#{free_end_at}"
               rescue TimeslotNotEmpty
                 # skip
               end
