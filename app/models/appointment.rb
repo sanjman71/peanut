@@ -160,14 +160,14 @@ class Appointment < ActiveRecord::Base
     self.customer = Customer.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
   end
     
-  # returns true if this appointment conflicts with any other
-  def conflicts?
-    self.conflicts.size > 0
-  end
-
   # returns all appointment conflicts
   def conflicts
     @conflicts ||= self.company.appointments.person(person.id).span(start_at, end_at)
+  end
+  
+  # returns true if this appointment conflicts with any other
+  def conflicts?
+    self.conflicts.size > 0
   end
   
   protected

@@ -5,12 +5,20 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    # find all people for the current company
-    @people = @current_company.people
-
+    @search = params[:search]
+    
+    if !@search.blank?
+      @people       = @current_company.people.search_name(@search).all(:order => "name ASC")
+      @search_text  = "People matching '#{@search}'"
+    else
+      @people       = @current_company.people.all(:order => "name ASC")
+      @search_text  = "All People"
+    end
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @people }
+      format.js
     end
   end
 

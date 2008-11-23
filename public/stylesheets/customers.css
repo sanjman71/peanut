@@ -1,17 +1,15 @@
 /* customer styles */
         
         
-div.customers_header                              { color: #666666; font-size: 12px; font-weight: bold; margin: 10px 0 10px; }
+div.customers_header, div.people_header           { color: #666666; font-size: 12px; font-weight: bold; margin: 10px 0 10px; }
                                             
-table.customers                                   { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; clear: left; }
+table.customers, table.people                     { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; clear: left; }
 
-table.customers td                                { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
+table.customers td, table.people td               { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
                                                     vertical-align: top; width: 30%; }
 
 table.customers td.contact_info                   { padding-left: 10px; }
 
-div.customer_name                                 { margin-left: 20px; }
+div.customer h1, div.person h1                    { color: #000000; font-size: 16px; margin: 0 0 5px; padding: 0; }
 
-div.customer h1                                   { color: #000000; font-size: 16px; margin: 0 0 5px; padding: 0; }
-
-div.customer h2                                   { color: #333333; font-size: 12px; margin: 0 0 7px; padding: 0; }
+div.customer h2, div.person h2                    { color: #333333; font-size: 12px; margin: 0 0 7px; padding: 0; }

@@ -1,0 +1,17 @@
+.container
+  .left
+    .section_header
+      %h1.index
+        == Find a person by typing their name
+      %p
+      .live_search
+        = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people')
+        = observe_field(:live_search_for_people, {:url => people_path, :method => :get, :with => "'search=' + element.value", :frequency => 1})
+        
+    .section_customers
+      .people_header#people_search_text
+        = @search_text
+      #people_table
+        = render(:partial => 'people.html.haml', :locals => {:people => @people})
+    
+    

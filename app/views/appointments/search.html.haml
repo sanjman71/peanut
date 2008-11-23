@@ -2,14 +2,14 @@
   .left
     .section_header
       %h1.index
-        == Find an appointment by typing in your confirmation code
+        == Find an appointment by typing in the confirmation code
         %p
         - form_remote_tag(:url => search_appointments_path(:subdomain => @subdomain), :method => :post) do |f|
           %span#code
             = text_field('appointment', 'code', :value => @code, :size => 50)
           &nbsp;
-          %span#search{:style => "padding: 5px;"}
-            = submit_tag 'Find', :name => nil
+          %span#search
+            = submit_tag 'Search', :name => nil
             
     .section_body
       %span.code#message
