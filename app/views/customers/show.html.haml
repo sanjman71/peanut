@@ -1,0 +1,38 @@
+.container
+  .left
+    .section_header
+      %h1.index{:style => "font-size: 18px;"}
+        = @customer.name
+            
+    .section_body
+      -# notes flash message
+      #note_flash
+      
+      -# customer contact info
+      .contact_info_header
+        == Contact info
+      .contact_info
+        %table.customer
+          %tr
+            %td.heading
+              == Email
+            %td.email
+              = @customer.email
+          %tr
+            %td.heading
+              == Phone
+            %td.phone
+              = @customer.phone
+              
+      -# customer notes
+      .new_note#new_note_container
+        %p== Add a note about this customer
+        - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
+          = hidden_field(:note, :subject_id, :value => @customer.id)
+          = hidden_field(:note, :subject_type, :value => @customer.class.to_s)
+          = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
+          %p
+          = f.submit 'Add note', :name => nil
+      %p
+      #notes_collection
+        = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})

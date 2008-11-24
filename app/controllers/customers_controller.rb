@@ -26,7 +26,11 @@ class CustomersController < ApplicationController
   # GET /customers/1.xml
   def show
     @customer = Customer.find(params[:id])
-
+    @note     = Note.new
+    
+    # build notes collection, most recent first 
+    @notes    = @customer.notes.sort_recent
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @customer }

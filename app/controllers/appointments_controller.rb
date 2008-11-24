@@ -95,8 +95,12 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   # GET /appointments/1.xml
   def show
-    @appointment = Appointment.find(params[:id])
-  
+    @appointment  = Appointment.find(params[:id])
+    @note         = Note.new
+    
+    # build notes collection, most recent first 
+    @notes        = @appointment.notes.sort_recent
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @appointment }

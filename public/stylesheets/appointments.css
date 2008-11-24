@@ -43,3 +43,10 @@ div.timeslots .timeslot a:hover, div.appointments .appointment a:hover, table.ap
                                                   
 div.timeslots .timeslot a:visited, div.appointments .appointment a:visited, table.appointments .appointment a:visited
                                                   { color: #5500BB; font-weight: bold; }
+                                                  
+table.appointment_header td.what                  { font-weight: bold; font-size: 15px; }
+
+table.appointment_header td.when                  { font-weight: bold; font-size: 15px; }
+
+table.appointment_header td.customer, table.appointment_header td.customer a              
+                                                  { font-weight: bold; font-size: 14px; color: #0033FF; }

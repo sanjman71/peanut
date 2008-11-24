@@ -1,13 +1,38 @@
 .container
   .left
     .section_header
-      Appointment Details
+      %span.other_indexes
+        = link_to 'Checkout', ''
+        = "|"
+        = link_to 'Cancel', ''
+      %table.appointment_header
+        %tr
+          %td.what
+            = @appointment.service.name
+            == with
+            = @appointment.person.name
+        %tr
+          %td.when
+            = @appointment.start_at.to_s(:appt_day_date_time)
+        %tr
+          %td.customer
+            - unless @appointment.customer.blank?
+              = link_to @appointment.customer.name, customer_path(@appointment.customer)
+            
     .section_body
-      .appointment
-        .description
-          == Appointment:
-          = appointment_description(@appointment)
-        %p
-        .customer
-          == Customer:
-          = @appointment.customer.name unless @appointment.customer.blank?
+      -# notes flash message
+      #note_flash
+      
+      -# appointment notes
+      .new_note#new_note_container
+        %p== Add a note about this appointment
+        - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
+          = hidden_field(:note, :subject_id, :value => @appointment.id)
+          = hidden_field(:note, :subject_type, :value => @appointment.class.to_s)
+          = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
+          %p
+          = f.submit 'Add note', :name => nil
+      %p
+      #notes_collection
+        = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+        

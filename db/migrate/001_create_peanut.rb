@@ -52,6 +52,19 @@ class CreatePeanut < ActiveRecord::Migration
       
       t.timestamps
     end
+    
+    create_table :notes do |t|
+      t.text  :comment
+      
+      t.timestamps
+    end
+    
+    # Polymorphic relationship mapping notes to different subjects
+    create_table :notes_subjects do |t|
+      t.references  :note
+      t.references  :subject, :polymorphic => true
+    end
+    
   end
 
   def self.down

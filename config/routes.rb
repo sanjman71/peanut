@@ -2,6 +2,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :companies
   map.resources :appointments, :member => { :confirmation => :get }, :collection => { :search => :any }
   map.resources :openings
+  map.resources :notes
   
   # override 'appointments/new' path
   map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'

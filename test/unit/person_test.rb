@@ -5,9 +5,6 @@ class PersonTest < ActiveSupport::TestCase
 
   def test_create
     company = Factory(:company)
-    assert company.valid?
-    assert_equal "Company Name", company.name
-    
     person1 = Factory(:person, :name => "Sanjay", :companies => [company])
     assert person1.valid?
     company.reload

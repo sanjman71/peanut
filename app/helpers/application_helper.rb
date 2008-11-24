@@ -25,7 +25,7 @@ module ApplicationHelper
 
     # 'Customers' link
     name = 'Customers'
-    if current_controller.controller_name == 'customers' and current_controller.action_name == 'index'
+    if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
       link = link_to(name, customers_path, :class => 'current')
     else
       link = link_to(name, customers_path)
@@ -45,7 +45,7 @@ module ApplicationHelper
 
     # 'People' link
     name = 'People'
-    if current_controller.controller_name == 'people' and current_controller.action_name == 'index'
+    if current_controller.controller_name == 'people' and ['index', 'show'].include?(current_controller.action_name)
       link = link_to(name, people_path, :class => 'current')
     else
       link = link_to(name, people_path)
