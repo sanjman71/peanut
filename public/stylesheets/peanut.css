@@ -30,7 +30,7 @@ div#tabs                                          { clear: left; height: 24px; m
 div#tabs ul                                       { margin: 0; padding: 0; }
 
 div#tabs li                                       { border: medium none; display: inline; list-style-image: none; list-style-position: outside; 
-                                                    list-style-type: none; margin: 0; padding: 0; font-size 12px; color: #FFFFFF; }
+                                                    list-style-type: none; margin: 0; padding: 0; color: #FFFFFF; }
 
 div#tabs li.with_space                            { margin-right: 2px; }
 
@@ -39,13 +39,13 @@ div#tabs li.right                                 { float: right; }
 div#tabs a                                        { text-decoration: none; }
 
 div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; background-color: #CD9100; border-bottom-color: #CD9100; border-style: solid; 
-                                                    border-width: 1px; color: #000000; padding: 3px 8px 7px; }
+                                                    border-width: 1px; color: #000000; padding: 3px 8px 8px; }
 
 div#tabs a.current                                { color: #000000; border-bottom-color: #E5E5E5; }
 
 div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited, div#tabs li a.current:visited                       
                                                   { background: #E5E5E5 url(/images/tab-background.gif) repeat-x scroll center top;
-                                                    border-bottom: 1px solid #E5E5E5; font-size: 12px; font-weight: bold; margin: 0;
+                                                    border-bottom: 1px solid #E5E5E5; font-weight: bold; margin: 0;
                                                     text-decoration: none; padding: 3px 8px 8px; }
 
 /* body styles */
