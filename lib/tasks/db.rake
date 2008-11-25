@@ -12,24 +12,35 @@ namespace :db do
       company2 = Company.create(:name => "Company 2")
       company3 = Company.create(:name => "Noel Rose")
     
-      # create some services
+      # create company1 services and people
       company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
       company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
-      company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
+      
+      haircut = company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
+      person1 = company1.people.create(:name => "Johnny")
+      person2 = company1.people.create(:name => "Mary")
+      
+      haircut.resources.push(person1)
+      haircut.resources.push(person2)
 
+      # create company3 services and people
       company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
       company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
-      company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
-      company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
-      company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work")
+      
+      mens_haircut    = company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
+      womens_haircut  = company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
+      womens_color    = company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work")
     
-      # create some people
-      company1.people.create(:name => "Johnny")
-      company1.people.create(:name => "Mary")
+      person1         = company3.people.create(:name => "Erika Maechtle")
+      person2         = company3.people.create(:name => "Josie")
 
-      company3.people.create(:name => "Erika Maechtle")
-      company3.people.create(:name => "Josie")
-
+      mens_haircut.resources.push(person1)
+      mens_haircut.resources.push(person2)
+      womens_haircut.resources.push(person1)
+      womens_haircut.resources.push(person2)
+      womens_color.resources.push(person1)
+      womens_color.resources.push(person2)
+      
       # create customers
       Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818")
       Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")

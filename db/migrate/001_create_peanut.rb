@@ -16,9 +16,17 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
   
-    # Polymorphic relationship mapping companies to different resources
+    # Polymorphic relationship mapping companies to different resources (e.g. people)
     create_table :companies_resources do |t|
       t.references  :company
+      t.references  :resource, :polymorphic => true
+
+      t.timestamps
+    end
+
+    # Polymorphic relationship mapping services to different resources (e.g. people)
+    create_table :resources_services do |t|
+      t.references  :service
       t.references  :resource, :polymorphic => true
 
       t.timestamps
@@ -59,7 +67,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
-    # Polymorphic relationship mapping notes to different subjects
+    # Polymorphic relationship mapping notes to different subjects (e.g. people, appointments)
     create_table :notes_subjects do |t|
       t.references  :note
       t.references  :subject, :polymorphic => true

@@ -18,6 +18,10 @@
           %td.customer
             - unless @appointment.customer.blank?
               = link_to @appointment.customer.name, customer_path(@appointment.customer)
+        %tr
+          %td.confirmation
+            == Confirmation code:
+            = @appointment.confirmation_code
             
     .section_body
       -# notes flash message

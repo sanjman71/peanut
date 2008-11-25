@@ -173,7 +173,9 @@ class Appointment < ActiveRecord::Base
   protected
   
   def make_confirmation_code
-    self.confirmation_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
+    unless self.confirmation_code
+      self.confirmation_code = Digest::SHA1.hexdigest( Time.now.to_s.split(//).sort_by {rand}.join )
+    end
   end
   
 end

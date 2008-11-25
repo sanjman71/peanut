@@ -4,6 +4,7 @@ class Service < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "services can only be scheduled as free, busy or work"
   belongs_to                  :company
   has_many                    :appointments
+  has_many_polymorphs         :resources, :from => [:people]
   before_save                 :titleize_name
   
   # name constants

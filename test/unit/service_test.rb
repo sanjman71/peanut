@@ -10,8 +10,22 @@ class ServiceTest < ActiveSupport::TestCase
   
   def test_should_titleize_name
     company = Factory(:company)
-    o       = Service.create(:company => company, :name => "boring job", :duration => 30, :mark_as => "busy")
-    assert o.valid?
-    assert_equal "Boring Job", o.name
+    object  = Service.create(:company => company, :name => "boring job", :duration => 30, :mark_as => "busy")
+    assert object.valid?
+    assert_equal "Boring Job", object.name
   end
+  
+  def test_should_create_polymorphic_resources
+    company = Factory(:company)
+    service = company.services.create(:company => company, :name => "boring job", :duration => 30, :mark_as => "busy")
+    assert service.valid?
+    
+    # create skill
+    person1 = Factory(:person, :name => "Sanjay", :companies => [company])
+    service.resources.push(person1)
+    service.reload
+    assert_equal [person1], service.resources
+    assert_equal [person1], service.people
+  end
+  
 end

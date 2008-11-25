@@ -56,3 +56,6 @@ table.appointment_header td.customer, table.appointment_header td.customer a
                                                   { font-weight: bold; font-size: 14px; color: #0033FF; }
                                                   
 table.appointment_header td.customer a:hover      { background: #FF6600; color: #FFFFFF; }
+
+table.appointment_header td.confirmation          { font-size: 12px; color: #666666; }
+
