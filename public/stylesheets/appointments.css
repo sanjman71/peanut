@@ -17,7 +17,7 @@ div.appointments .hover, div.timeslots .hover, table.appointments .hover
 
 div.schedule_form                                 { font-size: 13px; font-weight: bold; }
 
-div.schedule_form span.field                      { padding-right: 7px; }
+div.schedule_form span.field                      { padding-right: 7px; margin: 3px 0 3px; }
 
 table.appointments                                {  }
 

@@ -6,13 +6,16 @@
       .schedule_form
         %p
         - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
-          What:
+          %span
+            == What
           %span.field#what
             = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-          Who:
+          %span
+            == Who
           %span.field#who
             = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
-          When:
+          %span
+            == When
           %span.field#when
             = select_tag('when', options_for_select(Appointment::WHENS, @when))
           %span#search{:style => "padding: 5px;"}
@@ -20,12 +23,18 @@
             
     - unless @when.blank?
       .section_body
-        %h1== #{pluralize(@free_timeslots.size, 'Available Appointment')}
-        %h2== #{@when.titleize}
-        #free_calendar
-          = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-        .timeslots#free_timeslots
-          = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+        - if @errors
+          .alert
+            = @alert
+        - else
+          %h1
+            == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+          %h2
+            == #{@when.titleize}
+          #free_calendar
+            = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+          .timeslots#free_timeslots
+            = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
       
   .right
     .col

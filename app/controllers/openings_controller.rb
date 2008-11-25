@@ -41,6 +41,11 @@ class OpeningsController < ApplicationController
       return
     end
 
+    if @service.nothing?
+      @errors = true
+      @alert  = "Please select a service"
+    end
+    
     logger.debug("*** finding free time #{@when}")
     
     # find free appointments, and free timeslots for each free apppointment

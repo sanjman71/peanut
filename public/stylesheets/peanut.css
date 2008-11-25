@@ -66,6 +66,9 @@ div.section_body h1, div.section_body div.notice
                                                   { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; font-weight: bold; 
                                                     margin: 0; padding: 3px; text-align: left; }
 
+div.section_body div.alert                        { background-color: #FFCC00; border-bottom: 1px solid #FFCC00;                                                     font-size: 12px; font-weight: bold; 
+                                                    margin: 0; padding: 3px; text-align: left; }
+
 div.section_body h2                               { border-bottom: 1px solid #000000; color: #000000; font-size: 12px; font-weight: bold; 
                                                     margin: 15px 0 5px; padding: 0 0 2px; }
 
