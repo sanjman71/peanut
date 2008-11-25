@@ -48,5 +48,7 @@ table.appointment_header td.what                  { font-weight: bold; font-size
 
 table.appointment_header td.when                  { font-weight: bold; font-size: 15px; }
 
-table.appointment_header td.customer, table.appointment_header td.customer a              
+table.appointment_header td.customer, table.appointment_header td.customer a
                                                   { font-weight: bold; font-size: 14px; color: #0033FF; }
+                                                  
+table.appointment_header td.customer a:hover      { background: #FF6600; color: #FFFFFF; }

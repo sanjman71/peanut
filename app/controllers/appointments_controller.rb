@@ -159,7 +159,7 @@ class AppointmentsController < ApplicationController
       
       if @appointment
         # redirect to appointment show
-        @redirect = redirect_to(appointment_path(@appointment))
+        @redirect = appointment_path(@appointment)
       else
         # show error message?
       end

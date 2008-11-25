@@ -17,7 +17,7 @@
             %td.heading
               == Email
             %td.email
-              = @customer.email
+              = mail_to(@customer.email)
           %tr
             %td.heading
               == Phone
