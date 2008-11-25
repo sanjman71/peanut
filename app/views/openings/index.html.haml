@@ -3,18 +3,17 @@
     .section_header
       %h1.index
         == Schedule an Appointment
+      .schedule_form
         %p
         - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
           What:
-          %span#what
+          %span.field#what
             = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-          &nbsp;
           Who:
-          %span#who
+          %span.field#who
             = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
-          &nbsp;
           When:
-          %span#when
+          %span.field#when
             = select_tag('when', options_for_select(Appointment::WHENS, @when))
           %span#search{:style => "padding: 5px;"}
             = f.submit 'Search', :name => nil

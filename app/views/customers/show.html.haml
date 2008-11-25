@@ -5,9 +5,6 @@
         = @customer.name
             
     .section_body
-      -# notes flash message
-      #note_flash
-      
       -# customer contact info
       .contact_info_header
         == Contact info
@@ -24,6 +21,9 @@
             %td.phone
               = @customer.phone
               
+      -# notes flash message
+      #note_flash
+
       -# customer notes
       .new_note#new_note_container
         %p== Add a note about this customer

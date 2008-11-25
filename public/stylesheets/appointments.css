@@ -15,6 +15,10 @@ div.appointments .timeslot, div.timeslots .timeslot, div.appointments .appointme
 div.appointments .hover, div.timeslots .hover, table.appointments .hover     
                                                   { background: #FFFFCC; }
 
+div.schedule_form                                 { font-size: 13px; font-weight: bold; }
+
+div.schedule_form span.field                      { padding-right: 7px; }
+
 table.appointments                                {  }
 
 table.appointments tr                             { margin: 5px 0 0; padding: 2px 5px 2px; }

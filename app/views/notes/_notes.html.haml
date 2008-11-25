@@ -1,6 +1,6 @@
 .notes
-  .notes_header
-    - unless @notes.blank?
+  - unless @notes.blank?
+    .notes_header
       == Notes history
   - @notes.each do |note|
     .note{:id => "note_#{note.id}"}

@@ -21,6 +21,11 @@ class Service < ActiveRecord::Base
     end
   end
   
+  # return true if its the special service 'nothing'
+  def nothing?
+    self.id == 0
+  end
+  
   def duration_to_seconds
     self.duration * 60
   end

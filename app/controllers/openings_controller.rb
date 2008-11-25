@@ -13,7 +13,7 @@ class OpeningsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => @subdomain, :person_id => nil)))
     elsif params[:service_id].to_s == "0"
       # /services/0/free is redirected to force the user to select a service; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => @subdomain, :service_id => nil, :when => nil)))
+      return redirect_to(url_for(params.update(:subdomain => @subdomain, :service_id => nil)))
     end
     
     # initialize person, default to anyone
@@ -25,22 +25,22 @@ class OpeningsController < ApplicationController
     @daterange  = DateRange.new(:when => @when) unless @when.blank?
     
     # initialize service, default to nothing
-    @service    = Service.find_by_id(params[:service_id].to_i) || Service.nothing
+    @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
         
     # build appointment request for the timespan we're looking for
     @query      = AppointmentRequest.new(:when => @when, :service => @service, :person => @person, :company => @current_company)
 
     # build people collection
-    @people     = Person.all + Array(Person.anyone)
+    @people     = Array(Person.anyone) + @current_company.people.all
     
     # find services collection
-    @services   = Array(Service.nothing(:name => "Select a service")) + Service.work
+    @services   = Array(Service.nothing(:name => "Select a service")) + @current_company.services.work
 
     if @when.blank?
       # render empty page with help text
-      return render
+      return
     end
-        
+
     logger.debug("*** finding free time #{@when}")
     
     # find free appointments, and free timeslots for each free apppointment

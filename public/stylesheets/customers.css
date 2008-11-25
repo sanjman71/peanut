@@ -15,8 +15,8 @@ div.customer h1, div.person h1                    { color: #000000; font-size: 1
 div.customer h2, div.person h2                    { color: #333333; font-size: 12px; margin: 0 0 7px; padding: 0; }
 
 
-div.contact_info_header                           { background: #F2F2F2 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
-                                                    color: #999999; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
+div.contact_info_header                           { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
+                                                    color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
                                                     
 div.contact_info                                  { padding: 5px; }
 

@@ -10,16 +10,25 @@ namespace :db do
       # create test companies
       company1 = Company.create(:name => "Company 1")
       company2 = Company.create(:name => "Company 2")
-      company3 = Company.create(:name => "Company 3")
+      company3 = Company.create(:name => "Noel Rose")
     
       # create some services
       company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
       company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
       company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
+
+      company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
+      company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
+      company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
+      company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
+      company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work")
     
       # create some people
       company1.people.create(:name => "Johnny")
       company1.people.create(:name => "Mary")
+
+      company3.people.create(:name => "Erika Maechtle")
+      company3.people.create(:name => "Josie")
 
       # create customers
       Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818")
