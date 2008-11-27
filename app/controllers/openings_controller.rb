@@ -27,13 +27,13 @@ class OpeningsController < ApplicationController
     # initialize service, default to nothing
     @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
         
-    # build appointment request for the timespan we're looking for
+    # build appointment request for the selected timespan
     @query      = AppointmentRequest.new(:when => @when, :service => @service, :person => @person, :company => @current_company)
 
-    # build people collection
-    @people     = Array(Person.anyone) + @current_company.people.all
+    # build people collection, people are restricted by the services they perform
+    @people     = Array(Person.anyone) + @service.people
     
-    # find services collection
+    # find services collection, services are restricted by the company they belong to
     @services   = Array(Service.nothing(:name => "Select a service")) + @current_company.services.work
 
     if @when.blank?
@@ -41,11 +41,6 @@ class OpeningsController < ApplicationController
       return
     end
 
-    if @service.nothing?
-      @errors = true
-      @alert  = "Please select a service"
-    end
-    
     logger.debug("*** finding free time #{@when}")
     
     # find free appointments, and free timeslots for each free apppointment

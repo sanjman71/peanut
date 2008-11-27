@@ -8,7 +8,7 @@ class AppointmentRequest < Appointment
       # find free appointments for any person, order by start times
       collection = self.company.appointments.span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     else
-      # find free appointments for a specific resource, order by start times
+      # find free appointments for a specific person, order by start times
       collection = self.company.appointments.person(person_id).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     end
   end

@@ -20,6 +20,7 @@ class Appointment < ActiveRecord::Base
   
   named_scope :service,     lambda { |id| { :conditions => {:service_id => id} }}
   named_scope :person,      lambda { |id| { :conditions => {:person_id => id} }}
+  # named_scope :people,      lambda { |*args| { :conditions => ["person_id IN (?)", (*args.first || 0)] }}  # is this somewhat correct?
   named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
 

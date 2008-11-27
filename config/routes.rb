@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :appointments, :member => { :confirmation => :get }, :collection => { :search => :any }
   map.resources :openings
   map.resources :notes
-  
+
   # override 'appointments/new' path
   map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
@@ -22,7 +22,10 @@ ActionController::Routing::Routes.draw do |map|
   
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]
-  
+
+  # javascript routes
+  map.resources :javascripts,       :collection => {:service_providers => :get}
+    
   # map the company root to the appointments controller
   map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }
 

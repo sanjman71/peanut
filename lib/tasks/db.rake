@@ -16,12 +16,15 @@ namespace :db do
       company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
       company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
       
-      haircut = company1.services.create(:name => "Haircut", :duration => 30, :mark_as => "work")
-      person1 = company1.people.create(:name => "Johnny")
-      person2 = company1.people.create(:name => "Mary")
+      mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
+      womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
       
-      haircut.resources.push(person1)
-      haircut.resources.push(person2)
+      person1         = company1.people.create(:name => "Johnny")
+      person2         = company1.people.create(:name => "Mary")
+      
+      # apply rules to what services can be performed by what resources
+      mens_haircut.resources.push(person1)
+      womens_haircut.resources.push(person2)
 
       # create company3 services and people
       company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
