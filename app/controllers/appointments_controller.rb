@@ -92,21 +92,6 @@ class AppointmentsController < ApplicationController
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
-  # GET /appointments/1
-  # GET /appointments/1.xml
-  def show
-    @appointment  = Appointment.find(params[:id])
-    @note         = Note.new
-    
-    # build notes collection, most recent first 
-    @notes        = @appointment.notes.sort_recent
-    
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @appointment }
-    end
-  end
-
   # GET /schedule/people/1/services/1/20081231T000000
   # POST /schedule/people/1/services/1/20081231T000000
   def new
@@ -145,9 +130,33 @@ class AppointmentsController < ApplicationController
     return redirect_to(confirmation_appointment_path(@work_appointment))
   end
   
+  # GET /appointments/1
+  # GET /appointments/1.xml
+  def show
+    @appointment  = Appointment.find(params[:id])
+    @note         = Note.new
+    
+    # build notes collection, most recent first 
+    @notes        = @appointment.notes.sort_recent
+    
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @appointment }
+    end
+  end
+  
   # GET /appointments/1/confirmation
   def confirmation
     @appointment = Appointment.find(params[:id])
+  end
+
+  # GET /appointments/1/checkout
+  def checkout
+    @appointment = Appointment.find(params[:id])
+    @appointment.checkout!
+    
+    # redirect to appointment show page
+    return redirect_to(appointment_path(@appointment))
   end
   
   # GET /appointments/search

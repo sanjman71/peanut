@@ -2,9 +2,10 @@
   .left
     .section_header
       %span.other_indexes
-        = link_to 'Checkout', ''
-        = "|"
-        = link_to 'Cancel', ''
+        - if @appointment.state == 'upcoming'
+          = link_to 'Checkout', checkout_appointment_path(@appointment)
+          = "|"
+          = link_to 'Cancel', ''
       %table.appointment_header
         %tr
           %td.what

@@ -3,11 +3,11 @@
     .section_header
       %h1.index
         == Confirm your appointment
+        %p
+        = appointment_description(@appointment)
         
     .section_body
-      %h1= appointment_description(@appointment)
-      %p
-      .schedule_message
+      %h1
         == Before we finalize your appointment, we need some information about you. 
       %p
       .schedule_form

@@ -30,6 +30,7 @@ Rails::Initializer.run do |config|
   config.gem "haml", :version => '2.0.4'
   config.gem "starling", :version => '0.9.8'
   config.gem 'has_many_polymorphs'
+  config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

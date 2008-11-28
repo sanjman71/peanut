@@ -45,6 +45,24 @@ class Appointment < ActiveRecord::Base
   WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
   WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'this month', 'later']
   
+  # BEGIN acts_as_state_machhine
+  include AASM
+  
+  aasm_column           :state
+  aasm_initial_state    :upcoming
+  aasm_state            :upcoming
+  aasm_state            :completed
+  aasm_state            :canceled
+  
+  aasm_event :checkout do
+    transitions :to => :completed, :from => [:upcoming]
+  end
+
+  aasm_event :cancel do
+    transitions :to => :canceled, :from => [:upcoming]
+  end
+  # END acts_as_state_machine
+  
   def after_initialize
     if self.start_at and self.service and self.end_at.blank?
       # initialize end_at
