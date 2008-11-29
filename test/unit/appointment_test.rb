@@ -10,7 +10,6 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :resource_id
   should_require_attributes :resource_type
   should_require_attributes :start_at
-  should_require_attributes :start_at
   should_require_attributes :end_at
   should_require_attributes :confirmation_code
   should_allow_values_for   :mark_as, "free", "busy", "work"

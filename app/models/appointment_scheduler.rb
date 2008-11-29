@@ -112,4 +112,49 @@ class AppointmentScheduler
     appointment
   end
   
+  # cancel the work appointment, and reclaim the necessary free time
+  def self.cancel_work_appointment(appointment)
+    raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WORK
+    
+    # find any free time that book-ends this work appointment
+    company           = appointment.company
+    free_time_before  = company.appointments.free.all(:conditions => {:end_at => appointment.start_at})
+    free_time_after   = company.appointments.free.all(:conditions => {:start_at => appointment.end_at})
+    
+    raise AppointmentInvalid, "Too many free times that overlap" if free_time_before.size > 1
+    raise AppointmentInvalid, "Too many free times that overlap" if free_time_after.size > 1
+    
+    # combine the work appointment and any free times before/after into a single free appointment
+    resource          = appointment.resource
+    free_start_at     = appointment.start_at
+    free_start_at     = free_time_before.first.start_at unless free_time_before.blank?
+    free_end_at       = appointment.end_at
+    free_end_at       = free_time_after.first.end_at unless free_time_after.blank?
+    
+    free_appointment  = nil
+    
+    # commit the apointment changes
+    Appointment.transaction do
+      # remove the existing work appointment
+      appointment.destroy
+      
+      # remove any existing free appointments
+      free_time_before.each do |appointment|
+        appointment.destroy
+      end
+
+      free_time_after.each do |appointment|
+        appointment.destroy
+      end
+      
+      # add the new free appointment
+      free_appointment = create_free_appointment(company, resource, free_start_at, free_end_at)
+      if !free_appointment.valid?
+        raise ActiveRecord::Rollback
+      end
+    end
+    
+    free_appointment
+  end
+  
 end

@@ -160,6 +160,18 @@ class AppointmentsController < ApplicationController
     # redirect to appointment show page
     return redirect_to(appointment_path(@appointment))
   end
+
+  # GET /appointments/1/cancel
+  def cancel
+    @appointment  = Appointment.find(params[:id])
+    @person       = @appointment.resource
+    
+    # cancel the work appointment
+    AppointmentScheduler.cancel_work_appointment(@appointment)
+    
+    # redirect to the resource's schedule page
+    return redirect_to(person_appointments_path(@person))
+  end
   
   # GET /appointments/search
   def search

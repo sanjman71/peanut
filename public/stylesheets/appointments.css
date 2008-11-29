@@ -1,3 +1,4 @@
+
 /* appointment, timeslot styles */
                                                     
 div.appointments, div.timeslots, table.appointments, table.timeslots                   
@@ -53,9 +54,13 @@ table.appointment_header td.what                  { font-weight: bold; font-size
 table.appointment_header td.when                  { font-weight: bold; font-size: 15px; }
 
 table.appointment_header td.customer, table.appointment_header td.customer a
-                                                  { font-weight: bold; font-size: 14px; color: #0033FF; }
+                                                  { font-weight: bold; font-size: 14px; color: #0033FF; padding-top: 5px; }
                                                   
 table.appointment_header td.customer a:hover      { background: #FF6600; color: #FFFFFF; }
 
-table.appointment_header td.confirmation          { font-size: 12px; color: #666666; }
+table.appointment_header td.confirmation          { font-size: 12px; color: #666666; padding-top: 10px; }
 
+div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
+                                                    color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
+
+div.appointment_details                           { font-size: 11px; padding: 5px; }

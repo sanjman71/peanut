@@ -3,14 +3,14 @@ require 'test/factories'
 
 class AppointmentScheduleTest < ActiveSupport::TestCase
 
-  def test_should_schedule_work
+  def test_should_schedule_work_at_start_of_free_appointment
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     free      = Factory(:free_service, :company => company)
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
     customer  = Factory(:customer)
     
-    # create big fee timeslot
+    # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
                                           :resource => johnny,
@@ -29,19 +29,142 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
                                       
     assert new_appointment.valid?
     
-    # should be conflicts
-    assert new_appointment.conflicts?
-    
     assert_difference('Appointment.count', 1) do
+      # should be conflicts
+      assert new_appointment.conflicts?
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
       assert work_appointment.valid?
       # work appointment should have the correct customer and job
       assert_equal customer, work_appointment.customer
       assert_equal haircut, work_appointment.service
+      # work appointment should have the correct start and end times
+      assert_equal "20080801T000000", work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal "20080801T003000", work_appointment.end_at.to_s(:appt_schedule)
+    end
+
+    assert_difference('Appointment.count', -1) do
+      # cancel work appointment
+      work_appointment  = Appointment.work.first
+      free2_appointment = AppointmentScheduler.cancel_work_appointment(work_appointment)
+    
+      # free appointment should have the same properties as the original free appointment
+      assert_equal free_appointment.start_at, free2_appointment.start_at
+      assert_equal free_appointment.end_at, free2_appointment.end_at
+      assert_equal free, free2_appointment.service
+      assert_equal johnny, free2_appointment.resource
+      assert_equal 0, free2_appointment.customer_id
     end
   end
 
+  def test_should_schedule_work_in_middle_of_free_appointment
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    free      = Factory(:free_service, :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    customer  = Factory(:customer)
+    
+    # create free timeslot
+    free_appointment = Appointment.create(:company => company, 
+                                          :service => free,
+                                          :resource => johnny,
+                                          :customer_id => 0,
+                                          :start_at => "20080801000000",
+                                          :end_at =>   "20080802000000")  # free all day
+    assert free_appointment.valid?
+    
+    # create new appointment object for a haircut
+    new_appointment = Appointment.new(:company => company,
+                                      :service => haircut,
+                                      :resource => johnny,
+                                      :customer => customer,
+                                      :start_at => "20080801110000",
+                                      :duration =>  haircut.duration)
+                                      
+    assert new_appointment.valid?
+  
+    assert_difference('Appointment.count', 2) do
+      # should be conflicts
+      assert new_appointment.conflicts?
+      # schedule the work appointment, the free appointment should be split into free/work time
+      work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
+      assert work_appointment.valid?
+      # work appointment should have the correct customer and job
+      assert_equal customer, work_appointment.customer
+      assert_equal haircut, work_appointment.service
+      # work appointment should have the correct start and end times
+      assert_equal "20080801T110000", work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal "20080801T113000", work_appointment.end_at.to_s(:appt_schedule)
+    end
+    
+    assert_difference('Appointment.count', -2) do
+      # cancel work appointment
+      work_appointment  = Appointment.work.first
+      free2_appointment = AppointmentScheduler.cancel_work_appointment(work_appointment)
+    
+      # free appointment should have the same properties as the original free appointment
+      assert_equal free_appointment.start_at, free2_appointment.start_at
+      assert_equal free_appointment.end_at, free2_appointment.end_at
+      assert_equal free, free2_appointment.service
+      assert_equal johnny, free2_appointment.resource
+      assert_equal 0, free2_appointment.customer_id
+    end
+  end
+  
+  def test_should_schedule_work_at_end_of_free_appointment
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    free      = Factory(:free_service, :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    customer  = Factory(:customer)
+    
+    # create free timeslot
+    free_appointment = Appointment.create(:company => company, 
+                                          :service => free,
+                                          :resource => johnny,
+                                          :customer_id => 0,
+                                          :start_at => "20080801000000",
+                                          :end_at =>   "20080802000000")  # free all day
+    assert free_appointment.valid?
+    
+    # create new appointment object for a haircut
+    new_appointment = Appointment.new(:company => company,
+                                      :service => haircut,
+                                      :resource => johnny,
+                                      :customer => customer,
+                                      :start_at => "20080801233000",
+                                      :duration =>  haircut.duration)
+                                      
+    assert new_appointment.valid?
+    
+    assert_difference('Appointment.count', 1) do
+      # should be conflicts
+      assert new_appointment.conflicts?
+      # schedule the work appointment, the free appointment should be split into free/work time
+      work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
+      assert work_appointment.valid?
+      # work appointment should have the correct customer and job
+      assert_equal customer, work_appointment.customer
+      assert_equal haircut, work_appointment.service
+      # work appointment should have the correct start and end times
+      assert_equal "20080801T233000", work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal "20080802T000000", work_appointment.end_at.to_s(:appt_schedule)
+    end
+
+    assert_difference('Appointment.count', -1) do
+      # cancel work appointment
+      work_appointment  = Appointment.work.first
+      free2_appointment = AppointmentScheduler.cancel_work_appointment(work_appointment)
+    
+      # free appointment should have the same properties as the original free appointment
+      assert_equal free_appointment.start_at, free2_appointment.start_at
+      assert_equal free_appointment.end_at, free2_appointment.end_at
+      assert_equal free, free2_appointment.service
+      assert_equal johnny, free2_appointment.resource
+      assert_equal 0, free2_appointment.customer_id
+    end
+  end
+  
   def test_should_schedule_job_at_start_of_available_timeslot
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])

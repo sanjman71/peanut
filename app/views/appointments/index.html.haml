@@ -28,14 +28,20 @@
           - form_remote_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
             = hidden_field_tag :when, @when
             %p
-              %span{:style => 'font-size: 11px; padding: 2px;'}== When
-              %span= select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+              %span{:style => 'font-size: 11px; padding: 2px;'}
+                == When
+              %span
+                = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
             %p
-              %span#start_at_label{:style => 'font-size: 11px; padding: 4px;' }== Start
-              %span= text_field 'appointment[time_range]', 'start_at', :size => 12
+              %span#start_at_label{:style => 'font-size: 11px; padding: 4px;' }
+                == Start
+              %span
+                = text_field 'appointment[time_range]', 'start_at', :size => 12
             %p
-              %span#end_at_label{:style => 'font-size: 11px; padding: 6px;' }== End
-              %span= text_field 'appointment[time_range]', 'end_at', :size => 12
+              %span#end_at_label{:style => 'font-size: 11px; padding: 6px;' }
+                == End
+              %span
+                = text_field 'appointment[time_range]', 'end_at', :size => 12
             %p
               = f.submit 'Add'
   

@@ -3,9 +3,8 @@
     .section_header
       %span.other_indexes
         - if @appointment.state == 'upcoming'
-          = link_to 'Checkout', checkout_appointment_path(@appointment)
-          = "|"
-          = link_to 'Cancel', ''
+          -# upcoming appointments can be canceled
+          = link_to 'Cancel', cancel_appointment_path(@appointment)
       %table.appointment_header
         %tr
           %td.what
@@ -25,6 +24,14 @@
             = @appointment.confirmation_code
             
     .section_body
+      -# check if the appointment is in a completed state
+      - if @appointment.state == 'completed'
+        .appointment_header
+          == Checkout
+        %p
+        .appointment_details
+          == checkout details ...
+      
       -# notes flash message
       #note_flash
       
@@ -40,4 +47,24 @@
       %p
       #notes_collection
         = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+        
+  - if @appointment.state == 'upcoming'
+    -# upcoming appointments can be checked-out
+    .right
+      .col
+        .sidebar_form
+          .sidebar_header
+            %h1
+              == Checkout
+            - form_for(@appointment, :url => checkout_appointment_path(@appointment), :method => :post, :html => {:id => 'checkout_form'}) do |f|
+              .checkout
+                %table
+                  %tr
+                    %td{:style => "font-size: 11px; padding-right: 5px;"}
+                      == Price
+                    %td{:style => "font-size: 11px;"}
+                      = text_field_tag :checkout_price, nil
+              %p
+                = f.submit "Done", :name => nil
+            
         
