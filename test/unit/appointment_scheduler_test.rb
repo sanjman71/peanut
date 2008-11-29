@@ -13,7 +13,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big fee timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
-                                          :person => johnny,
+                                          :resource => johnny,
                                           :customer_id => 0,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
@@ -22,7 +22,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create new appointment object for a haircut
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
-                                      :person => johnny,
+                                      :resource => johnny,
                                       :customer => customer,
                                       :start_at => "20080801000000",
                                       :duration =>  haircut.duration)
@@ -51,7 +51,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :person => johnny,
+                                        :resource => johnny,
                                         :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
@@ -95,7 +95,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :person => johnny,
+                                        :resource => johnny,
                                         :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
@@ -154,7 +154,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :person => johnny,
+                                        :resource => johnny,
                                         :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day

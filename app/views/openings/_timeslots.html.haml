@@ -1,7 +1,7 @@
 - timeslots_by_day.each do |day, timeslots|
   %h2== #{day.to_s(:appt_day)}
   -# group timeslots by people
-  - timeslots.group_by { |timeslot| timeslot.person }.each do |person, timeslots|
+  - timeslots.group_by { |timeslot| timeslot.resource }.each do |person, timeslots|
     %table.timeslots
       - timeslots.each_with_index do |timeslot, i|
         - id = "#{timeslot.start_at.to_s(:appt_schedule)}_#{person.name.downcase}_#{i}"

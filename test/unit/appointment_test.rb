@@ -6,8 +6,10 @@ class AppointmentTest < ActiveSupport::TestCase
   # shoulda
   should_require_attributes :company_id
   should_require_attributes :service_id
-  should_require_attributes :person_id
   should_require_attributes :customer_id
+  should_require_attributes :resource_id
+  should_require_attributes :resource_type
+  should_require_attributes :start_at
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_require_attributes :confirmation_code
@@ -25,7 +27,7 @@ class AppointmentTest < ActiveSupport::TestCase
     # create appointment
     appt = Appointment.create(:company => company,
                               :service => haircut,
-                              :person => johnny,
+                              :resource => johnny,
                               :customer => customer,
                               :start_at_string => "today 2 pm")
     assert appt.valid?
@@ -74,7 +76,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_difference('Appointment.count') do
       appt = Appointment.create(:company => company,
                                 :service => haircut,
-                                :person => johnny,
+                                :resource => johnny,
                                 :customer => customer,
                                 :start_at_string => "today 2 pm")
       assert appt.valid?
@@ -92,7 +94,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
                               :service => free,
-                              :person => johnny,
+                              :resource => johnny,
                               :customer => customer,
                               :start_at => "20080802000000",
                               :end_at =>   "20080802000000")
@@ -110,7 +112,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
                                 :service => free,
-                                :person => johnny,
+                                :resource => johnny,
                                 :customer => customer,
                                 :start_at => "20080802000000",
                                 :end_at =>   "20080801010000")
@@ -128,7 +130,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
                                 :service => free,
-                                :person => johnny,
+                                :resource => johnny,
                                 :customer => customer,
                                 :start_at => "20080801000000",
                                 :end_at =>   "20080801010000") # 1 hour
@@ -160,7 +162,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_difference('Customer.count', 1) do
       appt = Appointment.new(:company => company, 
                              :service => haircut,
-                             :person => johnny,
+                             :resource => johnny,
                              :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     
@@ -171,7 +173,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_no_difference('Customer.count') do
       appt = Appointment.new(:company => company, 
                              :service => haircut,
-                             :person => johnny,
+                             :resource => johnny,
                              :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     

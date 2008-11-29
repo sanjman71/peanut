@@ -48,16 +48,16 @@ class CreatePeanut < ActiveRecord::Migration
     end
     
     create_table :appointments do |t|
-      t.integer   :company_id
-      t.integer   :service_id
-      t.integer   :person_id
-      t.integer   :customer_id
-      t.datetime  :start_at
-      t.datetime  :end_at
-      t.integer   :duration
-      t.string    :mark_as
-      t.string    :state
-      t.string    :confirmation_code
+      t.integer     :company_id
+      t.integer     :service_id
+      t.references  :resource, :polymorphic => true
+      t.integer     :customer_id
+      t.datetime    :start_at
+      t.datetime    :end_at
+      t.integer     :duration
+      t.string      :mark_as
+      t.string      :state
+      t.string      :confirmation_code
       
       t.timestamps
     end

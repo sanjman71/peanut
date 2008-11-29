@@ -28,7 +28,7 @@ class OpeningsController < ApplicationController
     @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
         
     # build appointment request for the selected timespan
-    @query      = AppointmentRequest.new(:when => @when, :service => @service, :person => @person, :company => @current_company)
+    @query      = AppointmentRequest.new(:when => @when, :service => @service, :resource => @person, :company => @current_company)
 
     # build people collection, people are restricted by the services they perform
     @people     = Array(Person.anyone) + @service.people

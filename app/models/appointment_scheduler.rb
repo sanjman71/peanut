@@ -91,7 +91,7 @@ class AppointmentScheduler
   end
     
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, person, start_at, end_at)
+  def self.create_free_appointment(company, resource, start_at, end_at)
     # find first service scheduled as 'free'
     service     = company.services.free.first
 
@@ -100,7 +100,7 @@ class AppointmentScheduler
     # create a new appointment object
     customer    = Customer.nobody
     appointment = Appointment.new(:start_at => start_at, :end_at => end_at, :mark_as => service.mark_as, :service => service, :company => company,
-                                  :person => person, :customer_id => customer.id)
+                                  :resource => resource, :customer_id => customer.id)
                               
     if appointment.conflicts?
       raise TimeslotNotEmpty

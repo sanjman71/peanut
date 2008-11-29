@@ -11,7 +11,7 @@
           %td.what
             = @appointment.service.name
             == with
-            = @appointment.person.name
+            = @appointment.resource.name
         %tr
           %td.when
             = @appointment.start_at.to_s(:appt_day_date_time)

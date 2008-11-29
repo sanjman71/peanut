@@ -10,8 +10,8 @@ class AppointmentTimeslot
     @end_at       = @start_at + @duration.minutes
   end
   
-  def person
-    @appointment.person if @appointment
+  def resource
+    @appointment.resource if @appointment
   end
   
 end

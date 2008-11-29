@@ -6,10 +6,10 @@ class AppointmentInvalid < Exception; end
 class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
-  belongs_to              :person
+  belongs_to              :resource, :polymorphic => true
   belongs_to              :service
   belongs_to              :customer
-  validates_presence_of   :company_id, :service_id, :person_id, :customer_id, :start_at, :end_at, :confirmation_code
+  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at, :confirmation_code
   validates_inclusion_of  :mark_as, :in => %w(free busy work)
   
   # appointment mark_as constants
@@ -19,8 +19,7 @@ class Appointment < ActiveRecord::Base
   
   
   named_scope :service,     lambda { |id| { :conditions => {:service_id => id} }}
-  named_scope :person,      lambda { |id| { :conditions => {:person_id => id} }}
-  # named_scope :people,      lambda { |*args| { :conditions => ["person_id IN (?)", (*args.first || 0)] }}  # is this somewhat correct?
+  named_scope :resource,    lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
   named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
@@ -95,10 +94,10 @@ class Appointment < ActiveRecord::Base
       end
     end
     
-    if self.person
-      # person must belong to the same company
-      if !self.person.companies.include?(self.company)
-        errors.add_to_base("Person is not associated to this company")
+    if self.resource
+      # resource must belong to the same company
+      if !self.resource.companies.include?(self.company)
+        errors.add_to_base("Resource is not associated to this company")
       end
     end
     
@@ -181,7 +180,7 @@ class Appointment < ActiveRecord::Base
     
   # returns all appointment conflicts
   def conflicts
-    @conflicts ||= self.company.appointments.person(person.id).span(start_at, end_at)
+    @conflicts ||= self.company.appointments.resource(resource).span(start_at, end_at)
   end
   
   # returns true if this appointment conflicts with any other

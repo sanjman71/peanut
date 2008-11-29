@@ -13,7 +13,7 @@
         %td.hover_region{:id => 'hover_'+hover_id, :style => 'display: none; padding-left: 10px; text-align: left;'}
           - if appointment.service.mark_as == Appointment::FREE
             -# free appointments can be deleted
-            = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'destroy', :person_id => appointment.person.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")
+            = link_to_remote('Delete', :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'destroy', :person_id => appointment.resource.id, :id => appointment.id), :method => :delete, :confirm => "Are you sure you want to delete this appointment?")
           - elsif appointment.service.mark_as == Appointment::WORK
             -# work appointments can be changed
             = link_to "Change", appointment_path(appointment)

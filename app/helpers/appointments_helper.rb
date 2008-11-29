@@ -23,7 +23,7 @@ module AppointmentsHelper
   end
   
   def appointment_description(appointment)
-    "#{appointment.service.name} with #{appointment.person.name} on #{appointment.start_at.to_s(:appt_day_date_time)}"
+    "#{appointment.service.name} with #{appointment.resource.name} on #{appointment.start_at.to_s(:appt_day_date_time)}"
   end
   
 end

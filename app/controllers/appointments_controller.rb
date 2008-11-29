@@ -2,7 +2,7 @@ class AppointmentsController < ApplicationController
   before_filter :init_current_company
   layout 'default'
   
-  # GET /resources/1/appointments
+  # GET /people/1/appointments
   def index
     if params[:customer_id]
       @customer     = Customer.find(params[:customer_id])
@@ -24,7 +24,8 @@ class AppointmentsController < ApplicationController
     # build new free appointment
     service       = Service.free.first
     customer      = Customer.nobody
-    @appointment  = Appointment.new(params[:appointment].merge(:person_id => params[:person_id], 
+    person        = Person.find(params[:person_id])
+    @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
                                                                :service_id => service.id,
                                                                :company_id => @current_company.id,
                                                                :customer_id => customer.id))
@@ -54,7 +55,7 @@ class AppointmentsController < ApplicationController
     manage_appointments
   end
   
-  # DELETE /resources/1/destroy
+  # DELETE /people/1/destroy
   def destroy
     @appointment  = Appointment.find(params[:id])
     @appointment.destroy
@@ -76,7 +77,7 @@ class AppointmentsController < ApplicationController
     @daterange    = DateRange.new(:when => @when)
     
     # find free, work appointments for a person
-    @appointments = @current_company.appointments.person(@person.id).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    @appointments = @current_company.appointments.resource(@person).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
@@ -96,7 +97,8 @@ class AppointmentsController < ApplicationController
   # POST /schedule/people/1/services/1/20081231T000000
   def new
     # build appointment hash
-    hash = {:service_id => params[:service_id], :person_id => params[:person_id], :start_at => params[:start_at], :company_id => @current_company.id}
+    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person',
+            :start_at => params[:start_at], :company_id => @current_company.id}
     hash.update(params[:appointment]) if params[:appointment]
     
     # build appointment object

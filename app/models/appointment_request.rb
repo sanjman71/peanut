@@ -2,15 +2,19 @@ class AppointmentRequest < Appointment
 
   def find_free_appointments(options={})
     # find free appointments with duration >= this request's service duration
-    duration    = self.service.duration
+    duration  = service.duration
     
-    if person_id.blank?
-      # find free appointments for any person, order by start times
-      collection = self.company.appointments.span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
+    if resource.anyone?
+      # find free appointments for any resource, order by start times
+      collection = company.appointments.span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     else
-      # find free appointments for a specific person, order by start times
-      collection = self.company.appointments.person(person_id).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
+      # find free appointments for a specific resource, order by start times
+      collection = company.appointments.resource(resource).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
     end
+    
+    # filter appointments by the people who can provide the service
+    people = service.people
+    collection.select { |o| people.include?(o.resource) }
   end
   
   # find free time slots based on appointment request [start_at, end_at]
