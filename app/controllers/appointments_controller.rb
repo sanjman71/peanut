@@ -142,14 +142,23 @@ class AppointmentsController < ApplicationController
     @notes        = @appointment.notes.sort_recent
     
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { render :action => 'show' }
       format.xml  { render :xml => @appointment }
     end
   end
   
   # GET /appointments/1/confirmation
   def confirmation
-    @appointment = Appointment.find(params[:id])
+    @appointment  = Appointment.find(params[:id])
+    @confirmation = true
+    
+    # only show confirmations for upcoming appointments
+    unless @appointment.state == 'upcoming'
+      return redirect_to(appointment_path(@appointment))
+    end
+    
+    # use show appointment action
+    show
   end
 
   # GET /appointments/1/checkout

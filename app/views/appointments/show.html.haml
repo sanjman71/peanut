@@ -24,31 +24,37 @@
             = @appointment.confirmation_code
             
     .section_body
-      -# check if the appointment is in a completed state
-      - if @appointment.state == 'completed'
+      - if @appointment.state == 'upcoming' and @confirmation
+        -# show appointment confirmation notice
+        .notice
+          == A confirmation email has also been sent to
+          = @appointment.customer.email unless @appointment.customer.blank?
+      - elsif @appointment.state == 'completed'
+        -# appointment is completed
         .appointment_header
           == Checkout
         %p
         .appointment_details
           == checkout details ...
       
-      -# notes flash message
-      #note_flash
+      - if @appointment.state == 'upcoming' and !@confirmation
+        -# notes flash message
+        #note_flash
       
-      -# appointment notes
-      .new_note#new_note_container
-        %p== Add a note about this appointment
-        - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
-          = hidden_field(:note, :subject_id, :value => @appointment.id)
-          = hidden_field(:note, :subject_type, :value => @appointment.class.to_s)
-          = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
-          %p
-          = f.submit 'Add note', :name => nil
-      %p
-      #notes_collection
-        = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+        -# appointment notes
+        .new_note#new_note_container
+          %p== Add a note about this appointment
+          - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
+            = hidden_field(:note, :subject_id, :value => @appointment.id)
+            = hidden_field(:note, :subject_type, :value => @appointment.class.to_s)
+            = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
+            %p
+            = f.submit 'Add note', :name => nil
+        %p
+        #notes_collection
+          = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
         
-  - if @appointment.state == 'upcoming'
+  - if @appointment.state == 'upcoming' and !@confirmation
     -# upcoming appointments can be checked-out
     .right
       .col
