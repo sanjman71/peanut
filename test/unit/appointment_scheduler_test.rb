@@ -41,6 +41,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       # work appointment should have the correct start and end times
       assert_equal "20080801T000000", work_appointment.start_at.to_s(:appt_schedule)
       assert_equal "20080801T003000", work_appointment.end_at.to_s(:appt_schedule)
+      # confirmation codes should be different
+      assert_not_equal work_appointment.confirmation_code, free_appointment.confirmation_code
     end
 
     assert_difference('Appointment.count', -1) do
@@ -185,7 +187,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     haircut_end_at    = "20080801003000" # 12:30 am, 30 minutes
 
     assert_no_difference('Appointment.count') do
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
   
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -229,7 +231,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     
     assert_no_difference('Appointment.count') do
       # split appointment, no commit
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
     
       # should now have 3 appointments
       assert_equal 3, appts.size
@@ -264,7 +266,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     
     assert_difference('Appointment.count', 2) do
       # split, commit appointment
-      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1)
+      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1, :customer => customer)
     end
   end
 
@@ -288,7 +290,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     haircut_end_at    = "20080802000000" # 12:00 am, 30 minutes
       
     assert_no_difference('Appointment.count') do
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
   
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -312,7 +314,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
 
     assert_difference('Appointment.count', 1) do
       # split, commit appointment
-      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1)
+      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1, :customer => customer)
     end
   end
 

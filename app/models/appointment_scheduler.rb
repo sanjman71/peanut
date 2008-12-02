@@ -40,7 +40,9 @@ class AppointmentScheduler
                                service_end_at.between?(appointment.start_at, appointment.end_at)
     
     # build new appointment
-    new_appt          = Appointment.new(appointment.attributes)
+    new_appt          = Appointment.new
+    new_appt.resource = appointment.resource
+    new_appt.company  = appointment.company
     new_appt.service  = service
     new_appt.start_at = service_start_at
     new_appt.end_at   = service_end_at
@@ -50,11 +52,10 @@ class AppointmentScheduler
     
     # build new start, end appointments
     unless service_start_at == appointment.start_at
-      # the start appoint starts at the same time but ends when the new appoint starts
+      # the start appointment starts at the same time but ends when the new appointment starts
       start_appt          = Appointment.new(appointment.attributes)
       start_appt.start_at = appointment.start_at
       start_appt.end_at   = new_appt.start_at
-      start_appt.mark_as  = Appointment::FREE
       start_appt.duration -= service.duration
     end
     
@@ -63,7 +64,6 @@ class AppointmentScheduler
       end_appt            = Appointment.new(appointment.attributes)
       end_appt.start_at   = new_appt.end_at
       end_appt.end_at     = appointment.end_at
-      end_appt.mark_as    = Appointment::FREE
       end_appt.duration   -= service.duration
     end
     

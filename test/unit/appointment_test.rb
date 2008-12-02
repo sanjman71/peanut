@@ -194,8 +194,24 @@ class AppointmentTest < ActiveSupport::TestCase
                               :end_at =>   "20080801010000") # 1 hour
     assert appt.valid?
     
+    # confirmation code should be 5 characters
     assert_equal 5, appt.confirmation_code.size
     assert_match /([A-Z]|[0-9])+/, appt.confirmation_code
+
+    # create another appointment
+    appt2 = Appointment.create(:company => company, 
+                               :service => free,
+                               :resource => johnny,
+                               :customer => customer,
+                               :start_at => "20080901000000",
+                               :end_at =>   "20080901010000") # 1 hour
+    assert appt2.valid?
+
+    # confirmation code should be 5 characters
+    assert_equal 5, appt2.confirmation_code.size
+    assert_match /([A-Z]|[0-9])+/, appt2.confirmation_code
+    # confirmation code should be random
+    assert_not_equal appt.confirmation_code, appt2.confirmation_code
   end
   
 end
