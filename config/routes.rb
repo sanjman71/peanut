@@ -13,7 +13,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :companies
   map.resources :appointments, :member => { :confirmation => :get, :checkout => :put, :cancel => :get }, :collection => { :search => :any }
-  map.resources :openings
+  map.resources :openings, :collection => { :search => :any }
   map.resources :notes
 
   # override 'appointments/new' path
