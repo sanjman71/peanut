@@ -120,4 +120,5 @@ div.nubbin                                        { height: 0; left: -4px; posit
 
 div.nubbin_content                                { font-size: 11px; height: 19px; line-height: 10px; margin: 0; padding: 7px 0 0 7px;
                                                     position: absolute; right: 0; width: 59px; }
-  
+
+div.login_info                                    {float: right;}
