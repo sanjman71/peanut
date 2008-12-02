@@ -25,3 +25,14 @@
 
 
 
+== Restful authentication with email
+I did this as follows:
+# while on branch master:
+git checkout -b ra_with_email
+git clone git://github.com/technoweenie/restful-authentication.git vendor/plugins/restful_authentication
+cd vendor/plugins/restful_authentication
+git remote add rawe git://github.com/enell/restful-authentication-with-email.git
+git fetch rawe
+git merge rawe/master
+# Should be 1 conflict. Resolve:
+git mergetool
