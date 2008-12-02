@@ -49,7 +49,7 @@ namespace :db do
       Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")
       
       # Create admin user
-      puts "adding admin user: admin@localhost.local, password: peanut"
+      puts "adding admin user: admin@killianmurphy.com, password: peanut"
       a = User.create :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut"
       a.register!
       a.activate!
