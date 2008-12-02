@@ -7,7 +7,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     free      = Factory(:free_service, :company => company)
-    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     # create free timeslot
@@ -61,7 +61,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     free      = Factory(:free_service, :company => company)
-    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     # create free timeslot
@@ -115,7 +115,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     free      = Factory(:free_service, :company => company)
-    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     # create free timeslot
@@ -180,7 +180,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
                                         :end_at =>   "20080802000000")  # available all day
     
     # split appointment
-    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     haircut_start_at  = "20080801000000" # 12:00 am
     haircut_end_at    = "20080801003000" # 12:30 am, 30 minutes
 
@@ -223,7 +223,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
-    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     haircut_start_at  = "20080801120000" # 12 pm
     haircut_end_at    = "20080801123000" # 12:30 pm, 30 minutes
     
@@ -283,7 +283,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
                                         :end_at =>   "20080802000000")  # available all day
     
     # split appointment
-    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company)
+    haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     haircut_start_at  = "20080801002330" # 11:30 pm
     haircut_end_at    = "20080802000000" # 12:00 am, 30 minutes
       

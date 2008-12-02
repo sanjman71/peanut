@@ -20,7 +20,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    haircut   = Factory(:work_service, :name => "Haircut", :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     # create appointment
@@ -69,7 +69,7 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_set_end_at_on_new_appointment
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    haircut   = Factory(:work_service, :name => "Haircut", :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     assert_difference('Appointment.count') do
@@ -87,7 +87,7 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_not_allow_when_start_at_is_same_as_end_at
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company)
+    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     assert_no_difference('Appointment.count') do
@@ -105,7 +105,7 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_not_allow_start_at_after_end_at
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company)
+    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     assert_no_difference('Appointment.count') do
@@ -123,7 +123,7 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_set_duration
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company)
+    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
     
     assert_difference('Appointment.count') do
@@ -155,7 +155,7 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_build_customer_association
     company = Factory(:company)
     johnny  = Factory(:person, :name => "Johnny", :companies => [company])
-    haircut = Factory(:work_service, :name => "Haircut", :company => company)
+    haircut = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
     
     # should create a new customer when building the new appointment
     assert_difference('Customer.count', 1) do
@@ -180,4 +180,22 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end  
         
+  def test_confirmation_code
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    free      = Factory(:free_service, :company => company, :price => 1.00)
+    customer  = Factory(:customer)
+    
+    appt = Appointment.create(:company => company, 
+                              :service => free,
+                              :resource => johnny,
+                              :customer => customer,
+                              :start_at => "20080801000000",
+                              :end_at =>   "20080801010000") # 1 hour
+    assert appt.valid?
+    
+    assert_equal 5, appt.confirmation_code.size
+    assert_match /([A-Z]|[0-9])+/, appt.confirmation_code
+  end
+  
 end

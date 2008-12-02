@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  validates_presence_of       :company_id, :name, :duration
+  validates_presence_of       :company_id, :name, :duration, :price_in_cents
   validates_uniqueness_of     :name, :scope => :company_id
   validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "services can only be scheduled as free, busy or work"
   belongs_to                  :company

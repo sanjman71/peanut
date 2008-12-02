@@ -12,6 +12,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.integer :duration
       t.string  :mark_as
+      t.integer :price_in_cents
       
       t.timestamps
     end

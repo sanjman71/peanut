@@ -18,6 +18,7 @@ Factory.define :free_service, :class => Service do |s|
   s.name "Available"
   s.mark_as "free"
   s.duration 0
+  s.price 0.00
 end
 
 Factory.define :customer do |c|

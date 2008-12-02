@@ -1,10 +1,11 @@
 class ServicesController < ApplicationController
-  layout 'admin'
+  before_filter :init_current_company
+  layout 'default'
   
-  # GET /jobs
-  # GET /jobs.xml
+  # GET /services
+  # GET /services.xml
   def index
-    @services = Service.find(:all)
+    @services = @current_company.services.work
 
     respond_to do |format|
       format.html # index.html.erb
@@ -12,35 +13,35 @@ class ServicesController < ApplicationController
     end
   end
 
-  # GET /jobs/1
-  # GET /jobs/1.xml
+  # GET /services/1
+  # GET /services/1.xml
   def show
     @service = Service.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @job }
+      format.xml  { render :xml => @service }
     end
   end
 
-  # GET /jobs/new
-  # GET /jobs/new.xml
+  # GET /services/new
+  # GET /services/new.xml
   def new
     @service = Service.new
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @job }
+      format.xml  { render :xml => @service }
     end
   end
 
-  # GET /jobs/1/edit
+  # GET /services/1/edit
   def edit
     @service = Service.find(params[:id])
   end
 
-  # POST /jobs
-  # POST /jobs.xml
+  # POST /services
+  # POST /services.xml
   def create
     @service = Service.new(params[:service])
 
@@ -48,7 +49,7 @@ class ServicesController < ApplicationController
       if @service.save
         flash[:notice] = 'Job was successfully created.'
         format.html { redirect_to(@service) }
-        format.xml  { render :xml => @service, :status => :created, :location => @job }
+        format.xml  { render :xml => @service, :status => :created, :location => @service }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @service.errors, :status => :unprocessable_entity }
@@ -56,31 +57,31 @@ class ServicesController < ApplicationController
     end
   end
 
-  # PUT /jobs/1
-  # PUT /jobs/1.xml
+  # PUT /services/1
+  # PUT /services/1.xml
   def update
-    @job = Job.find(params[:id])
+    @service = Service.find(params[:id])
 
     respond_to do |format|
-      if @job.update_attributes(params[:job])
-        flash[:notice] = 'Job was successfully updated.'
-        format.html { redirect_to(@job) }
+      if @service.update_attributes(params[:job])
+        flash[:notice] = 'Service was successfully updated.'
+        format.html { redirect_to(@service) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @job.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @service.errors, :status => :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /jobs/1
-  # DELETE /jobs/1.xml
+  # DELETE /services/1
+  # DELETE /services/1.xml
   def destroy
-    @job = Job.find(params[:id])
-    @job.destroy
+    @service = Servce.find(params[:id])
+    @service.destroy
 
     respond_to do |format|
-      format.html { redirect_to(jobs_url) }
+      format.html { redirect_to(services_path) }
       format.xml  { head :ok }
     end
   end

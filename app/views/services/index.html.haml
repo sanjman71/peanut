@@ -1,0 +1,11 @@
+.container
+  .left
+    .section_header
+      %h1.index
+        == Services
+        
+    .section_services
+      #services_table
+        = render(:partial => 'services.html.haml', :locals => {:services => @services})
+    
+    

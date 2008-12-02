@@ -13,11 +13,11 @@ namespace :db do
       company3 = Company.create(:name => "Noel Rose")
     
       # create company1 services and people
-      company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
-      company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
+      company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+      company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
       
-      mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
-      womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
+      mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
+      womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
       
       person1         = company1.people.create(:name => "Johnny")
       person2         = company1.people.create(:name => "Mary")
@@ -27,12 +27,12 @@ namespace :db do
       womens_haircut.resources.push(person2)
 
       # create company3 services and people
-      company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free")
-      company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy")
+      company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+      company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
       
-      mens_haircut    = company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work")
-      womens_haircut  = company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work")
-      womens_color    = company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work")
+      mens_haircut    = company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
+      womens_haircut  = company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
+      womens_color    = company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work", :price => 100.00)
     
       person1         = company3.people.create(:name => "Erika Maechtle")
       person2         = company3.people.create(:name => "Josie")

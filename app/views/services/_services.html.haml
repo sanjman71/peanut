@@ -1,0 +1,12 @@
+%table.services
+  - services.each do |service|
+    %tr{:id => "row_service_#{service.id}"}
+      %td
+        .service{:id => "service_#{service.id}"}
+          %h1{:style => "padding-left: 10px;"}= service.name
+      %td
+        .service
+          %h2= service.price
+      %td
+        .service
+          = link_to "Schedule an appointment", service_openings_path(:subdomain => @subdomain, :service_id => service.id)

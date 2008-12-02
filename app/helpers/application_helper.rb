@@ -60,6 +60,16 @@ module ApplicationHelper
     end
 
     yield link
+
+    # 'Services' link
+    name = 'Services'
+    if current_controller.controller_name == 'services' and ['index', 'show'].include?(current_controller.action_name)
+      link = link_to(name, services_path, :class => 'current')
+    else
+      link = link_to(name, services_path)
+    end
+
+    yield link
   end
   
 end

@@ -7,7 +7,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     free      = Factory(:free_service, :company => company)
-    haircut   = Factory(:work_service, :name => "Haircut", :company => company)
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
     anyone    = Person.anyone
     
     start_at  = Time.now.beginning_of_day + 8.hours
