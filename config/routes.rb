@@ -1,15 +1,16 @@
 ActionController::Routing::Routes.draw do |map|
 
-  map.signup '/signup', :controller => 'users', :action => 'new' 
-  map.login '/login', :controller => 'sessions', :action => 'new'
-  map.logout '/logout', :controller => 'sessions', :action => 'destroy'
-  map.register '/register', :controller => 'users', :action => 'create'
+  # user, session routes
+  map.signup    '/signup',        :controller => 'users', :action => 'new' 
+  map.login     '/login',         :controller => 'sessions', :action => 'new'
+  map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
+  map.register  '/register',      :controller => 'users', :action => 'create'
 
+  # user activation
   map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
-
-  map.resource :session
+  map.resource  :session
 
   map.resources :companies
   map.resources :appointments, :member => { :confirmation => :get, :checkout => :put, :cancel => :get }, :collection => { :search => :any }
@@ -38,14 +39,11 @@ ActionController::Routing::Routes.draw do |map|
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}
     
-  # map the company root to the appointments controller
-  map.company_root  '', :controller => 'dashboard', :action => 'index', :conditions => { :subdomain => /.+/ }
+  # map the company root to the companies controller
+  map.company_root  '',     :controller => 'companies', :action => 'index', :conditions => { :subdomain => /.+/ }
 
   # map the root to the companies controller
-  map.root          :controller => 'dashboard', :action => 'index'
-  
-  # configure the dashboard route
-  map.dashboard     'dashboard', :controller => 'dashboard', :action => 'index'
+  map.root                  :controller => 'companies', :action => 'index'
   
   # The priority is based upon order of creation: first created -> highest priority.
 

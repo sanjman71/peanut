@@ -29,14 +29,14 @@ table.appointments td.service                     { background: #5500BB none rep
 
 table.appointments td.work                        { background: #663333 none repeat scroll 0 0; }
                                                     
-table.appointments td.time                        { text-align: left; padding: 0; width: 150px;}
+table.appointments td.time                        { text-align: left; padding: 0; width: 150px; color: #000000; font-weight: normal; }
 
-table.appointments td.customer                    { text-align: left; font-size: 10px; font-weight: bold; padding-left: 10px; }
+table.appointments td.customer                    { text-align: left; font-size: 11px; font-weight: bold; padding-left: 10px; }
 
 table.timeslots td.person                         { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; margin-right: 2px; 
-                                                    padding: 2px 5px; text-align: right; width: 100px;}
+                                                    padding: 2px 5px; text-align: right; width: 125px;}
                                                      
-table.timeslots td.time                           { text-align: right; width: 60px; padding: 0 5px; }
+table.timeslots td.time                           { text-align: right; padding-right: 10px; width: 150px; }
 
 table.timeslots td.service                        { background: #FF6600 none repeat scroll 0 0; margin-right: 5px; padding: 1px 5px; }
 

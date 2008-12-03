@@ -11,7 +11,6 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :resource_type
   should_require_attributes :start_at
   should_require_attributes :end_at
-  should_require_attributes :confirmation_code
   should_allow_values_for   :mark_as, "free", "busy", "work"
   
   def test_span
@@ -210,8 +209,8 @@ class AppointmentTest < ActiveSupport::TestCase
     # confirmation code should be 5 characters
     assert_equal 5, appt2.confirmation_code.size
     assert_match /([A-Z]|[0-9])+/, appt2.confirmation_code
-    # confirmation code should be random
-    assert_not_equal appt.confirmation_code, appt2.confirmation_code
+    # confirmation code should the same for free appointments
+    assert_equal appt.confirmation_code, appt2.confirmation_code
   end
   
 end

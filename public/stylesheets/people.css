@@ -1,0 +1,9 @@
+div.people_header                                 { color: #666666; font-size: 12px; font-weight: bold; margin: 3px 0 10px; }
+
+table.people                                      { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; border: medium none; }
+
+table.people td                                   { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
+                                                    vertical-align: top; width: 30%; }
+                                                    
+table.people td.person h2                         { color: #000000; font-size: 16px; margin: 0 0 3px; border: none; }
+ 

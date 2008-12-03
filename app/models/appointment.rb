@@ -9,14 +9,17 @@ class Appointment < ActiveRecord::Base
   belongs_to              :resource, :polymorphic => true
   belongs_to              :service
   belongs_to              :customer
-  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at, :confirmation_code
+  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at
   validates_inclusion_of  :mark_as, :in => %w(free busy work)
+  before_save             :make_confirmation_code
   
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   BUSY                    = 'busy'      # busy appointments can not be scheduled
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
   
+  # appointment confirmation code constants
+  CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,     lambda { |id| { :conditions => {:service_id => id} }}
   named_scope :resource,    lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
@@ -75,9 +78,6 @@ class Appointment < ActiveRecord::Base
       # initialize mark_as field with service.mark_as
       self.mark_as = self.service.mark_as
     end
-
-    # initialize confirmation code
-    self.make_confirmation_code
   end
   
   def validate
@@ -192,9 +192,15 @@ class Appointment < ActiveRecord::Base
   
   def make_confirmation_code
     unless self.confirmation_code
-      possible_values         = ('A'..'Z').to_a + (0..9).to_a
-      code_length             = 5
-      self.confirmation_code  = (0...code_length).map{ possible_values[rand(possible_values.size)]}.join
+      if self.mark_as == WORK
+        # create a random string
+        possible_values         = ('A'..'Z').to_a + (0..9).to_a
+        code_length             = 5
+        self.confirmation_code  = (0...code_length).map{ possible_values[rand(possible_values.size)]}.join
+      else
+        # use a constant string
+        self.confirmation_code  = CONFIRMATION_CODE_ZERO
+      end
     end
   end
   

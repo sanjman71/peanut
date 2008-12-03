@@ -1,6 +1,5 @@
 %table.people
   - people.each do |person|
     %tr{:id => "row_person_#{person.id}"}
-      %td
-        .person{:id => "person_#{person.id}"}
-          %h1= link_to person.name, person_path(person)
+      %td.person
+        %h2= link_to person.name, person_path(person)
