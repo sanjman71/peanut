@@ -30,21 +30,24 @@
             Add Free Time
           - form_remote_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
             = hidden_field_tag :when, @when
-            %p
-              %span{:style => 'font-size: 11px; padding: 2px;'}
-                == When
-              %span
-                = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
-            %p
-              %span#start_at_label{:style => 'font-size: 11px; padding: 4px;' }
-                == Start
-              %span
-                = text_field 'appointment[time_range]', 'start_at', :size => 12
-            %p
-              %span#end_at_label{:style => 'font-size: 11px; padding: 6px;' }
-                == End
-              %span
-                = text_field 'appointment[time_range]', 'end_at', :size => 12
+            %table.add_free_time
+              %tr
+                %td.when
+                  == When
+                %td.input
+                  = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+              %tr
+                %td.start_at#end_at_label
+                  == Start
+                %td#start_at_text
+                  = text_field 'appointment[time_range]', 'start_at', :size => 10
+                  %span.example== e.g. 8:15 am
+              %tr
+                %td.end_at#start_at_label
+                  == End
+                %td
+                  = text_field 'appointment[time_range]', 'end_at', :size => 10
+                  %span.example== e.g. 5:30 pm
             %p
               = f.submit 'Add'
   
