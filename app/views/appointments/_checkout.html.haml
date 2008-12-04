@@ -1,0 +1,17 @@
+%h1
+  == Checkout
+- form_for(@appointment, :url => checkout_appointment_path(@appointment), :method => :post, :html => {:id => 'checkout_form'}) do |f|
+  %table.checkout
+    %tr
+      %td.price
+        == Total
+      %td
+        = text_field_tag "receipt[total]", nil, :value => @appointment.service.price, :size => 10
+    %tr
+      %td.price
+        == Tip
+      %td
+        = text_field_tag "receipt[tip]", nil, :size => 10
+        %span.example== e.g. 10
+  %p
+    = f.submit "Submit", :name => nil

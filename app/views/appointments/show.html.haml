@@ -35,11 +35,20 @@
       - elsif @appointment.state == 'completed'
         -# appointment is completed
         .appointment_header
-          == Checkout
-        %p
+          == Receipt
         .appointment_details
-          == checkout details ...
-      
+          %table.receipt
+            %tr
+              %td.heading
+                == Total
+              %td.price
+                = @appointment.receipt.total
+            %tr
+              %td.heading
+                == Tip
+              %td.price
+                = @appointment.receipt.tip
+                
       - if @appointment.state == 'upcoming' and !@confirmation
         -# notes flash message
         #note_flash
@@ -56,24 +65,13 @@
         %p
         #notes_collection
           = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
-        
+
   - if @appointment.state == 'upcoming' and !@confirmation
     -# upcoming appointments can be checked-out
     .right
       .col
         .sidebar_form
           .sidebar_header
-            %h1
-              == Checkout
-            - form_for(@appointment, :url => checkout_appointment_path(@appointment), :method => :post, :html => {:id => 'checkout_form'}) do |f|
-              .checkout
-                %table
-                  %tr
-                    %td{:style => "font-size: 11px; padding-right: 5px;"}
-                      == Price
-                    %td{:style => "font-size: 11px;"}
-                      = text_field_tag :checkout_price, nil
-              %p
-                = f.submit "Done", :name => nil
+            = render(:partial => 'checkout.html.haml', :locals => {:appointment => @appointment})
             
         

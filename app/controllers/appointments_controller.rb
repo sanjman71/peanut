@@ -163,7 +163,13 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/checkout
   def checkout
-    @appointment = Appointment.find(params[:id])
+    @appointment  = Appointment.find(params[:id])
+    @receipt      = AppointmentReceipt.new(params[:receipt])
+    
+    # save receipt
+    @appointment.receipt = @receipt
+    
+    # mark appointment as checked out
     @appointment.checkout!
     
     # redirect to appointment show page

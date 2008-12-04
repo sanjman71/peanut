@@ -63,6 +63,14 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
+    create_table :appointment_receipts do |t|
+      t.integer   :appointment_id
+      t.integer   :total_in_cents
+      t.integer   :tip_in_cents
+      
+      t.timestamps
+    end
+    
     create_table :notes do |t|
       t.text  :comment
       

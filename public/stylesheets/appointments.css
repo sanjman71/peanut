@@ -68,6 +68,16 @@ table.add_free_time                               { font-size: 11px; font-weight
 
 table.add_free_time tr                            { margin: 5px; padding: 2px; }
 
-table.add_free_time td.when, table.add_free_time start_at, table.add_free_time end_at
-                                                  { width: 40px; }
-                              
+table.add_free_time td.when, table.add_free_time td.start_at, table.add_free_time td.end_at
+                                                  { width: 30px; text-align: right; padding-right: 3px; }
+
+table.checkout                                    { font-size: 11px; font-weight: normal; }
+
+table.checkout tr                                 { margin: 5px; padding: 2px; }
+
+table.checkout td.price                           { width: 25px; text-align: right; padding-right: 3px; }
+
+table.receipt td.heading                          { background: #333333 none repeat scroll 0 0; color: #FFFFFF; font-size: 12px;
+                                                    padding: 2px 5px; width: 90px; text-align: left; }
+
+table.receipt td.price                            { font-size: 12px; padding-left: 5px; }
