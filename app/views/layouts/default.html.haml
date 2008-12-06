@@ -12,6 +12,8 @@
   %body
     #header
       %h1= @current_company.name
+      .login_info
+        = render :partial => 'users/user_bar'
       #tabs
         %ul
           %li.right
