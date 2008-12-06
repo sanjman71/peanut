@@ -22,6 +22,8 @@
 
     %p{:style => "color: green"}
       = flash[:notice]
+    %p{:style => "color: red"}
+      = flash[:error]
 
     .wrapper
       = yield

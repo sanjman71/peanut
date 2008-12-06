@@ -1,5 +1,5 @@
 class LocationsController < ApplicationController
-  before_filter :get_context
+  before_filter :init_current_company, :get_context
   
   layout 'default'
   
@@ -8,15 +8,22 @@ class LocationsController < ApplicationController
   def index
 
     if @current_company
-      @locations = Location.locatable(@current_company).paginate
-    else
-      @locations = Location.all.paginate
-    end
+      @locations = Location.locatable(@current_company).paginate :page => params[:locations_page]
 
-    respond_to do |format|
-      format.html # index.html.erb
-      format.js # index.js.rjs
-      format.xml  { render :xml => @locations.to_xml }
+      # We do authorization on the parent as appropriate. 
+      @may_edit_parent = has_privilege?("edit company", @current_company)
+
+      respond_to do |format|
+        format.html # index.html.erb
+        format.js # index.js.rjs
+      end
+
+    else
+      flash[:error] = "No company specified"
+
+      respond_to do |format|
+        format.html { redirect_to root_url }
+      end
     end
   end
 

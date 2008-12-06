@@ -37,9 +37,6 @@ ActionController::Routing::Routes.draw do |map|
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]
 
-  # locations - should be nested in companies
-  map.resources :locations
-
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}
     

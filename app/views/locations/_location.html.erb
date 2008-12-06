@@ -1,18 +1,8 @@
 <% if location %>
-  <% if (location.geocoded?) -%>
-  <div class="selectable" <%= "id='loc_#{h(location.id)}' lat=#{h(location.lat)} lng=#{h(location.lng)} idx=#{i}" -%> >
-    <%= image_tag "http://www.google.com/mapfiles/marker" + ('A'..'Z').to_a[i] + ".png", :class => :map_label_icon,
-          :alt => "Marker " + ('A'..'Z').to_a[i] %>
-  <% else -%>
-  <div class="unselectable" <%= "id='loc_#{h(location.id)}'" -%> >
-  <% end -%>
+  <div <%= "id='loc_#{h(location.id)}'" -%> >
     <span class="location_text">
       <% if show_location_title -%>
-        <%= location_title_renderer(location) %> 
-        <% if with_distance %>
-          <%= geodist %>
-        <% end %>
-        <br />
+        <%= location_title_renderer(location) %>  <br />
       <% end -%>
       <% if short_locations -%>
         <%= render :partial => 'locations/short_location', :object => location %>

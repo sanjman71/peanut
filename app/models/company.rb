@@ -5,7 +5,7 @@ class Company < ActiveRecord::Base
   has_many                  :services
   has_many                  :appointments
   has_many                  :customers, :through => :appointments, :uniq => true
-  has_many                  :locations
+  has_many                  :locations, :as => :locatable
   before_save               :init_subdomain
   
   private

@@ -1,10 +1,10 @@
 class Location < ActiveRecord::Base
 
   # Use GeoKit for mapping
-  acts_as_mappable
+  # acts_as_mappable
   
   # Ensure that the address is geocoded on creation and update
-  before_validation :geocode_address
+  # before_validation :geocode_address
 
   validates_presence_of :city
   validates_presence_of :country
