@@ -40,6 +40,10 @@ ActionController::Routing::Routes.draw do |map|
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}
 
+  # This allows us to get access to locations without going through their owner, if required.
+  # It at least gives us some useful automatic route definitions like edit_location_url etc.
+  map.resources :locations
+
   # Install the default routes as the lowest priority.
   map.namespace :badges do |badges|
     badges.resource :roles

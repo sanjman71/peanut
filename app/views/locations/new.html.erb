@@ -3,16 +3,11 @@
 
   <%= error_messages_for :location %>
 
-  <%
-    if @current_company
-      new_loc_form_path = company_path(@current_company) + locations_path      
-  	else
-      new_loc_form_path = locations_path
-    end
-  %>
-
-  <%= render :partial => 'edit_location', :object => @location, 
-      :locals => {:form_path => new_loc_form_path, :form_method => :post} %>
+  <% if @current_company
+      new_loc_form_path = company_locations_path(@current_company) %>
+    <%= render :partial => 'edit_location', :object => @location, 
+          :locals => {:form_path => new_loc_form_path} %>
+  <% end %>
 
   <%= link_to 'Back', new_loc_form_path %>
 </div>

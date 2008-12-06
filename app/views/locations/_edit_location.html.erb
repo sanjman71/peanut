@@ -1,12 +1,10 @@
 <div id='locations'>
   <%
-    form_path ||= locations_url
-    form_method ||= :get
     form_submit ||= 'Submit'
     user_location ||= !@user.nil?
   %>
   <% form_for @location, :url => form_path,
-        :html => {:id => 'edit_location_form', :method => form_method} do |form| %>
+        :html => {:id => 'edit_location_form'} do |form| %>
 
     <table>
       <tr>

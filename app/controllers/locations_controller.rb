@@ -11,7 +11,7 @@ class LocationsController < ApplicationController
       @locations = Location.locatable(@current_company).paginate :page => params[:locations_page]
 
       # We do authorization on the parent as appropriate. 
-      @may_edit_parent = has_privilege?("edit company", @current_company)
+      @may_edit_parent = has_privilege?("update company", @current_company)
 
       respond_to do |format|
         format.html # index.html.erb
