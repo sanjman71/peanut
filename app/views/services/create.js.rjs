@@ -1,0 +1,5 @@
+if @error
+  page[:service_name].addClassName 'highlight'
+else
+  page.redirect_to(edit_service_path(@service))
+end

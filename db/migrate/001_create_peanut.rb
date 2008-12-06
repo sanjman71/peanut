@@ -26,7 +26,7 @@ class CreatePeanut < ActiveRecord::Migration
     end
 
     # Polymorphic relationship mapping services to different resources (e.g. people)
-    create_table :resources_services do |t|
+    create_table :memberships do |t|
       t.references  :service
       t.references  :resource, :polymorphic => true
 
@@ -59,6 +59,14 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
+      
+      t.timestamps
+    end
+    
+    create_table :appointment_receipts do |t|
+      t.integer   :appointment_id
+      t.integer   :total_in_cents
+      t.integer   :tip_in_cents
       
       t.timestamps
     end

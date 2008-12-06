@@ -7,7 +7,27 @@
         == Services
         
     .section_body
-      #services_table
+      #flash
+      #services_list
         = render(:partial => 'services.html.haml', :locals => {:services => @services})
+        
+  .right
+    .col
+      .sidebar_form
+        .sidebar_header
+          %h1
+            == Create a new service
+          - form_remote_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
+            = hidden_field_tag "service[mark_as]", 'work'
+            = hidden_field_tag "service[price]", 0
+            = hidden_field_tag "service[duration]", 0
+            %p
+              = text_field_tag "service[name]", '', :size => 25, :id => 'service_name'
+              %br
+              %span{:style => "font-size: 11px; color: #666666"}== Examples: Hair Color, Bikini Wax
+            %p
+              = submit_tag "Create"
+          = javascript_tag "$('service_name').focus();"
+    
     
     

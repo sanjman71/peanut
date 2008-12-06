@@ -21,7 +21,7 @@
         = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
       #free_schedule
         = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
-        
+
   .right
     .col
       .sidebar_form

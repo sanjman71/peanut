@@ -3,9 +3,15 @@
     %tr{:id => "row_service_#{service.id}"}
       %td.service
         %h2= service.name
+        -# show all resources for this service
+        - resources = service.resources.collect { |r| r.name }.sort
+        = resources.join(", ")
+      %td.duration
+        == #{service.duration} minutes
       %td.price
         = service.price
       %td.action
-        = link_to "Schedule an appointment", service_openings_path(:subdomain => @subdomain, :service_id => service.id)
+        = link_to "Edit", edit_service_path(service), :class => 'admin'
       %td.action
-        = link_to "Edit", ""
+        = link_to_remote("Remove", :url => service_path(service), :method => :delete, :confirm => "Are you sure you want to delete this service?", :html => {:class => 'admin'})
+        

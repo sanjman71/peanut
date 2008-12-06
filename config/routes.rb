@@ -12,12 +12,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resource  :session
 
-  # Companies with nested locations
   map.resources :companies, :has_many  => [:locations]
-  map.resources :appointments, :member => { :confirmation => :get, :checkout => :put, :cancel => :get }, :collection => { :search => :any }
+  map.resources :appointments, :member => { :confirmation => :get, :checkout => :get, :cancel => :get }, :collection => { :search => :any }
   map.resources :openings, :collection => { :search => :any }
   map.resources :notes
-
+  map.resources :memberships
+  
   # override 'appointments/new' path
   map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
@@ -39,7 +39,17 @@ ActionController::Routing::Routes.draw do |map|
 
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}
-    
+
+  # Install the default routes as the lowest priority.
+  map.namespace :badges do |badges|
+    badges.resource :roles
+    badges.resource :user_roles
+    badges.resource :role_privileges
+    badges.resource :privileges
+    badges.connect '/admin/:action/:id', :controller => 'admin'
+  end
+
+
   # map the company root to the companies controller
   map.company_root  '',     :controller => 'companies', :action => 'index', :conditions => { :subdomain => /.+/ }
 

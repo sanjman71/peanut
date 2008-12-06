@@ -22,7 +22,7 @@ class AppointmentsController < ApplicationController
   # POST /people/1/create
   def create
     # build new free appointment
-    service       = Service.free.first
+    service       = @current_company.services.free.first
     customer      = Customer.nobody
     person        = Person.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
@@ -157,13 +157,19 @@ class AppointmentsController < ApplicationController
       return redirect_to(appointment_path(@appointment))
     end
     
-    # use show appointment action
+    # use show action
     show
   end
 
   # GET /appointments/1/checkout
   def checkout
-    @appointment = Appointment.find(params[:id])
+    @appointment  = Appointment.find(params[:id])
+    @receipt      = AppointmentReceipt.new(params[:receipt])
+    
+    # save receipt
+    @appointment.receipt = @receipt
+    
+    # mark appointment as checked out
     @appointment.checkout!
     
     # redirect to appointment show page
