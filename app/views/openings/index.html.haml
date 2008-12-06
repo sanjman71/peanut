@@ -23,7 +23,7 @@
           %span.field#when
             = select_tag('when', options_for_select(Appointment::WHENS, @when))
           %span#search{:style => "display: none;"}
-            = f.submit 'Search', :name => nil
+            = f.submit 'Search', :name => nil, :class => 'submit'
             
     - unless @when.blank?
       .section_body

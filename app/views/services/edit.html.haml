@@ -1,0 +1,41 @@
+- stylesheet('services')
+
+.container
+  .left
+    - form_remote_for(Membership.new, :url => memberships_path, :method => :post, :html => {:id => 'new_membership'}) do |f|
+      = hidden_field_tag "membership[service_id]", @service.id, :id => 'membership_service_id'
+      = hidden_field_tag "membership[resource_type]", 'Person', :id => 'membership_resource_type'
+      = hidden_field_tag "membership[resource_id]", '', :id => 'membership_resource_id'
+      
+    - form_for(@service, :url => service_path(@service), :method => :post) do |f|
+    
+      .section_header
+        %h1.index
+          == Service Name
+        = text_field_tag "service[name]", @service.name, :size => 30, :style => "background-color: #FFFF66"
+        
+      .section_body
+        .form_section
+          %table.service
+            %tr
+              %td.heading
+                == Price
+              %td.price
+                = text_field_tag "service[price]", @service.price, :size => 5, :style => "background-color: #FFFF66"
+            %tr
+              %td.heading
+                == Duration
+              %td.duration
+                = text_field_tag "service[duration]", @service.duration, :size => 5, :style => "background-color: #FFFF66"
+                == minutes
+                
+          %h2{:style => "font-size: 12px; font-weight: bold; border: none; color: #333333;"}
+            == People who provide this service
+          #memberships_list
+            = render(:partial => 'memberships.html.haml', :locals => {:memberships => @memberships, :non_members => @non_members})
+        
+        .submit
+          = submit_tag "Save Changes"
+          == or
+          = link_to "Cancel", services_path, :class => 'admin'
+        

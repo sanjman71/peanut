@@ -37,52 +37,59 @@ class ServicesController < ApplicationController
 
   # GET /services/1/edit
   def edit
-    @service = Service.find(params[:id])
+    @service      = @current_company.services.find(params[:id])
+    @memberships  = @service.memberships
+    @non_members  = @current_company.resources.all - @service.resources
   end
 
+  # COMPONENT - GET /services/1/memberships
+  # show all service memberships
+  def memberships
+    @service      = @current_company.services.find(params[:id])
+    @memberships  = @service.memberships
+    @non_members  = @current_company.resources.all - @service.resources
+  end
+  
   # POST /services
   # POST /services.xml
   def create
-    @service = Service.new(params[:service])
-
+    @service = @current_company.services.new(params[:service])
+    
+    if !@service.valid?
+      @error      = true
+      @error_text = "Could not create service"
+      return
+    end
+    
+    @service.save
+    
     respond_to do |format|
-      if @service.save
-        flash[:notice] = 'Job was successfully created.'
-        format.html { redirect_to(@service) }
-        format.xml  { render :xml => @service, :status => :created, :location => @service }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @service.errors, :status => :unprocessable_entity }
-      end
+      format.js # redirect to edit service page
     end
   end
 
   # PUT /services/1
   # PUT /services/1.xml
   def update
-    @service = Service.find(params[:id])
-
-    respond_to do |format|
-      if @service.update_attributes(params[:job])
-        flash[:notice] = 'Service was successfully updated.'
-        format.html { redirect_to(@service) }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @service.errors, :status => :unprocessable_entity }
-      end
+    @service  = Service.find(params[:id])
+    @status   = @service.update_attributes(params[:service])
+    
+    if !@status
+      raise Exception, "Error updating service"
     end
+    
+    redirect_to(services_path)
   end
 
   # DELETE /services/1
   # DELETE /services/1.xml
   def destroy
-    @service = Servce.find(params[:id])
+    @service = @current_company.services.find(params[:id])
     @service.destroy
 
-    respond_to do |format|
-      format.html { redirect_to(services_path) }
-      format.xml  { head :ok }
-    end
+    @notice_text = "Removed service #{@service.name}"
+
+    # build services collection
+    @services = @current_company.services.work
   end
 end

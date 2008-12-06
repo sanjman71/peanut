@@ -6,8 +6,10 @@
     .section_header
       %span.other_indexes
         - if @appointment.state == 'upcoming'
-          -# upcoming appointments can be canceled
+          -# upcoming appointments can be canceled and checked-out
           = link_to 'Cancel', cancel_appointment_path(@appointment)
+          == &nbsp;|
+          = link_to 'Checkout', checkout_appointment_path(@appointment)
       %table.appointment_header
         %tr
           %td.what
@@ -66,7 +68,7 @@
         #notes_collection
           = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
 
-  - if @appointment.state == 'upcoming' and !@confirmation
+  - if false #@appointment.state == 'upcoming' and !@confirmation
     -# upcoming appointments can be checked-out
     .right
       .col

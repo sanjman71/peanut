@@ -1,0 +1,12 @@
+%table.memberships
+  - memberships.sort_by{ |m| m.resource.name }.each do |membership|
+    %tr{:class => cycle("shaded", "")}
+      %td.person
+        = membership.resource.name
+      %td.action
+        = link_to_remote("Remove", :url => membership_path(membership), :method => :delete, :html => {:class => 'admin'})
+  - unless @non_members.blank?
+    %tr.add_user
+      %td{:colspan => 2, :style => "padding-top: 10px;"}
+        = select_tag('person_id', options_for_select([['Add a person to this service', 0]] + non_members.collect{ |o| [o.name, o.id]}, 0), :onchange => "$('membership_resource_id').value = this.options[this.selectedIndex].value; $('new_membership').onsubmit();")
+    

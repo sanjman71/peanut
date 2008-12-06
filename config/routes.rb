@@ -13,10 +13,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resource  :session
 
   map.resources :companies
-  map.resources :appointments, :member => { :confirmation => :get, :checkout => :put, :cancel => :get }, :collection => { :search => :any }
+  map.resources :appointments, :member => { :confirmation => :get, :checkout => :get, :cancel => :get }, :collection => { :search => :any }
   map.resources :openings, :collection => { :search => :any }
   map.resources :notes
-
+  map.resources :memberships
+  
   # override 'appointments/new' path
   map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
