@@ -27,3 +27,8 @@
 The administrative page is accessible here:
 http://localhost:3000/badges/admin/index
 I'll figure out a better solution to this, but in the meantime you can use this to administer it.
+
+Migration 003_... includes creating all the tables, the two default roles 'admin' and 'authorized', which are for admin users and all users respectively. All users created are automatically assigned the authorized role.
+Migration 004... adds the peanut specific roles 'company manager' and 'company employee', along with privileges 'create company', 'read company', 'update company' and 'delete company'. I provided initial assignments of these privileges to the two roles.
+
+This provides us with initial support. Next I need to start adding privilege requirements to models, views and controllers. Watch this space.
