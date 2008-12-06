@@ -39,7 +39,17 @@ ActionController::Routing::Routes.draw do |map|
 
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}
-    
+
+  # Install the default routes as the lowest priority.
+  map.namespace :badges do |badges|
+    badges.resource :roles
+    badges.resource :user_roles
+    badges.resource :role_privileges
+    badges.resource :privileges
+    badges.connect '/admin/:action/:id', :controller => 'admin'
+  end
+
+
   # map the company root to the companies controller
   map.company_root  '',     :controller => 'companies', :action => 'index', :conditions => { :subdomain => /.+/ }
 
