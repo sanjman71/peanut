@@ -149,7 +149,7 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments/1/confirmation
   def confirmation
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = @current_company.appointments.find(params[:id])
     @confirmation = true
     
     # only show confirmations for upcoming appointments
@@ -163,17 +163,19 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/checkout
   def checkout
-    @appointment  = Appointment.find(params[:id])
-    @receipt      = AppointmentReceipt.new(params[:receipt])
+    @appointment  = @current_company.appointments.find(params[:id])
+    @services     = @current_company.services.all
     
-    # save receipt
-    @appointment.receipt = @receipt
-    
-    # mark appointment as checked out
-    @appointment.checkout!
-    
-    # redirect to appointment show page
-    return redirect_to(appointment_path(@appointment))
+    # @receipt      = AppointmentReceipt.new(params[:receipt])
+    # 
+    # # save receipt
+    # @appointment.receipt = @receipt
+    # 
+    # # mark appointment as checked out
+    # @appointment.checkout!
+    # 
+    # # redirect to appointment show page
+    # return redirect_to(appointment_path(@appointment))
   end
 
   # GET /appointments/1/cancel
