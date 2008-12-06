@@ -1,0 +1,34 @@
+<% if location %>
+  <% if (location.geocoded?) -%>
+  <div class="selectable" <%= "id='loc_#{h(location.id)}' lat=#{h(location.lat)} lng=#{h(location.lng)} idx=#{i}" -%> >
+    <%= image_tag "http://www.google.com/mapfiles/marker" + ('A'..'Z').to_a[i] + ".png", :class => :map_label_icon,
+          :alt => "Marker " + ('A'..'Z').to_a[i] %>
+  <% else -%>
+  <div class="unselectable" <%= "id='loc_#{h(location.id)}'" -%> >
+  <% end -%>
+    <span class="location_text">
+      <% if show_location_title -%>
+        <%= location_title_renderer(location) %> 
+        <% if with_distance %>
+          <%= geodist %>
+        <% end %>
+        <br />
+      <% end -%>
+      <% if short_locations -%>
+        <%= render :partial => 'locations/short_location', :object => location %>
+      <% else -%>
+        <%= render :partial => 'locations/show_location', :object => location %>
+      <% end -%>
+    </span>
+	  <div class="editdelete">
+      <% if may_edit_parent %>
+        <%= link_to_remote "Edit", 
+          { :url => context_url + edit_location_path(location), :method => :get,
+            :html => {:class => 'edit_address'}},
+          :href => context_url + edit_location_path(location) -%>
+        <%= link_to "Delete", context_url + location_path(location), 
+            :method => :delete, :confirm => "Are you sure you want to delete this location" -%>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,79 @@
+<%
+# This partial uses a number of parameters, as follows:
+# short_locations - short location descriptions
+# show_location_title - show the title of the location (e.g. restaurant name)
+# big_map - show a big or little map initially
+# context_url - the url for the owner of the locations
+# home_location - show a home location, e.g. for a location-based search
+# page_param_name - the page parameter name for will_paginate
+
+short_locations = true if local_assigns[:short_locations].nil?
+show_location_title = true if local_assigns[:show_location_title].nil?
+big_map = false if local_assigns[:big_map].nil?
+context_url ||= ""
+home_location ||= nil
+page_param_name ||= :locations_page
+with_distance = false if local_assigns[:with_distance].nil?
+
+%>
+
+<% content_for :javascript do %>
+  <%= javascript_include_tag 'map_helpers' %>
+<% end %>
+
+<%
+may_edit_parent = case
+  when @restaurant then has_privilege?('edit', @restaurant)
+  when @user then User.authorized?('edit', current_user, @user)
+  else false  
+end
+%>  
+
+<div id='locations'>
+
+  <div id="mapbox">
+    <div id="map" class="regular_map"></div>
+    <div id="notmapped" class="regular_notmapped">This location has not been mapped.</div>
+    <span id="regular_map_link"><%= link_to_function "Regular Map", 'regularMap()' %></span>
+  </div>
+  <div id="addressbox" class="addressbox">
+    <% unless locations.nil? %>
+      <div class="toppage">
+        <%= location_page_info locations %> <br />
+        <%= will_paginate locations, :param_name => page_param_name %>
+      </div>
+      <% if with_distance
+        i = 0
+        locations.each_with_geodist do |location, geodist| %>
+          <%= render :partial => 'locations/location', :object => location,
+                    :locals => {:with_distance => with_distance, :i => i,
+                                :geodist => geodist, :show_location_title => show_location_title, :context_url => context_url,
+                                :short_locations => short_locations, :may_edit_parent => may_edit_parent}  %>
+          <% i += 1 %>
+        <% end
+      else
+        locations.each_with_index do |location, i| -%>
+        <%= render :partial => 'locations/location', :object => location,
+          :locals => {:with_distance => false, :i => i,
+                      :geodist => nil, :show_location_title => show_location_title, :context_url => context_url,
+                      :short_locations => short_locations, :may_edit_parent => may_edit_parent}  %>
+        <% end %>
+      <% end %>
+    <% end %>
+    <div class="bottompage">
+      <%= will_paginate locations, :param_name => page_param_name %>
+    </div>
+    <div class="bottompage">
+      <% if may_edit_parent %>
+        <%= link_to_remote "Add an address", 
+                { :url => context_url + new_location_path, :method => :get, 
+                  :html => {:class => 'add_address'}},
+                :href => context_url + new_location_path -%>
+      <% end %>
+    </div>
+    <%= link_to_function "Show all addresses", 'showAllLocations()' %> <br />
+    <%= link_to_function "Big Map", 'bigMap()' %>
+  </div>
+</div>
+
+<%= render :partial => "locations/draw_locations.js.erb", :object => locations, :locals => {:home_location => home_location } %>

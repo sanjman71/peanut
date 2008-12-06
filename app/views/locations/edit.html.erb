@@ -1,0 +1,31 @@
+<% content_for :javascript do %>
+  <%= javascript_include_tag 'map_helpers' %>
+<% end %>
+
+<h1>Editing location</h1>
+
+<%= error_messages_for :location %>
+
+<%
+  edit_loc_form_path = case
+    when @restaurant then restaurant_url(@restaurant) + location_path(@location)
+    when @user then user_url(@user) + location_path(@location)
+    else location_path(@location)
+  end
+%>
+
+<%= render :partial => 'edit_location', :object => @location, 
+  :locals => {:form_path => edit_loc_form_path, :form_method => :put, :form_submit => 'Edit' } %>
+
+<br/>
+<%= link_to "Edit", restaurant_path(@restaurant) + edit_location_path(@location) %>
+<%= link_to "Delete", restaurant_path(@restaurant) + location_path(@location), :method => :delete %>
+<br/>
+
+<% if (@restaurant) %>
+<%= link_to 'Back', restaurant_path(@restaurant) %>
+<% elsif (@user)%>
+<%= link_to 'Back', user_path(@user) %>
+<% else %>
+<%= link_to 'Back', location_path(@location) %>
+<% end %>

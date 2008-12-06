@@ -12,7 +12,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resource  :session
 
-  map.resources :companies
+  # Companies with nested locations
+  map.resources :companies, :has_many  => [:locations]
   map.resources :appointments, :member => { :confirmation => :get, :checkout => :put, :cancel => :get }, :collection => { :search => :any }
   map.resources :openings, :collection => { :search => :any }
   map.resources :notes
@@ -35,6 +36,9 @@ ActionController::Routing::Routes.draw do |map|
   
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]
+
+  # locations - should be nested in companies
+  map.resources :locations
 
   # javascript routes
   map.resources :javascripts,       :collection => {:service_providers => :get}

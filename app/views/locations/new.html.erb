@@ -1,0 +1,18 @@
+<div id='locations'>
+  <h1>New location</h1>
+
+  <%= error_messages_for :location %>
+
+  <%
+    if @current_company
+      new_loc_form_path = company_path(@current_company) + locations_path      
+  	else
+      new_loc_form_path = locations_path
+    end
+  %>
+
+  <%= render :partial => 'edit_location', :object => @location, 
+      :locals => {:form_path => new_loc_form_path, :form_method => :post} %>
+
+  <%= link_to 'Back', new_loc_form_path %>
+</div>

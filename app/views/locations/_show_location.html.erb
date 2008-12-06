@@ -1,0 +1,9 @@
+<span class="address">
+  <%= location_address_renderer(show_location, true) -%> <br />
+  <% if !show_location.phone.blank? -%> 
+    <%= h show_location.phone -%><br/>
+  <% end -%>
+  <% if !show_location.email.blank? -%>
+    <%= h show_location.email -%><br/>
+  <% end -%>
+</span>

@@ -1,0 +1,15 @@
+<%
+  context_url = case
+    when @restaurant then restaurant_url(@restaurant)
+    when @user then user_url(@user)
+    else ''
+  end
+%>
+
+<%= render :partial => "locations/locations",
+          :object => @locations,
+          :locals => 
+          { :short_locations => true, 
+            :show_location_title => true,
+            :context_url => context_url
+          } -%>
