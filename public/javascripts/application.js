@@ -148,9 +148,14 @@ $.fn.init_ujs_links = function () {
     if ($(this).attr("class").match(/delete/i))
       var params = {_method : 'delete'};
       
-//    $.ajax({
-//      type: "POST", data: {_method: "delete"}, url: $(this).attr("ujsxxx"), dataType: "script", beforeSend: function(xhr) {confirm('are you sure?');}
-//    });
+    // Check if a confirmation is required
+    if ($(this).attr("class").match(/confirm/i)) {
+      question  = $(this).attr("question") || "Are you sure?"
+      yesno     = confirm(question);
+      
+      if (yesno == false)
+        return false;
+    }
     
     $.post($(this).attr("ujs"), params, null, "script");
     return false;
