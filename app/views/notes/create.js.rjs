@@ -1,23 +1,22 @@
 if @errors
   # highlight note text
-  page[:note_comment].addClassName    'highlight'
-  page[:note_comment].focus
+  page["#note_comment"].add_class('highlighted')
+  page["#note_comment"].focus()
   
   # clear notice text
-  page[:note_flash].replace_html      ''
-  page[:note_flash].removeClassName   'notice'
+  page["#note_flash"].html('')
+  page["#note_flash"].remove_class('notice')
 else
   # highlight notice text
-  page[:note_flash].replace_html  @notice_text
-  page[:note_flash].addClassName  'notice'
+  page["#note_flash"].html(@notice_text)
+  page["#note_flash"].add_class('notice')
   
   # clear old note text
-  page[:note_comment].value = ''
+  page["#note_comment"].value = ''
   
   # rebuild notes
-  page[:notes_collection].replace_html  :partial => "notes/notes.html.haml", 
-                                        :locals => {:notes => @notes }
+  page["#notes_collection"].html(render(:partial => "notes/notes.html.haml", :locals => {:notes => @notes }))
                                   
-  # highlight new note
-  page["note_#{@note.id}"].highlight
+  # highlight new note??
+  # page["#note_#{@note.id}"].highlight();
 end

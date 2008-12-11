@@ -11,7 +11,7 @@ class Appointment < ActiveRecord::Base
   belongs_to              :customer
   validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at
   validates_inclusion_of  :mark_as, :in => %w(free busy work)
-  has_one                 :invoice, :class_name => "AppointmentInvoice"
+  has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
   before_save             :make_confirmation_code
   
   # appointment mark_as constants

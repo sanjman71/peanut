@@ -9,18 +9,9 @@
       = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
 
     .section_body
-      .checkout
-        %h1
-          == Services
-        - form_for(Service.new, services_path, :method => :post) do |f|
-          %table.service
-            %tr
-              %td.heading
-                = @appointment.service.name
-              %td.price
-                = text_field_tag 'service[price]', @appointment.service.price, :style => "background-color: #FFFF66"
-            %tr
-              %td.service{:colspan => 2}
-                = select_tag('service_id', options_for_select([['Add a service', 0]] + @services.collect{ |o| [o.name, o.id]}, 0))
+      .invoice_header
+        == Services and Products
+      #invoice
+        = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice, :services => @services})
                 
     

@@ -10,7 +10,7 @@ class MembershipsController < ApplicationController
       logger.debug("*** errors: #{@membership.errors.full_messages}")
     end
     
-    render_component :controller => 'services',  :action => 'memberships', :id => @membership.service,
+    render_component :controller => 'services',  :action => 'memberships', :id => @membership.service.id,
                      :layout => false, :params => {:authenticity_token => params[:authenticity_token] }
   end
   

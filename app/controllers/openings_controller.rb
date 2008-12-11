@@ -37,6 +37,7 @@ class OpeningsController < ApplicationController
     @services   = Array(Service.nothing(:name => "Select a service")) + @current_company.services.work
 
     if @when.blank?
+      logger.debug("*** showing empty page with help text")
       # render empty page with help text
       return
     end

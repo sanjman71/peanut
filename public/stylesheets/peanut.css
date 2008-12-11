@@ -63,7 +63,7 @@ div.section_header span.other_indexes             { float: right; font-size: 11p
 div.section_body                                  { padding: 20px 60px 20px 20px;}
 
 div.section_body h1, div.section_body div.notice                              
-                                                  { background-color: #FF6600; border-bottom: 1px solid #FFCC00; font-size: 12px; font-weight: bold; 
+                                                  { background-color: #FFCC00; border-bottom: 1px solid #FFCC00; font-size: 12px; font-weight: bold; 
                                                     margin: 0; padding: 3px; text-align: left; }
 
 div.section_body div.alert                        { background-color: #FFCC00; border-bottom: 1px solid #FFCC00;                                                     font-size: 12px; font-weight: bold; 
@@ -122,7 +122,7 @@ div.sidebar_header h1                             { font-size: 14px; font-weight
 
 /* highlight styles */
 
-.highlight                                        { background-color: #FFCC00; }
+.highlighted                                      { background: #FFCC00 none repeat scroll 0 0; }
 
 /* color styles */
 

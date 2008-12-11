@@ -1,0 +1,13 @@
+table.invoice                                     { width: 95%; border-collapse: collapse; font-size: 14px; }
+
+table.invoice td                                  { padding: 5px; }
+
+table.invoice tr.shaded td                        { background: #EDF3FE none repeat scroll 0 0; }
+
+table.invoice tr.highlighted td                   { background: #FFCC00 none repeat scroll 0 0; }
+
+table.invoice td.chargeable_name                  { width: 20%; white-space: nowrap; }
+
+table.invoice td.chargeable_price                 { white-space: nowrap; }
+
+table.invoice td.action                           { width: 2%; white-space: nowrap; }

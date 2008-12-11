@@ -1,0 +1,19 @@
+- javascript('invoices')
+- stylesheet('invoices')
+
+.container
+  .left
+    .section_header
+      %h1.index
+        == Invoice
+
+    .section_body
+      %p
+        == Services and Products
+      #invoice
+        = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice})
+      %p
+      - form_for(Service.new, add_invoice_path(@invoice), :url => add_invoice_path(@invoice), :html => {:id => "add_chargeable"}) do |f|
+        = select_tag('service_id', options_for_select(@services.collect{ |o| [o.name, o.id]}, 0))
+        = submit_tag "Add Service"
+  

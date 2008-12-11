@@ -40,6 +40,10 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
     assert_equal shampoo, li2.chargeable
     assert_equal [li1, li2], invoice.line_items
     
+    # remove line item
+    invoice.line_items.delete(li2)
+    invoice.reload
+    assert_equal [li1], invoice.line_items
   end
   
 end

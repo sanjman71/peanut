@@ -1,4 +1,5 @@
 - stylesheet('services')
+- javascript('services')
 
 .container
   .left
@@ -17,7 +18,7 @@
         .sidebar_header
           %h1
             == Create a new service
-          - form_remote_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
+          - form_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
             = hidden_field_tag "service[mark_as]", 'work'
             = hidden_field_tag "service[price]", 0
             = hidden_field_tag "service[duration]", 0
@@ -26,7 +27,7 @@
               %br
               %span{:style => "font-size: 11px; color: #666666"}== Examples: Hair Color, Bikini Wax
             %p
-              = submit_tag "Create"
+              = submit_tag "Create", :name => nil
           = javascript_tag "$('service_name').focus();"
     
     

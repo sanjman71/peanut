@@ -166,16 +166,8 @@ class AppointmentsController < ApplicationController
     @appointment  = @current_company.appointments.find(params[:id])
     @services     = @current_company.services.all
     
-    # @receipt      = AppointmentReceipt.new(params[:receipt])
-    # 
-    # # save receipt
-    # @appointment.receipt = @receipt
-    # 
-    # # mark appointment as checked out
-    # @appointment.checkout!
-    # 
-    # # redirect to appointment show page
-    # return redirect_to(appointment_path(@appointment))
+    # create/get invoice
+    @invoice      = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
   end
 
   # GET /appointments/1/cancel
