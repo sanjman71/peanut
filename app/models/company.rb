@@ -1,4 +1,8 @@
 class Company < ActiveRecord::Base
+
+  # Badges for authorization
+  badges_authorizable_object
+
   validates_uniqueness_of   :name
   validates_presence_of     :name
   has_many_polymorphs       :resources, :from => [:people]

@@ -53,6 +53,8 @@ namespace :db do
       a = User.create :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut"
       a.register!
       a.activate!
+      
+      a.grant_role('admin')
 
       puts "#{Time.now}: completed"
     end
