@@ -6,7 +6,7 @@ class OpeningsController < ApplicationController
   # GET /free.xml
   # GET /people/1/free
   # GET /people/1/services/3/free
-  # GET /people/1/services/3/free?when=tomorrow
+  # GET /people/1/services/3/free?when=this+week&time=morning
   def index
     if params[:person_id].to_s == "0"
       # /people/0/free is canonicalized to /free; preserve subdomain on redirect
@@ -24,11 +24,14 @@ class OpeningsController < ApplicationController
     @when       = params[:when]
     @daterange  = DateRange.new(:when => @when) unless @when.blank?
     
+    # initialize time
+    @time       = params[:time]
+
     # initialize service, default to nothing
     @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
-        
+
     # build appointment request for the selected timespan
-    @query      = AppointmentRequest.new(:when => @when, :service => @service, :resource => @person, :company => @current_company)
+    @query      = AppointmentRequest.new(:service => @service, :resource => @person, :when => @when, :time => @time, :company => @current_company)
 
     # build people collection, people are restricted by the services they perform
     @people     = Array(Person.anyone) + @service.people

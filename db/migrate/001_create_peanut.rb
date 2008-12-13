@@ -65,6 +65,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.datetime    :start_at
       t.datetime    :end_at
       t.integer     :duration
+      t.integer     :time_start_at  # time of day
+      t.integer     :time_end_at    # time of day
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code

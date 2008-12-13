@@ -2,14 +2,15 @@ class AppointmentRequest < Appointment
 
   def find_free_appointments(options={})
     # find free appointments with duration >= this request's service duration
-    duration  = service.duration
+    duration    = service.duration
+    time_range  = Appointment.time_range(time) 
     
     if resource.anyone?
       # find free appointments for any resource, order by start times
-      collection = company.appointments.span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
+      collection  = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.all(:order => 'start_at')
     else
       # find free appointments for a specific resource, order by start times
-      collection = company.appointments.resource(resource).span(start_at, end_at).duration_gt(duration).free.all(:order => 'start_at')
+      collection  = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.all(:order => 'start_at')
     end
     
     # filter appointments by the people who can provide the service
@@ -32,30 +33,16 @@ class AppointmentRequest < Appointment
     # iterate over free appointments
     duration    = self.service.duration
     timeslots   = collection.inject([]) do |array, appointment|
-      # create appointment timeslot
-      timeslot = AppointmentTimeslot.new(appointment)
+      # narrow appointments by request start, end times
+      appointment.narrow_by_time_range!(self.start_at, self.end_at)
       
-      # resize timeslot if free appointment is larger than requested appointment
-      timeslot.start_at = self.start_at if appointment.start_at < self.start_at
-      timeslot.end_at   = self.end_at if appointment.end_at > self.end_at
-      timeslot.duration = (timeslot.end_at.to_i - timeslot.start_at.to_i) / 60
-
-      # break timeslot into chunks based on service duration
-      chunks = timeslot.duration / duration
+      # narrow appointment by request time of day
+      appointment.narrow_by_time_of_day!(self.time)
       
-      # apply limit based on current array size
-      chunks = (limit - array.size) if limit
-      
-      0.upto(chunks-1) do |i|
-        # clone timeslot, then increment start_at based on chunk index
-        timeslot_i = timeslot.clone
-        timeslot_i.start_at = timeslot.start_at + (i * duration).minutes
-        timeslot_i.end_at   = timeslot_i.start_at + duration.minutes
-        timeslot_i.duration = duration
-        array << timeslot_i
-      end
-      
-      array
+      # build appointment timeslots
+      options = Hash.new
+      options[limit] = limit - array.size if limit
+      array   += appointment.timeslots(duration, options)
     end
     
     timeslots

@@ -13,5 +13,5 @@
       %td.action
         = link_to "Edit", edit_service_path(service), :class => 'admin'
       %td.action
-        = link_to("Remove", service_path(service), :class => 'admin ujs delete')
+        = link_to("Remove", service_path(service), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")
         

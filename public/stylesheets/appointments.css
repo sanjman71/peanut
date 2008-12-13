@@ -38,6 +38,11 @@ div.schedule_form span.field
   padding-right: 7px; 
 }
 
+div.schedule_form input.submit
+{ 
+  font-size: 12px;
+}
+
 table.appointments tr, table.timeslots tr
 { 
   margin: 5px 0 0; 
@@ -135,10 +140,22 @@ div.appointment_header                            { background: #E1E0E0 none rep
 
 div.appointment_details                           { font-size: 11px; padding: 5px; }
 
-table.add_free_time                               { font-size: 11px; font-weight: normal; }
+table.add_free_time
+{ 
+  font-size: 11px; 
+  font-weight: normal; 
+}
 
-table.add_free_time tr                            { margin: 5px; padding: 2px; }
+table.add_free_time tr
+{ 
+  margin: 5px; 
+  padding: 2px; 
+}
 
 table.add_free_time td.when, table.add_free_time td.start_at, table.add_free_time td.end_at
-                                                  { width: 30px; text-align: right; padding-right: 3px; }
+{ 
+  padding-right: 3px;
+  text-align: right; 
+  width: 30px; 
+}
 

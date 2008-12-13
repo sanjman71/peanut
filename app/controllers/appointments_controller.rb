@@ -77,7 +77,7 @@ class AppointmentsController < ApplicationController
     @daterange    = DateRange.new(:when => @when)
     
     # find free, work appointments for a person
-    @appointments = @current_company.appointments.resource(@person).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     

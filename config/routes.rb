@@ -39,7 +39,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :customers,         :has_many => [:appointments]
 
   # javascript routes
-  map.resources :javascripts,       :collection => {:service_providers => :get}
+  map.resources :javascripts,       :collection => {:skillset => :get}
 
   # Install the default routes as the lowest priority.
   map.namespace :badges do |badges|

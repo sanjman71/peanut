@@ -24,13 +24,18 @@
             == When
           %span.field#when
             = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
+          %span.field#time
+            = select_tag('time', options_for_select(Appointment::TIMES, @time))
           %span#search{:style => @when ? "display: inline;" : "display: none;"}
             = f.submit 'Search', :name => nil, :class => 'submit'
             
     - unless @when.blank?
       .section_body
         %h1
-          == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+          - if @free_timeslots.blank?
+            == No Available Appointments
+          - else
+            == #{pluralize(@free_timeslots.size, 'Available Appointment')}
         %h2
           == #{@when.titleize}
         #free_calendar
