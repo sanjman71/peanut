@@ -1,5 +1,5 @@
 <span class="address">
-  <%= location_address_renderer(show_location, true) -%> <br />
+  <%= render :partial => 'locations/location_address', :object => @location %>
   <% if !show_location.phone.blank? -%> 
     <%= h show_location.phone -%><br/>
   <% end -%>

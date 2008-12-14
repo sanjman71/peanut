@@ -10,9 +10,6 @@ class LocationsController < ApplicationController
     if @current_company
       @locations = Location.locatable(@current_company).paginate :page => params[:locations_page]
 
-      # We do authorization on the parent as appropriate. 
-      @may_edit_parent = has_privilege?("update company", @current_company)
-
       respond_to do |format|
         format.html # index.html.erb
         format.js # index.js.rjs
@@ -33,7 +30,7 @@ class LocationsController < ApplicationController
     @location = Location.find(params[:id])
 
     respond_to do |format|
-      format.html # show.rhtml
+      format.html # show.html.erb
       format.js { render :partial => 'show_location.html.erb', :object => @location }
       format.xml  { render :xml => @location.to_xml }
     end
@@ -139,6 +136,8 @@ class LocationsController < ApplicationController
       when @current_company then company_url(@current_company)
       else ''
     end
+    # We do authorization on the parent as appropriate. 
+    @may_edit_parent = has_privilege?("update company", @current_company)
 	end
   
   # Merges conditions so that the result is a valid +condition+ 

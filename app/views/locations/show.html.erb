@@ -1,32 +1,7 @@
-<p>
-  <b>Street addr:</b>
-  <%=h @location.street_addr %>
-</p>
-
-<p>
-  <b>City:</b>
-  <%=h @location.city %>
-</p>
-
-<p>
-  <b>State:</b>
-  <%=h @location.state %>
-</p>
-
-<p>
-  <b>Zip:</b>
-  <%=h @location.zip %>
-</p>
-
-<p>
-  <b>Country:</b>
-  <%=h @location.country %>
-</p>
-
-Phone <%= h @location.phone %><br/>
-Email <%= h @location.email %><br/>
-Notes <%= h @location.notes %><br/>
+<%= render :partial => 'locations/location_address', :object => @location %>
 
 
-<%= link_to 'Edit', edit_location_path(@location) %> |
-<%= link_to 'Back', locations_path %>
+<% if @may_edit_parent %>
+  <%= link_to 'Edit', edit_location_path(@location) %> |
+  <%= link_to 'Back', locations_path %>
+<% end %>
