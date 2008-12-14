@@ -1,6 +1,7 @@
 - stylesheet('appointments')
 - stylesheet('calendar')
-= javascript('service_providers')
+- javascript('openings')
+- javascript('skills')
 
 .container
   .left
@@ -9,6 +10,7 @@
         == Schedule an Appointment
       .schedule_form
         %p
+          = hidden_field_tag 'initial_person_id', @person.id
         - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
           %span
             == What
@@ -21,14 +23,19 @@
           %span
             == When
           %span.field#when
-            = select_tag('when', options_for_select(Appointment::WHENS, @when))
-          %span#search{:style => "display: none;"}
+            = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
+          %span.field#time
+            = select_tag('time', options_for_select(Appointment::TIMES, @time))
+          %span#search{:style => @when ? "display: inline;" : "display: none;"}
             = f.submit 'Search', :name => nil, :class => 'submit'
             
     - unless @when.blank?
       .section_body
         %h1
-          == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+          - if @free_timeslots.blank?
+            == No Available Appointments
+          - else
+            == #{pluralize(@free_timeslots.size, 'Available Appointment')}
         %h2
           == #{@when.titleize}
         #free_calendar

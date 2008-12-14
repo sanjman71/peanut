@@ -16,6 +16,15 @@ class CreatePeanut < ActiveRecord::Migration
       
       t.timestamps
     end
+
+    create_table :products do |t|
+      t.integer   :company_id
+      t.string    :name
+      t.integer   :stock_count
+      t.integer   :price_in_cents
+      
+      t.timestamps
+    end
   
     # Polymorphic relationship mapping companies to different resources (e.g. people)
     create_table :companies_resources do |t|
@@ -56,17 +65,27 @@ class CreatePeanut < ActiveRecord::Migration
       t.datetime    :start_at
       t.datetime    :end_at
       t.integer     :duration
+      t.integer     :time_start_at  # time of day
+      t.integer     :time_end_at    # time of day
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
       
       t.timestamps
     end
+
+    create_table :appointment_invoice_line_items do |t|
+      t.integer     :appointment_invoice_id
+      t.references  :chargeable, :polymorphic => true
+      t.integer     :price_in_cents
+      t.integer     :tax
+      
+      t.timestamps
+    end
     
-    create_table :appointment_receipts do |t|
+    create_table :appointment_invoices do |t|
       t.integer   :appointment_id
-      t.integer   :total_in_cents
-      t.integer   :tip_in_cents
+      t.integer   :gratuity_in_cents
       
       t.timestamps
     end

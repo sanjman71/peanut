@@ -1,8 +1,9 @@
 - stylesheet('services')
+- javascript('services')
 
 .container
   .left
-    - form_remote_for(Membership.new, :url => memberships_path, :method => :post, :html => {:id => 'new_membership'}) do |f|
+    - form_for(Membership.new, :url => memberships_path, :method => :post, :html => {:id => 'new_membership'}) do |f|
       = hidden_field_tag "membership[service_id]", @service.id, :id => 'membership_service_id'
       = hidden_field_tag "membership[resource_type]", 'Person', :id => 'membership_resource_type'
       = hidden_field_tag "membership[resource_id]", '', :id => 'membership_resource_id'
@@ -32,7 +33,7 @@
           %h2{:style => "font-size: 12px; font-weight: bold; border: none; color: #333333;"}
             == People who provide this service
           #memberships_list
-            = render(:partial => 'memberships.html.haml', :locals => {:memberships => @memberships, :non_members => @non_members})
+            = render(:partial => 'memberships/memberships.html.haml', :locals => {:memberships => @memberships, :non_members => @non_members})
         
         .submit
           = submit_tag "Save Changes"

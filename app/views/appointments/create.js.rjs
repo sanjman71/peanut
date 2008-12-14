@@ -1,24 +1,21 @@
 if @error
-  page[:start_at_label].addClassName 'highlight'
-  page[:end_at_label].addClassName 'highlight'
-  page[:appointment_flash].removeClassName 'notice'
-  page[:appointment_flash].replace_html @error_text
+  page["#start_at_label"].add_class('highlighted')
+  page["#end_at_label"].add_class('highlighted')
+  page["#appointment_flash"].remove_class('notice')
+  page["appointment_flash"].html(@error_text)
 else
-  page[:add_free_time_form].reset
-  page[:start_at_label].removeClassName 'highlight'
-  page[:end_at_label].removeClassName 'highlight'
-  page[:appointment_flash].addClassName 'notice'
-  page[:appointment_flash].replace_html @notice_text
+  page["#start_at_label"].remove_class('highlighted')
+  page["#end_at_label"].remove_class('highlighted')
+  page["#appointment_flash"].add_class('notice')
+  page["#appointment_flash"].html(@notice_text)
   
   # update calendar
-  page[:free_calendar].replace_html :partial => 'shared/calendar.html.haml', 
-                                    :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}
+  page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', 
+                                     :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}))
 
   # update appointment count
-  page[:appointments_count].replace_html :partial => 'appointments_count.html.haml',
-                                         :locals => {:count => @appointments.size}
+  page["#appointments_count"].html(render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size}))
   
   # update appointments
-  page[:free_schedule].replace_html :partial => 'appointments.html.haml',
-                                    :locals => {:appointments_by_day => @appointments_by_day}
+  page["#free_schedule"].html(render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day}))
 end 

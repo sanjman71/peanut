@@ -1,5 +1,5 @@
-- stylesheet('appointments')
-- stylesheet('notes')
+- stylesheet('appointments', 'notes')
+- javascript('appointments', 'notes')
 
 .container
   .left
@@ -10,23 +10,7 @@
           = link_to 'Cancel', cancel_appointment_path(@appointment)
           == &nbsp;|
           = link_to 'Checkout', checkout_appointment_path(@appointment)
-      %table.appointment_header
-        %tr
-          %td.what
-            = @appointment.service.name
-            == with
-            = @appointment.resource.name
-        %tr
-          %td.when
-            = @appointment.start_at.to_s(:appt_day_date_time)
-        %tr
-          %td.customer
-            - unless @appointment.customer.blank?
-              = link_to @appointment.customer.name, customer_path(@appointment.customer)
-        %tr
-          %td.confirmation
-            == Confirmation code:
-            = @appointment.confirmation_code
+      = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
             
     .section_body
       - if @appointment.state == 'upcoming' and @confirmation

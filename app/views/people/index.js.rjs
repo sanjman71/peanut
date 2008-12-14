@@ -1,5 +1,5 @@
 # update search text
-page[:people_search_text].replace_html @search_text
+page["#people_search_text"].html(@search_text)
 
 # update people list
-page[:people_table].replace_html :partial => 'people.html.haml', :locals => {:people => @people}
+page["#people_list"].html(render(:partial => 'people.html.haml', :locals => {:people => @people}))

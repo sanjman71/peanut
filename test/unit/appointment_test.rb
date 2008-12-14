@@ -13,7 +13,34 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :end_at
   should_allow_values_for   :mark_as, "free", "busy", "work"
   
-  def test_span
+  def test_time_of_day
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    customer  = Factory(:customer)
+
+    assert_difference('Appointment.count') do
+      # create appointment at 2 pm
+      appt = Appointment.create(:company => company,
+                                :service => haircut,
+                                :resource => johnny,
+                                :customer => customer,
+                                :start_at_string => "today 2 pm")
+
+      # check time of day values, which are utc
+      assert_equal (14*3600) - Time.zone.utc_offset, appt.time_start_at
+      assert_equal (14*3600) + (30*60) - Time.zone.utc_offset, appt.time_end_at
+      
+      # test time searches, only afternoon and anytime should match
+      assert_equal [], Appointment.time_overlap(Appointment.time_range("morning"))
+      assert_equal [appt], Appointment.time_overlap(Appointment.time_range("afternoon"))
+      assert_equal [], Appointment.time_overlap(Appointment.time_range("evening"))
+      assert_equal [appt], Appointment.time_overlap(Appointment.time_range("anytime"))
+      assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
+    end
+  end
+  
+  def test_overlap
     # clear database
     Appointment.delete_all
     
@@ -33,36 +60,37 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_equal Chronic.parse("today 2:30 pm"), appt.end_at
 
     # test appointment that matches exact start and end times
-    appts = Appointment.span(Chronic.parse("today 2 pm").utc, Chronic.parse("today 2:30 pm").utc)
+    appts = Appointment.overlap(Chronic.parse("today 2 pm").utc, Chronic.parse("today 2:30 pm").utc)
     assert_equal 1, appts.size
+    assert_equal [appt], appts
     
     # test appointment that ends at start time
-    appts = Appointment.span(Chronic.parse("today 1 pm").utc, Chronic.parse("today 2 pm").utc)
+    appts = Appointment.overlap(Chronic.parse("today 1 pm").utc, Chronic.parse("today 2 pm").utc)
     assert_equal 0, appts.size
 
     # test appointment that starts at end time
-    appts = Appointment.span(Chronic.parse("today 2:30 pm").utc, Chronic.parse("today 3 pm").utc)
+    appts = Appointment.overlap(Chronic.parse("today 2:30 pm").utc, Chronic.parse("today 3 pm").utc)
     assert_equal 0, appts.size
 
-    # test span that overlaps appointment start time
-    appts = Appointment.span(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 2:15 pm").utc)
+    # test range that overlaps appointment start time
+    appts = Appointment.overlap(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 2:15 pm").utc)
     assert_equal 1, appts.size
-    assert_equal appt, appts.first
+    assert_equal [appt], appts
 
-    # test span that overlaps appointment end time
-    appts = Appointment.span(Chronic.parse("today 2:15 pm").utc, Chronic.parse("today 2:45 pm").utc)
+    # test range that overlaps appointment end time
+    appts = Appointment.overlap(Chronic.parse("today 2:15 pm").utc, Chronic.parse("today 2:45 pm").utc)
     assert_equal 1, appts.size
-    assert_equal appt, appts.first
+    assert_equal [appt], appts
     
-    # test span that envelopes the appointment
-    appts = Appointment.span(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 3 pm").utc)
+    # test range that envelopes the appointment
+    appts = Appointment.overlap(Chronic.parse("today 1:30 pm").utc, Chronic.parse("today 3 pm").utc)
     assert_equal 1, appts.size
-    assert_equal appt, appts.first
+    assert_equal [appt], appts
 
-    # test span that is within the appointment
-    appts = Appointment.span(Chronic.parse("today 2:05 pm").utc, Chronic.parse("today 2:15 pm").utc)
+    # test range that is within the appointment
+    appts = Appointment.overlap(Chronic.parse("today 2:05 pm").utc, Chronic.parse("today 2:15 pm").utc)
     assert_equal 1, appts.size
-    assert_equal appt, appts.first
+    assert_equal [appt], appts
   end
   
   def test_should_set_end_at_on_new_appointment
@@ -141,7 +169,7 @@ class AppointmentTest < ActiveSupport::TestCase
     appt = Appointment.new(:when => '')
     assert !appt.valid?
     # should have an error for the when attribute
-    assert_equal ["When string is empty"], appt.errors.full_messages.select { |s| s.match(/When/) }
+    assert_equal ["When is empty"], appt.errors.full_messages.select { |s| s.match(/When/) }
   end
   
   def test_should_validate_time_range_attribute
@@ -211,6 +239,67 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_match /([A-Z]|[0-9])+/, appt2.confirmation_code
     # confirmation code should the same for free appointments
     assert_equal appt.confirmation_code, appt2.confirmation_code
+  end
+  
+  def test_should_narrow_by_morning
+    # build appointment from 5:30am - 12:30pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 12 pm"))
+    
+    # request morning appointments, narraw from 8am - 12pm
+    appointment.narrow_by_time_of_day!('morning')
+    assert_equal  Time.now.beginning_of_day + 8.hours, appointment.start_at
+    assert_equal  Time.now.beginning_of_day + 12.hours, appointment.end_at
+  end
+  
+  def test_should_narrow_by_afternoon_to_empty
+    # build appointment from 5:30am - 12pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 12 pm"))
+    
+    # request afternoon appointments, narrow to empty
+    appointment.narrow_by_time_of_day!('afternoon')
+    assert_equal nil, appointment.start_at
+    assert_equal nil, appointment.end_at
+    assert_equal 0, appointment.duration
+
+    # build appointment from 5:30am - 11:30pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 11:30 am"))
+    
+    # request afternoon appointments, narrow to empty
+    appointment.narrow_by_time_of_day!('afternoon')
+    assert_equal nil, appointment.start_at
+    assert_equal nil, appointment.end_at
+    assert_equal 0, appointment.duration
+  end
+
+  def test_should_narrow_by_evening_to_empty
+    # build appointment from 5:30am - 12pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 12 pm"))
+    
+    # request evening appointments, narrow to empty
+    appointment.narrow_by_time_of_day!('evening')
+    assert_equal nil, appointment.start_at
+    assert_equal nil, appointment.end_at
+    assert_equal 0, appointment.duration
+  end
+
+  def test_narrow_by_anytime
+    # build appointment from 5:30am - 12pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 12 pm"))
+    
+    # request anytime appointments
+    appointment.narrow_by_time_of_day!('anytime')
+    assert_equal  Time.now.beginning_of_day + 5.hours + 30.minutes, appointment.start_at
+    assert_equal  Time.now.beginning_of_day + 12.hours, appointment.end_at
+  end
+  
+  def test_should_narrow_by_bogus_to_empty
+    # build appointment from 5:30am - 12pm
+    appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 12 pm"))
+    
+    # request an invalid time of day, narrow to empty
+    appointment.narrow_by_time_of_day!('bogus')
+    assert_equal nil, appointment.start_at
+    assert_equal nil, appointment.end_at
   end
   
 end

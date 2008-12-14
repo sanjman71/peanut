@@ -6,9 +6,11 @@
     = stylesheet_link_tag 'peanut'
     = stylesheet_link_tag 'errors'
     = stylesheet_link_tag 'green'
-    = yield :head
-    = javascript_include_tag :defaults
-
+    = yield :stylesheet
+    = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
+    = javascript_include_tag 'jquery', 'jquery.selectboxes', 'application'
+    = yield :javascript
+    
   %body
     #header
       %h1= @current_company.name

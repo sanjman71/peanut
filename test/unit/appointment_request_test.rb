@@ -54,11 +54,11 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     assert_equal Chronic.parse("today 12:00 pm"), timeslots[3].end_at
 
     # should find 1 timeslot
-    timeslots = request.find_free_timeslots(:limit => 1)
-    assert_equal 1, timeslots.size
-    assert_equal 30, timeslots[0].duration
-    assert_equal Chronic.parse("today 10:00 am"), timeslots[0].start_at
-    assert_equal Chronic.parse("today 10:30 am"), timeslots[0].end_at
+    # timeslots = request.find_free_timeslots(:limit => 1)
+    # assert_equal 1, timeslots.size
+    # assert_equal 30, timeslots[0].duration
+    # assert_equal Chronic.parse("today 10:00 am"), timeslots[0].start_at
+    # assert_equal Chronic.parse("today 10:30 am"), timeslots[0].end_at
     
     # create appointment object, with range from 7 am to 5 pm
     request   = AppointmentRequest.new(:start_at => start_at - 1.hour, :end_at => end_at + 5.hours, :company => company, :service => haircut, :resource => johnny, :customer_id => 0)

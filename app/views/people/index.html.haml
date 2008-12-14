@@ -1,4 +1,5 @@
 - stylesheet('people')
+- javascript('people')
 
 .container
   .left
@@ -13,7 +14,7 @@
     .section_body
       .people_header#people_search_text
         = @search_text
-      #people_table
+      #people_list
         = render(:partial => 'people.html.haml', :locals => {:people => @people})
     
     

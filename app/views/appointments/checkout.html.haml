@@ -1,0 +1,17 @@
+- stylesheet('appointments')
+- stylesheet('services')
+
+.container
+  .left
+    .section_header
+      %h1
+        == Checkout
+      = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
+
+    .section_body
+      .invoice_header
+        == Services and Products
+      #invoice
+        = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice, :services => @services})
+                
+    

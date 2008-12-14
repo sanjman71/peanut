@@ -1,0 +1,9 @@
+%table.invoice
+  - invoice.line_items.each do |li|
+    %tr.chargeable{:class => cycle("shaded", "")}
+      %td.chargeable_name
+        = li.chargeable.name
+      %td.chargeable_price
+        = text_field_tag 'chargeable[price]', li.chargeable.price, :style => "background-color: #FFFF66"
+      %td.action
+        = link_to "Remove", remove_invoice_path(invoice, :line_item_id => li.id), :class => 'admin ujs'

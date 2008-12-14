@@ -17,6 +17,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings, :collection => { :search => :any }
   map.resources :notes
   map.resources :memberships
+  map.resources :invoices, :member => { :add => :post, :remove => :post }
   
   # override 'appointments/new' path
   map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
@@ -38,7 +39,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :customers,         :has_many => [:appointments]
 
   # javascript routes
-  map.resources :javascripts,       :collection => {:service_providers => :get}
+  map.resources :javascripts,       :collection => {:skillset => :get}
 
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.

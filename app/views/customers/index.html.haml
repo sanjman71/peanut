@@ -1,4 +1,5 @@
 - stylesheet('customers')
+- javascript('customers')
 
 .container
   .left
@@ -7,13 +8,13 @@
         == Find a customer by typing their name
       %p
       .live_search
-        = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers')
+        = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :url => customers_path)
         = observe_field(:live_search_for_customers, {:url => customers_path, :method => :get, :with => "'search=' + element.value", :frequency => 1})
         
     .section_body
       .customers_header#customer_search_text
         = @search_text
-      #customers_table
+      #customers_list
         = render(:partial => 'customers.html.haml', :locals => {:customers => @customers})
     
     

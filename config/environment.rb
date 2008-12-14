@@ -74,4 +74,6 @@ Rails::Initializer.run do |config|
   config.active_record.timestamped_migrations = false
 end
 
-require "will_paginate" 
+# Extend Range class
+require 'lib/range.rb'
+require "will_paginate"

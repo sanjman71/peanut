@@ -21,6 +21,12 @@ Factory.define :free_service, :class => Service do |s|
   s.price 0.00
 end
 
+Factory.define :product do |p|
+  p.name "Product 1"
+  p.stock_count 1
+  p.price_in_cents 100
+end
+
 Factory.define :customer do |c|
   c.name { |s| Factory.next :name }
   c.email { |s| Factory.next :email }

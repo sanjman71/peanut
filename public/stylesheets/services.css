@@ -1,4 +1,4 @@
-table.services                                    { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; border: medium none; }
+table.services                                    { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 95%; border: medium none; }
 
 table.services td                                 { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
                                                     vertical-align: top; width: 30%; }
@@ -9,7 +9,8 @@ table.services td.price                           { font-size: 12px; font-weight
 
 table.services td.action                          { font-size: 11px; font-weight: normal; width: 2%; white-space: nowrap; padding-left: 8px; }
 
-table.service td.heading                          { color: #000000; font-size: 12px; padding: 2px 5px; width: 20%; text-align: right; }
+table.service td.heading                          { background: #EDF3FE none repeat scroll 0 0; color: #000000; font-size: 12px; padding: 2px 5px; 
+                                                    text-align: right; }
 
 table.service td.price, table.service td.duration { font-size: 12px; padding-left: 5px; }
 

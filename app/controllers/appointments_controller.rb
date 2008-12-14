@@ -77,7 +77,7 @@ class AppointmentsController < ApplicationController
     @daterange    = DateRange.new(:when => @when)
     
     # find free, work appointments for a person
-    @appointments = @current_company.appointments.resource(@person).free_work.span(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
@@ -149,7 +149,7 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments/1/confirmation
   def confirmation
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = @current_company.appointments.find(params[:id])
     @confirmation = true
     
     # only show confirmations for upcoming appointments
@@ -163,17 +163,11 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/checkout
   def checkout
-    @appointment  = Appointment.find(params[:id])
-    @receipt      = AppointmentReceipt.new(params[:receipt])
+    @appointment  = @current_company.appointments.find(params[:id])
+    @services     = @current_company.services.all
     
-    # save receipt
-    @appointment.receipt = @receipt
-    
-    # mark appointment as checked out
-    @appointment.checkout!
-    
-    # redirect to appointment show page
-    return redirect_to(appointment_path(@appointment))
+    # create/get invoice
+    @invoice      = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
   end
 
   # GET /appointments/1/cancel

@@ -12,7 +12,7 @@ class CustomersController < ApplicationController
       @search_text  = "Customers matching '#{@search}'"
     else
       @customers    = @current_company.customers.all(:order => "name ASC")
-      @search_text  = "All Customers"
+      @search_text  = @customers.blank? ? "No Customers" : "All Customers"
     end
     
     respond_to do |format|
