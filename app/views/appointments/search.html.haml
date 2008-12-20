@@ -1,16 +1,12 @@
-.container
-  .left
-    .section_header
-      %h1.index
-        == Find an appointment by typing a confirmation code
-        %p
-        - form_remote_tag(:url => search_appointments_path(:subdomain => @subdomain), :method => :post) do |f|
-          %span#code
-            = text_field('appointment', 'code', :value => @code, :size => 20)
-          &nbsp;
-          %span#search
-            = submit_tag 'Search', :name => nil, :class => 'submit'
-            
-    .section_body
-      %span.code#message
-        = @error_message
+- javascript('appointments')
+
+.span-20.last.box
+  - form_tag(search_appointments_path(:subdomain => @subdomain), :method => :post, :id => "search_appointments_form") do |f|
+    = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
+    %br
+    = text_field('appointment', 'code', :value => @code, :class => 'title big')
+    = submit_tag 'Search', :name => nil, :class => 'submit'
+    
+.span-20.last
+  %span.code#message
+    = @error_message

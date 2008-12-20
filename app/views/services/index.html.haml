@@ -1,34 +1,26 @@
 - stylesheet('services')
 - javascript('services')
 
-.container
-  .left
-    .section_header
-      %h1.index
-        == Services
+.span-17
+  .span-15.last.box
+    %h2== Services
+  %hr.space
+  .span-15.prepend-1.append-1.last
+    .highlight#flash
+  #services
+    = render(:partial => 'services.html.haml', :locals => {:services => @services})
+    
+.span-6.prepend-1.last
+  .sidebar.padding-5
+    - form_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
+      = hidden_field_tag "service[mark_as]", 'work'
+      = hidden_field_tag "service[price]", 0
+      = hidden_field_tag "service[duration]", 0
+      %p
+        = label_tag "add_service_name", "Add a new service", :class => 'big'
+        = text_field_tag "service[name]", '', :id => 'add_service_name', :class => 'title big', :style => 'width: 200px;'
+        %em{:style => "color: #666666;"}== Examples: Hair Color, Bikini Wax
+      %p
+      = submit_tag "Create", :name => nil
+    
         
-    .section_body
-      #flash
-      #services_list
-        = render(:partial => 'services.html.haml', :locals => {:services => @services})
-        
-  .right
-    .col
-      .sidebar_form
-        .sidebar_header
-          %h1
-            == Create a new service
-          - form_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
-            = hidden_field_tag "service[mark_as]", 'work'
-            = hidden_field_tag "service[price]", 0
-            = hidden_field_tag "service[duration]", 0
-            %p
-              = text_field_tag "service[name]", '', :size => 25, :id => 'service_name'
-              %br
-              %span{:style => "font-size: 11px; color: #666666"}== Examples: Hair Color, Bikini Wax
-            %p
-              = submit_tag "Create", :name => nil
-          = javascript_tag "$('service_name').focus();"
-    
-    
-    

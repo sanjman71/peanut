@@ -1,3 +1,3 @@
 # rebuild people list
-page["#memberships_list"].html(render(:partial => "memberships/memberships.html.haml", 
-                                      :locals => {:memberships => @memberships, :non_members => @non_members}))
+page["#memberships"].html(render(:partial => "memberships/memberships.html.haml", 
+                                 :locals => {:memberships => @memberships, :non_members => @non_members}))

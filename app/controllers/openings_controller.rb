@@ -1,6 +1,6 @@
 class OpeningsController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /free
   # GET /free.xml

@@ -1,6 +1,6 @@
 if @redirect
   page.redirect_to(@redirect)
 else
-  page[:appointment_code].addClassName('highlight')
-  page[:appointment_code].focus
+  page["#appointment_code"].add_class('highlighted')
+  page["#appointment_code"].focus()
 end

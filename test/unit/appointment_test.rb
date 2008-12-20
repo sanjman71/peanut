@@ -189,7 +189,7 @@ class AppointmentTest < ActiveSupport::TestCase
       appt = Appointment.new(:company => company, 
                              :service => haircut,
                              :resource => johnny,
-                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     
       assert appt.valid?
@@ -200,7 +200,7 @@ class AppointmentTest < ActiveSupport::TestCase
       appt = Appointment.new(:company => company, 
                              :service => haircut,
                              :resource => johnny,
-                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     
       assert appt.valid?

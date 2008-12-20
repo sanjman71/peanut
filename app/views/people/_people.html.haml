@@ -1,5 +1,3 @@
-%table.people
-  - people.each do |person|
-    %tr{:id => "row_person_#{person.id}"}
-      %td.person
-        %h2= link_to person.name, person_path(person)
+- people.each do |person|
+  .prepend-1.person
+    %h2= link_to person.name, person_path(person)

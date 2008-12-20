@@ -1,6 +1,6 @@
 class CustomersController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /customers
   # GET /customers.xml

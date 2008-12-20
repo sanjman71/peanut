@@ -1,57 +1,50 @@
-- stylesheet('appointments')
-- stylesheet('calendar')
+- stylesheet('appointments', 'calendar')
 - javascript('appointments')
 
-.container
-  .left
-    .section_header
-      %span.other_indexes
-        - build_when_links(Appointment::WHEN_WEEKS, @when) do |link, separator|
-          = link
-          = separator
-      %h1.index
-        Schedule for
-        = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id))
-    .section_body
-      #appointment_flash
-      %h2
-        == #{@when.titleize}
-      #free_calendar
-        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-      %h2#appointments_count
-        = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
-      #free_schedule
-        = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
-
-  .right
-    .col
-      .sidebar_form
-        .sidebar_header
-          %h1
-            Add Free Time
-          - form_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
-            = hidden_field_tag :when, @when
-            %table.add_free_time
-              %tr
-                %td.when
-                  == When
-                %td.input
-                  = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
-              %tr
-                %td.start_at#end_at_label
-                  == Start
-                %td#start_at_text
-                  = text_field 'appointment[time_range]', 'start_at', :size => 10
-                  %span.example== e.g. 8:15 am
-              %tr
-                %td.end_at#start_at_label
-                  == End
-                %td
-                  = text_field 'appointment[time_range]', 'end_at', :size => 10
-                  %span.example== e.g. 5:30 pm
-            %p
-              = f.submit 'Add'
+.span-17
+  .span-16.last.box
+    .span-10
+      = label_tag "person_id", "Schedule for", :class => 'big'
+      = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :class => 'text')
+    .span-5.last
+      - build_when_links(Appointment::WHEN_WEEKS, @when) do |link, separator|
+        = link
+        = separator
+    
+  .span-16.prepend-1.last
+    #appointment_flash
+    %h2
+      == #{@when.titleize}
+    .span-16.last#free_calendar
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+    %h3.span-16.last3#appointments_count
+      = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
+    .span-16.last#free_schedule
+      = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
   
-          
+.span-6.prepend-1.last
+  .span-6.last.sidebar.padding-5
+    = label_tag 'add_free_time_form', "Add Free Time", :class => 'big'
+    - form_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+      = hidden_field_tag :when, @when
+      .add_free_time
+        .span-7.last.when
+          == When
+        .span-7.last
+          = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+        .span-7.last#start_at_label
+          == Start
+        .span-7.last#start_at_text
+          = text_field 'appointment[time_range]', 'start_at', :size => 8
+          %span.example== e.g. 8:15 am
+        .span-7.last#end_at_label
+          == End
+        .span-7.last#end_at_text
+          = text_field 'appointment[time_range]', 'end_at', :size => 8
+          %span.example== e.g. 5:30 pm
+        %hr.space
+        .span-7.last
+          = f.submit 'Add'
+
       
 

@@ -1,6 +1,6 @@
 class AppointmentsController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /people/1/appointments
   def index
@@ -26,15 +26,15 @@ class AppointmentsController < ApplicationController
     customer      = Customer.nobody
     person        = Person.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
-                                                               :service_id => service.id,
-                                                               :company_id => @current_company.id,
+                                                               :service => service,
+                                                               :company => @current_company,
                                                                :customer_id => customer.id))
     
     # check if appointment is valid                                                           
     if !@appointment.valid?
       @error      = true
-      @error_text = ''
-      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
+      logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
       return
     end
 
@@ -42,7 +42,7 @@ class AppointmentsController < ApplicationController
     if @appointment.conflicts?
       @error      = true
       @error_text = "Appointment conflict"
-      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      logger.debug("xxx create free time conflict: #{@appointment.errors.full_messages}")
       return
     end
     
@@ -185,15 +185,16 @@ class AppointmentsController < ApplicationController
   # GET /appointments/search
   def search
     if request.post?
-      # check confirmation code
+      # check confirmation code, limit search to work appointments
       @code         = params[:appointment][:code]
-      @appointment  = Appointment.find_by_confirmation_code(@code)
+      @appointment  = Appointment.work.find_by_confirmation_code(@code)
       
       if @appointment
         # redirect to appointment show
         @redirect = appointment_path(@appointment)
       else
         # show error message?
+        logger.debug("*** could not find appointment #{@code}")
       end
     end
   end

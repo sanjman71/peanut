@@ -1,12 +1,10 @@
-%table.memberships
-  - memberships.sort_by{ |m| m.resource.name }.each do |membership|
-    %tr{:class => cycle("shaded", "")}
-      %td.person
-        = membership.resource.name
-      %td.action
-        = link_to("Remove", membership_path(membership), :class => 'admin ujs delete')
-  - unless @non_members.blank?
-    %tr.add_user
-      %td{:colspan => 2, :style => "padding-top: 10px;"}
-        = select_tag('person_id', options_for_select([['Add a person to this service', 0]] + non_members.collect{ |o| [o.name, o.id]}, 0))
+- memberships.sort_by{ |m| m.resource.name }.each do |membership|
+  .span-20.prepend-1.last.membership{:class => cycle("shaded", "")}
+    .span-3.person
+      = membership.resource.name
+    .span-1.last.action
+      = link_to("Remove", membership_path(membership), :class => 'admin ujs delete')
+- unless @non_members.blank?
+  .span-20.prepend-1.last.add_user
+    = select_tag('person_id', options_for_select([['Add a person to this service', 0]] + non_members.collect{ |o| [o.name, o.id]}, 0))
     

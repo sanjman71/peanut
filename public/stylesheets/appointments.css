@@ -1,161 +1,28 @@
 /* appointment, timeslot styles */
                                                     
-div.appointments, div.timeslots, 
-table.appointments, table.timeslots
-{ 
-  border-collapse: collapse; 
-  font-size: 11px; 
-  font-weight: normal; 
-  margin: 0; 
-  padding 0 0 3px; 
-}
+div.appointments, div.timeslots                   { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 
-div.appointments h2, div.timeslots h2, h2.appointments
-{ 
-  border: none; 
-  color: #CC9933; 
-  font-size: 12px; 
-  font-weight: bold; 
-}
+div.schedule_form                                 { font-size: 13px; font-weight: bold; }
 
-div.appointments h3, div.timeslots h3, h3.appointments
-{ 
-  border: none; 
-  color: #CC9933; 
-  font-size: 11px; 
-  font-weight: bold; 
-}
+div.schedule_form span.field                      { margin: 3px 0 3px; padding-right: 7px; }
 
-div.schedule_form
-{ 
-  font-size: 13px; 
-  font-weight: bold; 
-}
+div.schedule_form input.submit                    { font-size: 12px; }
 
-div.schedule_form span.field
-{ 
-  margin: 3px 0 3px; 
-  padding-right: 7px; 
-}
+div.appointment                                   { padding: 7px; }
 
-div.schedule_form input.submit
-{ 
-  font-size: 12px;
-}
+div.timeslot                                      { padding: 7px; }
 
-table.appointments tr, table.timeslots tr
-{ 
-  margin: 5px 0 0; 
-  padding: 2px 5px 2px; 
-}
-
-table.appointments tr.shaded, table.timeslots tr.shaded
-{
-  background: #EDF3FE none repeat scroll 0 0;
-  /* background: #E1E0E0 none repeat scroll 0 0; */
-}
-
-table.appointments tr.highlighted, table.timeslots tr.highlighted
-{
-  background: #FFCC00 none repeat scroll 0 0;
-}
-
-table.appointments td.service
-{ 
-  background: #5500BB none repeat scroll 0 0; 
-  color: #FFFFFF;
-  padding: 2px 5px;
-  text-align: left; 
-  width: 100px; 
-}
-
-table.appointments td.work 
-{ 
-  background: #663333 none repeat scroll 0 0; 
-}
-
-table.appointments td.time
-{ 
-  color: #000000; 
-  font-weight: normal; 
-  padding: 0; 
-  text-align: left; 
-  width: 150px; 
-}
-
-table.appointments td.customer
-{ 
-  text-align: left; 
-  font-size: 11px; 
-  font-weight: bold; 
-  padding-left: 10px; 
-}
-
-table.timeslots td.person
-{ 
-  background: #5500BB none repeat scroll 0 0; 
-  color: #FFFFFF; 
-  margin-right: 2px; 
-  padding: 2px 5px; 
-  text-align: right; 
-  width: 125px;
-}
-                                                     
-table.timeslots td.time
-{ 
-  text-align: right; 
-  padding-right: 10px; 
-  width: 150px; 
-}
-
-table.timeslots td.service
-{ 
-  background: #FF6600 none repeat scroll 0 0; 
-  margin-right: 5px; 
-  padding: 1px 5px; 
-}
-
-div.timeslots .timeslot a, div.appointments .appointment a, table.appointments .appointment a
+div.timeslots .timeslot a, div.appointments .appointment a
                                                   { color: #5500BB; font-weight: bold; }
                                                   
-div.timeslots .timeslot a:hover, div.appointments .appointment a:hover, table.appointments .appointment a:hover
+div.timeslots .timeslot a:hover, div.appointments .appointment a:hover
                                                   { color: #5500BB; background-color: #FF6600; }
                                                   
-div.timeslots .timeslot a:visited, div.appointments .appointment a:visited, table.appointments .appointment a:visited
+div.timeslots .timeslot a:visited, div.appointments .appointment a:visited
                                                   { color: #5500BB; font-weight: bold; }
                                                   
-table.appointment_header td.what                  { font-weight: bold; font-size: 15px; }
-
-table.appointment_header td.when                  { font-weight: bold; font-size: 15px; }
-
-table.appointment_header td.customer, table.appointment_header td.customer a
-                                                  { font-weight: bold; font-size: 14px; color: #0033FF; padding-top: 5px; }
-                                                  
-table.appointment_header td.customer a:hover      { background: #FF6600; color: #FFFFFF; }
-
-table.appointment_header td.confirmation          { font-size: 12px; color: #666666; padding-top: 10px; }
-
 div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
 
 div.appointment_details                           { font-size: 11px; padding: 5px; }
-
-table.add_free_time
-{ 
-  font-size: 11px; 
-  font-weight: normal; 
-}
-
-table.add_free_time tr
-{ 
-  margin: 5px; 
-  padding: 2px; 
-}
-
-table.add_free_time td.when, table.add_free_time td.start_at, table.add_free_time td.end_at
-{ 
-  padding-right: 3px;
-  text-align: right; 
-  width: 30px; 
-}
 

@@ -1,62 +1,56 @@
-- stylesheet('appointments')
-- stylesheet('calendar')
-- javascript('openings')
-- javascript('skills')
+- stylesheet('appointments', 'calendar')
+- javascript('skills', 'openings')
 
-.container
-  .left
-    .section_header
-      %h1.index
-        == Schedule an Appointment
-      .schedule_form
-        %p
-          = hidden_field_tag 'initial_person_id', @person.id
-        - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
-          %span
-            == What
-          %span.field#what
-            = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-          %span
-            == Who
-          %span.field#who
-            = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
-          %span
-            == When
-          %span.field#when
-            = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
-          %span.field#time
-            = select_tag('time', options_for_select(Appointment::TIMES, @time))
-          %span#search{:style => @when ? "display: inline;" : "display: none;"}
-            = f.submit 'Search', :name => nil, :class => 'submit'
-            
-    - unless @when.blank?
-      .section_body
-        %h1
-          - if @free_timeslots.blank?
-            == No Available Appointments
-          - else
-            == #{pluralize(@free_timeslots.size, 'Available Appointment')}
-        %h2
-          == #{@when.titleize}
-        #free_calendar
-          = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-        .timeslots#free_timeslots
-          = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
-      
-  .right
-    .col
-      .instructions
-        - if @when.blank?
-          == How do I schedule an appointment?
-          %ul
-            %li== Select appointment criteria and click on 'Search'
-        - elsif !@free_timeslots.blank?
-          == What can I do here?
-          %ul
-            %li== Select an available appointment
-            %span== or
-            %li== Select different appointment criteria and search again
-        - else
-          == What can I do here?
-          %ul
-            %li== Select different appointment criteria and search again
+.span-17
+  .box
+    %h2== Schedule an Appointment
+    = hidden_field_tag 'initial_person_id', @person.id
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
+      == What
+      %span.field#what
+        = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
+      %span{:style => "padding-left: 10px;"}
+        == Who
+      %span.field#who
+        = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
+      %span{:style => "padding-left: 10px;"}
+        == When
+      %span.field#when
+        = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
+      %span.field#time
+        = select_tag('time', options_for_select(Appointment::TIMES, @time))
+      %span#search{:style => @when ? "display: inline;" : "display: none;"}
+        = f.submit 'Search', :name => nil, :class => 'submit'
+
+.span-6.prepend-1.last
+  .sidebar.padding-5
+    .instructions
+      - if @when.blank?
+        == How do I schedule an appointment?
+        %ul
+          %li== Select appointment criteria and click on 'Search'
+      - elsif !@free_timeslots.blank?
+        == What can I do here?
+        %ul
+          %li== Select an available appointment
+          %span== or
+          %li== Select different appointment criteria and search again
+      - else
+        == What can I do here?
+        %ul
+          %li== Select different appointment criteria and search again
+          
+.span-16.prepend-1.last
+  - unless @when.blank?
+    %h2
+      - if @free_timeslots.blank?
+        == No Available Appointments
+      - else
+        == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+    %h3
+      == #{@when.titleize}
+    #free_calendar
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+    .timeslots#free_timeslots
+      = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+

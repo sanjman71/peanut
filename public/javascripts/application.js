@@ -43,7 +43,7 @@ $.fn.init_new_service = function () {
   })
 } 
 
-// Add free time for a person on a specific day
+// Add free time for a resource on a specific day
 $.fn.init_add_free_time = function () {
   $("#add_free_time_form").submit(function () {
     $.post(this.action, $(this).serialize(), null, "script");
@@ -51,9 +51,17 @@ $.fn.init_add_free_time = function () {
   })
 }
 
+// Search for an appointment by its confirmation code
+$.fn.init_search_appointments_by_confirmation_code = function () {
+  $("#search_appointments_form").submit(function () {
+    $.post(this.action, $(this).serialize(), null, "script");
+    return false;
+  })
+}
+
 // Highlight appointments and show edit/delete options on hover
 $.fn.init_highlight_appointments = function () {
-  $("tr.appointment").hover(function () {
+  $(".appointment").hover(function () {
     $("#hover_" + this.id).show();
     $(this).addClass("highlighted");},
     function () {
@@ -73,7 +81,7 @@ $.fn.init_show_appointments = function () {
 
 // Highlights timeslots and show edit/delete options on hover
 $.fn.init_highlight_timeslots = function () {
-  $("tr.timeslot").hover(function () {
+  $(".timeslot").hover(function () {
     $("#hover_" + this.id).show();
     $(this).addClass("highlighted");},
     function () {

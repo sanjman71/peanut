@@ -1,11 +1,19 @@
 if @error
-  page["#start_at_label"].add_class('highlighted')
-  page["#end_at_label"].add_class('highlighted')
+  # clear any errors
+  page["#appointment_time_range_start_at"].add_class('highlighted')
+  page["#appointment_time_range_end_at"].add_class('highlighted')
+  page["#appointment_time_range_start_at"].focus()
+  # clear any notice messages, add error message
   page["#appointment_flash"].remove_class('notice')
-  page["appointment_flash"].html(@error_text)
+  page["#appointment_flash"].add_class('error')
+  page["#appointment_flash"].html(@error_text)
 else
-  page["#start_at_label"].remove_class('highlighted')
-  page["#end_at_label"].remove_class('highlighted')
+  # clear any errors 
+  page["#appointment_time_range_start_at"].remove_class('highlighted')
+  page["#appointment_time_range_end_at"].remove_class('highlighted')
+  page["#appointment_time_range_start_at"].focus()
+  # clear any error messages, add notice message
+  page["#appointment_flash"].remove_class('error')
   page["#appointment_flash"].add_class('notice')
   page["#appointment_flash"].html(@notice_text)
   

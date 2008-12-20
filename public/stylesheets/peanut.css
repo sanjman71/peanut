@@ -18,6 +18,10 @@ a img:hover                                       { background-color: green; }
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
 
+/* padding styles */
+
+.padding-5                                        { padding: 5px; }
+
 /* header, tab styles */
 
 div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 10px 23px 0px 30px; 
@@ -50,9 +54,11 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
 
 /* body styles */
 
+h1.title                                          { background: #EDF3FE; margin: 0px; padding-bottom: 15px; margin-bottom: 20px; }
+
 div.wrapper                                       { margin: 0 auto; min-width: 800px; padding: 5px 23px 0px 30px; }
 
-div.container                                     { margin: 0 auto; }
+div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
 
 div.section_header                                { background: #EDF3FE; margin: 0px; padding: 13px 30px 13px 24px; }
 
@@ -85,6 +91,10 @@ div.cancel, span.cancel                           { font-size: 10px; }
 
 /* form styles */
 
+input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
+
+label.big                                         { font-size: 16px; }
+
 div.section_header input                          { color: #000000; font-size: 20px; font-weight: bold; }
 
 div.section_header input.submit                   { color: #000000; font-size: 14px; font-weight: normal; }
@@ -113,6 +123,8 @@ div.instructions ul                               { font-size: 12px; }
 
 /* sidebar styles */
 
+div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0;  border: 1px solid #C9D8EF; }
+
 div.sidebar_form                                  { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; 
                                                     padding: 6px 10px 2px; }
 
@@ -122,8 +134,14 @@ div.sidebar_header h1                             { font-size: 14px; font-weight
 
 /* highlight styles */
 
-.highlighted                                      { background: #FFCC00 none repeat scroll 0 0; }
+.shaded                                           { background: #EDF3FE }
 
+.highlighted, .highlighted.shaded                 { background: #FFCC00 none repeat scroll 0 0; }
+
+.highlight.muted                                  { background: #FFFF66; }
+
+.blue.muted                                       { background: #EDF3FE; }
+  
 /* color styles */
 
 .red                                              { color: #FF0000; font-style: bold; font-size: 12px; }
