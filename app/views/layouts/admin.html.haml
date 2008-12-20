@@ -12,13 +12,15 @@
     
   %body
     #header
-      %h1== Admin Console
       .login_info
         = render :partial => 'users/user_bar'
+      %h1== Admin Console
       #tabs
         %ul
           %li.with_space
             = link_to 'Companies', companies_path
+            %li.with_space
+              = link_to 'Privileges & Roles', badges_admin_path
 
     %p{:style => "color: green"}
       = flash[:notice]

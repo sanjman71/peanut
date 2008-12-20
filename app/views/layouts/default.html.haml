@@ -13,9 +13,12 @@
     
   %body
     #header
-      %h1= @current_company.name
       .login_info
         = render :partial => 'users/user_bar'
+      %h1= link_to @current_company.name, :action => :show, :controller => 'companies', :subdomain => @current_company.subdomain
+      - unless @current_company.locations.empty?
+        Choose location:
+        = select_tag('location_id', options_for_select([['Any location', 0]] + @current_company.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id))
       #tabs
         %ul
           %li.right

@@ -15,17 +15,9 @@
 %>
 
 <%= render :partial => 'edit_location', :object => @location, 
-  :locals => {:form_path => edit_loc_form_path, :form_method => :put, :form_submit => 'Edit' } %>
+  :locals => {:form_submit => 'Update' } %>
 
 <br/>
-<%= link_to "Edit", restaurant_path(@restaurant) + edit_location_path(@location) %>
-<%= link_to "Delete", restaurant_path(@restaurant) + location_path(@location), :method => :delete %>
+<%= link_to "Delete", location_path(@location), :method => :delete %>
 <br/>
 
-<% if (@restaurant) %>
-<%= link_to 'Back', restaurant_path(@restaurant) %>
-<% elsif (@user)%>
-<%= link_to 'Back', user_path(@user) %>
-<% else %>
-<%= link_to 'Back', location_path(@location) %>
-<% end %>

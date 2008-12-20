@@ -3,7 +3,7 @@
     form_submit ||= 'Submit'
     user_location ||= !@user.nil?
   %>
-  <% form_for @location, :url => form_path,
+  <% form_for @location,
         :html => {:id => 'edit_location_form'} do |form| %>
 
     <table>
@@ -42,7 +42,9 @@
       <tr><td><%= form.label :notes, "Location Notes:" %></td></tr>
       <tr><td colspan=2><%= form.text_area :notes, :size => '40x3' %></td></tr>
       <tr>
-        <%= submit_tag form_submit %>
+        <td>
+          <%= submit_tag form_submit %>
+        </td>
       </tr>
     </table>
   <% end %>

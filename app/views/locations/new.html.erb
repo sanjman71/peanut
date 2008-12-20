@@ -6,7 +6,7 @@
   <% if @current_company
       new_loc_form_path = company_locations_path(@current_company) %>
     <%= render :partial => 'edit_location', :object => @location, 
-          :locals => {:form_path => new_loc_form_path} %>
+          :locals => {:form_submit => 'Add location'} %>
   <% end %>
 
   <%= link_to 'Back', new_loc_form_path %>

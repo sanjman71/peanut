@@ -1,5 +1,6 @@
 class LocationsController < ApplicationController
   before_filter :init_current_company, :get_context
+  after_filter :store_location, :only => [:index, :show]
   
   layout 'default'
   
@@ -94,14 +95,12 @@ class LocationsController < ApplicationController
     if @location.update_attributes(params[:location])
       respond_to do |format|
         flash[:notice] = 'Location was successfully updated.'
-        format.html { redirect_to @context_url }
-        format.xml  { head :ok }
+        format.html { redirect_back_or_default('/') }
       end
     else
       respond_to do |format|
         flash[:notice] = 'Problem updating location.'
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @location.errors.to_xml }
       end
     end
   end
@@ -114,10 +113,9 @@ class LocationsController < ApplicationController
     @context_url = locations_url if @context_url.blank?
     
     if @location
-      if @restaurant
-        @restaurant.locations.delete(@location)
-      elsif @user
-        @user.locations.delete(@location)
+      if @location.locatable
+        locatable = @location.locatable
+        locatable.locations.delete(@location)
       else
         @location.destroy
       end

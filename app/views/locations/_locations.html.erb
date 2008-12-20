@@ -15,10 +15,10 @@
   page_param_name ||= :locations_page
   with_distance = false if local_assigns[:with_distance].nil?
   may_edit_parent = false if local_assigns[:may_edit_parent].nil?
+  locatable = '' if local_assigns[:locatable].nil?
 %>
 
 <div id='locations'>
-
   <div id="addressbox" class="addressbox">
     <% unless locations.nil? %>
       <div class="toppage">
@@ -31,7 +31,7 @@
             <%= render :partial => 'locations/location', :object => location,
               :locals => {:with_distance => false, :i => i,
                           :geodist => nil, :show_location_title => show_location_title, :context_url => context_url,
-                          :short_locations => short_locations, :may_edit_parent => may_edit_parent}  %>
+                          :short_locations => short_locations, :may_edit_parent => may_edit_parent, :locatable => locatable}  %>
           </tr>
         <% end %>
       </table>

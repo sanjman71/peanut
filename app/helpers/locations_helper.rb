@@ -3,6 +3,8 @@ module LocationsHelper
   def location_title_renderer(location)
     if location.nil?
       return ''
+    elsif location.location_name.blank?
+      h(location.street_addr + ', ' + location.city + ' ' + location.state + ' ' + location.zip)
     else
       h(location.location_name)
     end
@@ -71,6 +73,13 @@ module LocationsHelper
         collection.total_entries
       ]
     end
+  end
+
+  def locations_for_select(locatable)
+    o = [[]]
+    o[0] = ['Any', 0]
+    o = o + options_for_select(locatable.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id)
+    o
   end
   
 end

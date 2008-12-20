@@ -14,3 +14,6 @@
 
 <%= link_to 'Show', @company %> |
 <%= link_to 'Back', companies_path %>
+
+<h2>Company locations</h2>
+<%= render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:may_edit_parent  => @may_edit_parent, :locatable => @company} %>
