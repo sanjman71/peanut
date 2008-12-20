@@ -19,12 +19,16 @@ class ApplicationController < ActionController::Base
   private
   
   def init_current_company
-    @current_company = Company.find_by_subdomain(current_subdomain)
-    unless @current_company
-      flash[:notice] = "Invalid company"
-      redirect_to root_path
+    # only search for a company if the subdomain is set
+    # if there's no subdomain, we're in admin mode
+    if current_subdomain
+      @current_company = Company.find_by_subdomain(current_subdomain)
+      unless @current_company
+        flash[:error] = "Invalid company"
+        redirect_to root_path
+      end
+      @subdomain = @current_company.subdomain
     end
-    @subdomain = @current_company.subdomain
   end
   
 end

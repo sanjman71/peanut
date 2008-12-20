@@ -52,11 +52,12 @@ ActionController::Routing::Routes.draw do |map|
     badges.resource :role_privileges
     badges.resource :privileges
     badges.connect '/admin/:action/:id', :controller => 'admin'
+    badges.admin   '/admin',        :controller => 'admin', :action => 'index' 
   end
 
 
   # map the company root to the companies controller
-  map.company_root  '',     :controller => 'companies', :action => 'index', :conditions => { :subdomain => /.+/ }
+  map.company_root  '/:action',     :controller => 'companies', :conditions => { :subdomain => /.+/ }
 
   # map the root to the companies controller
   map.root                  :controller => 'companies', :action => 'index'

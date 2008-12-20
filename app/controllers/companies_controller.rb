@@ -1,20 +1,25 @@
 class CompaniesController < ApplicationController
-  layout 'admin'
+  before_filter :init_current_company
+  before_filter :get_context, :only => [:index, :show, :edit, :update, :destroy] # Not for new and create
+  after_filter :store_location, :only => [:index, :show, :edit]
+
+  layout 'default'
   
   # GET /companies
   # GET /companies.xml
   def index
-    @companies = Company.find(:all)
 
-    @current_company = Company.find_by_subdomain(current_subdomain)
-    
     if @current_company
       # show company appointments page
-      return redirect_to(appointments_path)
+      return redirect_to(:action => :show, :subdomain => @current_company.subdomain)
     end
     
+    # We're going to an admin page
+    # need to check permission here
+    @companies = Company.find(:all)
+    
     respond_to do |format|
-      format.html # index.html.erb
+      format.html { render :layout => 'admin' } # index.html.erb
       format.xml  { render :xml => @companies }
     end
   end
@@ -22,10 +27,8 @@ class CompaniesController < ApplicationController
   # GET /companies/1
   # GET /companies/1.xml
   def show
-    @company = Company.find(params[:id])
-
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { redirect_to(appointments_path) }
       format.xml  { render :xml => @company }
     end
   end
@@ -43,7 +46,6 @@ class CompaniesController < ApplicationController
 
   # GET /companies/1/edit
   def edit
-    @company = Company.find(params[:id])
   end
 
   # POST /companies
@@ -66,7 +68,6 @@ class CompaniesController < ApplicationController
   # PUT /companies/1
   # PUT /companies/1.xml
   def update
-    @company = Company.find(params[:id])
 
     respond_to do |format|
       if @company.update_attributes(params[:company])
@@ -83,7 +84,6 @@ class CompaniesController < ApplicationController
   # DELETE /companies/1
   # DELETE /companies/1.xml
   def destroy
-    @company = Company.find(params[:id])
     @company.destroy
 
     respond_to do |format|
@@ -91,4 +91,15 @@ class CompaniesController < ApplicationController
       format.xml  { head :ok }
     end
   end
+  
+  def get_context
+    if @current_company
+      @company = @current_company
+    elsif params && params[:id]
+      @company = Company.find(params[:id])
+    end
+    # We do authorization on the parent as appropriate. 
+    @may_edit_parent = has_privilege?("update company", @company)
+	end
+  
 end
