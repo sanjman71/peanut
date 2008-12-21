@@ -22,13 +22,13 @@ def generic_monitoring(w, options = {})
   
   w.lifecycle do |on|
     on.condition(:flapping) do |c|
-      c.to_state = [:start, :restart]
-      c.times = 5
-      c.within = 5.minute
-      c.transition = :unmonitored
-      c.retry_in = 10.minutes
-      c.retry_times = 5
-      c.retry_within = 2.hours
+      c.to_state      = [:start, :restart]
+      c.times         = 5
+      c.within        = 5.minute
+      c.transition    = :unmonitored
+      c.retry_in      = 10.minutes
+      c.retry_times   = 5
+      c.retry_within  = 2.hours
     end
   end
 end
@@ -63,4 +63,26 @@ God.watch do |w|
   w.behavior(:clean_pid_file)
   
   generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 20.megabytes)
+end
+
+unless ENV['RAILS_ENV'] == 'development'
+  # use in staging, production environments
+  %w{5000 5001}.each do |port|
+    God.watch do |w|
+      w.name          = "peanut-mongrel-#{port}"
+      w.group         = "peanut"
+      w.interval      = 30.seconds # default      
+      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} \
+                        -P #{RAILS_ROOT}/log/mongrel.#{port}.pid  -d"
+      w.stop          = "mongrel_rails stop -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
+      w.restart       = "mongrel_rails restart -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
+      w.start_grace   = 10.seconds
+      w.restart_grace = 10.seconds
+      w.pid_file      = "#{RAILS_ROOT}/log/mongrel.#{port}.pid"
+    
+      w.behavior(:clean_pid_file)
+
+      generic_monitoring(w, :cpu_limit => 50.percent, :memory_limit => 150.megabytes)
+    end
+  end
 end
