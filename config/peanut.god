@@ -70,8 +70,8 @@ unless ENV['RAILS_ENV'] == 'development'
   %w{5000 5001}.each do |port|
     God.watch do |w|
       w.name          = "peanut-mongrel-#{port}"
-      w.group         = "peanut"
-      w.interval      = 30.seconds # default      
+      w.group         = "mongrel"
+      w.interval      = 60.seconds      
       w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} \
                         -P #{RAILS_ROOT}/log/mongrel.#{port}.pid  -d"
       w.stop          = "mongrel_rails stop -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
