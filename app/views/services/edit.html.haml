@@ -8,7 +8,7 @@
       = hidden_field_tag "membership[resource_type]", 'Person', :id => 'membership_resource_type'
       = hidden_field_tag "membership[resource_id]", '', :id => 'membership_resource_id'
       
-    - form_for(@service, :url => service_path(@service), :method => :post) do |f|
+    - form_for(@service, :url => service_path(@service, :subdomain => @subdomain), :method => :post) do |f|
     
       .section_header
         %h1.index
@@ -38,5 +38,5 @@
         .submit
           = submit_tag "Save Changes"
           == or
-          = link_to "Cancel", services_path, :class => 'admin'
+          = link_to "Cancel", services_path(:subdomain => @subdomain), :class => 'admin'
         

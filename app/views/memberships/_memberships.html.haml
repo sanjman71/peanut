@@ -4,7 +4,7 @@
       %td.person
         = membership.resource.name
       %td.action
-        = link_to("Remove", membership_path(membership), :class => 'admin ujs delete')
+        = link_to("Remove", membership_path(membership, :subdomain => @subdomain), :class => 'admin ujs delete')
   - unless @non_members.blank?
     %tr.add_user
       %td{:colspan => 2, :style => "padding-top: 10px;"}

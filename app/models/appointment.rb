@@ -161,6 +161,8 @@ class Appointment < ActiveRecord::Base
   end
   
   def start_at_string=(s)
+    # chronic parses times into the current time zone,
+    # but its stored by activerecord in utc format
     self.start_at = Chronic.parse(s)
   end
 
@@ -169,6 +171,8 @@ class Appointment < ActiveRecord::Base
   end
   
   def end_at_string=(s)
+    # chronic parses times into the current time zone,
+    # but its stored by activerecord in utc format
     self.end_at = Chronic.parse(s)
   end
   

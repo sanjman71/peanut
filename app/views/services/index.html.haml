@@ -18,7 +18,7 @@
         .sidebar_header
           %h1
             == Create a new service
-          - form_for(Service.new, :url => services_path, :method => :post, :html => {:class => 'new_service'}) do |f|
+          - form_for(Service.new, :url => services_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_service'}) do |f|
             = hidden_field_tag "service[mark_as]", 'work'
             = hidden_field_tag "service[price]", 0
             = hidden_field_tag "service[duration]", 0
