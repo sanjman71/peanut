@@ -22,9 +22,9 @@
           - build_tab_links(controller) do |link|
             %li.with_space= link
             
-    if RAILS_ENV == 'development
+    - if RAILS_ENV == 'development'
       .container.showgrid
-    else
+        = yield
+    - else
       .container
-    end
-      = yield
+        = yield
