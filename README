@@ -4,6 +4,8 @@ This problem with time conversion seems to be causing problems on our appointmen
 
 http://rails.lighthouseapp.com/projects/8994/tickets/1339
 
+One fix is to change config.cache_classes = true in your development.rb.
+
 == Getting Started
 
 1. Run the rake task <tt>rake db:peanut:init</tt> to initialize the database with some test data.
