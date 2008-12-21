@@ -3,7 +3,7 @@
     .span-4.person
       %h3= membership.resource.name
     .span-1.last.action
-      = link_to("Remove", membership_path(membership), :class => 'admin ujs delete')
+      = link_to("Remove", membership_path(membership, :subdomain => @subdomain), :class => 'admin ujs delete')
 - unless @non_members.blank?
   .span-20.prepend-1.last.add_user
     = select_tag('person_id', options_for_select([['Add a person to this service', 0]] + non_members.collect{ |o| [o.name, o.id]}, 0))
