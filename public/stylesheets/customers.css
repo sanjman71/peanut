@@ -1,31 +1,6 @@
 /* customer styles */
-/* use the same style for peopel and services as well */
 
-div.customers_header                              { color: #666666; font-size: 12px; font-weight: bold; margin: 3px 0 10px; }
+div.customers_header                              { font-size: 12px; font-weight: bold; margin: 3px 0 10px; }
                                             
-table.customers                                   { border-collapse: collapse; border-top: 1px solid #EFEFEF; width: 100%; border: medium none; }
 
-table.customers td                                { border-bottom: 1px solid #EFEFEF; font-size: 12px; font-weight: normal; padding: 8px 0; 
-                                                    vertical-align: top; width: 30%; }
-
-table.customers td.name h2                        { color: #000000; font-size: 16px; margin: 0 0 3px; border: none; }
-
-table.customers td.contact_info                   { padding-left: 10px; width: 25%; }
-
-table.customers td.contact_info div.email, table.customers td.contact_info div.phone       
-                                                  { color: #333333; font-size: 12px; margin: 0 0 7px; padding: 0;  }
-
-table.customers td.action                         { font-size: 11px; font-weight: normal; width: 10%; white-space: nowrap; padding-left: 8px; }
-
-
-div.contact_info_header                           { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
-                                                    color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
-                                                    
 div.contact_info                                  { padding: 5px; }
-
-table.customers tr                                { margin: 5px 0 0; padding: 2px 5px 2px; font-size: 11px; font-weight: normal; }
-
-table.customer td.heading                         { background: #333333 none repeat scroll 0 0; color: #FFFFFF; font-size: 12px;
-                                                    padding: 2px 5px; width: 90px; text-align: left; }
-
-table.customer td.email, table.customer td.phone  { font-size: 12px; padding-left: 5px; }

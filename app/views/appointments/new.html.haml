@@ -1,29 +1,28 @@
-.container
-  .left
-    .section_header
-      %h1.index
-        == Confirm your appointment
-        %p
-        = appointment_description(@appointment)
-        
-    .section_body
-      %h1
-        == Before we finalize your appointment, we need some information about you. 
+.span-17
+  .span-17.last.box
+    %h3
+      == Confirm your appointment
       %p
-      .schedule_form
-        - form_for(@appointment, :url => schedule_path(:subdomain => @subdomain)) do |f|
-          - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
-            %table
-              %tr
-                %td= customer_form.label :name
-                %td= customer_form.text_field :name
-              %tr
-                %td= customer_form.label :email
-                %td= customer_form.text_field :email
-              %tr
-                %td= customer_form.label :phone
-                %td= customer_form.text_field :phone
-          %p= f.submit "Schedule"
+      = appointment_description(@appointment)
+
+  .span-15.prepend-1
+    %h4
+      == Before we finalize your appointment, we need some information about you. 
+    %p
+    .schedule_form
+      - form_for(@appointment, :url => schedule_path(:subdomain => @subdomain)) do |f|
+        - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
+          %table
+            %tr
+              %td= customer_form.label :name
+              %td= customer_form.text_field :name
+            %tr
+              %td= customer_form.label :email
+              %td= customer_form.text_field :email
+            %tr
+              %td= customer_form.label :phone
+              %td= customer_form.text_field :phone
+        %p= f.submit "Schedule"
         
         
         

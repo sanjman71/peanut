@@ -1,41 +1,36 @@
 - stylesheet('customers', 'notes')
 - javascript('customers', 'notes')
 
-.container
-  .left
-    .section_header
-      %h1.index{:style => "font-size: 18px;"}
-        = @customer.name
-            
-    .section_body
-      -# customer contact info
-      .contact_info_header
-        == Contact info
-      .contact_info
-        %table.customer
-          %tr
-            %td.heading
-              == Email
-            %td.email
-              = mail_to(@customer.email)
-          %tr
-            %td.heading
-              == Phone
-            %td.phone
-              = @customer.phone
-              
-      -# notes flash message
-      #note_flash
+.span-20
+  .span-18.last.box
+    %h2= @customer.name
+    
+.span-20
+  .span-15.last.prepend-1
+    -# customer contact info
+    .block
+      == Contact info
+  .span-10.last.prepend-1
+    .span-2.padding-5
+      %h3== Email
+    .span-3.last.padding-5
+      %h3= mail_to(@customer.email)
+  .span-10.last.prepend-1
+    .span-2.padding-5
+      %h3== Phone
+    .span-3.last.padding-5
+      %h3= @customer.phone
 
-      -# customer notes
-      .new_note#new_note_container
-        %p== Add a note about this customer
-        - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
-          = hidden_field(:note, :subject_id, :value => @customer.id)
-          = hidden_field(:note, :subject_type, :value => @customer.class.to_s)
-          = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
-          %p
-          = f.submit 'Add note', :name => nil
+  .span-15.prepend-1
+    -# notes flash message
+    #note_flash
+
+    -# add new note
+    .new_note#new_note_container
       %p
-      #notes_collection
-        = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+        %h3== Add a note about this customer
+        = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @customer, :subdomain => @subdomain})
+    %p
+    -# customer notes
+    #notes_collection
+      = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})

@@ -120,7 +120,7 @@ $.fn.init_live_customers_search = function () {
 
 // Highlight invoice chargeable items
 $.fn.init_highlight_invoice_chargeables = function () {
-  $("tr.chargeable").hover(function () {
+  $(".chargeable").hover(function () {
     $(this).addClass("highlighted");},
     function () {
       $(this).removeClass("highlighted");

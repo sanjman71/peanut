@@ -12,17 +12,14 @@ div.appointment                                   { padding: 7px; }
 
 div.timeslot                                      { padding: 7px; }
 
-div.timeslots .timeslot a, div.appointments .appointment a
+div.timeslot a, div.appointment a
                                                   { color: #5500BB; font-weight: bold; }
                                                   
-div.timeslots .timeslot a:hover, div.appointments .appointment a:hover
+div.timeslot a:hover, div.appointment a:hover
                                                   { color: #5500BB; background-color: #FF6600; }
                                                   
-div.timeslots .timeslot a:visited, div.appointments .appointment a:visited
+div.timeslot a:visited, div.appointment a:visited
                                                   { color: #5500BB; font-weight: bold; }
                                                   
 div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
-
-div.appointment_details                           { font-size: 11px; padding: 5px; }
-

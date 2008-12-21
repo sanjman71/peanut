@@ -6,9 +6,9 @@
       - resources = service.resources.collect { |r| r.name }.sort
       = resources.join(", ")
     .span-3.duration
-      == #{service.duration} minutes
+      %h3== #{service.duration} minutes
     .span-3.price
-      = service.price
+      %h3= service.price
     .span-1.action
       = link_to "Edit", edit_service_path(service), :class => 'admin'
     .span-3.last.action
