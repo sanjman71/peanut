@@ -1,7 +1,7 @@
 - memberships.sort_by{ |m| m.resource.name }.each do |membership|
   .span-20.prepend-1.last.membership{:class => cycle("shaded", "")}
-    .span-3.person
-      = membership.resource.name
+    .span-4.person
+      %h3= membership.resource.name
     .span-1.last.action
       = link_to("Remove", membership_path(membership), :class => 'admin ujs delete')
 - unless @non_members.blank?

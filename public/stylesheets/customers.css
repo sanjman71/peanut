@@ -1,6 +1,3 @@
 /* customer styles */
 
-div.customers_header                              { font-size: 12px; font-weight: bold; margin: 3px 0 10px; }
-                                            
-
-div.contact_info                                  { padding: 5px; }
+div.customers_header                              { font-size: 12px; font-weight: bold; }

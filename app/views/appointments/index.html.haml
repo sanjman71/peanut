@@ -39,10 +39,9 @@
           %span.example== e.g. 8:15 am
         .span-7.last#end_at_label
           == End
-        .span-7.last#end_at_text
+        .span-7.last.append-bottom#end_at_text
           = text_field 'appointment[time_range]', 'end_at', :size => 8
           %span.example== e.g. 5:30 pm
-        %hr.space
         .span-7.last
           = f.submit 'Add'
 

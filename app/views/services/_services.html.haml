@@ -1,5 +1,5 @@
 - services.each do |service|
-  .span-17.last.service
+  .span-16.last.service{:class => cycle("shaded", "")}
     .span-6.prepend-1.name
       %h2{:style => "margin-bottom: 0px;"}= service.name
       -# show all resources for this service
@@ -9,7 +9,7 @@
       %h3== #{service.duration} minutes
     .span-3.price
       %h3= service.price
-    .span-1.action
-      = link_to "Edit", edit_service_path(service), :class => 'admin'
     .span-3.last.action
+      = link_to "Edit", edit_service_path(service), :class => 'admin'
+      &nbsp;
       = link_to("Remove", service_path(service), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")

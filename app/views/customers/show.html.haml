@@ -13,12 +13,12 @@
   .span-10.last.prepend-1
     .span-2.padding-5
       %h3== Email
-    .span-3.last.padding-5
+    .span-4.last.padding-5
       %h3= mail_to(@customer.email)
   .span-10.last.prepend-1
     .span-2.padding-5
       %h3== Phone
-    .span-3.last.padding-5
+    .span-4.last.padding-5
       %h3= @customer.phone
 
   .span-15.prepend-1
@@ -28,9 +28,9 @@
     -# add new note
     .new_note#new_note_container
       %p
-        %h3== Add a note about this customer
+        %h4== Add a note about this customer
         = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @customer, :subdomain => @subdomain})
-    %p
+    %hr.space
     -# customer notes
     #notes_collection
       = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})

@@ -32,7 +32,7 @@
     -# add note
     .new_note#new_note_container
       %p
-        %h3== Add a note about this appointment
+        %h4== Add a note about this appointment
         = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => @subdomain})
     %p
     -# appointment notes
