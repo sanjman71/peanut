@@ -4,7 +4,7 @@
 .span-20.last.box
   = label_tag "live_search_for_people", "Find a person by typing their name", :class => 'big'
   %br
-  = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people', :class => 'title big', :url => people_path)
+  = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people', :class => 'title big', :url => people_path(:subdomain => @subdomain))
       
 .span-20.last
   .prepend-1.people_header#people_search_text

@@ -29,7 +29,7 @@
     .new_note#new_note_container
       %p
         %h4== Add a note about this customer
-        = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @customer, :subdomain => @subdomain})
+        = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @customer})
     %hr.space
     -# customer notes
     #notes_collection

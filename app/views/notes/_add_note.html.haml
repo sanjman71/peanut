@@ -1,4 +1,4 @@
-- form_for(note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => subdomain), :method => :post) do |f|
+- form_for(note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
   = hidden_field(:note, :subject_id, :value => subject.id)
   = hidden_field(:note, :subject_type, :value => subject.class.to_s)
   = f.text_area(:comment, :style => "width: 90%; height: 50px;")
