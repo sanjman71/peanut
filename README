@@ -1,3 +1,9 @@
+== Rails 2.2 bugs
+
+This problem with time conversion seems to be causing problems on our appointments/index page:
+
+http://rails.lighthouseapp.com/projects/8994/tickets/1339
+
 == Getting Started
 
 1. Run the rake task <tt>rake db:peanut:init</tt> to initialize the database with some test data.
