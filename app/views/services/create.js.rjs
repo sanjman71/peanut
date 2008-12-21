@@ -1,5 +1,5 @@
 if @error
   page["#add_service_name"].addClass('highlighted')
 else
-  page.redirect_to(edit_service_path(@service))
+  page.redirect_to(edit_service_path(@service, :subdomain => @subdomain))
 end
