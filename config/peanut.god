@@ -1,4 +1,4 @@
-if RAILS_ENV == 'development'
+if ENV["RAILS"] == 'development'
   RAILS_ROOT = File.dirname(File.dirname(__FILE__))
 els
   RAILS_ROOT = "/usr/apps/peanut/current"
