@@ -1,11 +1,15 @@
-# in dev  environment: 'RAILS_ENV=development god -c config/peanut.god'
-# in prod environment: 'sudo god -c config/peanut.god'
+# start with: 'sudo god -c config/peanut.god'
 
-if ENV["RAILS_ENV"] == 'development'
-  RAILS_ROOT = File.dirname(File.dirname(__FILE__))
-else
-  RAILS_ROOT = "/usr/apps/peanut/current"
+RAILS_ROOT  = "/usr/apps/peanut/current"
+environment = 'production'
+
+if !File.exists?(RAILS_ROOT)
+  # assume development environment, use current directory
+  RAILS_ROOT  = File.dirname(File.dirname(__FILE__))
+  environment = 'development'
 end
+
+God.pid_file_directory = '/var/run/god'  # default value
 
 def generic_monitoring(w, options = {})
   w.start_if do |start|
@@ -71,9 +75,7 @@ God.watch do |w|
 end
 
 # run these in production environments
-unless ENV['RAILS_ENV'] == 'development'
-  
-  environment = 'production'
+if environment == 'production'
   
   %w{5000 5001}.each do |port|
     God.watch do |w|
@@ -95,11 +97,12 @@ unless ENV['RAILS_ENV'] == 'development'
   end
 
   God.watch do |w|
+    script            = "/etc/init.d/nginx"
     w.name            = "nginx"
     w.interval        = 60.seconds
-    w.start           = "/etc/init.d/nginx start"
-    w.stop            = "/etc/init.d/nginx stop"
-    w.restart         = "/etc/init.d/nginx restart"
+    w.start           = "#{script} start"
+    w.stop            = "#{script} stop"
+    w.restart         = "#{script} restart"
     w.start_grace     = 20.seconds
     w.restart_grace   = 20.seconds
     w.pid_file        = "/usr/local/nginx/logs/nginx.pid"
@@ -145,4 +148,4 @@ unless ENV['RAILS_ENV'] == 'development'
     generic_monitoring(w, :cpu_limit => 50.percent, :memory_limit => 50.megabytes)
   end
 
-end # unless 'development'
+end # if 'production'
