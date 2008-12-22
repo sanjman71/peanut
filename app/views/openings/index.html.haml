@@ -12,14 +12,14 @@
       %span{:style => "padding-left: 10px;"}
         == Who
       %span.field#who
-        = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id))
+        = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id), :style => "width: 125px;")
       %span{:style => "padding-left: 10px;"}
         == When
       %span.field#when
         = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
       %span.field#time
         = select_tag('time', options_for_select(Appointment::TIMES, @time))
-      %span#search{:style => @when ? "display: inline;" : "display: none;"}
+      %span#search{:style => @when ? "display: inline; padding-left: 10px;" : "display: none; padding-left: 10px;"}
         = f.submit 'Search', :name => nil, :class => 'submit'
 
 .span-6.prepend-1.last
@@ -47,10 +47,10 @@
         == No Available Appointments
       - else
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
-    %h3
+    %h3.span-16.last
       == #{@when.titleize}
-    #free_calendar
+    .span-16.last#free_calendar
       = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-    .timeslots#free_timeslots
+    .span-16.last.timeslots#free_timeslots
       = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
 

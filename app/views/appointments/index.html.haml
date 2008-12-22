@@ -6,7 +6,7 @@
     .span-10
       = label_tag "person_id", "Schedule for", :class => 'big'
       = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :class => 'text')
-    .span-5.last
+    .span-5.prepend-1.last
       - build_when_links(Appointment::WHEN_WEEKS, @when) do |link, separator|
         = link
         = separator

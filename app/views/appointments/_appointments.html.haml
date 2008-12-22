@@ -1,7 +1,7 @@
 - appointments_by_day.each do |day, appointments|
-  %h3.appointments
-    == #{day.to_s(:appt_day)}
-
+  .span-16.last
+    %h3== #{day.to_s(:appt_day)}
+  - reset_cycle
   - appointments.each do |appointment|
     -#- hover_id = 'appointment_'+appointment.id.to_s
     -#- id = 'appointment_'+appointment.id.to_s
@@ -17,4 +17,5 @@
         - elsif appointment.service.mark_as == Appointment::WORK
           -# work appointments can be changed
           = link_to "Change", appointment_path(appointment, :subdomain => @subdomain)
+  %hr.space
             
