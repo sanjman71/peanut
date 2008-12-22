@@ -70,15 +70,17 @@ God.watch do |w|
   generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 20.megabytes)
 end
 
-# run these in staging, production environments
+# run these in production environments
 unless ENV['RAILS_ENV'] == 'development'
+  
+  environment = 'production'
   
   %w{5000 5001}.each do |port|
     God.watch do |w|
       w.name          = "mongrel-#{port}"
       w.group         = "mongrel"
       w.interval      = 60.seconds      
-      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} \
+      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} -e #{environment} \
                         -P #{RAILS_ROOT}/log/mongrel.#{port}.pid  -d"
       w.stop          = "mongrel_rails stop -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
       w.restart       = "mongrel_rails restart -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
