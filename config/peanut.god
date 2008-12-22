@@ -1,4 +1,7 @@
-if ENV["RAILS"] == 'development'
+# in dev  environment: 'RAILS_ENV=development god -c config/peanut.god'
+# in prod environment: 'sudo god -c config/peanut.god'
+
+if ENV["RAILS_ENV"] == 'development'
   RAILS_ROOT = File.dirname(File.dirname(__FILE__))
 else
   RAILS_ROOT = "/usr/apps/peanut/current"
@@ -39,8 +42,7 @@ end
 
 God.watch do |w|
   script            = "#{RAILS_ROOT}/script/workling_client"
-  w.name            = "peanut-workling"
-  w.group           = "peanut"
+  w.name            = "workling"
   w.interval        = 60.seconds
   w.start           = "#{script} start"
   w.restart         = "#{script} restart"
@@ -55,8 +57,7 @@ God.watch do |w|
 end
 
 God.watch do |w|
-  w.name            = "peanut-starling"
-  w.group           = "peanut"
+  w.name            = "starling"
   w.interval        = 60.seconds
   w.start           = "starling -d -P #{RAILS_ROOT}/log/starling.pid -q #{RAILS_ROOT}/log/"
   w.stop            = "kill `cat #{RAILS_ROOT}/log/starling.pid`"
@@ -74,7 +75,7 @@ unless ENV['RAILS_ENV'] == 'development'
   
   %w{5000 5001}.each do |port|
     God.watch do |w|
-      w.name          = "peanut-mongrel-#{port}"
+      w.name          = "mongrel-#{port}"
       w.group         = "mongrel"
       w.interval      = 60.seconds      
       w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} \
@@ -92,9 +93,8 @@ unless ENV['RAILS_ENV'] == 'development'
   end
 
   God.watch do |w|
-    w.name            = "peanut-nginx"
-    w.group           = "nginx"
-    w.interval        = 30.seconds # default
+    w.name            = "nginx"
+    w.interval        = 60.seconds
     w.start           = "/etc/init.d/nginx start"
     w.stop            = "/etc/init.d/nginx stop"
     w.restart         = "/etc/init.d/nginx restart"
