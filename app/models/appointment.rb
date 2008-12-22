@@ -84,6 +84,12 @@ class Appointment < ActiveRecord::Base
     transitions :to => :canceled, :from => [:upcoming]
   end
   # END acts_as_state_machine
+
+  # TODO - this overrides and fixes a bug in Rails 2.2 - ticket http://rails.lighthouseapp.com/projects/8994/tickets/1339
+  def self.create_time_zone_conversion_attribute?(name, column)
+    # Appointment.write_inheritable_attribute(:skip_time_zone_conversion_for_attributes, [])
+    time_zone_aware_attributes && skip_time_zone_conversion_for_attributes && !skip_time_zone_conversion_for_attributes.include?(name.to_sym) && [:datetime, :timestamp].include?(column.type)
+  end
   
   # map time of day string to a utc time range in seconds
   def self.time_range(s)
