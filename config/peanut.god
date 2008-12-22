@@ -1,6 +1,6 @@
 if ENV["RAILS"] == 'development'
   RAILS_ROOT = File.dirname(File.dirname(__FILE__))
-els
+else
   RAILS_ROOT = "/usr/apps/peanut/current"
 end
 
@@ -125,9 +125,9 @@ unless ENV['RAILS_ENV'] == 'development'
     end
 
     # start if process is not running
-    w.transition(:up, :start) do |on|
-      on.condition(:process_exits)
-    end
+    # w.transition(:up, :start) do |on|
+    #   on.condition(:process_exits)
+    # end
 
     # w.transition(:up, :restart) do |on|
     #   on.condition(:http_response_code) do |c|
@@ -140,7 +140,7 @@ unless ENV['RAILS_ENV'] == 'development'
     #   end
     # end
 
-    generic_monitoring(w, :cpu_limit => 50.percent, :memory_limit => 75.megabytes)
+    generic_monitoring(w, :cpu_limit => 50.percent, :memory_limit => 50.megabytes)
   end
 
 end # unless 'development'
