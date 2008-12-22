@@ -81,3 +81,8 @@ require 'lib/range.rb'
 
 # Initialize workling to use starling
 Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
+
+# Initialize exception notifier
+ExceptionNotifier.exception_recipients  = %w(peanut-exception@jarna.com)
+ExceptionNotifier.sender_address        = %("peanut error" <app.error@peanut.com>)
+ExceptionNotifier.email_prefix          = "[app] "
