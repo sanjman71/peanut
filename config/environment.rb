@@ -78,3 +78,6 @@ end
 
 # Extend Range class
 require 'lib/range.rb'
+
+# Initialize workling to use starling
+Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
