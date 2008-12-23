@@ -23,3 +23,8 @@ role :db,           hosts[:slicehost], :primary => true
 # Users, groups
 set :user,          'peanut'  # log into servers as
 set :group,         'peanut'
+
+# Load external recipe files files
+load_paths << "config/mongrel"
+load "mongrel_tasks"
+
