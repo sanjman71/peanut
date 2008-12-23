@@ -18,9 +18,11 @@ a img:hover                                       { background-color: green; }
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
 
-/* padding styles */
+/* padding, border styles */
 
 .padding-5                                        { padding: 5px; }
+
+.letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
 
 /* header, tab styles */
 

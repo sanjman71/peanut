@@ -23,7 +23,7 @@ end
 
 Factory.define :product do |p|
   p.name "Product 1"
-  p.stock_count 1
+  p.inventory 1
   p.price_in_cents 100
 end
 

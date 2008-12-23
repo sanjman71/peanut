@@ -1,0 +1,5 @@
+if @error
+  page["#add_product_name"].addClass('highlighted')
+else
+  page.redirect_to(edit_product_path(@product, :subdomain => @subdomain))
+end

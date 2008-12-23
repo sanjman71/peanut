@@ -70,6 +70,16 @@ module ApplicationHelper
     end
 
     yield link
+
+    # 'Products' link
+    name = 'Products'
+    if current_controller.controller_name == 'products' and ['index', 'show'].include?(current_controller.action_name)
+      link = link_to(name, products_path, :class => 'current')
+    else
+      link = link_to(name, products_path)
+    end
+
+    yield link
   end
   
 end

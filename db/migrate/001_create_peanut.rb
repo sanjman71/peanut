@@ -20,7 +20,7 @@ class CreatePeanut < ActiveRecord::Migration
     create_table :products do |t|
       t.integer   :company_id
       t.string    :name
-      t.integer   :stock_count
+      t.integer   :inventory
       t.integer   :price_in_cents
       
       t.timestamps

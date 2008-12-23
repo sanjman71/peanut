@@ -32,8 +32,9 @@ ActionController::Routing::Routes.draw do |map|
     resource.resources :services,   :has_many => [:appointments, :openings]
   end
   
-  # services with nested resources
-  map.resources :services,          :has_many => [:appointments, :openings]
+  # services, products
+  map.resources :services
+  map.resources :products
   
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]

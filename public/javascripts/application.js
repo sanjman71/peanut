@@ -43,6 +43,14 @@ $.fn.init_new_service = function () {
   })
 } 
 
+// Add a new product
+$.fn.init_new_product = function () {
+  $("#new_product").submit(function () {
+    $.post(this.action, $(this).serialize(), null, "script");
+    return false;
+  })
+} 
+
 // Add free time for a resource on a specific day
 $.fn.init_add_free_time = function () {
   $("#add_free_time_form").submit(function () {

@@ -1,0 +1,26 @@
+- stylesheet('products')
+- javascript('products')
+
+- form_for(@product, :url => product_path(@product, :subdomain => @subdomain), :method => :post) do |f|
+
+  .span-20.last.box
+    = label_tag "product_name", "Product Name", :class => 'big'
+    %br
+    = text_field_tag "product[name]", @product.name, :class => 'title highlight muted'
+      
+  .span-20.last
+    .span-4.prepend-1
+      = label_tag "product_price", "Price"
+      %br
+      = text_field_tag "product[price]", @product.price, :class => 'text', :style => "width: 100px;"
+    .span-4.prepend-1.last
+      = label_tag "product_inventory", "Inventory"
+      %br
+      = text_field_tag "product[inventory]", @product.inventory, :class => 'text blue muted', :style => "width: 100px;"
+    
+  %hr.space
+  .span-20.prepend-1.last.submit
+    = submit_tag "Save Changes"
+    == or
+    = link_to "Cancel", products_path(:subdomain => @subdomain), :class => 'admin'
+                  

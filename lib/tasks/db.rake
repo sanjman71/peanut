@@ -26,17 +26,21 @@ namespace :db do
       mens_haircut.resources.push(person1)
       womens_haircut.resources.push(person2)
 
-      # create company3 services and people
+      # create company3 people, services, products
       company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
       company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
+
+      person1         = company3.people.create(:name => "Erika Maechtle")
+      person2         = company3.people.create(:name => "Josie")
       
       mens_haircut    = company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
       womens_haircut  = company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
       womens_color    = company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work", :price => 100.00)
-    
-      person1         = company3.people.create(:name => "Erika Maechtle")
-      person2         = company3.people.create(:name => "Josie")
 
+      shampoo         = company3.products.create(:name => "Shampoo", :inventory => 5, :price => 10.00)
+      conditioner     = company3.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
+      pomade          = company3.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
+      
       mens_haircut.resources.push(person1)
       mens_haircut.resources.push(person2)
       womens_haircut.resources.push(person1)
