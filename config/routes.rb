@@ -17,10 +17,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]
   map.resources :memberships
-  map.resources :invoices, :member => { :add => :post, :remove => :post }
+  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:show, :add, :remove]
+  map.resources :invoice_line_items
   
   # override 'appointments/new' path
-  map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule  'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
     
   map.resources :people do |resource|
     # nested appointments routes

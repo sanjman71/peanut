@@ -26,24 +26,32 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
     
     assert appt.invoice.valid?
     assert_equal [], invoice.line_items
+    assert_equal 0, invoice.total
+    assert_equal 0, invoice.total_as_money.cents
     
     # create service line item
     li1 = AppointmentInvoiceLineItem.new(:chargeable => haircut, :price_in_cents => 500)
     invoice.line_items.push(li1)
     assert_equal haircut, li1.chargeable
     assert_equal [li1], invoice.line_items
+    assert_equal 500, invoice.total
+    assert_equal 500, invoice.total_as_money.cents
     
     # create product line items
     shampoo = Factory(:product, :name => "Shampoo", :company => company)
-    li2     = AppointmentInvoiceLineItem.new(:chargeable => shampoo, :price_in_cents => 500)
+    li2     = AppointmentInvoiceLineItem.new(:chargeable => shampoo, :price_in_cents => 375)
     invoice.line_items.push(li2)
     assert_equal shampoo, li2.chargeable
     assert_equal [li1, li2], invoice.line_items
+    assert_equal 875, invoice.total
+    assert_equal 875, invoice.total_as_money.cents
     
     # remove line item
     invoice.line_items.delete(li2)
     invoice.reload
     assert_equal [li1], invoice.line_items
+    assert_equal 500, invoice.total
+    assert_equal 500, invoice.total_as_money.cents
   end
   
 end

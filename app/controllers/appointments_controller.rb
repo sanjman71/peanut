@@ -135,30 +135,24 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   # GET /appointments/1.xml
   def show
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = @current_company.appointments.find(params[:id])
     @note         = Note.new
+    @confirmation = params[:confirmation].to_i == 1
     
     # build notes collection, most recent first 
     @notes        = @appointment.notes.sort_recent
-    
-    respond_to do |format|
-      format.html { render :action => 'show' }
-      format.xml  { render :xml => @appointment }
-    end
   end
   
   # GET /appointments/1/confirmation
   def confirmation
     @appointment  = @current_company.appointments.find(params[:id])
-    @confirmation = true
     
     # only show confirmations for upcoming appointments
     unless @appointment.state == 'upcoming'
       return redirect_to(appointment_path(@appointment))
     end
     
-    # use show action
-    show
+    render_component(:action => 'show', :id => @appointment.id, :params => {:confirmation => 1})
   end
 
   # GET /appointments/1/checkout
@@ -168,6 +162,9 @@ class AppointmentsController < ApplicationController
     
     # create/get invoice
     @invoice      = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
+    
+    # redirect to invoices controller
+    redirect_to(invoice_path(@invoice, :subdomain => @subdomain))
   end
 
   # GET /appointments/1/cancel

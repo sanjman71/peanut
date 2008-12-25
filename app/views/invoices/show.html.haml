@@ -6,12 +6,19 @@
 
 .span-20
   .prepend-1
-    %h2== Services and Products
-    #invoice
-      = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice})
-    %hr.space
+    #invoice_total
+      = render(:partial => 'total.html.haml', :locals => {:invoice => @invoice})
+    %h2== Services
+    #invoice_services
+      = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice, :chargeable_types => ["Service"]})
     .span-10.last
-      - form_for(Service.new, add_invoice_path(@invoice), :url => add_invoice_path(@invoice), :html => {:id => "add_chargeable"}) do |f|
-        = select_tag('service_id', options_for_select(@services.collect{ |o| [o.name, o.id]}, 0))
-        = submit_tag "Add Service", :name => nil
+      - form_for(Service.new, add_invoice_path(@invoice), :url => add_invoice_path(@invoice), :html => {:id => "add_chargeable_service"}) do |f|
+        = select_tag('service_id', options_for_select([['Add a service', 0]] + @services.collect{ |o| [o.name, o.id]}, 0))
+    %hr.space
+    %h2== Products
+    #invoice_products
+      = render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice, :chargeable_types => ["Product"]})
+    .span-10.last
+      - form_for(Product.new, add_invoice_path(@invoice), :url => add_invoice_path(@invoice), :html => {:id => "add_chargeable_product"}) do |f|
+        = select_tag('product_id', options_for_select([['Add a product', 0]] + @products.collect{ |o| [o.name, o.id]}, 0))
   

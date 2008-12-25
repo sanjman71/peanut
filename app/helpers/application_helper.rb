@@ -14,9 +14,9 @@ module ApplicationHelper
     # 'Schedules' link
     name = 'Schedules'
     if current_controller.controller_name == 'appointments' and current_controller.action_name == 'index'
-      link = link_to(name, appointments_path, :class => 'current')
+      link = link_to(name, appointments_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, appointments_path)
+      link = link_to(name, appointments_path(:subdomain => @subdomain))
     end
     
     yield link
@@ -24,9 +24,9 @@ module ApplicationHelper
     # 'Openings' link
     name = 'Openings'
     if current_controller.controller_name == 'openings' and current_controller.action_name == 'index'
-      link = link_to(name, openings_path, :class => 'current')
+      link = link_to(name, openings_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, openings_path)
+      link = link_to(name, openings_path(:subdomain => @subdomain))
     end
     
     yield link
@@ -34,9 +34,9 @@ module ApplicationHelper
     # 'Customers' link
     name = 'Customers'
     if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
-      link = link_to(name, customers_path, :class => 'current')
+      link = link_to(name, customers_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, customers_path)
+      link = link_to(name, customers_path(:subdomain => @subdomain))
     end
 
     yield link

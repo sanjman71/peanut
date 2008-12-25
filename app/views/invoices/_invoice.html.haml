@@ -1,9 +1,20 @@
-- invoice.line_items.each do |li|
+- reset_cycle
+- invoice.line_items.select { |li| chargeable_types.include?(li.chargeable_type) }.each do |li|
   .span-15.last.padding-5.chargeable{:class => cycle("shaded", "")}
+    .span-6
+      %h3= li.chargeable.name
     .span-5
-      = li.chargeable.name
-    .span-5
-      = text_field_tag 'chargeable[price]', li.chargeable.price, :style => "background-color: #FFFF66"
-    .span-2.prepend-3.last
+      %h3
+        .price{:id => "item_#{li.id}"}
+          = li.price
+          = link_to 'Edit', '', :click => "edit_item_#{li.id}", :hide => "item_#{li.id}", :class => 'price edit', :style => 'font-size: 10px; padding: 3px;'
+        .price.hide{:id => "edit_item_#{li.id}"}
+          - form_for(li, :url => invoice_line_item_path(li, :subdomain => @subdomain), :method => :put, :html => {:class => "price update"}) do |f|
+            = text_field_tag 'item[price]', li.price, :style => "background-color: #FFFF66; width: 70px;"
+            = submit_tag 'Done', :name => nil
+            %span{:style => 'font-size: 11px;'}
+              == or
+              = link_to 'Cancel', '', :class => 'price edit cancel', :click => "item_#{li.id}", :hide => "edit_item_#{li.id}"
+    .span-2.prepend-2.last
       = link_to "Remove", remove_invoice_path(invoice, :line_item_id => li.id), :class => 'admin ujs'
       

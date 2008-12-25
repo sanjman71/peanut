@@ -136,11 +136,45 @@ $.fn.init_highlight_invoice_chargeables = function () {
 } 
 
 // Add a new chargeable line itme to an invoice
-$.fn.init_add_chargeable = function () {
-  $("#add_chargeable").submit(function () {
+$.fn.init_add_chargeables = function () {
+  // Add the selected service to an invoice
+  $("#service_id").change(function () {
+    $.post($("#add_chargeable_service").attr("action"), $("#add_chargeable_service").serialize(), null, "script");
+    return false;
+  })
+  // Add the selected product to an invoice
+  $("#product_id").change(function () {
+    $.post($("#add_chargeable_product").attr("action"), $("#add_chargeable_product").serialize(), null, "script");
+    return false;
+  })
+}
+
+$.fn.init_change_chargeable_prices = function() {
+  // update the price
+  $(".price.update").submit(function () {
     $.post(this.action, $(this).serialize(), null, "script");
     return false;
   })
+
+  // hide price, show edit price
+  $(".price.edit").click(function () {
+    $('#' + $(this).attr("hide")).addClass('hide');
+    $('#' + $(this).attr("click")).removeClass('hide');
+    return false;
+  })
+
+  // cancel edit price, show price
+  $(".price.edit.cancel").click(function () {
+    $('#' + $(this).attr("hide")).addClass('hide');
+    $('#' + $(this).attr("click")).removeClass('hide');
+    return false;
+  })
+}
+
+// Reset the chargeables select list to the first value
+$.fn.reset_chargeables = function () {
+  $("#service_id").attr("selectedIndex", 0);
+  $("#product_id").attr("selectedIndex", 0);
 }
 
 // Add a new note

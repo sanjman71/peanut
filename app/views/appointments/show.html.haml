@@ -1,31 +1,32 @@
 - stylesheet('appointments', 'notes')
 - javascript('appointments', 'notes')
 
-.span-20
-  .span-20.last.box
+.span-18
+  .span-18.last.box
     .span-14
       %h3
         = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
-    .span-5.last
+    .span-4.last
       - if @appointment.state == 'upcoming'
         -# upcoming appointments can be canceled and checked-out
-        = link_to 'Cancel', cancel_appointment_path(@appointment)
+        = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs delete confirm', :question => "Are you sure you want to cancel this appointment?")
         == &nbsp;|
-        = link_to 'Checkout', checkout_appointment_path(@appointment)
+        = link_to('Checkout', checkout_appointment_path(@appointment), :class => 'admin')
   
 .span-15.prepend-1.last
-  - if @appointment.state == 'upcoming' and @confirmation
+  - if @confirmation
     -# show appointment confirmation notice
     .notice
       == A confirmation email has also been sent to
       = @appointment.customer.email unless @appointment.customer.blank?
-  - elsif @appointment.state == 'completed'
+      
+  - if @appointment.state == 'completed'
     -# appointment is completed
     .appointment_header
       == Receipt
 
 .span-15.prepend-1  
-  - if @appointment.state == 'upcoming' and !@confirmation
+  - if @appointment.state == 'upcoming'
     -# notes flash message
     #note_flash
     

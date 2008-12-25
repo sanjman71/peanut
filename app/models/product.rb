@@ -8,4 +8,21 @@ class Product < ActiveRecord::Base
 
   # products with inventory == 0
   named_scope :outofstock,      { :conditions => ["inventory = 0"] }
+  
+  
+  # return true if the there is at least 1 of this product
+  def stocked?
+    return self.inventory > 0
+  end
+  
+  def inventory_add!(i)
+    self.inventory += i
+    self.save
+  end
+  
+  def inventory_remove!(i)
+    self.inventory -= i
+    self.save
+  end
+  
 end
