@@ -77,7 +77,7 @@ Rails::Initializer.run do |config|
 end
 
 # Extend Range class
-require 'lib/range.rb'
+require "#{RAILS_ROOT}/lib/range.rb"
 
 # Initialize workling to use starling
 Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
