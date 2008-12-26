@@ -19,8 +19,12 @@ class InvoicesController < ApplicationController
     end
       
     if @chargeable
-      line_item = AppointmentInvoiceLineItem.new(:chargeable => @chargeable, :price_in_cents => @chargeable.price_in_cents)
-      @invoice.line_items.push(line_item)
+      # add chargeable to invoice
+      @line_item = AppointmentInvoiceLineItem.new(:chargeable => @chargeable, :price_in_cents => @chargeable.price_in_cents)
+      @invoice.line_items.push(@line_item)
+      
+      # update chargeable's inventory count
+      @chargeable.inventory_remove!(1) if @chargeable.respond_to?(:inventory_remove!)
     end
     
     respond_to do |format|
@@ -31,9 +35,13 @@ class InvoicesController < ApplicationController
   def remove
     @invoice    = AppointmentInvoice.find(params[:id])
     @line_item  = @invoice.line_items.find(params[:line_item_id])
+    @chargeable = @line_item.chargeable
     
     # remove line item
     @invoice.line_items.delete(@line_item)
+
+    # update chargeable's inventory count
+    @chargeable.inventory_add!(1) if @chargeable.respond_to?(:inventory_add!)
 
     respond_to do |format|
       format.js { render :action => 'add_remove' }
