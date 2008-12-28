@@ -1,17 +1,12 @@
-%table.appointment_header
-  %tr
-    %td.what
-      = appointment.service.name
-      == with
-      = appointment.resource.name
-  %tr
-    %td.when
-      = appointment.start_at.to_s(:appt_day_date_time)
-  %tr
-    %td.customer
-      - unless appointment.customer.blank?
-        = link_to appointment.customer.name, customer_path(appointment.customer)
-  %tr
-    %td.confirmation
-      == Confirmation code:
-      = appointment.confirmation_code
+.what.padding-5
+  = appointment.service.name
+  == with
+  = appointment.resource.name
+.when.padding-5
+  = appointment.start_at.to_s(:appt_day_date_time)
+- unless appointment.customer.blank?
+  .customer.padding-5
+    = link_to appointment.customer.name, customer_path(appointment.customer)
+.confirmation.padding-5
+  == Confirmation code:
+  = appointment.confirmation_code

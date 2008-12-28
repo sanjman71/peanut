@@ -16,8 +16,7 @@ class CustomersController < ApplicationController
     end
     
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @customers }
+      format.html
       format.js
     end
   end
@@ -30,11 +29,6 @@ class CustomersController < ApplicationController
     
     # build notes collection, most recent first 
     @notes    = @customer.notes.sort_recent
-    
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @customer }
-    end
   end
 
   # GET /customers/new

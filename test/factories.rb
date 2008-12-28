@@ -1,11 +1,11 @@
 require 'factory_girl'
 
 Factory.define :company do |c|
-  c.name "Company Name"
+  c.name "Company 1"
 end
 
 Factory.define :person do |p|
-  p.name "Person Name"
+  p.name "Person 1"
 end
 
 Factory.define :work_service, :class => Service do |s|

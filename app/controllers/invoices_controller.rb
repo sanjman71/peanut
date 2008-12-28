@@ -3,9 +3,10 @@ class InvoicesController < ApplicationController
   layout 'blueprint'
 
   def show
-    @invoice  = AppointmentInvoice.find(params[:id])
-    @services = @current_company.services.work.all
-    @products = @current_company.products.instock
+    @invoice      = AppointmentInvoice.find(params[:id])
+    @appointment  = @invoice.appointment
+    @services     = @current_company.services.work.all
+    @products     = @current_company.products.instock
   end
   
   def add

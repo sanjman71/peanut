@@ -2,7 +2,9 @@
 
 .span-20
   .span-20.last.box
-    %h1== Invoice
+    %h3
+      .padding-5== Invoice
+      = render(:partial => 'appointments/appointment_header.html.haml', :locals => {:appointment => @appointment})
 
 .span-20
   .prepend-1
