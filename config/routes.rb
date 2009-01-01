@@ -13,15 +13,19 @@ ActionController::Routing::Routes.draw do |map|
   map.resource  :session
 
   map.resources :companies
-  map.resources :appointments, :member => { :confirmation => :get, :checkout => :get, :cancel => :get }, :collection => { :search => [:get, :post] }
+  map.resources :appointments, 
+                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => :get }, 
+                :collection => { :search => [:get, :post] }
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]
-  map.resources :memberships
+  map.resources :memberships, :only => [:create, :destroy]
   map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:show, :add, :remove]
   map.resources :invoice_line_items
+  map.resources :waitlist, :only => [:index]
   
   # override 'appointments/new' path
-  map.schedule  'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
+  map.waitlist  'waitlist/people/:person_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
   map.resources :people do |resource|
     # nested appointments routes
@@ -34,7 +38,7 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   # services, products
-  map.resources :services
+  map.resources :services, :has_many => [:openings]
   map.resources :products
   
   # customers with nested resources

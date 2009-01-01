@@ -87,15 +87,9 @@ div.right                                         { float: left; margin: 0 0 0; 
 
 div.col                                           { min-width: 200px; padding: 0 0 0 12px;}
 
-/* instruction styles */
-
-div.instructions                                  { background: #FFFFCC; padding: 5px; font-size: 12px; }
-
-div.instructions ul                               { font-size: 12px; }
-
 /* sidebar styles */
 
-div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0;  border: 1px solid #C9D8EF; }
+div.sidebar                                       { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; }
 
 div.sidebar_form                                  { background: #EDF3FE none repeat scroll 0 0; border: 1px solid #C9D8EF; 
                                                     padding: 6px 10px 2px; }
@@ -103,6 +97,13 @@ div.sidebar_form                                  { background: #EDF3FE none rep
 div.sidebar_form input                            { font-size: 14px; color: #000000; }
 
 div.sidebar_header h1                             { font-size: 14px; font-weight: bold; }
+
+/* instruction styles */
+
+div.instructions, div.instructions.sidebar        { background: #FFFFCC; padding: 5px; font-size: 12px; border: 1px solid #FFD324; }
+
+div.instructions ul                               { font-size: 12px; }
+
 
 /* highlight styles */
 

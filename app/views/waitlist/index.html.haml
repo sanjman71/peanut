@@ -1,0 +1,11 @@
+- stylesheet('appointments')
+- javascript('appointments')
+
+.span-17
+  .span-15.last.box
+    %h2== Waitlist
+  %hr.space
+  .span-15.prepend-1.append-1.last
+    .highlight#flash
+  #waitlist
+    = render(:partial => 'waitlist.html.haml', :locals => {:appointments => @appointments})

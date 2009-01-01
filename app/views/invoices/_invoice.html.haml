@@ -1,20 +1,20 @@
-- reset_cycle
-- invoice.line_items.select { |li| chargeable_types.include?(li.chargeable_type) }.each do |li|
-  .span-15.last.padding-5.chargeable{:class => cycle("shaded", "")}
-    .span-6
-      %h3= li.chargeable.name
-    .span-5
-      %h3
-        .price{:id => "item_#{li.id}"}
-          = li.price
-          = link_to 'Edit', '', :click => "edit_item_#{li.id}", :hide => "item_#{li.id}", :class => 'price edit', :style => 'font-size: 10px; padding: 3px;'
-        .price.hide{:id => "edit_item_#{li.id}"}
-          - form_for(li, :url => invoice_line_item_path(li, :subdomain => @subdomain), :method => :put, :html => {:class => "price update"}) do |f|
-            = text_field_tag 'item[price]', li.price, :style => "background-color: #FFFF66; width: 70px;"
-            = submit_tag 'Done', :name => nil
-            %span{:style => 'font-size: 11px;'}
-              == or
-              = link_to 'Cancel', '', :class => 'price edit cancel', :click => "item_#{li.id}", :hide => "edit_item_#{li.id}"
-    .span-2.prepend-2.last
-      = link_to "Remove", remove_invoice_path(invoice, :line_item_id => li.id), :class => 'admin ujs'
+#invoice_total
+  = render(:partial => 'invoices/invoice_total.html.haml', :locals => {:invoice => invoice})
+  
+%h2== Services
+#invoice_services
+  = render(:partial => 'invoices/invoice_line_items.html.haml', :locals => {:invoice => invoice, :chargeable_types => ["Service"], :mode => mode})
+- if mode == :rw
+  .span-10.last
+    - form_for(Service.new, add_invoice_path(invoice), :url => add_invoice_path(invoice), :html => {:id => "add_chargeable_service"}) do |f|
+      = select_tag('service_id', options_for_select([['Add a service', 0]] + services.collect{ |o| [o.name, o.id]}, 0))
       
+%hr.space
+
+%h2== Products
+#invoice_products
+  = render(:partial => 'invoices/invoice_line_items.html.haml', :locals => {:invoice => invoice, :chargeable_types => ["Product"], :mode => mode})
+- if @mode == :rw
+  .span-10.last
+    - form_for(Product.new, add_invoice_path(@invoice), :url => add_invoice_path(invoice), :html => {:id => "add_chargeable_product"}) do |f|
+      = select_tag('product_id', options_for_select([['Add a product', 0]] + products.collect{ |o| [o.name, o.id]}, 0))

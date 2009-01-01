@@ -11,7 +11,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :resource_type
   should_require_attributes :start_at
   should_require_attributes :end_at
-  should_allow_values_for   :mark_as, "free", "busy", "work"
+  should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
   
   def test_time_of_day
     company   = Factory(:company)
@@ -119,11 +119,11 @@ class AppointmentTest < ActiveSupport::TestCase
     
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
-                              :service => free,
-                              :resource => johnny,
-                              :customer => customer,
-                              :start_at => "20080802000000",
-                              :end_at =>   "20080802000000")
+                                :service => free,
+                                :resource => johnny,
+                                :customer => customer,
+                                :start_at => "20080802000000",
+                                :end_at =>   "20080802000000")
       assert !appt.valid?
       assert_match /Appointment start time/, appt.errors[:base]
     end
@@ -163,6 +163,41 @@ class AppointmentTest < ActiveSupport::TestCase
       assert appt.valid?
       assert_equal 60, appt.duration
     end
+  end
+  
+  def test_should_create_and_search_waitlist
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    work      = Factory(:work_service, :company => company, :price => 1.00)
+    customer  = Factory(:customer)
+    
+    # create waitlist appointment
+    appt      = Appointment.create(:company => company,
+                                   :mark_as => Appointment::WAIT,
+                                   :service => work,
+                                   :resource => johnny,
+                                   :customer => customer,
+                                   :when => "this week",
+                                   :time => "anytime")
+    assert appt.valid?
+    appt.reload
+    # appointment should be a waitlist
+    assert appt.waitlist?
+    assert_equal Appointment::WAIT, appt.mark_as
+    # appointment should have a confirmation code
+    assert_not_equal "00000", appt.confirmation_code
+    assert_equal work, appt.service
+    assert_equal johnny, appt.resource
+    assert_equal "upcoming", appt.state
+    
+    # assert_equal "", appt.start_at
+    # assert_equal "", appt.end_at
+    # time range should be entire day
+    assert_equal 0 - Time.zone.utc_offset, appt.time_start_at
+    assert_equal 24*3600 - Time.zone.utc_offset, appt.time_end_at
+    
+    # should find wait appointment on a search
+    assert_equal [appt], Appointment.wait
   end
   
   def test_should_validate_when_attribute

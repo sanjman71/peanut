@@ -21,22 +21,21 @@
       = @appointment.customer.email unless @appointment.customer.blank?
       
   - if @appointment.state == 'completed'
-    -# appointment is completed
-    .appointment_header
-      == Receipt
+    -# show invoice
+    #invoice
+      = render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => @mode})
 
 .span-15.prepend-1  
-  - if @appointment.state == 'upcoming'
-    -# notes flash message
-    #note_flash
-    
-    -# add note
-    .new_note#new_note_container
-      %p
-        %h4== Add a note about this appointment
-        = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => @subdomain})
+  -# notes flash message
+  #note_flash
+  
+  -# add note
+  .new_note#new_note_container
     %p
-    -# appointment notes
-    #notes_collection
-      = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+      %h4== Add a note about this appointment
+      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => @subdomain})
+  %p
+  -# appointment notes
+  #notes_collection
+    = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
         

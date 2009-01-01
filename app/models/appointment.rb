@@ -10,7 +10,7 @@ class Appointment < ActiveRecord::Base
   belongs_to              :service
   belongs_to              :customer
   validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at
-  validates_inclusion_of  :mark_as, :in => %w(free busy work)
+  validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
   before_save             :make_confirmation_code
   
@@ -18,6 +18,7 @@ class Appointment < ActiveRecord::Base
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   BUSY                    = 'busy'      # busy appointments can not be scheduled
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
+  WAIT                    = 'wait'      # wait appointments are waiting be scheduled in free timeslots
   
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
@@ -44,10 +45,11 @@ class Appointment < ActiveRecord::Base
                                                                        time_range.last, time_range.last, 
                                                                        time_range.first, time_range.last] }}
 
-  # find free, busy, work appointments
+  # find appointments by mark_as value
   named_scope :free,        { :conditions => {:mark_as => FREE} }
   named_scope :busy,        { :conditions => {:mark_as => BUSY} }
   named_scope :work,        { :conditions => {:mark_as => WORK} }
+  named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
   # valid when values
@@ -106,9 +108,17 @@ class Appointment < ActiveRecord::Base
     # initialize duration
     self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     
-    if self.service
-      # initialize mark_as field with service.mark_as
+    # initialize mark_as if its blank
+    if self.mark_as.blank? and self.service
       self.mark_as = self.service.mark_as
+    end
+    
+    if self.mark_as == WAIT
+      # special case of a wait list appointments
+      if @when == 'this week'
+        # set start_at to beginning of day
+        self.start_at = self.start_at.beginning_of_day
+      end  
     end
     
     # initialize time of day attributes
@@ -117,12 +127,20 @@ class Appointment < ActiveRecord::Base
       @time = 'anytime'
     end
     
-    if self.start_at
-      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.min * 60
-    end
+    if self.mark_as == WAIT
+      # set time of day values based on time value
+      time_range          = Appointment.time_range(@time)
+      self.time_start_at  = time_range.first
+      self.time_end_at    = time_range.last
+    else
+      # set time of day values based on appointment start, end times
+      if self.start_at
+        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.min * 60
+      end
 
-    if self.end_at
-      self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+      if self.end_at
+        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+      end
     end
   end
   
@@ -258,6 +276,11 @@ class Appointment < ActiveRecord::Base
     self.conflicts.size > 0
   end
   
+  # return true if the appointment is on the waitlist
+  def waitlist?
+    self.mark_as == WAIT
+  end
+  
   # narrow an appointment by start, end times
   def narrow_by_time_range!(start_at, end_at)
     # validate start, end times
@@ -330,7 +353,7 @@ class Appointment < ActiveRecord::Base
   
   def make_confirmation_code
     unless self.confirmation_code
-      if self.mark_as == WORK
+      if [WORK, WAIT].include?(self.mark_as)
         # create a random string
         possible_values         = ('A'..'Z').to_a + (0..9).to_a
         code_length             = 5

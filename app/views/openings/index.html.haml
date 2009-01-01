@@ -23,28 +23,30 @@
         = f.submit 'Search', :name => nil, :class => 'submit'
 
 .span-6.prepend-1.last
-  .sidebar.padding-5
-    .instructions
-      - if @when.blank?
-        == How do I schedule an appointment?
-        %ul
-          %li== Select appointment criteria and click on 'Search'
-      - elsif !@free_timeslots.blank?
-        == What can I do here?
-        %ul
-          %li== Select an available appointment
-          %span== or
-          %li== Select different appointment criteria and search again
-      - else
-        == What can I do here?
-        %ul
-          %li== Select different appointment criteria and search again
+  .sidebar.instructions.padding-5
+    - if @when.blank?
+      == How do I schedule an appointment?
+      %ul
+        %li== Select appointment criteria and click on 'Search'
+    - elsif !@free_timeslots.blank?
+      == What can I do here?
+      %ul
+        %li== Select an available appointment
+        %span== or
+        %li== Select different appointment criteria and search again
+    - else
+      == What can I do here?
+      %ul
+        %li== Select different appointment criteria and search again
+        %span== or
+        %li== Select the waitlist to be notified of an opening
           
 .span-16.prepend-1.last
   - unless @when.blank?
     %h2
       - if @free_timeslots.blank?
-        == No Available Appointments
+        == No Available Appointments -
+        = link_to "Waitlist", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
     %h3.span-16.last

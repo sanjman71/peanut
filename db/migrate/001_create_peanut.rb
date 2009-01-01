@@ -7,6 +7,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
+    add_index :companies, [:subdomain]
+    
     create_table :services do |t|
       t.integer :company_id
       t.string  :name
@@ -16,6 +18,8 @@ class CreatePeanut < ActiveRecord::Migration
       
       t.timestamps
     end
+
+    add_index :services, [:company_id, :mark_as]
 
     create_table :products do |t|
       t.integer   :company_id
@@ -34,6 +38,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :companies_resources, [:company_id, :resource_id, :resource_type]
+
     # Polymorphic relationship mapping services to different resources (e.g. people)
     create_table :memberships do |t|
       t.references  :service
@@ -42,6 +48,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :memberships, [:service_id, :resource_id, :resource_type]
+    
     # Polymorphic resource type
     create_table :people do |t|
       t.string  :name

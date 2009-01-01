@@ -5,12 +5,15 @@ class InvoicesController < ApplicationController
   def show
     @invoice      = AppointmentInvoice.find(params[:id])
     @appointment  = @invoice.appointment
+    @mode         = @appointment.state == 'upcoming' ? :rw : :r
     @services     = @current_company.services.work.all
     @products     = @current_company.products.instock
   end
   
   def add
-    @invoice  = AppointmentInvoice.find(params[:id])
+    @invoice      = AppointmentInvoice.find(params[:id])
+    @services     = @current_company.services.work.all
+    @products     = @current_company.products.instock
     
     # add chargeable
     if params[:service_id]
@@ -34,9 +37,11 @@ class InvoicesController < ApplicationController
   end
   
   def remove
-    @invoice    = AppointmentInvoice.find(params[:id])
-    @line_item  = @invoice.line_items.find(params[:line_item_id])
-    @chargeable = @line_item.chargeable
+    @invoice      = AppointmentInvoice.find(params[:id])
+    @line_item    = @invoice.line_items.find(params[:line_item_id])
+    @chargeable   = @line_item.chargeable
+    @services     = @current_company.services.work.all
+    @products     = @current_company.products.instock
     
     # remove line item
     @invoice.line_items.delete(@line_item)

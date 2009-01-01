@@ -1,16 +1,22 @@
 .span-17
   .span-17.last.box
     %h3
-      == Confirm your appointment
-      %p
-      = appointment_description(@appointment)
+      - if @appointment.waitlist?
+        == Confirm your waitlist appointment
+        %p
+        = appointment_waitlist_description(@appointment)
+      - else
+        == Confirm your appointment
+        %p
+        = appointment_description(@appointment)
 
   .span-15.prepend-1
     %h4
       == Before we finalize your appointment, we need some information about you. 
     %p
     .schedule_form
-      - form_for(@appointment, :url => schedule_path(:subdomain => @subdomain)) do |f|
+      - url = @appointment.waitlist? ? waitlist_path(:subdomain => @subdomain) : schedule_path(:subdomain => @subdomain) 
+      - form_for(@appointment, :url => url) do |f|
         - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
           %table
             %tr
@@ -22,7 +28,7 @@
             %tr
               %td= customer_form.label :phone
               %td= customer_form.text_field :phone
-        %p= f.submit "Schedule"
+        %p= f.submit "Confirm"
         
         
         

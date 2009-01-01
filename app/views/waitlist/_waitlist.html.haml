@@ -1,0 +1,9 @@
+- appointments.each do |appointment|
+  .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}
+    .span-5.prepend-1.name
+      %h3{:style => "margin-bottom: 0px;"}= appointment.resource.name
+      = appointment.service.name
+    .span-3.when
+      %h3== when
+    .span-3.time
+      %h3= appointment.time

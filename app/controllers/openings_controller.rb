@@ -1,12 +1,10 @@
 class OpeningsController < ApplicationController
   before_filter :init_current_company
   layout 'blueprint'
-  
-  # GET /free
-  # GET /free.xml
-  # GET /people/1/free
-  # GET /people/1/services/3/free
-  # GET /people/1/services/3/free?when=this+week&time=morning
+
+  # GET /openings
+  # GET /people/1/services/3/openings?when=this+week&time=morning
+  # GET /services/1/openings?time=anytime&when=this+week
   def index
     if params[:person_id].to_s == "0"
       # /people/0/free is canonicalized to /free; preserve subdomain on redirect

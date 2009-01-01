@@ -1,4 +1,3 @@
 # Handle add or remove rjs methods
-page["#invoice_services"].html(render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :chargeable_types => ["Service"]}));
-page["#invoice_products"].html(render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :chargeable_types => ["Product"]}));
-page["#invoice_total"].html(render(:partial => 'invoices/total.html.haml', :locals => {:invoice => @invoice}));
+page["#invoice"].html(render(:partial => 'invoices/invoice.html.haml', 
+                             :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => :rw}));
