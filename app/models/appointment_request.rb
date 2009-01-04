@@ -1,9 +1,10 @@
 class AppointmentRequest < Appointment
 
   def find_free_appointments(options={})
-    # find free appointments with duration >= this request's service duration
+    # find free appointments with duration >= appointment request's service duration
     duration    = service.duration
-    time_range  = Appointment.time_range(time) 
+    # use time range if it was specified, otherwise default to 'anytime'
+    time_range  = Appointment.time_range(self.time(:default => 'anytime'))
     
     if resource.anyone?
       # find free appointments for any resource, order by start times
@@ -36,8 +37,8 @@ class AppointmentRequest < Appointment
       # narrow appointments by request start, end times
       appointment.narrow_by_time_range!(self.start_at, self.end_at)
       
-      # narrow appointment by request time of day
-      appointment.narrow_by_time_of_day!(self.time)
+      # narrow appointment by request time of day, default to 'anytime'
+      appointment.narrow_by_time_of_day!(self.time(:default => 'anytime'))
       
       # build appointment timeslots
       options = Hash.new

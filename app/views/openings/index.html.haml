@@ -46,7 +46,7 @@
     %h2
       - if @free_timeslots.blank?
         == No Available Appointments -
-        = link_to "Waitlist", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
     %h3.span-16.last

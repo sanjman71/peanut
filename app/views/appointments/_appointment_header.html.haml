@@ -1,12 +1,21 @@
 .what.padding-5
-  = appointment.service.name
-  == with
-  = appointment.resource.name
+  .span-2.padding-bottom-5
+    == What:
+  .span-10.padding-bottom-5.last
+    = appointment.service.name
+.with.padding-5
+  .span-2.padding-bottom-5
+    == With:
+  .span-10.padding-bottom-5.last
+    = appointment.resource.name
 .when.padding-5
-  = appointment.start_at.to_s(:appt_day_date_time)
+  .span-2.padding-bottom-5
+    == When:
+  .span-10.padding-bottom-5.last
+    = appointment.start_at.to_s(:appt_day_date_time)
 - unless appointment.customer.blank?
-  .customer.padding-5
+  .customer.padding-5.span-12.last
     = link_to appointment.customer.name, customer_path(appointment.customer)
-.confirmation.padding-5
+.confirmation.padding-5.span-12.last
   == Confirmation code:
   = appointment.confirmation_code

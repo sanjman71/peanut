@@ -52,10 +52,13 @@ class AppointmentsController < ApplicationController
 
     logger.debug("*** created free time")
         
+    # check waitlist for any possible openings because of this new free appointment
+    WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
+    
     manage_appointments
   end
   
-  # DELETE /people/1/destroy
+  # DELETE /appointments/1
   def destroy
     @appointment  = Appointment.find(params[:id])
     @appointment.destroy
@@ -63,7 +66,12 @@ class AppointmentsController < ApplicationController
     
     logger.debug("*** deleted appointment #{@appointment.id}")
         
-    manage_appointments
+    if @appointment.waitlist?
+      # set redirect path
+      @redirect = waitlist_index_path(:subdomain => @subdomain)
+    else
+      manage_appointments
+    end
   end
   
   # shared method for managing free/work appointments
@@ -130,6 +138,9 @@ class AppointmentsController < ApplicationController
       
       begin
         @appointment.save!
+
+        # send waitlist confirmation
+        MailWorker.async_waitlist_confirmation(:id => @appointment.id)
       rescue Exception => e
         logger.debug("*** could not create waitlist appointment: #{e.message}")
         return
@@ -216,19 +227,22 @@ class AppointmentsController < ApplicationController
     AppointmentScheduler.cancel_work_appointment(@appointment)
     
     # redirect to the resource's schedule page
-    return redirect_to(person_appointments_path(@person))
+    respond_to do |format|
+      format.js
+      format.html { redirect_to(person_appointments_path(@person)) }
+    end
   end
   
   # GET /appointments/search
   def search
     if request.post?
       # check confirmation code, limit search to work appointments
-      @code         = params[:appointment][:code]
+      @code         = params[:appointment][:code].to_s.strip
       @appointment  = Appointment.work.find_by_confirmation_code(@code)
       
       if @appointment
         # redirect to appointment show
-        @redirect = appointment_path(@appointment)
+        @redirect = appointment_path(@appointment, :subdomain => @subdomain)
       else
         # show error message?
         logger.debug("*** could not find appointment #{@code}")

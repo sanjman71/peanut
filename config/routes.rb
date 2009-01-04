@@ -14,7 +14,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :companies
   map.resources :appointments, 
-                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => :get }, 
+                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]

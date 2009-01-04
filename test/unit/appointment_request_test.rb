@@ -22,17 +22,18 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     appts     = request.find_free_appointments
     assert_equal [], appts
     
-    # create appointment request for a specific service with a specific resource, with range from 10 am to 2 pm
+    # create appointment request for a specific service with a specific resource, with time range from 10 am to 2 pm
     request   = AppointmentRequest.new(:start_at => start_at + 2.hours, :end_at => end_at + 2.hours, :company => company, :service => haircut, :resource => johnny, :customer_id => 0)
 
     # should find no free appointments
     appts     = request.find_free_appointments
     assert_equal [], appts
     
-    # create person skill
+    # add person who performs the service
     haircut.resources.push(johnny)
+    haircut.reload
     
-    # should find free appointment created above
+    # should find free appointment now that we have a person who performs the service
     appts     = request.find_free_appointments
     assert_equal [appt], appts
     

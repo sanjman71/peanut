@@ -9,7 +9,7 @@
     .span-4.last
       - if @appointment.state == 'upcoming'
         -# upcoming appointments can be canceled and checked-out
-        = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs delete confirm', :question => "Are you sure you want to cancel this appointment?")
+        = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs confirm', :question => "Are you sure you want to cancel this appointment?")
         == &nbsp;|
         = link_to('Checkout', checkout_appointment_path(@appointment), :class => 'admin')
   
