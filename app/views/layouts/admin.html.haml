@@ -8,7 +8,7 @@
     = stylesheet_link_tag 'errors'
     = stylesheet_link_tag 'yellow'
     = javascript_include_tag :defaults
-    = yield :stylesheets
+    = yield :stylesheet
     
   %body
     #header
@@ -19,8 +19,8 @@
         %ul
           %li.with_space
             = link_to 'Companies', companies_path
-            %li.with_space
-              = link_to 'Privileges & Roles', badges_admin_path
+          %li.with_space
+            = link_to 'Privileges & Roles', admin_badges_path
 
     %p{:style => "color: green"}
       = flash[:notice]

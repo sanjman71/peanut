@@ -14,6 +14,14 @@ class CreateDefaultRolesPrivs < ActiveRecord::Migration
     
     # Company employee can read company
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rc) unless ce.nil? || rc.nil?
+
+    # Roles and privileges for managing roles and privileges
+    # Initially only available to the admin
+    Badges::Privilege.create(:name=>'create roles privilieges')
+    Badges::Privilege.create(:name=>'read roles privileges')
+    Badges::Privilege.create(:name=>'update roles privileges')
+    Badges::Privilege.create(:name=>'deleve roles privilieges')
+
   end
 
   def self.down
