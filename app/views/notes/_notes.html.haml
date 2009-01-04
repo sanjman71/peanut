@@ -1,10 +1,10 @@
 .notes
   - unless @notes.blank?
-    .notes_header
+    .block
       == Notes history
-  - @notes.each do |note|
-    .note{:id => "note_#{note.id}"}
-      .date
-        = note.created_at.to_s(:appt_day)
-      .comment
-        %p= note.comment
+    - @notes.each do |note|
+      .note{:id => "note_#{note.id}"}
+        .date
+          = note.created_at.to_s(:appt_day)
+        .comment
+          %p= note.comment

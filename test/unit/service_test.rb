@@ -11,7 +11,7 @@ class ServiceTest < ActiveSupport::TestCase
   
   def test_should_titleize_name
     company = Factory(:company)
-    object  = Service.create(:company => company, :name => "boring job", :duration => 30, :mark_as => "busy", :price => 1.00)
+    object  = company.services.create(:company => company, :name => "boring job", :duration => 30, :mark_as => "busy", :price => 1.00)
     assert object.valid?
     assert_equal "Boring Job", object.name
   end

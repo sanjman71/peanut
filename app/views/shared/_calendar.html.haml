@@ -9,7 +9,7 @@
 
 %table.calendar
   %tbody
-    %tr
+    %tr.colborder
       - week0.each do |day_i|
         -# show Mon-Sun header fields
         %th= (start_day + day_i.days).strftime("%a")

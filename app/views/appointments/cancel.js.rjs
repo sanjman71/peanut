@@ -1,0 +1,1 @@
+page.redirect_to(person_appointments_path(@person, :subdomain => @subdomain))

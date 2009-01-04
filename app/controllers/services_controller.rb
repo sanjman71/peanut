@@ -1,16 +1,11 @@
 class ServicesController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /services
   # GET /services.xml
   def index
     @services = @current_company.services.work
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @services }
-    end
   end
 
   # GET /services/1
@@ -28,11 +23,6 @@ class ServicesController < ApplicationController
   # GET /services/new.xml
   def new
     @service = Service.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @service }
-    end
   end
 
   # GET /services/1/edit
@@ -64,7 +54,7 @@ class ServicesController < ApplicationController
     @service.save
     
     respond_to do |format|
-      format.js # redirect to edit service page
+      format.js # redirect to edit page
     end
   end
 

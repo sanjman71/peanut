@@ -2,4 +2,4 @@
 page["#customer_search_text"].html(@search_text)
 
 # update customer list
-page["#customers_list"].html(render(:partial => 'customers.html.haml', :locals => {:customers => @customers}))
+page["#customers"].html(render(:partial => 'customers.html.haml', :locals => {:customers => @customers}))

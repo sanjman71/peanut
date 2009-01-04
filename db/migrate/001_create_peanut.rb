@@ -7,6 +7,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
     
+    add_index :companies, [:subdomain]
+    
     create_table :services do |t|
       t.integer :company_id
       t.string  :name
@@ -17,10 +19,12 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :services, [:company_id, :mark_as]
+
     create_table :products do |t|
       t.integer   :company_id
       t.string    :name
-      t.integer   :stock_count
+      t.integer   :inventory
       t.integer   :price_in_cents
       
       t.timestamps
@@ -34,6 +38,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :companies_resources, [:company_id, :resource_id, :resource_type], :name => 'index_on_companies_and_resources'
+
     # Polymorphic relationship mapping services to different resources (e.g. people)
     create_table :memberships do |t|
       t.references  :service
@@ -42,6 +48,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :memberships, [:service_id, :resource_id, :resource_type], :name => 'index_on_services_and_resources'
+    
     # Polymorphic resource type
     create_table :people do |t|
       t.string  :name
@@ -62,9 +70,11 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer     :service_id
       t.references  :resource, :polymorphic => true
       t.integer     :customer_id
+      t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
       t.integer     :duration
+      t.string      :time
       t.integer     :time_start_at  # time of day
       t.integer     :time_end_at    # time of day
       t.string      :mark_as

@@ -1,6 +1,6 @@
 class PeopleController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /people
   # GET /people.xml

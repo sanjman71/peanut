@@ -1,1 +1,0 @@
-page["#invoice"].html(render(:partial => 'invoice.html.haml', :locals => {:invoice => @invoice}));

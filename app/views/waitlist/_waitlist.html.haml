@@ -1,0 +1,16 @@
+- appointments.each do |appointment|
+  .span-18.last.letterbox.appointment{:class => cycle("shaded", ""), :id => appointment.id}
+    .span-4.prepend-1.name
+      %h3{:style => "margin-bottom: 2px;"}= (appointment.resource || Person.anyone).name
+      = appointment.service.name
+    .span-4.when
+      %h3{:style => "margin-bottom: 2px;"}= appointment.when.titleize
+      = appointment.start_at.to_s(:appt_short_month_day)
+      == -
+      = appointment.end_at.to_s(:appt_short_month_day)
+    .span-3.prepend-1.time
+      %h3= appointment.time.titleize
+    .span-4.customer
+      %h4= appointment.customer.name
+    .span-1.last.action
+      = link_to("Delete", appointment_path(appointment, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to delete this waitlist appointment?")

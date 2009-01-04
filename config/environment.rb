@@ -5,7 +5,7 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.1.1' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.2.2' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -27,9 +27,8 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem "chronic", :version => '0.2.3'
-  config.gem "haml", :version => '2.0.4'
+  config.gem "haml", :version => '2.0.6'
   config.gem "starling", :version => '0.9.8'
-  config.gem 'has_many_polymorphs'
   config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
@@ -47,6 +46,7 @@ Rails::Initializer.run do |config|
   # Make Time.zone default to the specified zone, and make Active Record store time values
   # in the database in UTC, and return them converted to the specified local zone.
   # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
+  config.active_record.default_timezone = :utc
   config.time_zone = 'Central Time (US & Canada)'
 
   # Your secret key for verifying cookie session data integrity.
@@ -75,5 +75,15 @@ Rails::Initializer.run do |config|
 end
 
 # Extend Range class
-require 'lib/range.rb'
+require "#{RAILS_ROOT}/lib/range.rb"
+
+# Initialize workling to use starling
+Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
+
+# Initialize exception notifier
+ExceptionNotifier.exception_recipients  = %w(peanut-exception@jarna.com)
+ExceptionNotifier.sender_address        = %("peanut error" <app.error@peanut.com>)
+ExceptionNotifier.email_prefix          = "[app] "
+
+# Use will_paginate
 require "will_paginate"

@@ -1,6 +1,6 @@
 class MembershipsController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # POST /create
   def create

@@ -1,6 +1,6 @@
 class NotesController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
 
   # POST /resources
   # POST /resources.xml

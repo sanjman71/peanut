@@ -1,63 +1,41 @@
 - stylesheet('appointments', 'notes')
 - javascript('appointments', 'notes')
 
-.container
-  .left
-    .section_header
-      %span.other_indexes
-        - if @appointment.state == 'upcoming'
-          -# upcoming appointments can be canceled and checked-out
-          = link_to 'Cancel', cancel_appointment_path(@appointment)
-          == &nbsp;|
-          = link_to 'Checkout', checkout_appointment_path(@appointment)
-      = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
-            
-    .section_body
-      - if @appointment.state == 'upcoming' and @confirmation
-        -# show appointment confirmation notice
-        .notice
-          == A confirmation email has also been sent to
-          = @appointment.customer.email unless @appointment.customer.blank?
-      - elsif @appointment.state == 'completed'
-        -# appointment is completed
-        .appointment_header
-          == Receipt
-        .appointment_details
-          %table.receipt
-            %tr
-              %td.heading
-                == Total
-              %td.price
-                = @appointment.receipt.total
-            %tr
-              %td.heading
-                == Tip
-              %td.price
-                = @appointment.receipt.tip
-                
-      - if @appointment.state == 'upcoming' and !@confirmation
-        -# notes flash message
-        #note_flash
+.span-18
+  .span-18.last.box
+    .span-14
+      %h3
+        = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
+    .span-4.last
+      - if @appointment.state == 'upcoming'
+        -# upcoming appointments can be canceled and checked-out
+        = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs confirm', :question => "Are you sure you want to cancel this appointment?")
+        == &nbsp;|
+        = link_to('Checkout', checkout_appointment_path(@appointment), :class => 'admin')
+  
+.span-15.prepend-1.last
+  - if @confirmation
+    -# show appointment confirmation notice
+    .notice
+      == A confirmation email has also been sent to
+      = @appointment.customer.email unless @appointment.customer.blank?
       
-        -# appointment notes
-        .new_note#new_note_container
-          %p== Add a note about this appointment
-          - form_remote_for(@note, :id => 'new_note', :class => 'new_note', :url => notes_path(:subdomain => @subdomain), :method => :post) do |f|
-            = hidden_field(:note, :subject_id, :value => @appointment.id)
-            = hidden_field(:note, :subject_type, :value => @appointment.class.to_s)
-            = f.text_area(:comment, :rows => 3, :style => "width: 90%;")
-            %p
-            = f.submit 'Add note', :name => nil
-        %p
-        #notes_collection
-          = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+  - if @appointment.state == 'completed'
+    -# show invoice
+    #invoice
+      = render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => @mode})
 
-  - if false #@appointment.state == 'upcoming' and !@confirmation
-    -# upcoming appointments can be checked-out
-    .right
-      .col
-        .sidebar_form
-          .sidebar_header
-            = render(:partial => 'checkout.html.haml', :locals => {:appointment => @appointment})
-            
+.span-15.prepend-1  
+  -# notes flash message
+  #note_flash
+  
+  -# add note
+  .new_note#new_note_container
+    %p
+      %h4== Add a note about this appointment
+      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => @subdomain})
+  %p
+  -# appointment notes
+  #notes_collection
+    = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
         

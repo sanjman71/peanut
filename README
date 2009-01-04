@@ -1,3 +1,13 @@
+== Rails 2.2 bugs
+
+This problem with time conversion seems to be causing problems on our appointments/index page:
+
+http://rails.lighthouseapp.com/projects/8994/tickets/1339
+
+/usr/local/lib/ruby/gems/1.8/gems/activerecord-2.2.2/lib/active_record/attribute_methods.rb:142:in `create_time_zone_conversion_attribute?'
+
+One fix is to change config.cache_classes = true in your development.rb.
+
 == Getting Started
 
 1. Run the rake task <tt>rake db:peanut:init</tt> to initialize the database with some test data.

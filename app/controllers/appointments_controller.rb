@@ -1,6 +1,6 @@
 class AppointmentsController < ApplicationController
   before_filter :init_current_company
-  layout 'default'
+  layout 'blueprint'
   
   # GET /people/1/appointments
   def index
@@ -26,15 +26,15 @@ class AppointmentsController < ApplicationController
     customer      = Customer.nobody
     person        = Person.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
-                                                               :service_id => service.id,
-                                                               :company_id => @current_company.id,
+                                                               :service => service,
+                                                               :company => @current_company,
                                                                :customer_id => customer.id))
     
     # check if appointment is valid                                                           
     if !@appointment.valid?
       @error      = true
-      @error_text = ''
-      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
+      logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
       return
     end
 
@@ -42,7 +42,7 @@ class AppointmentsController < ApplicationController
     if @appointment.conflicts?
       @error      = true
       @error_text = "Appointment conflict"
-      logger.debug("*** create free time error: #{@appointment.errors.full_messages}")
+      logger.debug("xxx create free time conflict: #{@appointment.errors.full_messages}")
       return
     end
     
@@ -52,10 +52,13 @@ class AppointmentsController < ApplicationController
 
     logger.debug("*** created free time")
         
+    # check waitlist for any possible openings because of this new free appointment
+    WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
+    
     manage_appointments
   end
   
-  # DELETE /people/1/destroy
+  # DELETE /appointments/1
   def destroy
     @appointment  = Appointment.find(params[:id])
     @appointment.destroy
@@ -63,7 +66,12 @@ class AppointmentsController < ApplicationController
     
     logger.debug("*** deleted appointment #{@appointment.id}")
         
-    manage_appointments
+    if @appointment.waitlist?
+      # set redirect path
+      @redirect = waitlist_index_path(:subdomain => @subdomain)
+    else
+      manage_appointments
+    end
   end
   
   # shared method for managing free/work appointments
@@ -93,18 +101,30 @@ class AppointmentsController < ApplicationController
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
-  # GET /schedule/people/1/services/1/20081231T000000
-  # POST /schedule/people/1/services/1/20081231T000000
+  # GET   /schedule/people/1/services/1/20081231T000000
+  # POST  /schedule/people/1/services/1/20081231T000000
+  # GET   /waitlist/people/3/services/8/this week/anytime
+  # POST  /waitlist/people/3/services/8/this week/anytime
   def new
-    # build appointment hash
-    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person',
-            :start_at => params[:start_at], :company_id => @current_company.id}
+    # build appointment hash differently for schedules vs waitlist requests
+    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person', :company_id => @current_company.id}
+    
+    if request.url.match(/\/waitlist\//)
+      # add when, time, mark_as attributes
+      hash.update(:time => params[:time], :when => params[:when], :mark_as => Appointment::WAIT)
+    elsif request.url.match(/\/schedule\//)
+      # add start_at attribute
+      hash.update(:start_at => params[:start_at])
+    else
+      raise ArgumentError
+    end
+    # add appointment attributes
     hash.update(params[:appointment]) if params[:appointment]
     
     # build appointment object
-    @appointment  = Appointment.new(hash)
+    @appointment = Appointment.new(hash)
     
-    logger.debug("*** appointment valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
+    logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
     
     if !@appointment.valid?
       # ask for customer info
@@ -112,8 +132,24 @@ class AppointmentsController < ApplicationController
       return
     end
     
-    # check for conflicts
-    if @appointment.conflicts?
+    if @appointment.waitlist?
+      # add waitlist appointment
+      logger.debug("*** adding waitlist appointment")
+      
+      begin
+        @appointment.save!
+
+        # send waitlist confirmation
+        MailWorker.async_waitlist_confirmation(:id => @appointment.id)
+      rescue Exception => e
+        logger.debug("*** could not create waitlist appointment: #{e.message}")
+        return
+      end
+
+      # show waitlist
+      return redirect_to(waitlist_index_path)
+    elsif @appointment.conflicts?
+      # resolve conflicts and schedule
       logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
       
       begin
@@ -126,48 +162,60 @@ class AppointmentsController < ApplicationController
         logger.debug("*** could not schedule appointment: #{e.message}")
         return
       end
-    end
 
-    # show appointment confirmation
-    return redirect_to(confirmation_appointment_path(@work_appointment))
+      # show appointment confirmation
+      return redirect_to(confirmation_appointment_path(@work_appointment))
+    end
   end
   
   # GET /appointments/1
   # GET /appointments/1.xml
   def show
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = @current_company.appointments.find(params[:id])
     @note         = Note.new
+    @confirmation = params[:confirmation].to_i == 1
+    
+    # invoices for completed appointments
+    @invoice      = @appointment.invoice
+    @services     = @current_company.services.work.all
+    @products     = @current_company.products.instock
+    @mode         = :r
     
     # build notes collection, most recent first 
     @notes        = @appointment.notes.sort_recent
-    
-    respond_to do |format|
-      format.html { render :action => 'show' }
-      format.xml  { render :xml => @appointment }
-    end
   end
   
   # GET /appointments/1/confirmation
   def confirmation
     @appointment  = @current_company.appointments.find(params[:id])
-    @confirmation = true
     
     # only show confirmations for upcoming appointments
     unless @appointment.state == 'upcoming'
       return redirect_to(appointment_path(@appointment))
     end
     
-    # use show action
-    show
+    # render show action
+    render_component(:action => 'show', :id => @appointment.id, :params => {:confirmation => 1})
   end
 
-  # GET /appointments/1/checkout
+  # GET /appointments/1/checkout - show invoice
+  # PUT /appointments/1/checkout - mark appointment as checked-out/completed
   def checkout
     @appointment  = @current_company.appointments.find(params[:id])
-    @services     = @current_company.services.all
     
-    # create/get invoice
-    @invoice      = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
+    if request.put?
+      # mark appointment as checked-out/completed
+      @appointment.checkout!
+
+      # redirect to show action
+      redirect_to(appointment_path(@appointment, :subdomain => @subdomain))
+    else
+      # create/get invoice
+      @invoice    = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
+
+      # redirect to invoices controller
+      redirect_to(invoice_path(@invoice, :subdomain => @subdomain))
+    end
   end
 
   # GET /appointments/1/cancel
@@ -179,21 +227,25 @@ class AppointmentsController < ApplicationController
     AppointmentScheduler.cancel_work_appointment(@appointment)
     
     # redirect to the resource's schedule page
-    return redirect_to(person_appointments_path(@person))
+    respond_to do |format|
+      format.js
+      format.html { redirect_to(person_appointments_path(@person)) }
+    end
   end
   
   # GET /appointments/search
   def search
     if request.post?
-      # check confirmation code
-      @code         = params[:appointment][:code]
-      @appointment  = Appointment.find_by_confirmation_code(@code)
+      # check confirmation code, limit search to work appointments
+      @code         = params[:appointment][:code].to_s.strip
+      @appointment  = Appointment.work.find_by_confirmation_code(@code)
       
       if @appointment
         # redirect to appointment show
-        @redirect = appointment_path(@appointment)
+        @redirect = appointment_path(@appointment, :subdomain => @subdomain)
       else
         # show error message?
+        logger.debug("*** could not find appointment #{@code}")
       end
     end
   end

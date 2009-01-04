@@ -1,0 +1,7 @@
+There is a waitlist opening:
+
+What: <%= @appointment.service.name %>
+With: <%= (@appointment.resource || Person.anyone).name %>
+When: <%= @appointment.time.titleize %>, <%= @appointment.when.titleize %>
+
+Your confirmation code is <%= @appointment.confirmation_code %>

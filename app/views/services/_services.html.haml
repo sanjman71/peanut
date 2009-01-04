@@ -1,17 +1,15 @@
-%table.services
-  - services.each do |service|
-    %tr{:id => "row_service_#{service.id}"}
-      %td.service
-        %h2= service.name
-        -# show all resources for this service
-        - resources = service.resources.collect { |r| r.name }.sort
-        = resources.join(", ")
-      %td.duration
-        == #{service.duration} minutes
-      %td.price
-        = service.price
-      %td.action
-        = link_to "Edit", edit_service_path(service), :class => 'admin'
-      %td.action
-        = link_to("Remove", service_path(service), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")
-        
+- services.each do |service|
+  .span-16.last.letterbox.service{:class => cycle("shaded", "")}
+    .span-6.prepend-1.name
+      %h2{:style => "margin-bottom: 0px;"}= service.name
+      -# show all resources for this service
+      - resources = service.resources.collect { |r| r.name }.sort
+      = resources.join(", ")
+    .span-3.duration
+      %h3== #{service.duration} minutes
+    .span-3.price
+      %h3= service.price
+    .span-3.last.action
+      = link_to "Edit", edit_service_path(service, :subdomain => @subdomain), :class => 'admin'
+      &nbsp;
+      = link_to("Remove", service_path(service, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")

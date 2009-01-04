@@ -12,15 +12,20 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resource  :session
 
-  map.resources :companies, :has_many  => [:locations]
-  map.resources :appointments, :member => { :confirmation => :get, :checkout => :get, :cancel => :get }, :collection => { :search => :any }
-  map.resources :openings, :collection => { :search => :any }
-  map.resources :notes
-  map.resources :memberships
-  map.resources :invoices, :member => { :add => :post, :remove => :post }
+  map.resources :companies
+  map.resources :appointments, 
+                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
+                :collection => { :search => [:get, :post] }
+  map.resources :openings, :collection => { :search => [:get, :post] }
+  map.resources :notes, :only => [:create]
+  map.resources :memberships, :only => [:create, :destroy]
+  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:show, :add, :remove]
+  map.resources :invoice_line_items
+  map.resources :waitlist, :only => [:index]
   
   # override 'appointments/new' path
-  map.schedule        'schedule/people/:person_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
+  map.waitlist  'waitlist/people/:person_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
   map.resources :people do |resource|
     # nested appointments routes
@@ -32,8 +37,9 @@ ActionController::Routing::Routes.draw do |map|
     resource.resources :services,   :has_many => [:appointments, :openings]
   end
   
-  # services with nested resources
-  map.resources :services,          :has_many => [:appointments, :openings]
+  # services, products
+  map.resources :services, :has_many => [:openings]
+  map.resources :products
   
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]

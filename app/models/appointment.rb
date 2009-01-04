@@ -10,7 +10,7 @@ class Appointment < ActiveRecord::Base
   belongs_to              :service
   belongs_to              :customer
   validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at
-  validates_inclusion_of  :mark_as, :in => %w(free busy work)
+  validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
   before_save             :make_confirmation_code
   
@@ -18,6 +18,7 @@ class Appointment < ActiveRecord::Base
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   BUSY                    = 'busy'      # busy appointments can not be scheduled
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
+  WAIT                    = 'wait'      # wait appointments are waiting be scheduled in free timeslots
   
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
@@ -44,10 +45,11 @@ class Appointment < ActiveRecord::Base
                                                                        time_range.last, time_range.last, 
                                                                        time_range.first, time_range.last] }}
 
-  # find free, busy, work appointments
+  # find appointments by mark_as value
   named_scope :free,        { :conditions => {:mark_as => FREE} }
   named_scope :busy,        { :conditions => {:mark_as => BUSY} }
   named_scope :work,        { :conditions => {:mark_as => WORK} }
+  named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
   # valid when values
@@ -60,11 +62,11 @@ class Appointment < ActiveRecord::Base
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
 
   # convert time of day to a seconds range
-  TIMES_HASH                = {'anytime'    => [0,      24*3600],     # entire day
-                               'morning'    => [8*3600, 12*3600],     # 8am - 12pm
-                               'afternoon'  => [12*3600, 17*3600],    # 12pm - 5pm
-                               'evening'    => [17*3600, 21*3600],    # 5pm - 9pm
-                               'never'      => [0,0]
+  TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
+                               'morning'    => [8*3600,   12*3600],     # 8am - 12pm
+                               'afternoon'  => [12*3600,  17*3600],     # 12pm - 5pm
+                               'evening'    => [17*3600,  21*3600],     # 5pm - 9pm
+                               'never'      => [0,        0]
                               }
 
   # BEGIN acts_as_state_machhine
@@ -84,6 +86,12 @@ class Appointment < ActiveRecord::Base
     transitions :to => :canceled, :from => [:upcoming]
   end
   # END acts_as_state_machine
+
+  # TODO - this overrides and fixes a bug in Rails 2.2 - ticket http://rails.lighthouseapp.com/projects/8994/tickets/1339
+  def self.create_time_zone_conversion_attribute?(name, column)
+    # Appointment.write_inheritable_attribute(:skip_time_zone_conversion_for_attributes, [])
+    time_zone_aware_attributes && skip_time_zone_conversion_for_attributes && !skip_time_zone_conversion_for_attributes.include?(name.to_sym) && [:datetime, :timestamp].include?(column.type)
+  end
   
   # map time of day string to a utc time range in seconds
   def self.time_range(s)
@@ -100,37 +108,57 @@ class Appointment < ActiveRecord::Base
     # initialize duration
     self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     
-    if self.service
-      # initialize mark_as field with service.mark_as
+    # initialize mark_as if its blank
+    if self.mark_as.blank? and self.service
       self.mark_as = self.service.mark_as
+    end
+    
+    # initialize when, time attributes
+
+    if self.when.nil?
+      self.when = ''
+    end
+
+    if self.time.nil?
+      self.time = ''
     end
     
     # initialize time of day attributes
     
-    if @time.blank?
-      @time = 'anytime'
-    end
-    
-    if self.start_at
-      self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.min * 60
-    end
+    if self.mark_as == WAIT
+      # special case of a waitlist appointment
+      if self.when == 'this week'
+        # set start_at to beginning of day
+        self.start_at = self.start_at.beginning_of_day
+      end
 
-    if self.end_at
-      self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+      # set time of day values based on time value
+      time_range          = Appointment.time_range(self.time)
+      self.time_start_at  = time_range.first
+      self.time_end_at    = time_range.last
+    else
+      # set time of day values based on appointment start, end times
+      if self.start_at
+        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.min * 60
+      end
+
+      if self.end_at
+        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+      end
     end
   end
   
   def validate
-    if @when == :error
+    if self.when == :error
       errors.add_to_base("When is invalid")
-    elsif @when == :blank
-      errors.add_to_base("When is empty")
+    elsif self.when == :blank
+      # errors.add_to_base("When is empty")
     end
 
-    if @time == :error
+    if self.time == :error
       errors.add_to_base("Time is invalid")
-    elsif @time == :blank
-      errors.add_to_base("Time is empty")
+    elsif self.time == :blank
+      # errors.add_to_base("Time is empty")
     end
     
     if self.start_at and self.end_at
@@ -154,33 +182,18 @@ class Appointment < ActiveRecord::Base
       end
     end
   end
-
-  # START: time virtual attributes
-  def start_at_string
-    self.start_at.to_s
-  end
   
-  def start_at_string=(s)
-    self.start_at = Chronic.parse(s)
-  end
-
-  def end_at_string
-    self.end_at.to_s
-  end
-  
-  def end_at_string=(s)
-    self.end_at = Chronic.parse(s)
-  end
-  
+  # START: override attribute methods
   def when=(s)
     if s.blank?
-      @when = :blank
+      # when can be empty
+      write_attribute(:when, '')
     elsif !WHENS.include?(s)
-      @when = :unsupported
+      write_attribute(:when , :error)
     elsif s == 'later'
+      write_attribute(:when, s)
       # special case, range should be 2 weeks after next week, adjusted by a day
       range         = Chronic.parse('next week', :guess => false)
-      @when         = s
       self.start_at = range.last + 1.day
       self.end_at   = range.last + 1.day + 2.weeks
     else
@@ -188,11 +201,11 @@ class Appointment < ActiveRecord::Base
       range = Chronic.parse(s, :guess => false)
       
       if range.blank?
-        @when = :error
+        write_attribute(:when, :error)
         return
       end
 
-      @when         = s
+      write_attribute(:when, s)
       self.start_at = range.first
       self.end_at   = range.last
 
@@ -207,28 +220,58 @@ class Appointment < ActiveRecord::Base
     end
   end
   
-  def when
-    @when
-  end
-  
   def time=(s)
     if s.blank?
-      @time = :blank
-    elsif !TIMES.include?(s)
-      @time = :unsupported
-    else
-      @time = s
+      # time can be empty
+      write_attribute(:time, '')
+    elsif TIMES.include?(s)
+      write_attribute(:time, s)
+    else 
+      # invalid time
+      write_attribute(:time, :error)
     end
   end
   
-  def time
+  def time(options = {})
+    @time = read_attribute(:time)
+    if @time.blank? and options[:default]
+      # return default value
+      return options[:default]
+    end
     @time
+  end
+  
+  # END: override attribute methdos
+  
+  # START: appointment virtual attributes
+  def start_at_string
+    self.start_at.to_s
+  end
+  
+  def start_at_string=(s)
+    # chronic parses times into the current time zone,
+    # but its stored by activerecord in utc format
+    self.start_at = Chronic.parse(s)
+  end
+
+  def end_at_string
+    self.end_at.to_s
+  end
+  
+  def end_at_string=(s)
+    # chronic parses times into the current time zone,
+    # but its stored by activerecord in utc format
+    self.end_at = Chronic.parse(s)
   end
   
   def time_range=(attributes)
     time_range      = TimeRange.new(attributes)
     self.start_at   = time_range.start_at
     self.end_at     = time_range.end_at
+  end
+  
+  def time_range
+    Range.new(time_start_at, time_end_at)
   end
   # END: time virtual attributes
   
@@ -237,15 +280,31 @@ class Appointment < ActiveRecord::Base
   def customer_attributes=(customer_attributes)
     self.customer = Customer.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
   end
-    
+      
   # returns all appointment conflicts
+  # conflict rules:
+  #  - resource must be the same
+  #  - start, end times must overlap
+  #  - must be marked as 'free' or 'work'
   def conflicts
-    @conflicts ||= self.company.appointments.resource(resource).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free_work.resource(resource).overlap(start_at, end_at)
   end
   
   # returns true if this appointment conflicts with any other
   def conflicts?
     self.conflicts.size > 0
+  end
+  
+  # return true if the appointment is on the waitlist
+  def waitlist?
+    self.mark_as == WAIT
+  end
+  
+  # return the collection of waitlist appointments that overlap with a free appointment
+  def waitlist
+    return [] if self.mark_as != FREE
+    # find wait appointments that overlap in both date and time ranges
+    @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
   end
   
   # narrow an appointment by start, end times
@@ -320,7 +379,7 @@ class Appointment < ActiveRecord::Base
   
   def make_confirmation_code
     unless self.confirmation_code
-      if self.mark_as == WORK
+      if [WORK, WAIT].include?(self.mark_as)
         # create a random string
         possible_values         = ('A'..'Z').to_a + (0..9).to_a
         code_length             = 5

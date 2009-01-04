@@ -23,6 +23,7 @@ config.action_mailer.delivery_method = :test
 
 # Required gems for test environment
 config.gem 'thoughtbot-factory_girl', :lib => 'factory_girl', :source => 'http://gems.github.com'
+config.gem "thoughtbot-shoulda", :lib => "shoulda/rails", :source => "http://gems.github.com"
 
 config.action_controller.session = {
   :session_key => '_peanut_session',

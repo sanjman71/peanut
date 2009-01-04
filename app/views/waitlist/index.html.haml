@@ -1,0 +1,14 @@
+- stylesheet('appointments')
+- javascript('appointments')
+
+.span-20
+  .span-18.last.box
+    %h2
+      == Waitlist
+    %h3
+      == Today is #{Time.now.to_s(:appt_day)}
+  %hr.space
+  .span-18.prepend-1.append-1.last
+    .highlight#flash
+  #waitlist
+    = render(:partial => 'waitlist.html.haml', :locals => {:appointments => @appointments})

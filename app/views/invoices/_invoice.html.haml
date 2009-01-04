@@ -1,9 +1,20 @@
-%table.invoice
-  - invoice.line_items.each do |li|
-    %tr.chargeable{:class => cycle("shaded", "")}
-      %td.chargeable_name
-        = li.chargeable.name
-      %td.chargeable_price
-        = text_field_tag 'chargeable[price]', li.chargeable.price, :style => "background-color: #FFFF66"
-      %td.action
-        = link_to "Remove", remove_invoice_path(invoice, :line_item_id => li.id), :class => 'admin ujs'
+#invoice_total
+  = render(:partial => 'invoices/invoice_total.html.haml', :locals => {:invoice => invoice})
+  
+%h2== Services
+#invoice_services
+  = render(:partial => 'invoices/invoice_line_items.html.haml', :locals => {:invoice => invoice, :chargeable_types => ["Service"], :mode => mode})
+- if mode == :rw
+  .span-10.last
+    - form_for(Service.new, add_invoice_path(invoice), :url => add_invoice_path(invoice), :html => {:id => "add_chargeable_service"}) do |f|
+      = select_tag('service_id', options_for_select([['Add a service', 0]] + services.collect{ |o| [o.name, o.id]}, 0))
+      
+%hr.space
+
+%h2== Products
+#invoice_products
+  = render(:partial => 'invoices/invoice_line_items.html.haml', :locals => {:invoice => invoice, :chargeable_types => ["Product"], :mode => mode})
+- if @mode == :rw
+  .span-10.last
+    - form_for(Product.new, add_invoice_path(@invoice), :url => add_invoice_path(invoice), :html => {:id => "add_chargeable_product"}) do |f|
+      = select_tag('product_id', options_for_select([['Add a product', 0]] + products.collect{ |o| [o.name, o.id]}, 0))

@@ -1,6 +1,8 @@
 if @errors
-  # highlight note text
+  # highlight note comment field
   page["#note_comment"].add_class('highlighted')
+  
+  # set focus
   page["#note_comment"].focus()
   
   # clear notice text
@@ -11,11 +13,15 @@ else
   page["#note_flash"].html(@notice_text)
   page["#note_flash"].add_class('notice')
   
-  # clear old note text
+  # clear note comment field
+  page["#note_comment"].remove_class('highlighted')
   page["#note_comment"].value = ''
+
+  # set focus
+  page["#note_comment"].focus()
   
   # rebuild notes
-  page["#notes_collection"].html(render(:partial => "notes/notes.html.haml", :locals => {:notes => @notes }))
+  page["#notes_collection"].html(render(:partial => "notes/notes.html.haml", :locals => {:notes => @notes}))
                                   
   # highlight new note??
   # page["#note_#{@note.id}"].highlight();

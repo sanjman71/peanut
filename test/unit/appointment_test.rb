@@ -11,8 +11,8 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :resource_type
   should_require_attributes :start_at
   should_require_attributes :end_at
-  should_allow_values_for   :mark_as, "free", "busy", "work"
-  
+  should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
+    
   def test_time_of_day
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
@@ -27,7 +27,11 @@ class AppointmentTest < ActiveSupport::TestCase
                                 :customer => customer,
                                 :start_at_string => "today 2 pm")
 
+      assert appt.valid?
+      assert_equal '', appt.when
+      
       # check time of day values, which are utc
+      assert_equal '', appt.time
       assert_equal (14*3600) - Time.zone.utc_offset, appt.time_start_at
       assert_equal (14*3600) + (30*60) - Time.zone.utc_offset, appt.time_end_at
       
@@ -56,6 +60,7 @@ class AppointmentTest < ActiveSupport::TestCase
                               :customer => customer,
                               :start_at_string => "today 2 pm")
     assert appt.valid?
+    assert_equal '', appt.when
     assert_equal Chronic.parse("today 2 pm"), appt.start_at
     assert_equal Chronic.parse("today 2:30 pm"), appt.end_at
 
@@ -119,11 +124,11 @@ class AppointmentTest < ActiveSupport::TestCase
     
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
-                              :service => free,
-                              :resource => johnny,
-                              :customer => customer,
-                              :start_at => "20080802000000",
-                              :end_at =>   "20080802000000")
+                                :service => free,
+                                :resource => johnny,
+                                :customer => customer,
+                                :start_at => "20080802000000",
+                                :end_at =>   "20080802000000")
       assert !appt.valid?
       assert_match /Appointment start time/, appt.errors[:base]
     end
@@ -165,11 +170,96 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
+  def test_should_create_and_search_waitlist
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    customer  = Factory(:customer)
+    
+    # create waitlist appointment
+    wait      = Appointment.create(:company => company,
+                                   :mark_as => Appointment::WAIT,
+                                   :service => haircut,
+                                   :resource => johnny,
+                                   :customer => customer,
+                                   :when => "this week",
+                                   :time => "morning")
+    assert_valid wait
+    wait.reload
+    # appointment should be on waitlist
+    assert wait.waitlist?
+    assert_equal Appointment::WAIT, wait.mark_as
+    # appointment should have a non-zero confirmation code
+    assert_not_equal Appointment::CONFIRMATION_CODE_ZERO, wait.confirmation_code
+    assert_equal haircut, wait.service
+    assert_equal johnny, wait.resource
+    assert_equal "upcoming", wait.state
+    
+    # assert_equal "", appt.start_at
+    # assert_equal "", appt.end_at
+    # time range should be entire day
+    # assert_equal 0 - Time.zone.utc_offset, appt.time_start_at
+    # assert_equal 24*3600 - Time.zone.utc_offset, appt.time_end_at
+    
+    # should find wait appointment on a blanket search
+    assert_equal [wait], Appointment.wait
+    
+    # should find wait appointment on a morning search 
+    assert_equal [wait], Appointment.wait.time_overlap(Appointment.time_range('morning'))
+
+    # should find wait appointment on an anytiem search 
+    assert_equal [wait], Appointment.wait.time_overlap(Appointment.time_range('anytime'))
+
+    # should find no waitlist appointment on an afternoon search 
+    assert_equal [], Appointment.wait.time_overlap(Appointment.time_range('afternoon'))
+
+    # should find no waitlist appointment on an evening search 
+    assert_equal [], Appointment.wait.time_overlap(Appointment.time_range('evening'))
+
+    # should find no waitlist appointment on an invalid search 
+    assert_equal [], Appointment.wait.time_overlap(Appointment.time_range('bogus'))
+    
+    # create free time from 8 am to noon
+    free      = Factory(:free_service, :company => company)
+    start_at  = wait.start_at.beginning_of_day + 8.hours
+    end_at    = start_at + 4.hours
+    appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
+    assert appt.valid?
+    
+    # should find waitlist overlap
+    assert_equal [wait], appt.waitlist
+
+    # create free time from noon to 5 pm
+    start_at  = wait.start_at.beginning_of_day + 12.hours
+    end_at    = start_at + 4.hours
+    appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
+    assert appt.valid?
+    
+    # should find no waitlist overlap
+    assert_equal [], appt.waitlist
+
+    # create free time from 1 am to 8 am
+    start_at  = wait.start_at.beginning_of_day + 1.hour
+    end_at    = start_at + 7.hours
+    appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
+    assert appt.valid?
+
+    # should find no waitlist overlap
+    assert_equal [], appt.waitlist
+  end
+
   def test_should_validate_when_attribute
-    appt = Appointment.new(:when => '')
+    appt = Appointment.new(:when => 'bogus')
     assert !appt.valid?
     # should have an error for the when attribute
-    assert_equal ["When is empty"], appt.errors.full_messages.select { |s| s.match(/When/) }
+    assert_equal "When is invalid", appt.errors[:base]
+  end
+
+  def test_should_validate_time_attribute
+    appt = Appointment.new(:time => 'bogus')
+    assert !appt.valid?
+    # should have an error for the time attribute
+    assert_equal "Time is invalid", appt.errors[:base]
   end
   
   def test_should_validate_time_range_attribute
@@ -189,7 +279,7 @@ class AppointmentTest < ActiveSupport::TestCase
       appt = Appointment.new(:company => company, 
                              :service => haircut,
                              :resource => johnny,
-                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     
       assert appt.valid?
@@ -200,7 +290,7 @@ class AppointmentTest < ActiveSupport::TestCase
       appt = Appointment.new(:company => company, 
                              :service => haircut,
                              :resource => johnny,
-                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@getfave.com", "phone" => "4085551212"},
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
                              :start_at_string => "today 2 pm")
     
       assert appt.valid?

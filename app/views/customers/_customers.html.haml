@@ -1,12 +1,12 @@
-%table.customers
-  - customers.each do |customer|
-    %tr{:id => "row_customer_#{customer.id}"}
-      %td.name
-        %h2= link_to customer.name, customer_path(customer)
-      %td.contact_info
-        .email
-          = customer.email
-        .phone
-          = customer.phone
-      %td.action
-        = link_to "Appointments", customer_appointments_path(customer)
+- customers.each do |customer|
+  .prepend-1.customer
+    .span-7
+      %h2= link_to customer.name, customer_path(customer, :subdomain => @subdomain)
+    .span-8
+      .email
+        %h3= mail_to(customer.email)
+      .phone
+        %h3= customer.phone
+    .span-3.last
+      %h4= link_to "Appointments", customer_appointments_path(customer, :subdomain => @subdomain)
+        

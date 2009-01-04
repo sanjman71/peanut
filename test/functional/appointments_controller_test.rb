@@ -17,7 +17,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   def test_should_create_appointment
     assert_difference('Appointment.count') do
       post :create, :appointment => {
-                          "customer_attributes"=>{"name"=>"Customer 1", "phone"=>"6503876818", "email"=>"customer1@getfave.com"}
+                          "customer_attributes"=>{"name"=>"Customer 1", "phone"=>"6503876818", "email"=>"customer1@peanut.com"}
                       }
     end
 

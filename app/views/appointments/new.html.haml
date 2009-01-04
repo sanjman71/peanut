@@ -1,29 +1,44 @@
-.container
-  .left
-    .section_header
-      %h1.index
-        == Confirm your appointment
-        %p
-        = appointment_description(@appointment)
-        
-    .section_body
-      %h1
+.span-17
+  .span-17.last.box
+    %h3
+      .span-2.padding-bottom-5
+        == What:
+      .span-14.padding-bottom-5.last
+        = @appointment.service.name
+      .span-2.padding-bottom-5
+        == With:
+      .span-14.padding-bottom-5.last{:style => 'padding-bottom: 5px;'}
+        = (@appointment.resource || Person.anyone).name
+      .span-2.padding-bottom-5
+        == When:
+      .span-14.padding-bottom-5.last{:style => 'padding-bottom: 5px;'}
+        - if @appointment.waitlist?
+          == #{@appointment.time.titleize}, #{@appointment.when.titleize}
+        - else
+          = @appointment.start_at.to_s(:appt_day_date_time)
+
+  .span-15.prepend-1
+    %h4
+      - if @appointment.waitlist?
+        == Before we confirm you on the waitlist, we need some information about you.
+      - else
         == Before we finalize your appointment, we need some information about you. 
-      %p
-      .schedule_form
-        - form_for(@appointment, :url => schedule_path(:subdomain => @subdomain)) do |f|
-          - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
-            %table
-              %tr
-                %td= customer_form.label :name
-                %td= customer_form.text_field :name
-              %tr
-                %td= customer_form.label :email
-                %td= customer_form.text_field :email
-              %tr
-                %td= customer_form.label :phone
-                %td= customer_form.text_field :phone
-          %p= f.submit "Schedule"
+    %p
+    .schedule_form
+      - url = @appointment.waitlist? ? waitlist_path(:subdomain => @subdomain) : schedule_path(:subdomain => @subdomain) 
+      - form_for(@appointment, :url => url) do |f|
+        - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
+          %table
+            %tr
+              %td= customer_form.label :name
+              %td= customer_form.text_field :name
+            %tr
+              %td= customer_form.label :email
+              %td= customer_form.text_field :email
+            %tr
+              %td= customer_form.label :phone
+              %td= customer_form.text_field :phone
+        %p= f.submit "Confirm"
         
         
         

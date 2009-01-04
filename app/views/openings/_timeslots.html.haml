@@ -1,12 +1,18 @@
 - timeslots_by_day.each do |day, timeslots|
-  %h2== #{day.to_s(:appt_day)}
+  .span-16.last
+    %h3== #{day.to_s(:appt_day)}
   -# group timeslots by people
+  - reset_cycle
   - timeslots.group_by { |timeslot| timeslot.resource }.each do |person, timeslots|
-    %table.timeslots
-      - timeslots.each_with_index do |timeslot, i|
-        - id = "#{timeslot.start_at.to_s(:appt_schedule)}_#{person.name.downcase}_#{i}"
-        %tr.timeslot{:id => "timeslot_#{id}", :class => cycle("shaded", "")}
-          %td.person= person.name
-          %td.time== #{timeslot.start_at.to_s(:appt_time)} - #{timeslot.end_at.to_s(:appt_time)}
-          %td.hover_region{:id => "hover_timeslot_#{id}", :style => 'display: none'}
-            = link_to('Book It', schedule_path(:subdomain => @subdomain, :person_id => person.id, :service_id => service.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
+    - timeslots.each_with_index do |timeslot, i|
+      -# use appointment, timeslot to create a unique id
+      - appt = timeslot.appointment
+      - id   = "appointment_#{appt.id}_timeslot_#{i}"
+      .span-11.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
+        .span-5.person
+          = person.name
+        .span-4.time
+          == #{timeslot.start_at.to_s(:appt_time)} - #{timeslot.end_at.to_s(:appt_time)}
+        .span-2.last.hide.hover_region{:id => "hover_#{id}"}
+          = link_to('Book It', schedule_path(:subdomain => @subdomain, :person_id => person.id, :service_id => service.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
+  %hr.space

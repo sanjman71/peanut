@@ -43,7 +43,15 @@ $.fn.init_new_service = function () {
   })
 } 
 
-// Add free time for a person on a specific day
+// Add a new product
+$.fn.init_new_product = function () {
+  $("#new_product").submit(function () {
+    $.post(this.action, $(this).serialize(), null, "script");
+    return false;
+  })
+} 
+
+// Add free time for a resource on a specific day
 $.fn.init_add_free_time = function () {
   $("#add_free_time_form").submit(function () {
     $.post(this.action, $(this).serialize(), null, "script");
@@ -51,9 +59,17 @@ $.fn.init_add_free_time = function () {
   })
 }
 
+// Search for an appointment by its confirmation code
+$.fn.init_search_appointments_by_confirmation_code = function () {
+  $("#search_appointments_form").submit(function () {
+    $.post(this.action, $(this).serialize(), null, "script");
+    return false;
+  })
+}
+
 // Highlight appointments and show edit/delete options on hover
 $.fn.init_highlight_appointments = function () {
-  $("tr.appointment").hover(function () {
+  $(".appointment").hover(function () {
     $("#hover_" + this.id).show();
     $(this).addClass("highlighted");},
     function () {
@@ -73,7 +89,7 @@ $.fn.init_show_appointments = function () {
 
 // Highlights timeslots and show edit/delete options on hover
 $.fn.init_highlight_timeslots = function () {
-  $("tr.timeslot").hover(function () {
+  $(".timeslot").hover(function () {
     $("#hover_" + this.id).show();
     $(this).addClass("highlighted");},
     function () {
@@ -112,7 +128,7 @@ $.fn.init_live_customers_search = function () {
 
 // Highlight invoice chargeable items
 $.fn.init_highlight_invoice_chargeables = function () {
-  $("tr.chargeable").hover(function () {
+  $(".chargeable").hover(function () {
     $(this).addClass("highlighted");},
     function () {
       $(this).removeClass("highlighted");
@@ -120,11 +136,45 @@ $.fn.init_highlight_invoice_chargeables = function () {
 } 
 
 // Add a new chargeable line itme to an invoice
-$.fn.init_add_chargeable = function () {
-  $("#add_chargeable").submit(function () {
+$.fn.init_add_chargeables = function () {
+  // Add the selected service to an invoice
+  $("#service_id").change(function () {
+    $.post($("#add_chargeable_service").attr("action"), $("#add_chargeable_service").serialize(), null, "script");
+    return false;
+  })
+  // Add the selected product to an invoice
+  $("#product_id").change(function () {
+    $.post($("#add_chargeable_product").attr("action"), $("#add_chargeable_product").serialize(), null, "script");
+    return false;
+  })
+}
+
+$.fn.init_change_chargeable_prices = function() {
+  // update the price
+  $(".price.update").submit(function () {
     $.post(this.action, $(this).serialize(), null, "script");
     return false;
   })
+
+  // hide price, show edit price
+  $(".price.edit").click(function () {
+    $('#' + $(this).attr("hide")).addClass('hide');
+    $('#' + $(this).attr("click")).removeClass('hide');
+    return false;
+  })
+
+  // cancel edit price, show price
+  $(".price.edit.cancel").click(function () {
+    $('#' + $(this).attr("hide")).addClass('hide');
+    $('#' + $(this).attr("click")).removeClass('hide');
+    return false;
+  })
+}
+
+// Reset the chargeables select list to the first value
+$.fn.reset_chargeables = function () {
+  $("#service_id").attr("selectedIndex", 0);
+  $("#product_id").attr("selectedIndex", 0);
 }
 
 // Add a new note

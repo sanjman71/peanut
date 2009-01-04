@@ -1,6 +1,9 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
+require 'mocha'
+
+include AuthenticatedSystem
 
 class Test::Unit::TestCase
   # Transactional fixtures accelerate your tests by wrapping each test method
@@ -35,4 +38,11 @@ class Test::Unit::TestCase
   fixtures :all
 
   # Add more helper methods to be used by all tests here...
+  
+  def setup_subdomain
+    # stub subdomain object
+    @company = Factory(:company)
+    Company.stubs(:find_by_subdomain).returns(@company)
+  end
+  
 end

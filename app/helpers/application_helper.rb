@@ -11,37 +11,37 @@ module ApplicationHelper
   
   def build_tab_links(current_controller)
 
-    # 'Schedules' link
+    # 'Schedules' tab
     name = 'Schedules'
     if current_controller.controller_name == 'appointments' and current_controller.action_name == 'index'
-      link = link_to(name, appointments_path, :class => 'current')
+      link = link_to(name, appointments_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, appointments_path)
+      link = link_to(name, appointments_path(:subdomain => @subdomain))
     end
     
     yield link
 
-    # 'Openings' link
+    # 'Openings' tab
     name = 'Openings'
     if current_controller.controller_name == 'openings' and current_controller.action_name == 'index'
-      link = link_to(name, openings_path, :class => 'current')
+      link = link_to(name, openings_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, openings_path)
+      link = link_to(name, openings_path(:subdomain => @subdomain))
     end
     
     yield link
 
-    # 'Customers' link
+    # 'Customers' tab
     name = 'Customers'
     if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
-      link = link_to(name, customers_path, :class => 'current')
+      link = link_to(name, customers_path(:subdomain => @subdomain), :class => 'current')
     else
-      link = link_to(name, customers_path)
+      link = link_to(name, customers_path(:subdomain => @subdomain))
     end
 
     yield link
 
-    # 'Appointments' link
+    # 'Appointments' tab
     name = 'Appointments'
     if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
       link = link_to(name, search_appointments_path, :class => 'current')
@@ -51,7 +51,7 @@ module ApplicationHelper
 
     yield link
 
-    # 'People' link
+    # 'People' tab
     name = 'People'
     if current_controller.controller_name == 'people' and ['index', 'show'].include?(current_controller.action_name)
       link = link_to(name, people_path, :class => 'current')
@@ -61,12 +61,32 @@ module ApplicationHelper
 
     yield link
 
-    # 'Services' link
+    # 'Services' tab
     name = 'Services'
     if current_controller.controller_name == 'services' and ['index', 'show'].include?(current_controller.action_name)
       link = link_to(name, services_path, :class => 'current')
     else
       link = link_to(name, services_path)
+    end
+
+    yield link
+
+    # 'Products' tab
+    name = 'Products'
+    if current_controller.controller_name == 'products' and ['index', 'show'].include?(current_controller.action_name)
+      link = link_to(name, products_path, :class => 'current')
+    else
+      link = link_to(name, products_path)
+    end
+
+    yield link
+
+    # 'Waitlist' tab
+    name = 'Waitlist'
+    if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
+      link = link_to(name, waitlist_index_path, :class => 'current')
+    else
+      link = link_to(name, waitlist_index_path)
     end
 
     yield link

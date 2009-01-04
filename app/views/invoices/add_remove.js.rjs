@@ -1,0 +1,3 @@
+# Handle add or remove rjs methods
+page["#invoice"].html(render(:partial => 'invoices/invoice.html.haml', 
+                             :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => :rw}));
