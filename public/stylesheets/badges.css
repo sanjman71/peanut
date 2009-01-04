@@ -1,0 +1,14 @@
+table.badges {
+	border-spacing: 2px;
+	background-color: gray;
+}
+table.badges th {
+	padding: 4px;
+	background-color: #DDDDDD;
+	text-align: right;
+}
+table.badges td {
+	padding: 4px;
+	background-color: white;
+	text-align: center;
+}

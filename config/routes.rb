@@ -51,16 +51,11 @@ ActionController::Routing::Routes.draw do |map|
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations
 
-  # Install the default routes as the lowest priority.
-  map.namespace :badges do |badges|
-    badges.resource :roles
-    badges.resource :user_roles
-    badges.resource :role_privileges
-    badges.resource :privileges
-    badges.connect '/admin/:action/:id', :controller => 'admin'
-    badges.admin   '/admin',        :controller => 'admin', :action => 'index' 
+  # Administrative controllers
+  map.namespace :admin do |admin|
+    admin.home '', :controller => 'base', :action => 'index'
+    admin.badges 'badges/:action/:id', :controller => 'badges'
   end
-
 
   # map the company root to the companies controller
   #  map.company_root  '/:action', :controller => 'companies', :conditions => { :subdomain => /.+/ }
