@@ -52,12 +52,17 @@ namespace :db do
       Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818")
       Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")
       
-      # Create admin user
+      # Create admin users
       puts "adding admin user: admin@killianmurphy.com, password: peanut"
-      a = User.create :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut"
+      a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut")
       a.register!
       a.activate!
-      
+      a.grant_role('admin')
+
+      puts "adding admin user: sanjay@jarna.com, password: peanut"
+      a = User.create(:company_id => 0, :name => "Admin", :email => "sanjay@jarna.com", :password => "peanut", :password_confirmation => "peanut")
+      a.register!
+      a.activate!
       a.grant_role('admin')
 
       puts "#{Time.now}: completed"

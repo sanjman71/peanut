@@ -30,10 +30,8 @@ a img:hover                                       { background-color: green; }
 
 /* header, tab styles */
 
-div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 10px 23px 0px 30px; 
+div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
                                                     position: relative; text-align: left; }
-
-div#header h1                                     { color: #000000; font-size: 24px; font-weight: normal; margin: 0; padding: 0; text-align: left; }
 
 div#tabs                                          { clear: left; height: 24px; margin: 15px 0 0; padding: 0; font-size: 12px; }
 
@@ -59,8 +57,6 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
                                                     text-decoration: none; padding: 3px 8px 8px; }
 
 /* body styles */
-
-h1.title                                          { background: #EDF3FE; margin: 0px; padding-bottom: 15px; margin-bottom: 20px; }
 
 div.wrapper                                       { margin: 0 auto; min-width: 800px; padding: 5px 23px 0px 30px; }
 

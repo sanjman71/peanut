@@ -14,13 +14,27 @@
     
   %body
     #header
-      %h1= @current_company.name
-      #tabs
-        %ul
-          %li.right
-            = link_to 'Admin Console', companies_path(:subdomain => nil)
-          - build_tab_links(controller) do |link|
-            %li.with_space= link
+      .container
+        .span-21
+          %h2= @current_company.name
+        .span-3.last
+          
+          - if logged_in?
+            == My Info
+            == |&nbsp;
+            = link_to('Log-out', logout_path, :class => 'admin', :style => 'color: #DDDDDD;')
+          - else
+            = link_to('Log-in', login_path, :class => 'admin', :style => 'color: #DDDDDD;')
+        #tabs
+          .span-21
+            %ul
+            - build_tab_links(controller) do |tab|
+              %li.with_space= tab
+          - if has_privilege?('create company')
+            .span-3.last
+              %ul
+                %li
+                  = link_to 'Admin Console', companies_path(:subdomain => nil)
             
     - if RAILS_ENV == 'development'
       .container.showgrid

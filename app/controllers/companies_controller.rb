@@ -9,8 +9,8 @@ class CompaniesController < ApplicationController
     @current_company = Company.find_by_subdomain(current_subdomain)
     
     if @current_company
-      # show company appointments page
-      return redirect_to(appointments_path)
+      # show company openings
+      return redirect_to(openings_path)
     end
     
     respond_to do |format|
