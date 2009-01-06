@@ -18,12 +18,7 @@
         .span-21
           %h2= @current_company.name
         .span-3.last{:style => 'color: #DDDDDD;'}
-          - if logged_in?
-            = link_to('My Info', edit_user_path(current_user, :subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
-            == &nbsp;|&nbsp;
-            = link_to('Log-out', logout_path, :class => 'admin', :style => 'color: #DDDDDD;')
-          - else
-            = link_to('Log-in', login_path, :class => 'admin', :style => 'color: #DDDDDD;')
+          = render :partial => 'users/user_bar'
         #tabs
           .span-21
             %ul

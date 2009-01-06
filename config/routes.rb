@@ -1,17 +1,19 @@
 ActionController::Routing::Routes.draw do |map|
 
   # user, session routes
-  map.signup    '/signup',        :controller => 'users', :action => 'new' 
   map.login     '/login',         :controller => 'sessions', :action => 'new'
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
   map.register  '/register',      :controller => 'users', :action => 'create'
 
   # user activation
-  map.activate '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
+  map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
+  # signup routes
+  map.signup    '/signup/:plan', :controller => 'signup', :action => 'new'
+  
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resource  :session
-
+  
   map.resources :companies
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },

@@ -5,6 +5,7 @@ class Company < ActiveRecord::Base
 
   validates_uniqueness_of   :name
   validates_presence_of     :name
+  validates_presence_of     :time_zone
   has_many_polymorphs       :resources, :from => [:people]
   has_many                  :services
   has_many                  :products
@@ -12,6 +13,11 @@ class Company < ActiveRecord::Base
   has_many                  :users
   has_many                  :customers, :through => :appointments, :uniq => true
   before_save               :init_subdomain
+
+  def after_initialize
+    # titleize name
+    self.name = self.name.titleize unless self.name.blank?
+  end
   
   private
   

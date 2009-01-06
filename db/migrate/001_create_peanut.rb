@@ -1,8 +1,9 @@
 class CreatePeanut < ActiveRecord::Migration
   def self.up
     create_table :companies do |t|
-      t.string :name
-      t.string :subdomain
+      t.string  :name
+      t.string  :time_zone
+      t.string  :subdomain
       
       t.timestamps
     end
