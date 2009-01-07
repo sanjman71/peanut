@@ -2,7 +2,10 @@
 %html{:xmlns => "http://www.w3.org/1999/xhtml", 'xml:lang' => "en", :lang => "en"}
   %head
     %meta{'http-equiv' => "content-type", :content => "text/html;charset=UTF-8"}
-    %title== #{@current_company.name}
+    - if @current_company
+      %title== #{@current_company.name}
+    - else
+      %title== Peanut
     = stylesheet_link_tag 'blueprint/screen'
     = stylesheet_link_tag 'peanut'
     = stylesheet_link_tag 'errors'
@@ -16,12 +19,13 @@
     #header
       .container
         .span-21
-          %h2= link_to @current_company.name, show_company_root_path(:subdomain => @current_company.subdomain)
-          - if @current_company.locations.size == 1
-            = "Location: " + location_title_renderer(@current_company.locations.first)
-          - elsif @current_company.locations.size > 1
-            Choose location:
-            = select_tag('location_id', options_for_select([['Any location', 0]] + @current_company.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id))
+          - if @current_company
+            %h2= link_to @current_company.name, show_company_root_path(:subdomain => @current_company.subdomain)
+            - if @current_company.locations.size == 1
+              = "Location: " + location_title_renderer(@current_company.locations.first)
+            - elsif @current_company.locations.size > 1
+              Choose location:
+              = select_tag('location_id', options_for_select([['Any location', 0]] + @current_company.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id))
         .span-3.last{:style => 'color: #DDDDDD;'}
           = render :partial => 'users/user_bar'
         #tabs
