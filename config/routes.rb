@@ -57,14 +57,14 @@ ActionController::Routing::Routes.draw do |map|
     admin.badges 'badges/:action/:id', :controller => 'badges'
   end
 
+  # map the root to the home controller
+  map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => /www/ }
+  
   # map the company root to the companies controller
   #  map.company_root  '/:action', :controller => 'companies', :conditions => { :subdomain => /.+/ }
-  map.show_company_root  '', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
-  map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :conditions => { :subdomain => /.+/ }
+  map.show_company_root  '', :controller => 'companies', :action => 'show', :requires => { :subdomain => /^[^(www\.)][\w\-]+/ }
+  map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :requires => { :subdomain => /^[^(www\.)][\w\-]+/ }
 
-  # map the root to the companies controller
-  map.root                  :controller => 'companies', :action => 'index'
-  
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
