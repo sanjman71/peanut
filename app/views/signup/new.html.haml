@@ -1,0 +1,76 @@
+- form_for(@company, :url => signup_path, :method => :post, :html => {:class => 'new_company'}) do |f|
+  .span-20.box
+    .span-20.last
+      %h2== Create your account
+    .span-18.last
+      %hr
+    -# show any company errors
+    - unless @company.errors.blank?
+      .span-18.notice
+        = error_messages_for('company', :header_message => nil)
+    .span-20.last.padding-bottom-10
+      .span-4
+        %h3.text-align-right== Company name:
+      .span-16.last
+        = f.text_field :name, :id => 'company_name', :class => 'title big', :style => 'width: 200px; margin: 0px;'
+        %span{:style => 'font-size: 12px; font-weight: bold;'}=@domain
+    .span-16.prepend-4.last
+      %em{:style => "color: #666666; font-size: 15px;"}== This is the address you will use to login and manage your appointments. (e.g. http://peanut.peanutcalendar.com)
+    
+    %hr.space
+  
+    .span-20.last
+      .span-4
+        %h3.text-align-right== Timezone:
+      .span-16.last
+        = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin: 0px; font-size: 14px;'}
+        
+    %hr.space
+  
+    - fields_for("company[user]", @user) do |user_form|
+      .span-20.last
+        %h2== Create your user profile
+      .span-18.last
+        %hr
+      -# show any user errors
+      - unless @user.errors.blank?
+        .span-18.notice
+          = error_messages_for('user', :header_message => nil)
+      .span-20.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right== Your email:
+        .span-16.last
+          = user_form.text_field :email, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-20.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right== Your password:
+        .span-16.last
+          = user_form.password_field :password, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-20.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right== Confirm password:
+        .span-16.last
+          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+          .span-20.last.padding-bottom-10
+        
+
+    %hr.space
+
+    .span-20.last
+      %h2== Review your plan and signup
+    .span-18.last
+      %hr
+    -# show terms errors
+    - if @terms_error
+      .span-18.notice
+        = @terms_error
+    .span-20.last
+      %h3== All plans are monthly. There are no cancellation fees or long-term contracts.
+    .span-20.last
+      %h3
+        = check_box_tag "company[terms]"
+        = label_tag 'company_terms', 'I agree to the terms and conditions'
+      
+  .span-20.prepend-1
+    = submit_tag "Create My Account", :name => nil, :style => 'font-size: 15px;'
+  

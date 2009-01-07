@@ -1,0 +1,7 @@
+- if logged_in?
+  = link_to('My Info', edit_user_path(current_user, :subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
+  == &nbsp;|&nbsp;
+  = link_to('Log-out', logout_path, :class => 'admin', :style => 'color: #DDDDDD;')
+- else
+  = link_to('Log-in', login_path, :class => 'admin', :style => 'color: #DDDDDD;')
+

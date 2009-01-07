@@ -1,10 +1,11 @@
 class UsersController < ApplicationController
+  before_filter :init_current_company
+  layout 'blueprint'
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
   
-
   # render new.rhtml
   def new
     @user = User.new
@@ -41,6 +42,11 @@ class UsersController < ApplicationController
     end
   end
 
+  # /users/1/edit
+  def edit
+    @user = @current_company.users.find(params[:id])
+  end
+  
   def suspend
     @user.suspend! 
     redirect_to users_path
