@@ -6,7 +6,9 @@
       .email
         %h3= mail_to(customer.email)
       .phone
-        %h3= customer.phone
+        %h3
+          = customer.phone
+          = "(#{customer.mobile_carrier.name})" if customer.mobile_carrier
     .span-3.last
       %h4= link_to "Appointments", customer_appointments_path(customer, :subdomain => @subdomain)
         

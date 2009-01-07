@@ -10,8 +10,10 @@ class CompaniesController < ApplicationController
   def index
 
     if @current_company
-      # show company appointments page
-      return redirect_to(:action => :show, :subdomain => @current_company.subdomain)
+      # show company openings
+      return redirect_to(openings_path)
+      # KILLIAN - check this:
+      # return redirect_to(:action => :show, :subdomain => @current_company.subdomain)
     end
     
     # We're going to an admin page

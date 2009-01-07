@@ -8,9 +8,8 @@ namespace :db do
       puts "#{Time.now}: adding test data ..."
       
       # create test companies
-      company1 = Company.create(:name => "Company 1")
-      company2 = Company.create(:name => "Company 2")
-      company3 = Company.create(:name => "Noel Rose")
+      company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)")
+      noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)")
     
       # create company1 services and people
       company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
@@ -26,38 +25,51 @@ namespace :db do
       mens_haircut.resources.push(person1)
       womens_haircut.resources.push(person2)
 
-      # create company3 people, services, products
-      company3.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
-      company3.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
+      # create noelrose people, services, products
+      noelrose.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+      noelrose.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
 
-      person1         = company3.people.create(:name => "Erika Maechtle")
-      person2         = company3.people.create(:name => "Josie")
+      person1         = noelrose.people.create(:name => "Erika Maechtle")
+      person2         = noelrose.people.create(:name => "Josie")
       
-      mens_haircut    = company3.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
-      womens_haircut  = company3.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
-      womens_color    = company3.services.create(:name => "Women's Color", :duration => 120, :mark_as => "work", :price => 100.00)
+      mens_haircut    = noelrose.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
+      womens_haircut  = noelrose.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
+      color1          = noelrose.services.create(:name => "Single Process Color", :duration => 120, :mark_as => "work", :price => 65.00)
+      color2          = noelrose.services.create(:name => "Touch-Up Color", :duration => 120, :mark_as => "work", :price => 45.00)
+      color3          = noelrose.services.create(:name => "Glossing", :duration => 120, :mark_as => "work", :price => 25.00)
 
-      shampoo         = company3.products.create(:name => "Shampoo", :inventory => 5, :price => 10.00)
-      conditioner     = company3.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
-      pomade          = company3.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
+      shampoo         = noelrose.products.create(:name => "Shampoo", :inventory => 5, :price => 10.00)
+      conditioner     = noelrose.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
+      pomade          = noelrose.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
       
+      # add skillsets
       mens_haircut.resources.push(person1)
       mens_haircut.resources.push(person2)
       womens_haircut.resources.push(person1)
       womens_haircut.resources.push(person2)
-      womens_color.resources.push(person1)
-      womens_color.resources.push(person2)
+      color1.resources.push(person1)
+      color1.resources.push(person2)
+      color2.resources.push(person1)
+      color2.resources.push(person2)
+      color3.resources.push(person1)
+      color3.resources.push(person2)
       
       # create customers
-      Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818")
+      verizon = MobileCarrier.find_by_name("Verizon Wireless")
+      Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818", :mobile_carrier => verizon)
       Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")
       
-      # Create admin user
+      # Create admin users
       puts "adding admin user: admin@killianmurphy.com, password: peanut"
-      a = User.create :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut"
+      a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut")
       a.register!
       a.activate!
-      
+      a.grant_role('admin')
+
+      puts "adding admin user: sanjay@jarna.com, password: peanut"
+      a = User.create(:company_id => 0, :name => "Admin", :email => "sanjay@jarna.com", :password => "peanut", :password_confirmation => "peanut")
+      a.register!
+      a.activate!
       a.grant_role('admin')
 
       puts "#{Time.now}: completed"
