@@ -24,8 +24,9 @@
             %ul
               %li.with_space
                 = link_to 'Companies', companies_path
-              %li.with_space
-                = link_to 'Privileges & Roles', admin_badges_path
+              - if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')
+                %li.with_space
+                  = link_to 'Privileges & Roles', admin_badges_path
 
     .container
       = yield
