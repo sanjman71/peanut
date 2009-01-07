@@ -58,11 +58,27 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
-    create_table :customers do |t|
+    create_table :mobile_carriers do |t|
       t.string :name
-      t.string :email
-      t.string :phone
-
+      t.string :key   # used by SMSFu plugin to find carrier's email gateway address
+    end
+    
+    # Create default mobile carriers
+    MobileCarrier.create(:name => 'Alltel Wireless',    :key => 'alltel')
+    MobileCarrier.create(:name => 'AT&T/Cingular',      :key => 'at&t')
+    MobileCarrier.create(:name => 'Boost Mobile',       :key => 'boost')
+    MobileCarrier.create(:name => 'Sprint Wireless',    :key => 'sprint')
+    MobileCarrier.create(:name => 'T-Mobile US',        :key => 't-mobile')
+    MobileCarrier.create(:name => 'T-Mobile UK',        :key => 't-mobile-uk')
+    MobileCarrier.create(:name => 'Virgin Mobile',      :key => 'virgin')
+    MobileCarrier.create(:name => 'Verizon Wireless',   :key => 'verizon')
+    
+    create_table :customers do |t|
+      t.string  :name
+      t.string  :email
+      t.string  :phone
+      t.integer :mobile_carrier_id
+      
       t.timestamps
     end
     

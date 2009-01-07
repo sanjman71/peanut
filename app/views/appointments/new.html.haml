@@ -18,7 +18,7 @@
           = @appointment.start_at.to_s(:appt_day_date_time)
 
   .span-15.prepend-1
-    %h4
+    %h3
       - if @appointment.waitlist?
         == Before we confirm you on the waitlist, we need some information about you.
       - else
@@ -28,17 +28,33 @@
       - url = @appointment.waitlist? ? waitlist_path(:subdomain => @subdomain) : schedule_path(:subdomain => @subdomain) 
       - form_for(@appointment, :url => url) do |f|
         - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
-          %table
-            %tr
-              %td= customer_form.label :name
-              %td= customer_form.text_field :name
-            %tr
-              %td= customer_form.label :email
-              %td= customer_form.text_field :email
-            %tr
-              %td= customer_form.label :phone
-              %td= customer_form.text_field :phone
-        %p= f.submit "Confirm"
+          .span-16.last
+            .span-4
+              %h2.text-align-right== Name:
+            .span-12.last
+              = customer_form.text_field :name, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last
+            .span-4
+              %h2.text-align-right== Email:
+            .span-12.last
+              = customer_form.text_field :email, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last
+            .span-4
+              %h2.text-align-right== Phone:
+            .span-12.last
+              = customer_form.text_field :phone, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last
+            .span-4
+              %h2.text-align-right== Mobile Carrier:
+            .span-12.last
+              = customer_form.select('mobile_carrier_id', MobileCarrier.all.collect{ |c| [c.name, c.id]}, {}, :style => 'font-size: 15px;')
+          .span-12.prepend-4.last.top
+            %em{:style => "color: #666666; font-size: 13px;"}== Specifying your mobile carrier is optional.  It is used to notify you of appointment changes via text message.
+                          
+          %hr.space
+          
+          .span-16.last
+            = f.submit "Confirm", :style => 'font-size: 15px;'
         
         
         
