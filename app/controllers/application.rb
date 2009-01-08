@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
   # Exception notifier to send emails when we have exceptions
   include ExceptionNotifiable
   
+  # Default layout
+  layout "company"
+
   private
   
   def init_current_company

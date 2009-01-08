@@ -1,7 +1,6 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
 
   def new
     # render new.html.haml

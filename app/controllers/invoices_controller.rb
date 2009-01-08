@@ -1,6 +1,5 @@
 class InvoicesController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
 
   def show
     @invoice      = AppointmentInvoice.find(params[:id])

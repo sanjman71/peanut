@@ -1,6 +1,5 @@
 class AppointmentsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
   
   @@default_when    = Appointment::WHEN_THIS_WEEK
   

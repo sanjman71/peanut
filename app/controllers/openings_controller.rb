@@ -1,6 +1,5 @@
 class OpeningsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
 
   # GET /openings
   # GET /people/1/services/3/openings?when=this+week&time=morning
