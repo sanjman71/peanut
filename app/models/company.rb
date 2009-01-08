@@ -1,5 +1,6 @@
 class Company < ActiveRecord::Base
-
+  extend ActiveSupport::Memoizable
+  
   # Badges for authorization
   badges_authorizable_object
 
@@ -17,6 +18,23 @@ class Company < ActiveRecord::Base
   def after_initialize
     # titleize name
     self.name = self.name.titleize unless self.name.blank?
+  end
+  
+  def people_count
+    people.count
+  end
+  memoize :people_count
+  
+  def services_count
+    services.count
+  end
+  memoize :services_count
+  
+  # returns true if the company has enough people and services to schedule appointments
+  def can_schedule_appointments?
+    return false if people_count == 0
+    return false if services_count == 0
+    true
   end
   
   private

@@ -9,6 +9,20 @@ module ApplicationHelper
     content_for(:stylesheet) { stylesheet_link_tag(*files) }
   end
   
+  FLASH_TYPES = [:error, :warning, :success, :message]
+
+  def display_flash(type = nil)
+    html = ""
+
+    if type.nil?
+      FLASH_TYPES.each { |name| html << display_flash(name) }
+    else
+      return flash[type].blank? ? "" : "<div class=\"#{type}\">#{flash[type]}</div>"
+    end
+
+    html
+  end
+  
   def build_tab_links(current_controller)
     
     # 'Openings' tab

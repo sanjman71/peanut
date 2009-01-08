@@ -47,7 +47,7 @@
             .span-4
               %h2.text-align-right== Mobile Carrier:
             .span-12.last
-              = customer_form.select('mobile_carrier_id', MobileCarrier.all.collect{ |c| [c.name, c.id]}, {}, :style => 'font-size: 15px;')
+              = customer_form.select('mobile_carrier_id', [["Select a carrier", nil]] + MobileCarrier.all.collect{ |c| [c.name, c.id]}, {}, :style => 'font-size: 15px;')
           .span-12.prepend-4.last.top
             %em{:style => "color: #666666; font-size: 13px;"}== Specifying your mobile carrier is optional.  It is used to notify you of appointment changes via text message.
                           

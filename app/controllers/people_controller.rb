@@ -12,7 +12,7 @@ class PeopleController < ApplicationController
       @search_text  = "People matching '#{@search}'"
     else
       @people       = @current_company.people.all(:order => "name ASC")
-      @search_text  = "All People"
+      @search_text  = @people.blank? ? "No People" : "All People"
     end
     
     respond_to do |format|
@@ -49,20 +49,27 @@ class PeopleController < ApplicationController
     @person = @current_company.people.find(params[:id])
   end
 
-  # POST /resources
-  # POST /resources.xml
+  # POST /people
+  # POST /people.xml
   def create
-    @person = Person.new(params[:people])
+    @person = Person.new(params[:person])
+
+    if !@person.valid?
+      @error      = true
+      @error_text = "Could not create person"
+      return
+    end
+    
+    # save person
+    @person.save
+    
+    # add person to company
+    @current_company.people.push(@person)
+    
+    flash[:notice] = "Created #{@person.name}"
 
     respond_to do |format|
-      if @person.save
-        flash[:notice] = 'Person was successfully created.'
-        format.html { redirect_to(@person) }
-        format.xml  { render :xml => @person, :status => :created, :location => @resource }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @person.errors, :status => :unprocessable_entity }
-      end
+      format.js # redirect to people index page
     end
   end
 

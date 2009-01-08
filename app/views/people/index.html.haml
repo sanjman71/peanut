@@ -1,15 +1,28 @@
 - stylesheet('people')
 - javascript('people')
 
-.span-20.last.box
-  = label_tag "live_search_for_people", "Find a person by typing their name", :class => 'big'
-  %br
-  = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people', :class => 'title big', :url => people_path(:subdomain => @subdomain))
+.span-15
+  .span-15.box
+    = label_tag "live_search_for_people", "Find a person by typing their name", :class => 'big'
+    %br
+    = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people', :class => 'title big', :url => people_path(:subdomain => @subdomain))
       
-.span-20.last
-  .prepend-1.people_header#people_search_text
-    = @search_text
-  #people
-    = render(:partial => 'people.html.haml', :locals => {:people => @people})
+  .span-14.prepend-1.append-1.last
+    = display_flash(:notice)
+      
+  .span-15.last
+    .prepend-1.people.header#people_search_text
+      = @search_text
+    #people
+      = render(:partial => 'people.html.haml', :locals => {:people => @people})
     
-    
+.span-7.prepend-2.last
+  .span-6.box
+    - form_for(Person.new, :url => people_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_person'}) do |f|
+      .span-6.last
+        = label_tag "add_person_name", "Add a person", :class => 'big'
+      .span-6.last
+        = text_field_tag "person[name]", '', :id => 'add_person_name', :class => 'title big', :style => 'width: 200px;'
+      .span-6.last
+        = submit_tag "Create", :name => nil, :style => 'font-size: 15px;'
+

@@ -35,6 +35,14 @@ $.fn.init_new_membership = function () {
   })
 } 
 
+// Add a new person
+$.fn.init_new_person = function () {
+  $("#new_person").submit(function () {
+    $.post(this.action, $(this).serialize(), null, "script");
+    return false;
+  })
+} 
+
 // Add a new service
 $.fn.init_new_service = function () {
   $("#new_service").submit(function () {

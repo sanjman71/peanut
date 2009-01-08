@@ -1,7 +1,7 @@
 - stylesheet('products')
 - javascript('products')
 
-.span-17
+.span-16
   .span-15.last.box
     %h2== Products
   %hr.space
@@ -11,15 +11,18 @@
     = render(:partial => 'products.html.haml', :locals => {:products => @products})
     
 .span-6.prepend-1.last
-  .sidebar.padding-5
+  .span-6.box
     - form_for(Product.new, :url => products_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_product'}) do |f|
       = hidden_field_tag "product[price]", 0
       = hidden_field_tag "product[inventory]", 0
-      %p
-        = label_tag "add_product_name", "Add a new product", :class => 'big'
+      .span-6.last
+        = label_tag "add_product_name", "Add a product", :class => 'big'
+      .span-6.last
         = text_field_tag "product[name]", '', :id => 'add_product_name', :class => 'title big', :style => 'width: 200px;'
-        %em{:style => "color: #666666;"}== Examples: Shampoo, Styling Gel
-      %p
-      = submit_tag "Create", :name => nil
+      .span-6.last
+        %em{:style => "color: #666666; font-size: 12px;"}== Examples: Shampoo, Styling Gel
+      %hr.space
+      .span-6.last
+        = submit_tag "Create", :name => nil, :style => 'font-size: 15px'
     
         

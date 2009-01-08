@@ -24,6 +24,7 @@
             %ul
             - build_tab_links(controller) do |tab|
               %li.with_space= tab
+              
           - if has_privilege?('create company')
             .span-3.last
               %ul

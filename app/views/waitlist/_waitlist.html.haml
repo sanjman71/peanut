@@ -1,3 +1,7 @@
+- if appointments.blank?
+  .span-18.prepend-1
+    %h2== The waitlist is empty
+    
 - appointments.each do |appointment|
   .span-18.last.letterbox.appointment{:class => cycle("shaded", ""), :id => appointment.id}
     .span-4.prepend-1.name
