@@ -19,28 +19,6 @@ class CompaniesController < ApplicationController
     end
   end
 
-  # GET /companies/1
-  # GET /companies/1.xml
-  def show
-    @company = Company.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @company }
-    end
-  end
-
-  # GET /companies/new
-  # GET /companies/new.xml
-  def new
-    @company = Company.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @company }
-    end
-  end
-
   # GET /companies/1/edit
   def edit
     @company = Company.find(params[:id])
@@ -71,7 +49,7 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       if @company.update_attributes(params[:company])
         flash[:notice] = 'Company was successfully updated.'
-        format.html { redirect_to(@company) }
+        format.html { redirect_to(companies_path) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

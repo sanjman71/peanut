@@ -31,6 +31,9 @@ class ApplicationController < ActionController::Base
       redirect_to root_path
     end
     @subdomain = @current_company.subdomain
+
+    # set company time zone
+    Time.zone = @current_company.time_zone
   end
-  
+
 end

@@ -61,10 +61,6 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
 
 /* body styles */
 
-/*
-div.wrapper                                       { margin: 0 auto; min-width: 800px; padding: 5px 23px 0px 30px; }
-*/
-
 div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
 
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
@@ -76,10 +72,11 @@ input.title.big                                   { color: #000000; font-size: 2
 
 label.big                                         { font-size: 16px; }
 
-/* button styles */
-
 .button                                           { font-size: 12px;}
 .button.big                                       { font-size: 15px; }
+
+.select                                           { font-size: 12px; }
+.select.big                                       { font-size: 15px; }
 
 /* admin styles */
 

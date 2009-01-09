@@ -14,7 +14,8 @@ class Company < ActiveRecord::Base
   has_many                  :users
   has_many                  :customers, :through => :appointments, :uniq => true
   before_save               :init_subdomain
-
+  after_create              :init_basic_services
+  
   def after_initialize
     # titleize name
     self.name = self.name.titleize unless self.name.blank?
@@ -29,11 +30,15 @@ class Company < ActiveRecord::Base
     services.count
   end
   memoize :services_count
+
+  def work_services_count
+    services.work.count
+  end
+  memoize :work_services_count
   
-  # returns true if the company has enough people and services to schedule appointments
+  # returns true if the company has at least 1 person and 1 work service
   def can_schedule_appointments?
-    return false if people_count == 0
-    return false if services_count == 0
+    return false if people_count == 0 or work_services_count == 0
     true
   end
   
@@ -42,6 +47,11 @@ class Company < ActiveRecord::Base
   # initialize subdomain based on company name
   def init_subdomain
     self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '')
+  end
+  
+  # initialize company's basic services
+  def init_basic_services
+    services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
   end
   
 end

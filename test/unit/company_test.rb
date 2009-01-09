@@ -23,4 +23,15 @@ class CompanyTest < ActiveSupport::TestCase
     assert_equal "Jax Salon", c.name
   end
 
+  def test_should_create_basic_services_after_create
+    c = Company.create(:name => "Mary's Hair Salon", :time_zone => "UTC")
+    assert c.valid?
+    c.reload
+    
+    assert_equal 1, c.services_count
+    assert_equal 0, c.work_services_count
+    assert_equal 1, c.services.free.size
+    assert_equal false, c.can_schedule_appointments?
+  end
+  
 end

@@ -1,8 +1,9 @@
 - companies.each do |company|
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
-    .span-6.prepend-1.name
-      %h2{:style => "margin-bottom: 0px;"}= company.name
-    .span-3.last.action
+    .span-10.prepend-1.name
+      %h2.bottom= company.name
+      %h4.bottom= company.time_zone
+    .span-3.prepend-2.last.action
       = link_to "Edit", edit_company_path(company), :class => 'admin'
       == &nbsp;
-      = link_to "Show", openings_path(:subdomain => company.subdomain), :class => 'admin'
+      = link_to "Site", openings_path(:subdomain => company.subdomain), :class => 'admin'

@@ -12,9 +12,6 @@ namespace :db do
       noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)")
     
       # create company1 services and people
-      company1.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
-      company1.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
-      
       mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
       womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
       
@@ -26,9 +23,6 @@ namespace :db do
       womens_haircut.resources.push(person2)
 
       # create noelrose people, services, products
-      noelrose.services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
-      noelrose.services.create(:name => Service::UNAVAILABLE, :duration => 0, :mark_as => "busy", :price => 0.00)
-
       person1         = noelrose.people.create(:name => "Erika Maechtle")
       person2         = noelrose.people.create(:name => "Josie")
       
