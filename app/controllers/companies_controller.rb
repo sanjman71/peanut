@@ -3,7 +3,7 @@ class CompaniesController < ApplicationController
   before_filter :get_context, :only => [:index, :show, :edit, :update, :destroy] # Not for new and create
   after_filter :store_location, :only => [:index, :show, :edit]
 
-  layout 'default'
+  layout 'company'
   
   # GET /companies
   # GET /companies.xml
@@ -29,7 +29,7 @@ class CompaniesController < ApplicationController
   # GET /companies/1/edit
   def edit
   end
-
+  
   # POST /companies
   # POST /companies.xml
   def create
@@ -38,7 +38,7 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       if @company.save
         flash[:notice] = 'Company was successfully created.'
-        format.html { redirect_to(@company) }
+        format.html { redirect_to(companies_path) }
         format.xml  { render :xml => @company, :status => :created, :location => @company }
       else
         format.html { render :action => "new" }
@@ -54,7 +54,7 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       if @company.update_attributes(params[:company])
         flash[:notice] = 'Company was successfully updated.'
-        format.html { redirect_to(@company) }
+        format.html { redirect_to(companies_path) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
