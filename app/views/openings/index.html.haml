@@ -1,3 +1,4 @@
+- title("Schedule an Apppointment")
 - stylesheet('appointments', 'calendar')
 - javascript('skills', 'openings')
 
@@ -42,6 +43,14 @@
         %li== Select the waitlist to be notified of an opening
           
 .span-16.prepend-1.last
+  - if !@current_company.can_schedule_appointments?
+    %h2
+      == Before customers can schedule appointments, there must be at least 1 person
+      = link_to '(add)', people_path
+      == and 1 service
+      = link_to '(add)', services_path
+      == .
+      
   - unless @when.blank?
     %h2
       - if @free_timeslots.blank?

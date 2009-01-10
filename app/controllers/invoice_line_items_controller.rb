@@ -1,6 +1,5 @@
 class InvoiceLineItemsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
 
   def update
     @invoice_line_items = AppointmentInvoiceLineItem.find(params[:id])

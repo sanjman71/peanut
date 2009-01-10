@@ -1,3 +1,7 @@
+- if services.blank?
+  .span-10.prepend-1.last
+    %h3== No Services
+  
 - services.each do |service|
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
     .span-6.prepend-1.name

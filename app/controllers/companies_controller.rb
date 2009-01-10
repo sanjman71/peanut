@@ -26,26 +26,6 @@ class CompaniesController < ApplicationController
     end
   end
 
-  # GET /companies/1
-  # GET /companies/1.xml
-  def show
-    respond_to do |format|
-      format.html { redirect_to(appointments_path) }
-      format.xml  { render :xml => @company }
-    end
-  end
-
-  # GET /companies/new
-  # GET /companies/new.xml
-  def new
-    @company = Company.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @company }
-    end
-  end
-
   # GET /companies/1/edit
   def edit
   end

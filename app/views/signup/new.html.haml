@@ -1,3 +1,5 @@
+- title('Peanut Signup')
+
 - form_for(@company, :url => signup_path, :method => :post, :html => {:class => 'new_company'}) do |f|
   .span-20.box
     .span-20.last
@@ -23,7 +25,7 @@
       .span-4
         %h3.text-align-right== Timezone:
       .span-16.last
-        = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin: 0px; font-size: 14px;'}
+        = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {:include_blank => true}, {:style => 'margin: 0px;', :class => 'select big'}
         
     %hr.space
   
@@ -40,17 +42,17 @@
         .span-4
           %h3.text-align-right== Your email:
         .span-16.last
-          = user_form.text_field :email, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+          = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
           %h3.text-align-right== Your password:
         .span-16.last
-          = user_form.password_field :password, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+          = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
           %h3.text-align-right== Confirm password:
         .span-16.last
-          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
           .span-20.last.padding-bottom-10
         
 
@@ -73,4 +75,6 @@
       
   .span-20.prepend-1
     = submit_tag "Create My Account", :name => nil, :style => 'font-size: 15px;'
+    == &nbsp;or&nbsp;
+    = link_to 'Cancel', root_path, :style => 'font-size: 12px;'
   

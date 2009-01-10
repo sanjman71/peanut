@@ -19,6 +19,9 @@ class ApplicationController < ActionController::Base
   # Exception notifier to send emails when we have exceptions
   include ExceptionNotifiable
   
+  # Default layout
+  layout "company"
+
   private
   
   def init_current_company
@@ -31,7 +34,10 @@ class ApplicationController < ActionController::Base
         redirect_to root_path
       end
       @subdomain = @current_company.subdomain
+
+      # set company time zone
+      Time.zone = @current_company.time_zone
     end
   end
-  
+
 end

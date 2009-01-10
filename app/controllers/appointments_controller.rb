@@ -1,6 +1,7 @@
 class AppointmentsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
+  
+  @@default_when    = Appointment::WHEN_THIS_WEEK
   
   # GET /people/1/appointments
   def index
@@ -9,11 +10,16 @@ class AppointmentsController < ApplicationController
       @appointments = @customer.appointments
       raise Exception, "show customer appointments: #{@appointments.size}"
     end
+
+    if @current_company.people_count == 0
+      # show message that people need to be added before viewing schedules
+      return
+    end
     
     if params[:person_id].blank?
       # redirect to a specific person
       person = @current_company.people.first
-      redirect_to url_for(params.update(:subdomain => @subdomain, :person_id => person.id))
+      redirect_to url_for(params.update(:subdomain => @subdomain, :person_id => person.id)) and return
     end
     
     manage_appointments
@@ -81,7 +87,7 @@ class AppointmentsController < ApplicationController
     @people       = @current_company.people.all
 
     # initialize time parameters
-    @when         = params[:when] || 'this week'
+    @when         = params[:when] || @@default_when
     @daterange    = DateRange.new(:when => @when)
     
     # find free, work appointments for a person

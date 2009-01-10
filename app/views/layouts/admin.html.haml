@@ -2,7 +2,9 @@
 %html{:xmlns => "http://www.w3.org/1999/xhtml", 'xml:lang' => "en", :lang => "en"}
   %head
     %meta{'http-equiv' => "content-type", :content => "text/html;charset=UTF-8"}
-    %title== Admin Console: #{controller.action_name}
+    %title
+      = yield :title
+    %meta{:name => 'robots', :content => 'nofollow, noindex'}
     = stylesheet_link_tag 'blueprint/screen'
     = stylesheet_link_tag 'peanut'
     = stylesheet_link_tag 'errors'

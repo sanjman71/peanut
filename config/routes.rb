@@ -14,7 +14,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resource  :session
   
-  map.resources :companies
+  map.resources :companies, :except => [:new, :show]
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }

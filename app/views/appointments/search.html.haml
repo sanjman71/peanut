@@ -5,7 +5,8 @@
     = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
     %br
     = text_field('appointment', 'code', :value => @code, :class => 'title big')
-    = submit_tag 'Search', :name => nil, :class => 'submit'
+    == &nbsp;
+    = submit_tag 'Search', :name => nil, :class => 'submit button big'
     
 .span-20.last
   %span.code#message

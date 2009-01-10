@@ -1,6 +1,5 @@
 class ProductsController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
   
   # GET /products
   # GET /products.xml
