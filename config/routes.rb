@@ -10,9 +10,9 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup    '/signup/:plan', :controller => 'signup', :action => 'new'
-
+  
   # invitation signup route
-  map.invitation_signup   '/invitations/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
+  map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resources :invitations, :only => [:new, :create]
