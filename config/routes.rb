@@ -54,10 +54,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :locations
 
   # Administrative controllers
-  map.namespace :admin do |admin|
-    admin.home '', :controller => 'base', :action => 'index'
-    admin.badges 'badges/:action/:id', :controller => 'badges'
-  end
+  map.badges 'badges/:action/:id', :controller => 'badges'
 
   # map the root to the home controller
   map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => "www" }

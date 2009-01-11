@@ -1,6 +1,5 @@
-class Admin::BadgesController < Admin::BaseController
-  layout 'admin'
-  helper :all # include all helpers, all the time
+class BadgesController < ApplicationController
+  layout "admin"
   
   privilege_required 'create roles privilieges', :only => [:create_role, :create_privilege]
   privilege_required 'read roles privileges', :only => [:index]
