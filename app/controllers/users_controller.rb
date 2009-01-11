@@ -5,9 +5,25 @@ class UsersController < ApplicationController
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
   
-  # render new.rhtml
+  def index
+    @users = @current_company.users
+  end
+  
   def new
-    @user = User.new
+    @invitation = Invitation.find_by_token(params[:invitation_token])
+    
+    if @invitation.blank?
+      @error = true
+      return
+    end
+    
+    if User.find_by_invitation_id(@invitation.id)
+      @error = true
+      return
+    end
+    
+    @user       = User.new(:invitation_token => @invitation.token, :company_id => @current_company.id, :invitation_id => @invitation.id)
+    @user.email = @invitation.recipient_email
   end
  
   def create
@@ -16,8 +32,10 @@ class UsersController < ApplicationController
     @user.register! if @user && @user.valid?
     success = @user && @user.valid?
     if success && @user.errors.empty?
-      redirect_back_or_default('/')
-      flash[:notice] = "Thanks for signing up!  We're sending you an email with your activation code."
+      # activate user, redirect to login page
+      @user.activate!
+      redirect_back_or_default('/login')
+      flash[:notice] = "Your account was successfully created. Login to continue."
     else
       flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
       render :action => 'new'

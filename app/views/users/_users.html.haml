@@ -1,0 +1,8 @@
+- users.each do |user|
+  .span-16.last.letterbox.user{:class => cycle("shaded", "")}
+    .span-12.prepend-1.name
+      %h2{:style => "margin-bottom: 0px;"}= user.email
+      -# show user roles
+      = user.roles.collect(&:name).join(", ")
+    .span-3.last.action
+      = link_to "Edit", edit_user_path(user, :subdomain => @subdomain), :class => 'admin'

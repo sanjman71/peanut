@@ -14,9 +14,20 @@ class CreateUsers < ActiveRecord::Migration
       t.datetime  :activated_at
       t.string    :state,                     :null => :no, :default => 'passive'
       t.datetime  :deleted_at
+      t.integer   :invitation_id
+      t.integer   :invitation_limit
     end
     
     add_index :users, [:company_id, :email], :unique => true
+    
+    create_table :invitations do |t|
+      t.integer   :sender_id
+      t.string    :recipient_email
+      t.string    :token
+      t.datetime  :sent_at
+      
+      t.timestamps
+    end
   end
 
   def self.down

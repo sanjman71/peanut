@@ -1,7 +1,7 @@
 class SmsWorker < Workling::Base
   include SMSFu
   
-  def waitlist_confirmation(options)
+  def send_waitlist_confirmation(options)
     appointment = Appointment.find_by_id(options[:id].to_i)
     
     if appointment.blank?

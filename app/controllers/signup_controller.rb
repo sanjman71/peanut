@@ -3,10 +3,8 @@ class SignupController < ApplicationController
 
   # /signup/:plan
   def new
-    @domain = '.peanutcalendar.com'
-    
     if request.post? or request.put?
-      @user     = User.new(params[:company].delete(:user))
+      @user     = User.new(params[:company].delete(:user).update(:invitation_id => User.make_token))
       @terms    = params[:company].delete(:terms).to_i
       @company  = Company.new(params[:company])
       

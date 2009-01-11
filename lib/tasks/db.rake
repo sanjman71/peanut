@@ -47,12 +47,7 @@ namespace :db do
       color2.resources.push(person2)
       color3.resources.push(person1)
       color3.resources.push(person2)
-      
-      # create customers
-      verizon = MobileCarrier.find_by_name("Verizon Wireless")
-      Customer.create(:name => "Sanjay Kapoor", :email => "sanjay@jarna.com", :phone => "6503876818", :mobile_carrier => verizon)
-      Customer.create(:name => "Killian Murphy", :email => "killian@killianmurphy.com", :phone => "6504502628")
-      
+
       # Create admin users
       puts "adding admin user: admin@killianmurphy.com, password: peanut"
       a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut")

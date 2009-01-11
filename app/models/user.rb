@@ -20,11 +20,16 @@ class User < ActiveRecord::Base
   validates_presence_of     :company_id
   belongs_to                :company
   
-
+  validates_presence_of     :invitation_id
+  validates_uniqueness_of   :invitation_id
+  
+  has_many                  :sent_invitations, :class_name => 'Invitation'
+  belongs_to                :invitation
+  
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :company_id, :email, :name, :password, :password_confirmation
+  attr_accessible :company_id, :email, :name, :password, :password_confirmation, :invitation_token, :invitation_id
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
@@ -42,6 +47,14 @@ class User < ActiveRecord::Base
     write_attribute :email, (value ? value.downcase : nil)
   end
 
+  def invitation_token
+    invitation.token if invitation
+  end
+  
+  def invitation_token=(token)
+    self.invitation = Invitation.find_by_token(token)
+  end
+  
   protected
     
   def make_activation_code

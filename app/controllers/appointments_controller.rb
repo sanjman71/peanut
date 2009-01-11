@@ -146,11 +146,11 @@ class AppointmentsController < ApplicationController
         @appointment.save!
 
         # send waitlist confirmation
-        MailWorker.async_waitlist_confirmation(:id => @appointment.id)
+        MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
 
         if @appointment.customer.sms?
           # send sms waitilist confirmation 
-          SmsWorker.async_waitlist_confirmation(:id => @appointment.id)
+          SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
         end
       rescue Exception => e
         logger.debug("*** could not create waitlist appointment: #{e.message}")
@@ -168,7 +168,7 @@ class AppointmentsController < ApplicationController
         @work_appointment = AppointmentScheduler.create_work_appointment(@appointment)
         
         # send appointment confirmation
-        MailWorker.async_appointment_confirmation(:id => @work_appointment.id)
+        MailWorker.async_send_appointment_confirmation(:id => @work_appointment.id)
       rescue Exception => e
         logger.debug("*** could not schedule appointment: #{e.message}")
         return

@@ -70,7 +70,7 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
-  config.active_record.observers = :user_observer
+  # config.active_record.observers = :user_observer
   
   # Turn off timestamped migrations
   config.active_record.timestamped_migrations = false
@@ -86,3 +86,6 @@ Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
 ExceptionNotifier.exception_recipients  = %w(peanut-exception@jarna.com)
 ExceptionNotifier.sender_address        = %("peanut error" <app.error@peanut.com>)
 ExceptionNotifier.email_prefix          = "[app] "
+
+# 
+DOMAIN = '.peanutcalendar.com'

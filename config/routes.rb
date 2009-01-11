@@ -8,10 +8,14 @@ ActionController::Routing::Routes.draw do |map|
   # user activation
   map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
-  # signup routes
+  # company signup route
   map.signup    '/signup/:plan', :controller => 'signup', :action => 'new'
+
+  # invitation signup route
+  map.invitation_signup   '/invitations/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
+  map.resources :invitations, :only => [:new, :create]
   map.resource  :session
   
   map.resources :companies, :except => [:new, :show]
