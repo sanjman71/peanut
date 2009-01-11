@@ -1,8 +1,7 @@
-<p>
-  <b>Name:</b>
-  <%=h @company.name %>
-</p>
-
+.span-20.box
+  %h2
+    == Editing
+    = @company.name
 
 <%= link_to 'Edit', edit_company_root_path(:subdomain => @company.subdomain) %> |
 <%= link_to 'Back', companies_path %>

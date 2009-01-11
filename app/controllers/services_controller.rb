@@ -1,6 +1,5 @@
 class ServicesController < ApplicationController
   before_filter :init_current_company
-  layout 'blueprint'
   
   # GET /services
   # GET /services.xml

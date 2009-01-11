@@ -1,3 +1,4 @@
+- title("Customers")
 - stylesheet('customers')
 - javascript('customers')
 
@@ -7,7 +8,7 @@
   = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => @subdomain))
 
 .span-20.last
-  .prepend-1.append-bottom.customers_header#customer_search_text
+  .prepend-1.append-bottom.customers.header#customer_search_text
     = @search_text
   #customers
     = render(:partial => 'customers.html.haml', :locals => {:customers => @customers})

@@ -13,7 +13,7 @@ class SignupController < ApplicationController
       # use a transaction to objects
       Company.transaction do
         # check terms
-        @terms_error = 'Please accept the terms and conditions' unless @terms == 1
+        @terms_error = 'The terms and conditions must be accepted' unless @terms == 1
         
         # create company, user objects
         @company.save
@@ -23,8 +23,16 @@ class SignupController < ApplicationController
         # rollback unless all objects are valid
         raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or @terms != 1
 
-        # signup completed
-        redirect_to companies_path
+        # register, activate user
+        @user.register!
+        @user.activate!
+        
+        # set user roles
+        @user.grant_role('company manager')
+        
+        # signup completed, redirect to login page
+        flash[:notice] = "Signup complete! Please sign in to continue."
+        return redirect_to(login_path(:subdomain => @company.subdomain))
       end
     else
       @company  = Company.new

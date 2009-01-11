@@ -119,8 +119,8 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_not_allow_when_start_at_is_same_as_end_at
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
+    free      = company.services.free.first
     
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
@@ -137,8 +137,8 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_not_allow_start_at_after_end_at
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
+    free      = company.services.free.first
     
     assert_no_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
@@ -155,8 +155,8 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_should_set_duration
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
+    free      = company.services.free.first
     
     assert_difference('Appointment.count') do
       appt = Appointment.create(:company => company, 
@@ -220,7 +220,7 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_equal [], Appointment.wait.time_overlap(Appointment.time_range('bogus'))
     
     # create free time from 8 am to noon
-    free      = Factory(:free_service, :company => company)
+    free      = company.services.free.first
     start_at  = wait.start_at.beginning_of_day + 8.hours
     end_at    = start_at + 4.hours
     appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
@@ -300,8 +300,8 @@ class AppointmentTest < ActiveSupport::TestCase
   def test_confirmation_code
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company, :price => 1.00)
     customer  = Factory(:customer)
+    free      = company.services.free.first
     
     appt = Appointment.create(:company => company, 
                               :service => free,

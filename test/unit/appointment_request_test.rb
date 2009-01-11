@@ -6,8 +6,8 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     # create free time from 8 am to noon
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    free      = Factory(:free_service, :company => company)
     haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    free      = company.services.free.first
     anyone    = Person.anyone
     
     start_at  = Time.now.beginning_of_day + 8.hours

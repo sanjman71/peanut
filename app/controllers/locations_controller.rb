@@ -2,8 +2,6 @@ class LocationsController < ApplicationController
   before_filter :init_current_company, :get_context
   after_filter :store_location, :only => [:index, :show]
   
-  layout 'default'
-  
   # GET /locations
   # GET /locations.xml
   def index
