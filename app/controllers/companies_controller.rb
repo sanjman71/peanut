@@ -10,8 +10,6 @@ class CompaniesController < ApplicationController
     if @current_company
       # show company openings
       return redirect_to(openings_path)
-      # KILLIAN - check this:
-      # return redirect_to(:action => :show, :subdomain => @current_company.subdomain)
     end
     
     # We're going to an admin page
