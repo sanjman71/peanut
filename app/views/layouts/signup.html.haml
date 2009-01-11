@@ -18,11 +18,16 @@
     #header
       .container
         .span-21
-          %h1== Signup for a free account
-            
+          .login_info
+            = render :partial => 'users/user_bar'
+            == &nbsp;|&nbsp;
+            = render :partial => 'shared/admin_bar'
+          %h1= yield :title
+
     - if RAILS_ENV == 'development'
       .container.showgrid
         = yield
     - else
       .container
         = yield
+  

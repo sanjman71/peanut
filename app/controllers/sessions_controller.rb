@@ -3,7 +3,12 @@ class SessionsController < ApplicationController
   before_filter :init_current_company
 
   def new
-    # render new.html.haml
+    if @current_company.blank?
+      # use special layout
+      render(:action => 'new', :layout => 'signup')
+    else
+      # use default layout
+    end
   end
 
   def create
@@ -23,7 +28,14 @@ class SessionsController < ApplicationController
       note_failed_signin
       @email       = params[:email]
       @remember_me = params[:remember_me]
-      render :action => 'new'
+      
+      if @current_company.blank?
+        # use special layout
+        render(:action => 'new', :layout => 'signup')
+      else
+        # use default layout
+        render :action => 'new'
+      end
     end
   end
 

@@ -1,0 +1,5 @@
+= link_to('Companies', companies_path(:subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
+
+- if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')
+  = link_to('Privileges & Roles', badges_path, :class => 'admin', :style => 'color: #DDDDDD;')
+
