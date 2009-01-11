@@ -60,7 +60,6 @@ ActionController::Routing::Routes.draw do |map|
   map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => "www" }
   
   # map the company root to the companies controller
-  #  map.company_root  '/:action', :controller => 'companies', :conditions => { :subdomain => /.+/ }
   map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
   map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :conditions => { :subdomain => /.+/ }
 
