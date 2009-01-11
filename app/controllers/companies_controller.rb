@@ -3,8 +3,6 @@ class CompaniesController < ApplicationController
   before_filter :get_context, :only => [:index, :show, :edit, :update, :destroy] # Not for new and create
   after_filter :store_location, :only => [:index, :show, :edit]
 
-  layout 'default'
-  
   # GET /companies
   # GET /companies.xml
   def index
