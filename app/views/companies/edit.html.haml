@@ -17,3 +17,7 @@
       = f.submit 'Update', :class => 'button big'
       == or
       = link_to 'Cancel', companies_path, :style => 'font-size: 12px;'
+
+  %h2
+    == Company locations
+  = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:may_edit_parent  => @may_edit_parent, :locatable => @company}
