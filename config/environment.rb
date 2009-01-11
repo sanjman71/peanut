@@ -53,10 +53,8 @@ Rails::Initializer.run do |config|
   # If you change this key, all old sessions will become invalid!
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
-  config.action_controller.session = {
-    :session_key => '_peanut_session',
-    :secret      => '36791ab51cc708c1cf0314576d5a6a5fb5b1ecf2c4eebf911eeed605b2b666ffd62f24a93ae99519c100543b0ee9195866cdf0e088a0f64add7dad04da09ccd7'
-  }
+  #
+  # Moved this to dev, test and production .rb files so that we can use different domains for each - peanut.dev, peanut.test and peanut.com
 
   # Use the database for sessions instead of the cookie-based default,
   # which shouldn't be used to store highly confidential information
@@ -89,3 +87,6 @@ ExceptionNotifier.email_prefix          = "[app] "
 
 # 
 DOMAIN = '.peanutcalendar.com'
+
+# Use will_paginate
+require "will_paginate"

@@ -18,7 +18,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invitations, :only => [:new, :create]
   map.resource  :session
   
-  map.resources :companies, :except => [:new, :show]
+  map.resources :companies
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }
@@ -53,22 +53,20 @@ ActionController::Routing::Routes.draw do |map|
   # javascript routes
   map.resources :javascripts,       :collection => {:skillset => :get}
 
-  # Install the default routes as the lowest priority.
-  map.namespace :badges do |badges|
-    badges.resource :roles
-    badges.resource :user_roles
-    badges.resource :role_privileges
-    badges.resource :privileges
-    badges.connect '/admin/:action/:id', :controller => 'admin'
-  end
+  # This allows us to get access to locations without going through their owner, if required.
+  # It at least gives us some useful automatic route definitions like edit_location_url etc.
+  map.resources :locations
 
+  # Administrative controllers
+  map.badges 'badges/:action/:id', :controller => 'badges'
 
-  # map the company root to the companies controller
-  map.company_root  '',     :controller => 'companies', :action => 'index', :conditions => { :subdomain => /.+/ }
-
-  # map the root to the companies controller
-  map.root                  :controller => 'companies', :action => 'index'
+  # map the root to the home controller
+  map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => "www" }
   
+  # map the company root to the companies controller
+  map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
+  map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :conditions => { :subdomain => /.+/ }
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

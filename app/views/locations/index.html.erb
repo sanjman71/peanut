@@ -1,0 +1,8 @@
+<%= render :partial => "locations/locations",
+          :object => @locations,
+          :locals => 
+          { :short_locations => true, 
+            :show_location_title => true,
+            :context_url => @context_url || '',
+            :may_edit_parent => @may_edit_parent
+          } -%>

@@ -33,6 +33,8 @@ One fix is to change config.cache_classes = true in your development.rb.
 2. Start the workling client and monitor
    - ./script/workling_client start
 
+<<<<<<< HEAD:README
+=======
 == Badges
 The administrative page is accessible here:
 http://localhost:3000/badges/admin/index
@@ -42,3 +44,4 @@ Migration 003_... includes creating all the tables, the two default roles 'admin
 Migration 004... adds the peanut specific roles 'company manager' and 'company employee', along with privileges 'create company', 'read company', 'update company' and 'delete company'. I provided initial assignments of these privileges to the two roles.
 
 This provides us with initial support. Next I need to start adding privilege requirements to models, views and controllers. Watch this space.
+>>>>>>> c18086172e6d49fef575cfbb9c87ed0334e0fc62:README

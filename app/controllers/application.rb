@@ -25,15 +25,20 @@ class ApplicationController < ActionController::Base
   private
   
   def init_current_company
-    @current_company = Company.find_by_subdomain(current_subdomain)
-    unless @current_company
-      flash[:notice] = "Invalid company"
-      redirect_to root_path
-    end
-    @subdomain = @current_company.subdomain
+    # Don't look for a company if we're on the home pages
+    # If we're on www.peanut.xxx then current_subdomain will be nil
+    if current_subdomain
+      @current_company = Company.find_by_subdomain(current_subdomain)
+      if @current_company
+        @subdomain = @current_company.subdomain
 
-    # set company time zone
-    Time.zone = @current_company.time_zone
+        # set company time zone
+        Time.zone = @current_company.time_zone
+      else
+        flash[:error] = "Invalid company"
+        redirect_to root_path
+      end
+    end
   end
 
 end

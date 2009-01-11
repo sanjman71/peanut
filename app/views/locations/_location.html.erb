@@ -1,0 +1,30 @@
+<% if location %>
+  <div <%= "id='loc_#{h(location.id)}'" -%> >
+    <td>
+      <span class="location_text">
+        <% if show_location_title -%>
+          <%= link_to location_title_renderer(location), location_path(location) %>: 
+        <% end -%>
+        </td>
+        <td>
+          <span class="location_text">
+        <% if short_locations -%>
+          <%= render :partial => 'locations/short_location', :object => location %>
+        <% else -%>
+          <%= render :partial => 'locations/location_address', :object => location %>
+        <% end -%>
+      </span>
+    </td>
+    <td>
+  	  <span class="editdelete">
+        <% if may_edit_parent %>
+          <%= link_to_remote "Edit", 
+            { :url => edit_location_path(location), :method => :get, :html => {:class => 'edit_address'}},
+            :href => edit_location_path(location) -%>
+          <%= link_to "Delete", location_path(location), 
+              :method => :delete, :confirm => "Are you sure you want to delete this location" -%>
+        <% end %>
+      </span>
+    </td>
+  </div>
+<% end %>

@@ -18,12 +18,17 @@
     #header
       .container
         .span-21
-          %h2== Admin Console
+          .login_info
+            = render :partial => 'users/user_bar'
+          %h1== Admin Console
         #tabs
           .span-21
             %ul
               %li.with_space
                 = link_to 'Companies', companies_path
+              - if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')
+                %li.with_space
+                  = link_to 'Privileges & Roles', badges_path
 
     .container
       = yield
