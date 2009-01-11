@@ -17,10 +17,10 @@ class CreateDefaultRolesPrivs < ActiveRecord::Migration
 
     # Roles and privileges for managing roles and privileges
     # Initially only available to the admin
-    Badges::Privilege.create(:name=>'create roles privilieges')
+    Badges::Privilege.create(:name=>'create roles privileges')
     Badges::Privilege.create(:name=>'read roles privileges')
     Badges::Privilege.create(:name=>'update roles privileges')
-    Badges::Privilege.create(:name=>'deleve roles privilieges')
+    Badges::Privilege.create(:name=>'delete roles privilieges')
 
   end
 

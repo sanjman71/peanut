@@ -3,8 +3,6 @@ class CompaniesController < ApplicationController
   before_filter :get_context, :only => [:index, :show, :edit, :update, :destroy] # Not for new and create
   after_filter :store_location, :only => [:index, :show, :edit]
 
-  layout 'company'
-  
   # GET /companies
   # GET /companies.xml
   def index
@@ -23,6 +21,26 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       format.html { render :layout => 'admin' } # index.html.erb
       format.xml  { render :xml => @companies }
+    end
+  end
+
+  # GET /companies/1
+  # GET /companies/1.xml
+  def show
+    respond_to do |format|
+      format.html { redirect_to(appointments_path) }
+      format.xml  { render :xml => @company }
+    end
+  end
+
+  # GET /companies/new
+  # GET /companies/new.xml
+  def new
+    @company = Company.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @company }
     end
   end
 
