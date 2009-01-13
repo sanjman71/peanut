@@ -111,9 +111,6 @@ div.instructions ul                               { font-size: 12px; }
 
 .green                                            { color: #FF6600; font-style: bold; font-size: 12px; }
 
-/* move the login panel to the right of the header */
-.login_info                                       { float: right; }
-
 /* example styles */
 
 span.example                                      { color: #666666; font-style: italic; font-size: 11px; padding-left: 5px; }

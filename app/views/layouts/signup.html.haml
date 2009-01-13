@@ -17,12 +17,10 @@
   %body
     #header
       .container
-        .span-21
-          .login_info
-            = render :partial => 'users/user_bar'
-            == &nbsp;|&nbsp;
-            = render :partial => 'shared/admin_bar'
+        .span-18
           %h1= yield :title
+        .span-6.last.admin
+          = render :partial => 'shared/admin_bar'
 
     - if RAILS_ENV == 'development'
       .container.showgrid
