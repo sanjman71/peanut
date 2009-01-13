@@ -6,9 +6,12 @@ class Note < ActiveRecord::Base
   named_scope               :sort_recent, {:order => "created_at DESC"}
   
   def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
     if @subject_type and @subject_id
       begin
-        @subject  = Kernel.const_get(@subject_type).find_by_id(@subject_id)
+        @subject = Kernel.const_get(@subject_type).find_by_id(@subject_id)
       end
     end
   end

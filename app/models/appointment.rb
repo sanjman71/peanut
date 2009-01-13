@@ -100,6 +100,9 @@ class Appointment < ActiveRecord::Base
   end
   
   def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
     if self.start_at and self.service and self.end_at.blank?
       # initialize end_at
       self.end_at = self.start_at + self.service.duration_to_seconds
