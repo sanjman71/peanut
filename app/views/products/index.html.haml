@@ -7,6 +7,11 @@
   %hr.space
   .span-15.prepend-1.append-1.last
     .highlight#flash
+  .span-16.pagination.block
+    .span-13
+      = page_entries_info @products
+    .span-3.last
+      = will_paginate(@products, :page_links => false, :params => {:subdomain => @subdomain})
   #products
     = render(:partial => 'products.html.haml', :locals => {:products => @products})
     

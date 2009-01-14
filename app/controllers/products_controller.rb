@@ -4,7 +4,7 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.xml
   def index
-    @products = @current_company.products
+    @products = @current_company.products.paginate(:page => params[:page], :order => "name ASC")
   end
   
   # POST /products
