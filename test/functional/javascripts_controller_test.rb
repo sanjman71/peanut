@@ -1,4 +1,5 @@
-require 'test_helper'
+require 'test/test_helper'
+require 'test/factories'
 
 class JavascriptsControllerTest < ActionController::TestCase
   # Replace this with your real tests.

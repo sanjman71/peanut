@@ -39,7 +39,7 @@ class Test::Unit::TestCase
 
   # Add more helper methods to be used by all tests here...
   
-  def setup_subdomain
+  def stub_subdomain
     # stub subdomain object
     @company = Factory(:company)
     Company.stubs(:find_by_subdomain).returns(@company)
