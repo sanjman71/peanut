@@ -64,7 +64,7 @@ God.watch do |w|
   pid_file          = "#{God.pid_file_directory}/starling.pid"
   w.name            = "starling"
   w.interval        = 60.seconds
-  w.start           = "starling -d -P #{pid_file} -q #{RAILS_ROOT}/log/"
+  w.start           = "starling -d -p 22122 -P #{pid_file} -q #{RAILS_ROOT}/log/"
   w.stop            = "kill `cat #{pid_file}`"
   w.start_grace     = 10.seconds
   w.restart_grace   = 10.seconds
