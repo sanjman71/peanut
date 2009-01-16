@@ -1,9 +1,17 @@
-.span-20
-  .span-18.box.last
+.span-18
+  .span-17.box.last
     %h1= @person.name
+    %h3
+      - if @services.blank?
+        == No Services
+      - else
+        == Services:
+        = @services.collect(&:name).join(", ")
     
-.span-20
-  == Show list of appointments?
-  %p
-  == Add/remove skills here?
+.span-18
+  .span-17.prepend-1
+    - if @appointments.blank?
+      %h3== No Appointments
+
+  = render(:partial => 'appointments/appointments_list.html.haml', :locals => {:appointments => @appointments})
     

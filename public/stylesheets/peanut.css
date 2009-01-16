@@ -28,6 +28,8 @@ a img:hover                                       { background-color: green; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
 
+.margin-bottom-0                                  { margin-bottom: 0px; }
+
 .text-align-right                                 { text-align: right; }
 .text-align-left                                  { text-align: left; }
 
@@ -66,11 +68,6 @@ div.container div.box                             { background: #EDF3FE; padding
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
 
-/* pagination styles */
-
-.pagination.block                                 { background: #FFF6BF none repeat scroll 0 0; padding: 5px 0px 5px 0px; margin-bottom: 20px;
-                                                    color: #666666; font-size: 11px; font-weight: bold; }
-
 /* form styles */
 
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
@@ -99,6 +96,14 @@ div.instructions, div.instructions.sidebar        { background: #FFFFCC; padding
 
 div.instructions ul                               { font-size: 12px; }
 
+/* pagination styles */
+
+.pagination a                                     { background: #FF6600; }
+
+.pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
+                                                    text-decoration: none; }
+
+.pagination span.disabled                         { background: #CCCCCC; }
 
 /* highlight styles */
 
@@ -112,9 +117,11 @@ div.instructions ul                               { font-size: 12px; }
   
 /* color styles */
 
-.red                                              { color: #FF0000; font-style: bold; font-size: 12px; }
+.red                                              { color: #FF0000; }
 
-.green                                            { color: #FF6600; font-style: bold; font-size: 12px; }
+.green                                            { color: #FF6600; }
+
+.grey                                             { color: #666666; }
 
 /* example styles */
 

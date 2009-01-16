@@ -29,13 +29,15 @@ class CustomersControllerTest < ActionController::TestCase
   
   context "search non-empty customer database" do
     setup do
-      # create company customer and stub search results (customers are linked to company throught appointments)
-      @customer = Factory(:customer, :name => 'Booty Licious')
-      @company.stubs(:customers).returns(Customer)
-      @company.stubs(:all).returns([@customer])
+      # create customer with a valid appointment
+      @customer     = Factory(:customer, :name => 'Booty Licious')
+      @johnny       = Factory(:person, :name => "Johnny", :companies => [@company])
+      @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :resource => @johnny, :service => @haircut)
+      assert_valid @appointment
     end
 
-    context "with an ajax search for 'fi'" do
+    context "with an ajax search for 'boo'" do
       setup do
         xhr :get, :index, :format => 'js', :search => 'boo'
       end

@@ -5,7 +5,7 @@
 - services.each do |service|
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
     .span-6.prepend-1.name
-      %h2{:style => "margin-bottom: 0px;"}= service.name
+      %h2.margin-bottom-0= service.name
       -# show all resources for this service
       - resources = service.resources.collect { |r| r.name }.sort
       = resources.join(", ")

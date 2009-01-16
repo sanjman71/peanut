@@ -1,6 +1,12 @@
 class InvoicesController < ApplicationController
   before_filter :init_current_company
 
+  def index
+    # find all invoices for completed appointments
+    @appointments = @current_company.appointments.completed
+    @total        = @appointments.inject(Money.new(0)) { |total, appt| total += appt.invoice.total_as_money }
+  end
+  
   def show
     @invoice      = AppointmentInvoice.find(params[:id])
     @appointment  = @invoice.appointment

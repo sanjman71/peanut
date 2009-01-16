@@ -25,7 +25,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]
   map.resources :memberships, :only => [:create, :destroy]
-  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:show, :add, :remove]
+  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   

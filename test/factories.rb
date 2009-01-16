@@ -34,10 +34,25 @@ Factory.define :customer do |c|
   c.phone "6505551212"
 end
 
+# Factory.define :appointment do |a|
+#   a.mark_as     { |o| o.service.mark_as }
+# end
+
+Factory.define :appointment_today, :class => Appointment do |a|
+  a.mark_as         { |o| o.service.mark_as }
+  a.start_at        { |o| Factory.next :today_hour }  # choose an hour from today
+  a.duration        { |o| o.service.duration_to_seconds }
+  a.end_at          { |o| o.start_at + o.service.duration_to_seconds }  # add duration to start_at
+end
+
 Factory.sequence :name do |n|
   "user#{n}"
 end
 
 Factory.sequence :email do |n|
   "user#{n}@peanut.com"
+end
+
+Factory.sequence :today_hour do |n|
+  Time.now.beginning_of_day + n.hours
 end

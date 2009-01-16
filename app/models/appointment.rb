@@ -52,6 +52,10 @@ class Appointment < ActiveRecord::Base
   named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
+  # find appointments by state, eager load the associated invoice for completed appointments
+  named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
+  named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
+
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
   WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']

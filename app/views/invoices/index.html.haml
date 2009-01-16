@@ -1,0 +1,14 @@
+.span-15
+  .span-15.box
+    %h2== Invoices
+    
+  #invoices
+    = render(:partial => 'appointments/appointments_list.html.haml', :locals => {:appointments => @appointments})
+    
+  %hr.space
+  
+  .span-16.last.highlighted
+    .span-5.prepend-1
+      %h2== Total
+    .span-5
+      %h2= @total
