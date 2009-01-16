@@ -7,18 +7,17 @@ if File.exists?(peanut_dir)
   # production environment
   RAILS_ROOT  = peanut_dir
   environment = 'production'
-  user        = 'peanut'
-  group       = 'peanut'
 else
   # assume development environment, use current directory
   RAILS_ROOT  = File.dirname(File.dirname(__FILE__))
   environment = 'development'
   
-  # read user, group from config file
-  config      = YAML.load_file("#{RAILS_ROOT}/config/god/user.yml")
-  user        = config['user']
-  group       = config['group']
 end
+
+# Load user, group info
+config  = YAML.load_file("#{RAILS_ROOT}/config/god/user.yml")
+user    = config['user']
+group   = config['group']
 
 # Create, set permissions on default pid file directory
 system "mkdir -p /var/run/god"
