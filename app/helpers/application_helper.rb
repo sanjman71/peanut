@@ -27,6 +27,11 @@ module ApplicationHelper
     html
   end
   
+  def display_message(msg, type = :notice)
+    return "" if msg.blank?
+    "<div class=\"#{type.to_s}\">#{msg}</div>"
+  end
+  
   def build_tab_links(current_controller)
     
     # 'Openings' tab

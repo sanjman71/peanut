@@ -20,8 +20,9 @@ class User < ActiveRecord::Base
   validates_presence_of     :company_id
   belongs_to                :company
   
+  # Invitations ids are required, but the special value 0 is allowed, indicating the user signed up directly on the site
   validates_presence_of     :invitation_id
-  validates_uniqueness_of   :invitation_id
+  validates_uniqueness_of   :invitation_id, :if => "invitation_id != 0"
   
   has_many                  :sent_invitations, :class_name => 'Invitation'
   belongs_to                :invitation
