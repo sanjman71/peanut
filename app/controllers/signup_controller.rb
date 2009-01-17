@@ -1,6 +1,7 @@
 class SignupController < ApplicationController
   layout 'signup'
-
+  # ssl_required :new
+  
   # /signup/:plan
   def new
     if request.post? or request.put?

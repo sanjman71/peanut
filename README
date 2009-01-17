@@ -51,3 +51,21 @@ Migration 003_... includes creating all the tables, the two default roles 'admin
 Migration 004... adds the peanut specific roles 'company manager' and 'company employee', along with privileges 'create company', 'read company', 'update company' and 'delete company'. I provided initial assignments of these privileges to the two roles.
 
 This provides us with initial support. Next I need to start adding privilege requirements to models, views and controllers. Watch this space.
+
+== SSL Setup and Testing in development
+
+Excellent tutorial at:
+
+http://www.ricroberts.com/articles/2008/09/25/setting-up-ssl-for-rails-and-testing-it-locally
+
+The local apache configuration on a mac lives in /etc/apache2.
+
+To start apache:
+  - sudo httpd -k start
+  
+To stop apache:
+  - sudo httpd -k stop
+  
+Apache listens on port 80 and 443, and proxies to webbrick or mongrel (usually on port 3000 in dev).
+
+Uses the ssl_requirement plugin to enforce secure actions.
