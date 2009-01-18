@@ -1,16 +1,17 @@
 # Start with: 'sudo god -c config/peanut.god'
 require 'yaml'
 
+# Application directory in production
 peanut_dir    = "/usr/apps/peanut/current"
 
 if File.exists?(peanut_dir)
   # production environment
   RAILS_ROOT  = peanut_dir
-  environment = 'production'
+  rails_env   = 'production'
 else
   # assume development environment, use current directory
   RAILS_ROOT  = File.dirname(File.dirname(__FILE__))
-  environment = 'development'
+  rails_env   = 'development'
   
 end
 
@@ -97,17 +98,17 @@ God.watch do |w|
 end
 
 # run these in production environments
-if environment == 'production'
+if rails_env == 'production'
   
   # log, pid files => RAILS_ROOT/log
   %w{5000 5001}.each do |port|
     God.watch do |w|
       w.name          = "mongrel-#{port}"
-      w.group         = "mongrel"
+      w.group         = "mongrels"
       w.uid           = user
       w.gid           = group
       w.interval      = 60.seconds      
-      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} -e #{environment} \
+      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} -e #{rails_env} \
                         -P #{RAILS_ROOT}/log/mongrel.#{port}.pid  -d"
       w.stop          = "mongrel_rails stop -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
       w.restart       = "mongrel_rails restart -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"

@@ -6,3 +6,6 @@ hosts[:slicehost]   = '173.45.229.171:30001'
 role :app,          hosts[:slicehost]
 role :web,          hosts[:slicehost]
 role :db,           hosts[:slicehost], :primary => true
+
+# Set rails environment
+set :rails_env,     'production'

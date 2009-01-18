@@ -20,7 +20,9 @@ set :deploy_via,    :remote_cache
 set :user,          'peanut'  # log into servers as
 set :group,         'peanut'
 
-# Load external recipe files files
+# Load external recipe files
 load_paths << "config/mongrel"
+load_paths << "config/database"
 load "mongrel_tasks"
+load "database_tasks"
 
