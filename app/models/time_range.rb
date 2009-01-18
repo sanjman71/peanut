@@ -1,3 +1,4 @@
+# Builds a time range within a given day
 class TimeRange
   attr_accessor :day, :start_at, :end_at
   

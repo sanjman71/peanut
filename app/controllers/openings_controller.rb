@@ -19,7 +19,7 @@ class OpeningsController < ApplicationController
     
     # initialize when, no default
     @when       = params[:when]
-    @daterange  = DateRange.new(:when => @when) unless @when.blank?
+    @daterange  = DateRange.parse_when(@when) unless @when.blank?
     
     # initialize time
     @time       = params[:time]

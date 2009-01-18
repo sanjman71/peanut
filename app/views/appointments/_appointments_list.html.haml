@@ -3,7 +3,7 @@
     .span-5.prepend-1.invoice
       %h2= (appointment.resource || Person.anyone).name
       
-    .span-5
+    .span-3
       - if appointment.invoice
         %h2= appointment.invoice.total_as_money
         .invoice.hide
@@ -11,6 +11,10 @@
       - else
         %h3{:style => 'padding-top: 5px;'}== Scheduled
         
-    .span-5.last
-      %h3{:style => 'padding-top: 5px;'}= appointment.updated_at.to_s(:appt_short_month_day_year)
+    .span-4
+      %h3{:style => 'padding-top: 5px; margin-bottom: 2px;'}= appointment.service.name
+      %h4= appointment.customer.name
+    
+    .span-3.last
+      %h3{:style => 'padding-top: 5px;'}= appointment.start_at.to_s(:appt_short_month_day_year)
     

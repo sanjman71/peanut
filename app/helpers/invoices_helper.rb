@@ -1,6 +1,6 @@
-module AppointmentsHelper
+module InvoicesHelper
 
-  def build_appointment_when_links(person, when_collection, current, options={})
+  def build_invoice_when_links(when_collection, current, options={})
     default = options[:default]
     
     when_collection.each do |s|
@@ -9,10 +9,10 @@ module AppointmentsHelper
       
       if s == default
         # no when parameter for the default value
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain), :class => klass)
+        link  = link_to(s.titleize, invoices_path(:subdomain => @subdomain), :class => klass)
       else
         # use when parameter
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain, :when => s), :class => klass)
+        link  = link_to(s.titleize, invoices_path(:subdomain => @subdomain, :when => s), :class => klass)
       end
       
       # use separator unless its the last element

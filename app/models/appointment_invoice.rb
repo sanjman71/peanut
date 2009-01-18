@@ -7,6 +7,12 @@ class AppointmentInvoice < ActiveRecord::Base
   # find invoices for completed appointments
   named_scope :completed,   { :include => :appointment, :conditions => {'appointments.state' => 'completed'} }
   
+  def after_create
+    # add appointment service as a line item
+    li = AppointmentInvoiceLineItem.new(:chargeable => appointment.service, :price_in_cents => appointment.service.price_in_cents)
+    line_items.push(li)
+  end
+  
   def total
     line_items.inject(0) do |sum, item|
       sum += item.price_in_cents

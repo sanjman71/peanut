@@ -2,8 +2,12 @@ class InvoicesController < ApplicationController
   before_filter :init_current_company
 
   def index
-    # find all invoices for completed appointments
-    @appointments = @current_company.appointments.completed
+    # build daterange using when
+    @when         = params[:when] || Appointment::WHEN_PAST_WEEK
+    @daterange    = DateRange.parse_when(@when)
+    
+    # find all invoices for completed appointments, within the when range
+    @appointments = @current_company.appointments.completed.overlap(@daterange.start_at, @daterange.end_at).all(:order => 'start_at ASC')
     @total        = @appointments.inject(Money.new(0)) { |total, appt| total += appt.invoice.total_as_money }
   end
   

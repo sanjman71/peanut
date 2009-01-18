@@ -29,8 +29,8 @@ Factory.define :product do |p|
 end
 
 Factory.define :customer do |c|
-  c.name { |s| Factory.next :name }
-  c.email { |s| Factory.next :email }
+  c.name { |s| Factory.next :customer_name }
+  c.email { |s| Factory.next :customer_email }
   c.phone "6505551212"
 end
 
@@ -49,8 +49,16 @@ Factory.sequence :name do |n|
   "user#{n}"
 end
 
+Factory.sequence :customer_name do |n|
+  "Customer #{n}"
+end
+
 Factory.sequence :email do |n|
   "user#{n}@peanut.com"
+end
+
+Factory.sequence :customer_email do |n|
+  "customer#{n}@peanut.com"
 end
 
 Factory.sequence :today_hour do |n|

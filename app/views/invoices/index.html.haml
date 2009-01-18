@@ -1,14 +1,24 @@
 .span-15
-  .span-15.box
-    %h2== Invoices
+  .span-15.last.box
+    .span-9
+      %h2== Invoices
+    .span-6.last
+      - build_invoice_when_links(Appointment::WHENS_PAST, @when, :default => 'past week') do |link, separator|
+        = link
+        = separator
     
+  .span-15.prepend-1
+    - if @appointments.blank?
+      %h3== No Invoices
+      
   #invoices
     = render(:partial => 'appointments/appointments_list.html.haml', :locals => {:appointments => @appointments})
     
   %hr.space
   
-  .span-16.last.highlighted
-    .span-5.prepend-1
-      %h2== Total
-    .span-5
-      %h2= @total
+  - unless @appointments.blank?
+    .span-16.last.highlighted
+      .span-5.prepend-1
+        %h2== Total
+      .span-5
+        %h2= @total

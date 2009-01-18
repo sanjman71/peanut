@@ -58,9 +58,11 @@ class Appointment < ActiveRecord::Base
 
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
+  WHEN_PAST_WEEK            = 'past week'
   WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
   WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
   WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'this month', 'later']
+  WHENS_PAST                = ['past week', 'past 2 weeks', 'past month']
   
   # valid time of day values
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
