@@ -9,7 +9,7 @@
     .highlight#flash
   .span-15.prepend-1
     .span-11
-      %h4= page_entries_info @products
+      %h4= page_entries_info @products unless @products.blank?
     .span-4.last
       = will_paginate(@products, :page_links => false, :params => {:subdomain => @subdomain})
   #products
