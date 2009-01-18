@@ -38,9 +38,10 @@ class User < ActiveRecord::Base
   # We really need a Dispatch Chain here or something.
   # This will also let us return a human error message.
   #
-  def self.authenticate(email, password)
+  def self.authenticate(email, password, options={})
     return nil if email.blank? || password.blank?
-    u = find_in_state :first, :active, :conditions => {:email => email} # need to get the salt
+    c = options[:company_id].to_i
+    u = find_in_state :first, :active, :conditions => {:email => email, :company_id => c} # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
   
