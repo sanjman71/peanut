@@ -6,16 +6,18 @@ namespace :db do
     namespace :init do
       
       desc "Iniatialize admin users"
-      task :users do 
+      task :admin_users do 
         # Create admin users
         puts "adding admin user: admin@killianmurphy.com, password: peanut"
-        a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut")
+        a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", 
+                        :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
         a.register!
         a.activate!
         a.grant_role('admin')
 
         puts "adding admin user: sanjay@jarna.com, password: peanut"
-        a = User.create(:company_id => 0, :name => "Admin", :email => "sanjay@jarna.com", :password => "peanut", :password_confirmation => "peanut")
+        a = User.create(:company_id => 0, :name => "Admin", :email => "sanjay@jarna.com", 
+                        :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
         a.register!
         a.activate!
         a.grant_role('admin')
