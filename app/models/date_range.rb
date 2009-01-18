@@ -1,20 +1,38 @@
 class DateRange
-  attr_accessor :name, :start_at, :end_at, :days, :errors
+  attr_accessor :name, :start_at, :end_at, :days
+  cattr_accessor :errors
   
+  # extend ActiveRecord so we can use the Errors module
+  extend ActiveRecord
+
   # include enumerable mixin which requires an 'each' method
   include Enumerable
   
   def initialize(options={})
     @name         = options[:when]
-    @errors       = (@name == 'error') 
+    
+    if @name == 'error'
+      # create error object
+      @error  = true
+      @errors = ActiveRecord::Errors.new(self)
+      @errors.add_to_base("When is invalid")
+      return
+    end
+    
     @start_at     = options[:start_at].utc if options[:start_at]
     @end_at       = options[:end_at].utc if options[:end_at]
-    
-    # compute days
     @days         = (@end_at - @start_at).to_i / (60 * 60 * 24)
     
     # initialize enumerable param
     @index        = 0
+  end
+  
+  def valid?
+    !@error
+  end
+
+  def errors
+    @errors ||= ActiveRecord::Errors.new(self)
   end
   
   def self.today

@@ -5,10 +5,7 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'parse today' do
     setup do 
       @daterange = DateRange.parse_when('today')
-    end
-    
-    should 'have no errors' do
-      assert !@daterange.errors
+      assert_valid @daterange
     end
     
     should 'have days count of 1' do
@@ -19,10 +16,7 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'parse tomorrow' do
     setup do
       @daterange = DateRange.parse_when('tomorrow')
-    end
-
-    should 'have no errors' do
-      assert !@daterange.errors
+      assert_valid @daterange
     end
 
     should 'have days count of 1' do
@@ -33,12 +27,9 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'this week' do
     setup do
       @daterange = DateRange.parse_when('this week')
+      assert_valid @daterange
       # sunday is day 0, saturday is day 6
       @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
-    end
-
-    should 'have no errors' do
-      assert !@daterange.errors
     end
 
     should 'have days count based on current day of week' do
@@ -49,10 +40,7 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'next week' do
     setup do
       @daterange = DateRange.parse_when('next week')
-    end
-
-    should 'have no errors' do
-      assert !@daterange.errors
+      assert_valid @daterange
     end
 
     should 'have days count of 7' do
@@ -63,10 +51,7 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'next 2 weeks' do
     setup do
       @daterange = DateRange.parse_when('next 2 weeks')
-    end
-
-    should 'have no errors' do
-      assert !@daterange.errors
+      assert_valid @daterange
     end
 
     should 'have days count of 14' do
@@ -77,14 +62,25 @@ class DateRangeTest < ActiveSupport::TestCase
   context 'past week' do
     setup do
       @daterange = DateRange.parse_when('past week')
-    end
-
-    should 'have no errors' do
-      assert !@daterange.errors
+      assert_valid @daterange
     end
 
     should 'have days count of 7' do
       assert_equal 7, @daterange.days
+    end
+  end
+  
+  context 'bogus when' do
+    setup do
+      @daterange = DateRange.parse_when('bogus')
+    end
+    
+    should 'not be valid' do
+      assert !@daterange.valid?
+    end
+    
+    should 'have errors' do
+      assert_match /When is invalid/, @daterange.errors[:base]
     end
   end
   

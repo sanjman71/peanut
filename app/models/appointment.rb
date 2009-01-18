@@ -197,34 +197,16 @@ class Appointment < ActiveRecord::Base
     if s.blank?
       # when can be empty
       write_attribute(:when, '')
-    elsif !WHENS.include?(s)
-      write_attribute(:when , :error)
-    elsif s == 'later'
-      write_attribute(:when, s)
-      # special case, range should be 2 weeks after next week, adjusted by a day
-      range         = Chronic.parse('next week', :guess => false)
-      self.start_at = range.last + 1.day
-      self.end_at   = range.last + 1.day + 2.weeks
     else
-      # parse when string
-      range = Chronic.parse(s, :guess => false)
+      daterange = DateRange.parse_when(s)
       
-      if range.blank?
-        write_attribute(:when, :error)
-        return
-      end
-
-      write_attribute(:when, s)
-      self.start_at = range.first
-      self.end_at   = range.last
-
-      if s == 'this week'
-        # make 'this week' end on monday 12am
-        self.end_at += 1.day
-      elsif s == 'next week'
-        # make 'next week' go from monday to monday
-        self.start_at += 1.day
-        self.end_at   += 1.day
+      if !daterange.valid?
+        # invalid when
+        write_attribute(:when , :error)
+      else
+        write_attribute(:when, daterange.name)
+        self.start_at   = daterange.start_at
+        self.end_at     = daterange.end_at
       end
     end
   end
