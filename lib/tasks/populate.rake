@@ -3,6 +3,7 @@ namespace :db do
     
     require 'populator'
     require 'faker'
+    require 'test/factories'
     
     @@count_default = 20
     
@@ -48,5 +49,47 @@ namespace :db do
         company.resources.push(person)
       end
     end
-  end
-end
+  
+  
+    desc "Populate invoices for the first company in the database"
+    task :invoices, :count do |t, args|
+      count     = args.count.to_i 
+      count     = @@count_default if count == 0 # default value
+      
+      # find first company
+      company   = Company.first
+      
+      # find all people that provide services
+      people    = company.people.select { |p| !p.services.blank? }
+      person    = people.first
+      service   = person.services.first
+      customer  = Customer.first || Factory(:customer)
+      
+      puts "*** #{people.collect(&:name).join(", ")}"
+
+      puts "#{Time.now}: populating #{count} invoices for #{person.name} for company #{company.name}"
+      
+      count.downto(1) do |i|
+        # create appointments, choose day randomly
+        day_start   = Time.now.beginning_of_day - rand(30).days
+        start_at    = day_start
+        appointment = Appointment.create(:company => company, :resource => person, :service => service, :customer => customer, :start_at => start_at)
+      
+        puts "*** start time: #{appointment.start_at.to_s(:appt_date)}"
+        
+        # create invoice
+        appointment.invoice = AppointmentInvoice.create
+        
+        # set random price 
+        appointment.invoice.line_items.first.update_attribute(:price_in_cents, rand(10000))
+        
+        # mark appointment as checked out
+        appointment.checkout!
+        
+        # increment start_at
+        start_at = appointment.end_at
+      end
+    end
+    
+  end # populate
+end # db

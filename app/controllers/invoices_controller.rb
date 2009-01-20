@@ -1,14 +1,33 @@
 class InvoicesController < ApplicationController
   before_filter :init_current_company
 
+  # /invoices
+  # /invoices/when/past-2-weeks
+  # /invoices/range/20090101..20090201
   def index
-    # build daterange using when
-    @when         = params[:when] || Appointment::WHEN_PAST_WEEK
-    @daterange    = DateRange.parse_when(@when)
+    if params[:start_date] and params[:end_date]
+      # build daterange using range values
+      @start_date   = params[:start_date]
+      @end_date     = params[:end_date]
+      @daterange    = DateRange.parse_range(@start_date, @end_date)
+    else
+      # build daterange using when
+      @when         = (params[:when] || Appointment::WHEN_PAST_WEEK).to_s_param
+      @daterange    = DateRange.parse_when(@when)
+    end
     
-    # find all invoices for completed appointments, within the when range
+    # find all invoices for completed appointments, restricted by daterange
     @appointments = @current_company.appointments.completed.overlap(@daterange.start_at, @daterange.end_at).all(:order => 'start_at ASC')
     @total        = @appointments.inject(Money.new(0)) { |total, appt| total += appt.invoice.total_as_money }
+  end
+  
+  # /invoices/search
+  # params[:start_date], params[:end_date]
+  def search
+    # reformat start_date, end_date strings, and redirect to index action
+    start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
+    end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
+    redirect_to url_for(:action => 'index', :start_date => start_date, :end_date => end_date, :subdomain => @subdomain)
   end
   
   def show

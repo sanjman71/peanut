@@ -75,8 +75,10 @@ Rails::Initializer.run do |config|
   config.active_record.timestamped_migrations = false
 end
 
-# Extend Range class
+# Extend ruby classes
 require "#{RAILS_ROOT}/lib/range.rb"
+require "#{RAILS_ROOT}/lib/array.rb"
+require "#{RAILS_ROOT}/lib/string.rb"
 
 # Initialize workling to use starling
 Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new

@@ -78,7 +78,22 @@ class DateRange
       start_at  = end_at - 1.month
     end
       
-    DateRange.new(Hash[:when => s, :start_at => start_at, :end_at => end_at])
+    DateRange.new(Hash[:when => s.titleize, :start_at => start_at, :end_at => end_at])
+  end
+  
+  # parse start, end dates - e.g. "20090101", defaults to end date inclusive
+  def self.parse_range(start_date, end_date, options={})
+    # parse options
+    exclusive   = options[:exclusive] == true
+    
+    # build name from start, end dates
+    range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
+    
+    if exclusive
+      DateRange.new(Hash[:when => range_name, :start_at => Time.parse(start_date), :end_at => Time.parse(end_date)])
+    else
+      DateRange.new(Hash[:when => range_name, :start_at => Time.parse(start_date), :end_at => Time.parse(end_date) + 1.day])
+    end
   end
   
   def each

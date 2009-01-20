@@ -17,7 +17,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resources :invitations, :only => [:new, :create]
   map.resource  :session
-  
+
+  # special invoice routes
+  map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
+  map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
+    
   map.resources :companies
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
@@ -25,7 +29,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]
   map.resources :memberships, :only => [:create, :destroy]
-  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:index, :show, :add, :remove]
+  map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
