@@ -97,6 +97,23 @@ God.watch do |w|
   generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 20.megabytes)
 end
 
+# pid file => /var/run
+God.watch do |w|
+  w.name            = "apache"
+  w.interval        = 30.seconds # default
+  apache            = "httpd -k"
+  w.start           = "#{apache} start"
+  w.stop            = "#{apache} stop"
+  w.restart         = "#{apache} restart"
+  w.start_grace     = 10.seconds
+  w.restart_grace   = 10.seconds
+  w.pid_file        = "/var/run/httpd.pid"
+
+  w.behavior(:clean_pid_file)
+
+  generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 100.megabytes)
+end
+
 # run these in production environments
 if rails_env == 'production'
   
