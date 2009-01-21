@@ -1,8 +1,8 @@
 - javascript('date', 'jquery.bgiframe', 'jquery.datePicker', 'invoices')
 - stylesheet('datePicker')
 
-.span-15
-  .span-15.last.box
+.span-17
+  .span-16.last.box
     .span-9
       %h2== Invoices
       %h4= @daterange.name
@@ -30,7 +30,7 @@
             == or
             = link_to "Cancel", '', :id => 'show_links'
           
-  .span-15.prepend-1
+  .span-16.prepend-1
     - if @appointments.blank?
       %h3== No Invoices
       
@@ -46,3 +46,8 @@
       .span-5
         %h2= @total
         
+.span-6.prepend-1.last
+  .sidebar.instructions.padding-5
+    == How do search invoices?
+    %ul
+      %li== Select a pre-defined search range or specify your own date range
