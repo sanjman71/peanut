@@ -25,6 +25,16 @@ class ApplicationController < ActionController::Base
   # Default layout
   layout "company"
 
+  # Method called when badges authentication fails
+  def access_denied(options)
+    if @current_company
+      flash[:error] = "Access denied"
+      redirect_to access_denied_companies_path(:subdomain => @subdomain)
+    else
+      # todo: do something different here
+    end
+  end
+  
   private
   
   def init_current_company

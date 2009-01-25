@@ -22,7 +22,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
   map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
     
-  map.resources :companies
+  map.resources :companies, :collection => {:access_denied => :get}
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }
