@@ -28,6 +28,8 @@ a img:hover                                       { background-color: green; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
 
+.margin-bottom-0                                  { margin-bottom: 0px; }
+
 .text-align-right                                 { text-align: right; }
 .text-align-left                                  { text-align: left; }
 
@@ -94,25 +96,32 @@ div.instructions, div.instructions.sidebar        { background: #FFFFCC; padding
 
 div.instructions ul                               { font-size: 12px; }
 
+/* pagination styles */
+
+.pagination a                                     { background: #FF6600; }
+
+.pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
+                                                    text-decoration: none; }
+
+.pagination span.disabled                         { background: #CCCCCC; }
 
 /* highlight styles */
 
-.shaded                                           { background: #EDF3FE }
+.shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }
 
-.highlighted, .highlighted.shaded                 { background: #FFCC00 none repeat scroll 0 0; }
+.highlighted, .highlighted.shaded, .highlight     { background: #FFCC00; none repeat scroll 0 0; }
 
-.highlight.muted                                  { background: #FFFF66; }
+.highlight.muted                                  { background: #FFFF66; none repeat scroll 0 0; }
 
-.blue.muted                                       { background: #EDF3FE; }
+.blue.muted                                       { background: #EDF3FE; none repeat scroll 0 0; }
   
 /* color styles */
 
-.red                                              { color: #FF0000; font-style: bold; font-size: 12px; }
+.red                                              { color: #FF0000; }
 
-.green                                            { color: #FF6600; font-style: bold; font-size: 12px; }
+.green                                            { color: #FF6600; }
 
-/* move the login panel to the right of the header */
-.login_info                                       { float: right; }
+.grey                                             { color: #666666; }
 
 /* example styles */
 

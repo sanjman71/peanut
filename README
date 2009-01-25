@@ -15,27 +15,34 @@ One fix is to change config.cache_classes = true in your development.rb.
 2. Run the rake task <tt>rake db:peanut:freetime:init[days] to setup from freetime.
 
 3. Edit your /etc/hosts file by adding the following lines:
-    127.0.0.1     www.localhost
-    127.0.0.1     company1.localhost
-    127.0.0.1     company2.localhost
-    127.0.0.1     company3.localhost
+    127.0.0.1     www.peanut.dev
+    127.0.0.1     peanut.dev peanut.test
+    127.0.0.1     peanut.peanut.dev   # add this line for each company you create
   
-4. Go to http://localhost:3000/companies to view/add companies.
+4. Go to http://www.peanut.dev:3000/.  From here, you can login or signup.
 
-5. Go to http://company1.localhost:3000/appointments to see appointments for a company.
+== Populating the database
 
+There are a few tasks that can be used to populate random data into the database.  
 
-== Configuring/Starting Starling and Workling
+The current tasks populate the people and products database.  The tasks are:
+  - rake db:populate:people[count]
+  - rake db:populate:products[count]
+  
+Note that only the first company in the database is populated.  This also means you need at least 1 company for these tasks to run correctly.
 
-1. Start the starling daemon: 
-   - sudo starling -d -p 22122
+== Configuring/Starting Starling, Workling, ...
 
-2. Start the workling client and monitor
-   - ./script/workling_client start
+1. All processes are started and monitored by the god daemon.  The config/god/user.yml specifies the user, group values to use in the development environment. (We should probably have a better way of configuring based on different development environments)
 
-<<<<<<< HEAD:README
-=======
+2. Install the god gem:
+  - sudo gem install god
+
+3. Start the god daemon
+  - sudo god -c config/peanut.god 
+  
 == Badges
+
 The administrative page is accessible here:
 http://localhost:3000/badges/admin/index
 I'll figure out a better solution to this, but in the meantime you can use this to administer it.
@@ -44,4 +51,21 @@ Migration 003_... includes creating all the tables, the two default roles 'admin
 Migration 004... adds the peanut specific roles 'company manager' and 'company employee', along with privileges 'create company', 'read company', 'update company' and 'delete company'. I provided initial assignments of these privileges to the two roles.
 
 This provides us with initial support. Next I need to start adding privilege requirements to models, views and controllers. Watch this space.
->>>>>>> c18086172e6d49fef575cfbb9c87ed0334e0fc62:README
+
+== SSL Setup and Testing in development
+
+Excellent tutorial at:
+
+http://www.ricroberts.com/articles/2008/09/25/setting-up-ssl-for-rails-and-testing-it-locally
+
+The local apache configuration on a mac lives in /etc/apache2.
+
+To start apache:
+  - sudo httpd -k start
+  
+To stop apache:
+  - sudo httpd -k stop
+  
+Apache listens on port 80 and 443, and proxies to webbrick or mongrel (usually on port 3000 in dev).
+
+Uses the ssl_requirement plugin to enforce secure actions.

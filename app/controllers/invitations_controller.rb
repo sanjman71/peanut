@@ -12,7 +12,7 @@ class InvitationsController < ApplicationController
     @invitation.sender  = current_user
     
     if @invitation.save
-      MailWorker.async_send_invitation(:id => @invitation.id, :url => invitation_signup_url(@invitation.token))
+      MailWorker.async_send_invitation(:id => @invitation.id, :url => invite_url(@invitation.token))
       flash[:notice] = "Your invitation has been sent"
       redirect_to(users_path)
     else

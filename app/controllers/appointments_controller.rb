@@ -8,7 +8,7 @@ class AppointmentsController < ApplicationController
     if params[:customer_id]
       @customer     = Customer.find(params[:customer_id])
       @appointments = @customer.appointments
-      raise Exception, "show customer appointments: #{@appointments.size}"
+      raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
 
     if @current_company.people_count == 0
@@ -89,7 +89,7 @@ class AppointmentsController < ApplicationController
 
     # initialize time parameters
     @when         = params[:when] || @@default_when
-    @daterange    = DateRange.new(:when => @when)
+    @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
     @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at

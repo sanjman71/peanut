@@ -17,6 +17,9 @@ class Company < ActiveRecord::Base
   after_create              :init_basic_services
   
   def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
     # titleize name
     self.name = self.name.titleize unless self.name.blank?
   end

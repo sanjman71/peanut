@@ -1,6 +1,8 @@
 if @redirect
   page.redirect_to(@redirect)
 else
-  page["#appointment_code"].add_class('highlighted')
+  page["#progress"].hide();  # Hide progress bar
+  page["#submit"].show();    # Show submit button 
+  page["#appointment_code"].addClass('highlighted')
   page["#appointment_code"].focus()
 end

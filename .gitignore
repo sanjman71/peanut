@@ -1,5 +1,6 @@
 log/*
 tmp/*
 db/schema.rb
+config/god/*
 public/system/*
 .DS_Store

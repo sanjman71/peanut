@@ -13,7 +13,11 @@ class SessionsController < ApplicationController
 
   def create
     logout_keeping_session!
-    user = User.authenticate(params[:email], params[:password])
+    
+    # authenticate user within a company domain; admins login with a company id of 0
+    company_id  = @current_company.blank? ? 0 : @current_company.id
+    user        = User.authenticate(params[:email], params[:password], :company_id => company_id)
+    
     if user
       # Protects against session fixation attacks, causes request forgery
       # protection if user resubmits an earlier form using back
@@ -45,7 +49,8 @@ class SessionsController < ApplicationController
     redirect_back_or_default('/')
   end
 
-protected
+  protected
+
   # Track failed login attempts
   def note_failed_signin
     flash[:error] = "Couldn't log you in as '#{params[:email]}'"

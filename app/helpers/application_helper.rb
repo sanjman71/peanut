@@ -27,6 +27,11 @@ module ApplicationHelper
     html
   end
   
+  def display_message(msg, type = :notice)
+    return "" if msg.blank?
+    "<div class=\"#{type.to_s}\">#{msg}</div>"
+  end
+  
   def build_tab_links(current_controller)
     
     # 'Openings' tab
@@ -62,6 +67,16 @@ module ApplicationHelper
 
       yield link
 
+      # 'Invoices' tab
+      name = 'Invoices'
+      if current_controller.controller_name == 'invoices' and ['index', 'show'].include?(current_controller.action_name)
+        link = link_to(name, invoices_path, :class => 'current')
+      else
+        link = link_to(name, invoices_path)
+      end
+
+      yield link
+
       # 'Appointments' tab
       name = 'Appointments'
       if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
@@ -71,7 +86,7 @@ module ApplicationHelper
       end
 
       yield link
-
+      
       # 'People' tab
       name = 'People'
       if current_controller.controller_name == 'people' and ['index', 'show'].include?(current_controller.action_name)

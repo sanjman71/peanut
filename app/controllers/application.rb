@@ -7,6 +7,9 @@ class ApplicationController < ActionController::Base
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
 
+  # SSL support
+  include SslRequirement
+  
   # See ActionController::RequestForgeryProtection for details
   # Uncomment the :secret if you're not using the cookie session store
   protect_from_forgery # :secret => 'f8d7ebb54beb33a37cef2211b595ecf7'
@@ -41,5 +44,13 @@ class ApplicationController < ActionController::Base
       @current_location = Location.find_by_id(session[:location_id]) || Location.anywhere
     end
   end
-  
+
+  # redirect http://[company].peanut.com/ to the company subdomain root path
+  def redirect_subdomain_home_route
+    return true if current_subdomain.blank? or current_subdomain == 'www'
+    # its a company subdomain, redirect to subdomain root path
+    redirect_to(openings_path)
+    false
+  end
+    
 end

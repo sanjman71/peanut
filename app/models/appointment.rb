@@ -52,6 +52,10 @@ class Appointment < ActiveRecord::Base
   named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
+  # find appointments by state, eager load the associated invoice for completed appointments
+  named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
+  named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
+
   # Orderings
   named_scope :order_start_at, {:order => 'start_at'}
   
@@ -85,9 +89,11 @@ class Appointment < ActiveRecord::Base
   
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
+  WHEN_PAST_WEEK            = 'past week'
   WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
   WHEN_WEEKS                = [WHEN_THIS_WEEK, 'next week', 'later']
   WHENS_EXTENDED            = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'next 2 weeks', 'this month', 'later']
+  WHENS_PAST                = ['past week', 'past 2 weeks', 'past month']
   
   # valid time of day values
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
@@ -131,6 +137,9 @@ class Appointment < ActiveRecord::Base
   end
   
   def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
     if self.start_at and self.service and self.end_at.blank?
       # initialize end_at
       self.end_at = self.start_at + self.service.duration_to_seconds
@@ -219,34 +228,16 @@ class Appointment < ActiveRecord::Base
     if s.blank?
       # when can be empty
       write_attribute(:when, '')
-    elsif !WHENS.include?(s)
-      write_attribute(:when , :error)
-    elsif s == 'later'
-      write_attribute(:when, s)
-      # special case, range should be 2 weeks after next week, adjusted by a day
-      range         = Chronic.parse('next week', :guess => false)
-      self.start_at = range.last + 1.day
-      self.end_at   = range.last + 1.day + 2.weeks
     else
-      # parse when string
-      range = Chronic.parse(s, :guess => false)
+      daterange = DateRange.parse_when(s)
       
-      if range.blank?
-        write_attribute(:when, :error)
-        return
-      end
-
-      write_attribute(:when, s)
-      self.start_at = range.first
-      self.end_at   = range.last
-
-      if s == 'this week'
-        # make 'this week' end on monday 12am
-        self.end_at += 1.day
-      elsif s == 'next week'
-        # make 'next week' go from monday to monday
-        self.start_at += 1.day
-        self.end_at   += 1.day
+      if !daterange.valid?
+        # invalid when
+        write_attribute(:when , :error)
+      else
+        write_attribute(:when, daterange.name)
+        self.start_at   = daterange.start_at
+        self.end_at     = daterange.end_at
       end
     end
   end

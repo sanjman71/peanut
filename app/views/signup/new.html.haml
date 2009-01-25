@@ -26,6 +26,8 @@
         %h3.text-align-right== Timezone:
       .span-16.last
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {:include_blank => true}, {:style => 'margin: 0px;', :class => 'select big'}
+      .span-16.prepend-4.last
+        %em{:style => "color: #666666; font-size: 15px;"}== This is the timezone for your business.  Users will be shown available times and schedule appointments in this timezone. 
         
     %hr.space
   

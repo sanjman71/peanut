@@ -1,3 +1,7 @@
+- if products.blank?
+  .span-10.prepend-1.last
+    %h3== No Products
+  
 - products.each do |product|
   .span-16.last.letterbox.product{:class => cycle("shaded", "")}
     .span-6.prepend-1.name

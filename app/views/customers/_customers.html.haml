@@ -10,5 +10,5 @@
           = customer.phone
           = "(#{customer.mobile_carrier.name})" if customer.mobile_carrier
     .span-3.last
-      %h4= link_to "Appointments", customer_appointments_path(customer, :subdomain => @subdomain)
+      %h4= link_to "Appointments", customer_appointments_path(customer)
         

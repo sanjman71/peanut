@@ -20,8 +20,9 @@ class User < ActiveRecord::Base
   validates_presence_of     :company_id
   belongs_to                :company
   
+  # Invitations ids are required, but the special value 0 is allowed, indicating the user signed up directly on the site
   validates_presence_of     :invitation_id
-  validates_uniqueness_of   :invitation_id
+  validates_uniqueness_of   :invitation_id, :if => "invitation_id != 0"
   
   has_many                  :sent_invitations, :class_name => 'Invitation'
   belongs_to                :invitation
@@ -37,9 +38,10 @@ class User < ActiveRecord::Base
   # We really need a Dispatch Chain here or something.
   # This will also let us return a human error message.
   #
-  def self.authenticate(email, password)
+  def self.authenticate(email, password, options={})
     return nil if email.blank? || password.blank?
-    u = find_in_state :first, :active, :conditions => {:email => email} # need to get the salt
+    c = options[:company_id].to_i
+    u = find_in_state :first, :active, :conditions => {:email => email, :company_id => c} # need to get the salt
     u && u.authenticated?(password) ? u : nil
   end
   

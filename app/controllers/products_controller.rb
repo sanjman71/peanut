@@ -4,7 +4,7 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.xml
   def index
-    @products = @current_company.products
+    @products = @current_company.products.paginate(:page => params[:page], :order => "name ASC")
   end
   
   # POST /products
@@ -14,11 +14,15 @@ class ProductsController < ApplicationController
     
     if !@product.valid?
       @error      = true
-      @error_text = "Could not create producgt"
+      @error_text = "Could not create product"
       return
     end
     
+    # save product
     @product.save
+    
+    # set redirect path
+    @redirect_path = edit_product_path(@product, :subdomain => @subdomain)
     
     respond_to do |format|
       format.js # redirect to edit page

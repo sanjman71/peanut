@@ -64,7 +64,8 @@ class ServicesController < ApplicationController
     @status   = @service.update_attributes(params[:service])
     
     if !@status
-      raise Exception, "Error updating service"
+      flash[:error] = @service.errors.full_messages
+      redirect_to(edit_service_path(@service, :subdomain => @subdomain)) and return
     end
     
     redirect_to(services_path)
