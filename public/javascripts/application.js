@@ -220,14 +220,12 @@ $.fn.init_add_note = function () {
   })
 } 
 
-// Show location switcher menu
-$.fn.init_location_switcher_menu = function() {
-  $('#location_switcher').click(function () {
-//    $(this).addClass('hide');
-    $("#location_switcher_menu").toggleClass('hide');
-    return false;
-  })
-    
+// Initialize location switcher list
+$.fn.init_location_switcher_list = function() {
+  $('#location_switcher li').hover(
+    function() { $('ul', this).css('display', 'block');},
+    function() { $('ul', this).css('display', 'none'); }
+  );
 }
 
 // Replace all ujs classes with ajax post calls
@@ -260,6 +258,7 @@ $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
   $(document).init_company_location();
-  $(document).init_location_switcher_menu();
+  $(document).init_location_switcher_list();
+
 })
 

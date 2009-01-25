@@ -19,14 +19,15 @@
     #header
       .container
         .span-24
-          .span-20
+          .span-5
             = render :partial => "companies/company_links.html.haml", :locals => {:company => @current_company}
-          .span-4.last{:style => 'color: #DDDDDD;'}
+          .span-4.prepend-15.last{:style => 'color: #DDDDDD;'}
             = render :partial => 'users/user_bar'
         .span-24.last
           %h2{:style => 'color: #FFFFFF;'}
             = @current_company.name
             - if !@current_company.locations.empty?
+              == -
               = @current_location.name
         .span-24#tabs
           .span-21

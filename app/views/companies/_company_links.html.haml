@@ -1,9 +1,10 @@
 - if company.locations.size > 1
-  .switch
-    #location_switcher= link_to 'Change Location', '', :class => 'admin header'
-    %span.hide#location_switcher_menu{:style => 'position: relative;'}
-      - company.locations.each do |location|
-        .location= link_to location.name, set_default_location_path(location), :class => 'admin header'
-    
+  %ul#location_switcher
+    %li.location_switcher_header
+      = link_to 'Change Location', '', :class => 'admin header'
+      %ul
+        - company.locations.each do |location|
+          %l1
+            = link_to location.name, set_default_location_path(location), :class => 'admin header'
+            
 -#= link_to 'Add a Location', new_location_path(:subdomain => @subdomain)
-

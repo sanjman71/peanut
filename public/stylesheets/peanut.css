@@ -61,6 +61,12 @@ div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited,
                                                     border-bottom: 1px solid #E5E5E5; font-weight: bold; margin: 0;
                                                     text-decoration: none; padding: 3px 8px 8px; }
 
+#location_switcher, #location_switcher ul         { list-style: none; }
+#location_switcher, #location_switcher *          { padding: 0; margin: 0; }
+#location_switcher li ul                          { display: none; }
+#location_switcher li:hover ul                    { display: block; }
+
+
 /* body styles */
 
 div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
