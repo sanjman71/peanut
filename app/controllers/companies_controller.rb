@@ -90,6 +90,10 @@ class CompaniesController < ApplicationController
     end
   end
   
+  def access_denied
+    render :text => "Access Denied", :layout => 'company'
+  end
+  
   def get_context
     if @current_company
       @company = @current_company

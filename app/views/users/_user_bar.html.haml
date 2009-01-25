@@ -1,7 +1,9 @@
 - if logged_in?
-  = link_to('Users', users_path(:subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
-  == &nbsp;|&nbsp;
-  = link_to('My Info', edit_user_path(current_user, :subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
+  - if @current_company
+    = link_to('Users', users_path(:subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
+    == &nbsp;|&nbsp;
+  Logged in as
+  = link_to("#{current_user.email}", edit_user_path(current_user, :subdomain => @subdomain), :class => 'admin', :style => 'color: #DDDDDD;')
   == &nbsp;|&nbsp;
   = link_to('Log-out', logout_path, :class => 'admin', :style => 'color: #DDDDDD;')
 - else
