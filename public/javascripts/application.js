@@ -71,7 +71,6 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   $("#search_appointments_form").validate({
      showErrors: function(errorMap, errorList) {
        // handle form errors by highlighting the required field 
-       console.log("show errors");
        $(".required").addClass('highlighted');
        return false;
      }
@@ -221,6 +220,15 @@ $.fn.init_add_note = function () {
   })
 } 
 
+// Show location switcher menu
+$.fn.init_location_switcher_menu = function() {
+  $('#location_switcher').click(function () {
+//    $(this).addClass('hide');
+    $("#location_switcher_menu").toggleClass('hide');
+    return false;
+  })
+    
+}
 
 // Replace all ujs classes with ajax post calls
 // Todo: figure out how to ask the user to confirm before executing a call
@@ -252,5 +260,6 @@ $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
   $(document).init_company_location();
+  $(document).init_location_switcher_menu();
 })
 

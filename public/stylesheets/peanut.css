@@ -33,7 +33,7 @@ a img:hover                                       { background-color: green; }
 .text-align-right                                 { text-align: right; }
 .text-align-left                                  { text-align: left; }
 
-/* header, tab styles */
+/* header, tab, link styles */
 
 div#header                                        { margin: 0; min-width: 900px; min-height: 50px; overflow: hidden; padding: 15px 0px 0px 0px; 
                                                     position: relative; text-align: left; }
@@ -83,6 +83,8 @@ label.big                                         { font-size: 16px; }
 /* admin styles */
 
 a.admin:link, a.admin:visited                     { font-size: 11px; font-weight: normal; color: #0000FF; }
+
+a.header:link, a.header:visited                   { color: #CCCCCC; }
 
 a.admin:hover                                     { color: #FFFFFF; background-color: #0000FF; text-decoration: none; }
 
