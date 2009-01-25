@@ -32,15 +32,23 @@ class ApplicationController < ActionController::Base
     # If we're on www.peanut.xxx then current_subdomain will be nil
     if current_subdomain
       @current_company = Company.find_by_subdomain(current_subdomain)
-      if @current_company
-        @subdomain = @current_company.subdomain
-
-        # set company time zone
-        Time.zone = @current_company.time_zone
-      else
+      
+      if @current_company.blank?
         flash[:error] = "Invalid company"
-        redirect_to root_path
+        return redirect_to root_path
       end
+
+      # initialize subdomain
+      @subdomain  = @current_company.subdomain
+
+      # initialize application time zone
+      Time.zone   = @current_company.time_zone
+
+      if session[:location_id].blank? and !@current_company.locations.empty?
+        # initialize session location to company's only location
+        session[:location_id] = @current_company.locations.first.id
+      end
+      
       @current_location = Location.find_by_id(session[:location_id]) || Location.anywhere
     end
   end
