@@ -6,16 +6,13 @@ class Location < ActiveRecord::Base
   # Ensure that the address is geocoded on creation and update
   # before_validation :geocode_address
 
-  validates_presence_of :city
-  validates_presence_of :country
-  
-	belongs_to :locatable, :polymorphic => true
+  # validates_presence_of :city
+  # validates_presence_of :country
 
-  named_scope :locatable, lambda { |l| { :conditions => ["locatable_type = '%s' and locatable_id = %d", l.class.to_s, l.id] }}
-  named_scope :locatable_type, lambda { |lt| { :conditions => ["locatable_type = '%s'", lt.to_s]}}
+  has_many_polymorphs :locatables, :from => [:companies, :appointments]
 
   # Make sure only accessible attributes are written to from forms etc.
-	attr_accessible :location_name, :street_addr, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
+	attr_accessible :name, :street_addr, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
 	
   COUNTRIES = [
     ['USA', 'us'],
@@ -44,11 +41,13 @@ class Location < ActiveRecord::Base
     (Math::PI / 180.0) * lng if lng
   end
   
-  def locatable=(l)
-    self.locatable_type = l.class.to_s
-    self.locatable_id = l.id
+  def self.anywhere
+    Location.new do |l|
+      l.name = "Anywhere"
+      l.send(:id=, 0)
+    end
   end
-
+  
   protected
 
   def geocode_address

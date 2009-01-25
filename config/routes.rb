@@ -10,14 +10,18 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup    '/signup/:plan', :controller => 'signup', :action => 'new'
-
+  
   # invitation signup route
-  map.invitation_signup   '/invitations/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
+  map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
   map.resources :invitations, :only => [:new, :create]
   map.resource  :session
-  
+
+  # special invoice routes
+  map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
+  map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
+    
   map.resources :companies
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
@@ -25,7 +29,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :openings, :collection => { :search => [:get, :post] }
   map.resources :notes, :only => [:create]
   map.resources :memberships, :only => [:create, :destroy]
-  map.resources :invoices, :member => { :add => :post, :remove => :post }, :only => [:show, :add, :remove]
+  map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
@@ -55,7 +59,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
-  map.resources :locations
+  map.resources :locations, :member => {:set_default => :get}
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'

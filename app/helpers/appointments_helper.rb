@@ -1,7 +1,7 @@
 module AppointmentsHelper
 
-  def build_when_links(person, when_collection, current)
-    default = Appointment::WHEN_THIS_WEEK
+  def build_appointment_when_links(person, when_collection, current, options={})
+    default = options[:default]
     
     when_collection.each do |s|
       # add css 'current' class for the current link

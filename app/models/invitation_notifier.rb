@@ -4,7 +4,7 @@ class InvitationNotifier < ActionMailer::Base
     setup_email
     recipients(invitation.recipient_email)
     subject("Peanut Invitation")
-    body(:invitation => invitation, :signup_url => signup_url)
+    body(:invitation => invitation, :sender => invitation.sender, :signup_url => signup_url)
   end
 
   protected

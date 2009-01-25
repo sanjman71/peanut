@@ -1,13 +1,28 @@
-# start with: 'sudo god -c config/peanut.god'
+# Start with: 'sudo god -c config/peanut.god'
+require 'yaml'
 
-RAILS_ROOT  = "/usr/apps/peanut/current"
-environment = 'production'
+# Application directory in production
+peanut_dir    = "/usr/apps/peanut/current"
 
-if !File.exists?(RAILS_ROOT)
+if File.exists?(peanut_dir)
+  # production environment
+  RAILS_ROOT  = peanut_dir
+  rails_env   = 'production'
+else
   # assume development environment, use current directory
   RAILS_ROOT  = File.dirname(File.dirname(__FILE__))
-  environment = 'development'
+  rails_env   = 'development'
+  
 end
+
+# Load user, group info
+config  = YAML.load_file("#{RAILS_ROOT}/config/god/user.yml")
+user    = config['user']
+group   = config['group']
+
+# Create, set permissions on default pid file directory
+system "mkdir -p /var/run/god"
+system "chmod ugo+rw /var/run/god"
 
 God.pid_file_directory = '/var/run/god'  # default value
 
@@ -44,9 +59,12 @@ def generic_monitoring(w, options = {})
   end
 end
 
+# log, pid files => RAILS_ROOT/log
 God.watch do |w|
   script            = "#{RAILS_ROOT}/script/workling_client"
   w.name            = "workling"
+  w.uid             = user
+  w.gid             = group
   w.interval        = 60.seconds
   w.start           = "#{script} start"
   w.restart         = "#{script} restart"
@@ -60,11 +78,15 @@ God.watch do |w|
   generic_monitoring(w, :cpu_limit => 80.percent, :memory_limit => 100.megabytes)
 end
 
+# pid file  => /var/run/god
+# log files => ?
 God.watch do |w|
   pid_file          = "#{God.pid_file_directory}/starling.pid"
   w.name            = "starling"
+  w.uid             = user
+  w.gid             = group
   w.interval        = 60.seconds
-  w.start           = "starling -d -P #{pid_file} -q #{RAILS_ROOT}/log/"
+  w.start           = "starling -d -p 22122 -P #{pid_file} -q #{RAILS_ROOT}/log/"
   w.stop            = "kill `cat #{pid_file}`"
   w.start_grace     = 10.seconds
   w.restart_grace   = 10.seconds
@@ -75,15 +97,35 @@ God.watch do |w|
   generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 20.megabytes)
 end
 
+# pid file => /var/run
+God.watch do |w|
+  w.name            = "apache"
+  w.interval        = 30.seconds # default
+  apache            = "httpd -k"
+  w.start           = "#{apache} start"
+  w.stop            = "#{apache} stop"
+  w.restart         = "#{apache} restart"
+  w.start_grace     = 10.seconds
+  w.restart_grace   = 10.seconds
+  w.pid_file        = "/var/run/httpd.pid"
+
+  w.behavior(:clean_pid_file)
+
+  generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 100.megabytes)
+end
+
 # run these in production environments
-if environment == 'production'
+if rails_env == 'production'
   
+  # log, pid files => RAILS_ROOT/log
   %w{5000 5001}.each do |port|
     God.watch do |w|
       w.name          = "mongrel-#{port}"
-      w.group         = "mongrel"
+      w.group         = "mongrels"
+      w.uid           = user
+      w.gid           = group
       w.interval      = 60.seconds      
-      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} -e #{environment} \
+      w.start         = "mongrel_rails start -c #{RAILS_ROOT} -p #{port} -e #{rails_env} \
                         -P #{RAILS_ROOT}/log/mongrel.#{port}.pid  -d"
       w.stop          = "mongrel_rails stop -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
       w.restart       = "mongrel_rails restart -P #{RAILS_ROOT}/log/mongrel.#{port}.pid"
@@ -97,6 +139,7 @@ if environment == 'production'
     end
   end
 
+  # log, pid files => /usr/local/nginx/logs
   God.watch do |w|
     script            = "/etc/init.d/nginx"
     w.name            = "nginx"
@@ -149,4 +192,4 @@ if environment == 'production'
     generic_monitoring(w, :cpu_limit => 50.percent, :memory_limit => 50.megabytes)
   end
 
-end # if 'production'
+end # production environment

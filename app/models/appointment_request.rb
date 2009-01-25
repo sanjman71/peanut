@@ -8,10 +8,10 @@ class AppointmentRequest < Appointment
     
     if resource.anyone?
       # find free appointments for any resource, order by start times
-      collection  = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.all(:order => 'start_at')
+      collection  = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     else
       # find free appointments for a specific resource, order by start times
-      collection  = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.all(:order => 'start_at')
+      collection  = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     end
     
     # filter appointments by the people who can provide the service

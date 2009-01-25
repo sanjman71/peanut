@@ -13,11 +13,13 @@ class Company < ActiveRecord::Base
   has_many                  :appointments
   has_many                  :users
   has_many                  :customers, :through => :appointments, :uniq => true
-  has_many                  :locations, :as => :locatable
   before_save               :init_subdomain
   after_create              :init_basic_services
   
   def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
     # titleize name
     self.name = self.name.titleize unless self.name.blank?
   end
@@ -42,6 +44,11 @@ class Company < ActiveRecord::Base
     return false if people_count == 0 or work_services_count == 0
     true
   end
+  
+  def locations_with_any
+    Array(Location.anywhere) + self.locations
+  end
+  
   
   private
   

@@ -12,20 +12,20 @@
     = stylesheet_link_tag 'green'
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag 'jquery', 'jquery.selectboxes', 'application'
+    = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'application'
     = yield :javascript
     
   %body
     #header
       .container
-        .span-15
+        .span-20
           %h2= link_to @current_company.name, show_company_root_path(:subdomain => @current_company.subdomain)
           - if @current_company.locations.size == 1
             = "Location: " + location_title_renderer(@current_company.locations.first)
           - elsif @current_company.locations.size > 1
             Choose location:
-            = select_tag('location_id', options_for_select([['Any location', 0]] + @current_company.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id))
-        .span-9.last{:style => 'color: #DDDDDD;'}
+            = select_tag('location_id', options_for_select(@current_company.locations_with_any.collect{ |l| [location_title_renderer(l), l.id]}, @current_location.id))
+        .span-4.last{:style => 'color: #DDDDDD;'}
           = render :partial => 'users/user_bar'
         #tabs
           .span-21
@@ -39,10 +39,10 @@
                 %li
                   = link_to 'Admin Console', companies_path(:subdomain => nil)
             
-    %p{:style => "color: green"}
-      = flash[:notice]
-    %p{:style => "color: red"}
-      = flash[:error]
+    -#%p{:style => "color: green"}
+      -#= flash[:notice]
+    -#%p{:style => "color: red"}
+      -#= flash[:error]
 
     - if RAILS_ENV == 'development'
       .container.showgrid

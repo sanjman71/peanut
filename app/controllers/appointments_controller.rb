@@ -8,7 +8,7 @@ class AppointmentsController < ApplicationController
     if params[:customer_id]
       @customer     = Customer.find(params[:customer_id])
       @appointments = @customer.appointments
-      raise Exception, "show customer appointments: #{@appointments.size}"
+      raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
 
     if @current_company.people_count == 0
@@ -30,11 +30,12 @@ class AppointmentsController < ApplicationController
     # build new free appointment
     service       = @current_company.services.free.first
     customer      = Customer.nobody
-    person        = Person.find(params[:person_id])
+    person        = @current_company.resources.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
                                                                :service => service,
                                                                :company => @current_company,
-                                                               :customer_id => customer.id))
+                                                               :customer_id => customer.id,
+                                                               :location_id => @current_location.id))
     
     # check if appointment is valid                                                           
     if !@appointment.valid?
@@ -88,10 +89,10 @@ class AppointmentsController < ApplicationController
 
     # initialize time parameters
     @when         = params[:when] || @@default_when
-    @daterange    = DateRange.new(:when => @when)
+    @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
-    @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).all(:order => 'start_at')
+    @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     

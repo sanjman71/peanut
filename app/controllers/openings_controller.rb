@@ -19,7 +19,7 @@ class OpeningsController < ApplicationController
     
     # initialize when, no default
     @when       = params[:when]
-    @daterange  = DateRange.new(:when => @when) unless @when.blank?
+    @daterange  = DateRange.parse_when(@when) unless @when.blank?
     
     # initialize time
     @time       = params[:time]
@@ -28,7 +28,8 @@ class OpeningsController < ApplicationController
     @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
 
     # build appointment request for the selected timespan
-    @query      = AppointmentRequest.new(:service => @service, :resource => @person, :when => @when, :time => @time, :company => @current_company)
+    @query      = AppointmentRequest.new(:service => @service, :resource => @person, :when => @when, :time => @time, :company => @current_company,
+                                         :location => @current_location)
 
     # build people collection, people are restricted by the services they perform
     @people     = Array(Person.anyone) + @service.people

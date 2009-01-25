@@ -3,6 +3,8 @@ require 'test/factories'
 
 class PersonTest < ActiveSupport::TestCase
 
+  should_require_attributes :name
+
   context "create person" do
     setup do
       @company = Factory(:company)

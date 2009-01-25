@@ -4,10 +4,10 @@ require 'test/factories'
 class CustomersControllerTest < ActionController::TestCase
 
   def setup
-    setup_subdomain
+    stub_subdomain
   end
   
-  context "search customers on an empty db" do
+  context "search an empty customers database with an empty search" do
     setup do
       get :index
     end
@@ -18,33 +18,49 @@ class CustomersControllerTest < ActionController::TestCase
     should_assign_to :customers, :search_text
     should_not_assign_to :search
     
-    should "not find any customers with an empty search" do
+    should "find 0 customers" do
       assert_equal [], assigns(:customers)
+    end
+    
+    should "have search text" do
       assert_equal "No Customers", assigns(:search_text)
     end
   end
   
-  context "search customers using a javascript request with 1 customer in the db" do
+  context "search non-empty customer database" do
     setup do
-      # stub search results
-      @customer = Factory(:customer, :name => 'Customer')
-      @company.stubs(:customers).returns(Customer)
-      @company.stubs(:all).returns([@customer])
-      xhr :get, :index, :format => 'js', :search => 'c'
+      # create customer with a valid appointment
+      @customer     = Factory(:customer, :name => 'Booty Licious')
+      @johnny       = Factory(:person, :name => "Johnny", :companies => [@company])
+      @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :resource => @johnny, :service => @haircut)
+      assert_valid @appointment
     end
 
-    should_respond_with :success
-    should_render_template 'customers/index.js.rjs'
-    should_respond_with_content_type "text/javascript"
-    should_not_set_the_flash
-    should_assign_to :customers, :search, :search_text
+    context "with an ajax search for 'boo'" do
+      setup do
+        xhr :get, :index, :format => 'js', :search => 'boo'
+      end
     
-    should "find matching customers on a valid search" do
-      assert_equal [@customer], assigns(:customers)
-      assert_equal 'c', assigns(:search)
-      assert_equal "Customers matching 'c'", assigns(:search_text)
-      assert_match /text\/javascript/, @response.headers['type']
-      # assert_equal "", @response.body
+      should_respond_with :success
+      should_render_template 'customers/index.js.rjs'
+      should_respond_with_content_type "text/javascript"
+      should_not_set_the_flash
+      should_assign_to :customers, :search, :search_text
+
+      should "find customer" do
+        assert_equal [@customer], assigns(:customers)
+        # assert_equal "", @response.body
+      end
+
+      should "have a search value" do
+        assert_equal 'boo', assigns(:search)
+      end
+      
+      should "have search text" do
+        assert_equal "Customers matching 'boo'", assigns(:search_text)
+      end
+      
     end
   end
 

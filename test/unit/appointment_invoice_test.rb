@@ -9,7 +9,7 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
   def test_invoice
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price_in_cents => 500)
     customer  = Factory(:customer)
     
     # create appointment
@@ -24,18 +24,13 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
     appt.invoice  = AppointmentInvoice.create
     invoice       = appt.invoice
     
+    # invoice should have a line item for the appointment service
     assert appt.invoice.valid?
-    assert_equal [], invoice.line_items
-    assert_equal 0, invoice.total
-    assert_equal 0, invoice.total_as_money.cents
-    
-    # create service line item
-    li1 = AppointmentInvoiceLineItem.new(:chargeable => haircut, :price_in_cents => 500)
-    invoice.line_items.push(li1)
-    assert_equal haircut, li1.chargeable
-    assert_equal [li1], invoice.line_items
+    assert_equal 1, invoice.line_items.size
     assert_equal 500, invoice.total
     assert_equal 500, invoice.total_as_money.cents
+    li1 = invoice.line_items.first
+    assert_equal haircut, li1.chargeable
     
     # create product line items
     shampoo = Factory(:product, :name => "Shampoo", :company => company)

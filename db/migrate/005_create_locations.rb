@@ -3,7 +3,7 @@ class CreateLocations < ActiveRecord::Migration
     create_table :locations do |t|
 
       # This location's name
-      t.string :location_name, :default => nil
+      t.string :name, :default => nil
 
       # This location's address
     	t.string :street_addr, :string
@@ -23,19 +23,19 @@ class CreateLocations < ActiveRecord::Migration
     	t.decimal :geocode_lat, :precision => 15, :scale => 10
     	t.decimal :geocode_long, :precision => 15, :scale => 10
 
-    	# These are for the polymorphic association
-    	t.integer :locatable_id, :null => true
-    	t.string :locatable_type
-
-      # Thinking Sphinx search
-      t.boolean :delta, :null => false, :default => false
-
       t.timestamps
       t.integer :lock_version, :default => 0, :null => false
     end
+    
+    create_table :locatables_locations do |t|
+      t.references :location
+      t.references :locatable, :polymorphic => true
+    end
+    
   end
 
   def self.down
+    drop_table :locatables_locations
     drop_table :locations
   end
 end

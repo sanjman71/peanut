@@ -7,6 +7,11 @@
   %hr.space
   .span-15.prepend-1.append-1.last
     .highlight#flash
+  .span-15.prepend-1
+    .span-11
+      %h4= page_entries_info @products unless @products.blank?
+    .span-4.last
+      = will_paginate(@products, :page_links => false, :params => {:subdomain => @subdomain})
   #products
     = render(:partial => 'products.html.haml', :locals => {:products => @products})
     
@@ -16,13 +21,14 @@
       = hidden_field_tag "product[price]", 0
       = hidden_field_tag "product[inventory]", 0
       .span-6.last
-        = label_tag "add_product_name", "Add a product", :class => 'big'
+        = label_tag "new_product_name", "Add a product", :class => 'big'
       .span-6.last
-        = text_field_tag "product[name]", '', :id => 'add_product_name', :class => 'title big', :style => 'width: 200px;'
+        = text_field_tag "product[name]", '', :id => 'new_product_name', :class => 'title big required', :style => 'width: 200px;'
       .span-6.last
         %em{:style => "color: #666666; font-size: 12px;"}== Examples: Shampoo, Styling Gel
       %hr.space
       .span-6.last
-        = submit_tag "Create", :name => nil, :class => 'button big'
+        .hide#progress= image_tag 'barbershop.gif'
+        #submit= submit_tag "Create", :name => nil, :class => 'button big'
     
         

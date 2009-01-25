@@ -17,13 +17,14 @@
       = hidden_field_tag "service[price]", 0
       = hidden_field_tag "service[duration]", 0
       .span-6.last
-        = label_tag "add_service_name", "Add a service", :class => 'big'
+        = label_tag "new_service_name", "Add a service", :class => 'big'
       .span-6.last
-        = text_field_tag "service[name]", '', :id => 'add_service_name', :class => 'title big', :style => 'width: 200px;'
+        = text_field_tag "service[name]", '', :id => 'new_service_name', :class => 'title big required', :style => 'width: 200px;'
       .span-6.last
         %em{:style => "color: #666666; font-size: 12px;"}== Examples: Hair Color, Bikini Wax
       %hr.space
       .span-6.last
-        = submit_tag "Create", :name => nil, :class => 'button big'
+        .hide#progress= image_tag 'barbershop.gif'
+        #submit= submit_tag "Create", :name => nil, :class => 'button big'
     
         

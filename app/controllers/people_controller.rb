@@ -24,11 +24,16 @@ class PeopleController < ApplicationController
   # GET /people/1
   # GET /people/1.xml
   def show
-    @person = @current_company.people.find(params[:id])
+    @person       = @current_company.people.find(params[:id])
+    
+    # find associated services
+    @services     = @person.services
+    
+    # find work appointments
+    @appointments = @current_company.appointments.resource(@person).work
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @resource }
     end
   end
 
@@ -64,6 +69,9 @@ class PeopleController < ApplicationController
     
     # add person to company
     @current_company.people.push(@person)
+    
+    # set redirect path
+    @redirect_path = people_path
     
     flash[:notice] = "Created #{@person.name}"
 

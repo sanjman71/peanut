@@ -1,3 +1,3 @@
 - people.each do |person|
-  .prepend-1.person
+  .span-15.prepend-1.person{:class => cycle("shaded", "")}
     %h2= link_to person.name, person_path(person, :subdomain => @subdomain)

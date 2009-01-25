@@ -12,16 +12,23 @@
     = label_tag "service_name", "Service Name", :class => 'big'
     %br
     = text_field_tag "service[name]", @service.name, :class => 'title highlight muted'
-      
+  
+  .span-10.prepend-1.last
+    = display_flash(:error)
+    
   .span-20.last
-    .span-4.prepend-1
-      = label_tag "service_price", "Price"
-      %br
+    .span-3.prepend-1
+      %h2= label_tag "service_price", "Price"
+    .span-16.last
       = text_field_tag "service[price]", @service.price, :class => 'text', :style => "width: 100px;"
-    .span-4.prepend-1.last
-      = label_tag "service_duration", "Duration (minutes)"
-      %br
+  .span-20.last
+    .span-3.prepend-1
+      %h2= label_tag "service_duration", "Duration"
+    .span-16.last
       = text_field_tag "service[duration]", @service.duration, :class => 'text blue muted', :style => "width: 100px;"
+      %b{:style => 'font-size: 12px;'}== &nbsp;Minutes
+  .span-20.prepend-4.last
+    %em== An accurate duration will allow you to more efficiently schedule appointments
     
   %hr.space
   .span-20.prepend-1.last.submit

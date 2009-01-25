@@ -35,29 +35,27 @@ $.fn.init_new_membership = function () {
   })
 } 
 
-// Add a new person
-$.fn.init_new_person = function () {
-  $("#new_person").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
+// Add a new object (e.g. person, service, product)
+$.fn.init_new_object = function (form_id) {
+  // validate the form by binding a callback to the submit function
+  $(form_id).validate({
+    // handle form errors by highlighting the required field 
+    showErrors: function(errorMap, errorList) {
+      $(".required").addClass('highlighted');
+    }
+  });
+  
+  // do an ajax form post on submit
+  $(form_id).submit(function () {
+    if ($(this).valid()) {
+      $.post(this.action, $(this).serialize(), null, "script");
+      // hide the submit button and show the progress bar
+      $(this).find("#submit").hide();
+      $(this).find("#progress").show();
+    }
     return false;
   })
-} 
-
-// Add a new service
-$.fn.init_new_service = function () {
-  $("#new_service").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
-    return false;
-  })
-} 
-
-// Add a new product
-$.fn.init_new_product = function () {
-  $("#new_product").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
-    return false;
-  })
-} 
+}
 
 // Add free time for a resource on a specific day
 $.fn.init_add_free_time = function () {
@@ -69,9 +67,28 @@ $.fn.init_add_free_time = function () {
 
 // Search for an appointment by its confirmation code
 $.fn.init_search_appointments_by_confirmation_code = function () {
+  // validate the form by binding a callback to the submit function
+  $("#search_appointments_form").validate({
+     showErrors: function(errorMap, errorList) {
+       // handle form errors by highlighting the required field 
+       console.log("show errors");
+       $(".required").addClass('highlighted');
+       return false;
+     }
+    }
+  );
+  
+  // do an ajax form post on submit
   $("#search_appointments_form").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
-    return false;
+    // note: the validate function has already been caled at this point, but I'm not
+    // sure how to get its result w/o calling valid explicitly here
+    if ($(this).valid()) {
+      $.post(this.action, $(this).serialize(), null, "script");
+      // hide the submit button and show the progress bar
+      $(this).find("#submit").hide();
+      $(this).find("#progress").show();
+      return false;
+    }
   })
 }
 
@@ -95,6 +112,15 @@ $.fn.init_show_appointments = function () {
   })
 }
 
+// Set the company's location
+$.fn.init_company_location = function () {
+  $("#location_id").change(function () {
+    var href = '/locations/' + this.value + '/set_default';
+    window.location = href;
+    return false;
+  })
+}
+
 // Highlights timeslots and show edit/delete options on hover
 $.fn.init_highlight_timeslots = function () {
   $(".timeslot").hover(function () {
@@ -111,9 +137,11 @@ $.fn.init_live_people_search = function () {
   $("#live_search_for_people").keyup(function () {
     var search_url  = this.url;
     var search_term = this.value;
-    // Excecute search and throttle how often its called
+    // execute search, throttle how often its called
     var search_execution = function () {
       $.get(search_url, {search : search_term}, null, "script");
+      // show search progress bar
+      $('#search_progress').show();
     }.sleep(300);
   
     return false;
@@ -125,7 +153,7 @@ $.fn.init_live_customers_search = function () {
   $("#live_search_for_customers").keyup(function () {
     var search_url  = this.url;
     var search_term = this.value;
-    // Excecute search and throttle how often its called
+    // excecut search, throttle how often its called
     var search_execution = function () {
       $.get(search_url, {search : search_term}, null, "script");
     }.sleep(300);
@@ -223,5 +251,6 @@ $.fn.init_ujs_links = function () {
 $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
+  $(document).init_company_location();
 })
 

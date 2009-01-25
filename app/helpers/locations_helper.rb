@@ -3,10 +3,10 @@ module LocationsHelper
   def location_title_renderer(location)
     if location.nil?
       return ''
-    elsif location.location_name.blank?
+    elsif location.name.blank?
       h(location.street_addr + ', ' + location.city + ' ' + location.state + ' ' + location.zip)
     else
-      h(location.location_name)
+      h(location.name)
     end
   end
 

@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $(document).init_live_people_search();
-  $(document).init_new_person();  // Don't rebind after an ajax call
+  $(document).init_new_object("#new_person");  // don't need to rebind after an ajax call
   $("#live_search_for_people").focus();
 })
 

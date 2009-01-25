@@ -6,7 +6,7 @@
     = label_tag "live_search_for_people", "Find a person by typing their name", :class => 'big'
     %br
     = text_field("person", "name", :autocomplete => "off", :id => 'live_search_for_people', :class => 'title big', :url => people_path(:subdomain => @subdomain))
-      
+    %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
   .span-14.prepend-1.append-1.last
     = display_flash(:notice)
       
@@ -22,7 +22,8 @@
       .span-6.last
         = label_tag "add_person_name", "Add a person", :class => 'big'
       .span-6.last
-        = text_field_tag "person[name]", '', :id => 'add_person_name', :class => 'title big', :style => 'width: 200px;'
+        = text_field_tag "person[name]", '', :id => 'person_name', :class => 'title big required', :style => 'width: 200px;'
       .span-6.last
-        = submit_tag "Create", :name => nil, :class => 'button big'
+        .hide#progress= image_tag 'barbershop.gif'
+        #submit= submit_tag "Create", :name => nil, :class => 'button big'
 

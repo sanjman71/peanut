@@ -3,7 +3,7 @@
     <td>
       <span class="location_text">
         <% if show_location_title -%>
-          <%= link_to location_title_renderer(location), location_path(location) %>: 
+          <%= link_to location_title_renderer(location), location_path(location, :subdomain => @subdomain) %>: 
         <% end -%>
         </td>
         <td>
