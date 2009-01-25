@@ -5,18 +5,20 @@ namespace :db do
     
     namespace :init do
       
-      desc "Iniatialize admin users"
+      task :dev_data  => ["db:peanut:rp:init", :companies, :admin_users, :regular_users]
+      
+      desc "Initialize admin users"
       task :admin_users do 
         # Create admin users
         puts "adding admin user: admin@killianmurphy.com, password: peanut"
-        a = User.create(:company_id => 0, :name => "Admin", :email => "admin@killianmurphy.com", 
+        a = User.create(:name => "Admin", :email => "admin@killianmurphy.com", 
                         :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
         a.register!
         a.activate!
         a.grant_role('admin')
 
         puts "adding admin user: sanjay@jarna.com, password: peanut"
-        a = User.create(:company_id => 0, :name => "Admin", :email => "sanjay@jarna.com", 
+        a = User.create(:name => "Admin", :email => "sanjay@jarna.com", 
                         :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
         a.register!
         a.activate!
@@ -25,6 +27,28 @@ namespace :db do
         puts "#{Time.now}: completed"
       end
       
+      desc "Initialize regular users"
+      task :regular_users do 
+        # Create admin users
+        puts "adding user: johnny@peanut.com, password: peanut"
+        a = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
+                        :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+        a.register!
+        a.activate!
+
+        a.grant_role('company manager', Company.find_by_name('Company 1'))
+
+        puts "adding user: mary@peanut.com, password: peanut"
+        a = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
+                        :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+        a.register!
+        a.activate!
+        
+        a.grant_role('company employee', Company.find_by_name('Company 1'))
+        
+        puts "#{Time.now}: completed"
+      end
+
       desc "Initialize companies used as test data"
       task :companies do
         puts "#{Time.now}: adding test data ..."

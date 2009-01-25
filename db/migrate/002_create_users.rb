@@ -1,7 +1,6 @@
 class CreateUsers < ActiveRecord::Migration
   def self.up
     create_table :users, :force => true do |t|
-      t.integer   :company_id
       t.string    :name,                      :limit => 100, :default => '', :null => true
       t.string    :email,                     :limit => 100
       t.string    :crypted_password,          :limit => 40
@@ -18,7 +17,7 @@ class CreateUsers < ActiveRecord::Migration
       t.integer   :invitation_limit
     end
     
-    add_index :users, [:company_id, :email], :unique => true
+    add_index :users, [:email], :unique => true
     
     create_table :invitations do |t|
       t.integer   :sender_id

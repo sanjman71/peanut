@@ -14,6 +14,8 @@
     .span-3.price
       %h3= service.price
     .span-3.last.action
-      = link_to "Edit", edit_service_path(service, :subdomain => @subdomain), :class => 'admin'
-      &nbsp;
-      = link_to("Remove", service_path(service, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")
+      - if_privilege('update services', @current_company) do
+        = link_to "Edit", edit_service_path(service, :subdomain => @subdomain), :class => 'admin'
+      - if_privilege('delete services', @current_company) do
+        &nbsp;
+        = link_to("Remove", service_path(service, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this service?")
