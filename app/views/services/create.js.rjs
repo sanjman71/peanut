@@ -1,5 +1,7 @@
 if @error
-  page["#add_service_name"].addClass('highlighted')
+  page["#newservice_name"].addClass('highlighted')
+  page["#progress"].hide();  # hide progress bar
+  page["#submit"].show();    # show submit button 
 else
   page.redirect_to(edit_service_path(@service, :subdomain => @subdomain))
 end

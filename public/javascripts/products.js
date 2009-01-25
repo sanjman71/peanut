@@ -1,11 +1,10 @@
 $(document).ready(function() {
-  $(document).init_new_product();
-  $("#add_product_name").focus();
+  $(document).init_new_object("#new_product");  // don't need to rebind after an ajax call
+  $("#new_product_name").focus();
 })
 
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
  $(document).init_ujs_links();
- $(document).init_new_product();
- $("#add_product_name").focus();
+ $("#new_product_name").focus();
 })

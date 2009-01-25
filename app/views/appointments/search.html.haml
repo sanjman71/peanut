@@ -1,13 +1,15 @@
 - javascript('appointments')
 
 .span-17
-  .box
+  .span-17.box
     - form_tag(search_appointments_path(:subdomain => @subdomain), :method => :post, :id => "search_appointments_form") do |f|
-      = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
-      %br
-      = text_field('appointment', 'code', :value => @code, :class => 'title big')
-      == &nbsp;
-      = submit_tag 'Search', :name => nil, :class => 'submit button big'
+      .span-17
+        = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
+        %br
+        = text_field('appointment', 'code', :value => @code, :class => 'title big required')
+        == &nbsp;
+        %span.hide#progress= image_tag 'barbershop.gif', :class => 'button big'
+        %span#submit= submit_tag 'Search', :name => nil, :class => 'submit button big'
 
 .span-6.prepend-1.last
   .sidebar.instructions.padding-5
@@ -19,7 +21,7 @@
       %li== The confirmation email that was sent to you contains your confirmation code
     == What if I deleted my confirmation email?
     %ul
-      %li== Then you're kinda screwed
+      %li== Whoops
 
 .span-18.last
   %span.code#message
