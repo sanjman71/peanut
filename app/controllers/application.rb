@@ -38,7 +38,8 @@ class ApplicationController < ActionController::Base
         flash[:error] = "Invalid company"
         redirect_to root_path
       end
+      @current_location = Location.find_by_id(session[:location_id]) || Location.anywhere
     end
   end
-
+  
 end

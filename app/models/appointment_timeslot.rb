@@ -15,5 +15,4 @@ class AppointmentTimeslot
   def resource
     @appointment.resource if @appointment
   end
-  
 end

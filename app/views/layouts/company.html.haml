@@ -24,7 +24,7 @@
             = "Location: " + location_title_renderer(@current_company.locations.first)
           - elsif @current_company.locations.size > 1
             Choose location:
-            = select_tag('location_id', options_for_select([['Any location', 0]] + @current_company.locations.collect{ |l| [location_title_renderer(l), l.id]}, @current_company.id))
+            = select_tag('location_id', options_for_select(@current_company.locations_with_any.collect{ |l| [location_title_renderer(l), l.id]}, @current_location.id))
         .span-3.last{:style => 'color: #DDDDDD;'}
           = render :partial => 'users/user_bar'
         #tabs

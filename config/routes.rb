@@ -55,7 +55,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
-  map.resources :locations
+  map.resources :locations, :member => {:set_default => :get}
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'

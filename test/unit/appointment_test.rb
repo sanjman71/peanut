@@ -268,6 +268,47 @@ class AppointmentTest < ActiveSupport::TestCase
     assert_equal Chronic.parse("today 1 pm"), appt.start_at
     assert_equal Chronic.parse("today 3 pm"), appt.end_at
   end
+
+  def test_should_build_appointment_with_location
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    location  = Factory(:location)
+    company.locations = Array(location)
+    
+    assert_difference('Appointment.count', 1) do
+      appt = Appointment.new(:company => company, 
+                             :service => haircut,
+                             :resource => johnny,
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
+                             :start_at_string => "today 2 pm",
+                             :location_id => location.id.to_s)
+      assert appt.valid?
+      appt.save
+      appt.reload
+      assert appt.locations == Array(location)
+    end
+  end
+
+  def test_should_build_appointment_with_location_anywhere
+    company   = Factory(:company)
+    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+    haircut   = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
+    
+    assert_difference('Appointment.count', 1) do
+      appt = Appointment.new(:company => company, 
+                             :service => haircut,
+                             :resource => johnny,
+                             :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
+                             :start_at_string => "today 2 pm",
+                             :location_id => Location.anywhere.id)
+      assert appt.valid?
+      appt.save
+      appt.reload
+      # appointment should have no locations
+      assert appt.locations == []
+    end
+  end
   
   def test_should_build_customer_association
     company = Factory(:company)

@@ -95,6 +95,15 @@ $.fn.init_show_appointments = function () {
   })
 }
 
+// Set the company's location
+$.fn.init_company_location = function () {
+  $("#location_id").change(function () {
+    var href = '/locations/' + this.value + '/set_default';
+    window.location = href;
+    return false;
+  })
+}
+
 // Highlights timeslots and show edit/delete options on hover
 $.fn.init_highlight_timeslots = function () {
   $(".timeslot").hover(function () {
@@ -223,5 +232,6 @@ $.fn.init_ujs_links = function () {
 $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
+  $(document).init_company_location();
 })
 

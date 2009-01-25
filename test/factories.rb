@@ -5,6 +5,14 @@ Factory.define :company do |c|
   c.time_zone   "Central Time (US & Canada)"
 end
 
+Factory.define :location do |l|
+  l.name        "Location 1"
+  l.street_addr "123 Broadway"
+  l.city        "New York"
+  l.state       "CA"
+  l.zip         "12345"
+end
+
 Factory.define :person do |p|
   p.name "Person 1"
 end

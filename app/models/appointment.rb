@@ -52,6 +52,37 @@ class Appointment < ActiveRecord::Base
   named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
+  # Orderings
+  named_scope :order_start_at, {:order => 'start_at'}
+  
+  
+  # scope appointment search by a location
+  
+  # general_location is used for broad searches, where a search for appointments in Chicago includes appointments assigned to anywhere
+  # as well as those assigned to chicago. A search for appointments assigned to anywhere includes all appointments - no constraints.
+  named_scope :general_location,
+                lambda { |location_id|
+                  if (location_id == 0 || location_id.blank?)
+                    # If the request is for any location, there is no condition
+                    {}
+                  else
+                    # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
+                    { :include => :locations, :conditions => ["locations.id = '?' OR locations.id IS NULL", location_id] }
+                  end
+                }
+  # specific_location is used for narrow searchees, where a search for appointments in Chicago includes only those appointments assigned to
+  # Chicago. A search for appointments assigned to anywhere includes only those appointments - not those assigned to Chicago, for example.
+  named_scope :specific_location,
+                lambda { |location_id|
+                  # If the request is for any location, there is no condition
+                  if (location_id == 0 || location_id.blank? )
+                    { :include => :locations, :conditions => ["locations.id IS NULL"] }
+                  else
+                    # If a location is specified, we accept appointments with this location, or with "anywhere" - i.e. null location
+                    { :include => :locations, :conditions => ["locations.id = '?'", location_id] }
+                  end
+                }
+  
   # valid when values
   WHEN_THIS_WEEK            = 'this week'
   WHENS                     = ['today', 'tomorrow', WHEN_THIS_WEEK, 'next week', 'later']
@@ -243,7 +274,7 @@ class Appointment < ActiveRecord::Base
   
   # END: override attribute methdos
   
-  # START: appointment virtual attributes
+  # START: virtual attributes
   def start_at_string
     self.start_at.to_s
   end
@@ -273,12 +304,26 @@ class Appointment < ActiveRecord::Base
   def time_range
     Range.new(time_start_at, time_end_at)
   end
-  # END: time virtual attributes
+  
+  # appointments are only supposed to have one location
+  def location    
+    self.locations.first || Location.anywhere
+  end
+  
+  def location=(location)
+    self.locations << location
+  end
+  # END: virtual attributes
   
   # allow assignment of customer attributes when creating an appointment
   # will only create a new customer if it doesn't already exist based on the 'email' field
   def customer_attributes=(customer_attributes)
     self.customer = Customer.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
+  end
+  
+  # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)
+  def location_id=(id)
+    self.locations << company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
   end
       
   # returns all appointment conflicts
@@ -306,7 +351,7 @@ class Appointment < ActiveRecord::Base
     # find wait appointments that overlap in both date and time ranges
     @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)
   end
-  
+    
   # narrow an appointment by start, end times
   def narrow_by_time_range!(start_at, end_at)
     # validate start, end times

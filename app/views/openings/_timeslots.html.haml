@@ -8,11 +8,13 @@
       -# use appointment, timeslot to create a unique id
       - appt = timeslot.appointment
       - id   = "appointment_#{appt.id}_timeslot_#{i}"
-      .span-11.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
+      .span-16.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
         .span-5.person
           = person.name
         .span-4.time
           == #{timeslot.start_at.to_s(:appt_time)} - #{timeslot.end_at.to_s(:appt_time)}
+        .span-3.location
+          = appt.location.name
         .span-2.last.hide.hover_region{:id => "hover_#{id}"}
           = link_to('Book It', schedule_path(:subdomain => @subdomain, :person_id => person.id, :service_id => service.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
   %hr.space
