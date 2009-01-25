@@ -26,7 +26,7 @@ namespace :db do
       end
       
       desc "Initialize companies used as test data"
-      task :compannies do
+      task :companies do
         puts "#{Time.now}: adding test data ..."
       
         # create test companies
