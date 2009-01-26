@@ -1,5 +1,11 @@
 class ServicesController < ApplicationController
   before_filter :init_current_company
+
+  privilege_required 'create services', :only => [:new, :create], :on => :current_company
+  privilege_required 'read services', :only => [:index, :show], :on => :current_company
+  privilege_required 'update services', :only => [:edit, :update], :on => :current_company
+  privilege_required 'delete services', :only => [:destroy], :on => :current_company
+
   
   # GET /services
   # GET /services.xml

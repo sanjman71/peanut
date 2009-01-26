@@ -11,8 +11,8 @@ class Company < ActiveRecord::Base
   has_many                  :services
   has_many                  :products
   has_many                  :appointments
-  has_many                  :users
   has_many                  :customers, :through => :appointments, :uniq => true
+  has_many                  :invitations
   before_save               :init_subdomain
   after_create              :init_basic_services
   

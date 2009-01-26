@@ -14,9 +14,10 @@ module Badges
         # set the associations
         has_many :user_roles, :class_name=>'Badges::UserRole', :foreign_key=>'user_id', :dependent => :destroy
         has_many :roles, :through=>:user_roles, :uniq=>true
+        named_scope :with_role, lambda { |r| { :include => :roles, :conditions => ["badges_roles.id = ?", r.id]}}
         
         #point userrole to the correct user class
-        Badges::UserRole.associate_user_class(self)
+        #Badges::UserRole.associate_user_class(self)
 
         # include the instance methods on the user record
         include Badges::Authorized::InstanceMethods

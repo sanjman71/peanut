@@ -6,32 +6,53 @@ class UsersController < ApplicationController
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
   
   def index
-    @users = @current_company.users
+    @users = @current_company.authorized_users
   end
   
   def new
     @invitation = Invitation.find_by_token(params[:invitation_token])
     
+    # if the invitation doesn't exist, give an error
     if @invitation.blank?
       @error = true
       return
     end
-    
-    if User.find_by_invitation_id(@invitation.id)
+
+    # if the invitation has already been used, give an error
+    if !@invitation.recipient.blank?
       @error = true
       return
     end
-    
-    @user       = User.new(:invitation_token => @invitation.token, :company_id => @current_company.id, :invitation_id => @invitation.id)
+
+    # If the user already exists, we don't try to recreate them. Instead we add them to the company and redirect to the login page 
+    if @user = User.find_by_email(@invitation.recipient_email)
+      # add the invitation to the user's list of invitations
+      @user.received_invitations << @invitation
+      # add the user to the company
+      @user.grant_role('company employee', @invitation.company)
+      redirect_back_or_default('/login')
+      flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
+    end
+
+    # We're creating a new user. Initialize the email from the invitation. The user gets to change this, however
+    @user       = User.new()
     @user.email = @invitation.recipient_email
   end
  
   def create
     logout_keeping_session!
+    @invitation = Invitation.find_by_token(params[:invitation_token])
+    if @invitation.blank?
+      @error = true
+      return
+    end
+    
     @user = User.new(params[:user])
     @user.register! if @user && @user.valid?
     success = @user && @user.valid?
     if success && @user.errors.empty?
+      # Grant the user basic access to the company
+      @user.grant_role('company employee', @invitation.company)
       # activate user, redirect to login page
       @user.activate!
       redirect_back_or_default('/login')

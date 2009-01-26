@@ -5,8 +5,7 @@
     %h2== Your invitation is invalid
 - else
   - form_for(@user, :url => users_path, :method => :post, :html => {:class => 'new_user'}) do |f|
-    = f.hidden_field :invitation_id
-    = f.hidden_field :company_id
+    = hidden_field_tag :invitation_token, @invitation.token
   
     .span-20.box
       .span-20.last

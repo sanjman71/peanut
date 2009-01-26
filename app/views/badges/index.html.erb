@@ -8,7 +8,7 @@
   <table class="badges">
     <tr>
       <th></th>
-  <% for role in @roles.sort_by {|r| r.name } -%>
+  <% for role in @roles.sort_by {|r| r.id } -%>
       <th><%= role.name %> (<%=link_to 'X', { :id=>role, 
                                               :action=>'delete_role', 
                                               :controller=>controller.controller_name}, 
@@ -16,13 +16,13 @@
   <% end -%>
     </tr>
 
-  <% for privilege in @privileges.sort_by {|p| p.name} -%>
+  <% for privilege in @privileges.sort_by {|p| p.id} -%>
     <tr>
       <th><%= privilege.name %> (<%=link_to 'X', {  :id=>privilege, 
                                                     :action=>'delete_privilege', 
                                                     :controller=>controller.controller_name}, 
                                                   :confirm => "Are you sure you want to delete '#{privilege.name}'?" %>)</th>
-      <% for role in @roles.sort_by {|r| r.name } -%>
+      <% for role in @roles.sort_by {|r| r.id } -%>
           <td><%=check_box_tag("p#{privilege.id}_r#{role.id}", 1, @privilege_roles[privilege.id].has_key?(role.id))%></td>
       <% end -%>
     </tr>
