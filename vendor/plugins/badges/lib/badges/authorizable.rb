@@ -9,6 +9,7 @@ module Badges
 
       def badges_authorizable_object
         has_many :user_roles, :as=>:authorizable, :class_name=>"Badges::UserRole", :dependent => :destroy
+        has_many :authorized_users, :through => :user_roles, :source => :user
 
         include Badges::ModelAuthorization::InstanceMethods
         include Badges::Authorizable::InstanceMethods
