@@ -6,6 +6,7 @@ namespace :db do
     namespace :init do
       
       task :dev_data  => ["db:peanut:rp:init", :companies, :admin_users, :regular_users]
+      task :prod_data  => ["db:peanut:rp:init", :admin_users]
       
       desc "Initialize admin users"
       task :admin_users do 
@@ -46,6 +47,14 @@ namespace :db do
         
         a.grant_role('company employee', Company.find_by_name('Company 1'))
         
+        puts "adding user: erika@peanut.com, password: peanut"
+        a = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
+                        :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+        a.register!
+        a.activate!
+        
+        a.grant_role('company employee', Company.find_by_name('Noel Rose'))
+
         puts "#{Time.now}: completed"
       end
 

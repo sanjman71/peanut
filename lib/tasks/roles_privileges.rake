@@ -6,7 +6,7 @@ namespace :db do
     namespace :rp do
       
       desc "Initialize roles and privileges"
-      task :init  => [:companies, :roles_privs, :appointments, :invoices, :services]
+      task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users]
 
       desc "Initialize company roles and privileges"
       # Avoid name clash with company data initialization by postfixing rp
@@ -125,6 +125,28 @@ namespace :db do
 
         # Company employee can view services
         Badges::RolePrivilege.create(:role=>ce,:privilege=>rs)
+
+      end
+      
+      desc "Initialize user management roles & privileges"
+      task :users do
+
+        puts "adding user management roles & privileges"
+        
+        cm = Badges::Role.find_by_name('company manager')
+        ce = Badges::Role.find_by_name('company employee')
+        
+        cu = Badges::Privilege.create(:name=>"create users")
+        ru = Badges::Privilege.create(:name=>"read users")
+        uu = Badges::Privilege.create(:name=>"update users")
+        du = Badges::Privilege.create(:name=>"delete users")
+
+        # Company manager can manage a company's users
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>ru)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>uu)
+
+        # Company employee can view services
+        Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
 
       end
       
