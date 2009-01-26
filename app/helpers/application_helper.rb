@@ -129,4 +129,22 @@ module ApplicationHelper
     end # 'update company' privilege
   end
   
+  # build the set of locations links for the specified company, using the current_location if its given
+  def build_location_links(company, current_location=nil)
+    # get all company locations, remove the current location
+    company_locations = company.locations - Array(current_location)
+    
+    # add the special anywhere location if its not the current location
+    company_locations += Array(Location.anywhere) unless current_location and current_location.anywhere?
+    
+    # sort locations by name
+    company_locations.sort_by{ |l| l.name }.each_with_index do |location, index|
+      # build company location link
+      name = location.name
+      link = set_default_location_path(location)
+      last = index == (company_locations.size - 1)
+      yield name, link, last
+    end
+  end
+  
 end

@@ -18,17 +18,32 @@
   %body
     #header
       .container
-        .span-24
-          .span-5
-            = render :partial => "companies/company_links.html.haml", :locals => {:company => @current_company}
-          .span-4.prepend-15.last{:style => 'color: #DDDDDD;'}
-            = render :partial => 'users/user_bar'
         .span-24.last
-          %h2{:style => 'color: #FFFFFF;'}
-            = @current_company.name
-            - if !@current_company.locations.empty?
-              == -
-              = @current_location.name
+          .span-7
+            - if @current_company.locations.size > 1
+              -# allow user to change the current location
+              %ul#location_switcher
+                %li
+                  #location_switcher_link= link_to 'Change Location', '', :class => 'admin header'
+                  %ul
+                    - build_location_links(@current_company, @current_location) do |name, link, is_last|
+                      = link_to name, link, :class => 'admin header'
+                      = "&nbsp;|&nbsp;" unless is_last
+              
+          .span-6.prepend-11.last{:style => 'color: #DDDDDD; text-align: right;'}
+            = render :partial => 'users/user_links.html.haml'
+        .span-5.prepend-19.last{:style => 'color: #DDDDDD; text-align: right;'}
+          - if logged_in?
+            %em{:style => 'font-size: 12px; color: #CC9900;'}== Logged in as #{current_user.email}
+            
+            
+        .span-24.last
+          %h2#company_name{:style => 'color: #FFFFFF;'}
+            -# show company name; include location name if its appropriate
+            - name  = @current_company.name
+            - name += " - #{@current_location.name}" unless @current_company.locations.empty?
+            = name
+            
         .span-24#tabs
           .span-21
             %ul

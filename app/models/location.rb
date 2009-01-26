@@ -48,6 +48,11 @@ class Location < ActiveRecord::Base
     end
   end
   
+  # return true if its the special 'anywhere' location
+  def anywhere?
+    self.id == 0
+  end
+  
   protected
 
   def geocode_address
