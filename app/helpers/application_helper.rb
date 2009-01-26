@@ -58,7 +58,7 @@ module ApplicationHelper
 
     end
 
-    # if has_privilege?('read customers', @current_company)
+    if has_privilege?('read customers', @current_company)
 
       # 'Customers' tab
       name = 'Customers'
@@ -70,7 +70,7 @@ module ApplicationHelper
 
       yield link
 
-    # end
+    end
   
     if has_privilege?('read invoices', @current_company)
 
@@ -100,6 +100,8 @@ module ApplicationHelper
 
     end
       
+    if has_privilege?('read people', @current_company)
+
       # 'People' tab
       name = 'People'
       if current_controller.controller_name == 'people' and ['index', 'show'].include?(current_controller.action_name)
@@ -110,6 +112,8 @@ module ApplicationHelper
 
       yield link
 
+    end
+    
     if has_privilege?('read services', @current_company)
 
       # 'Services' tab
@@ -124,6 +128,8 @@ module ApplicationHelper
 
     end
 
+    if has_privilege?('read products', @current_company)
+
       # 'Products' tab
       name = 'Products'
       if current_controller.controller_name == 'products' and ['index', 'show'].include?(current_controller.action_name)
@@ -133,6 +139,10 @@ module ApplicationHelper
       end
 
       yield link
+      
+    end
+    
+    if has_privilege?('read waitlist', @current_company)
 
       # 'Waitlist' tab
       name = 'Waitlist'
@@ -143,6 +153,8 @@ module ApplicationHelper
       end
 
       yield link
+
+    end
 
   end
   

@@ -6,7 +6,7 @@ namespace :db do
     namespace :rp do
       
       desc "Initialize roles and privileges"
-      task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users]
+      task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :people, :products, :waitlist]
 
       desc "Initialize company roles and privileges"
       # Avoid name clash with company data initialization by postfixing rp
@@ -147,6 +147,86 @@ namespace :db do
 
         # Company employee can view services
         Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
+
+      end
+      
+      desc "Initialize customer management roles & privileges"
+      task :customers do
+        
+        puts "adding customer management roles & privileges"
+        
+        cm = Badges::Role.find_by_name('company manager')
+        ce = Badges::Role.find_by_name('company employee')
+
+        cc = Badges::Privilege.create(:name=>"create customers")
+        rc = Badges::Privilege.create(:name=>"read customers")
+        uc = Badges::Privilege.create(:name=>"update customers")
+        dc = Badges::Privilege.create(:name=>"delete customers")
+
+        # Company manager can manage a company's customers
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>rc)
+        
+        # TODO - add more privileges and roles here as appropriate
+
+      end
+
+      desc "Initialize people management roles & privileges"
+      task :people do
+        
+        puts "adding people management roles & privileges"
+        
+        cm = Badges::Role.find_by_name('company manager')
+        ce = Badges::Role.find_by_name('company employee')
+
+        c = Badges::Privilege.create(:name=>"create people")
+        r = Badges::Privilege.create(:name=>"read people")
+        u = Badges::Privilege.create(:name=>"update people")
+        d = Badges::Privilege.create(:name=>"delete people")
+
+        # Company manager can manage a company's people
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+
+        # TODO - add more privileges and roles here as appropriate
+
+      end
+      
+      desc "Initialize products management roles & privileges"
+      task :products do
+        
+        puts "adding products management roles & privileges"
+        
+        cm = Badges::Role.find_by_name('company manager')
+        ce = Badges::Role.find_by_name('company employee')
+
+        c = Badges::Privilege.create(:name=>"create products")
+        r = Badges::Privilege.create(:name=>"read products")
+        u = Badges::Privilege.create(:name=>"update products")
+        d = Badges::Privilege.create(:name=>"delete products")
+
+        # Company manager can manage a company's products
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+
+        # TODO - add more privileges and roles here as appropriate
+
+      end
+      
+      desc "Initialize waitlist management roles & privileges"
+      task :waitlist do
+        
+        puts "adding waitlist management roles & privileges"
+        
+        cm = Badges::Role.find_by_name('company manager')
+        ce = Badges::Role.find_by_name('company employee')
+
+        c = Badges::Privilege.create(:name=>"create waitlist")
+        r = Badges::Privilege.create(:name=>"read waitlist")
+        u = Badges::Privilege.create(:name=>"update waitlist")
+        d = Badges::Privilege.create(:name=>"delete waitlist")
+
+        # Company manager can manage a company's waitlist
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+
+        # TODO - add more privileges and roles here as appropriate
 
       end
       
