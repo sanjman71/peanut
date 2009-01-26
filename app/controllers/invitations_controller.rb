@@ -10,6 +10,7 @@ class InvitationsController < ApplicationController
   def create
     @invitation         = Invitation.new(params[:invitation])
     @invitation.sender  = current_user
+    @invitation.company = @current_company
     
     if @invitation.save
       MailWorker.async_send_invitation(:id => @invitation.id, :url => invite_url(@invitation.token))

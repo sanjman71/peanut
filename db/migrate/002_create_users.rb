@@ -21,9 +21,11 @@ class CreateUsers < ActiveRecord::Migration
     
     create_table :invitations do |t|
       t.integer   :sender_id
+      t.integer   :recipient_id
       t.string    :recipient_email
       t.string    :token
       t.datetime  :sent_at
+      t.integer   :company_id
       
       t.timestamps
     end
