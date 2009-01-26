@@ -53,7 +53,7 @@ namespace :db do
         a.register!
         a.activate!
         
-        a.grant_role('company employee', Company.find_by_name('Noel Rose'))
+        a.grant_role('company manager', Company.find_by_name('Noel Rose'))
 
         puts "#{Time.now}: completed"
       end
