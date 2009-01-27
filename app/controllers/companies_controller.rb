@@ -1,22 +1,19 @@
 class CompaniesController < ApplicationController
-  before_filter :init_current_company
+  before_filter :init_current_company, :except => [:index]
   after_filter  :store_location, :only => [:index, :show, :edit]
+  layout "signup"
+
+  privilege_required 'read companies', :only => [:index]
+  privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
+  privilege_required 'delete companies', :only => [:destroy], :on => :current_company
 
   # GET /companies
   # GET /companies.xml
   def index
-
-    if @current_company
-      # show company openings
-      return redirect_to(openings_path)
-    end
-    
-    # We're going to an admin page
-    # need to check permission here
     @companies = Company.find(:all)
     
     respond_to do |format|
-      format.html { render :layout => 'admin' } # index.html.erb
+      format.html
       format.xml  { render :xml => @companies }
     end
   end
@@ -91,8 +88,4 @@ class CompaniesController < ApplicationController
     end
   end
   
-  def access_denied
-    render :text => "Access Denied", :layout => 'company'
-  end
-    
 end

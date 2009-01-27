@@ -1,7 +1,7 @@
 class BadgesController < ApplicationController
-  layout "admin"
+  layout "signup"
   
-  privilege_required 'create roles privilieges', :only => [:create_role, :create_privilege]
+  privilege_required 'create roles priviliges', :only => [:create_role, :create_privilege]
   privilege_required 'read roles privileges', :only => [:index]
   privilege_required 'update roles privileges', :only => [:update_role_privileges]
   privilege_required 'deleve roles privilieges', :only => [:delete_role, :delete_privilege]
