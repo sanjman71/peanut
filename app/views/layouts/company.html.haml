@@ -57,11 +57,6 @@
                 %li
                   = link_to 'Admin Console', companies_path(:subdomain => nil)
             
-    -#%p{:style => "color: green"}
-      -#= flash[:notice]
-    -#%p{:style => "color: red"}
-      -#= flash[:error]
-
     - if RAILS_ENV == 'development'
       .container.showgrid
         = yield
