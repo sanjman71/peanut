@@ -7,7 +7,7 @@
     == &nbsp;|&nbsp;
     
   - if has_privilege?('company manager', @current_company)
-    = link_to 'Edit Company', edit_company_path(@current_company, :subdomain => @subdomain), :class => 'admin header'
+    = link_to 'Company Info', edit_company_path(@current_company, :subdomain => @subdomain), :class => 'admin header'
     == &nbsp;|&nbsp;
     
   = link_to('Log-out', logout_path, :class => 'admin header')

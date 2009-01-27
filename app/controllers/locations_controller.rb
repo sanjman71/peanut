@@ -1,25 +1,15 @@
 class LocationsController < ApplicationController
-  before_filter :init_current_company, :get_context
-  after_filter :store_location, :only => [:index, :show]
+  before_filter :init_current_company
+  after_filter  :store_location, :only => [:index, :show]
   
   # GET /locations
   # GET /locations.xml
   def index
+    @locations = @current_company.locations.paginate :page => params[:locations_page]
 
-    if @current_company
-      @locations = @current_company.locations.paginate :page => params[:locations_page]
-
-      respond_to do |format|
-        format.html # index.html.erb
-        format.js # index.js.rjs
-      end
-
-    else
-      flash[:error] = "No company specified"
-
-      respond_to do |format|
-        format.html { redirect_to root_url }
-      end
+    respond_to do |format|
+      format.html # index.html.erb
+      format.js   # index.js.rjs
     end
   end
 
@@ -35,12 +25,13 @@ class LocationsController < ApplicationController
     end
   end
   
+  # GET /locations/1/set_default
   def set_default
     @location = @current_company.locations.find_by_id(params[:id]) || Location.anywhere
     
     if request.referrer
       session[:location_id] = @location.id
-      redirect_to request.referrer and return
+      redirect_to(request.referrer) and return
     end
 
   end
@@ -50,7 +41,7 @@ class LocationsController < ApplicationController
     @location = Location.new
     
     respond_to do |format|
-      format.html # new.html.erb
+      format.html # new.html.haml
       format.js # new.js.rjs
     end
   end
@@ -59,10 +50,8 @@ class LocationsController < ApplicationController
   def edit
     @location = Location.find(params[:id])
     
-    @context_url = location_url(@location) if @context_url.blank? && @location
-    
     respond_to do |format|
-      format.html # edit.html.erb
+      format.html # edit.html.haml
       format.js # edit.js.rjs
     end
     
@@ -72,14 +61,14 @@ class LocationsController < ApplicationController
   # POST /locations.xml
   def create
     @location = Location.new(params[:location])
-    @current_company.locations << @location if @current_company
     
-    @context_url = location_url(@location) if @context_url.blank?
+    # add location to current company
+    @current_company.locations << @location if @current_company
     
     if @location.save
       flash[:notice] = 'Location was successfully created.'
       respond_to do |format|
-        format.html { redirect_to @context_url }
+        format.html { redirect_to(redirect_success_path) }
         format.xml  { head :created, :location => location_url(@location) }
       end
     else
@@ -96,14 +85,10 @@ class LocationsController < ApplicationController
   def update
     @location = Location.find(params[:id])
 
-    if @location
-      @context_url = location_url(@location) if @context_url.blank?
-    end
-    
     if @location.update_attributes(params[:location])
       respond_to do |format|
         flash[:notice] = 'Location was successfully updated.'
-        format.html { redirect_back_or_default('/') }
+        format.html { redirect_to(redirect_success_path) }
       end
     else
       respond_to do |format|
@@ -118,28 +103,22 @@ class LocationsController < ApplicationController
   def destroy
     @location = Location.find(params[:id])
     
-    @context_url = locations_url if @context_url.blank?
-    
     if @location
       @location.destroy
+      flash[:notice] = 'Location was successfully removed.'
     end
     
     respond_to do |format|
-      format.html { redirect_to @context_url }
+      format.html { redirect_to(redirect_success_path) }
       format.xml  { head :ok }
     end
   end
   
   protected
-  
-  def get_context
-    @context_url = case
-      when @current_company then openings_url(:subdomain => @current_company.subdomain)
-      else root_url
-    end
-    # We do authorization on the parent as appropriate. 
-    @may_edit_parent = has_privilege?("update company", @current_company)
-	end
+
+  def redirect_success_path
+    edit_company_path(@current_company, :subdomain => @subdomain)
+  end
   
   # Merges conditions so that the result is a valid +condition+ 
   def merge_conditions(conditions)

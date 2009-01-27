@@ -1,6 +1,7 @@
 -# This partial takes the following parameters:
 -# horizontal = determines whether to output the address on a single line
 -# render_country = should we print out the country
+
 - horizontal = false if local_assigns[:horizontal].nil?
 - render_country = false if local_assigns[:render_country].nil?
 - render_phone = false if local_assigns[:render_phone].nil?
@@ -8,6 +9,7 @@
 - render_notes = false if local_assigns[:render_notes].nil?
 - country_name = location_country_name(location_address)
 - line_break = horizontal ? '' : '<br />'
+
 .address
   = "#{h(location_address.street_addr)},#{line_break}" unless location_address.street_addr.blank?
   = "#{h(location_address.city)},#{line_break}" unless location_address.city.blank?

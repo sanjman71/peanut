@@ -1,3 +1,3 @@
 page.replace :locations, :partial => "locations/locations", :object => @locations,
   :locals => {:short_locations => false, :show_location_title => false, 
-              :context_url => context_url, :big_map => big_map }
+              :big_map => big_map }

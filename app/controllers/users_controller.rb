@@ -82,7 +82,7 @@ class UsersController < ApplicationController
 
   # /users/1/edit
   def edit
-    @user = @current_company.users.find(params[:id])
+    @user = User.find(params[:id])
   end
   
   def suspend

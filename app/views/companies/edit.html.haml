@@ -3,6 +3,10 @@
     == Editing
     = @company.name
 
+.span-20
+  .span-17.prepend-1
+    = display_flash(:notice)
+    
   - form_for(@company) do |f|
     = f.error_messages
   
@@ -18,6 +22,9 @@
         == or
         = link_to 'Cancel', companies_path, :style => 'font-size: 12px;'
     %hr.space
-  %h2
-    == Company locations
-  = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:may_edit_parent  => @may_edit_parent, :locatable => @company}
+    %hr.space
+    
+  .span-19.prepend-1.last
+    %h2
+      == Locations
+    = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}

@@ -1,7 +1,6 @@
 page.replace :locations, :partial => "locations/edit_location", :object => @location, 
   :locals => {
-      :form_path => @context_url + location_path(@location), 
+      :form_path => location_path(@location), 
       :form_method => :put, 
-      :form_submit => 'Update',
-      :context_url => @context_url
+      :form_submit => 'Update'
   }

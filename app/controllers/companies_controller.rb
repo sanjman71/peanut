@@ -1,7 +1,6 @@
 class CompaniesController < ApplicationController
   before_filter :init_current_company
-  before_filter :get_context, :only => [:index, :show, :edit, :update, :destroy] # Not for new and create
-  after_filter :store_location, :only => [:index, :show, :edit]
+  after_filter  :store_location, :only => [:index, :show, :edit]
 
   # GET /companies
   # GET /companies.xml
@@ -44,6 +43,7 @@ class CompaniesController < ApplicationController
 
   # GET /companies/1/edit
   def edit
+    @company = Company.find(params[:id])
   end
   
   # POST /companies
@@ -66,6 +66,7 @@ class CompaniesController < ApplicationController
   # PUT /companies/1
   # PUT /companies/1.xml
   def update
+    @company = Company.find(params[:id])
 
     respond_to do |format|
       if @company.update_attributes(params[:company])
@@ -93,15 +94,5 @@ class CompaniesController < ApplicationController
   def access_denied
     render :text => "Access Denied", :layout => 'company'
   end
-  
-  def get_context
-    if @current_company
-      @company = @current_company
-    elsif params && params[:id]
-      @company = Company.find(params[:id])
-    end
-    # We do authorization on the parent as appropriate. 
-    @may_edit_parent = has_privilege?("update company", @company)
-	end
-  
+    
 end

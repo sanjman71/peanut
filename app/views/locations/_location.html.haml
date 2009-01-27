@@ -1,0 +1,14 @@
+- if location
+  %div[location]
+    .span-5.location_text
+      - if show_location_title
+        %h3= location_title_renderer(location)
+    .span-3.location_text
+      - if short_locations
+        = render :partial => 'locations/short_location', :object => location
+      - else
+        = render :partial => 'locations/location_address', :object => location
+    .span-11.last.editdelete
+      - if has_privilege?("update company", @current_company)
+        = link_to "Edit", edit_location_path(location, :subdomain => @subdomain), :class => 'edit_address' 
+        = link_to "Delete", location_path(location), :method => :delete, :confirm => "Are you sure you want to delete this location"

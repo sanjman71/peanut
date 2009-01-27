@@ -1,0 +1,30 @@
+-# This partial uses a number of parameters, as follows:
+-# short_locations - short location descriptions
+-# show_location_title - show the title of the location (e.g. restaurant name)
+-# big_map - show a big or little map initially
+-# home_location - show a home location, e.g. for a location-based search
+-# page_param_name - the page parameter name for will_paginate
+ 
+- short_locations = true if local_assigns[:short_locations].nil?
+- show_location_title = true if local_assigns[:show_location_title].nil?
+- big_map = false if local_assigns[:big_map].nil?
+- home_location ||= nil
+- page_param_name ||= :locations_page
+- with_distance = false if local_assigns[:with_distance].nil?
+- locatable = '' if local_assigns[:locatable].nil?
+
+#locations
+  .addressbox#addressbox
+    - unless locations.nil?
+      .toppage
+        = location_page_info locations
+        = will_paginate locations, :param_name => page_param_name
+      .locations
+        - locations.each_with_index do |location, i|
+          .span-20.last
+            = render :partial => 'locations/location', :object => location, :locals => {:with_distance => false, :i => i,:geodist => nil, :show_location_title => show_location_title, :short_locations => short_locations, :locatable => locatable}
+    .bottompage
+      = will_paginate locations, :param_name => page_param_name
+    .bottompage
+      - if has_privilege?("update company", @current_company)
+        = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'

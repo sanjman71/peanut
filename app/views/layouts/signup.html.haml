@@ -19,8 +19,8 @@
       .container
         .span-18
           %h1= yield :title
-        .span-6.last.admin
-          = render :partial => 'shared/admin_bar'
+        .span-6.last.admin.text-align-right
+          = render :partial => 'shared/signup_bar'
 
     - if RAILS_ENV == 'development'
       .container.showgrid

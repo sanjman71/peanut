@@ -1,7 +1,6 @@
-.locations
-  %h2.prepend-1
-    == New location
+%h2.prepend-1
+  == New location
 
-  = error_messages_for :location
+= error_messages_for :location
 
-  = render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Add location'}
+= render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Add location', :submit_url => locations_path(:subdomain => @subdomain)}

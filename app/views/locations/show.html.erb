@@ -1,7 +1,6 @@
 <%= render :partial => 'locations/location_address', :object => @location %>
 
-
-<% if @may_edit_parent %>
+<% if has_privilege?("update company", @current_company) %>
   <%= link_to 'Edit', edit_location_path(@location) %> |
   <%= link_to 'Back', locations_path %>
 <% end %>

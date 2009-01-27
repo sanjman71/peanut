@@ -1,5 +1,5 @@
 .location
-  - form_for @location, :html => {:id => 'edit_location_form'} do |form|
+  - form_for @location, :url => submit_url, :html => {:id => 'edit_location_form'} do |form|
     .span-20.last
       .span-4.prepend-1
         %h3= form.label :name, "Name:"
@@ -50,3 +50,5 @@
     
     .span-20.prepend-1.last
       = submit_tag form_submit || 'Submit', :class => 'big button'
+      == or
+      = link_to 'Cancel', edit_company_path(@current_company, :subdomain => @subdomain)

@@ -1,0 +1,10 @@
+- content_for :javascript do
+  = javascript_include_tag 'map_helpers'
+
+%h2.prepend-1
+  == Editing location
+
+= error_messages_for :location
+
+= render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Update', :submit_url => location_path(@location, :subdomain => @subdomain) }
+

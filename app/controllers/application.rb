@@ -45,7 +45,7 @@ class ApplicationController < ActionController::Base
       
       if @current_company.blank?
         flash[:error] = "Invalid company"
-        return redirect_to root_path
+        return redirect_to(root_path)
       end
 
       # initialize subdomain

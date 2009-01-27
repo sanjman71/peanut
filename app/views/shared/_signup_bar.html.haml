@@ -1,0 +1,12 @@
+- if has_privilege?('read companies')
+  = link_to('Companies', companies_path(:subdomain => @subdomain), :class => 'signup')
+  == &nbsp;|&nbsp;
+
+- if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')
+  = link_to('Privileges & Roles', badges_path, :class => 'signup')
+  == &nbsp;|&nbsp;
+  
+- if logged_in?
+  = link_to('Log-out', logout_path, :class => 'signup')
+- else
+  = link_to('Log-in', login_path, :class => 'signup')

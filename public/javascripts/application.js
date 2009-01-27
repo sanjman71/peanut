@@ -220,11 +220,18 @@ $.fn.init_add_note = function () {
   })
 } 
 
-// Initialize location switcher list
-$.fn.init_location_switcher_list = function() {
+// Initialize location switcher allowing users to change the current location
+$.fn.init_location_switcher = function() {
   $('#location_switcher li').hover(
-    function() { $('ul', this).css('display', 'block');},
-    function() { $('ul', this).css('display', 'none'); }
+    // add block class for internet explorer
+    function() { 
+      $('ul', this).css('display', 'block');
+      $('#location_switcher_link').addClass('hide');
+    },
+    function() { 
+      $('ul', this).css('display', 'none'); 
+      $('#location_switcher_link').removeClass('hide');
+    }
   );
 }
 
@@ -258,7 +265,6 @@ $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
   $(document).init_company_location();
-  $(document).init_location_switcher_list();
-
+  $(document).init_location_switcher();
 })
 

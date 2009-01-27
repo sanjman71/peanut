@@ -16,7 +16,6 @@ class SignupController < ApplicationController
         
         # create company, user objects
         @company.save
-        @user.company = @company
         @user.save
         
         # rollback unless all objects are valid

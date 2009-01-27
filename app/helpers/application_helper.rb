@@ -32,6 +32,13 @@ module ApplicationHelper
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
   
+  # build company, location title from specified objects
+  def company_location_title(company, location)
+    name  = company.name
+    name += " - #{location.name}" unless company.locations.empty? or location.blank?
+    name
+  end
+  
   def build_tab_links(current_controller)
     
     # 'Openings' tab
