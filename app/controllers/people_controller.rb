@@ -1,6 +1,11 @@
 class PeopleController < ApplicationController
   before_filter :init_current_company
   
+  privilege_required 'create people', :only => [:new, :create], :on => :current_company
+  privilege_required 'read people', :only => [:index, :show], :on => :current_company
+  privilege_required 'update people', :only => [:edit, :update], :on => :current_company
+  privilege_required 'delete people', :only => [:destroy], :on => :current_company
+  
   # GET /people
   # GET /people.xml
   def index

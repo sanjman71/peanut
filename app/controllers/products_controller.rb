@@ -1,5 +1,10 @@
 class ProductsController < ApplicationController
   before_filter :init_current_company
+
+  privilege_required 'create products', :only => [:new, :create], :on => :current_company
+  privilege_required 'read products', :only => [:index, :show], :on => :current_company
+  privilege_required 'update products', :only => [:edit, :update], :on => :current_company
+  privilege_required 'delete products', :only => [:destroy], :on => :current_company
   
   # GET /products
   # GET /products.xml
