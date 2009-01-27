@@ -8,11 +8,12 @@ if File.exists?(peanut_dir)
   # production environment
   RAILS_ROOT  = peanut_dir
   rails_env   = 'production'
+  apache      = "/etc/init.d/apache2"
 else
   # assume development environment, use current directory
   RAILS_ROOT  = File.dirname(File.dirname(__FILE__))
   rails_env   = 'development'
-  
+  apache      = "httpd -k"
 end
 
 # Load user, group info
@@ -101,7 +102,6 @@ end
 God.watch do |w|
   w.name            = "apache"
   w.interval        = 30.seconds # default
-  apache            = "httpd -k"
   w.start           = "#{apache} start"
   w.stop            = "#{apache} stop"
   w.restart         = "#{apache} restart"
@@ -113,7 +113,7 @@ God.watch do |w|
 
   generic_monitoring(w, :cpu_limit => 30.percent, :memory_limit => 100.megabytes)
 end
-
+  
 # run these in production environments
 if rails_env == 'production'
   
