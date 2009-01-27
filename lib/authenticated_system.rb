@@ -53,6 +53,9 @@ module AuthenticatedSystem
       authorized? || access_denied
     end
 
+    # Note: The badges plugin redirect url is used instead of this
+    # method to handle the case where the user is not authorized.
+    #
     # Redirect as appropriate when an access request fails.
     #
     # The default action is to redirect to the login screen.
@@ -61,21 +64,21 @@ module AuthenticatedSystem
     # behavior in case the user is not authorized
     # to access the requested action.  For example, a popup window might
     # simply close itself.
-    def access_denied
-      respond_to do |format|
-        format.html do
-          store_location
-          redirect_to new_session_path
-        end
-        # format.any doesn't work in rails version < http://dev.rubyonrails.org/changeset/8987
-        # Add any other API formats here.  (Some browsers, notably IE6, send Accept: */* and trigger 
-        # the 'format.any' block incorrectly. See http://bit.ly/ie6_borken or http://bit.ly/ie6_borken2
-        # for a workaround.)
-        format.any(:json, :xml) do
-          request_http_basic_authentication 'Web Password'
-        end
-      end
-    end
+    # def access_denied
+    #   respond_to do |format|
+    #     format.html do
+    #       store_location
+    #       redirect_to new_session_path
+    #     end
+    #     # format.any doesn't work in rails version < http://dev.rubyonrails.org/changeset/8987
+    #     # Add any other API formats here.  (Some browsers, notably IE6, send Accept: */* and trigger 
+    #     # the 'format.any' block incorrectly. See http://bit.ly/ie6_borken or http://bit.ly/ie6_borken2
+    #     # for a workaround.)
+    #     format.any(:json, :xml) do
+    #       request_http_basic_authentication 'Web Password'
+    #     end
+    #   end
+    # end
 
     # Store the URI of the current request in the session.
     #
