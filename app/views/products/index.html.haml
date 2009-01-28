@@ -28,7 +28,7 @@
         %em{:style => "color: #666666; font-size: 12px;"}== Examples: Shampoo, Styling Gel
       %hr.space
       .span-6.last
-        .hide#progress= image_tag 'barbershop.gif'
-        #submit= submit_tag "Create", :name => nil, :class => 'button big'
+        #submit.show= submit_tag "Create", :name => nil, :class => 'button big'
+        #progress.hide= image_tag 'barbershop.gif', :size => '70x25'
     
         
