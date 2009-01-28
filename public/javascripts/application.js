@@ -42,6 +42,7 @@ $.fn.init_new_object = function(form_id) {
     // handle form errors by highlighting the required field 
     showErrors: function(errorMap, errorList) {
       $(".required").addClass('highlighted');
+      $(".required").focus();
     },
     // don't validate until the form is submitted and we call valid
     onfocusout: false,
