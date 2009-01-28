@@ -20,7 +20,7 @@
       .span-5
         = f.submit 'Update', :class => 'button big'
         == or
-        = link_to 'Cancel', company_path(@company, :subdomain => @subdomain), :style => 'font-size: 12px;'
+        = link_to 'Cancel', root_path(:subdomain => @subdomain), :style => 'font-size: 12px;'
     %hr.space
     %hr.space
     

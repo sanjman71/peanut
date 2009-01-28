@@ -52,13 +52,5 @@ class ApplicationController < ActionController::Base
       @current_location = Location.find_by_id(session[:location_id]) || Location.anywhere
     end
   end
-
-  # redirect http://[company].peanut.com/ to the company subdomain root path
-  def redirect_subdomain_home_route
-    return true if current_subdomain.blank? or current_subdomain == 'www'
-    # its a company subdomain, redirect to subdomain root path
-    redirect_to(openings_path)
-    false
-  end
     
 end

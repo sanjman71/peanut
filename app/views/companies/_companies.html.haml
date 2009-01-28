@@ -5,4 +5,4 @@
       %h4.bottom= company.time_zone
     .span-2.prepend-3.last.action
       - if has_privilege?("read companies")
-        = link_to "Site", openings_path(:subdomain => company.subdomain), :class => 'admin'
+        = link_to "Site", root_path(:subdomain => company.subdomain), :class => 'admin'
