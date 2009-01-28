@@ -36,13 +36,17 @@ $.fn.init_new_membership = function () {
 } 
 
 // Add a new object (e.g. person, service, product)
-$.fn.init_new_object = function (form_id) {
+$.fn.init_new_object = function(form_id) {
   // validate the form by binding a callback to the submit function
   $(form_id).validate({
     // handle form errors by highlighting the required field 
     showErrors: function(errorMap, errorList) {
       $(".required").addClass('highlighted');
-    }
+    },
+    // don't validate until the form is submitted and we call valid
+    onfocusout: false,
+    onkeyup: false,
+    onsubmit: false
   });
   
   // do an ajax form post on submit
@@ -58,9 +62,25 @@ $.fn.init_new_object = function (form_id) {
 }
 
 // Add free time for a resource on a specific day
-$.fn.init_add_free_time = function () {
+$.fn.init_add_free_time = function() {
+  // validate the form by binding a callback to the submit function
+  $("#add_free_time_form").validate({
+    // handle form errors by highlighting the required field 
+    showErrors: function(errorMap, errorList) {
+      $(".required").addClass('highlighted');
+    },
+    // don't validate until the form is submitted and we call valid
+    onfocusout: false,
+    onkeyup: false,
+    onsubmit: false
+  });
+  
   $("#add_free_time_form").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
+    if ($(this).valid()) {
+      $.post(this.action, $(this).serialize(), null, "script");
+      $(this).find("#submit").hide();
+      $(this).find("#progress").show();
+    }
     return false;
   })
 }
@@ -72,8 +92,12 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
      showErrors: function(errorMap, errorList) {
        // handle form errors by highlighting the required field 
        $(".required").addClass('highlighted');
-       return false;
-     }
+       $("#appointment_code").focus();
+     },
+     // don't validate until the form is submitted and we call valid
+     onfocusout: false,
+     onkeyup: false,
+     onsubmit: false
     }
   );
   
@@ -86,8 +110,8 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
       // hide the submit button and show the progress bar
       $(this).find("#submit").hide();
       $(this).find("#progress").show();
-      return false;
     }
+    return false;
   })
 }
 

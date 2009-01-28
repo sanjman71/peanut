@@ -44,13 +44,14 @@
           .span-7.last#start_at_label
             == Start
           .span-7.last#start_at_text
-            = text_field 'appointment[time_range]', 'start_at', :size => 8
+            = text_field 'appointment[time_range]', 'start_at', :size => 10, :class => 'required'
             %span.example== e.g. 8:15 am
           .span-7.last#end_at_label
             == End
           .span-7.last.append-bottom#end_at_text
-            = text_field 'appointment[time_range]', 'end_at', :size => 8
+            = text_field 'appointment[time_range]', 'end_at', :size => 10, :class => 'required'
             %span.example== e.g. 5:30 pm
           .span-7.last
-            = f.submit 'Add', :name => nil, :class => 'button'
+            #submit= f.submit 'Add', :name => nil, :class => 'button big'
+            .hide#progress= image_tag 'barbershop.gif'
 
