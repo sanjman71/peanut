@@ -29,13 +29,20 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }
-  map.resources :openings, :collection => { :search => [:get, :post] }
+  map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.resources :notes, :only => [:create]
   map.resources :memberships, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
+  # format openings search path, scoped by person (optional) and service
+  map.connect   'people/:person_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
+  map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
+
+  # format appointments index path, scoped by person
+  map.connect   'people/:person_id/appointments/:when', :controller => 'appointments', :action => 'index'
+
   # override 'appointments/new' path
   map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
   map.waitlist  'waitlist/people/:person_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
@@ -44,7 +51,7 @@ ActionController::Routing::Routes.draw do |map|
     # nested appointments routes
     resource.resources :appointments
     # nested openings routes
-    resource.resources :openings
+    resource.resources :openings, :only => [:index]
     
     # nested services routes
     resource.resources :services,   :has_many => [:appointments, :openings]

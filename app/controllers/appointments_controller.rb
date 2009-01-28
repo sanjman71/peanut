@@ -86,7 +86,7 @@ class AppointmentsController < ApplicationController
     @people       = @current_company.people.all
 
     # initialize time parameters
-    @when         = params[:when] || @@default_when
+    @when         = (params[:when] || @@default_when).to_s_param
     @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person

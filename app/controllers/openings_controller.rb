@@ -18,11 +18,11 @@ class OpeningsController < ApplicationController
     @person   = Person.anyone if @person.blank?
     
     # initialize when, no default
-    @when       = params[:when]
+    @when       = params[:when].to_s_param if params[:when]
     @daterange  = DateRange.parse_when(@when) unless @when.blank?
     
     # initialize time
-    @time       = params[:time]
+    @time       = params[:time].to_s_param if params[:time]
 
     # initialize service, default to nothing
     @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
@@ -71,6 +71,10 @@ class OpeningsController < ApplicationController
   def search
     # remove 'authenticity_token' params
     params.delete('authenticity_token')
+    # url format parameters
+    ['when', 'time'].each do |s|
+      params[s] = params[s].to_url_param if params[s]
+    end
     redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index'))
   end
   
