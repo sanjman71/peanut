@@ -25,7 +25,7 @@ ActionController::Routing::Routes.draw do |map|
   # unauthorized route
   map.connect   '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
-  map.resources :companies, :collection => {:access_denied => :get}
+  map.resources :companies, :only => [:index, :show, :edit, :update, :destroy]
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }
@@ -62,7 +62,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
-  map.resources :locations, :member => {:set_default => :get}
+  map.resources :locations,         :member => {:select => :get}
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'

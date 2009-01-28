@@ -7,14 +7,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
                                           :resource => johnny,
-                                          :customer_id => 0,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -23,7 +22,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
                                       :resource => johnny,
-                                      :customer => customer,
+                                      :owner => owner,
                                       :start_at => "20080801000000",
                                       :duration =>  haircut.duration)
                                       
@@ -35,8 +34,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
       assert work_appointment.valid?
-      # work appointment should have the correct customer and job
-      assert_equal customer, work_appointment.customer
+      # work appointment should have the correct owner and job
+      assert_equal owner, work_appointment.owner
       assert_equal haircut, work_appointment.service
       # work appointment should have the correct start and end times
       assert_equal "20080801T000000", work_appointment.start_at.to_s(:appt_schedule)
@@ -55,7 +54,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
       assert_equal johnny, free2_appointment.resource
-      assert_equal 0, free2_appointment.customer_id
+      # owner id should be nil for a free appointment
+      assert_equal nil, free2_appointment.owner_id
     end
   end
 
@@ -63,14 +63,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
                                           :resource => johnny,
-                                          :customer_id => 0,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -79,7 +78,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
                                       :resource => johnny,
-                                      :customer => customer,
+                                      :owner => owner,
                                       :start_at => "20080801110000",
                                       :duration =>  haircut.duration)
                                       
@@ -91,8 +90,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
       assert work_appointment.valid?
-      # work appointment should have the correct customer and job
-      assert_equal customer, work_appointment.customer
+      # work appointment should have the correct owner and job
+      assert_equal owner, work_appointment.owner
       assert_equal haircut, work_appointment.service
       # work appointment should have the correct start and end times
       assert_equal "20080801T110000", work_appointment.start_at.to_s(:appt_schedule)
@@ -111,7 +110,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
       assert_equal johnny, free2_appointment.resource
-      assert_equal 0, free2_appointment.customer_id
+      # owner id should be nil for a free appointment
+      assert_equal nil, free2_appointment.owner_id
     end
   end
   
@@ -119,14 +119,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
                                           :resource => johnny,
-                                          :customer_id => 0,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -135,7 +134,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
                                       :resource => johnny,
-                                      :customer => customer,
+                                      :owner => owner,
                                       :start_at => "20080801233000",
                                       :duration =>  haircut.duration)
                                       
@@ -147,8 +146,8 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       # schedule the work appointment, the free appointment should be split into free/work time
       work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
       assert work_appointment.valid?
-      # work appointment should have the correct customer and job
-      assert_equal customer, work_appointment.customer
+      # work appointment should have the correct owner and job
+      assert_equal owner, work_appointment.owner
       assert_equal haircut, work_appointment.service
       # work appointment should have the correct start and end times
       assert_equal "20080801T233000", work_appointment.start_at.to_s(:appt_schedule)
@@ -167,21 +166,20 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
       assert_equal johnny, free2_appointment.resource
-      assert_equal 0, free2_appointment.customer_id
+      assert_equal nil, free2_appointment.owner_id
     end
   end
   
   def test_should_schedule_job_at_start_of_available_timeslot
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
                                         :resource => johnny,
-                                        :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -191,7 +189,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     haircut_end_at    = "20080801003000" # 12:30 am, 30 minutes
 
     assert_no_difference('Appointment.count') do
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :owner => owner)
   
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -218,14 +216,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   def test_should_schedule_job_in_middle_of_available_timeslot
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
                                         :resource => johnny,
-                                        :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -235,7 +232,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     
     assert_no_difference('Appointment.count') do
       # split appointment, no commit
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :owner => owner)
     
       # should now have 3 appointments
       assert_equal 3, appts.size
@@ -270,21 +267,20 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     
     assert_difference('Appointment.count', 2) do
       # split, commit appointment
-      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1, :customer => customer)
+      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :owner => owner, :commit => 1)
     end
   end
 
   def test_should_schedule_job_at_end_of_available_timeslot
     company   = Factory(:company)
     johnny    = Factory(:person, :name => "Johnny", :companies => [company])
-    customer  = Factory(:customer)
     free      = company.services.free.first
+    owner     = Factory(:user)
     
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
                                         :resource => johnny,
-                                        :customer => customer,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -294,7 +290,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     haircut_end_at    = "20080802000000" # 12:00 am, 30 minutes
       
     assert_no_difference('Appointment.count') do
-      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :customer => customer)
+      appts         = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :owner => owner)
   
       # should now have 2 appointments
       assert_equal 2, appts.size
@@ -318,7 +314,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
 
     assert_difference('Appointment.count', 1) do
       # split, commit appointment
-      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1, :customer => customer)
+      appts = AppointmentScheduler.split_free_appointment(available_appt, haircut, haircut_start_at, haircut_end_at, :commit => 1, :owner => owner)
     end
   end
 

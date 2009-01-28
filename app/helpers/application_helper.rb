@@ -40,7 +40,6 @@ module ApplicationHelper
   end
   
   def build_tab_links(current_controller)
-    
     # 'Openings' tab
     name = 'Openings'
     if current_controller.controller_name == 'openings' and current_controller.action_name == 'index'
@@ -59,6 +58,20 @@ module ApplicationHelper
         link = link_to(name, appointments_path(:subdomain => @subdomain), :class => 'current')
       else
         link = link_to(name, appointments_path(:subdomain => @subdomain))
+      end
+
+      yield link
+
+    end
+
+    if has_privilege?('read waitlist', @current_company)
+
+      # 'Waitlist' tab
+      name = 'Waitlist'
+      if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
+        link = link_to(name, waitlist_index_path, :class => 'current')
+      else
+        link = link_to(name, waitlist_index_path)
       end
 
       yield link
@@ -148,21 +161,6 @@ module ApplicationHelper
       yield link
       
     end
-    
-    if has_privilege?('read waitlist', @current_company)
-
-      # 'Waitlist' tab
-      name = 'Waitlist'
-      if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
-        link = link_to(name, waitlist_index_path, :class => 'current')
-      else
-        link = link_to(name, waitlist_index_path)
-      end
-
-      yield link
-
-    end
-
   end
   
   # build the set of locations links for the specified company, using the current_location if its given
@@ -177,7 +175,7 @@ module ApplicationHelper
     company_locations.sort_by{ |l| l.name }.each_with_index do |location, index|
       # build company location link
       name = location.name
-      link = set_default_location_path(location)
+      link = select_location_path(location)
       last = index == (company_locations.size - 1)
       yield name, link, last
     end

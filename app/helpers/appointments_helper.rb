@@ -9,10 +9,10 @@ module AppointmentsHelper
       
       if s == default
         # no when parameter for the default value
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain), :class => klass)
+        link  = link_to(s.titleize, person_appointments_path(person), :class => klass)
       else
         # use when parameter
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain, :when => s), :class => klass)
+        link  = link_to(s.titleize, person_appointments_path(person, :when => s), :class => klass)
       end
       
       # use separator unless its the last element

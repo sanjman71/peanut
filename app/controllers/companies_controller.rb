@@ -1,7 +1,7 @@
 class CompaniesController < ApplicationController
   before_filter :init_current_company, :except => [:index]
   after_filter  :store_location, :only => [:index, :show, :edit]
-  layout "signup"
+  layout "company"
 
   privilege_required 'read companies', :only => [:index]
   privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
@@ -13,7 +13,7 @@ class CompaniesController < ApplicationController
     @companies = Company.find(:all)
     
     respond_to do |format|
-      format.html
+      format.html { render :action => :index, :layout => 'signup' }
       format.xml  { render :xml => @companies }
     end
   end
@@ -27,39 +27,11 @@ class CompaniesController < ApplicationController
     end
   end
 
-  # GET /companies/new
-  # GET /companies/new.xml
-  def new
-    @company = Company.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @company }
-    end
-  end
-
   # GET /companies/1/edit
   def edit
     @company = Company.find(params[:id])
   end
   
-  # POST /companies
-  # POST /companies.xml
-  def create
-    @company = Company.new(params[:company])
-
-    respond_to do |format|
-      if @company.save
-        flash[:notice] = 'Company was successfully created.'
-        format.html { redirect_to(companies_path) }
-        format.xml  { render :xml => @company, :status => :created, :location => @company }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @company.errors, :status => :unprocessable_entity }
-      end
-    end
-  end
-
   # PUT /companies/1
   # PUT /companies/1.xml
   def update
@@ -68,7 +40,8 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       if @company.update_attributes(params[:company])
         flash[:notice] = 'Company was successfully updated.'
-        format.html { redirect_to(companies_path) }
+        # redirect to edit company page, since company show doesn't really show anything
+        format.html { redirect_to(edit_company_path(@company, :subdomain => @subdomain)) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }

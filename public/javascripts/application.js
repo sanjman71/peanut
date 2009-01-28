@@ -91,6 +91,15 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   })
 }
 
+// Search schedules for available appointments
+$.fn.init_schedule_search = function () {
+  $("#schedule_search_form").submit(function () {
+    // replace the search button with a progress image when its clicked
+    $("#search_submit").addClass('hide');
+    $("#search_progress").removeClass('hide');
+  })
+}
+
 // Highlight appointments and show edit/delete options on hover
 $.fn.init_highlight_appointments = function () {
   $(".appointment").hover(function () {
@@ -106,15 +115,6 @@ $.fn.init_highlight_appointments = function () {
 $.fn.init_show_appointments = function () {
   $("#person_id").change(function () {
     var href = '/people/' + this.value + '/appointments';
-    window.location = href;
-    return false;
-  })
-}
-
-// Set the company's location
-$.fn.init_company_location = function () {
-  $("#location_id").change(function () {
-    var href = '/locations/' + this.value + '/set_default';
     window.location = href;
     return false;
   })
@@ -155,6 +155,8 @@ $.fn.init_live_customers_search = function () {
     // excecut search, throttle how often its called
     var search_execution = function () {
       $.get(search_url, {search : search_term}, null, "script");
+      // show search progress bar
+      $('#search_progress').show();
     }.sleep(300);
     
     return false;
@@ -221,7 +223,7 @@ $.fn.init_add_note = function () {
 } 
 
 // Initialize location switcher allowing users to change the current location
-$.fn.init_location_switcher = function() {
+$.fn.init_switch_locations = function() {
   $('#location_switcher li').hover(
     // add block class for internet explorer
     function() { 
@@ -242,7 +244,7 @@ $.fn.init_ujs_links = function () {
   $("a.ujs").attr("ujs", function() { return this.href })
   $("a.ujs").attr("href","javascript:void(0)")
 
-  $("a.ujs").click( function() {
+  $("a.ujs").click(function() {
     // Check if its a rails delete link
     if ($(this).attr("class").match(/delete/i))
       var params = {_method : 'delete'};
@@ -264,7 +266,8 @@ $.fn.init_ujs_links = function () {
 $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
-  $(document).init_company_location();
-  $(document).init_location_switcher();
+  $(document).init_switch_locations();
+  
+  $(document).init_schedule_search();
 })
 

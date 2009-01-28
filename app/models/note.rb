@@ -1,6 +1,6 @@
 class Note < ActiveRecord::Base
   validates_presence_of     :comment
-  has_many_polymorphs       :subjects, :from => [:appointments, :customers]
+  has_many_polymorphs       :subjects, :from => [:appointments, :users]
   attr_accessor             :subject
 
   named_scope               :sort_recent, {:order => "created_at DESC"}

@@ -3,6 +3,8 @@ class CreateUsers < ActiveRecord::Migration
     create_table :users, :force => true do |t|
       t.string    :name,                      :limit => 100, :default => '', :null => true
       t.string    :email,                     :limit => 100
+      t.string    :phone,                     :limit => 40
+      t.integer   :mobile_carrier_id
       t.string    :crypted_password,          :limit => 40
       t.string    :salt,                      :limit => 40
       t.datetime  :created_at

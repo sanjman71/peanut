@@ -18,7 +18,7 @@
     -# show appointment confirmation notice
     .notice
       == A confirmation email has also been sent to
-      = @appointment.customer.email unless @appointment.customer.blank?
+      = @appointment.owner.email unless @appointment.owner.blank?
       
   - if @appointment.state == 'completed'
     -# show invoice

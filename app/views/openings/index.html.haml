@@ -6,7 +6,7 @@
   .box
     %h2== Schedule an Appointment
     = hidden_field_tag 'initial_person_id', @person.id
-    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
       == What
       %span.field#what
         = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
@@ -21,7 +21,9 @@
       %span.field#time
         = select_tag('time', options_for_select(Appointment::TIMES, @time))
       %span#search{:style => @when ? "display: inline; padding-left: 10px;" : "display: none; padding-left: 10px;"}
-        = f.submit 'Search', :name => nil, :class => 'submit'
+        = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit'
+        %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+        
 
 .span-6.prepend-1.last
   .sidebar.instructions.padding-5

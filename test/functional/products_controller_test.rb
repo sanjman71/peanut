@@ -8,6 +8,10 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "create product" do
+    context "without authorization" do
+      
+    end
+    
     context "with a blank name" do
       setup do
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}

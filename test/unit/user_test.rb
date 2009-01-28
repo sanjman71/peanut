@@ -5,7 +5,7 @@ class UserTest < ActiveSupport::TestCase
 
   context "create without an invitation" do
     setup do
-      @user1 = User.create(:company_id => 0, :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
+      @user1 = User.create(:company_id => 0, :name => "User 1", :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
     end
     
     should "be a valid user" do
@@ -15,7 +15,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "create another user without an invitation" do
       setup do
-        @user2 = User.create(:company_id => 0, :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
+        @user2 = User.create(:company_id => 0, :name => "User 2", :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
       end
       
       should "be a valid user" do

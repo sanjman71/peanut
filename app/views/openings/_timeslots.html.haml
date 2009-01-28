@@ -10,7 +10,7 @@
       - id   = "appointment_#{appt.id}_timeslot_#{i}"
       .span-16.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
         .span-5.person
-          = person.name
+          %h4{:style => 'margin-left: 5px;'}= person.name
         .span-4.time
           == #{timeslot.start_at.to_s(:appt_time)} - #{timeslot.end_at.to_s(:appt_time)}
         .span-3.location

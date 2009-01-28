@@ -8,9 +8,9 @@ div.schedule_form span.field                      { margin: 3px 0 3px; padding-r
 
 div.schedule_form input.submit                    { font-size: 12px; }
 
-div.appointment                                   { padding: 7px; }
+div.appointment                                   { padding: 7px 0 7px 0; }
 
-div.timeslot                                      { padding: 7px; }
+div.timeslot                                      { padding: 7px 0 7px 0; }
 
 div.timeslot a, div.appointment a
                                                   { color: #5500BB; font-weight: bold; }
