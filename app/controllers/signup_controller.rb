@@ -1,5 +1,5 @@
 class SignupController < ApplicationController
-  layout 'signup'
+  layout 'home'
   # ssl_required :new
   
   # /signup/:plan

@@ -13,7 +13,8 @@ class CompaniesController < ApplicationController
     @companies = Company.find(:all)
     
     respond_to do |format|
-      format.html { render :action => :index, :layout => 'signup' }
+      # use home layout when listing all companies
+      format.html { render :action => :index, :layout => 'home' }
       format.xml  { render :xml => @companies }
     end
   end

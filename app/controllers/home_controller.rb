@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   before_filter :init_current_company
-  layout 'signup'
+  layout 'home'
   
   def index
     if @current_company
@@ -8,7 +8,7 @@ class HomeController < ApplicationController
       render(:template => 'companies/show', :layout => 'company') and return
     else
       # show www/root home page
-      render(:action => :index, :layout => 'signup') and return
+      render(:action => :index, :layout => 'home') and return
     end
   end
   
@@ -17,7 +17,7 @@ class HomeController < ApplicationController
     if @current_company
       layout = 'company'
     else
-      layout = 'signup'
+      layout = 'home'
     end
     
     render :action => :unauthorized, :layout => layout

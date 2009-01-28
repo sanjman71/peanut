@@ -1,5 +1,5 @@
 class BadgesController < ApplicationController
-  layout "signup"
+  layout "home"
   
   privilege_required 'create roles priviliges', :only => [:create_role, :create_privilege]
   privilege_required 'read roles privileges', :only => [:index]
