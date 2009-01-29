@@ -9,7 +9,7 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "create product" do
-    context "without privilege create products" do
+    context "without privilege ['create products']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
@@ -60,7 +60,7 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "edit a new product" do
-    context "without privilege update products" do
+    context "without privilege ['update products']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("update products").returns(false)
         get :edit, :id => 1
@@ -82,7 +82,7 @@ class ProductsControllerTest < ActionController::TestCase
   end
   
   context "show all products" do
-    context "without privilege read products" do
+    context "without privilege ['read products']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read products").returns(false)
         get :index
@@ -91,7 +91,7 @@ class ProductsControllerTest < ActionController::TestCase
       should_redirect_to "unauthorized_path"  
     end
     
-    context "with privilege read products, but not create products" do
+    context "with privilege ['read products'], but not ['create products']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
         @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
@@ -105,7 +105,7 @@ class ProductsControllerTest < ActionController::TestCase
       end
     end
   
-    context "with privilege read products and create products" do
+    context "with privilege ['read products', 'create products']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
         @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
@@ -114,7 +114,7 @@ class ProductsControllerTest < ActionController::TestCase
       
       should_respond_with :success
       
-      should "not show add products form" do
+      should "show add products form" do
         assert_select "form#new_product_form", 1
       end
     end

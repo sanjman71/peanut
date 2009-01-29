@@ -9,7 +9,7 @@ class ServicesControllerTest < ActionController::TestCase
   end
 
   context "create service" do
-    context "without privilege create services" do
+    context "without privilege ['create services']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("create services").returns(false)
         xhr :post, :create, :service => {:name => "New service"}
@@ -18,7 +18,7 @@ class ServicesControllerTest < ActionController::TestCase
       should_redirect_to "unauthorized_path"
     end
     
-    context "with privilege create services" do
+    context "with privilege ['create services']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("create services").returns(true)
         xhr :post, :create, :service => {:name => "New service"}
@@ -30,7 +30,7 @@ class ServicesControllerTest < ActionController::TestCase
   end
   
   context "list services" do
-    context "without privilege read services" do
+    context "without privilege ['read services']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read services").returns(false)
         get :index
@@ -39,7 +39,7 @@ class ServicesControllerTest < ActionController::TestCase
       should_redirect_to "unauthorized_path"
     end
     
-    context "with privilege read services, but not create services" do
+    context "with privilege ['read services'], but not ['create services']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read services").returns(true)
         @controller.stubs(:has_stubbed_privilege?).with("create services").returns(false)
@@ -53,7 +53,7 @@ class ServicesControllerTest < ActionController::TestCase
       end
     end
     
-    context "with privilege read services and create services" do
+    context "with privilege ['read services', 'create services']" do
       setup do
         @controller.stubs(:has_stubbed_privilege?).with("read services").returns(true)
         @controller.stubs(:has_stubbed_privilege?).with("create services").returns(true)
