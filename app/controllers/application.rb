@@ -22,9 +22,24 @@ class ApplicationController < ActionController::Base
   # Exception notifier to send emails when we have exceptions
   include ExceptionNotifiable
   
+  # Initialize current company and subdomain
+  before_filter :init_current_company
+  
+  # Load and cache all user privileges on each call so we don't have to keep checking the database
+  before_filter :init_current_privileges
+  
   # Default layout
   layout "company"
 
+  # check user privileges against the pre-loaded memory collection instead of using the database
+  def has_privilege?(p, *args)
+    authorizable  = args[0]
+    user          = args[1] || current_user
+    logger.debug("*** checking privilege #{p}, on authorizable #{authorizable ? authorizable.name : ""}, for user #{user ? user.name : ""}")
+    return false if @current_privileges.blank?
+    return @current_privileges.include?(p)
+  end
+  
   private
   
   def init_current_company
@@ -53,4 +68,17 @@ class ApplicationController < ActionController::Base
     end
   end
     
+  def init_current_privileges
+    if current_user
+      if @current_company
+        # load privileges on current company (includes privileges on no authorizable object)
+        @current_privileges = current_user.privileges(@current_company).collect { |p| p.name }
+      else
+        # load privileges without an authorizable object
+        @current_privileges = current_user.privileges.collect { |p| p.name }
+      end
+    else
+      @current_privileges = []
+    end
+  end
 end

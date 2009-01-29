@@ -1,6 +1,5 @@
 class CustomersController < ApplicationController
-  before_filter :init_current_company
-  
+
   # GET /customers
   # GET /customers.xml
   def index

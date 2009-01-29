@@ -1,5 +1,4 @@
 class HomeController < ApplicationController
-  before_filter :init_current_company
   layout 'home'
   
   def index

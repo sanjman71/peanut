@@ -1,5 +1,4 @@
 class LocationsController < ApplicationController
-  before_filter :init_current_company
   after_filter  :store_location, :only => [:index, :show]
   
   # GET /locations

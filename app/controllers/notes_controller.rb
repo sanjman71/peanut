@@ -1,5 +1,4 @@
 class NotesController < ApplicationController
-  before_filter :init_current_company
 
   # POST /resources
   # POST /resources.xml

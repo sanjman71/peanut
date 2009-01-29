@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  before_filter :init_current_company
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]

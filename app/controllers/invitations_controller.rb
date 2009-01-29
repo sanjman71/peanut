@@ -1,5 +1,4 @@
 class InvitationsController < ApplicationController
-  before_filter :init_current_company
 
   # GET /invitation/new
   def new

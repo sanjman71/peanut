@@ -1,7 +1,7 @@
 class AppointmentsController < ApplicationController
-  before_filter :init_current_company
   
-  @@default_when    = Appointment::WHEN_THIS_WEEK
+  # Default when value
+  @@default_when = Appointment::WHEN_THIS_WEEK
   
   # GET /people/1/appointments
   def index

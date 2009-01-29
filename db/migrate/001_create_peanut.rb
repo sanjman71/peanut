@@ -33,6 +33,7 @@ class CreatePeanut < ActiveRecord::Migration
     end
   
     add_index :products, [:company_id]
+    add_index :products, [:company_id, :name]
     
     # Polymorphic relationship mapping companies to different resources (e.g. people)
     create_table :companies_resources do |t|

@@ -1,6 +1,5 @@
 class CompaniesController < ApplicationController
-  before_filter :init_current_company, :except => [:index]
-  after_filter  :store_location, :only => [:index, :show, :edit]
+  after_filter :store_location, :only => [:index, :show, :edit]
   layout "company"
 
   privilege_required 'read companies', :only => [:index]

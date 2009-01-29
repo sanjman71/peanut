@@ -1,5 +1,4 @@
 class InvoicesController < ApplicationController
-  before_filter :init_current_company
 
   # /invoices
   # /invoices/when/past-2-weeks
