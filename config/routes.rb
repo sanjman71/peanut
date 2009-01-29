@@ -23,7 +23,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
     
   # unauthorized route
-  map.connect   '/unauthorized', :controller => 'home', :action => 'unauthorized'
+  map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
   map.resources :companies, :only => [:index, :show, :edit, :update, :destroy]
   map.resources :appointments, 

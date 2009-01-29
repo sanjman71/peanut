@@ -18,9 +18,9 @@
     
 .span-7.prepend-2.last
   .span-6.box
-    - form_for(Person.new, :url => people_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_person'}) do |f|
+    - form_for(Person.new, :url => people_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_person', :id => 'new_person_form'}) do |f|
       .span-6.last
-        = label_tag "add_person_name", "Add a person", :class => 'big'
+        = label_tag "new_person_name", "Add a person", :class => 'big'
       .span-6.last
         = text_field_tag "person[name]", '', :id => 'person_name', :class => 'title big required', :style => 'width: 200px;'
       .span-6.last

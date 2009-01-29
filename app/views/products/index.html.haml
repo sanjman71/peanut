@@ -18,7 +18,7 @@
 - if_privilege('create products', @current_company) do
   .span-6.prepend-1.last
     .span-6.box
-      - form_for(Product.new, :url => products_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_product'}) do |f|
+      - form_for(Product.new, :url => products_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_product', :id => 'new_product_form'}) do |f|
         = hidden_field_tag "product[price]", 0
         = hidden_field_tag "product[inventory]", 0
         .span-6.last

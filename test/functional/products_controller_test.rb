@@ -4,19 +4,26 @@ require 'test/factories'
 class ProductsControllerTest < ActionController::TestCase
 
   def setup
-    stub_subdomain
+    @controller = ProductsController.new
+    @company    = stub_subdomain
   end
 
   context "create product" do
-    context "without authorization" do
+    context "without privilege create products" do
+      setup do
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
+      end
       
+      should_redirect_to "unauthorized_path"
     end
     
     context "with a blank name" do
       setup do
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
       end
-
+    
       should_respond_with :success
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
@@ -31,9 +38,10 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "with a valid name" do
       setup do
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
         xhr :post, :create, :product => {:name => "Pomade", :price => "0", :inventory => "0"}
       end
-
+    
       should_respond_with :success
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
@@ -52,7 +60,17 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "edit a new product" do
+    context "without privilege update products" do
+      setup do
+        @controller.stubs(:has_stubbed_privilege?).with("update products").returns(false)
+        get :edit, :id => 1
+      end
+      
+      should_redirect_to "unauthorized_path"  
+    end
+    
     setup do 
+      @controller.stubs(:has_stubbed_privilege?).with("update products").returns(true)
       # create product first, as it would be from the create form
       @shampoo = Factory(:product, :name => 'Shampoo', :inventory => 0, :price => 0, :company => @company)
       get :edit, :id => @shampoo
@@ -64,8 +82,47 @@ class ProductsControllerTest < ActionController::TestCase
   end
   
   context "show all products" do
+    context "without privilege read products" do
+      setup do
+        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(false)
+        get :index
+      end
+      
+      should_redirect_to "unauthorized_path"  
+    end
+    
+    context "with privilege read products, but not create products" do
+      setup do
+        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        get :index
+      end
+      
+      should_respond_with :success
+      
+      should "not show add products form" do
+        assert_select "form#new_product_form", 0
+      end
+    end
+  
+    context "with privilege read products and create products" do
+      setup do
+        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
+        get :index
+      end
+      
+      should_respond_with :success
+      
+      should "not show add products form" do
+        assert_select "form#new_product_form", 1
+      end
+    end
+    
     context "on an empty database" do 
       setup do
+        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
         get :index
       end
   
@@ -80,6 +137,8 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "on a database with 1 product" do
       setup do
+        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
+        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
         # create product first
         @shampoo = Factory(:product, :name => 'Shampoo', :company => @company)
         get :index

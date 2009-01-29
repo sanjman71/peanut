@@ -69,7 +69,7 @@ class ApplicationController < ActionController::Base
   end
     
   def init_current_privileges
-    if current_user
+    if logged_in?
       if @current_company
         # load privileges on current company (includes privileges on no authorizable object)
         @current_privileges = current_user.privileges(@current_company).collect { |p| p.name }
