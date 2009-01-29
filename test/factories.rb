@@ -36,6 +36,13 @@ Factory.define :product do |p|
   p.price_in_cents  100
 end
 
+Factory.define :user do |u|
+  u.name                    { |s| Factory.next :name }
+  u.email                   { |s| Factory.next :email }
+  u.password                "peanut"
+  u.password_confirmation   "peanut"
+end
+
 Factory.define :customer do |c|
   c.name { |s| Factory.next :customer_name }
   c.email { |s| Factory.next :customer_email }
