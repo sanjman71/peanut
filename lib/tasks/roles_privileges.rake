@@ -125,7 +125,6 @@ namespace :db do
 
         # Company employee can view services
         Badges::RolePrivilege.create(:role=>ce,:privilege=>rs)
-
       end
       
       desc "Initialize user management roles & privileges"
@@ -147,7 +146,6 @@ namespace :db do
 
         # Company employee can view services
         Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
-
       end
       
       desc "Initialize customer management roles & privileges"
@@ -183,11 +181,14 @@ namespace :db do
         u = Badges::Privilege.create(:name=>"update people")
         d = Badges::Privilege.create(:name=>"delete people")
 
-        # Company manager can manage a company's people
+        # Company manager can manage people
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>c)
         Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>d)
 
-        # TODO - add more privileges and roles here as appropriate
-
+        # Company employee can view people
+        Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
       end
       
       desc "Initialize products management roles & privileges"
@@ -203,11 +204,14 @@ namespace :db do
         u = Badges::Privilege.create(:name=>"update products")
         d = Badges::Privilege.create(:name=>"delete products")
 
-        # Company manager can manage a company's products
+        # Company manager can manage products
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>c)
         Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>d)
 
-        # TODO - add more privileges and roles here as appropriate
-
+        # Company employee can view products
+        Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
       end
       
       desc "Initialize waitlist management roles & privileges"
