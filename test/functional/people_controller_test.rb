@@ -11,9 +11,18 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   context "create person" do
+    context "without privilege ['create people']" do
+      setup do
+        @controller.stubs(:current_privileges).returns([])
+        xhr :post, :create, :person => {:name => ""}
+      end
+      
+      should_redirect_to "unauthorized_path"
+    end
     
     context "with an empty person" do
       setup do
+        @controller.stubs(:current_privileges).returns(["create people"])
         xhr :post, :create, :person => {:name => ""}
       end
 
@@ -31,6 +40,7 @@ class PeopleControllerTest < ActionController::TestCase
     
     context "with a valid person" do
       setup do
+        @controller.stubs(:current_privileges).returns(["create people"])
         xhr :post, :create, :person => {:name => "Wilma"}
       end
 
@@ -50,9 +60,18 @@ class PeopleControllerTest < ActionController::TestCase
   end
   
   context "search an empty people database" do
+    context "without privilege ['read people']" do
+      setup do
+        @controller.stubs(:current_privileges).returns([])
+        get :index
+      end
+      
+      should_redirect_to "unauthorized_path"
+    end
     
     context "with an empty search" do 
       setup do
+        @controller.stubs(:current_privileges).returns(["read people"])
         get :index
       end
 
@@ -73,6 +92,7 @@ class PeopleControllerTest < ActionController::TestCase
     
     context "with a search for barney" do
       setup do 
+        @controller.stubs(:current_privileges).returns(["read people"])
         get :index, :search => 'barney'
       end
 
@@ -104,6 +124,7 @@ class PeopleControllerTest < ActionController::TestCase
     
     context "with a search for 'ba'" do
       setup do
+        @controller.stubs(:current_privileges).returns(["read people"])
         get :index, :search => 'ba'
       end
       
@@ -128,6 +149,7 @@ class PeopleControllerTest < ActionController::TestCase
     
     context "with a search for 'xyz'" do
       setup do
+        @controller.stubs(:current_privileges).returns(["read people"])
         get :index, :search => 'xyz'
       end
       
@@ -152,6 +174,7 @@ class PeopleControllerTest < ActionController::TestCase
     
     context "with an ajax request for 'ba'" do
       setup do
+        @controller.stubs(:current_privileges).returns(["read people"])
         xhr :get, :index, :format => 'js', :search => 'ba'
       end
 
