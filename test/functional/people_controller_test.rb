@@ -4,7 +4,10 @@ require 'test/factories'
 class PeopleControllerTest < ActionController::TestCase
 
   def setup
-    stub_subdomain
+    @controller = PeopleController.new
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
 
   context "create person" do

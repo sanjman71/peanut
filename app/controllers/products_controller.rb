@@ -7,13 +7,13 @@ class ProductsController < ApplicationController
   # GET /products
   # GET /products.xml
   def index
-    @products = @current_company.products.paginate(:page => params[:page], :order => "name ASC")
+    @products = current_company.products.paginate(:page => params[:page], :order => "name ASC")
   end
   
   # POST /products
   # POST /products.xml
   def create
-    @product = @current_company.products.new(params[:product])
+    @product = current_company.products.new(params[:product])
     
     if !@product.valid?
       @error      = true
@@ -34,7 +34,7 @@ class ProductsController < ApplicationController
   
   # GET /products/1/edit
   def edit
-    @product = @current_company.products.find(params[:id])
+    @product = current_company.products.find(params[:id])
   end
   
   # PUT /products/1
@@ -53,13 +53,13 @@ class ProductsController < ApplicationController
   # DELETE /products/1
   # DELETE /products/1.xml
   def destroy
-    @product = @current_company.products.find(params[:id])
+    @product = current_company.products.find(params[:id])
     @product.destroy
 
     @notice_text = "Removed product #{@product.name}"
 
     # build products collection
-    @products = @current_company.products
+    @products = current_company.products
   end
   
 end

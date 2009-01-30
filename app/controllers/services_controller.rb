@@ -8,7 +8,7 @@ class ServicesController < ApplicationController
   # GET /services
   # GET /services.xml
   def index
-    @services = @current_company.services.work
+    @services = current_company.services.work
   end
 
   # GET /services/1
@@ -30,23 +30,23 @@ class ServicesController < ApplicationController
 
   # GET /services/1/edit
   def edit
-    @service      = @current_company.services.find(params[:id])
+    @service      = current_company.services.find(params[:id])
     @memberships  = @service.memberships
-    @non_members  = @current_company.resources.all - @service.resources
+    @non_members  = current_company.resources.all - @service.resources
   end
 
   # COMPONENT - GET /services/1/memberships
   # show all service memberships
   def memberships
-    @service      = @current_company.services.find(params[:id])
+    @service      = current_company.services.find(params[:id])
     @memberships  = @service.memberships
-    @non_members  = @current_company.resources.all - @service.resources
+    @non_members  = current_company.resources.all - @service.resources
   end
   
   # POST /services
   # POST /services.xml
   def create
-    @service = @current_company.services.new(params[:service])
+    @service = current_company.services.new(params[:service])
     
     if !@service.valid?
       @error      = true
@@ -78,12 +78,12 @@ class ServicesController < ApplicationController
   # DELETE /services/1
   # DELETE /services/1.xml
   def destroy
-    @service = @current_company.services.find(params[:id])
+    @service = current_company.services.find(params[:id])
     @service.destroy
 
     @notice_text = "Removed service #{@service.name}"
 
     # build services collection
-    @services = @current_company.services.work
+    @services = current_company.services.work
   end
 end

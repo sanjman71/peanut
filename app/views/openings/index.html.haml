@@ -54,16 +54,22 @@
       == .
       
   - unless @when.blank?
-    %h2
+    %h2.span-16
       - if @free_timeslots.blank?
+        -# No available appointments
         == No Available Appointments -
         = link_to "Notify me if there is an opening", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
+        -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+        
     %h3.span-16.last
+      -# Show appointment when range
       == #{@when.titleize}
-    .span-16.last#free_calendar
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-    .span-16.last.timeslots#free_timeslots
-      = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+
+    - cache(@openings_cache_key, :expires_in => 5.minutes) do
+      .span-16.last#free_calendar
+        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      .span-16.last.timeslots#free_timeslots
+        = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
 

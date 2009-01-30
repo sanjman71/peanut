@@ -5,13 +5,15 @@ class ServicesControllerTest < ActionController::TestCase
 
   def setup
     @controller = ServicesController.new
-    @company    = stub_subdomain
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
 
   context "create service" do
     context "without privilege ['create services']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("create services").returns(false)
+        @controller.stubs(:current_privileges).returns([])
         xhr :post, :create, :service => {:name => "New service"}
       end
       
@@ -20,7 +22,7 @@ class ServicesControllerTest < ActionController::TestCase
     
     context "with privilege ['create services']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("create services").returns(true)
+        @controller.stubs(:current_privileges).returns(["create services"])
         xhr :post, :create, :service => {:name => "New service"}
       end
       
@@ -32,7 +34,7 @@ class ServicesControllerTest < ActionController::TestCase
   context "list services" do
     context "without privilege ['read services']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read services").returns(false)
+        @controller.stubs(:current_privileges).returns([])
         get :index
       end
       
@@ -41,11 +43,10 @@ class ServicesControllerTest < ActionController::TestCase
     
     context "with privilege ['read services'], but not ['create services']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read services").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create services").returns(false)
+        @controller.stubs(:current_privileges).returns(["read services"])
         get :index
       end
-
+  
       should_respond_with :success
       
       should "not show add service form" do
@@ -55,11 +56,10 @@ class ServicesControllerTest < ActionController::TestCase
     
     context "with privilege ['read services', 'create services']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read services").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create services").returns(true)
+        @controller.stubs(:current_privileges).returns(["read services", "create services"])
         get :index
       end
-
+  
       should_respond_with :success
     
       should "show add service form" do

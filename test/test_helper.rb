@@ -39,15 +39,4 @@ class Test::Unit::TestCase
 
   # Add more helper methods to be used by all tests here...
   
-  def stub_subdomain
-    # stub subdomain object
-    @company = Factory(:company)
-    Company.stubs(:find_by_subdomain).returns(@company)
-    @company
-  end
-  
-  def stub_privileges(array)
-    ApplicationController.any_instance.stubs(:has_privilege?).with("create services").returns(true)
-  end
-  
 end

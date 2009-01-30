@@ -32,10 +32,11 @@ module ApplicationHelper
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
   
-  # build company, location title from specified objects
-  def company_location_title(company, location)
-    name  = company.name
-    name += " - #{location.name}" unless company.locations.empty? or location.blank?
+  # build title based on the current company and location
+  def current_company_title_with_location
+    name  = current_company.name
+    # add location name if we have at least company location
+    name += " - #{current_location.name}" unless current_locations.size == 0 or current_location.blank?
     name
   end
   
@@ -50,7 +51,7 @@ module ApplicationHelper
     
     yield link
 
-    if has_privilege?('read work appointments', @current_company)
+    if has_privilege?('read work appointments', current_company)
 
       # 'Schedules' tab
       name = 'Schedules'
@@ -64,7 +65,7 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read waitlist', @current_company)
+    if has_privilege?('read waitlist', current_company)
 
       # 'Waitlist' tab
       name = 'Waitlist'
@@ -78,7 +79,7 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read customers', @current_company)
+    if has_privilege?('read customers', current_company)
 
       # 'Customers' tab
       name = 'Customers'
@@ -92,7 +93,7 @@ module ApplicationHelper
 
     end
   
-    if has_privilege?('read invoices', @current_company)
+    if has_privilege?('read invoices', current_company)
 
       # 'Invoices' tab
       name = 'Invoices'
@@ -106,7 +107,7 @@ module ApplicationHelper
 
     end
     
-    if has_privilege?('read work appointments', @current_company)
+    if has_privilege?('read work appointments', current_company)
 
       # 'Appointments' tab
       name = 'Appointments'
@@ -120,7 +121,7 @@ module ApplicationHelper
 
     end
       
-    if has_privilege?('read people', @current_company)
+    if has_privilege?('read people', current_company)
 
       # 'People' tab
       name = 'People'
@@ -134,7 +135,7 @@ module ApplicationHelper
 
     end
     
-    if has_privilege?('read services', @current_company)
+    if has_privilege?('read services', current_company)
 
       # 'Services' tab
       name = 'Services'
@@ -148,7 +149,7 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read products', @current_company)
+    if has_privilege?('read products', current_company)
 
       # 'Products' tab
       name = 'Products'
@@ -163,21 +164,20 @@ module ApplicationHelper
     end
   end
   
-  # build the set of locations links for the specified company, using the current_location if its given
-  def build_location_links(company, current_location=nil)
+  # build the set of locations links for the current company, using the current locations collection
+  def build_company_location_links
     # get all company locations, remove the current location
-    company_locations = company.locations - Array(current_location)
+    locations = current_locations - Array(current_location)
     
     # add the special anywhere location if its not the current location
-    company_locations += Array(Location.anywhere) unless current_location and current_location.anywhere?
+    locations += Array(Location.anywhere) unless current_location and current_location.anywhere?
     
     # sort locations by name
-    company_locations.sort_by{ |l| l.name }.each_with_index do |location, index|
+    locations.sort_by{ |l| l.name }.each_with_index do |location, index|
       # build company location link
-      name = location.name
       link = select_location_path(location)
-      last = index == (company_locations.size - 1)
-      yield name, link, last
+      last = index == (locations.size - 1)
+      yield location.name, link, last
     end
   end
   

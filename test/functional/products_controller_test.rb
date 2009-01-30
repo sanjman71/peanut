@@ -5,13 +5,15 @@ class ProductsControllerTest < ActionController::TestCase
 
   def setup
     @controller = ProductsController.new
-    @company    = stub_subdomain
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
 
   context "create product" do
     context "without privilege ['create products']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        @controller.stubs(:current_privileges).returns([])
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
       end
       
@@ -20,7 +22,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "with a blank name" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
+        @controller.stubs(:current_privileges).returns(["create products"])
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
       end
     
@@ -38,7 +40,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "with a valid name" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
+        @controller.stubs(:current_privileges).returns(["create products"])
         xhr :post, :create, :product => {:name => "Pomade", :price => "0", :inventory => "0"}
       end
     
@@ -62,7 +64,7 @@ class ProductsControllerTest < ActionController::TestCase
   context "edit a new product" do
     context "without privilege ['update products']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("update products").returns(false)
+        @controller.stubs(:current_privileges).returns([])
         get :edit, :id => 1
       end
       
@@ -70,7 +72,7 @@ class ProductsControllerTest < ActionController::TestCase
     end
     
     setup do 
-      @controller.stubs(:has_stubbed_privilege?).with("update products").returns(true)
+      @controller.stubs(:current_privileges).returns(["update products"])
       # create product first, as it would be from the create form
       @shampoo = Factory(:product, :name => 'Shampoo', :inventory => 0, :price => 0, :company => @company)
       get :edit, :id => @shampoo
@@ -84,7 +86,7 @@ class ProductsControllerTest < ActionController::TestCase
   context "show all products" do
     context "without privilege ['read products']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(false)
+        @controller.stubs(:current_privileges).returns([])
         get :index
       end
       
@@ -93,8 +95,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "with privilege ['read products'], but not ['create products']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        @controller.stubs(:current_privileges).returns(["read products"])
         get :index
       end
       
@@ -107,8 +108,7 @@ class ProductsControllerTest < ActionController::TestCase
   
     context "with privilege ['read products', 'create products']" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(true)
+        @controller.stubs(:current_privileges).returns(["read products", "create products"])
         get :index
       end
       
@@ -121,8 +121,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "on an empty database" do 
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        @controller.stubs(:current_privileges).returns(["read products"])
         get :index
       end
   
@@ -137,8 +136,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "on a database with 1 product" do
       setup do
-        @controller.stubs(:has_stubbed_privilege?).with("read products").returns(true)
-        @controller.stubs(:has_stubbed_privilege?).with("create products").returns(false)
+        @controller.stubs(:current_privileges).returns(["read products"])
         # create product first
         @shampoo = Factory(:product, :name => 'Shampoo', :company => @company)
         get :index

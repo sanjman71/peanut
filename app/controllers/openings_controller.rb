@@ -58,6 +58,9 @@ class OpeningsController < ApplicationController
       hash[timeslot.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = 'free'
       hash
     end
+
+    # build openings cache key
+    @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments)
     
     respond_to do |format|
       format.html # index.html.erb

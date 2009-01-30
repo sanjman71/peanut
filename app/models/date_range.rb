@@ -19,8 +19,8 @@ class DateRange
       return
     end
     
-    @start_at     = options[:start_at].utc if options[:start_at]
-    @end_at       = options[:end_at].utc if options[:end_at]
+    @start_at     = options[:start_at] if options[:start_at]
+    @end_at       = options[:end_at] if options[:end_at]
     @days         = (@end_at - @start_at).to_i / (60 * 60 * 24)
     
     # initialize enumerable param

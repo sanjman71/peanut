@@ -4,6 +4,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
+      t.integer :locations_count, :default => 0    # locations counter cache
       
       t.timestamps
     end
@@ -93,10 +94,13 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
+      t.integer     :locations_count, :default => 0     # locations counter cache
       
       t.timestamps
     end
 
+    add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
+    
     create_table :appointment_invoice_line_items do |t|
       t.integer     :appointment_invoice_id
       t.references  :chargeable, :polymorphic => true
