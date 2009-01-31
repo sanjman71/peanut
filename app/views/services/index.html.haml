@@ -1,7 +1,6 @@
 - stylesheet('services')
 - javascript('services')
 
-
 - if_privilege('read services', @current_company) do
   .span-16
     .span-15.last.box
@@ -15,7 +14,7 @@
 - if_privilege('create services', @current_company) do
   .span-6.prepend-1.last
     .span-6.box
-      - form_for(Service.new, :url => services_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_service', :id => 'new_service_form'}) do |f|
+      - form_for(Service.new, :url => services_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_service', :id => 'new_service_form'}) do |f|
         = hidden_field_tag "service[mark_as]", 'work'
         = hidden_field_tag "service[price]", 0
         = hidden_field_tag "service[duration]", 0

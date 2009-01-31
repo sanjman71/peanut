@@ -1,12 +1,12 @@
 - stylesheet('services')
 - javascript('services')
 
-- form_for(Membership.new, :url => memberships_path(:subdomain => @subdomain), :method => :post, :html => {:id => 'new_membership'}) do |f|
+- form_for(Membership.new, :url => memberships_path(:subdomain => current_subdomain), :method => :post, :html => {:id => 'new_membership'}) do |f|
   = hidden_field_tag "membership[service_id]", @service.id, :id => 'membership_service_id'
   = hidden_field_tag "membership[resource_type]", 'Person', :id => 'membership_resource_type'
   = hidden_field_tag "membership[resource_id]", '', :id => 'membership_resource_id'
     
-- form_for(@service, :url => service_path(@service, :subdomain => @subdomain), :method => :post) do |f|
+- form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 
   .span-20.last.box
     = label_tag "service_name", "Service Name", :class => 'big'
@@ -34,7 +34,7 @@
   .span-20.prepend-1.last.submit
     = submit_tag "Save Changes"
     == or
-    = link_to "Cancel", services_path(:subdomain => @subdomain), :class => 'admin'
+    = link_to "Cancel", services_path(:subdomain => current_subdomain), :class => 'admin'
     
   %hr.space
   .span-20.prepend-1.last
@@ -44,5 +44,5 @@
     = render(:partial => 'memberships/memberships.html.haml', :locals => {:memberships => @memberships, :non_members => @non_members})
   %hr.space
   .span-20.prepend-1.last
-    = button_to "Done", :url => services_path(:subdomain => @subdomain)
+    = button_to "Done", :url => services_path(:subdomain => current_subdomain)
               

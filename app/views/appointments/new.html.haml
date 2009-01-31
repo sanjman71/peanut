@@ -29,7 +29,7 @@
       
     %p
     .schedule_form
-      - url = @appointment.waitlist? ? waitlist_path(:subdomain => @subdomain) : schedule_path(:subdomain => @subdomain) 
+      - url = @appointment.waitlist? ? waitlist_path(:subdomain => current_subdomain) : schedule_path(:subdomain => current_subdomain) 
       - form_for(@appointment, :url => url) do |f|
         - fields_for("appointment[owner_attributes]", @appointment.owner) do |owner_form|
           .span-16.last{:style => 'margin-bottom: 7px;'}

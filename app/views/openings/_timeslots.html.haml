@@ -16,5 +16,5 @@
         .span-3.location
           = appt.location.name
         .span-2.last.hide.hover_region{:id => "hover_#{id}"}
-          = link_to('Book It', schedule_path(:subdomain => @subdomain, :person_id => person.id, :service_id => service.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
+          = link_to('Book It', schedule_path(:subdomain => current_subdomain, :person_id => person.id, :service_id => service.id, :start_at => timeslot.start_at.to_s(:appt_schedule)))
   %hr.space

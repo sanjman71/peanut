@@ -17,4 +17,4 @@
     .span-4.owner
       %h4= appointment.owner.name
     .span-1.last.action
-      = link_to("Delete", appointment_path(appointment, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to delete this waitlist appointment?")
+      = link_to("Delete", appointment_path(appointment, :subdomain => current_subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to delete this waitlist appointment?")

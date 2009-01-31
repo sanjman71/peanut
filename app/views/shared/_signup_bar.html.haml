@@ -1,5 +1,5 @@
 - if has_privilege?('read companies')
-  = link_to('Companies', companies_path(:subdomain => @subdomain), :class => 'signup')
+  = link_to('Companies', companies_path(:subdomain => current_subdomain), :class => 'signup')
   == &nbsp;|&nbsp;
 
 - if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')

@@ -6,7 +6,7 @@
   .box
     %h2== Schedule an Appointment
     = hidden_field_tag 'initial_person_id', @person.id
-    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
       == What
       %span.field#what
         = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
@@ -58,7 +58,7 @@
       - if @free_timeslots.blank?
         -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}

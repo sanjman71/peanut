@@ -3,7 +3,7 @@
     .span-13
       %h2== Users
     .span-4.last
-      %h3= link_to 'Invite a user', new_invitation_path(:subdomain => @subdomain)
+      %h3= link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
   %hr.space
   
   .span-14.prepend-1.append-1.last

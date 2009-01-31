@@ -1,7 +1,7 @@
 - stylesheet('products')
 - javascript('products')
 
-- form_for(@product, :url => product_path(@product, :subdomain => @subdomain), :method => :post) do |f|
+- form_for(@product, :url => product_path(@product, :subdomain => current_subdomain), :method => :post) do |f|
 
   .span-20.last.box
     = label_tag "product_name", "Product Name", :class => 'big'
@@ -22,5 +22,5 @@
   .span-20.prepend-1.last.submit
     = submit_tag "Save Changes"
     == or
-    = link_to "Cancel", products_path(:subdomain => @subdomain), :class => 'admin'
+    = link_to "Cancel", products_path(:subdomain => current_subdomain), :class => 'admin'
                   

@@ -10,7 +10,7 @@
           - unless mode == :r
             = link_to 'Edit', '', :click => "edit_item_#{li.id}", :hide => "item_#{li.id}", :class => 'price edit admin', :style => 'font-size: 10px; padding: 3px;'
         .price.hide{:id => "edit_item_#{li.id}"}
-          - form_for(li, :url => invoice_line_item_path(li, :subdomain => @subdomain), :method => :put, :html => {:class => "price update admin"}) do |f|
+          - form_for(li, :url => invoice_line_item_path(li, :subdomain => current_subdomain), :method => :put, :html => {:class => "price update admin"}) do |f|
             = text_field_tag 'item[price]', li.price, :style => "background-color: #FFFF66; width: 70px;"
             = submit_tag 'Done', :name => nil
             %span{:style => 'font-size: 11px;'}

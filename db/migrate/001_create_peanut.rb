@@ -64,6 +64,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :people, :name
+    
     create_table :mobile_carriers do |t|
       t.string :name
       t.string :key   # used by SMSFu plugin to find carrier's email gateway address
