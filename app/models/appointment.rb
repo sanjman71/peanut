@@ -8,8 +8,9 @@ class Appointment < ActiveRecord::Base
   belongs_to              :service
   belongs_to              :resource, :polymorphic => true
   belongs_to              :service
-  belongs_to              :customer
-  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :customer_id, :start_at, :end_at
+  belongs_to              :owner, :class_name => 'User'
+  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :start_at, :end_at
+  validates_presence_of   :owner_id, :if => :owner_required?
   validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
   before_save             :make_confirmation_code
@@ -23,9 +24,9 @@ class Appointment < ActiveRecord::Base
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
   
-  named_scope :service,     lambda { |id| { :conditions => {:service_id => id} }}
+  named_scope :service,     lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :resource,    lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
-  named_scope :customer,    lambda { |id| { :conditions => {:customer_id => id} }}
+  named_scope :owner,       lambda { |o| { :conditions => {:owner_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
   # find appointments based on a named time range
@@ -223,6 +224,12 @@ class Appointment < ActiveRecord::Base
     end
   end
   
+  # users are required for work, waitlist appointments
+  def owner_required?
+    return true if [WORK, WAIT].include?self.mark_as
+    return false
+  end
+  
   # START: override attribute methods
   def when=(s)
     if s.blank?
@@ -306,10 +313,10 @@ class Appointment < ActiveRecord::Base
   end
   # END: virtual attributes
   
-  # allow assignment of customer attributes when creating an appointment
-  # will only create a new customer if it doesn't already exist based on the 'email' field
-  def customer_attributes=(customer_attributes)
-    self.customer = Customer.find_by_email(customer_attributes["email"]) || self.create_customer(customer_attributes)
+  # allow assignment of owner attributes when creating an appointment
+  # will create a new onwer if and only if the email field is unique
+  def owner_attributes=(owner_attributes)
+    self.owner = User.find_by_email(owner_attributes["email"]) || self.create_owner(owner_attributes)
   end
   
   # Assign a location. Don't assign if no location specified, or if Location.anywhere is specified (id == 0)

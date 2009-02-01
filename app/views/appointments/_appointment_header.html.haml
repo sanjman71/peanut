@@ -13,9 +13,9 @@
     == When:
   .span-10.padding-bottom-5.last
     = appointment.start_at.to_s(:appt_day_date_time)
-- unless appointment.customer.blank?
-  .customer.padding-5.span-12.last
-    = link_to appointment.customer.name, customer_path(appointment.customer)
+- unless appointment.owner.blank?
+  .owner.padding-5.span-12.last
+    = link_to appointment.owner.name, customer_path(appointment.owner)
 .confirmation.padding-5.span-12.last
   == Confirmation code:
   = appointment.confirmation_code

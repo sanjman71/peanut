@@ -7,7 +7,7 @@
   .span-17.prepend-1
     = display_flash(:notice)
     
-  - form_for(@company) do |f|
+  - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
     = f.error_messages
   
     .span-19.prepend-1.last
@@ -20,7 +20,7 @@
       .span-5
         = f.submit 'Update', :class => 'button big'
         == or
-        = link_to 'Cancel', companies_path, :style => 'font-size: 12px;'
+        = link_to 'Cancel', root_path(:subdomain => current_subdomain), :style => 'font-size: 12px;'
     %hr.space
     %hr.space
     

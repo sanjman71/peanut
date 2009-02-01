@@ -18,36 +18,50 @@
           = @appointment.start_at.to_s(:appt_day_date_time)
 
   .span-15.prepend-1
-    %h3
+    %h4
       - if @appointment.waitlist?
         == Before we add you on the waitlist, we need some information about you.
       - else
         == Before we finalize your appointment, we need some information about you. 
+      == If you already have an account, please
+      = link_to 'login', new_session_path
+      == first.
+      
     %p
     .schedule_form
-      - url = @appointment.waitlist? ? waitlist_path(:subdomain => @subdomain) : schedule_path(:subdomain => @subdomain) 
+      - url = @appointment.waitlist? ? waitlist_path(:subdomain => current_subdomain) : schedule_path(:subdomain => current_subdomain) 
       - form_for(@appointment, :url => url) do |f|
-        - fields_for("appointment[customer_attributes]", @appointment.customer) do |customer_form|
+        - fields_for("appointment[owner_attributes]", @appointment.owner) do |owner_form|
+          .span-16.last{:style => 'margin-bottom: 7px;'}
+            .span-4
+              %h3.text-align-right{:style => 'padding-top: 7px;'}== Name:
+            .span-12.last
+              = owner_form.text_field :name, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last{:style => 'margin-bottom: 7px;'}
+            .span-4
+              %h3.text-align-right{:style => 'padding-top: 7px;'}== Email:
+            .span-12.last
+              = owner_form.text_field :email, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last{:style => 'margin-bottom: 7px;'}
+            .span-4
+              %h3.text-align-right{:style => 'padding-top: 7px;'}== Password:
+            .span-12.last
+              = owner_form.password_field :password, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last{:style => 'margin-bottom: 7px;'}
+            .span-4
+              %h3.text-align-right{:style => 'padding-top: 7px;'}== Confirm Password:
+            .span-12.last
+              = owner_form.password_field :password_confirmation, :class => 'title', :style => 'width: 250px; margin: 0px;'
+          .span-16.last{:style => 'margin-bottom: 7px;'}
+            .span-4
+              %h3.text-align-right{:style => 'padding-top: 7px;'}== Phone:
+            .span-12.last
+              = owner_form.text_field :phone, :class => 'title', :style => 'width: 250px; margin: 0px;'
           .span-16.last
             .span-4
-              %h2.text-align-right== Name:
+              %h3.text-align-right{:style => 'padding-top: 10px;'}== Mobile Carrier:
             .span-12.last
-              = customer_form.text_field :name, :class => 'title', :style => 'width: 250px; margin: 0px;'
-          .span-16.last
-            .span-4
-              %h2.text-align-right== Email:
-            .span-12.last
-              = customer_form.text_field :email, :class => 'title', :style => 'width: 250px; margin: 0px;'
-          .span-16.last
-            .span-4
-              %h2.text-align-right== Phone:
-            .span-12.last
-              = customer_form.text_field :phone, :class => 'title', :style => 'width: 250px; margin: 0px;'
-          .span-16.last
-            .span-4
-              %h2.text-align-right== Mobile Carrier:
-            .span-12.last
-              = customer_form.select('mobile_carrier_id', [["Select a carrier", nil]] + MobileCarrier.all.collect{ |c| [c.name, c.id]}, {}, :style => 'font-size: 15px;')
+              = owner_form.select('mobile_carrier_id', [["Select a carrier", nil]] + MobileCarrier.all.collect{ |c| [c.name, c.id]}, {}, :style => 'font-size: 15px;')
           .span-12.prepend-4.last.top
             %em{:style => "color: #666666; font-size: 13px;"}== Specifying your mobile carrier is optional.  It is used to notify you of appointment changes via text message.
                           

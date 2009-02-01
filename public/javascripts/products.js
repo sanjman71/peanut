@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $(document).init_new_object("#new_product");  // don't need to rebind after an ajax call
+  $(document).init_new_object("#new_product_form");  // don't need to rebind after an ajax call
   $("#new_product_name").focus();
 })
 

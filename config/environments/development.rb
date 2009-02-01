@@ -11,7 +11,7 @@ config.whiny_nils = true
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true
 config.action_view.debug_rjs                         = true
-config.action_controller.perform_caching             = false
+config.action_controller.perform_caching             = true
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
@@ -23,5 +23,8 @@ config.action_controller.session = {
   :secret      => '36791ab51cc708c1cf0314576d5a6a5fb5b1ecf2c4eebf911eeed605b2b666ffd62f24a93ae99519c100543b0ee9195866cdf0e088a0f64add7dad04da09ccd7',
   :session_domain => ".peanut.dev"
 }
+
+# Configure memcache
+config.cache_store  = :mem_cache_store, '127.0.0.1:11212', { :namespace => 'peanut' }
 
 require 'ruby-debug'

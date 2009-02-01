@@ -6,5 +6,5 @@
 
 = error_messages_for :location
 
-= render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Update', :submit_url => location_path(@location, :subdomain => @subdomain) }
+= render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Update', :submit_url => location_path(@location, :subdomain => current_subdomain) }
 

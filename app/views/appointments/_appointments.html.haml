@@ -3,26 +3,24 @@
     %h3== #{day.to_s(:appt_day)}
   - reset_cycle
   - appointments.each do |appointment|
-    -#- hover_id = 'appointment_'+appointment.id.to_s
-    -#- id = 'appointment_'+appointment.id.to_s
     .span-16.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("shaded", "")], :id => 'appointment_'+appointment.id.to_s}
       .span-4.time
-        == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+        %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
       .span-3.location
         %h6= appointment.location.name
       .span-3.service{:class => appointment.mark_as}
         %h6= appointment.service.name
-      .span-3.customer
-        - if appointment.customer
-          %h6= appointment.customer.name
+      .span-3.owner
+        - if appointment.owner
+          %h6= appointment.owner.name
         -else
           %h6== &nbsp;
       .span-2.prepend-1.last.action.hide{:id => "hover_appointment_#{appointment.id}"}
-        - if appointment.service.mark_as == Appointment::FREE
-          -# free appointments can be deleted
-          = link_to('Delete', url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'destroy', :person_id => appointment.resource.id, :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
-        - elsif appointment.service.mark_as == Appointment::WORK
-          -# work appointments can be changed
-          = link_to "Change", appointment_path(appointment, :subdomain => @subdomain)
+        - if appointment.service.mark_as == Appointment::FREE and has_privilege?("delete free appointments", @current_company)
+          -# free appointments can be deleted with appropriate permissions
+          = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :person_id => appointment.resource.id, :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+        - elsif appointment.service.mark_as == Appointment::WORK and has_privilege?("update work appointments", @current_company)
+          -# work appointments can be changed with appropriate permissions
+          = link_to "Change", appointment_path(appointment, :subdomain => current_subdomain)
   %hr.space
             

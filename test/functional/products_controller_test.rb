@@ -4,15 +4,28 @@ require 'test/factories'
 class ProductsControllerTest < ActionController::TestCase
 
   def setup
-    stub_subdomain
+    @controller = ProductsController.new
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
 
   context "create product" do
-    context "with a blank name" do
+    context "without privilege ['create products']" do
       setup do
+        @controller.stubs(:current_privileges).returns([])
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
       end
-
+      
+      should_redirect_to "unauthorized_path"
+    end
+    
+    context "with a blank name" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["create products"])
+        xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
+      end
+    
       should_respond_with :success
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
@@ -27,9 +40,10 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "with a valid name" do
       setup do
+        @controller.stubs(:current_privileges).returns(["create products"])
         xhr :post, :create, :product => {:name => "Pomade", :price => "0", :inventory => "0"}
       end
-
+    
       should_respond_with :success
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
@@ -48,7 +62,17 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "edit a new product" do
+    context "without privilege ['update products']" do
+      setup do
+        @controller.stubs(:current_privileges).returns([])
+        get :edit, :id => 1
+      end
+      
+      should_redirect_to "unauthorized_path"  
+    end
+    
     setup do 
+      @controller.stubs(:current_privileges).returns(["update products"])
       # create product first, as it would be from the create form
       @shampoo = Factory(:product, :name => 'Shampoo', :inventory => 0, :price => 0, :company => @company)
       get :edit, :id => @shampoo
@@ -60,8 +84,44 @@ class ProductsControllerTest < ActionController::TestCase
   end
   
   context "show all products" do
+    context "without privilege ['read products']" do
+      setup do
+        @controller.stubs(:current_privileges).returns([])
+        get :index
+      end
+      
+      should_redirect_to "unauthorized_path"  
+    end
+    
+    context "with privilege ['read products'], but not ['create products']" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["read products"])
+        get :index
+      end
+      
+      should_respond_with :success
+      
+      should "not show add products form" do
+        assert_select "form#new_product_form", 0
+      end
+    end
+  
+    context "with privilege ['read products', 'create products']" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["read products", "create products"])
+        get :index
+      end
+      
+      should_respond_with :success
+      
+      should "show add products form" do
+        assert_select "form#new_product_form", 1
+      end
+    end
+    
     context "on an empty database" do 
       setup do
+        @controller.stubs(:current_privileges).returns(["read products"])
         get :index
       end
   
@@ -76,6 +136,7 @@ class ProductsControllerTest < ActionController::TestCase
     
     context "on a database with 1 product" do
       setup do
+        @controller.stubs(:current_privileges).returns(["read products"])
         # create product first
         @shampoo = Factory(:product, :name => 'Shampoo', :company => @company)
         get :index

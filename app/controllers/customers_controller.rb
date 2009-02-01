@@ -1,16 +1,15 @@
 class CustomersController < ApplicationController
-  before_filter :init_current_company
-  
+
   # GET /customers
   # GET /customers.xml
   def index
     @search = params[:search]
     
     if !@search.blank?
-      @customers    = @current_company.customers.search_name(@search).all(:order => "name ASC")
+      @customers    = @current_company.owners.search_by_name(@search).all(:order => "name ASC")
       @search_text  = "Customers matching '#{@search}'"
     else
-      @customers    = @current_company.customers.all(:order => "name ASC")
+      @customers    = @current_company.owners.all(:order => "name ASC")
       @search_text  = @customers.blank? ? "No Customers" : "All Customers"
     end
     

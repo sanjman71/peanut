@@ -3,6 +3,9 @@
 
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
+  
+  # Make the following methods available to all helpers
+  helper_method :current_user, :logged_in?, :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -22,26 +25,53 @@ class ApplicationController < ActionController::Base
   # Exception notifier to send emails when we have exceptions
   include ExceptionNotifiable
   
+  # Initialize current company and subdomain
+  before_filter :init_current_company
+  
+  # Load and cache all user privileges on each call so we don't have to keep checking the database
+  before_filter :init_current_privileges
+  
   # Default layout
   layout "company"
 
-  # Method called when badges authentication fails
-  def access_denied(options)
-    if @current_company
-      flash[:error] = "Access denied"
-      redirect_to access_denied_companies_path(:subdomain => @subdomain)
-    else
-      # todo: do something different here
-    end
+  # check user privileges against the pre-loaded memory collection instead of using the database
+  def has_privilege?(p, *args)
+    authorizable  = args[0]
+    user          = args[1] || current_user
+    logger.debug("*** checking privilege #{p}, on authorizable #{authorizable ? authorizable.name : ""}, for user #{user ? user.name : ""}")
+    return false if current_privileges.blank?
+    return current_privileges.include?(p)
+  end
+
+  #
+  # Note: current_subdomain is defined by the subdomain_fu plugin
+  #
+  
+  def current_company
+    @current_company
+  end
+  
+  def current_locations
+    @current_locations
+  end
+  
+  def current_location
+    @current_location
+  end
+  
+  def current_privileges
+    @current_privileges
   end
   
   private
   
+  # Initialize the current company and all related parameters (e.g. locations, time zone, ...)
   def init_current_company
     # Don't look for a company if we're on the home pages
     # If we're on www.peanut.xxx then current_subdomain will be nil
     if current_subdomain
-      @current_company = Company.find_by_subdomain(current_subdomain)
+      # find company and all associated locations
+      @current_company = Company.find_by_subdomain(current_subdomain, :include => :locations)
       
       if @current_company.blank?
         flash[:error] = "Invalid company"
@@ -53,22 +83,34 @@ class ApplicationController < ActionController::Base
 
       # initialize application time zone
       Time.zone   = @current_company.time_zone
+      
+      # initialize all company locations
+      @current_locations = @current_company.locations
 
-      if session[:location_id].blank? and !@current_company.locations.empty?
-        # initialize session location to company's only location
-        session[:location_id] = @current_company.locations.first.id
+      if session[:location_id].blank? and !@current_locations.empty?
+        # initialize session location id to company's first location
+        session[:location_id] = @current_locations.first.id
       end
       
-      @current_location = Location.find_by_id(session[:location_id]) || Location.anywhere
+      # initialize current location, default to anywhere
+      @current_location = @current_locations.select { |l| l.id == session[:location_id] }.first
+      @current_location = Location.anywhere if @current_location.blank?
+
+      logger.debug("*** current_location: #{@current_location.name}")
     end
   end
-
-  # redirect http://[company].peanut.com/ to the company subdomain root path
-  def redirect_subdomain_home_route
-    return true if current_subdomain.blank? or current_subdomain == 'www'
-    # its a company subdomain, redirect to subdomain root path
-    redirect_to(openings_path)
-    false
-  end
     
+  def init_current_privileges
+    if logged_in?
+      if @current_company
+        # load privileges on current company (includes privileges on no authorizable object)
+        @current_privileges = current_user.privileges(@current_company).collect { |p| p.name }
+      else
+        # load privileges without an authorizable object
+        @current_privileges = current_user.privileges.collect { |p| p.name }
+      end
+    else
+      @current_privileges = []
+    end
+  end
 end

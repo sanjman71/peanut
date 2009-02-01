@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $(document).init_new_membership();
-  $(document).init_new_object("#new_service");  // don't need to rebind after an ajax call
+  $(document).init_new_object("#new_service_form");  // don't need to rebind after an ajax call
   $("#new_service_name").focus();
 })
 

@@ -15,7 +15,7 @@ class AppointmentScheduler
     
     # split the free appointment into free/work appointments
     free_appointment  = appointment.conflicts.first
-    new_appointments  = self.split_free_appointment(free_appointment, appointment.service, appointment.start_at, appointment.end_at, :commit => 1, :customer => appointment.customer)
+    new_appointments  = self.split_free_appointment(free_appointment, appointment.service, appointment.start_at, appointment.end_at, :commit => 1, :owner => appointment.owner)
     work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
   end
   
@@ -48,7 +48,7 @@ class AppointmentScheduler
     new_appt.end_at   = service_end_at
     new_appt.mark_as  = service.mark_as
     new_appt.duration = service.duration
-    new_appt.customer = options[:customer] if options[:customer]
+    new_appt.owner    = options[:owner]  # set to nil if no owner is specified
     
     # build new start, end appointments
     unless service_start_at == appointment.start_at
@@ -98,9 +98,12 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
     # create a new appointment object
-    customer    = Customer.nobody
-    appointment = Appointment.new(:start_at => start_at, :end_at => end_at, :mark_as => service.mark_as, :service => service, :company => company,
-                                  :resource => resource, :customer_id => customer.id)
+    appointment = Appointment.new(:start_at => start_at, 
+                                  :end_at => end_at, 
+                                  :mark_as => service.mark_as, 
+                                  :service => service, 
+                                  :resource => resource,
+                                  :company => company)
                               
     if appointment.conflicts?
       raise TimeslotNotEmpty

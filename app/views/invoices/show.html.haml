@@ -6,7 +6,7 @@
       %h3
         = render(:partial => 'appointments/appointment_header.html.haml', :locals => {:appointment => @appointment})
     .prepend-2.span-4.last
-      = link_to "Back to Appointment", appointment_path(@appointment, :subdomain => @subdomain), :class => 'admin'
+      = link_to "Back to Appointment", appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin'
 
 .span-20
   .prepend-1

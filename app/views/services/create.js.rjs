@@ -3,5 +3,5 @@ if @error
   page["#progress"].hide();  # hide progress bar
   page["#submit"].show();    # show submit button 
 else
-  page.redirect_to(edit_service_path(@service, :subdomain => @subdomain))
+  page.redirect_to(edit_service_path(@service, :subdomain => current_subdomain))
 end

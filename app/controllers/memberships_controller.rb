@@ -1,5 +1,4 @@
 class MembershipsController < ApplicationController
-  before_filter :init_current_company
   
   # POST /create
   def create

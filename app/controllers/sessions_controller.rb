@@ -1,13 +1,13 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
-  before_filter :init_current_company
 
   def new
     if @current_company.blank?
-      # use special layout
-      render(:action => 'new', :layout => 'signup')
+      # use home layout
+      render(:action => 'new', :layout => 'home')
     else
       # use default layout
+      render(:action => 'new')
     end
   end
 
@@ -34,8 +34,8 @@ class SessionsController < ApplicationController
       @remember_me = params[:remember_me]
       
       if @current_company.blank?
-        # use special layout
-        render(:action => 'new', :layout => 'signup')
+        # use home layout
+        render(:action => 'new', :layout => 'home')
       else
         # use default layout
         render :action => 'new'

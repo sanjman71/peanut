@@ -1,43 +1,20 @@
 class CompaniesController < ApplicationController
-  before_filter :init_current_company
-  after_filter  :store_location, :only => [:index, :show, :edit]
+  after_filter :store_location, :only => [:index, :show, :edit]
+  layout "company"
+
+  privilege_required 'read companies', :only => [:index]
+  privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
+  privilege_required 'delete companies', :only => [:destroy], :on => :current_company
 
   # GET /companies
   # GET /companies.xml
   def index
-
-    if @current_company
-      # show company openings
-      return redirect_to(openings_path)
-    end
-    
-    # We're going to an admin page
-    # need to check permission here
     @companies = Company.find(:all)
     
     respond_to do |format|
-      format.html { render :layout => 'admin' } # index.html.erb
+      # use home layout when listing all companies
+      format.html { render :action => :index, :layout => 'home' }
       format.xml  { render :xml => @companies }
-    end
-  end
-
-  # GET /companies/1
-  # GET /companies/1.xml
-  def show
-    respond_to do |format|
-      format.html { redirect_to(appointments_path) }
-      format.xml  { render :xml => @company }
-    end
-  end
-
-  # GET /companies/new
-  # GET /companies/new.xml
-  def new
-    @company = Company.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @company }
     end
   end
 
@@ -46,23 +23,6 @@ class CompaniesController < ApplicationController
     @company = Company.find(params[:id])
   end
   
-  # POST /companies
-  # POST /companies.xml
-  def create
-    @company = Company.new(params[:company])
-
-    respond_to do |format|
-      if @company.save
-        flash[:notice] = 'Company was successfully created.'
-        format.html { redirect_to(companies_path) }
-        format.xml  { render :xml => @company, :status => :created, :location => @company }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @company.errors, :status => :unprocessable_entity }
-      end
-    end
-  end
-
   # PUT /companies/1
   # PUT /companies/1.xml
   def update
@@ -71,7 +31,8 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       if @company.update_attributes(params[:company])
         flash[:notice] = 'Company was successfully updated.'
-        format.html { redirect_to(companies_path) }
+        # redirect to edit company page, since company show doesn't really show anything
+        format.html { redirect_to(edit_company_path(@company, :subdomain => @subdomain)) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
@@ -91,8 +52,4 @@ class CompaniesController < ApplicationController
     end
   end
   
-  def access_denied
-    render :text => "Access Denied", :layout => 'company'
-  end
-    
 end

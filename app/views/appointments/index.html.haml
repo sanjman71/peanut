@@ -34,7 +34,7 @@
   .span-6.last
     .span-6.box
       = label_tag 'add_free_time_form', "Add Free Time", :class => 'big'
-      - form_for(Appointment.new, :url => url_for(:subdomain => @subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+      - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
         = hidden_field_tag :when, @when
         .add_free_time
           .span-7.last.when
@@ -44,13 +44,14 @@
           .span-7.last#start_at_label
             == Start
           .span-7.last#start_at_text
-            = text_field 'appointment[time_range]', 'start_at', :size => 8
+            = text_field 'appointment[time_range]', 'start_at', :size => 10, :class => 'required'
             %span.example== e.g. 8:15 am
           .span-7.last#end_at_label
             == End
           .span-7.last.append-bottom#end_at_text
-            = text_field 'appointment[time_range]', 'end_at', :size => 8
+            = text_field 'appointment[time_range]', 'end_at', :size => 10, :class => 'required'
             %span.example== e.g. 5:30 pm
           .span-7.last
-            = f.submit 'Add', :name => nil, :class => 'button'
+            #submit= f.submit 'Add', :name => nil, :class => 'button big'
+            .hide#progress= image_tag 'barbershop.gif'
 

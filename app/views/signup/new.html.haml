@@ -33,7 +33,7 @@
   
     - fields_for("user", @user) do |user_form|
       .span-20.last
-        %h2== Create your user profile
+        %h2== Create your user account
       .span-18.last
         %hr
       -# show any user errors
@@ -42,17 +42,22 @@
           = error_messages_for('user', :header_message => nil)
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right== Your email:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+        .span-16.last
+          = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      .span-20.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
         .span-16.last
           = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right== Your password:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
         .span-16.last
           = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right== Confirm password:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
         .span-16.last
           = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
           .span-20.last.padding-bottom-10

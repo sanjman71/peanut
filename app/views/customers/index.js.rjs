@@ -3,3 +3,6 @@ page["#customer_search_text"].html(@search_text)
 
 # update customer list
 page["#customers"].html(render(:partial => 'customers.html.haml', :locals => {:customers => @customers}))
+
+# hide search progress bar
+page["#search_progress"].hide();

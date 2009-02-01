@@ -26,12 +26,17 @@ class CreateLocations < ActiveRecord::Migration
       t.timestamps
       t.integer :lock_version, :default => 0, :null => false
     end
+
+    add_index :locations, [:name]
     
     create_table :locatables_locations do |t|
       t.references :location
       t.references :locatable, :polymorphic => true
     end
     
+    add_index :locatables_locations, [:location_id]
+    add_index :locatables_locations, [:locatable_id, :locatable_type], :name => "index_on_locatables"
+    add_index :locatables_locations, [:location_id, :locatable_id, :locatable_type], :name => "index_on_locations_locatables"
   end
 
   def self.down

@@ -5,14 +5,15 @@ module AppointmentsHelper
     
     when_collection.each do |s|
       # add css 'current' class for the current link
-      klass = (s == current) ? 'current' : ''
+      klass       = (s == current) ? 'current' : ''
+      url_params  = {:controller => 'appointments', :action => 'index', :person_id => person, :subdomain => @subdomain}
       
       if s == default
         # no when parameter for the default value
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain), :class => klass)
+        link  = link_to(s.titleize, url_for(url_params), :class => klass)
       else
         # use when parameter
-        link  = link_to(s.titleize, person_appointments_path(person, :subdomain => @subdomain, :when => s), :class => klass)
+        link  = link_to(s.titleize, url_for(url_params.update(:when => s.to_url_param)), :class => klass)
       end
       
       # use separator unless its the last element

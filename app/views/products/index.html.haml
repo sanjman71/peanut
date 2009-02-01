@@ -11,24 +11,24 @@
     .span-11
       %h4= page_entries_info @products unless @products.blank?
     .span-4.last
-      = will_paginate(@products, :page_links => false, :params => {:subdomain => @subdomain})
+      = will_paginate(@products, :page_links => false, :params => {:subdomain => current_subdomain})
   #products
     = render(:partial => 'products.html.haml', :locals => {:products => @products})
     
-.span-6.prepend-1.last
-  .span-6.box
-    - form_for(Product.new, :url => products_path(:subdomain => @subdomain), :method => :post, :html => {:class => 'new_product'}) do |f|
-      = hidden_field_tag "product[price]", 0
-      = hidden_field_tag "product[inventory]", 0
-      .span-6.last
-        = label_tag "new_product_name", "Add a product", :class => 'big'
-      .span-6.last
-        = text_field_tag "product[name]", '', :id => 'new_product_name', :class => 'title big required', :style => 'width: 200px;'
-      .span-6.last
-        %em{:style => "color: #666666; font-size: 12px;"}== Examples: Shampoo, Styling Gel
-      %hr.space
-      .span-6.last
-        .hide#progress= image_tag 'barbershop.gif'
-        #submit= submit_tag "Create", :name => nil, :class => 'button big'
-    
-        
+- if_privilege('create products', @current_company) do
+  .span-6.prepend-1.last
+    .span-6.box
+      - form_for(Product.new, :url => products_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_product', :id => 'new_product_form'}) do |f|
+        = hidden_field_tag "product[price]", 0
+        = hidden_field_tag "product[inventory]", 0
+        .span-6.last
+          = label_tag "new_product_name", "Add a product", :class => 'big'
+        .span-6.last
+          = text_field_tag "product[name]", '', :id => 'new_product_name', :class => 'title big required', :style => 'width: 200px;'
+        .span-6.last
+          %em{:style => "color: #666666; font-size: 12px;"}== Examples: Shampoo, Styling Gel
+        %hr.space
+        .span-6.last
+          #submit.show= submit_tag "Create", :name => nil, :class => 'button big'
+          #progress.hide= image_tag 'barbershop.gif', :size => '70x25'
+

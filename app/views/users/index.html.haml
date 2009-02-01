@@ -1,6 +1,9 @@
-.span-16
-  .span-15.last.box
-    %h2== Users
+.span-19
+  .span-17.last.box
+    .span-13
+      %h2== Users
+    .span-4.last
+      %h3= link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
   %hr.space
   
   .span-14.prepend-1.append-1.last
@@ -10,8 +13,4 @@
     .highlight#flash
   #services
     = render(:partial => 'users.html.haml', :locals => {:users => @users})
-    
-.span-6.prepend-1.last
-  .span-6.box
-    %h3= link_to 'Invite a user', new_invitation_path(:subdomain => @subdomain)
 

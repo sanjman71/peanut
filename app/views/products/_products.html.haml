@@ -11,6 +11,6 @@
     .span-3.inventory
       %h3== #{product.inventory} left
     .span-3.last.action
-      = link_to "Edit", edit_product_path(product, :subdomain => @subdomain), :class => 'admin'
+      = link_to "Edit", edit_product_path(product, :subdomain => current_subdomain), :class => 'admin'
       &nbsp;
-      = link_to("Remove", product_path(product, :subdomain => @subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this product?")
+      = link_to("Remove", product_path(product, :subdomain => current_subdomain), :class => 'admin ujs delete confirm', :question => "Are you sure you want to remove this product?")

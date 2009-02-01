@@ -1,5 +1,4 @@
 class LocationsController < ApplicationController
-  before_filter :init_current_company
   after_filter  :store_location, :only => [:index, :show]
   
   # GET /locations
@@ -25,8 +24,8 @@ class LocationsController < ApplicationController
     end
   end
   
-  # GET /locations/1/set_default
-  def set_default
+  # GET /locations/1/select
+  def select
     @location = @current_company.locations.find_by_id(params[:id]) || Location.anywhere
     
     if request.referrer

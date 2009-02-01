@@ -4,6 +4,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
+      t.integer :locations_count, :default => 0    # locations counter cache
       
       t.timestamps
     end
@@ -20,6 +21,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :services, [:company_id]
     add_index :services, [:company_id, :mark_as]
 
     create_table :products do |t|
@@ -31,6 +33,9 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
   
+    add_index :products, [:company_id]
+    add_index :products, [:company_id, :name]
+    
     # Polymorphic relationship mapping companies to different resources (e.g. people)
     create_table :companies_resources do |t|
       t.references  :company
@@ -39,6 +44,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :companies_resources, [:resource_id, :resource_type], :name => 'index_on_resources'
     add_index :companies_resources, [:company_id, :resource_id, :resource_type], :name => 'index_on_companies_and_resources'
 
     # Polymorphic relationship mapping services to different resources (e.g. people)
@@ -58,6 +64,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.timestamps
     end
 
+    add_index :people, :name
+    
     create_table :mobile_carriers do |t|
       t.string :name
       t.string :key   # used by SMSFu plugin to find carrier's email gateway address
@@ -72,21 +80,12 @@ class CreatePeanut < ActiveRecord::Migration
     MobileCarrier.create(:name => 'T-Mobile UK',        :key => 't-mobile-uk')
     MobileCarrier.create(:name => 'Virgin Mobile',      :key => 'virgin')
     MobileCarrier.create(:name => 'Verizon Wireless',   :key => 'verizon')
-    
-    create_table :customers do |t|
-      t.string  :name
-      t.string  :email
-      t.string  :phone
-      t.integer :mobile_carrier_id
-      
-      t.timestamps
-    end
-    
+        
     create_table :appointments do |t|
       t.integer     :company_id
       t.integer     :service_id
       t.references  :resource, :polymorphic => true
-      t.integer     :customer_id
+      t.integer     :owner_id       # user who owns the appointment
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at
@@ -97,10 +96,13 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :mark_as
       t.string      :state
       t.string      :confirmation_code
+      t.integer     :locations_count, :default => 0     # locations counter cache
       
       t.timestamps
     end
 
+    add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
+    
     create_table :appointment_invoice_line_items do |t|
       t.integer     :appointment_invoice_id
       t.references  :chargeable, :polymorphic => true
@@ -133,7 +135,6 @@ class CreatePeanut < ActiveRecord::Migration
 
   def self.down
     drop_table :appointments
-    drop_table :customers
     drop_table :companies_resources
     drop_table :people
     drop_table :services

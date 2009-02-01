@@ -1,12 +1,12 @@
 class AppointmentsController < ApplicationController
-  before_filter :init_current_company
   
-  @@default_when    = Appointment::WHEN_THIS_WEEK
+  # Default when value
+  @@default_when = Appointment::WHEN_THIS_WEEK
   
   # GET /people/1/appointments
   def index
     if params[:customer_id]
-      @customer     = Customer.find(params[:customer_id])
+      @customer     = User.find(params[:customer_id])
       @appointments = @customer.appointments
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
@@ -29,12 +29,10 @@ class AppointmentsController < ApplicationController
   def create
     # build new free appointment
     service       = @current_company.services.free.first
-    customer      = Customer.nobody
     person        = @current_company.resources.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
                                                                :service => service,
                                                                :company => @current_company,
-                                                               :customer_id => customer.id,
                                                                :location_id => @current_location.id))
     
     # check if appointment is valid                                                           
@@ -88,7 +86,7 @@ class AppointmentsController < ApplicationController
     @people       = @current_company.people.all
 
     # initialize time parameters
-    @when         = params[:when] || @@default_when
+    @when         = (params[:when] || @@default_when).to_s_param
     @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
@@ -113,7 +111,7 @@ class AppointmentsController < ApplicationController
   # GET   /waitlist/people/3/services/8/this week/anytime
   # POST  /waitlist/people/3/services/8/this week/anytime
   def new
-    # build appointment hash differently for schedules vs waitlist requests
+    # build appointment hash differently for schedule vs waitlist appointment requests
     hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person', :company_id => @current_company.id}
     
     if request.url.match(/\/waitlist\//)
@@ -125,6 +123,13 @@ class AppointmentsController < ApplicationController
     else
       raise ArgumentError
     end
+
+    if logged_in?
+      # fill in owner id from current user
+      params[:appointment] ||= {}
+      params[:appointment][:owner_id] = current_user.id
+    end
+
     # add appointment attributes
     hash.update(params[:appointment]) if params[:appointment]
     
@@ -134,8 +139,8 @@ class AppointmentsController < ApplicationController
     logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
     
     if !@appointment.valid?
-      # ask for customer info
-      logger.debug("*** appointment is missing customer info")
+      # ask for owner/user info
+      logger.debug("*** appointment is missing owner info")
       return
     end
     
@@ -149,7 +154,7 @@ class AppointmentsController < ApplicationController
         # send waitlist confirmation
         MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
 
-        if @appointment.customer.sms?
+        if @appointment.owner.sms?
           # send sms waitilist confirmation 
           SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
         end

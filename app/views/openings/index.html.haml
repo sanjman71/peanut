@@ -6,7 +6,7 @@
   .box
     %h2== Schedule an Appointment
     = hidden_field_tag 'initial_person_id', @person.id
-    - form_for(@query, :url => url_for(:action => 'search', :subdomain => @subdomain), :method => :post) do |f|
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
       == What
       %span.field#what
         = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
@@ -21,7 +21,9 @@
       %span.field#time
         = select_tag('time', options_for_select(Appointment::TIMES, @time))
       %span#search{:style => @when ? "display: inline; padding-left: 10px;" : "display: none; padding-left: 10px;"}
-        = f.submit 'Search', :name => nil, :class => 'submit'
+        = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit'
+        %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+        
 
 .span-6.prepend-1.last
   .sidebar.instructions.padding-5
@@ -52,16 +54,22 @@
       == .
       
   - unless @when.blank?
-    %h2
+    %h2.span-16
       - if @free_timeslots.blank?
+        -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => @subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
+        -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+        
     %h3.span-16.last
+      -# Show appointment when range
       == #{@when.titleize}
-    .span-16.last#free_calendar
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-    .span-16.last.timeslots#free_timeslots
-      = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+
+    - cache(@openings_cache_key, :expires_in => 5.minutes) do
+      .span-16.last#free_calendar
+        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      .span-16.last.timeslots#free_timeslots
+        = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
 

@@ -18,7 +18,7 @@
     -# show appointment confirmation notice
     .notice
       == A confirmation email has also been sent to
-      = @appointment.customer.email unless @appointment.customer.blank?
+      = @appointment.owner.email unless @appointment.owner.blank?
       
   - if @appointment.state == 'completed'
     -# show invoice
@@ -33,7 +33,7 @@
   .new_note#new_note_container
     %p
       %h4== Add a note about this appointment
-      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => @subdomain})
+      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => current_subdomain})
   %p
   -# appointment notes
   #notes_collection

@@ -3,7 +3,7 @@
   %head
     %meta{'http-equiv' => "content-type", :content => "text/html;charset=UTF-8"}
     %title
-      = "#{@current_company.name} -"
+      = "#{current_company.name} -"
       = yield :title
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
     = stylesheet_link_tag 'blueprint/screen'
@@ -19,14 +19,15 @@
     #header
       .container
         .span-24.last
-          .span-7{:class => "locations_count_#{@current_company.locations.size}"}
-            - if @current_company.locations.size > 1
+          .span-7{:class => "locations_count_#{@current_locations.size}"}
+            - if @current_locations.size > 1
               -# allow user to change the current location
               %ul#location_switcher
                 %li
                   #location_switcher_link= link_to 'Change Location', '', :class => 'admin header'
                   %ul
-                    - build_location_links(@current_company, @current_location) do |name, link, is_last|
+                    -# build current company location links
+                    - build_company_location_links do |name, link, is_last|
                       = link_to name, link, :class => 'admin header'
                       = "&nbsp;|&nbsp;" unless is_last
             - else
@@ -39,8 +40,8 @@
         .span-24.last
           .span-19
             %h2#company_name{:style => 'color: #FFFFFF;'}
-              -# show company name; include location name if its appropriate
-              = company_location_title(@current_company, @current_location)
+              -# show company name, include location name if its appropriate
+              = current_company_title_with_location
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')

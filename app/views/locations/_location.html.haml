@@ -9,6 +9,6 @@
       - else
         = render :partial => 'locations/location_address', :object => location
     .span-11.last.editdelete
-      - if has_privilege?("update companies", @current_company)
-        = link_to "Edit", edit_location_path(location, :subdomain => @subdomain), :class => 'edit_address' 
+      - if has_privilege?("update companies", current_company)
+        = link_to "Edit", edit_location_path(location, :subdomain => current_subdomain), :class => 'edit_address' 
         = link_to "Delete", location_path(location), :method => :delete, :confirm => "Are you sure you want to delete this location"

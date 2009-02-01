@@ -36,13 +36,18 @@ $.fn.init_new_membership = function () {
 } 
 
 // Add a new object (e.g. person, service, product)
-$.fn.init_new_object = function (form_id) {
+$.fn.init_new_object = function(form_id) {
   // validate the form by binding a callback to the submit function
   $(form_id).validate({
     // handle form errors by highlighting the required field 
     showErrors: function(errorMap, errorList) {
       $(".required").addClass('highlighted');
-    }
+      $(".required").focus();
+    },
+    // don't validate until the form is submitted and we call valid
+    onfocusout: false,
+    onkeyup: false,
+    onsubmit: false
   });
   
   // do an ajax form post on submit
@@ -58,9 +63,25 @@ $.fn.init_new_object = function (form_id) {
 }
 
 // Add free time for a resource on a specific day
-$.fn.init_add_free_time = function () {
+$.fn.init_add_free_time = function() {
+  // validate the form by binding a callback to the submit function
+  $("#add_free_time_form").validate({
+    // handle form errors by highlighting the required field 
+    showErrors: function(errorMap, errorList) {
+      $(".required").addClass('highlighted');
+    },
+    // don't validate until the form is submitted and we call valid
+    onfocusout: false,
+    onkeyup: false,
+    onsubmit: false
+  });
+  
   $("#add_free_time_form").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
+    if ($(this).valid()) {
+      $.post(this.action, $(this).serialize(), null, "script");
+      $(this).find("#submit").hide();
+      $(this).find("#progress").show();
+    }
     return false;
   })
 }
@@ -72,8 +93,12 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
      showErrors: function(errorMap, errorList) {
        // handle form errors by highlighting the required field 
        $(".required").addClass('highlighted');
-       return false;
-     }
+       $("#appointment_code").focus();
+     },
+     // don't validate until the form is submitted and we call valid
+     onfocusout: false,
+     onkeyup: false,
+     onsubmit: false
     }
   );
   
@@ -86,8 +111,17 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
       // hide the submit button and show the progress bar
       $(this).find("#submit").hide();
       $(this).find("#progress").show();
-      return false;
     }
+    return false;
+  })
+}
+
+// Search schedules for available appointments
+$.fn.init_schedule_search = function () {
+  $("#schedule_search_form").submit(function () {
+    // replace the search button with a progress image when its clicked
+    $("#search_submit").addClass('hide');
+    $("#search_progress").removeClass('hide');
   })
 }
 
@@ -106,15 +140,6 @@ $.fn.init_highlight_appointments = function () {
 $.fn.init_show_appointments = function () {
   $("#person_id").change(function () {
     var href = '/people/' + this.value + '/appointments';
-    window.location = href;
-    return false;
-  })
-}
-
-// Set the company's location
-$.fn.init_company_location = function () {
-  $("#location_id").change(function () {
-    var href = '/locations/' + this.value + '/set_default';
     window.location = href;
     return false;
   })
@@ -155,6 +180,8 @@ $.fn.init_live_customers_search = function () {
     // excecut search, throttle how often its called
     var search_execution = function () {
       $.get(search_url, {search : search_term}, null, "script");
+      // show search progress bar
+      $('#search_progress').show();
     }.sleep(300);
     
     return false;
@@ -221,7 +248,7 @@ $.fn.init_add_note = function () {
 } 
 
 // Initialize location switcher allowing users to change the current location
-$.fn.init_location_switcher = function() {
+$.fn.init_switch_locations = function() {
   $('#location_switcher li').hover(
     // add block class for internet explorer
     function() { 
@@ -242,7 +269,7 @@ $.fn.init_ujs_links = function () {
   $("a.ujs").attr("ujs", function() { return this.href })
   $("a.ujs").attr("href","javascript:void(0)")
 
-  $("a.ujs").click( function() {
+  $("a.ujs").click(function() {
     // Check if its a rails delete link
     if ($(this).attr("class").match(/delete/i))
       var params = {_method : 'delete'};
@@ -264,7 +291,8 @@ $.fn.init_ujs_links = function () {
 $(document).ready(function() {
   // Initialize all ujs links
   $(document).init_ujs_links();
-  $(document).init_company_location();
-  $(document).init_location_switcher();
+  $(document).init_switch_locations();
+  
+  $(document).init_schedule_search();
 })
 
