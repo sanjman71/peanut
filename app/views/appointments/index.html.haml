@@ -33,7 +33,7 @@
 - unless @current_company.people_count == 0
   .span-6.last
     .span-6.box
-      = label_tag 'add_free_time_form', "Add Free Time", :class => 'big'
+      = label_tag 'add_free_time_form', "Staff Scheduling", :class => 'big'
       - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
         = hidden_field_tag :when, @when
         .add_free_time

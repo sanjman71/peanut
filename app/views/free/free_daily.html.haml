@@ -1,0 +1,22 @@
+- title("Manage Schedules")
+- stylesheet('ui.core', 'ui.theme', 'ui.datepicker')
+- javascript('ui.core', 'ui.datepicker', 'free')
+
+.span-17.box
+  %h2== Manage daily available time
+  %h4== Add available time slots by specifying the day and time range
+
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+  .span-17#dates
+    = render(:partial => 'daily', :locals => {:date_id => 'date_1'})
+
+  %hr.space
+
+  .span-16.prepend-1.add
+    %h4= link_to_function "Add another", :id => "add_more_dates"
+  
+  %hr.space
+
+  .span-16.prepend-1
+    %h2= f.submit "Add", :class => 'big button'
+  

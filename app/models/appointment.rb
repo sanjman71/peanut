@@ -304,8 +304,13 @@ class Appointment < ActiveRecord::Base
   end
   
   # appointments are only supposed to have one location
-  def location    
-    self.locations.first || Location.anywhere
+  def location
+    if locations_count == 0
+      # no need to query the database here
+      Location.anywhere
+    else
+      self.locations.first
+    end
   end
   
   def location=(location)

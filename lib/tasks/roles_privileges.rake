@@ -27,7 +27,6 @@ namespace :db do
 
         # Company employee can read company                   
         Badges::RolePrivilege.create(:role=>ce,:privilege=>rc)
-
       end
       
       desc "Initialize roles & privileges roles and privileges"
@@ -60,17 +59,18 @@ namespace :db do
 
         cfa = Badges::Privilege.create(:name=>"create work appointments")
         rwa = Badges::Privilege.create(:name=>"read work appointments")
+        uwa = Badges::Privilege.create(:name=>"update work appointments")
         dwa = Badges::Privilege.create(:name=>"delete work appointments")
 
         # Company manager can fully manage schedule
         Badges::RolePrivilege.create(:role=>cm,:privilege=>cfa)
-        Badges::RolePrivilege.create(:role=>cm,:privilege=>rwa)
         Badges::RolePrivilege.create(:role=>cm,:privilege=>dfa)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>rwa)
+        Badges::RolePrivilege.create(:role=>cm,:privilege=>uwa)
         Badges::RolePrivilege.create(:role=>cm,:privilege=>dwa)
 
         # Company employee can read schedule
         Badges::RolePrivilege.create(:role=>ce,:privilege=>rwa)
-
       end
       
       desc "Initialize invoices roles and privileges"
@@ -100,7 +100,6 @@ namespace :db do
         Badges::RolePrivilege.create(:role=>im,:privilege=>ri)
         Badges::RolePrivilege.create(:role=>im,:privilege=>ui)
         Badges::RolePrivilege.create(:role=>im,:privilege=>di)
-                
       end
 
       desc "Initialize services roles and privileges"

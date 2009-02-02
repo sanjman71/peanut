@@ -6,14 +6,14 @@ class OpeningsController < ApplicationController
   def index
     if params[:person_id].to_s == "0"
       # /people/0/free is canonicalized to /free; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => @subdomain, :person_id => nil)))
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :person_id => nil)))
     elsif params[:service_id].to_s == "0"
-      # /services/0/free is redirected to force the user to select a service; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => @subdomain, :service_id => nil)))
+      # /services/0/free is canonicalized to /free; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
     end
     
     # initialize person, default to anyone
-    @person   = @current_company.people.find(params[:person_id]) if params[:person_id]
+    @person   = current_company.people.find(params[:person_id]) if params[:person_id]
     @person   = Person.anyone if @person.blank?
     
     # initialize when, no default
@@ -24,17 +24,25 @@ class OpeningsController < ApplicationController
     @time       = params[:time].to_s_param if params[:time]
 
     # initialize service, default to nothing
-    @service    = @current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
+    @service    = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
 
     # build appointment request for the selected timespan
-    @query      = AppointmentRequest.new(:service => @service, :resource => @person, :when => @when, :time => @time, :company => @current_company,
-                                         :location => @current_location)
+    @query      = AppointmentRequest.new(:service => @service, :resource => @person, :when => @when, :time => @time, :company => current_company,
+                                         :location => current_location)
 
     # build people collection, people are restricted by the services they perform
     @people     = Array(Person.anyone) + @service.people
     
     # find services collection, services are restricted by the company they belong to
-    @services   = Array(Service.nothing(:name => "Select a service")) + @current_company.services.work
+    @services   = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
+
+    # build skills collection mapping services to people/resources
+    @skills     = current_company.services.work.inject([]) do |array, service|
+      service.people.each do |person|
+        array << [service.id, person.id, person.name]
+      end
+      array
+    end
 
     if @when.blank?
       logger.debug("*** showing empty page with help text")
@@ -60,11 +68,10 @@ class OpeningsController < ApplicationController
     end
 
     # build openings cache key
-    @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments)
+    @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
     
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @appointments }
     end
   end
 

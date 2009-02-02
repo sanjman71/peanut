@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   
   # Make the following methods available to all helpers
-  helper_method :current_user, :logged_in?, :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges
+  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
   end
 
   #
-  # Note: current_subdomain is defined by the subdomain_fu plugin
+  # Note: current_subdomain is already defined by the subdomain_fu plugin
   #
   
   def current_company

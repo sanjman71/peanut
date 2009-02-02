@@ -1,0 +1,18 @@
+- fields_for "time_range[]", TimeRange.new do |f|
+  .prepend-1.span-16.date
+    .span-4
+      %span{:style => 'font-size: 13px;'}== Date:
+      %br
+      = f.text_field 'day', :style => 'width: 90px; font-size: 13px;', :class => 'datepicker', :id => date_id
+    
+    .span-3
+      %span{:style => 'font-size: 13px;'}== Start Time:
+      %br
+      = f.text_field 'start_at', :style => 'width: 90px; font-size: 13px;', :id => 'start_at'
+    
+    .span-9.last
+      %span{:style => 'font-size: 13px;'}== End Time:
+      %br
+      = f.text_field 'end_at', :style => 'width: 90px; font-size: 13px;', :id => 'end_at'
+      %span.example== e.g. 9 am, 10:15 am, 3:30 pm
+    

@@ -47,6 +47,8 @@ ActionController::Routing::Routes.draw do |map|
   map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
   map.waitlist  'waitlist/people/:person_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
+  map.connect   'people/:person_id/free/:style', :controller => 'free', :action => 'index'
+  
   map.resources :people do |resource|
     # nested appointments routes
     resource.resources :appointments
@@ -55,6 +57,9 @@ ActionController::Routing::Routes.draw do |map|
     
     # nested services routes
     resource.resources :services,   :has_many => [:appointments, :openings]
+    
+    # manage free time
+    resource.resources :free, :only => [:index]
   end
   
   # services, products

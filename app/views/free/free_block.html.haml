@@ -1,0 +1,50 @@
+- title("Manage Free Time")
+- stylesheet('ui.core', 'ui.theme', 'ui.datepicker')
+- javascript('ui.core', 'ui.datepicker', 'free')
+
+.span-17.box
+  %h2== Manage blocks of available time
+  %h4== Add the same block of available time for a number of consecutive days
+  
+.span-17
+  -# show date fields
+  .prepend-1.span-16.dates
+    .span-16
+      %h3== Select your start and end dates (click on the fields to view a calendar):
+    .span-3
+      %span{:style => 'font-size: 13px;'}== Start Date:
+      %br
+      = text_field_tag 'start_date', '', :style => 'width: 90px; font-size: 13px;', :id => 'start_datepicker'
+      
+    .span-1
+      %span{:style => 'font-size: 25px;'}== -
+      
+    .span-12.last
+      %span{:style => 'font-size: 13px;'}== End Date:
+      %br
+      = text_field_tag 'end_date', '', :style => 'width: 90px; font-size: 13px;', :id => 'end_datepicker'
+    
+    %hr.space
+    
+    .span-16
+      %h3== And your start and end times:
+    .span-3
+      %span{:style => 'font-size: 13px;'}== Start Time:
+      %br
+      = text_field_tag 'start_at', '', :style => 'width: 90px; font-size: 13px;', :id => 'start_at'
+
+    .span-1
+      %span{:style => 'font-size: 25px;'}== -
+
+    .span-12.last
+      %span{:style => 'font-size: 13px;'}== End Time:
+      %br
+      = text_field_tag 'end_at', '', :style => 'width: 90px; font-size: 13px;', :id => 'end_at'
+      %span.example== e.g. 9 am, 10:15 am, 3:30 pm
+      
+
+    %hr.space
+    
+    %h3{:style => 'line-height: 1.5;'}== Click to add this free time to your schedule.  After its been added, users will be able to schedule appointments during these times.
+      
+  -#.inline#datepicker

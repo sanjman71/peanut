@@ -19,7 +19,7 @@ class AppointmentsController < ApplicationController
     if params[:person_id].blank?
       # redirect to a specific person
       person = @current_company.people.first
-      redirect_to url_for(params.update(:subdomain => @subdomain, :person_id => person.id)) and return
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :person_id => person.id)) and return
     end
     
     manage_appointments

@@ -12,7 +12,7 @@ module ApplicationHelper
   def stylesheet(*files)
     content_for(:stylesheet) { stylesheet_link_tag(*files) }
   end
-  
+    
   FLASH_TYPES = [:error, :warning, :success, :message]
 
   def display_flash(type = nil)
@@ -161,6 +161,13 @@ module ApplicationHelper
 
       yield link
       
+    end
+  end
+  
+  def build_admin_tab_links
+    if has_privilege?('create companies')
+      link = link_to 'Admin Console', companies_path(:subdomain => nil)
+      yield link
     end
   end
   
