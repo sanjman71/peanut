@@ -9,7 +9,7 @@ class Location < ActiveRecord::Base
   # validates_presence_of :city
   # validates_presence_of :country
 
-  has_many_polymorphs :locatables, :from => [:companies, :appointments]
+  has_many_polymorphs :locatables, :from => [:companies, :appointments], :through => :locatables_locations
 
   # Make sure only accessible attributes are written to from forms etc.
 	attr_accessible :name, :street_addr, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes

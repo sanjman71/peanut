@@ -3,12 +3,12 @@
 - javascript('ui.core', 'ui.datepicker', 'free')
 
 .span-17.box
-  %h2== Manage daily available time
-  %h4== Add available time slots by specifying the day and time range
+  %h2== Schedule available time
+  %h4== Schedule available time slots by specifying a day and time range
 
-- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
-  .span-17#dates
-    = render(:partial => 'daily', :locals => {:date_id => 'date_1'})
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+  .span-17#free_time_list
+    = render(:partial => 'daily')
 
   %hr.space
 
@@ -18,5 +18,10 @@
   %hr.space
 
   .span-16.prepend-1
-    %h2= f.submit "Add", :class => 'big button'
+    %h2#submit
+      = f.submit "Schedule Available Time", :class => 'big button'
+      %span{:style => 'font-size: 11px;'}
+        == or
+        = link_to 'Cancel', person_appointments_path(:subdomain => current_subdomain)
+    #progress.hide= image_tag 'barbershop.gif'
   
