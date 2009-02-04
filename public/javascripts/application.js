@@ -67,9 +67,10 @@ $.fn.init_new_object = function(form_id) {
 $.fn.init_add_free_time = function() {
   // validate the form by binding a callback to the submit function
   $("#add_free_time_form").validate({
-    // handle form errors by highlighting the required field 
+    // handle form errors
     showErrors: function(errorMap, errorList) {
-      $(".required").addClass('highlighted');
+      // highlight blank fields only
+      $(".required:blank").addClass('highlighted');
     },
     // don't validate until the form is submitted and we call valid
     onfocusout: false,
@@ -92,8 +93,8 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   // validate the form by binding a callback to the submit function
   $("#search_appointments_form").validate({
      showErrors: function(errorMap, errorList) {
-       // handle form errors by highlighting the required field 
-       $(".required").addClass('highlighted');
+       // highlight blank fields only
+       $(".required:blank").addClass('highlighted');
        $("#appointment_code").focus();
      },
      // don't validate until the form is submitted and we call valid
@@ -128,13 +129,16 @@ $.fn.init_schedule_search = function () {
 
 // Highlight appointments and show edit/delete options on hover
 $.fn.init_highlight_appointments = function () {
-  $(".appointment").hover(function () {
-    $("#hover_" + this.id).show();
-    $(this).addClass("highlighted");},
+  $(".appointment").hover(
+    function () {
+      $("#hover_" + this.id).show();
+      $(this).addClass("highlighted");
+    },
     function () {
       $("#hover_" + this.id).hide();
       $(this).removeClass("highlighted");
-  })
+    }
+  )
 } 
 
 // Show apointments for the selected person
@@ -148,13 +152,16 @@ $.fn.init_show_appointments = function () {
 
 // Highlights timeslots and show edit/delete options on hover
 $.fn.init_highlight_timeslots = function () {
-  $(".timeslot").hover(function () {
-    $("#hover_" + this.id).show();
-    $(this).addClass("highlighted");},
+  $(".timeslot").hover(
+    function () {
+      $("#hover_" + this.id).show();
+      $(this).addClass("highlighted");
+    },
     function () {
       $("#hover_" + this.id).hide();
       $(this).removeClass("highlighted");
-  })
+    }
+  )
 } 
 
 // Live people search

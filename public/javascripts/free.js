@@ -33,7 +33,7 @@ $.fn.init_add_free_time = function () {
       $(this).find("#progress").show();
     }
     return false;
-  })
+  });
 }
 
 $(document).ready(function() {
