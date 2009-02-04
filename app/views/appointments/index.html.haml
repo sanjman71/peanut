@@ -33,7 +33,7 @@
 - unless @current_company.people_count == 0
   .span-6.last
     .span-6.box
-      = label_tag 'add_free_time_form', "Add Free Time", :class => 'big'
+      = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
       - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
         = hidden_field_tag :when, @when
         .add_free_time
@@ -54,4 +54,7 @@
           .span-7.last
             #submit= f.submit 'Add', :name => nil, :class => 'button big'
             .hide#progress= image_tag 'barbershop.gif'
+            
+      %hr.space
+      %h4= link_to "Schedule Blocks of Available Time", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
 

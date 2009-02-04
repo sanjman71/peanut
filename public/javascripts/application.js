@@ -39,9 +39,10 @@ $.fn.init_new_membership = function () {
 $.fn.init_new_object = function(form_id) {
   // validate the form by binding a callback to the submit function
   $(form_id).validate({
-    // handle form errors by highlighting the required field 
+    // handle form errors 
     showErrors: function(errorMap, errorList) {
-      $(".required").addClass('highlighted');
+      // highlight blank fields
+      $(".required:blank").addClass('highlighted');
       $(".required").focus();
     },
     // don't validate until the form is submitted and we call valid

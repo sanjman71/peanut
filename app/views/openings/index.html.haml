@@ -23,8 +23,11 @@
       %span#search{:style => @when ? "display: inline; padding-left: 10px;" : "display: none; padding-left: 10px;"}
         = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit'
         %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-        
 
+.span-17.skills.hide
+  - @skills.each do |skill|
+    .skill{:service_id => skill[0], :person_id => skill[1], :person_name => skill[2]}
+          
 .span-6.prepend-1.last
   .sidebar.instructions.padding-5
     - if @when.blank?

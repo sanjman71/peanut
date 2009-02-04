@@ -1,33 +1,32 @@
 var skills = new Array();
 
 $.fn.init_skills = function () {
-  $.getJSON("/javascripts/skillset.js", function(json) {
-    // Initialize skills array
-    $.each(json, function (index, tuple) {
-      skills.push(tuple);
-    })
-    
-    // Initalize the rest of the page after the skills have been set
-    $(document).init_people();
-    $(document).init_search_button();
-  })
-  
+  // build skills array
+  $(".skills .skill").each(function(index, skill)
+  {
+    var service_id  = $(skill).attr("service_id");
+    var person_id   = $(skill).attr("person_id");
+    var person_name = $(skill).attr("person_name");
+
+    // create an array with the service id, person id and name
+    skills.push([service_id, person_id, person_name]);
+  });
 }
 
 $.fn.init_people = function () {
-  // Find selected service
+  // find the selected service
   var service_id = $('#service_id').val();
   
-  // Remove all people
+  // remove all people
   $('#person_id').removeOption(/./);
   
-  // Find person initially selected
+  // find the person initially selected
   var initial_person_id = $('#initial_person_id').attr("value");
   
-  // Add special anyone person
+  // add the special anyone person
   $('#person_id').addOption(0, "Anyone", 0 == initial_person_id);
   
-  // Add people providing selected service
+  // add people providing the selected service
   $.each(skills, function (index, skill) {
     if (skill[0] == service_id)
     {
@@ -37,10 +36,10 @@ $.fn.init_people = function () {
 }
 
 $.fn.init_search_button = function () {
-  // Find selected service
+  // find the selected service
   var service_id = $('#service_id').val();
   
-  // Hide search button unless a service is selected
+  // only show the search button if a service is selected (service id of 0 means no service)
   if (service_id == 0) {
     $("#search").hide();
   } else {
@@ -50,8 +49,10 @@ $.fn.init_search_button = function () {
 
 $(document).ready(function() {
   $(document).init_skills();
-  
-  // Binds service select dropdown
+  $(document).init_people();
+  $(document).init_search_button();
+    
+  // when a service is selected, rebuild the people select list and change the search button state
   $("#service_id").change(function () {
     $(document).init_people();
     $(document).init_search_button();
