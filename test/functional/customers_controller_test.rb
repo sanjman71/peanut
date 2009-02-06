@@ -4,7 +4,10 @@ require 'test/factories'
 class CustomersControllerTest < ActionController::TestCase
 
   def setup
-    stub_subdomain
+    @controller = CustomersController.new
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
   
   context "search an empty customers database with an empty search" do
@@ -30,10 +33,10 @@ class CustomersControllerTest < ActionController::TestCase
   context "search non-empty customer database" do
     setup do
       # create customer with a valid appointment
-      @customer     = Factory(:customer, :name => 'Booty Licious')
+      @customer     = Factory(:user, :name => 'Booty Licious')
       @johnny       = Factory(:person, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
-      @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :resource => @johnny, :service => @haircut)
+      @appointment  = Factory(:appointment_today, :company => @company, :owner => @customer, :resource => @johnny, :service => @haircut)
       assert_valid @appointment
     end
 
@@ -67,7 +70,7 @@ class CustomersControllerTest < ActionController::TestCase
   context "show customer" do
     setup do
       # create customer
-      @customer = Factory(:customer, :name => 'Customer')
+      @customer = Factory(:user, :name => 'Customer')
     end
 
     context "with no notes" do

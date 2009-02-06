@@ -6,10 +6,10 @@ class CustomersController < ApplicationController
     @search = params[:search]
     
     if !@search.blank?
-      @customers    = @current_company.owners.search_by_name(@search).all(:order => "name ASC")
+      @customers    = current_company.owners.search_by_name(@search).all(:order => "name ASC")
       @search_text  = "Customers matching '#{@search}'"
     else
-      @customers    = @current_company.owners.all(:order => "name ASC")
+      @customers    = current_company.owners.all(:order => "name ASC")
       @search_text  = @customers.blank? ? "No Customers" : "All Customers"
     end
     
@@ -22,7 +22,7 @@ class CustomersController < ApplicationController
   # GET /customers/1
   # GET /customers/1.xml
   def show
-    @customer = Customer.find(params[:id])
+    @customer = User.find(params[:id])
     @note     = Note.new
     
     # build notes collection, most recent first 
@@ -32,7 +32,7 @@ class CustomersController < ApplicationController
   # GET /customers/new
   # GET /customers/new.xml
   def new
-    @customer = Customer.new
+    @customer = User.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -42,13 +42,13 @@ class CustomersController < ApplicationController
 
   # GET /customers/1/edit
   def edit
-    @customer = Customer.find(params[:id])
+    @customer = User.find(params[:id])
   end
 
   # POST /customers
   # POST /customers.xml
   def create
-    @customer = Customer.new(params[:customer])
+    @customer = User.new(params[:customer])
 
     respond_to do |format|
       if @customer.save
@@ -82,7 +82,7 @@ class CustomersController < ApplicationController
   # DELETE /customers/1
   # DELETE /customers/1.xml
   def destroy
-    @customer = Customer.find(params[:id])
+    @customer = User.find(params[:id])
     @customer.destroy
 
     respond_to do |format|
