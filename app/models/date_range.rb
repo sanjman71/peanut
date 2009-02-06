@@ -40,7 +40,9 @@ class DateRange
   end
   
   # parse when string into a valid date range
-  def self.parse_when(s)
+  # options:
+  #   - start_on => day of week to start calendar on, 0-6 where 0 is sunday, defaults to start_at
+  def self.parse_when(s, options={})
     if !(Appointment::WHENS_EXTENDED + Appointment::WHENS_PAST).include?(s)
       return DateRange.new(Hash[:when => 'error'])
     end
@@ -82,10 +84,21 @@ class DateRange
       start_at  = end_at - 1.month
     end
       
+    # adjust calendar based on start_on day
+    start_on = options[:start_on] || start_at.wday
+    
+    if start_on != start_at.wday
+      # need to show x days before start_at to start on the correct day
+      subtract_days = start_at.wday > start_on ? start_at.wday - start_on : 7 - (start_on - start_at.wday)
+      start_at      -= subtract_days.days
+    end
+    
     DateRange.new(Hash[:when => s.titleize, :start_at => start_at, :end_at => end_at])
   end
   
   # parse start, end dates - e.g. "20090101", defaults to end date inclusive
+  # options:
+  #   - exclusive => true|false, if true do not include end date in range, default is inclusive or exclusive == false  #   - start_on => [0..6], day of week to start calendar on, 0 is sunday
   def self.parse_range(start_date, end_date, options={})
     # parse options
     exclusive   = options[:exclusive] == true

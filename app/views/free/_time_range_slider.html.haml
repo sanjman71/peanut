@@ -1,0 +1,18 @@
+-# arguments
+-# time_of_day, e.g. 'morning', 'afternoon'
+-# hour_start
+-# hour_end
+-# display - id of element to show display time
+
+.span-20.slider.hide{:id => time_of_day}
+  - hour_interval = 15
+  - hour_start.upto(hour_end) do |hour|
+    -# the end hour is shown with 1 increment
+    - increments = (hour == hour_end) ? 1 : 60/hour_interval
+    - 0.upto(increments - 1) do |i|
+      - minute    = i * hour_interval
+      - time_show = "#{sprintf("%d", hour == 12 ? hour : hour % 12)}:#{sprintf("%02d", minute)}"
+      - time_army = "#{sprintf("%02d", hour)}#{sprintf("%02d", minute)}"
+      - ampm      = hour < 12 ? "am" : "pm"
+      %span.time{:style => 'font-size: 10px; padding-left: 1px; padding-right: 1px;', :id => time_army, :ampm => ampm, :display => display}= time_show
+  

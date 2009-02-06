@@ -98,7 +98,8 @@ class Appointment < ActiveRecord::Base
   
   # valid time of day values
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
-
+  TIMES_EXTENDED            = ['anytime', 'early morning', 'morning', 'afternoon', 'evening', 'late night']
+  
   # convert time of day to a seconds range
   TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
                                'morning'    => [8*3600,   12*3600],     # 8am - 12pm

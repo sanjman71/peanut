@@ -1,5 +1,5 @@
 - title("Manage Schedules")
-- stylesheet('calendar/green/style.css', 'calendar')
+- stylesheet('calendar')
 - javascript('free_calendar')
 
 .span-17.box
@@ -7,16 +7,34 @@
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
   - fields_for "time_range[]", TimeRange.new do |f|
-    %h3.span-17.prepend-1.last
-      == Select the days on the calendar and then specify the time slot.
+    %h3.span-14.prepend-1.last{:style => 'line-height: 20px;'}
+      == Select the available days on the calendar. Then, specify the start and end time for the time slot.
          
+    %h3.span-14.prepend-1.last#date_count
+      == 0 dates selected
+    
     .span-14.prepend-1.last#free_calendar
       = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @events})
 
+    .span-17.prepend-1.last{:style => 'font-size: 13px;'}
+      == Start Time:
+      = select_tag('start_time_of_day', options_for_select(@tod, @tod_start), :class => 'text')
+      %span{:id => 'start_time', :style => 'font-size 13px; padding-left: 5px;'}==
+    .span-17.prepend-1.sliders#slider_start
+      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'start_time'})
+      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'start_time'})
+
     %hr.space
 
-    %h3.span-17.prepend-1.last#date_count
-      == 0 dates selected
+    .span-14.prepend-1.last{:style => 'font-size: 13px;'}
+      == End Time:
+      = select_tag('end_time_of_day', options_for_select(@tod, @tod_end), :class => 'text')
+      %span{:id => 'end_time', :style => 'font-size 13px; padding-left: 5px;'}==
+    .span-17.prepend-1.sliders#slider_end
+      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'end_time'})
+      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'end_time'})
+    
+    %hr.space
       
     #dates
       = f.text_field 'day', :id => 'template', :class => 'hide'

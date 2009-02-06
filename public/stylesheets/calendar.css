@@ -18,7 +18,13 @@ table.calendar span                               { margin: 3px 0 0; padding: 0;
 
 table.calendar td.today                           { background: #008800 none repeat scroll 0 0; color: #FFFFFF;}
 
-table.calendar td.hover                           { background: #333333 none repeat scroll 0 0; color: #FFFFFF; }
+table.calendar td.hover                           { background: #FFCC00 none repeat scroll 0 0; color: #000000; }
 
 table.calendar td.mark                            { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}
+
+/* calendar time slot slider styles */
+
+.slider .time                                     { color: #333333; }
+
+.slider .time.mark                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}
 

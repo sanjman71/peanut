@@ -13,15 +13,17 @@ class FreeController < ApplicationController
     @person     = current_company.people.find(params[:person_id]) if params[:person_id]
     @person     = Person.anyone if @person.blank?
     
-    # initialize daterange and calendar markings
-    @daterange  = DateRange.parse_when('next 4 weeks')
+    # initialize daterange and calendar markings, start calendar on sunday
+    @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0)
     @events     = {}
     
-    # xxx - adjust the daterange 
-    # xxx - we need a better way to start the calendar on a specified day of the week
-    @daterange.start_at = Date.today - 3.days
-    @daterange.days     += 3
+    # build time of day collection
+    # TODO xxx - need a better way of mapping these times to start, end hours
+    @tod        = ['morning', 'afternoon']
+    @tod_start  = 'morning'
+    @tod_end    = 'afternoon'
     
+    # select the view to show
     style       = params[:style] || 'block'
     
     respond_to do |format|
