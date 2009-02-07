@@ -19,7 +19,9 @@ class Appointment < ActiveRecord::Base
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   BUSY                    = 'busy'      # busy appointments can not be scheduled
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
-  WAIT                    = 'wait'      # wait appointments are waiting be scheduled in free timeslots
+  WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
+  
+  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and its available to marked as free
   
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
@@ -57,7 +59,7 @@ class Appointment < ActiveRecord::Base
   named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
   named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
 
-  # Orderings
+  # order by sorting
   named_scope :order_start_at, {:order => 'start_at'}
   
   
@@ -147,7 +149,7 @@ class Appointment < ActiveRecord::Base
       self.end_at = self.start_at + self.service.duration_to_seconds
     end
     
-    # initialize duration
+    # initialize duration (in minutes)
     self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     
     # initialize mark_as if its blank

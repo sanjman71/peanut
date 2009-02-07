@@ -11,11 +11,16 @@ class FreeController < ApplicationController
         
     # initialize person, default to anyone
     @person     = current_company.people.find(params[:person_id]) if params[:person_id]
-    @person     = Person.anyone if @person.blank?
+    @person     = Person.anyone if @person.blank?     
     
-    # initialize daterange and calendar markings, start calendar on sunday
+    # initialize daterange, start calendar on sunday
     @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0)
-    @events     = {}
+    
+    # find unscheduled time
+    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @person, @daterange)
+    
+    # build calendar markings
+    @calendar_markings  = build_calendar_markings(@unscheduled_appts.values.flatten)
     
     # build time of day collection
     # TODO xxx - need a better way of mapping these times to start, end hours

@@ -3,49 +3,59 @@
 - javascript('free_calendar')
 
 .span-17.box
-  %h2== Schedule the same available time slot across multiple days
+  %h2== Schedule blocks of available time slot across multiple days
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
-  - fields_for "time_range[]", TimeRange.new do |f|
-    %h3.span-14.prepend-1.last{:style => 'line-height: 20px;'}
-      == Select the available days on the calendar. Then, specify the start and end time for the time slot.
-         
-    %h3.span-14.prepend-1.last#date_count
-      == 0 dates selected
-    
-    .span-14.prepend-1.last#free_calendar
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @events})
-
-    .span-17.prepend-1.last{:style => 'font-size: 13px;'}
-      == Start Time:
-      = select_tag('start_time_of_day', options_for_select(@tod, @tod_start), :class => 'text')
+  %h3.span-14.prepend-1.last{:style => 'line-height: 25px;'}
+    == Select 1 or more days on the calendar, and specify the start and end time.  Then click the 'Schedule' button to schedule the available time.
+       
+  %em.span-14.prepend-1.last#date_count
+    == No dates selected
+  
+  %hr.space
+  
+  .span-21.prepend-1.last
+    .span-14#free_calendar
+      = render(:partial => 'shared/calendar', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+    .span-6.prepend-1.last#unscheduled_list
+      = render(:partial => 'free/unscheduled', :locals => {:unscheduled_appts => @unscheduled_appts})
+        
+  .span-14.prepend-1.last{:style => 'font-size: 13px; margin-bottom: 7px;'}
+    .span-2
+      %span== Start Time:
+    .span-12.last
+      = select_tag('start_time_of_day', options_for_select(@tod, @tod_start), :class => 'text', :style => 'margin: 0px;')
       %span{:id => 'start_time', :style => 'font-size 13px; padding-left: 5px;'}==
-    .span-17.prepend-1.sliders#slider_start
-      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'start_time'})
-      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'start_time'})
+  .span-14.prepend-1.sliders#slider_start
+    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'start_time'})
+    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'start_time'})
 
-    %hr.space
+  %hr.space
 
-    .span-14.prepend-1.last{:style => 'font-size: 13px;'}
+  .span-14.prepend-1.last{:style => 'font-size: 13px; margin-bottom: 7px;'}
+    .span-2
       == End Time:
-      = select_tag('end_time_of_day', options_for_select(@tod, @tod_end), :class => 'text')
+    .span-12.last
+      = select_tag('end_time_of_day', options_for_select(@tod, @tod_end), :class => 'text', :style => 'margin: 0px;')
       %span{:id => 'end_time', :style => 'font-size 13px; padding-left: 5px;'}==
-    .span-17.prepend-1.sliders#slider_end
-      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'end_time'})
-      = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'end_time'})
+  .span-14.prepend-1.sliders#slider_end
+    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'end_time'})
+    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'end_time'})
+  
+  %hr.space
     
-    %hr.space
-      
-    #dates
-      = f.text_field 'day', :id => 'template', :class => 'hide'
+  #dates
+    = text_field_tag 'days[]', 'day', :id => 'template', :class => 'hide'
+    = text_field 'start_at', '', :name => 'start_at', :id => 'start_at', :class => 'hide'
+    = text_field 'end_at', '', :name => 'end_at', :id => 'end_at', :class => 'hide'
 
-    %hr.space
-    %hr.space
-    
-    .span-16.prepend-1
-      %h2#submit
-        = f.submit "Schedule Available Time", :class => 'big button'
-        %span{:style => 'font-size: 11px;'}
-          == or
-          = link_to 'Cancel', person_appointments_path(:subdomain => current_subdomain)
+  %hr.space
+  %hr.space
+  
+  .span-16.prepend-1
+    %h2#submit
+      = f.submit "Schedule Available Time", :class => 'big button'
+      %span{:style => 'font-size: 11px;'}
+        == or
+        = link_to 'Cancel', person_appointments_path(:subdomain => current_subdomain)
   

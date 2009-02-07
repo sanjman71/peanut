@@ -62,10 +62,7 @@ class OpeningsController < ApplicationController
     logger.debug("*** found #{@free_appointments.size} free appointments, #{@free_timeslots.size} free timeslots over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings = @free_timeslots.inject(Hash.new) do |hash, timeslot|
-      hash[timeslot.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = 'free'
-      hash
-    end
+    @calendar_markings  = build_calendar_markings(@free_timeslots)
 
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)

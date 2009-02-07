@@ -54,8 +54,9 @@
           .span-7.last
             #submit= f.submit 'Add', :name => nil, :class => 'button big'
             .hide#progress= image_tag 'barbershop.gif'
-            
-      %hr.space
-      %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
-      %h4= link_to "Schedule the same time slot across multiple days", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain)
+         
+      %hr.space   
+      %h4== or
+      %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain)
+      %h4= link_to "Schedule blocks of available time (version 2)", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
 

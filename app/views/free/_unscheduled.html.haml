@@ -1,0 +1,15 @@
+- unscheduled_appts.keys.sort.each do |key|
+  .unscheduled.hide{:id => "unscheduled_#{key}", :style => 'color: #666666;'}
+    %h4#date{:style => 'margin-bottom: 3px;'}
+      - date = unscheduled_appts[key].first.start_at
+      = date.to_s(:appt_short_month_day_year)
+    #times
+      - if unscheduled_appts[key].size == 1
+        == Nothing scheduled
+      - else
+        - unscheduled_appts[key].each do |time_range|
+          == Unscheduled: &nbsp; 
+          = time_range.start_at.to_s(:appt_time)
+          == -
+          = time_range.end_at.to_s(:appt_time)
+          %br

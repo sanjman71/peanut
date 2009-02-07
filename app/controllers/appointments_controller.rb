@@ -95,10 +95,7 @@ class AppointmentsController < ApplicationController
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
-      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = appointment.mark_as
-      hash
-    end
+    @calendar_markings = build_calendar_markings(@appointments)
 
     logger.debug("*** calendar markings: #{@calendar_markings}")
     
