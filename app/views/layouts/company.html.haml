@@ -6,15 +6,11 @@
       = "#{current_company.name} -"
       = yield :title
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
-    = stylesheet_link_tag 'blueprint/screen'
-    = stylesheet_link_tag 'peanut'
-    = stylesheet_link_tag 'errors'
-    = stylesheet_link_tag 'green'
+    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'green'
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
     = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'application'
     = yield :javascript
-    = yield :footerjs
     
   %body
     #header
