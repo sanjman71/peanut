@@ -13,6 +13,9 @@ class FreeController < ApplicationController
     @person     = current_company.people.find(params[:person_id]) if params[:person_id]
     @person     = Person.anyone if @person.blank?     
     
+    # build list of people to allow the scheduled to be adjusted by person
+    @people     = current_company.people.all
+    
     # initialize daterange, start calendar on sunday
     @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0)
     

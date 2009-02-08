@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
-  // set hover states to show selected date
-  $(".weekday,.weekend").hover(
+  // set hover states to show selected date, ignore past dates
+  $(".weekday:not(.past),.weekend:not(.past)").hover(
     function() {
       // highlight date
       $(this).addClass('hover');
@@ -16,6 +16,43 @@ $(document).ready(function() {
       $("#unscheduled_" + id).addClass('hide');
     }
   );
+
+  // toggle dates as they are selected, ignore past dates
+  $(".weekday:not(.past),.weekend:not(.past)").click(function () {
+    $(this).toggleClass('mark');
+    
+    if ($(this).hasClass('mark')) 
+    {
+      // clone template input field
+      var $new_date = $("input#template").clone();
+      
+      // set value, id attributes
+      $new_date.attr("value", $(this).attr("id"));
+      $new_date.attr("id", $(this).attr("id"));
+      
+      // add date class
+      $new_date.addClass('date');
+      
+      // append date object input field to free time list
+      $("#dates").append($new_date);
+    }
+    else 
+    {
+      // remove date object input field
+      remove_id = "input#" + $(this).attr("id")
+      $("#dates").find(remove_id).remove();
+    }
+
+    // update dates selected count
+    var date_count  = $(".date").length;
+    var date_text   = date_count + " dates selected";
+    
+    if (date_count == 0) { date_text = "No dates selected" }
+    if (date_count == 1) { date_text = "1 date selected" }
+    
+    $("#date_count").text(date_text);
+  });
+  
 
   // set default slider values
   $("#slider_start").find("#morning").removeClass('hide');
@@ -61,42 +98,6 @@ $(document).ready(function() {
     $("#slider_end").find("#" + time_of_day).removeClass('hide')
     return false;
   })
-  
-  // toggle dates as they are selected
-  $(".weekday,.weekend").click(function () {
-    $(this).toggleClass('mark');
-    
-    if ($(this).hasClass('mark')) 
-    {
-      // clone template input field
-      var $new_date = $("input#template").clone();
-      
-      // set value, id attributes
-      $new_date.attr("value", $(this).attr("id"));
-      $new_date.attr("id", $(this).attr("id"));
-      
-      // add date class
-      $new_date.addClass('date');
-      
-      // append date object input field to free time list
-      $("#dates").append($new_date);
-    }
-    else 
-    {
-      // remove date object input field
-      remove_id = "input#" + $(this).attr("id")
-      $("#dates").find(remove_id).remove();
-    }
-
-    // update dates selected count
-    var date_count  = $(".date").length;
-    var date_text   = date_count + " dates selected";
-    
-    if (date_count == 0) { date_text = "No dates selected" }
-    if (date_count == 1) { date_text = "1 date selected" }
-    
-    $("#date_count").text(date_text);
-  });
   
   $("#add_free_time_form").submit(function () {
     // check for at least 1 date, and start and end times
