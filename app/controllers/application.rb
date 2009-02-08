@@ -60,7 +60,7 @@ class ApplicationController < ActionController::Base
   end
   
   def current_privileges
-    @current_privileges
+    @current_privileges ||= []
   end
   
   private
@@ -84,8 +84,8 @@ class ApplicationController < ActionController::Base
       # initialize application time zone
       Time.zone   = @current_company.time_zone
       
-      # initialize all company locations
-      @current_locations = @current_company.locations
+      # initialize all company locations, check locations_count before querying the database
+      @current_locations = @current_company.locations_count ? @current_company.locations : []
 
       if session[:location_id].blank? and !@current_locations.empty?
         # initialize session location id to company's first location

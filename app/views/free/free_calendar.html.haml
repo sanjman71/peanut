@@ -1,0 +1,33 @@
+- title("Manage Schedules")
+- stylesheet('calendar/green/style.css', 'calendar')
+- javascript('free_calendar')
+
+.span-17.box
+  %h2== Schedule the same available time slot across multiple days
+
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+  - fields_for "time_range[]", TimeRange.new do |f|
+    %h3.span-17.prepend-1.last
+      == Select the days on the calendar and then specify the time slot.
+         
+    .span-14.prepend-1.last#free_calendar
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @events})
+
+    %hr.space
+
+    %h3.span-17.prepend-1.last#date_count
+      == 0 dates selected
+      
+    #dates
+      = f.text_field 'day', :id => 'template', :class => 'hide'
+
+    %hr.space
+    %hr.space
+    
+    .span-16.prepend-1
+      %h2#submit
+        = f.submit "Schedule Available Time", :class => 'big button'
+        %span{:style => 'font-size: 11px;'}
+          == or
+          = link_to 'Cancel', person_appointments_path(:subdomain => current_subdomain)
+  

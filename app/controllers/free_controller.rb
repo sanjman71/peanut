@@ -10,10 +10,19 @@ class FreeController < ApplicationController
     end
         
     # initialize person, default to anyone
-    @person   = current_company.people.find(params[:person_id]) if params[:person_id]
-    @person   = Person.anyone if @person.blank?
+    @person     = current_company.people.find(params[:person_id]) if params[:person_id]
+    @person     = Person.anyone if @person.blank?
     
-    style     = params[:style] || 'block'
+    # initialize daterange and calendar markings
+    @daterange  = DateRange.parse_when('next 4 weeks')
+    @events     = {}
+    
+    # xxx - adjust the daterange 
+    # xxx - we need a better way to start the calendar on a specified day of the week
+    @daterange.start_at = Date.today - 3.days
+    @daterange.days     += 3
+    
+    style       = params[:style] || 'block'
     
     respond_to do |format|
       format.html { render(:action => "free_#{style}")}

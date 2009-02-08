@@ -63,6 +63,10 @@ class DateRange
       # use [today, today + 2 weeks]
       start_at  = Time.now.beginning_of_day
       end_at    = start_at + 2.weeks
+    elsif s == 'next 4 weeks'
+      # use [today, today + 4 weeks]
+      start_at  = Time.now.beginning_of_day
+      end_at    = start_at + 4.weeks
     elsif s == 'later'
       # should start after 'next week', and last for 2 weeks
       start_at  = Time.now.next_week + 1.week
