@@ -1,6 +1,6 @@
 $(document).ready(function() {
   $(document).init_add_free_time(); // don't need to rebind after an ajax call
-  $(document).init_show_appointments();
+  $(document).init_select_person_for_appointment_calendar();
   $(document).init_highlight_appointments();
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
   $('#appointment_code').focus();
@@ -9,6 +9,6 @@ $(document).ready(function() {
 
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
-  $(document).init_show_appointments();
+  $(document).init_select_person_for_appointment_calendar();
   $(document).init_highlight_appointments();
 })
