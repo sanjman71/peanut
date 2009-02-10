@@ -3,12 +3,13 @@ require 'test/factories'
 
 class ProductTest < ActiveSupport::TestCase
 
-  # shoulda
   should_require_attributes :company_id
   should_require_attributes :name
   should_require_attributes :inventory
   should_require_attributes :price_in_cents
-
+  
+  should_belong_to          :company
+  
   def test_should_change_inventory
     company = Factory(:company)
     product = Factory(:product, :inventory => 5, :company => company)

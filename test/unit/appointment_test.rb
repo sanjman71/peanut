@@ -3,7 +3,6 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  # shoulda
   should_require_attributes :company_id
   should_require_attributes :service_id
   should_require_attributes :resource_id
@@ -11,7 +10,13 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
-    
+
+  should_belong_to          :company
+  should_belong_to          :service
+  should_belong_to          :resource
+  should_belong_to          :owner
+  should_have_one           :invoice
+  
   context "free appointment" do
     setup do
       @company        = Factory(:company)
@@ -131,6 +136,37 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal [], Appointment.time_overlap(Appointment.time_range("morning"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("evening"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
+    end
+  end
+  
+  context "create appointment with time range attributes and am/pm times" do
+    setup do
+      @today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @appt  = Appointment.new(:time_range => {:day => @today, :start_at => "1 pm", :end_at => "3 pm"})
+    end
+    
+    should "have start time today at 1 pm" do
+      assert_equal Chronic.parse("today 1 pm"), @appt.start_at
+    end
+    
+    should "have end time today at 3 pm" do
+      assert_equal Chronic.parse("today 3 pm"), @appt.end_at
+    end
+  end
+  
+  context "create appointment with time range object and numeric times" do
+    setup do
+      @today      = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @appt       = Appointment.new(:time_range => @time_range)
+    end
+
+    should "have start time today at 10 am" do
+      assert_equal Chronic.parse("today 10 am"), @appt.start_at
+    end
+    
+    should "have end time today at noon" do
+      assert_equal Chronic.parse("today 12 pm"), @appt.end_at
     end
   end
   
@@ -383,12 +419,6 @@ class AppointmentTest < ActiveSupport::TestCase
   #   assert_equal "Time is invalid", appt.errors[:base]
   # end
   # 
-  # def test_should_validate_time_range_attribute
-  #   today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
-  #   appt  = Appointment.new(:time_range => {:day => today, :start_at => "1 pm", :end_at => "3 pm"})
-  #   assert_equal Chronic.parse("today 1 pm"), appt.start_at
-  #   assert_equal Chronic.parse("today 3 pm"), appt.end_at
-  # end
   # 
   # def test_should_build_appointment_with_location
   #   company   = Factory(:company)
