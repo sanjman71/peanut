@@ -12,7 +12,7 @@
       %br
       == Use the time range sliders to select the available time range.
       %br
-      == Click the 'Schedule' button to add the available time to your calendar.
+      == Click the 'Schedule' button to add the selected available time to your calendar.
   .span-7.prepend-1.last
     .sidebar.instructions.padding-5
       == What is available time?
@@ -21,10 +21,14 @@
       == Why does everyone start with no available time?
       %ul{:style => 'font-size: 11px;'}
         %li== Its the default, since the system has no way of knowing when a person is available to work.
-        
+
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :person_id => @person.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
        
-  %em.span-14.prepend-1.last#date_count
+  .span-14.prepend-1.append-9.last
+    = display_flash(:notice)
+    = display_flash(:error)
+
+  %em.span-14.prepend-1.append-9.last#date_count
     == No dates selected
   
   %hr.space
