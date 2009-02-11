@@ -5,6 +5,9 @@ $(document).ready(function() {
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
   $('#appointment_code').focus();
   $('#appointment_time_range_start_at').focus();
+
+  // rounded corners
+  $('.rounded').corners();
 })
 
 // Re-bind after an ajax call

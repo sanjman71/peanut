@@ -16,6 +16,16 @@ a img                                             { border: 0 none; vertical-ali
 
 a img:hover                                       { background-color: green; }
 
+/* rounded corner support */
+
+a.rounded, .rounded.button                        { outline: none; border: none; text-decoration: none; cursor: pointer; white-space: nowrap; 
+                                                    vertical-align: middle; /* or top */
+                                                    display: -moz-inline-box; display: inline-block; 
+                                                    overflow: visible; /* IE6 form button fix */ }
+
+.rounded.button                                   { color: #FFFFFF; background-color: #0000BB; padding: 5px 5px; }
+.rounded.button:hover                             { background-color: #000000; }
+
 /* error styles */
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
