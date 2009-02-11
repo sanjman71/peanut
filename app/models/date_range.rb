@@ -83,34 +83,35 @@ class DateRange
       end_at    = Time.now.end_of_day + 1.second
       start_at  = end_at - 1.month
     end
-      
+
     # adjust calendar based on start_on day
-    start_on = options[:start_on] || start_at.wday
-    
-    if start_on != start_at.wday
-      # need to show x days before start_at to start on the correct day
-      subtract_days = start_at.wday > start_on ? start_at.wday - start_on : 7 - (start_on - start_at.wday)
-      start_at      -= subtract_days.days
-    end
-    
+    start_at = adjust_start_day_to_start_on(start_at, options)
+      
     DateRange.new(Hash[:when => s.titleize, :start_at => start_at, :end_at => end_at])
   end
   
   # parse start, end dates - e.g. "20090101", defaults to end date inclusive
   # options:
   #   - exclusive => true|false, if true do not include end date in range, default is inclusive or exclusive == false  #   - start_on => [0..6], day of week to start calendar on, 0 is sunday
+  #   - start_on => day of week to start calendar on, 0-6 where 0 is sunday, defaults to start_at
   def self.parse_range(start_date, end_date, options={})
     # parse options
     exclusive   = options[:exclusive] == true
     
     # build name from start, end dates
     range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
+    start_at    = Time.parse(start_date)
     
     if exclusive
-      DateRange.new(Hash[:when => range_name, :start_at => Time.parse(start_date), :end_at => Time.parse(end_date)])
+      end_at = Time.parse(end_date)
     else
-      DateRange.new(Hash[:when => range_name, :start_at => Time.parse(start_date), :end_at => Time.parse(end_date) + 1.day])
+      end_at = Time.parse(end_date) + 1.day
     end
+
+    # adjust calendar based on start_on day
+    start_at = adjust_start_day_to_start_on(start_at, options)
+
+    DateRange.new(Hash[:when => range_name, :start_at => start_at, :end_at => end_at])
   end
   
   def each
@@ -119,4 +120,18 @@ class DateRange
     end
   end
   
+  protected
+  
+  # adjust start_at based on start_on day
+  def self.adjust_start_day_to_start_on(start_at, options)
+    start_on = options[:start_on] || start_at.wday
+    
+    if start_on != start_at.wday
+      # need to show x days before start_at to start on the correct day
+      subtract_days = start_at.wday > start_on ? start_at.wday - start_on : 7 - (start_on - start_at.wday)
+      start_at      -= subtract_days.days
+    end
+    
+    start_at
+  end
 end

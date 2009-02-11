@@ -20,7 +20,7 @@ class Appointment < ActiveRecord::Base
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
   WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
   
-  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and its available to marked as free
+  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
   
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
