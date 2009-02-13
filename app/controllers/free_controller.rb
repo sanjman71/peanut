@@ -16,8 +16,8 @@ class FreeController < ApplicationController
     # build list of people to allow the scheduled to be adjusted by person
     @people     = current_company.people.all
     
-    # initialize daterange, start calendar on sunday
-    @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0)
+    # initialize daterange, start calendar on sunday, end calendar on sunday
+    @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
     
     # find unscheduled time
     @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @person, @daterange)

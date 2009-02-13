@@ -9,7 +9,7 @@ class DateRange
   include Enumerable
   
   def initialize(options={})
-    @name         = options[:when]
+    @name = options[:name]
     
     if @name == 'error'
       # create error object
@@ -21,10 +21,19 @@ class DateRange
     
     @start_at     = options[:start_at] if options[:start_at]
     @end_at       = options[:end_at] if options[:end_at]
-    @days         = (@end_at - @start_at).to_i / (60 * 60 * 24)
+    
+    if @start_at and @end_at
+      # if end_at ends at 59 minutes and 59 seconds, add 1 second to make sure the days calculation is correct
+      seconds   = (@end_at - @start_at).to_i
+      seconds   += 1 if @end_at.min == 59 and @end_at.sec == 59
+      # convert seconds to days
+      @days     = seconds / (60 * 60 * 24)
+    else
+      @days     = 0
+    end
     
     # initialize enumerable param
-    @index        = 0
+    @index = 0
   end
   
   def valid?
@@ -35,91 +44,94 @@ class DateRange
     @errors ||= ActiveRecord::Errors.new(self)
   end
   
+  def each
+    # range is inclusive
+    Range.new(0, @days-1).each do |i|
+      yield @start_at + i.days
+    end
+  end
+  
   def self.today
     Time.today.utc
   end
   
   # parse when string into a valid date range
   # options:
-  #   - start_on => day of week to start calendar on, 0-6 where 0 is sunday, defaults to start_at
+  #   - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
+  #   - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
   def self.parse_when(s, options={})
-    if !(Appointment::WHENS_EXTENDED + Appointment::WHENS_PAST).include?(s)
-      return DateRange.new(Hash[:when => 'error'])
+    if (m = s.match(/next (\d{1}) weeks/)) # e.g. 'next 3 weeks'
+      # use [today, today + n weeks]
+      n         = m[1].to_i
+      start_at  = Time.now.beginning_of_day
+      end_at    = start_at + n.weeks
+    else
+      case s
+      when 'today'
+        start_at  = Time.now.beginning_of_day
+        end_at    = start_at + 1.day
+      when 'tomorrow'
+        start_at  = Time.now.tomorrow.beginning_of_day
+        end_at    = start_at + 1.day
+      when 'this week'
+        # this week ends on sunday night midnight
+        end_at    = Time.now.end_of_week + 1.second
+        start_at  = Time.now.beginning_of_day
+      when 'next week'
+        # next week starts on monday
+        start_at  = Time.now.next_week
+        end_at    = start_at + 1.week
+      when 'later'
+        # should start after 'next week', and last for 2 weeks
+        start_at  = Time.now.next_week + 1.week
+        end_at    = start_at + 2.weeks
+      when 'past week'
+        end_at    = Time.now.end_of_day + 1.second
+        start_at  = end_at - 1.week
+      when 'past 2 weeks'
+        end_at    = Time.now.end_of_day + 1.second
+        start_at  = end_at - 2.weeks
+      when 'past month'
+        end_at    = Time.now.end_of_day + 1.second
+        start_at  = end_at - 1.month
+      else
+        return DateRange.new(Hash[:name => 'error'])
+      end
     end
     
-    if s == 'today'
-      start_at  = Time.now.beginning_of_day
-      end_at    = start_at + 1.day
-    elsif s == 'tomorrow'
-      start_at  = Time.now.tomorrow.beginning_of_day
-      end_at    = start_at + 1.day
-    elsif s == 'this week'
-      # this week ends on sunday night midnight
-      end_at    = Time.now.end_of_week + 1.second
-      start_at  = Time.now.beginning_of_day
-    elsif s == 'next week'
-      # next week starts on monday
-      start_at  = Time.now.next_week
-      end_at    = start_at + 1.week
-    elsif s == 'next 2 weeks'
-      # use [today, today + 2 weeks]
-      start_at  = Time.now.beginning_of_day
-      end_at    = start_at + 2.weeks
-    elsif s == 'next 4 weeks'
-      # use [today, today + 4 weeks]
-      start_at  = Time.now.beginning_of_day
-      end_at    = start_at + 4.weeks
-    elsif s == 'later'
-      # should start after 'next week', and last for 2 weeks
-      start_at  = Time.now.next_week + 1.week
-      end_at    = start_at + 2.weeks
-    elsif s == 'past week'
-      end_at    = Time.now.end_of_day + 1.second
-      start_at  = end_at - 1.week
-    elsif s == 'past 2 weeks'
-      end_at    = Time.now.end_of_day + 1.second
-      start_at  = end_at - 2.weeks
-    elsif s == 'past month'
-      end_at    = Time.now.end_of_day + 1.second
-      start_at  = end_at - 1.month
-    end
-
-    # adjust calendar based on start_on day
-    start_at = adjust_start_day_to_start_on(start_at, options)
+    # adjust calendar based on start_on and end_on days
+    start_at  = adjust_start_day_to_start_on(start_at, options)
+    end_at    = adjust_end_day_to_end_on(end_at, options)
       
-    DateRange.new(Hash[:when => s.titleize, :start_at => start_at, :end_at => end_at])
+    DateRange.new(Hash[:name => s.titleize, :start_at => start_at, :end_at => end_at])
   end
   
   # parse start, end dates - e.g. "20090101", defaults to end date inclusive
   # options:
-  #   - exclusive => true|false, if true do not include end date in range, default is inclusive or exclusive == false  #   - start_on => [0..6], day of week to start calendar on, 0 is sunday
-  #   - start_on => day of week to start calendar on, 0-6 where 0 is sunday, defaults to start_at
+  #   - inclusive => true|false, if true not include end date in range, default is true
+  #   - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at.wday
+  #   - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at.wday
   def self.parse_range(start_date, end_date, options={})
     # parse options
-    exclusive   = options[:exclusive] == true
+    inclusive   = options.has_key?(:inclusive) ? options[:inclusive] : true
     
     # build name from start, end dates
     range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
-    start_at    = Time.parse(start_date)
+    start_at    = Time.parse(start_date).utc.beginning_of_day
+    end_at      = Time.parse(end_date).beginning_of_day
     
-    if exclusive
-      end_at = Time.parse(end_date)
-    else
-      end_at = Time.parse(end_date) + 1.day
+    if inclusive
+      # include the last day by adjusting to the end of the day
+      end_at = end_at.end_of_day
     end
 
-    # adjust calendar based on start_on day
-    start_at = adjust_start_day_to_start_on(start_at, options)
-
-    DateRange.new(Hash[:when => range_name, :start_at => start_at, :end_at => end_at])
+    # adjust calendar based on start_on, end_on day
+    start_at  = adjust_start_day_to_start_on(start_at, options)
+    end_at    = adjust_end_day_to_end_on(end_at, options)
+    
+    DateRange.new(Hash[:name => range_name, :start_at => start_at, :end_at => end_at])
   end
-  
-  def each
-    Range.new(0, @days-1).each do |i|
-      yield @start_at + i.days
-    end
-  end
-  
+    
   protected
   
   # adjust start_at based on start_on day
@@ -133,5 +145,19 @@ class DateRange
     end
     
     start_at
+  end
+  
+  # adjust end_at based on end_on day
+  def self.adjust_end_day_to_end_on(end_at, options)
+    # if end_on was specified, adjust it 1 day because we really want the beginning of the next day
+    end_on = options[:end_on] ? options[:end_on] : end_at.wday
+    
+    if end_on != end_at.wday
+      # add x days if the end on day is greater than the current day of the week
+      add_days    = end_on > end_at.wday ? end_on - end_at.wday + 1 : 7 - (end_at.wday - end_on)
+      end_at     += add_days.days
+    end
+    
+    end_at
   end
 end

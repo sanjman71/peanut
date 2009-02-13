@@ -23,7 +23,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @johnny         = Factory(:person, :name => "Johnny", :companies => [@company])
       @time_start_at  = Time.now.beginning_of_day
       @time_end_at    = @time_start_at + 1.hour
-      @daterange      = DateRange.new(:start_at => @time_start_at.beginning_of_day, :end_at => @time_start_at.beginning_of_day + 1.day)
+      @daterange      = DateRange.parse_range(@time_start_at.to_s(:appt_schedule_day), @time_start_at.to_s(:appt_schedule_day))
       @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @time_start_at, @time_end_at)
       
       # build mapping of unscheduled time
