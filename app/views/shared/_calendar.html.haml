@@ -18,8 +18,8 @@
         %tr
           - week.compact.each do |day_i|
             -# compute the day we're on
-            - day   = start_day + day_i.days
-            -# check for markings on this day
+            - day     = start_day + day_i.days
+            -# check for markings (used as css tags) on this day
             - key     = day.to_s(:appt_schedule_day)
             - klasses = Array(markings[key])
             -# add weekday or weekend class

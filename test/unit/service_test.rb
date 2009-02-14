@@ -7,6 +7,11 @@ class ServiceTest < ActiveSupport::TestCase
   should_require_attributes :price_in_cents
   should_allow_values_for   :mark_as, "free", "busy", "work"
   
+  should_belong_to          :company
+  should_have_many          :appointments
+  should_have_many          :memberships
+  should_have_many          :people
+  
   context "create service" do
     setup do
       @company = Factory(:company)

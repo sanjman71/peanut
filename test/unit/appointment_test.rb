@@ -3,7 +3,6 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  # shoulda
   should_require_attributes :company_id
   should_require_attributes :service_id
   should_require_attributes :resource_id
@@ -11,23 +10,41 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
-    
-  context "create free appointment" do
+
+  should_belong_to          :company
+  should_belong_to          :service
+  should_belong_to          :resource
+  should_belong_to          :owner
+  should_have_one           :invoice
+  
+  context "free appointment" do
     setup do
-      @company  = Factory(:company)
-      @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
-      start_at  = Time.now.beginning_of_day
-      end_at    = start_at + 1.hour
-      @appt     = AppointmentScheduler.create_free_appointment(@company, @johnny, start_at, end_at)
-      assert_valid @appt
+      @company        = Factory(:company)
+      @johnny         = Factory(:person, :name => "Johnny", :companies => [@company])
+      @time_start_at  = Time.now.beginning_of_day
+      @time_end_at    = @time_start_at + 1.hour
+      @daterange      = DateRange.new(:start_at => @time_start_at.beginning_of_day, :end_at => @time_start_at.beginning_of_day + 1.day)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @time_start_at, @time_end_at)
+      
+      # build mapping of unscheduled time
+      @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @johnny, @daterange)
     end
       
+    should_change "Appointment.count", :by => 1
+    
     should "should not have an owner" do
       assert_equal nil, @appt.owner
     end
+    
+    should "have 1 unscheduled slot today for 23 hours starting at 1 am" do
+      assert_equal [@time_start_at.to_s(:appt_schedule_day)], @unscheduled.keys
+      assert_equal 1, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].size
+      assert_equal 23*60, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].first.duration
+      assert_equal 1, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].first.start_at.hour
+    end
   end
   
-  context "create work appointment" do
+  context "work appointment" do
     setup do
       @company  = Factory(:company)
       @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
@@ -39,13 +56,15 @@ class AppointmentTest < ActiveSupport::TestCase
                                      :resource => @johnny,
                                      :start_at_string => "today 2 pm")
     end
+
+    should_not_change "Appointment.count"
     
     should "require owner" do
       assert_match /blank/, @appt.errors[:owner_id]
     end
   end
   
-  context "create appointment by building owner association" do
+  context "appointment by building owner association" do
     setup do
       @company  = Factory(:company)
       @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
@@ -60,13 +79,11 @@ class AppointmentTest < ActiveSupport::TestCase
                                      :start_at_string => "today 2 pm")
     end
     
-    should "be a valid appointment" do
-      assert_valid @appt
-    end
-    
+    # should create appointment and user
+    should_change "Appointment.count", :by => 1    
     should_change "User.count", :by => 1
     
-    should "create an owner" do
+    should "have an owner" do
       assert_valid @appt.owner
     end
   end
@@ -87,7 +104,7 @@ class AppointmentTest < ActiveSupport::TestCase
   #     assert appt.valid?
   #   end
   
-  context "create afternoon appointment" do
+  context "afternoon appointment" do
     setup do
       @company  = Factory(:company)
       @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
@@ -119,6 +136,37 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal [], Appointment.time_overlap(Appointment.time_range("morning"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("evening"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
+    end
+  end
+  
+  context "create appointment with time range attributes and am/pm times" do
+    setup do
+      @today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @appt  = Appointment.new(:time_range => {:day => @today, :start_at => "1 pm", :end_at => "3 pm"})
+    end
+    
+    should "have start time today at 1 pm" do
+      assert_equal Chronic.parse("today 1 pm"), @appt.start_at
+    end
+    
+    should "have end time today at 3 pm" do
+      assert_equal Chronic.parse("today 3 pm"), @appt.end_at
+    end
+  end
+  
+  context "create appointment with time range object and numeric times" do
+    setup do
+      @today      = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @appt       = Appointment.new(:time_range => @time_range)
+    end
+
+    should "have start time today at 10 am" do
+      assert_equal Chronic.parse("today 10 am"), @appt.start_at
+    end
+    
+    should "have end time today at noon" do
+      assert_equal Chronic.parse("today 12 pm"), @appt.end_at
     end
   end
   
@@ -371,12 +419,6 @@ class AppointmentTest < ActiveSupport::TestCase
   #   assert_equal "Time is invalid", appt.errors[:base]
   # end
   # 
-  # def test_should_validate_time_range_attribute
-  #   today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
-  #   appt  = Appointment.new(:time_range => {:day => today, :start_at => "1 pm", :end_at => "3 pm"})
-  #   assert_equal Chronic.parse("today 1 pm"), appt.start_at
-  #   assert_equal Chronic.parse("today 3 pm"), appt.end_at
-  # end
   # 
   # def test_should_build_appointment_with_location
   #   company   = Factory(:company)

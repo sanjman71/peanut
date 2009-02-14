@@ -141,10 +141,19 @@ $.fn.init_highlight_appointments = function () {
   )
 } 
 
-// Show apointments for the selected person
-$.fn.init_show_appointments = function () {
+// Show appointment schedule for the selected person
+$.fn.init_select_person_for_appointment_calendar = function () {
   $("#person_id").change(function () {
     var href = '/people/' + this.value + '/appointments';
+    window.location = href;
+    return false;
+  })
+}
+
+// Show free/available calendar for the selected person
+$.fn.init_select_person_for_free_calendar = function () {
+  $("#person_id").change(function () {
+    var href = '/people/' + this.value + '/free/calendar';
     window.location = href;
     return false;
   })

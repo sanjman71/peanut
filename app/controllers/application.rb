@@ -63,6 +63,24 @@ class ApplicationController < ActionController::Base
     @current_privileges ||= []
   end
   
+  # build hash mapping days to appointment attributes that are used as css tags in calendar views
+  def build_calendar_markings(appointments)
+    appointments.inject(Hash.new) do |hash, appointment|
+      key = appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)
+      hash[key] ||= []
+      hash[key].push(appointment.mark_as).uniq!
+      
+      if appointment.mark_as == Appointment::NONE
+        # if the unscheduled time is not the entire day, it means there is at least one free/work appointment
+        if appointment.duration != 24 * 60
+          hash[key].push(Appointment::BUSY).uniq!
+        end
+      end
+      
+      hash
+    end
+  end
+  
   private
   
   # Initialize the current company and all related parameters (e.g. locations, time zone, ...)

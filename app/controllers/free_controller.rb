@@ -11,17 +11,27 @@ class FreeController < ApplicationController
         
     # initialize person, default to anyone
     @person     = current_company.people.find(params[:person_id]) if params[:person_id]
-    @person     = Person.anyone if @person.blank?
+    @person     = Person.anyone if @person.blank?     
     
-    # initialize daterange and calendar markings
-    @daterange  = DateRange.parse_when('next 4 weeks')
-    @events     = {}
+    # build list of people to allow the scheduled to be adjusted by person
+    @people     = current_company.people.all
     
-    # xxx - adjust the daterange 
-    # xxx - we need a better way to start the calendar on a specified day of the week
-    @daterange.start_at = Date.today - 3.days
-    @daterange.days     += 3
+    # initialize daterange, start calendar on sunday
+    @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0)
     
+    # find unscheduled time
+    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @person, @daterange)
+    
+    # build calendar markings
+    @calendar_markings  = build_calendar_markings(@unscheduled_appts.values.flatten)
+    
+    # build time of day collection
+    # TODO xxx - need a better way of mapping these times to start, end hours
+    @tod        = ['morning', 'afternoon']
+    @tod_start  = 'morning'
+    @tod_end    = 'afternoon'
+    
+    # select the view to show
     style       = params[:style] || 'block'
     
     respond_to do |format|
@@ -40,29 +50,39 @@ class FreeController < ApplicationController
     @errors       = Hash.new
     @success      = Hash.new
     
-    # iterate over specified time ranges
-    params[:time_range].each do |time_range|
-      time_range_index  = time_range.delete(:index).to_i
-      appointment_hash  = base_hash.merge(:time_range => time_range)
-      
+    @start_at     = params[:start_at]
+    @end_at       = params[:end_at]
+    
+    # iterate over specified day
+    params[:days].each do |day|
       # build new appointment
-      @appointment      = Appointment.new(appointment_hash)
+      time_range    = TimeRange.new(:day => day, :start_at => @start_at, :end_at => @end_at)
+      @appointment  = Appointment.new(base_hash.merge(:time_range => time_range))
                                                       
       # check if appointment is valid
       if !@appointment.valid?
-        @error      = true
         @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
         logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
-        @errors[time_range_index] = @appointment.errors.full_messages.join(", ")
+        @errors[day] = @appointment.errors.full_messages.join(", ")
       else
+        # create appointment
+        @appointment.save
         logger.debug("*** valid free time")
-        @success[time_range_index] = "Added available time on #{appointment_free_time_scheduled_at(@appointment)}"
+        @success[day] = "Added available time on #{appointment_free_time_scheduled_at(@appointment)}"
       end
-    end # time_range
+    end
     
     logger.debug("*** errors: #{@errors}")
     logger.debug("*** success: #{@success}")
     
+    if @errors.keys.size > 0
+      flash[:error]   = "There were #{@errors.keys.size} errors creating available time"
+      @redirect       = url_for(:action => 'new', :style => 'calendar', :subdomain => current_subdomain) 
+    else
+      flash[:notice]  = "Created available time"
+      @redirect       = url_for(:action => 'new', :style => 'calendar', :subdomain => current_subdomain) 
+    end
+        
     respond_to do |format|
       format.js
     end

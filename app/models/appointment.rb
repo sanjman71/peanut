@@ -7,7 +7,6 @@ class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
   belongs_to              :resource, :polymorphic => true
-  belongs_to              :service
   belongs_to              :owner, :class_name => 'User'
   validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :start_at, :end_at
   validates_presence_of   :owner_id, :if => :owner_required?
@@ -19,19 +18,21 @@ class Appointment < ActiveRecord::Base
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   BUSY                    = 'busy'      # busy appointments can not be scheduled
   WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
-  WAIT                    = 'wait'      # wait appointments are waiting be scheduled in free timeslots
+  WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
+  
+  NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
   
   # appointment confirmation code constants
   CONFIRMATION_CODE_ZERO  = '00000'
   
-  named_scope :service,     lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :resource,    lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
-  named_scope :owner,       lambda { |o| { :conditions => {:owner_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :duration_gt, lambda { |t|  { :conditions => ["duration >= ?", t] }}
+  named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
+  named_scope :resource,      lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
+  named_scope :owner,         lambda { |o| { :conditions => {:owner_id => o.is_a?(Integer) ? o : o.id} }}
+  named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
-  # find appointments based on a named time range
-  named_scope :upcoming,    { :conditions => ["start_at >= ?", Time.now] }
-  named_scope :past,        { :conditions => ["start_at <= ?", Time.now] }
+  # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
+  named_scope :upcoming,      lambda { { :conditions => ["start_at >= ?", Time.now] } }
+  named_scope :past,          lambda { { :conditions => ["start_at <= ?", Time.now] } }
   
   # find appointments overlapping a time range
   named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
@@ -57,7 +58,7 @@ class Appointment < ActiveRecord::Base
   named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
   named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
 
-  # Orderings
+  # order by sorting
   named_scope :order_start_at, {:order => 'start_at'}
   
   
@@ -98,7 +99,8 @@ class Appointment < ActiveRecord::Base
   
   # valid time of day values
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
-
+  TIMES_EXTENDED            = ['anytime', 'early morning', 'morning', 'afternoon', 'evening', 'late night']
+  
   # convert time of day to a seconds range
   TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
                                'morning'    => [8*3600,   12*3600],     # 8am - 12pm
@@ -146,7 +148,7 @@ class Appointment < ActiveRecord::Base
       self.end_at = self.start_at + self.service.duration_to_seconds
     end
     
-    # initialize duration
+    # initialize duration (in minutes)
     self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     
     # initialize mark_as if its blank
@@ -294,7 +296,14 @@ class Appointment < ActiveRecord::Base
   end
   
   def time_range=(attributes)
-    time_range      = TimeRange.new(attributes)
+    case attributes.class.to_s
+    when 'Hash', 'HashWithIndifferentAccess'
+      time_range = TimeRange.new(attributes)
+    when 'TimeRange'
+      time_range = attributes
+    else
+      raise ArgumentError, "expected TimeRange or Hash"
+    end
     self.start_at   = time_range.start_at
     self.end_at     = time_range.end_at
   end

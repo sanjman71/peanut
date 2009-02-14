@@ -3,6 +3,10 @@ require 'test/factories'
 
 class NoteTest < ActiveSupport::TestCase
 
+  should_require_attributes   :comment
+  should_have_many            :users
+  should_have_many            :appointments
+  
   context "create note on subject" do
     setup do
       @subject = Factory(:user)

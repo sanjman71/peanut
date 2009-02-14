@@ -11,14 +11,14 @@ class AppointmentsController < ApplicationController
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
 
-    if @current_company.people_count == 0
+    if current_company.people_count == 0
       # show message that people need to be added before viewing schedules
       return
     end
     
     if params[:person_id].blank?
       # redirect to a specific person
-      person = @current_company.people.first
+      person = current_company.people.first
       redirect_to url_for(params.update(:subdomain => current_subdomain, :person_id => person.id)) and return
     end
     
@@ -28,12 +28,12 @@ class AppointmentsController < ApplicationController
   # POST /people/1/create
   def create
     # build new free appointment
-    service       = @current_company.services.free.first
-    person        = @current_company.resources.find(params[:person_id])
+    service       = current_company.services.free.first
+    person        = current_company.resources.find(params[:person_id])
     @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
                                                                :service => service,
-                                                               :company => @current_company,
-                                                               :location_id => @current_location.id))
+                                                               :company => current_company,
+                                                               :location_id => current_location.id))
     
     # check if appointment is valid                                                           
     if !@appointment.valid?
@@ -82,23 +82,20 @@ class AppointmentsController < ApplicationController
   # shared method for managing free/work appointments
   def manage_appointments
     # initialize person, default to anyone
-    @person       = @current_company.people.find_by_id(params[:person_id])
-    @people       = @current_company.people.all
+    @person       = current_company.people.find_by_id(params[:person_id])
+    @people       = current_company.people.all
 
     # initialize time parameters
     @when         = (params[:when] || @@default_when).to_s_param
     @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
-    @appointments = @current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
+    @appointments = current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings = @appointments.inject(Hash.new) do |hash, appointment|
-      hash[appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)] = appointment.mark_as
-      hash
-    end
+    @calendar_markings = build_calendar_markings(@appointments)
 
     logger.debug("*** calendar markings: #{@calendar_markings}")
     
@@ -112,7 +109,7 @@ class AppointmentsController < ApplicationController
   # POST  /waitlist/people/3/services/8/this week/anytime
   def new
     # build appointment hash differently for schedule vs waitlist appointment requests
-    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person', :company_id => @current_company.id}
+    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person', :company_id => current_company.id}
     
     if request.url.match(/\/waitlist\//)
       # add when, time, mark_as attributes
@@ -188,14 +185,14 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   # GET /appointments/1.xml
   def show
-    @appointment  = @current_company.appointments.find(params[:id])
+    @appointment  = current_company.appointments.find(params[:id])
     @note         = Note.new
     @confirmation = params[:confirmation].to_i == 1
     
     # invoices for completed appointments
     @invoice      = @appointment.invoice
-    @services     = @current_company.services.work.all
-    @products     = @current_company.products.instock
+    @services     = current_company.services.work.all
+    @products     = current_company.products.instock
     @mode         = :r
     
     # build notes collection, most recent first 
@@ -204,7 +201,7 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments/1/confirmation
   def confirmation
-    @appointment  = @current_company.appointments.find(params[:id])
+    @appointment  = current_company.appointments.find(params[:id])
     
     # only show confirmations for upcoming appointments
     unless @appointment.state == 'upcoming'
@@ -218,7 +215,7 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1/checkout - show invoice
   # PUT /appointments/1/checkout - mark appointment as checked-out/completed
   def checkout
-    @appointment  = @current_company.appointments.find(params[:id])
+    @appointment  = current_company.appointments.find(params[:id])
     
     if request.put?
       # mark appointment as checked-out/completed

@@ -21,6 +21,8 @@
   - unless @current_company.people_count == 0
     .span-16.prepend-1.last
       #appointment_flash
+      
+    .span-16.prepend-1.last
       %h2
         == #{@when.titleize}
       .span-16.last#free_calendar
@@ -54,8 +56,9 @@
           .span-7.last
             #submit= f.submit 'Add', :name => nil, :class => 'button big'
             .hide#progress= image_tag 'barbershop.gif'
-            
-      %hr.space
-      %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
-      %h4= link_to "Schedule the same time slot across multiple days", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain)
+         
+      %hr.space   
+      %h4== or
+      %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain), :class => 'rounded button'
+      %h4= link_to "Schedule blocks of available time (version 2)", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
 

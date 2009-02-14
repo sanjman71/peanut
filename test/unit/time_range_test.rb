@@ -3,21 +3,52 @@ require 'test/factories'
 
 class TimeRangeTest < ActiveSupport::TestCase
   
-  def test_time_range
-    company   = Factory(:company)
-    johnny    = Factory(:person, :name => "Johnny", :companies => [company])
+  def test_should_create_time_range_using_ampm_string
+    @tomorrow    = (Time.now + 1.day).to_s(:appt_schedule_day) # e.g. 20081201
+    @time_range  = TimeRange.new(:day => @tomorrow, :start_at => "1 pm", :end_at => "3 pm")
+  
+    # start_at, end_at times should be adjusted to tomorrow
+    assert_equal Chronic.parse("tomorrow 1 pm"), @time_range.start_at
+    assert_equal Chronic.parse("tomorrow 3 pm"), @time_range.end_at
     
-    tomorrow  = (Time.now + 1.day).to_s(:appt_schedule_day) # e.g. 20081201
-    free_time = TimeRange.new(:day => tomorrow,
-                              :start_at => "1 pm",
-                              :end_at => "3 pm",
-                              :person_id => johnny.id,
-                              :company_id => company.id,
-                              :customer_id => 0)
-    # start_at, end_at times should be adjusted to 'day'    
-    assert_equal Chronic.parse("tomorrow 1 pm"), free_time.start_at
-    assert_equal Chronic.parse("tomorrow 3 pm"), free_time.end_at
+    # duration should be 120 minutes
+    assert_equal 120, @time_range.duration
+  end
+  
+  def test_should_create_default_time_range_of_all_day_today
+    @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day))
+
+    # should default to all day today
+    assert_equal Chronic.parse("yesterday midnight"), @time_range.start_at
+    assert_equal Chronic.parse("today midnight"), @time_range.end_at
   end
 
+  def test_should_create_time_range_using_army_notation
+    @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "0300", :end_at => "0500")
+    
+    # start_at, end_at times should be adjusted to today
+    assert_equal Chronic.parse("today 3 am"), @time_range.start_at
+    assert_equal Chronic.parse("today 5 am"), @time_range.end_at
+    
+    # duration should be 120 minutes
+    assert_equal 120, @time_range.duration
 
+    @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "1500", :end_at => "1800")
+    
+    # start_at, end_at times should be adjusted to today
+    assert_equal Chronic.parse("today 3 pm"), @time_range.start_at
+    assert_equal Chronic.parse("today 6 pm"), @time_range.end_at
+    
+    # duration should be 180 minutes
+    assert_equal 180, @time_range.duration
+
+    @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "1100", :end_at => "1200")
+    
+    # start_at, end_at times should be adjusted to today
+    assert_equal Chronic.parse("today 11 am"), @time_range.start_at
+    assert_equal Chronic.parse("today 12 pm"), @time_range.end_at
+    
+    # duration should be 60 minutes
+    assert_equal 60, @time_range.duration
+  end
 end
