@@ -17,11 +17,11 @@ class OpeningsController < ApplicationController
     @person   = Person.anyone if @person.blank?
     
     # initialize when, no default
-    @when       = params[:when].to_s_param if params[:when]
+    @when       = params[:when].from_url_param if params[:when]
     @daterange  = DateRange.parse_when(@when) unless @when.blank?
     
     # initialize time
-    @time       = params[:time].to_s_param if params[:time]
+    @time       = params[:time].from_url_param if params[:time]
 
     # initialize service, default to nothing
     @service    = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing

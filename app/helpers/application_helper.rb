@@ -31,15 +31,7 @@ module ApplicationHelper
     return "" if msg.blank?
     "<div class=\"#{type.to_s}\">#{msg}</div>"
   end
-  
-  # build title based on the current company and location
-  def current_company_title_with_location
-    name  = current_company.name
-    # add location name if we have at least company location
-    name += " - #{current_location.name}" unless current_locations.size == 0 or current_location.blank?
-    name
-  end
-  
+    
   def build_tab_links(current_controller)
     # 'Openings' tab
     name = 'Openings'
@@ -171,21 +163,9 @@ module ApplicationHelper
     end
   end
   
-  # build the set of locations links for the current company, using the current locations collection
-  def build_company_location_links
-    # get all company locations, remove the current location
-    locations = current_locations - Array(current_location)
-    
-    # add the special anywhere location if its not the current location
-    locations += Array(Location.anywhere) unless current_location and current_location.anywhere?
-    
-    # sort locations by name
-    locations.sort_by{ |l| l.name }.each_with_index do |location, index|
-      # build company location link
-      link = select_location_path(location)
-      last = index == (locations.size - 1)
-      yield location.name, link, last
-    end
+  def build_company_location_select_options
+    anywhere = Location.anywhere
+    [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}
   end
   
 end
