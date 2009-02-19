@@ -30,43 +30,85 @@
         %em{:style => "color: #666666; font-size: 15px;"}== This is the timezone for your business.  Users will be shown available times and schedule appointments in this timezone. 
         
     %hr.space
-  
-    - fields_for("user", @user) do |user_form|
+
+    - if logged_in?
+      %h2== This company is being created for #{current_user.name}
+    - else
+      - fields_for("user", @user) do |user_form|
+        .span-20.last
+          %h2== Create your user account
+        .span-18.last
+          %hr
+        -# show any user errors
+        - unless @user.errors.blank?
+          .span-18.notice
+            = error_messages_for('user', :header_message => nil)
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+          .span-16.last
+            = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
+          .span-16.last
+            = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
+          .span-16.last
+            = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+          .span-16.last
+            = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+            .span-20.last.padding-bottom-10
+        
+
+    %hr.space
+
+    - fields_for("account", @user.account) do |account_form|
       .span-20.last
-        %h2== Create your user account
+        %h2== Billing Information
       .span-18.last
         %hr
       -# show any user errors
-      - unless @user.errors.blank?
+      - unless @user.account.errors.blank?
         .span-18.notice
-          = error_messages_for('user', :header_message => nil)
+          = error_messages_for('account', :header_message => nil)
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Street Address:
         .span-16.last
-          = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+          = account_form.text_field :street1, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Street Address 2:
         .span-16.last
-          = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+          = account_form.text_field :street2, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== City:
         .span-16.last
-          = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+          = account_form.text_field :city, :class => 'title big', :style => 'width: 300px; margin: 0px;'
       .span-20.last.padding-bottom-10
         .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+          %h3.text-align-right{:style => "padding-top: 10px;"}== State:
         .span-16.last
-          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-          .span-20.last.padding-bottom-10
-        
+          = account_form.text_field :state, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      .span-20.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Zip:
+        .span-16.last
+          = account_form.text_field :zip, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      .span-20.last.padding-bottom-10
 
     %hr.space
 
     .span-20.last
       %h2== Review your plan and signup
+      = render :partial => 'plans/plan', :object => @plan
     .span-18.last
       %hr
     -# show terms errors

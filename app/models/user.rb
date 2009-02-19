@@ -9,6 +9,12 @@ class User < ActiveRecord::Base
   # Badges for authorization
   badges_authorized_user
 
+  # Accounting and plans
+  has_one                   :account
+  has_many                  :user_company_plans
+  has_many                  :plans, :through => :user_company_plans
+  has_many                  :companies, :through => :user_company_plans
+
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100
   validates_presence_of     :name

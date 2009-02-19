@@ -76,6 +76,9 @@ ActionController::Routing::Routes.draw do |map|
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations,         :member => {:select => :get}
 
+  # Plans
+  map.resources :plans
+
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
 
