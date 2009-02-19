@@ -15,6 +15,11 @@ class Company < ActiveRecord::Base
   has_many                  :invitations
   before_save               :init_subdomain
   after_create              :init_basic_services
+
+  # Accounting info
+  has_one                   :user_company_plan
+  has_one                   :company_owner, :through => :user_company_plan, :source => :user
+  has_one                   :plan, :through => :user_company_plan
   
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database

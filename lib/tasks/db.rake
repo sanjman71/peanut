@@ -5,8 +5,8 @@ namespace :db do
     
     namespace :init do
       
-      task :dev_data  => ["db:peanut:rp:init", :companies, :admin_users, :regular_users]
-      task :prod_data  => ["db:peanut:rp:init", :admin_users]
+      task :dev_data  => ["db:peanut:rp:init", :companies, :admin_users, :regular_users, "db:peanut:plans:init"]
+      task :prod_data  => ["db:peanut:rp:init", :admin_users, "db:peanut:plans:init"]
       
       desc "Initialize admin users"
       task :admin_users do 
