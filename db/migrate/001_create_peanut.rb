@@ -17,6 +17,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :duration
       t.string  :mark_as
       t.integer :price_in_cents
+      t.integer :resources_count, :default => 0   # counter cache
       
       t.timestamps
     end
@@ -60,6 +61,7 @@ class CreatePeanut < ActiveRecord::Migration
     # Polymorphic resource type
     create_table :people do |t|
       t.string  :name
+      t.integer :services_count, :default => 0   # counter cache
 
       t.timestamps
     end
