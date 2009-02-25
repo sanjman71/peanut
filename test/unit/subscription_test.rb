@@ -92,7 +92,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       end
       
       should "have subscription errors" do
-        assert @subscription.errors?
+        assert !@subscription.errors.empty?
         assert_equal 'Credit card is invalid', @subscription.errors.on_base
       end
     end

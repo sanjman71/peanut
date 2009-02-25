@@ -56,7 +56,7 @@ class SignupController < ApplicationController
       @ucp.save
       
       # rollback unless all objects are valid
-      raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@account.valid? or !@ucp.valid? or @terms != 1 or @subscription.errors?
+      raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@account.valid? or !@ucp.valid? or @terms != 1 or !@subscription.errors.empty?
 
       # register, activate user
       if !logged_in?

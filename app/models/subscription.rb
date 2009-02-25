@@ -31,11 +31,7 @@ class Subscription < ActiveRecord::Base
   def start_payment_at=(datetime)
     write_attribute(:start_payment_at, datetime.beginning_of_day) unless datetime.blank?
   end
-  
-  def errors?
-    !self.errors.blank?
-  end
-  
+    
   # authorize the payment and create a vault id
   def authorize(credit_card, options = {})
     # create payment
