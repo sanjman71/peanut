@@ -1,0 +1,22 @@
+- title('Choose a new plan')
+
+.span-24.last
+  .span-15.prepend-1.append-1.last
+    .highlight#flash
+
+  .span-22.prepend-1.append-1.last
+    %h2 Choose a new plan
+    = "Your company is currently using the <strong>#{current_company.plan.name}</strong> plan and has #{pluralize current_company.locations.size, "location"} and #{pluralize current_company.resources.size, "resource"}."
+    %br
+    = "Depending on the number of locations and resources you have, you may not be eligible for all plans below."
+
+  .plans.span-24
+    = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("basic")
+    = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("premium")
+    = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("max")
+    = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("free")
+
+%hr.space
+
+.span-20.prepend-1
+  %h3= link_to 'Company Openings', openings_path(:subdomain => current_subdomain)
