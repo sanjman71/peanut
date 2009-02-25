@@ -11,9 +11,9 @@ class User < ActiveRecord::Base
 
   # Accounting and plans
   has_one                   :account
-  has_many                  :user_company_plans
-  has_many                  :plans, :through => :user_company_plans
-  has_many                  :companies, :through => :user_company_plans
+  has_many                  :plan_subscriptions
+  has_many                  :plans, :through => :plan_subscriptions
+  has_many                  :companies, :through => :plan_subscriptions
 
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100

@@ -20,7 +20,11 @@ class CompaniesController < ApplicationController
 
   # GET /companies/1/edit
   def edit
-    @company = Company.find(params[:id])
+    if (params[:id].blank? && current_company)
+      @company = current_company
+    else
+      @company = Company.find(params[:id])
+    end
   end
   
   # PUT /companies/1

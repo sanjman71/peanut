@@ -15,21 +15,17 @@ class CreateAccounts < ActiveRecord::Migration
     create_table :plans do |t|
       t.timestamps
       t.string      :name
-      t.string      :link_text
+      t.string      :textid
       t.string      :icon
-      t.decimal     :monthly_cost
-      t.decimal     :yearly_cost
+      t.decimal     :cost
       t.string      :cost_currency
-      t.integer     :max_resources
-      t.integer     :max_services
-      t.integer     :max_products
-      t.integer     :max_appointments
       t.integer     :max_locations
-      t.integer     :days_before_start_billing
+      t.integer     :max_resources
+      t.integer     :days_to_first_bill
       t.integer     :months_between_bills
     end
     
-    create_table :user_company_plans do |t|
+    create_table :plan_subscriptions do |t|
       t.timestamps
       t.references  :user
       t.references  :company
@@ -40,7 +36,7 @@ class CreateAccounts < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :user_company_plans
+    drop_table :plan_subscriptions
     drop_table :plans
     drop_table :accounts
   end

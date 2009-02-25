@@ -3,10 +3,24 @@
     == Editing
     = @company.name
 
-.span-20
+  .span-20
+    .span-17.prepend-1
+      = display_flash(:notice)
+      = display_flash(:error)
+
   .span-17.prepend-1
-    = display_flash(:notice)
-    
+    .span-8
+      %h3
+        = "Currently using the <strong>#{@company.plan.name}</strong> plan."
+        %br
+        - if @company.plan_subscription.next_bill_date
+          = "Your next bill of #{number_to_currency(@company.plan.cost)} will be charged on #{@company.plan_subscription.next_bill_date.to_date.to_s(:long)}."
+        %br
+        = link_to "Change plan", change_plan_path(:subdomain => current_subdomain)
+    .span-5.last
+      = render :partial => 'plans/plan', :object => @company.plan
+
+
   - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
     = f.error_messages
   
@@ -23,7 +37,7 @@
         = link_to 'Cancel', root_path(:subdomain => current_subdomain), :style => 'font-size: 12px;'
     %hr.space
     %hr.space
-    
+
   .span-19.prepend-1.last
     %h2
       == Locations

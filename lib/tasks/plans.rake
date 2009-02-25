@@ -13,14 +13,11 @@ namespace :db do
         
         puts "creating free plan"
         p = Plan.create(
-          :name => "Free!",
-          :link_text => "free",
-          :monthly_cost => 0.0,
+          :name => "Free",
+          :textid => "free",
+          :cost => 0.0,
           :cost_currency => "USD",
           :max_resources => 1,
-          :max_services => 5,
-          :max_products => 5,
-          :max_appointments => 100,
           :max_locations => 1
         )
       end
@@ -31,15 +28,12 @@ namespace :db do
         puts "creating basic plan"
         p = Plan.create(
           :name => "Basic",
-          :link_text => "basic",
-          :monthly_cost => 10.0,
+          :textid => "basic",
+          :cost => 10.0,
           :cost_currency => "USD",
           :max_resources => 5,
-          :max_services => 20,
-          :max_products => 50,
-          :max_appointments => 5000,
           :max_locations => 1,
-          :days_before_start_billing => 30,
+          :days_to_first_bill => 30,
           :months_between_bills => 1
         )
       end
@@ -50,15 +44,12 @@ namespace :db do
         puts "creating premium plan"
         p = Plan.create(
           :name => "Premium",
-          :link_text => "premium",
-          :monthly_cost => 30.0,
+          :textid => "premium",
+          :cost => 30.0,
           :cost_currency => "USD",
           :max_resources => 20,
-          :max_services => 50,
-          :max_products => 100,
-          :max_appointments => 10000,
           :max_locations => 3,
-          :days_before_start_billing => 30,
+          :days_to_first_bill => 30,
           :months_between_bills => 1
         )
       end
@@ -69,10 +60,10 @@ namespace :db do
         puts "creating max plan"
         p = Plan.create(
           :name => "Max",
-          :link_text => "max",
-          :monthly_cost => 50.0,
+          :textid => "max",
+          :cost => 50.0,
           :cost_currency => "USD",
-          :days_before_start_billing => 30,
+          :days_to_first_bill => 30,
           :months_between_bills => 1
         )
       end

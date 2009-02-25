@@ -1,35 +1,22 @@
-.plan.span-5
-  .box
-    .name
-      = link_to("<h2 class='bottom'>#{plan.name}</h2>", signup_path(:plan => plan.link_text), :class => 'signup')
-    .details
-      %h4.bottom
-        - if plan.monthly_cost
-          = "#{number_to_currency(plan.monthly_cost)} per month"
-        - elsif plan_yearly_cost
-          = "#{number_to_currency(plan.yearly_cost)} per year"
-        - else
-          = "Free!!"
-      .max_resources
-        - if plan.max_resources
-          = pluralize plan.max_resources, "resource"
-        - else
-          Unlimited resources!
-      .max_products
-        - if plan.max_products
-          = pluralize plan.max_products, "products"
-        - else
-          Unlimited products!
-      .max_appointments
-        - if plan.max_appointments
-          = pluralize plan.max_appointments, "appointments"
-        - else
-          Unlimited appointments!
-      .max_locations
-        - if plan.max_locations
-          = pluralize plan.max_locations, "locations"
-        - else
-          Unlimited locations!
-      - if plan.days_before_start_billing && plan.months_between_bills
-        .billing_info
-        = "Billing starts after #{pluralize(plan.days_before_start_billing, 'day')} and is billed every #{pluralize(plan.months_between_bills, 'month')}"
+.plan-details
+  %h4.bottom
+    - if plan.cost
+      = "#{number_to_currency(plan.cost)} every #{pluralize(plan.months_between_bills, 'month')}."
+    - else
+      = "Free!!"
+  %ul
+    %li.max_locations
+      - if plan.max_locations
+        = "Up to #{pluralize plan.max_locations, "location"}"
+      - else
+        Unlimited locations!
+    %li.max_resources
+      - if plan.max_resources
+        = "Up to #{pluralize plan.max_resources, "resource"}"
+      - else
+        Unlimited resources!
+    %li.billing_info
+      - if plan.days_to_first_bill && plan.months_between_bills
+        = "Billing starts after #{pluralize(plan.days_to_first_bill, 'day')} and is billed every #{pluralize(plan.months_between_bills, 'month')}"
+      - else
+        = "Great for evaluation or personal needs."

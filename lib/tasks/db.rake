@@ -6,10 +6,10 @@ namespace :db do
     namespace :init do
       
       desc "Initialize development data"
-      task :dev_data  => ["db:peanut:rp:init", :companies, :admin_users, :regular_users, "db:peanut:plans:init"]
+      task :dev_data  => ["db:peanut:rp:init", "db:peanut:plans:init", :admin_users, :regular_users, :companies]
 
       desc "Initialize production data"
-      task :prod_data  => ["db:peanut:rp:init", :admin_users, "db:peanut:plans:init"]
+      task :prod_data  => ["db:peanut:rp:init", "db:peanut:plans:init", :admin_users]
       
       desc "Initialize admin users"
       task :admin_users do 
@@ -65,10 +65,14 @@ namespace :db do
       task :companies do
         puts "#{Time.now}: adding test data ..."
       
+        puts "#{Time.now}: adding companies company1 and noelrose ..."
         # create test companies
         company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)")
         noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)")
+        company1.save
+        noelrose.save
     
+        puts "#{Time.now}: adding company1 services and people ..."
         # create company1 services and people
         mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
         womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
@@ -80,6 +84,7 @@ namespace :db do
         mens_haircut.resources.push(person1)
         womens_haircut.resources.push(person2)
 
+        puts "#{Time.now}: adding noelrose services and people ..."
         # create noelrose people, services, products
         person1         = noelrose.people.create(:name => "Erika Maechtle")
         person2         = noelrose.people.create(:name => "Josie")
@@ -94,6 +99,7 @@ namespace :db do
         conditioner     = noelrose.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
         pomade          = noelrose.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
       
+        puts "#{Time.now}: adding skillsets ..."
         # add skillsets
         mens_haircut.resources.push(person1)
         mens_haircut.resources.push(person2)
@@ -105,6 +111,17 @@ namespace :db do
         color2.resources.push(person2)
         color3.resources.push(person1)
         color3.resources.push(person2)
+        
+        puts "#{Time.now}: adding company plans and account owners ..."
+        basic = Plan.find_by_textid("basic")
+        premium = Plan.find_by_textid("premium")
+        company1.plan = basic
+        company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
+        company1.company_owner = User.find_by_email("admin@killianmurphy.com")
+
+        noelrose.plan = premium
+        noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
+        noelrose.company_owner = User.find_by_email("sanjay@jarna.com")
 
         puts "#{Time.now}: completed"
       end

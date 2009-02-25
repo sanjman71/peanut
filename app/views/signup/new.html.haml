@@ -15,9 +15,14 @@
         %h3.text-align-right== Company name:
       .span-16.last
         = f.text_field :name, :id => 'company_name', :class => 'title big', :style => 'width: 200px; margin: 0px;'
+        %hr
+      .span-4
+        %h3.text-align-right== Subdomain:
+      .span-16.last
+        = f.text_field :subdomain, :style => 'width: 200px; margin: 0px;'
         %span{:style => 'font-size: 12px; font-weight: bold;'}=DOMAIN
     .span-16.prepend-4.last
-      %em{:style => "color: #666666; font-size: 15px;"}== This is the address you will use to login and manage your appointments. (e.g. http://peanut.peanutcalendar.com)
+      %em{:style => "color: #666666; font-size: 15px;"}== This is the address you will use to login and manage your appointments. (e.g. http://peanut#{DOMAIN}). It should only have letters, numbers and a dash.
     
     %hr.space
   
@@ -158,6 +163,9 @@
         = @terms_error
     .span-20.last
       %h3== All plans are monthly. There are no cancellation fees or long-term contracts.
+    .span-5.lasat
+      = link_to "Choose another plan", plans_path
+    %hr.space
     .span-20.last
       %h3
         = check_box_tag "company[terms]"
