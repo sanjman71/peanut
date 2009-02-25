@@ -1,8 +1,15 @@
 class SubscriptionError < StandardError; end
 
 class Subscription < ActiveRecord::Base
-  validates_presence_of   :time_unit, :time_value, :amount, :start_payment_at
+  validates_presence_of   :plan_id, :user_id, :company_id, :start_billing_at
+  belongs_to              :user
+  belongs_to              :company
+  belongs_to              :plan
   has_many                :payments
+  
+  attr_accessible         :plan_id, :user_id, :company_id, :plan, :user, :company
+
+  delegate                :cost, :to => :plan
   
   # BEGIN acts_as_state_machhine
   include AASM
@@ -26,10 +33,17 @@ class Subscription < ActiveRecord::Base
     transitions :to => :frozen, :from => [:active, :frozen]
   end
   # END acts_as_state_machine
-  
-  # always force start payment date to the beginning of the day
-  def start_payment_at=(datetime)
-    write_attribute(:start_payment_at, datetime.beginning_of_day) unless datetime.blank?
+
+  def after_initialize
+    # after_initialize can also be called when retrieving objects from the database
+    return unless new_record?
+    
+    self.start_billing_at = self.plan.start_billing_at unless plan.blank?
+  end
+
+  # always force start billing date to the beginning of the day
+  def start_billing_at=(date)
+    write_attribute(:start_billing_at, date) unless date.blank?
   end
     
   # authorize the payment and create a vault id
@@ -40,7 +54,7 @@ class Subscription < ActiveRecord::Base
     
     transaction do
       # authorize payment, and request a vault id
-      @payment.authorize(amount, credit_card, :store => true)
+      @payment.authorize(cost, credit_card, :store => true)
     
       if @payment.authorized?
         # transition to authorized state
@@ -49,8 +63,8 @@ class Subscription < ActiveRecord::Base
         # store the vault id
         self.vault_id = @payment.params['customer_vault_id']
         
-        # set the next payment date
-        self.next_payment_at = self.start_payment_at
+        # set the next billing date
+        self.next_billing_at = self.start_billing_at
         
         # commit changes
         self.save
@@ -67,7 +81,7 @@ class Subscription < ActiveRecord::Base
   
   # bill the credit card referenced by the vault id, or using the credit card specified
   def bill(credit_card = nil)
-    if self.next_payment_at.to_date > Date.today
+    if self.next_billing_at.to_date > Date.today
       raise SubscriptionError, "next billing date is in the future"
     end
     
@@ -77,15 +91,15 @@ class Subscription < ActiveRecord::Base
     
     transaction do
       # purchase using the customer vault id, or the credit card if its specified
-      @payment.purchase(amount, credit_card || vault_id)
+      @payment.purchase(cost, credit_card || vault_id)
     
       if @payment.paid?
         # transition to active state
         active!
 
-        # set the last, next payment dates
-        self.last_payment_at = Time.now
-        self.next_payment_at = Time.now + eval("#{time_value}.#{time_unit}")
+        # set the last, next billing dates
+        self.last_billing_at = Time.now
+        self.next_billing_at = Time.now + plan.billing_cycle
 
         # commit changes
         self.save

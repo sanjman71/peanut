@@ -116,11 +116,11 @@ namespace :db do
         basic = Plan.find_by_textid("basic")
         premium = Plan.find_by_textid("premium")
         company1.plan = basic
-        company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
+        # company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
         company1.company_owner = User.find_by_email("admin@killianmurphy.com")
 
         noelrose.plan = premium
-        noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
+        # noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
         noelrose.company_owner = User.find_by_email("sanjay@jarna.com")
 
         puts "#{Time.now}: completed"

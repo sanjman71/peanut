@@ -15,12 +15,12 @@ class AddPaymentProcessing < ActiveRecord::Migration
     end  
     
     create_table :subscriptions do |t|
-      t.integer     :time_value, :null => false     # e.g. 1, 5, 30
-      t.string      :time_unit, :null => false      # e.g. days, months
-      t.integer     :amount
-      t.datetime    :start_payment_at
-      t.datetime    :last_payment_at
-      t.datetime    :next_payment_at
+      t.references  :user
+      t.references  :company
+      t.references  :plan
+      t.datetime    :start_billing_at
+      t.datetime    :last_billing_at
+      t.datetime    :next_billing_at
       t.string      :vault_id, :default => nil
       t.string      :state, :default => 'initialized'
       t.timestamps
