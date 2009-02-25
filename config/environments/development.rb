@@ -27,4 +27,17 @@ config.action_controller.session = {
 # Configure memcache
 config.cache_store  = :mem_cache_store, '127.0.0.1:11212', { :namespace => 'peanut' }
 
+# ActiveMerchange configuration, using the Braintree gateway
+config.after_initialize do 
+  ActiveMerchant::Billing::Base.mode = :test 
+end
+ 
+config.to_prepare do
+  Payment.gateway =
+    ActiveMerchant::Billing::BraintreeGateway.new( 
+      :login    => 'demo', 
+      :password => 'password' 
+  ) 
+end 
+
 require 'ruby-debug'

@@ -59,7 +59,6 @@ Factory.sequence :user_email do |n|
   "user#{n}@peanut.com"
 end
 
-
 Factory.sequence :today_hour do |n|
   Time.now.beginning_of_day + n.hours
 end

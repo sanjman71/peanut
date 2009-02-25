@@ -9,10 +9,13 @@ class SignupController < ApplicationController
     else
       @company  = Company.new
       @user     = logged_in? ? current_user : User.new
+      
       if @user.account.blank?
         @user.account = Account.new
       end
-      @plan     = Plan.find_by_link_text(params[:plan])
+      
+      @plan         = Plan.find_by_link_text(params[:plan])
+      @subscription = Subscription.new
     end
   end
 
@@ -20,12 +23,14 @@ class SignupController < ApplicationController
   
   def do_signup
     @user     = logged_in? ? current_user : User.new(params[:user])
+    
     if !@user.account
       @account  = @user.build_account(params[:account])
     else
       @user.account.update_attributes(params[:account])
       @account = @user.account
     end
+    
     @terms    = params[:company].delete(:terms).to_i
     @company  = Company.new(params[:company])
     @plan     = Plan.find_by_link_text(params[:plan])
@@ -38,6 +43,11 @@ class SignupController < ApplicationController
       @ucp = UserCompanyPlan.new(:user => @user, :company => @company, :plan => @plan)
       @ucp.next_bill_date = Time.now + (@plan.days_before_start_billing).days if @plan.days_before_start_billing
 
+      # create user subscription
+      @subscription = Subscription.create(:time_value => 1, :time_unit => "months", :amount => 100, :start_payment_at => Time.now + 1.month)
+      @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
+      @payment      = @subscription.authorize(@credit_card)
+
       # create company, user objects
       # create account and join table objects
       @company.save
@@ -46,7 +56,7 @@ class SignupController < ApplicationController
       @ucp.save
       
       # rollback unless all objects are valid
-      raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@account.valid? or !@ucp.valid? or @terms != 1
+      raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@account.valid? or !@ucp.valid? or @terms != 1 or @subscription.errors?
 
       # register, activate user
       if !logged_in?
