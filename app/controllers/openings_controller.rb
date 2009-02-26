@@ -65,7 +65,7 @@ class OpeningsController < ApplicationController
     @calendar_markings  = build_calendar_markings(@free_timeslots)
 
     # build openings cache key
-    @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
+    # @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
     
     respond_to do |format|
       format.html # index.html.erb
