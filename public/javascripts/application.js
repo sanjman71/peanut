@@ -69,8 +69,9 @@ $.fn.init_add_free_time = function() {
   $("#add_free_time_form").validate({
     // handle form errors
     showErrors: function(errorMap, errorList) {
-      // highlight blank fields only
+      // highlight blank fields, and set focus on first blank field
       $(".required:blank").addClass('highlighted');
+      $(".required:blank:first").focus();
     },
     // don't validate until the form is submitted and we call valid
     onfocusout: false,
@@ -79,6 +80,8 @@ $.fn.init_add_free_time = function() {
   });
   
   $("#add_free_time_form").submit(function () {
+    // reset any previous form errors beforing validating
+    $(".required").removeClass('highlighted');
     if ($(this).valid()) {
       $.post(this.action, $(this).serialize(), null, "script");
       $(this).find("#submit").hide();
@@ -106,8 +109,7 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   
   // do an ajax form post on submit
   $("#search_appointments_form").submit(function () {
-    // note: the validate function has already been caled at this point, but I'm not
-    // sure how to get its result w/o calling valid explicitly here
+    // validate the form, and submit iff its valid
     if ($(this).valid()) {
       $.post(this.action, $(this).serialize(), null, "script");
       // hide the submit button and show the progress bar
@@ -121,7 +123,7 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
 // Search schedules for available appointments
 $.fn.init_schedule_search = function () {
   $("#schedule_search_form").submit(function () {
-    // replace the search button with a progress image when its clicked
+    // replace the search button with a progress image onsubmit
     $("#search_submit").addClass('hide');
     $("#search_progress").removeClass('hide');
   })
@@ -264,28 +266,17 @@ $.fn.init_add_note = function () {
   })
 } 
 
-// Initialize location switcher allowing users to change the current location
-$.fn.init_switch_locations = function() {
-  $('#location_switcher li').hover(
-    // add block class for internet explorer
-    function() { 
-      $('ul', this).css('display', 'block');
-      $('#location_switcher_link').addClass('hide');
-    },
-    function() { 
-      $('ul', this).css('display', 'none'); 
-      $('#location_switcher_link').removeClass('hide');
-    }
-  );
+// Change session location onchange
+$.fn.init_change_location = function() {
+  $("select#location_id").change(function () {
+    var href = '/locations/' + this.value + '/select';
+    window.location = href;
+    return false;
+  })
 }
 
-// Replace all ujs classes with ajax post calls
-// Todo: figure out how to ask the user to confirm before executing a call
+// Replace all ujs classes with ajax post calls; ask user for confirmation if required.
 $.fn.init_ujs_links = function () {
-  // Replace regular links with ajax calls
-  $("a.ujs").attr("ujs", function() { return this.href })
-  $("a.ujs").attr("href","javascript:void(0)")
-
   $("a.ujs").click(function() {
     // Check if its a rails delete link
     if ($(this).attr("class").match(/delete/i))
@@ -297,19 +288,25 @@ $.fn.init_ujs_links = function () {
       yesno     = confirm(question);
       
       if (yesno == false)
+      {
         return false;
+      }
     }
     
-    $.post($(this).attr("ujs"), params, null, "script");
+    $.post($(this).attr("href"), params, null, "script");
     return false;
   })
 }
 
 $(document).ready(function() {
-  // Initialize all ujs links
+  // initialize all ujs links
   $(document).init_ujs_links();
-  $(document).init_switch_locations();
-  
-  $(document).init_schedule_search();
+  // initialize change location select link
+  $(document).init_change_location();
+})
+
+$(document).ajaxComplete(function(request, settings) {
+  // re-initialize all ujs links and any new links
+  $(document).init_ujs_links();
 })
 

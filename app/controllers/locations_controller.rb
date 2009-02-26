@@ -4,7 +4,7 @@ class LocationsController < ApplicationController
   # GET /locations
   # GET /locations.xml
   def index
-    @locations = @current_company.locations.paginate :page => params[:locations_page]
+    @locations = current_company.locations.paginate :page => params[:locations_page]
 
     respond_to do |format|
       format.html # index.html.erb
@@ -15,7 +15,7 @@ class LocationsController < ApplicationController
   # GET /locations/1
   # GET /locations/1.xml
   def show
-    @location = @current_company.locations.find_by_id(params[:id]) || Location.anywhere
+    @location = current_company.locations.find_by_id(params[:id]) || Location.anywhere
     
     respond_to do |format|
       format.html # show.html.erb
@@ -26,13 +26,16 @@ class LocationsController < ApplicationController
   
   # GET /locations/1/select
   def select
-    @location = @current_company.locations.find_by_id(params[:id]) || Location.anywhere
+    @location = current_company.locations.find_by_id(params[:id]) || Location.anywhere
+
+    # cache location as a session param
+    session[:location_id] = @location.id
     
     if request.referrer
-      session[:location_id] = @location.id
       redirect_to(request.referrer) and return
+    else
+      redirect_to("/") and return
     end
-
   end
 
   # GET /locations/new
@@ -128,22 +131,7 @@ class LocationsController < ApplicationController
   protected
 
   def redirect_success_path
-    edit_company_root_path(:subdomain => @subdomain)
+    edit_company_root_path(:subdomain => current_subdomain)
   end
   
-  # Merges conditions so that the result is a valid +condition+ 
-  def merge_conditions(conditions)
-    
-    condition_str = ""
-    args_hash = {}
-    
-    # Assume each condition consists of a string followed by arguments
-    # We'll concatenate all the strings, and concatenate the arguments
-    # where the arguments are hashes, we'll merge them.    
-    conditions = conditions.find_all {|c| not c.nil? and not c.empty? }
-    condition_str = conditions.collect{|c| c[0]}.join(' AND ')
-    conditions.collect{|c| c[1]}.each { |c| args_hash = args_hash.merge(c) unless c.nil? }
-    [condition_str, args_hash]
-  end
-    
 end

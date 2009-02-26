@@ -44,6 +44,15 @@ Factory.define :user do |u|
   u.phone                 "9999999999"
 end
 
+Factory.define :monthly_plan, :class => Plan do |o|
+  o.name                          "Monthly"
+  o.cost                          1000  # cents
+  o.start_billing_in_time_amount  1
+  o.start_billing_in_time_unit    "months"
+  o.between_billing_time_amount   1
+  o.between_billing_time_unit     "months"
+end
+
 Factory.define :appointment_today, :class => Appointment do |a|
   a.mark_as         { |o| o.service.mark_as }
   a.start_at        { |o| Factory.next :today_hour }  # choose an hour from today
@@ -58,7 +67,6 @@ end
 Factory.sequence :user_email do |n|
   "user#{n}@peanut.com"
 end
-
 
 Factory.sequence :today_hour do |n|
   Time.now.beginning_of_day + n.hours

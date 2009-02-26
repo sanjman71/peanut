@@ -9,19 +9,15 @@
       %h1 30-day Free Trial on All Accounts!
       %h3 There are several plans available. Signing up only takes a minute.
 
-  - free = Plan.find_by_textid("free")
-  - basic = Plan.find_by_textid("basic")
-  - premium = Plan.find_by_textid("premium")
-  - max = Plan.find_by_textid("max")
   .plans.span-24
     .span-5
-      = render :partial => 'plans/signup_plan', :object => basic
+      = render :partial => 'plans/signup_plan', :object => @basic
     .span-5.prepend-1
-      = render :partial => 'plans/signup_plan', :object => premium
+      = render :partial => 'plans/signup_plan', :object => @premium
     .span-5.prepend-1
-      = render :partial => 'plans/signup_plan', :object => max
+      = render :partial => 'plans/signup_plan', :object => @max
     .span-5.prepend-1.last
-      = render :partial => 'plans/signup_plan', :object => free
+      = render :partial => 'plans/signup_plan', :object => @free
 
 %hr.space
 

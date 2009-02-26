@@ -29,13 +29,12 @@ class Company < ActiveRecord::Base
   has_many                  :owners, :through => :appointments, :uniq => true
   has_many                  :invitations
 
-  # before_save               :init_subdomain
   after_create              :init_basic_services
 
   # Accounting info
-  has_one                   :plan_subscription
-  has_one                   :company_owner, :through => :plan_subscription, :source => :user
-  has_one                   :plan, :through => :plan_subscription
+  has_one                   :subscription
+  has_one                   :company_owner, :through => :subscription, :source => :user
+  has_one                   :plan, :through => :subscription
   
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
@@ -88,7 +87,7 @@ class Company < ActiveRecord::Base
   # initialize subdomain based on company name
   def init_subdomain
     if !attribute_present?("subdomain")
-      self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '')
+      self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '') unless name.blank?
     end
   end
   

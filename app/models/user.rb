@@ -10,10 +10,9 @@ class User < ActiveRecord::Base
   badges_authorized_user
 
   # Accounting and plans
-  has_one                   :account
-  has_many                  :plan_subscriptions
-  has_many                  :plans, :through => :plan_subscriptions
-  has_many                  :companies, :through => :plan_subscriptions
+  has_many                  :subscriptions
+  has_many                  :plans, :through => :subscriptions
+  has_many                  :companies, :through => :subscriptions
 
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100

@@ -9,7 +9,7 @@ ActionController::Routing::Routes.draw do |map|
   map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
   # company signup route
-  map.signup        '/signup', :controller => 'signup', :action => 'index'
+  map.signup        '/signup',       :controller => 'signup', :action => 'index'
   map.signup_plan   '/signup/:plan', :controller => 'signup', :action => 'new'
   
   # invitation signup route

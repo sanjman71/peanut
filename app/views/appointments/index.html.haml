@@ -21,6 +21,9 @@
   - unless @current_company.people_count == 0
     .span-16.prepend-1.last
       #appointment_flash
+
+    .span-16.prepend-1.last
+      = display_flash(:notice)
       
     .span-16.prepend-1.last
       %h2

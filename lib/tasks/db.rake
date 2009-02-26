@@ -5,7 +5,10 @@ namespace :db do
     
     namespace :init do
       
+      desc "Initialize development data"
       task :dev_data  => ["db:peanut:rp:init", "db:peanut:plans:init", :admin_users, :regular_users, :companies]
+
+      desc "Initialize production data"
       task :prod_data  => ["db:peanut:rp:init", "db:peanut:plans:init", :admin_users]
       
       desc "Initialize admin users"
@@ -113,11 +116,11 @@ namespace :db do
         basic = Plan.find_by_textid("basic")
         premium = Plan.find_by_textid("premium")
         company1.plan = basic
-        company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
+        # company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
         company1.company_owner = User.find_by_email("admin@killianmurphy.com")
 
         noelrose.plan = premium
-        noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
+        # noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
         noelrose.company_owner = User.find_by_email("sanjay@jarna.com")
 
         puts "#{Time.now}: completed"
