@@ -26,5 +26,8 @@
     .bottompage
       = will_paginate locations, :param_name => page_param_name
     .bottompage
-      - if has_privilege?("update companies", @current_company)
-        = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+      - if @current_company.may_add_location?
+        - if has_privilege?("update companies", @current_company)
+          = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+      - else
+        = "You cannot add any additional locations on your current plan. #{link_to "Change plan", change_plan_path(:subdomain => current_subdomain)}"

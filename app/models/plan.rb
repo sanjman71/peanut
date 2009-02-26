@@ -9,4 +9,12 @@ class Plan < ActiveRecord::Base
     )
   end
   
+  def may_add_location?(company)
+    (self.max_locations.blank? || (company.locations.size < self.max_locations))
+  end
+  
+  def may_add_resource?(company)
+    (self.max_resources.blank? || (company.resources.size < self.max_resources))
+  end
+  
 end

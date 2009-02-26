@@ -40,5 +40,5 @@
 
   .span-19.prepend-1.last
     %h2
-      == Locations
+      == Company Locations
     = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}

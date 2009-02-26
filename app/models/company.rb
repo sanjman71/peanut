@@ -69,7 +69,15 @@ class Company < ActiveRecord::Base
   def locations_with_any
     Array(Location.anywhere) + self.locations
   end
+
+  # Plan tests
+  def may_add_location?
+    self.plan.may_add_location?(self)
+  end
   
+  def may_add_resource?
+    self.plan.may_add_resource?(self)
+  end  
   
   protected
 
