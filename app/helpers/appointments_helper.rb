@@ -10,7 +10,7 @@ module AppointmentsHelper
       
       if s == default
         # no when parameter for the default value
-        link  = link_to(s.titleize, url_for(url_params), :class => klass)
+        link  = link_to(s.titleize, url_for(url_params.update(:when => nil)), :class => klass)
       else
         # use when parameter
         link  = link_to(s.titleize, url_for(url_params.update(:when => s.to_url_param)), :class => klass)

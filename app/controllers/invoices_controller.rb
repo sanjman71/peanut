@@ -11,7 +11,7 @@ class InvoicesController < ApplicationController
       @daterange    = DateRange.parse_range(@start_date, @end_date)
     else
       # build daterange using when
-      @when         = (params[:when] || Appointment::WHEN_PAST_WEEK).to_s_param
+      @when         = (params[:when] || Appointment::WHEN_PAST_WEEK).from_url_param
       @daterange    = DateRange.parse_when(@when)
     end
     

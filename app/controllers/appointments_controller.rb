@@ -65,17 +65,20 @@ class AppointmentsController < ApplicationController
   
   # DELETE /appointments/1
   def destroy
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = current_company.appointments.find(params[:id])
     @appointment.destroy
-    @notice_text  = "Deleted appointment"
     
+    # set flash
+    flash[:notice] = "Deleted appointment"
     logger.debug("*** deleted appointment #{@appointment.id}")
         
     if @appointment.waitlist?
-      # set redirect path
-      @redirect = waitlist_index_path(:subdomain => @subdomain)
+      # redirect to waitlist index
+      @redirect = waitlist_index_path(:subdomain => current_subdomain)
     else
-      manage_appointments
+      # redirect to person's appointment path 
+      @person   = @appointment.resource
+      @redirect = person_appointments_path(@person)
     end
   end
   
@@ -86,7 +89,7 @@ class AppointmentsController < ApplicationController
     @people       = current_company.people.all
 
     # initialize time parameters
-    @when         = (params[:when] || @@default_when).to_s_param
+    @when         = (params[:when] || @@default_when).from_url_param
     @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
@@ -228,7 +231,7 @@ class AppointmentsController < ApplicationController
       @invoice    = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
 
       # redirect to invoices controller
-      redirect_to(invoice_path(@invoice, :subdomain => @subdomain))
+      redirect_to(invoice_path(@invoice, :subdomain => current_subdomain))
     end
   end
 
