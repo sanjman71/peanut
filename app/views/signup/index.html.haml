@@ -1,0 +1,26 @@
+- title('Sign up for Peanut Calendar')
+
+.span-24.last
+  .span-15.prepend-1.append-1.last
+    .highlight#flash
+
+  .span-22.prepend-1.append-1.last
+    .plan-heading
+      %h1 30-day Free Trial on All Accounts!
+      %h3 There are several plans available. Signing up only takes a minute.
+
+  .plans.span-24
+    .span-5
+      = render :partial => 'plans/signup_plan', :object => @basic
+    .span-5.prepend-1
+      = render :partial => 'plans/signup_plan', :object => @premium
+    .span-5.prepend-1
+      = render :partial => 'plans/signup_plan', :object => @max
+    .span-5.prepend-1.last
+      = render :partial => 'plans/signup_plan', :object => @free
+
+%hr.space
+
+.span-20.prepend-1
+  %h3= link_to 'Home', root_path
+

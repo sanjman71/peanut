@@ -51,4 +51,4 @@
     .span-20.prepend-1.last
       = submit_tag form_submit || 'Submit', :class => 'big button'
       == or
-      = link_to 'Cancel', edit_company_path(current_company, :subdomain => current_subdomain)
+      = link_to 'Cancel', edit_company_root_path(:subdomain => current_subdomain)

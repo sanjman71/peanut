@@ -147,3 +147,12 @@ div.instructions ul                               { font-size: 12px; }
 /* example styles */
 
 span.example                                      { color: #666666; font-style: italic; font-size: 11px; padding-left: 5px; }
+
+div.basic, div.premium, div.max                   { background-color: lightblue; }
+div.free                                          { background-color: lightgrey; }
+div.plan-ineligable                               { background-color: red;}
+div.plans                                         { text-align: center; }
+div.plans.a                                       { background-color: red;}
+div.plan-heading                                  { text-align: center;}
+div.plan                                          { height: 200px;}
+

@@ -40,12 +40,19 @@ class LocationsController < ApplicationController
 
   # GET /locations/new
   def new
-    @location = Location.new
     
+    if !current_company.may_add_location?
+      flash[:error] = "Your plan does not allow you to add another location."
+      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+    end
+    
+    @location = Location.new
+  
     respond_to do |format|
       format.html # new.html.haml
       format.js # new.js.rjs
     end
+  
   end
 
   # GET /locations/1/edit
@@ -62,6 +69,11 @@ class LocationsController < ApplicationController
   # POST /locations
   # POST /locations.xml
   def create
+    if !current_company.may_add_location?
+      flash[:error] = "Your plan does not allow you to add another location."
+      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+    end
+    
     @location = Location.new(params[:location])
     
     # add location to current company
@@ -119,7 +131,7 @@ class LocationsController < ApplicationController
   protected
 
   def redirect_success_path
-    edit_company_path(current_company, :subdomain => current_subdomain)
+    edit_company_root_path(:subdomain => current_subdomain)
   end
   
 end

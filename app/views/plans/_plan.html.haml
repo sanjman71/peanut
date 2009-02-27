@@ -1,0 +1,22 @@
+.plan-details
+  %h4.bottom
+    - if plan.cost > 0
+      = "#{number_to_currency(plan.cost/100)} every #{pluralize(plan.between_billing_time_amount, plan.between_billing_time_unit)}."
+    - else
+      = "Free!!"
+  %ul
+    %li.max_locations
+      - if plan.max_locations
+        = "Up to #{pluralize plan.max_locations, "location"}"
+      - else
+        Unlimited locations!
+    %li.max_resources
+      - if plan.max_resources
+        = "Up to #{pluralize plan.max_resources, "resource"}"
+      - else
+        Unlimited resources!
+    %li.billing_info
+      - if plan.start_billing_in_time_amount && plan.between_billing_time_amount
+        = "Billing starts after #{pluralize(plan.start_billing_in_time_amount, plan.start_billing_in_time_unit)} and is billed every #{pluralize(plan.start_billing_in_time_amount, plan.start_billing_in_time_unit)}"
+      - else
+        = "Great for evaluation or personal needs."

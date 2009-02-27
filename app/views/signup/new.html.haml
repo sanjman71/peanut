@@ -1,6 +1,7 @@
 - title('Peanut Signup')
 
-- form_for(@company, :url => signup_path, :method => :post, :html => {:class => 'new_company'}) do |f|
+- form_for(@company, :url => signup_plan_path(:plan => @plan.textid), :method => :post, :html => {:class => 'new_company'}) do |f|
+  = hidden_field_tag "plan", @plan.textid
   .span-20.box
     .span-20.last
       %h2== Create your account
@@ -15,9 +16,14 @@
         %h3.text-align-right== Company name:
       .span-16.last
         = f.text_field :name, :id => 'company_name', :class => 'title big', :style => 'width: 200px; margin: 0px;'
+        %hr
+      .span-4
+        %h3.text-align-right== Subdomain:
+      .span-16.last
+        = f.text_field :subdomain, :style => 'width: 200px; margin: 0px;'
         %span{:style => 'font-size: 12px; font-weight: bold;'}=DOMAIN
     .span-16.prepend-4.last
-      %em{:style => "color: #666666; font-size: 15px;"}== This is the address you will use to login and manage your appointments. (e.g. http://peanut.peanutcalendar.com)
+      %em{:style => "color: #666666; font-size: 15px;"}== This is the address you will use to login and manage your appointments. (e.g. http://peanut#{DOMAIN}). It should only have letters, numbers and a dash.
     
     %hr.space
   
@@ -30,38 +36,111 @@
         %em{:style => "color: #666666; font-size: 15px;"}== This is the timezone for your business.  Users will be shown available times and schedule appointments in this timezone. 
         
     %hr.space
-  
-    - fields_for("user", @user) do |user_form|
-      .span-20.last
-        %h2== Create your user account
-      .span-18.last
-        %hr
-      -# show any user errors
-      - unless @user.errors.blank?
-        .span-18.notice
-          = error_messages_for('user', :header_message => nil)
-      .span-20.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
-        .span-16.last
-          = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-20.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
-        .span-16.last
-          = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-20.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
-        .span-16.last
-          = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-20.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
-        .span-16.last
-          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-          .span-20.last.padding-bottom-10
+
+    - if logged_in?
+      %h2== This company is being created for #{current_user.name}
+    - else
+      - fields_for("user", @user) do |user_form|
+        .span-20.last
+          %h2== Create your user account
+        .span-18.last
+          %hr
+        -# show any user errors
+        - unless @user.errors.blank?
+          .span-18.notice
+            = error_messages_for('user', :header_message => nil)
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+          .span-16.last
+            = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
+          .span-16.last
+            = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
+          .span-16.last
+            = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+        .span-20.last.padding-bottom-10
+          .span-4
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+          .span-16.last
+            = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+            .span-20.last.padding-bottom-10
         
+
+    %hr.space
+
+    .span-20.last
+      %h2== Billing Information
+    .span-18.last
+      %hr
+        
+    -# show any subscription errors
+    - unless @subscription and @subscription.errors.blank?
+      .span-18.notice
+        = error_messages_for('subscription', :header_message => nil)
+        
+    .span-20#credit_card
+      .span-20.last
+        .span-7#first_name
+          = label_tag 'cc_first_name', 'First Name'
+          %br
+          = text_field_tag 'cc[first_name]', '', :id => 'cc_first_name', :class => 'title', :style => 'width: 200px;'
+
+        .span-13.last#last_name
+          = label_tag 'cc_last_name', 'Last Name'
+          %br
+          = text_field_tag 'cc[last_name]', '', :id => 'cc_last_name', :class => 'title', :style => 'width: 200px;'
+      
+      .span-20.last
+        .span-7#type
+          = label_tag 'cc_type', 'Credit Card Type'
+          %br
+          = select_tag('cc[type]', options_for_select(credit_card_types_for_select), :class => 'select big', :style => 'width: 150px;')
+        .span-6#number
+          = label_tag 'cc_number', 'Credit Card Number'
+          %br
+          = text_field_tag 'cc[number]', '', :id => 'cc_number', :class => 'title', :style => 'width: 200px;'
+        .span-3#expires
+          = label_tag 'expires', 'Expires On'
+          %br
+          = select_tag('cc[month]', options_for_select(Range.new(1,12)), :class => 'select big')
+          = select_tag('cc[year]', options_for_select(Range.new(2009, 2020)), :class => 'select big')
+        .span-4.last#cvv
+          = label_tag 'cc_verification_value', 'CVV'
+          %br
+          = text_field_tag 'cc[verification_value]', '', :id => 'cc_verification_value', :class => 'title', :style => 'width: 25px; height: 12px; font-size: 11px;'
+            
+      / .span-20.last.padding-bottom-10
+      /   .span-4
+      /     %h3.text-align-right{:style => "padding-top: 10px;"}== Street Address:
+      /   .span-16.last
+      /     = account_form.text_field :street1, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      / .span-20.last.padding-bottom-10
+      /   .span-4
+      /     %h3.text-align-right{:style => "padding-top: 10px;"}== Street Address 2:
+      /   .span-16.last
+      /     = account_form.text_field :street2, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      / .span-20.last.padding-bottom-10
+      /   .span-4
+      /     %h3.text-align-right{:style => "padding-top: 10px;"}== City:
+      /   .span-16.last
+      /     = account_form.text_field :city, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      / .span-20.last.padding-bottom-10
+      /   .span-4
+      /     %h3.text-align-right{:style => "padding-top: 10px;"}== State:
+      /   .span-16.last
+      /     = account_form.text_field :state, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      / .span-20.last.padding-bottom-10
+      /   .span-4
+      /     %h3.text-align-right{:style => "padding-top: 10px;"}== Zip:
+      /   .span-16.last
+      /     = account_form.text_field :zip, :class => 'title big', :style => 'width: 300px; margin: 0px;'
+      / .span-20.last.padding-bottom-10
 
     %hr.space
 
@@ -69,12 +148,19 @@
       %h2== Review your plan and signup
     .span-18.last
       %hr
+
+    .span-20.last
+      = render :partial => 'plans/plan', :object => @plan
+      
     -# show terms errors
     - if @terms_error
       .span-18.notice
         = @terms_error
     .span-20.last
       %h3== All plans are monthly. There are no cancellation fees or long-term contracts.
+    .span-5.lasat
+      = link_to "Choose another plan", plans_path
+    %hr.space
     .span-20.last
       %h3
         = check_box_tag "company[terms]"

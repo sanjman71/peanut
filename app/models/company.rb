@@ -6,6 +6,21 @@ class Company < ActiveRecord::Base
 
   validates_uniqueness_of   :name
   validates_presence_of     :name
+
+  # Subdomain rules
+  validates_presence_of     :subdomain
+  validates_format_of       :subdomain,
+                            :with => /^[A-Za-z0-9-]+$/,
+                            :message => 'The subdomain can only contain alphanumeric characters and dashes.',
+                            :allow_blank => true
+  validates_uniqueness_of   :subdomain,
+                            :case_sensitive => false
+  validates_exclusion_of    :subdomain,
+                            :in => %w( support blog www billing help api ),
+                            :message => "The subdomain <strong>{{value}}</strong> is reserved and unavailable."
+
+  before_validation         :init_subdomain, :downcase_subdomain
+
   validates_presence_of     :time_zone
   has_many_polymorphs       :resources, :from => [:people]
   has_many                  :services
@@ -13,8 +28,13 @@ class Company < ActiveRecord::Base
   has_many                  :appointments
   has_many                  :owners, :through => :appointments, :uniq => true
   has_many                  :invitations
-  before_save               :init_subdomain
+
   after_create              :init_basic_services
+
+  # Accounting info
+  has_one                   :subscription
+  has_one                   :company_owner, :through => :subscription, :source => :user
+  has_one                   :plan, :through => :subscription
   
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
@@ -48,13 +68,27 @@ class Company < ActiveRecord::Base
   def locations_with_any
     Array(Location.anywhere) + self.locations
   end
+
+  # Plan tests
+  def may_add_location?
+    self.plan.may_add_location?(self)
+  end
   
+  def may_add_resource?
+    self.plan.may_add_resource?(self)
+  end  
   
-  private
+  protected
+
+  def downcase_subdomain
+    self.subdomain.downcase! if attribute_present?("subdomain")
+  end
   
   # initialize subdomain based on company name
   def init_subdomain
-    self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '')
+    if !attribute_present?("subdomain")
+      self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '') unless name.blank?
+    end
   end
   
   # initialize company's basic services
