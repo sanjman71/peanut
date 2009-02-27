@@ -1,12 +1,15 @@
-- if current_company.plan != choose_plan
-  .span-5.prepend-1
-    - if choose_plan.is_eligible(current_company)
-      %div{:class => "#{choose_plan.textid} plan"}
-        = link_to("<h2 class='bottom'>#{choose_plan.name}</h2>", update_plan_path(:plan => choose_plan.textid, :subdomain => current_subdomain), :class => 'signup')
-        = render :partial => 'plans/plan', :object => choose_plan
-        = link_to("<h2 class='bottom'>Choose Plan!</h2>", update_plan_path(:plan => choose_plan.textid, :subdomain => current_subdomain), :class => 'signup')
-    - else
-      %div{:class => "plan-ineligable plan"}
-        %h2.bottom= choose_plan.name
-        = render :partial => 'plans/plan', :object => choose_plan
-        %h2.signup= "Not eligible"
+- if current_company.plan == choose_plan
+  %div{:class => "plan-ineligable plan"}
+    %h2.bottom= choose_plan.name
+    = render :partial => 'plans/plan', :object => choose_plan
+    %h2.signup= "Current plan"
+- elsif choose_plan.is_eligible(current_company)
+  %div{:class => "#{choose_plan.textid} plan"}
+    = link_to("<h2 class='bottom'>#{choose_plan.name}</h2>", update_plan_path(:plan => choose_plan.textid, :subdomain => current_subdomain), :class => 'signup')
+    = render :partial => 'plans/plan', :object => choose_plan
+    = link_to("<h2 class='bottom'>Choose Plan!</h2>", update_plan_path(:plan => choose_plan.textid, :subdomain => current_subdomain), :class => 'signup')
+- else
+  %div{:class => "plan-ineligable plan"}
+    %h2.bottom= choose_plan.name
+    = render :partial => 'plans/plan', :object => choose_plan
+    %h2.signup= "Not eligible"
