@@ -13,8 +13,10 @@
       %h3
         = "Currently using the <strong>#{@company.plan.name}</strong> plan."
         %br
-        - if @company.plan_subscription.next_bill_date
-          = "Your next bill of #{number_to_currency(@company.plan.cost)} will be charged on #{@company.plan_subscription.next_bill_date.to_date.to_s(:long)}."
+        - if @company.subscription.start_billing_at
+          = "Your first bill of #{number_to_currency(@company.plan.cost/100)} will be charged on #{@company.subscription.start_billing_at.to_date.to_s(:long)}."
+        - elsif @company.subscription.next_billing_at
+          = "Your next bill of #{number_to_currency(@company.plan.cost/100)} will be charged on #{@company.subscription.next_billing_at.to_date.to_s(:long)}."
         %br
         = link_to "Change plan", change_plan_path(:subdomain => current_subdomain)
     .span-5.last
@@ -40,5 +42,5 @@
 
   .span-19.prepend-1.last
     %h2
-      == Locations
+      == Company Locations
     = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}

@@ -1,10 +1,10 @@
-class PlanSubscriptionsController < ApplicationController
+class SubscriptionsController < ApplicationController
   layout "company"
 
   privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
   
   def edit
-    @plan_subscription = current_company.plan_subscription
+    @subscription = current_company.subscription
     
     respond_to do |format|
       format.html # edit.html.haml
@@ -16,9 +16,6 @@ class PlanSubscriptionsController < ApplicationController
     
     if @plan.is_eligible(current_company)
       current_company.plan = @plan
-      if current_company.plan_subscription.next_bill_date.blank?
-        current_company.plan_subscription.next_bill_date = Time.now + @plan.days_to_first_bill
-      end
       current_company.save
       flash[:notice] = "Your plan has been updated."
     else

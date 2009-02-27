@@ -18,12 +18,14 @@
     
 .span-7.prepend-2.last
   .span-6.box
-    - form_for(Person.new, :url => people_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_person', :id => 'new_person_form'}) do |f|
-      .span-6.last
-        = label_tag "new_person_name", "Add a person", :class => 'big'
-      .span-6.last
-        = text_field_tag "person[name]", '', :id => 'person_name', :class => 'title big required', :style => 'width: 200px;'
-      .span-6.last
-        .hide#progress= image_tag 'barbershop.gif'
-        #submit= submit_tag "Create", :name => nil, :class => 'button big'
-
+    - if current_company.may_add_resource?
+      - form_for(Person.new, :url => people_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_person', :id => 'new_person_form'}) do |f|
+        .span-6.last
+          = label_tag "new_person_name", "Add a person", :class => 'big'
+        .span-6.last
+          = text_field_tag "person[name]", '', :id => 'person_name', :class => 'title big required', :style => 'width: 200px;'
+        .span-6.last
+          .hide#progress= image_tag 'barbershop.gif'
+          #submit= submit_tag "Create", :name => nil, :class => 'button big'
+    - else
+      = "You cannot add any more people. If you wish to do so, please #{link_to "change plan", change_plan_path(:subdomain => current_subdomain) }"

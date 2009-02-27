@@ -1,4 +1,4 @@
-class AddPaymentProcessing < ActiveRecord::Migration
+class CreatePaymentProcessing < ActiveRecord::Migration
   def self.up
     create_table :payments do |t|
       t.references  :subscription

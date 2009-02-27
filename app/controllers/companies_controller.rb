@@ -36,7 +36,7 @@ class CompaniesController < ApplicationController
       if @company.update_attributes(params[:company])
         flash[:notice] = 'Company was successfully updated.'
         # redirect to edit company page, since company show doesn't really show anything
-        format.html { redirect_to(edit_company_path(@company, :subdomain => @subdomain)) }
+        format.html { redirect_to(edit_company_root_path(:subdomain => @subdomain)) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
