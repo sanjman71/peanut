@@ -19,23 +19,19 @@ class Plan < ActiveRecord::Base
     (self.max_resources.blank? || (company.resources.size < self.max_resources))
   end
   
-  # calculate and return start billing date based on current time or passed in time (defaults to current time)
+  # calculate and return start billing datetime based on current time or passed in time (defaults to current time)
   def start_billing_at(options={})
     return nil if self.start_billing_in_time_amount.blank? or self.start_billing_in_time_unit.blank?
-    start_at = options[:from] || Time.now
-    (start_at + eval("#{self.start_billing_in_time_amount}.#{self.start_billing_in_time_unit}")).to_date
+    start_at = options[:from] ? options[:from] : Time.now.utc
+    (start_at + eval("#{self.start_billing_in_time_amount}.#{self.start_billing_in_time_unit}")).beginning_of_day
   end
   
-  # calculate and return time between billing cycles
-  def billing_cycle
+  # calculate and return the specified number of billing cycles
+  def billing_cycle(count=1)
     return 0 if self.between_billing_time_amount.blank? or self.between_billing_time_unit.blank?
-    eval("#{self.between_billing_time_amount}.#{self.between_billing_time_unit}")
-  end
-  
-  # calculate and return time between billing cycles
-  def billing_cycle
-    return 0 if self.between_billing_time_amount.blank? or self.between_billing_time_unit.blank?
-    eval("#{self.between_billing_time_amount}.#{self.between_billing_time_unit}")
+    # build cycle count
+    cycles = count * self.between_billing_time_amount
+    eval("#{cycles}.#{self.between_billing_time_unit}")
   end
   
 end

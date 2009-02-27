@@ -21,6 +21,8 @@ class CreatePaymentProcessing < ActiveRecord::Migration
       t.datetime    :start_billing_at
       t.datetime    :last_billing_at
       t.datetime    :next_billing_at
+      t.integer     :paid_count, :default => 0
+      t.integer     :billing_errors_count, :default => 0
       t.string      :vault_id, :default => nil
       t.string      :state, :default => 'initialized'
       t.timestamps
