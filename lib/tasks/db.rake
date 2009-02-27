@@ -115,13 +115,15 @@ namespace :db do
         puts "#{Time.now}: adding company plans and account owners ..."
         basic = Plan.find_by_textid("basic")
         premium = Plan.find_by_textid("premium")
-        company1.plan = basic
-        # company1.plan_subscription.next_bill_date = Time.now + basic.days_to_first_bill
-        company1.company_owner = User.find_by_email("admin@killianmurphy.com")
 
-        noelrose.plan = premium
-        # noelrose.plan_subscription.next_bill_date = Time.now + premium.days_to_first_bill
-        noelrose.company_owner = User.find_by_email("sanjay@jarna.com")
+        u1 = User.find_by_email("admin@killianmurphy.com")
+        u2 = User.find_by_email("sanjay@jarna.com")
+
+        company1.subscription = Subscription.create(:user => u1, :plan => basic, :company => company1)
+        noelrose.subscription = Subscription.create(:user => u2, :plan => premium, :company => noelrose)
+        
+        company1.save
+        noelrose.save
 
         puts "#{Time.now}: completed"
       end

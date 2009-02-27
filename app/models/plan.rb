@@ -32,8 +32,6 @@ class Plan < ActiveRecord::Base
     eval("#{self.between_billing_time_amount}.#{self.between_billing_time_unit}")
   end
   
-  end
-  
   # calculate and return time between billing cycles
   def billing_cycle
     return 0 if self.between_billing_time_amount.blank? or self.between_billing_time_unit.blank?

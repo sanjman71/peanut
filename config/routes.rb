@@ -79,8 +79,8 @@ ActionController::Routing::Routes.draw do |map|
 
   # Plans
   map.resources :plans
-  map.change_plan   '/change_plan', :controller => 'plan_subscriptions', :action => 'edit'
-  map.update_plan   '/update_plan/:plan', :controller => 'plan_subscriptions', :action => 'update'
+  map.change_plan   '/change_plan', :controller => 'subscriptions', :action => 'edit'
+  map.update_plan   '/update_plan/:plan', :controller => 'subscriptions', :action => 'update'
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
