@@ -45,7 +45,7 @@ class PeopleController < ApplicationController
   def new
     if !current_company.may_add_resource?
       flash[:error] = "Your plan does not allow you to add another person."
-      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+      redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
     
     @person = Person.new
@@ -67,7 +67,7 @@ class PeopleController < ApplicationController
 
     if !current_company.may_add_resource?
       flash[:error] = "Your plan does not allow you to add another person."
-      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+      redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
 
     @person = Person.new(params[:person])
