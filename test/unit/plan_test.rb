@@ -16,11 +16,15 @@ class PlanTest < ActiveSupport::TestCase
     should_change "Plan.count", :by => 1
     
     should "have start billing at in 1 month" do
-      assert_equal Time.now.to_date + 1.month, @monthly_plan.start_billing_at
+      assert_equal Time.now.utc.beginning_of_day + 1.month, @monthly_plan.start_billing_at
     end
     
-    should "have billing cycle of 1 month" do
+    should "have 1 billing cycle of 1 month" do
       assert_equal 1.month, @monthly_plan.billing_cycle
+    end
+
+    should "have 2 billing cycles of 2 months" do
+      assert_equal 2.months, @monthly_plan.billing_cycle(2)
     end
   end
 

@@ -1,6 +1,6 @@
 class Membership < ActiveRecord::Base
-  belongs_to                :service
-  belongs_to                :resource, :polymorphic => true
+  belongs_to                :service, :counter_cache => :resources_count
+  belongs_to                :resource, :polymorphic => true, :counter_cache => :services_count
   validates_presence_of     :service_id, :resource_id, :resource_type
   
   def validate

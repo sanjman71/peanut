@@ -23,8 +23,7 @@ a.rounded, .rounded.button                        { outline: none; border: none;
                                                     display: -moz-inline-box; display: inline-block; 
                                                     overflow: visible; /* IE6 form button fix */ }
 
-.rounded.button                                   { color: #FFFFFF; background-color: #000088; padding: 5px 5px; }
-.rounded.button:hover                             { background-color: #0000CC; }
+.rounded.button                                   { color: #FFFFFF; background-color: #111111; padding: 5px 5px; }
 
 /* error styles */
 
@@ -148,8 +147,8 @@ div.instructions ul                               { font-size: 12px; }
 
 span.example                                      { color: #666666; font-style: italic; font-size: 11px; padding-left: 5px; }
 
-div.basic, div.premium, div.max                   { background-color: lightblue; }
-div.free                                          { background-color: lightgrey; }
+div.plan.basic, div.plan.premium, div.plan.max    { background-color: lightblue; }
+div.plan.free                                     { background-color: lightgrey; }
 div.plan-ineligable                               { background-color: red;}
 div.plans                                         { text-align: center; }
 div.plans.a                                       { background-color: red;}

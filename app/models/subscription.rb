@@ -1,7 +1,7 @@
 class SubscriptionError < StandardError; end
 
 class Subscription < ActiveRecord::Base
-  validates_presence_of   :plan_id, :user_id, :company_id, :start_billing_at
+  validates_presence_of   :plan_id, :user_id, :company_id, :start_billing_at, :paid_count, :billing_errors_count
   belongs_to              :user
   belongs_to              :company
   belongs_to              :plan
@@ -30,7 +30,7 @@ class Subscription < ActiveRecord::Base
   end
 
   aasm_event :frozen do
-    transitions :to => :frozen, :from => [:active, :frozen]
+    transitions :to => :frozen, :from => [:authorized, :active, :frozen]
   end
   # END acts_as_state_machine
 
@@ -38,12 +38,10 @@ class Subscription < ActiveRecord::Base
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
     
-    self.start_billing_at = self.plan.start_billing_at unless plan.blank?
-  end
-
-  # always force start billing date to the beginning of the day
-  def start_billing_at=(date)
-    write_attribute(:start_billing_at, date) unless date.blank?
+    # use plan start billing date, store as utc value
+    self.start_billing_at     = self.plan.start_billing_at.utc unless plan.blank?
+    self.paid_count           = 0
+    self.billing_errors_count = 0
   end
     
   # authorize the payment and create a vault id
@@ -97,15 +95,29 @@ class Subscription < ActiveRecord::Base
         # transition to active state
         active!
 
-        # set the last, next billing dates
+        # increment paid count
+        self.paid_count = self.paid_count + 1
+        
+        # set the last bill date to now
         self.last_billing_at = Time.now
-        self.next_billing_at = Time.now + plan.billing_cycle
 
+        # set next billing date as an integer number of billing cycles from the start billing date, store as utc value
+        self.next_billing_at = self.start_billing_at.utc + plan.billing_cycle(self.paid_count)
+
+        # reset billing errors count
+        self.billing_errors_count = 0
+        
         # commit changes
         self.save
       else
         # transition to frozen state
         frozen!
+
+        # increment billing errors count
+        self.billing_errors_count = self.billing_errors_count + 1
+
+        # commit changes
+        self.save
       end
 
       @payment

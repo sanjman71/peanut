@@ -2,7 +2,7 @@ require 'test/test_helper'
 require 'test/factories'
 
 class SubscriptionTest < ActiveSupport::TestCase
-  should_require_attributes :company_id, :user_id, :plan_id, :start_billing_at
+  should_require_attributes :company_id, :user_id, :plan_id, :start_billing_at, :paid_count
   should_have_many          :payments
   
   def setup
@@ -42,7 +42,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       end
       
       should "have next billing date == today" do
-        assert_equal Time.now.beginning_of_day, @subscription.next_billing_at
+        assert_equal Time.now.utc.beginning_of_day, @subscription.next_billing_at
       end
       
       context "bill subscription" do
@@ -56,16 +56,21 @@ class SubscriptionTest < ActiveSupport::TestCase
         end
         
         should "update last, next billing dates" do
-          assert_equal Date.today, @subscription.last_billing_at.to_date
-          assert_equal Date.today + 1.month, @subscription.next_billing_at.to_date
+          assert_equal Date.today, @subscription.last_billing_at.to_date  # dates are easier to compare than timestamps
+          assert_equal Time.now.utc.beginning_of_day + 1.month, @subscription.next_billing_at
         end
     
-        should "have a 2 total payment" do
+        should "have 2 total payments" do
           assert_equal [@payment, @paid_payment], @subscription.payments
         end
     
-        should "have a 1 paid payment" do
+        should "have 1 paid payment" do
           assert_equal [@paid_payment], @subscription.payments.paid
+          assert_equal 1, @subscription.paid_count
+        end
+        
+        should "have billing errors count == 0" do
+          assert_equal 0, @subscription.billing_errors_count
         end
         
         should "raise exception if billed again" do
@@ -74,9 +79,25 @@ class SubscriptionTest < ActiveSupport::TestCase
           end
         end
       end
+      
+      context "bill subscription with an invalid credit card" do
+        setup do
+          @bad_credit_card  = credit_card(:number => '2')
+          @error_payment    = @subscription.bill(@bad_credit_card)
+          @subscription.reload
+        end
+
+        should "set billing errors count to 1" do
+          assert_equal 1, @subscription.billing_errors_count
+        end
+        
+        should "change subscription to froze state" do
+          assert @subscription.frozen?
+        end
+      end
     end
 
-    context "authorize with an valid credit card" do
+    context "authorize with an invalid credit card" do
       setup do
         @credit_card  = credit_card(:number => '2')
         @payment      = @subscription.authorize(@credit_card)
@@ -132,7 +153,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       end
       
       should "have next billing date in 1 month" do
-        assert_equal Time.now.beginning_of_day + 1.month, @subscription.next_billing_at
+        assert_equal Time.now.utc.beginning_of_day + 1.month, @subscription.next_billing_at
       end
     
       should "should raise subscription error if billed again" do

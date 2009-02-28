@@ -43,7 +43,7 @@ class LocationsController < ApplicationController
     
     if !current_company.may_add_location?
       flash[:error] = "Your plan does not allow you to add another location."
-      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+      redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
     
     @location = Location.new
@@ -71,7 +71,7 @@ class LocationsController < ApplicationController
   def create
     if !current_company.may_add_location?
       flash[:error] = "Your plan does not allow you to add another location."
-      return redirect_to edit_company_root_path(:subdomain => current_subdomain)
+      redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
     
     @location = Location.new(params[:location])
