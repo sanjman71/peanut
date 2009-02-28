@@ -71,15 +71,14 @@ ActionController::Routing::Routes.draw do |map|
   # customers with nested resources
   map.resources :customers,         :has_many => [:appointments]
 
-  # javascript routes
-  map.resources :javascripts,       :collection => {:skillset => :get}
-
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations,         :member => {:select => :get}
 
-  # Plans
+  # Plans and subscriptions
   map.resources :plans
+  map.connect   'subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
+  map.resources :subscriptions
   map.change_plan   '/change_plan', :controller => 'subscriptions', :action => 'edit'
   map.update_plan   '/update_plan/:plan', :controller => 'subscriptions', :action => 'update'
 

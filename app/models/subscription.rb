@@ -11,6 +11,9 @@ class Subscription < ActiveRecord::Base
 
   delegate                :cost, :to => :plan
   
+  # find all subscriptions with billing errors
+  named_scope             :billing_errors, { :conditions => ["billing_errors_count > 0"] }
+  
   # BEGIN acts_as_state_machhine
   include AASM
   
