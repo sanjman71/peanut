@@ -6,6 +6,12 @@ $(document).ready(function() {
   $('#appointment_code').focus();
   $('#appointment_time_range_start_at').focus();
 
+  Date.firstDayOfWeek = 7;
+  Date.format = 'mm/dd/yyyy';
+
+  $(document).init_datepicker({start_date : (new Date()).asString(), end_date : (new Date()).addMonths(1).asString(), max_days:10});
+  $(document).init_toggle_dates();
+
   // rounded corners
   $('.rounded').corners();
 })

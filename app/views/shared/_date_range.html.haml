@@ -1,0 +1,13 @@
+- form_for(object, :url => url) do |f|
+  .span-3
+    == Start:
+    %br
+    = text_field_tag 'start_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
+  .span-3.last
+    == End:
+    %br
+    = text_field_tag 'end_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
+  .span-6.last{:style => 'padding-top: 7px;'}
+    = f.submit 'Search', :name => nil, :class => 'button'
+    == or
+    = link_to "Cancel", '', :id => 'show_links'
