@@ -3,7 +3,8 @@ class AppointmentsController < ApplicationController
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
-  # GET /people/1/appointments
+  # GET /people/1/appointments/when/next-week
+  # GET /people/1/appointments/range/20090101..20090201
   def index
     if params[:customer_id]
       @customer     = User.find(params[:customer_id])
@@ -88,9 +89,20 @@ class AppointmentsController < ApplicationController
     @person       = current_company.people.find_by_id(params[:person_id])
     @people       = current_company.people.all
 
-    # initialize time parameters
-    @when         = (params[:when] || @@default_when).from_url_param
-    @daterange    = DateRange.parse_when(@when)
+    if params[:start_date] and params[:end_date]
+      # build daterange using range values
+      @start_date = params[:start_date]
+      @end_date   = params[:end_date]
+      @daterange  = DateRange.parse_range(@start_date, @end_date)
+    else
+      # build daterange using when
+      @when       = (params[:when] || @@default_when).from_url_param
+      @daterange  = DateRange.parse_when(@when)
+    end
+
+    # initialize date range parameters
+    # @when         = (params[:when] || @@default_when).from_url_param
+    # @daterange    = DateRange.parse_when(@when)
     
     # find free, work appointments for a person
     @appointments = current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
@@ -251,59 +263,30 @@ class AppointmentsController < ApplicationController
   end
   
   # GET /appointments/search
+  # POST /appointments/search
+  #  - search for an appointment by code => params[:appointment][:code]
+  #  - search for appointments by date range => params[:start_date], params[:end_date]
   def search
     if request.post?
-      # check confirmation code, limit search to work appointments
-      @code         = params[:appointment][:code].to_s.strip
-      @appointment  = Appointment.work.find_by_confirmation_code(@code)
+      if params[:appointment] and params[:appointment][:code]
+        # check confirmation code, limit search to work appointments
+        @code         = params[:appointment][:code].to_s.strip
+        @appointment  = Appointment.work.find_by_confirmation_code(@code)
       
-      if @appointment
-        # redirect to appointment show
-        @redirect = appointment_path(@appointment, :subdomain => @subdomain)
-      else
-        # show error message?
-        logger.debug("*** could not find appointment #{@code}")
+        if @appointment
+          # redirect to appointment show
+          @redirect = appointment_path(@appointment, :subdomain => current_subdomain)
+        else
+          # show error message?
+          logger.debug("*** could not find appointment #{@code}")
+        end
+      elsif params[:start_date] and params[:end_date]
+        # reformat start_date, end_date strings, and redirect to index action
+        start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
+        end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
+        redirect_to url_for(:action => 'index', :start_date => start_date, :end_date => end_date, :subdomain => current_subdomain)
       end
     end
   end
-  
-  # GET /appointments/1/edit
-  # def edit
-  #   @appointment = Appointment.find(params[:id])
-  # end
-
-  # POST /appointments
-  # POST /appointments.xml
-  # def create
-  #   @appointment = Appointment.new(params[:appointment])
-  # 
-  #   respond_to do |format|
-  #     if @appointment.save
-  #       flash[:notice] = 'Appointment was successfully created.'
-  #       format.html { redirect_to(@appointment) }
-  #       format.xml  { render :xml => @appointment, :status => :created, :location => @appointment }
-  #     else
-  #       format.html { render :action => "confirm" }
-  #       format.xml  { render :xml => @appointment.errors, :status => :unprocessable_entity }
-  #     end
-  #   end
-  # end
-
-  # PUT /appointments/1
-  # PUT /appointments/1.xml
-  # def update
-  #   @appointment = Appointment.find(params[:id])
-  # 
-  #   respond_to do |format|
-  #     if @appointment.update_attributes(params[:appointment])
-  #       flash[:notice] = 'Appointment was successfully updated.'
-  #       format.html { redirect_to(@appointment) }
-  #       format.xml  { head :ok }
-  #     else
-  #       format.html { render :action => "edit" }
-  #       format.xml  { render :xml => @appointment.errors, :status => :unprocessable_entity }
-  #     end
-  #   end
-  # end
-
+    
 end

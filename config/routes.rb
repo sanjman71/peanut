@@ -22,7 +22,7 @@ ActionController::Routing::Routes.draw do |map|
   # special invoice routes
   map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
   map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
-    
+
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
@@ -37,12 +37,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # format openings search path, scoped by person (optional) and service
+  # openings search path, scoped by person (optional) and service
   map.connect   'people/:person_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
-  # format appointments index path, scoped by person
-  map.connect   'people/:person_id/appointments/:when', :controller => 'appointments', :action => 'index'
+  # appointments index path, scoped by person
+  map.connect   'people/:person_id/appointments/when/:when', :controller => 'appointments', :action => 'index'
+  map.connect   'people/:person_id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
 
   # override 'appointments/new' path
   map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
@@ -52,12 +53,12 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :people do |resource|
     # nested appointments routes
-    resource.resources :appointments
+    resource.resources :appointments, :collection => {:search => :post}
     # nested openings routes
     resource.resources :openings, :only => [:index]
     
     # nested services routes
-    resource.resources :services,   :has_many => [:appointments, :openings]
+    resource.resources :services, :has_many => [:appointments, :openings]
     
     # manage free time
     resource.resources :free, :only => [:new, :create]

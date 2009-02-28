@@ -6,29 +6,18 @@
     .span-9
       %h2== Invoices
       %h4= @daterange.name
-    .span-6.last
+    .span-6.prepend-1.last
       #links
         - build_invoice_when_links(Appointment::WHENS_PAST, @when, :default => 'past week') do |link, separator|
           = link
           = separator
+        %br
         %em== or
         %br
         = link_to "Use a Date Range", '', :id => 'show_dates'
         
       #dates.hide
-        - form_for(AppointmentInvoice.new, :url => search_invoices_path, :method => :get) do |f|
-          .span-3
-            == Start:
-            %br
-            = text_field_tag 'start_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
-          .span-3.last
-            == End:
-            %br
-            = text_field_tag 'end_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
-          .span-6.last{:style => 'padding-top: 7px;'}
-            = f.submit 'Search', :name => nil, :class => 'button'
-            == or
-            = link_to "Cancel", '', :id => 'show_links'
+        = render(:partial => 'shared/date_range', :locals => {:object => AppointmentInvoice.new, :url => search_invoices_path})
           
   .span-16.prepend-1
     - if @appointments.blank?

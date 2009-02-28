@@ -1,6 +1,6 @@
 - title("Schedules")
-- stylesheet('appointments', 'calendar')
-- javascript('appointments')
+- javascript('date', 'jquery.bgiframe', 'jquery.datePicker', 'appointments')
+- stylesheet('appointments', 'calendar', 'datePicker')
 
 .span-17
   .span-16.last.box
@@ -10,14 +10,24 @@
         = link_to '(add)', people_path
         == before you can view a schedule.
     - else
-      .span-10
-        = label_tag "person_id", "Schedule for", :class => 'big'
-        = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :class => 'text')
-      .span-5.prepend-1.last
-        - build_appointment_when_links(@person, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
-          = link
-          = separator
-          
+      .span-9
+        %h3
+          = label_tag "person_id", "Schedule for", :class => 'big'
+          = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :class => 'text')
+        %h4== Filler
+      .span-6.prepend-1.last
+        #links
+          - build_appointment_when_links(@person, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
+            = link
+            = separator
+          %br
+          %em== or
+          %br
+          = link_to "Use a Date Range", '', :id => 'show_dates'
+
+        #dates.hide
+          = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => search_person_appointments_path(:subdomain => current_subdomain)})
+      
   - unless @current_company.people_count == 0
     .span-16.prepend-1.last
       #appointment_flash
@@ -27,7 +37,7 @@
       
     .span-16.prepend-1.last
       %h2
-        == #{@when.titleize}
+        == #{@daterange.name}
       .span-16.last#free_calendar
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
       %h3.span-16.last3#appointments_count

@@ -275,6 +275,69 @@ $.fn.init_change_location = function() {
   })
 }
 
+$.fn.init_datepicker = function(s) {
+
+  var defaults = {start_date : "01/01/2009", end_date : "12/31/2009", max_days : 7}
+  s = $.extend({}, defaults, s);
+  
+  // initialize date picker object
+  $('.date-pick').datePicker({clickInput:true, createButton:false, startDate:s.start_date, endDate:s.end_date});
+
+  // bind to start date selected event
+  $('#start_date').bind(
+    'dpClosed',
+    function(e, selectedDates)
+    {
+      // get selected start date
+      var d = selectedDates[0];
+      if (d) {
+        d = new Date(d);
+        // end date must be after the selected start date
+        $('#end_date').dpSetStartDate(d.addDays(1).asString());
+        // adjust end date based on max days
+        $('#end_date').dpSetEndDate(d.addDays(s.max_days).asString());
+      }
+    }
+  );
+  
+  // bind to end date selected event
+  $('#end_date').bind(
+    'dpClosed',
+    function(e, selectedDates)
+    {
+      // get selected end date
+      var d = selectedDates[0];
+      if (d) {
+        d = new Date(d);
+        // start date must be before the selected end date
+        $('#start_date').dpSetEndDate(d.addDays(-1).asString());
+      }
+    }
+  );
+}
+
+$.fn.init_toggle_dates = function() {
+  // show dates and hide links
+  $('#show_dates').bind(
+    'click',
+    function() {
+      $('#dates').show();
+      $('#links').hide();
+      return false;
+    }
+  );
+  
+  // show links and hide dates
+  $('#show_links').bind(
+    'click',
+    function() {
+      $('#links').show();
+      $('#dates').hide();
+      return false;
+    }
+  );
+}
+
 // Replace all ujs classes with ajax post calls; ask user for confirmation if required.
 $.fn.init_ujs_links = function () {
   $("a.ujs").click(function() {

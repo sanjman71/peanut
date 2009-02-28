@@ -9,8 +9,8 @@ module AppointmentsHelper
       url_params  = {:controller => 'appointments', :action => 'index', :person_id => person, :subdomain => @subdomain}
       
       if s == default
-        # no when parameter for the default value
-        link  = link_to(s.titleize, url_for(url_params.update(:when => nil)), :class => klass)
+        # no when parameter for the default value (explicitly clear start/end date used for range values)
+        link  = link_to(s.titleize, url_for(url_params.update(:when => nil, :start_date => nil, :end_date => nil)), :class => klass)
       else
         # use when parameter
         link  = link_to(s.titleize, url_for(url_params.update(:when => s.to_url_param)), :class => klass)
