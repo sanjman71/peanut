@@ -91,8 +91,8 @@ class SubscriptionTest < ActiveSupport::TestCase
           assert_equal 1, @subscription.billing_errors_count
         end
         
-        should "change subscription to froze state" do
-          assert @subscription.frozen?
+        should "leave subscription in authorized state" do
+          assert @subscription.authorized?
         end
       end
     end

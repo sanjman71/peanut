@@ -110,10 +110,7 @@ class Subscription < ActiveRecord::Base
         # commit changes
         self.save
       else
-        # transition to frozen state
-        frozen!
-
-        # increment billing errors count
+        # leave state alone but increment billing errors count
         self.billing_errors_count = self.billing_errors_count + 1
 
         # commit changes
