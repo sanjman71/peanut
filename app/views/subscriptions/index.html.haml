@@ -1,0 +1,15 @@
+- title('Subscriptions')
+
+.span-23.box
+  .span-8
+    %h3= @search_text
+  .span-8.last
+    = link_to 'All', subscriptions_path
+    == &nbsp;|&nbsp;
+    = link_to "Billing Errors", url_for({:filter => 'errors'})
+    
+.span-24.last
+  .span-15.prepend-1.append-1.last
+    .highlight#flash
+    
+  = render(:partial => 'subscriptions', :locals => {:subscriptions => @subscriptions})

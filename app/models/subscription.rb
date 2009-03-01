@@ -11,6 +11,9 @@ class Subscription < ActiveRecord::Base
 
   delegate                :cost, :to => :plan
   
+  # find all subscriptions with billing errors
+  named_scope             :billing_errors, { :conditions => ["billing_errors_count > 0"] }
+  
   # BEGIN acts_as_state_machhine
   include AASM
   
@@ -110,10 +113,7 @@ class Subscription < ActiveRecord::Base
         # commit changes
         self.save
       else
-        # transition to frozen state
-        frozen!
-
-        # increment billing errors count
+        # leave state alone but increment billing errors count
         self.billing_errors_count = self.billing_errors_count + 1
 
         # commit changes

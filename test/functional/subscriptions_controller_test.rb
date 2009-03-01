@@ -1,8 +1,9 @@
-require 'test_helper'
+require 'test/test_helper'
 
-class PlanSubscriptionsControllerTest < ActionController::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
-  end
+class SubscriptionsControllerTest < ActionController::TestCase
+  
+  # index route
+  should_route :get, '/subscriptions',  :controller => 'subscriptions', :action => 'index'
+  should_route :get, '/subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
+  
 end
