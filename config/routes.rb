@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup        '/signup',       :controller => 'signup', :action => 'index'
-  map.signup_plan   '/signup/:plan', :controller => 'signup', :action => 'new'
+  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
   
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
@@ -78,10 +78,10 @@ ActionController::Routing::Routes.draw do |map|
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations,         :member => {:select => :get}
 
-  # Plans
+  # Plans & subscriptions
   map.resources :plans
-  map.change_plan   '/change_plan', :controller => 'subscriptions', :action => 'edit'
-  map.update_plan   '/update_plan/:plan', :controller => 'subscriptions', :action => 'update'
+  map.change_subscription   '/change_subscription', :controller => 'subscriptions', :action => 'edit'
+  map.update_subscription   '/update_subscription/:plan_id', :controller => 'subscriptions', :action => 'update'
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'

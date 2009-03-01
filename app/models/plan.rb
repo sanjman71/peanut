@@ -4,6 +4,8 @@ class Plan < ActiveRecord::Base
   has_many                :users, :through => :subscriptions
   has_many                :companies, :through => :subscriptions
   
+  named_scope             :order_by_cost, { :order => :cost }
+  
   def is_eligible(company)
     (
       (self.max_locations.blank? || (company.locations.size <= self.max_locations)) &&

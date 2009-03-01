@@ -1,0 +1,6 @@
+form_for @cc do |form|
+  .span-7#first_name
+    = f.label :first_name, 'First Name'
+    %br
+    = f.text_field :first_name, :class => 'title', :style => 'width: 200px;'
+

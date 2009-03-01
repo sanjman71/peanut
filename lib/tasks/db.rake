@@ -113,8 +113,11 @@ namespace :db do
         color3.resources.push(person2)
         
         puts "#{Time.now}: adding company plans and account owners ..."
-        basic = Plan.find_by_textid("basic")
-        premium = Plan.find_by_textid("premium")
+        plans     = Plan.order_by_cost
+        free     = plans[0]
+        basic    = plans[1]
+        premium  = plans[2]
+        max      = plans[3]
 
         u1 = User.find_by_email("admin@killianmurphy.com")
         u2 = User.find_by_email("sanjay@jarna.com")

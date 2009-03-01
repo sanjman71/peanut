@@ -12,13 +12,17 @@
 
   .plans.span-24
     .span-5
-      = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("basic")
+      .plan-basic
+        = render :partial => 'plans/choose_plan', :object => @basic
     .span-5.prepend-1
-      = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("premium")
+      .plan-premium
+        = render :partial => 'plans/choose_plan', :object => @premium
     .span-5.prepend-1
-      = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("max")
-    .span-5.prepend-1
-      = render :partial => 'plans/choose_plan', :object => Plan.find_by_textid("free")
+      .plan-max
+        = render :partial => 'plans/choose_plan', :object => @max
+    .span-5.prepend-1.last
+      .plan-free
+        = render :partial => 'plans/choose_plan', :object => @free
 
 %hr.space
 

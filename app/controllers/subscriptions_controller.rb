@@ -5,6 +5,12 @@ class SubscriptionsController < ApplicationController
   
   def edit
     @subscription = current_company.subscription
+
+    plans     = Plan.order_by_cost
+    @free     = plans[0]
+    @basic    = plans[1]
+    @premium  = plans[2]
+    @max      = plans[3]
     
     respond_to do |format|
       format.html # edit.html.haml
@@ -12,7 +18,7 @@ class SubscriptionsController < ApplicationController
   end
   
   def update
-    @plan = Plan.find_by_textid(params[:plan])
+    @plan = Plan.find(params[:plan_id])
     
     if @plan.is_eligible(current_company)
       current_company.plan = @plan
@@ -25,5 +31,5 @@ class SubscriptionsController < ApplicationController
     redirect_to edit_company_root_path(:subdomain => current_company.subdomain)
         
   end
-
+  
 end
