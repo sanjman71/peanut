@@ -14,7 +14,7 @@
         %h3
           = label_tag "person_id", "Schedule for", :class => 'big'
           = select_tag('person_id', options_for_select(@people.collect{ |o| [o.name, o.id]}, @person.id), :class => 'text')
-        %h4== Filler
+        %h3= @daterange.name
       .span-6.prepend-1.last
         #links
           - build_appointment_when_links(@person, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
@@ -37,7 +37,7 @@
       
     .span-16.prepend-1.last
       %h2
-        == #{@daterange.name}
+        = @daterange.name
       .span-16.last#free_calendar
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
       %h3.span-16.last3#appointments_count
