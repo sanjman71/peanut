@@ -64,7 +64,6 @@ class PeopleController < ApplicationController
   # POST /people
   # POST /people.xml
   def create
-
     if !current_company.may_add_resource?
       flash[:error] = "Your plan does not allow you to add another person."
       redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return

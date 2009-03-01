@@ -5,9 +5,15 @@ class PeopleControllerTest < ActionController::TestCase
 
   def setup
     @controller = PeopleController.new
+    @plan       = Factory(:monthly_plan)
     @company    = Factory(:company)
-    # stub current company method
+    
+    # stub current company method in controller and view
     @controller.stubs(:current_company).returns(@company)
+    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
+    
+    # stub plan for the current company
+    @company.stubs(:plan).returns(@plan)
   end
 
   context "create person" do

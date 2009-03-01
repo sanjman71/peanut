@@ -4,7 +4,10 @@ require 'test/factories'
 class UsersControllerTest < ActionController::TestCase
 
   def setup
-    stub_subdomain
+    @controller = CustomersController.new
+    @company    = Factory(:company)
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
   
   context "new user" do
@@ -22,19 +25,17 @@ class UsersControllerTest < ActionController::TestCase
     
     context "with an invitation" do
 
-      @sender = Factory(:user)
-      @recipient_email = Factory.next(:email)
-
-      @invitation = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
-      assert_valid @invitation
-
       setup do
+        @sender = Factory(:user)
+        @recipient_email = Factory.next(:user_email)
+        @invitation = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
+        assert_valid @invitation
         get :new, :invitation_token => @invitation.token
       end
 
       should_respond_with :success
-      should_not_change "User.count"
-
+      should_change "User.count", :by => 1 # for the sender user object
+      should_change "Invitation.count", :by => 1
     end
     
   end
