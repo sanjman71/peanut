@@ -1,6 +1,34 @@
-form_for @cc do |form|
+- form_for @credit_card, :url => update_cc_subscription_path(current_company.subscription, :subdomain => current_subdomain), :html => {:method => :post} do |f|
   .span-7#first_name
-    = f.label :first_name, 'First Name'
+    = f.label :first_name
     %br
     = f.text_field :first_name, :class => 'title', :style => 'width: 200px;'
 
+  .span-13.last#last_name
+    = f.label :last_name
+    %br
+    = f.text_field :last_name, :class => 'title', :style => 'width: 200px;'
+  
+  .span-20.last
+    .span-7#type
+      = f.label :type, 'Credit Card Type'
+      %br
+      = f.select :type, credit_card_types_for_select, :class => 'select big', :style => 'width: 150px;'
+
+    .span-6#number
+      = f.label :number, 'Credit Card Number'
+      %br
+      = f.text_field :number, :class => 'title', :style => 'width: 200px;'
+  .span-20.last
+    .span-3#expires
+      = f.label :expires, 'Expires On'
+      %br
+      = f.select :month, Range.new(1,12), :class => 'select big'
+      = f.select :year, Range.new(2009, 2020), :class => 'select big'
+    .span-4.last#cvv
+      = f.label :verification_value, 'CVV'
+      %br
+      = f.text_field :verification_value, :class => 'title', :style => 'width: 25px; height: 12px; font-size: 11px;'
+      %br
+    .span-20.last
+      = f.submit "Update Credit Card Information"

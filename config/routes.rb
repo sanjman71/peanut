@@ -78,7 +78,7 @@ ActionController::Routing::Routes.draw do |map|
   # Plans and subscriptions
   map.resources :plans
   map.connect   'subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
-  map.resources :subscriptions
+  map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
   map.change_subscription   '/change_subscription', :controller => 'subscriptions', :action => 'edit'
   map.update_subscription   '/update_subscription/:plan_id', :controller => 'subscriptions', :action => 'update'
 

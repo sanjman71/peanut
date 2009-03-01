@@ -48,4 +48,24 @@ class SubscriptionsController < ApplicationController
         
   end
   
+  def edit_cc
+    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])    
+  end
+  
+  def update_cc
+
+    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:active_merchant_billing_credit_card])
+    @payment      = current_company.subscription.authorize(@credit_card)
+    
+    respond_to do |format|
+      if current_company.subscription.errors.empty?
+        flash[:notice] = 'Credit card was successfully updated.'
+        format.html { redirect_to(edit_company_root_path(:subdomain => current_subdomain)) }
+      else
+        flash[:notice] = 'There was a problem authorizing your credit card.'
+        format.html { render :action => "edit_cc" }
+      end
+    end
+  end
+
 end

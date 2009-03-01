@@ -25,7 +25,7 @@ class Subscription < ActiveRecord::Base
   aasm_state            :frozen       # payment declined in the active state
   
   aasm_event :authorized do
-    transitions :to => :authorized, :from => [:initialized]
+    transitions :to => :authorized, :from => [:initialized, :active, :authorized]
   end
 
   aasm_event :active do
@@ -64,8 +64,12 @@ class Subscription < ActiveRecord::Base
         # store the vault id
         self.vault_id = @payment.params['customer_vault_id']
         
-        # set the next billing date
-        self.next_billing_at = self.start_billing_at
+        # set the next billing date if we don't have one
+        # if we have a next_billing_at date, then this is a credit card update, and we shouldn't change
+        # the next billing date
+        if self.next_billing_at.blank?
+          self.next_billing_at = self.start_billing_at
+        end
         
         # commit changes
         self.save
