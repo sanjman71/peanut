@@ -28,4 +28,4 @@
           .hide#progress= image_tag 'barbershop.gif'
           #submit= submit_tag "Create", :name => nil, :class => 'button big'
     - else
-      = "You cannot add any more people. If you wish to do so, please #{link_to "change plan", change_subscription_path(:subdomain => current_subdomain) }"
+      = "You cannot add any more people. If you wish to do so, please #{link_to "change subscription", change_subscription_path(:subdomain => current_subdomain) }"

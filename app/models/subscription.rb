@@ -2,6 +2,7 @@ class SubscriptionError < StandardError; end
 
 class Subscription < ActiveRecord::Base
   validates_presence_of   :plan_id, :user_id, :company_id, :start_billing_at, :paid_count, :billing_errors_count
+  validates_uniqueness_of :company_id
   belongs_to              :user
   belongs_to              :company
   belongs_to              :plan

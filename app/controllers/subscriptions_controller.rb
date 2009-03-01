@@ -37,8 +37,8 @@ class SubscriptionsController < ApplicationController
     @plan = Plan.find(params[:plan_id])
     
     if @plan.is_eligible(current_company)
-      current_company.plan = @plan
-      current_company.save
+      current_company.subscription.plan = @plan
+      current_company.subscription.save
       flash[:notice] = "Your plan has been updated."
     else
       flash[:error] = "You are not eligible for the #{@plan.name} plan."
