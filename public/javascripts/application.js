@@ -314,6 +314,31 @@ $.fn.init_datepicker = function(s) {
       }
     }
   );
+  
+  // check date fields before submit
+  $("#appointment_submit").click(function() {
+    var errors = 0;
+    
+    if ($('#start_date').attr("value") == '') {
+      $('#start_date').addClass('highlighted');
+      errors += 1;
+    } else {
+      $('#start_date').removeClass('highlighted');
+    }
+
+    if ($('#end_date').attr("value") == '') {
+      $('#end_date').addClass('highlighted');
+      errors += 1;
+    } else {
+      $('#end_date').removeClass('highlighted');
+    }
+    
+    if (errors > 0 ) {
+      return false
+    } else {
+      return true;
+    }
+  })
 }
 
 $.fn.init_toggle_dates = function() {
