@@ -1,4 +1,4 @@
-%div{:class => "#{signup_plan.textid} plan"}
-  = link_to("<h2 class='bottom'>#{signup_plan.name}</h2>", signup_plan_path(:plan => signup_plan.textid), :class => 'signup')
+%div{:class => "plan"}
+  = link_to("<h2 class='bottom'>#{signup_plan.name}</h2>", signup_plan_path(:plan_id => signup_plan.id), :class => 'signup')
   = render :partial => 'plans/plan', :object => signup_plan
-  = link_to("<h2 class='bottom'>Sign up!</h2>", signup_plan_path(:plan => signup_plan.textid), :class => 'signup')
+  = link_to("<h2 class='bottom'>Sign up!</h2>", signup_plan_path(:plan_id => signup_plan.id), :class => 'signup')

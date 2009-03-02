@@ -21,6 +21,12 @@ class SubscriptionsController < ApplicationController
   
   def edit
     @subscription = current_company.subscription
+
+    plans     = Plan.order_by_cost
+    @free     = plans[0]
+    @basic    = plans[1]
+    @premium  = plans[2]
+    @max      = plans[3]
     
     respond_to do |format|
       format.html # edit.html.haml
@@ -28,11 +34,11 @@ class SubscriptionsController < ApplicationController
   end
   
   def update
-    @plan = Plan.find_by_textid(params[:plan])
+    @plan = Plan.find(params[:plan_id])
     
     if @plan.is_eligible(current_company)
-      current_company.plan = @plan
-      current_company.save
+      current_company.subscription.plan = @plan
+      current_company.subscription.save
       flash[:notice] = "Your plan has been updated."
     else
       flash[:error] = "You are not eligible for the #{@plan.name} plan."
@@ -40,6 +46,26 @@ class SubscriptionsController < ApplicationController
     
     redirect_to edit_company_root_path(:subdomain => current_company.subdomain)
         
+  end
+  
+  def edit_cc
+    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])    
+  end
+  
+  def update_cc
+
+    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:active_merchant_billing_credit_card])
+    @payment      = current_company.subscription.authorize(@credit_card)
+    
+    respond_to do |format|
+      if current_company.subscription.errors.empty?
+        flash[:notice] = 'Credit card was successfully updated.'
+        format.html { redirect_to(edit_company_root_path(:subdomain => current_subdomain)) }
+      else
+        flash[:notice] = 'There was a problem authorizing your credit card.'
+        format.html { render :action => "edit_cc" }
+      end
+    end
   end
 
 end

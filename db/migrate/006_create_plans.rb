@@ -3,7 +3,7 @@ class CreatePlans < ActiveRecord::Migration
     
     create_table :plans do |t|
       t.string      :name
-      t.string      :textid
+      t.boolean     :enabled
       t.string      :icon
       t.integer     :cost   # value in cents
       t.string      :cost_currency

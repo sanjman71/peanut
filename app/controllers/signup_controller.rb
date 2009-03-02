@@ -9,7 +9,7 @@ class SignupController < ApplicationController
     else
       @company      = Company.new
       @user         = logged_in? ? current_user : User.new
-      @plan         = Plan.find_by_textid(params[:plan])
+      @plan         = Plan.find(params[:plan_id])
       @subscription = Subscription.new
     end
   end
@@ -20,7 +20,7 @@ class SignupController < ApplicationController
       @user         = logged_in? ? current_user : User.new(params[:user])
       @terms        = params[:company].delete(:terms).to_i
       @company      = Company.new(params[:company])
-      @plan         = Plan.find_by_textid(params[:plan])
+      @plan         = Plan.find(params[:plan_id])
 
       # try to create company, user objects
       @company.save
@@ -28,8 +28,12 @@ class SignupController < ApplicationController
 
       # try to create subscription only if user and company are valid
       @subscription = Subscription.create(:user => @user, :company => @company, :plan => @plan)
-      @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
-      @payment      = @subscription.authorize(@credit_card)
+      
+      # Check credit card details only if the plan has a cost associated with it or if the data has been provided.
+      if @plan.cost > 0 || !params[:cc].blank?
+        @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
+        @payment      = @subscription.authorize(@credit_card)
+      end
 
       # check terms
       @terms_error  = 'The terms and conditions must be accepted' unless @terms == 1
@@ -59,10 +63,11 @@ class SignupController < ApplicationController
   end
   
   def index
-    @free     = Plan.find_by_textid("free")
-    @basic    = Plan.find_by_textid("basic")
-    @premium  = Plan.find_by_textid("premium")
-    @max      = Plan.find_by_textid("max")
+    plans     = Plan.order_by_cost
+    @free     = plans[0]
+    @basic    = plans[1]
+    @premium  = plans[2]
+    @max      = plans[3]
   end
 
 end

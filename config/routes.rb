@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup        '/signup',       :controller => 'signup', :action => 'index'
-  map.signup_plan   '/signup/:plan', :controller => 'signup', :action => 'new'
+  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
   
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
@@ -85,9 +85,9 @@ ActionController::Routing::Routes.draw do |map|
   # Plans and subscriptions
   map.resources :plans
   map.connect   'subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
-  map.resources :subscriptions
-  map.change_plan   '/change_plan', :controller => 'subscriptions', :action => 'edit'
-  map.update_plan   '/update_plan/:plan', :controller => 'subscriptions', :action => 'update'
+  map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
+  map.change_subscription   '/change_subscription', :controller => 'subscriptions', :action => 'edit'
+  map.update_subscription   '/update_subscription/:plan_id', :controller => 'subscriptions', :action => 'update'
 
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'

@@ -24,17 +24,17 @@ class SubscriptionTest < ActiveSupport::TestCase
     
     context "authorize with a valid credit card" do
       setup do
-        @credit_card  = credit_card(:number => '1')
-        @payment      = @subscription.authorize(@credit_card)
+        @credit_card        = credit_card(:number => '1')
+        @authorization      = @subscription.authorize(@credit_card)
         @subscription.reload
       end
       
       should "have a 1 total payment" do
-        assert_equal [@payment], @subscription.payments
+        assert_equal [@authorization], @subscription.payments
       end
     
       should "have a 1 authorized payment" do
-        assert_equal [@payment], @subscription.payments.authorized
+        assert_equal [@authorization], @subscription.payments.authorized
       end
       
       should "change subscription to authorized state" do
@@ -61,7 +61,7 @@ class SubscriptionTest < ActiveSupport::TestCase
         end
     
         should "have 2 total payments" do
-          assert_equal [@payment, @paid_payment], @subscription.payments
+          assert_equal [@authorization, @paid_payment], @subscription.payments
         end
     
         should "have 1 paid payment" do
@@ -77,6 +77,37 @@ class SubscriptionTest < ActiveSupport::TestCase
           assert_raise SubscriptionError do
             @subscription.bill(@credit_card)
           end
+        end
+        
+        context "update credit card (after billing)" do
+          
+          setup do
+            @credit_card2  = credit_card(:number => '1')
+            @authorization2      = @subscription.authorize(@credit_card2)
+            @subscription.reload
+          end
+
+          should "change subscription back to authorized state" do
+            assert @subscription.authorized?
+          end
+
+          should "not change last, next billing dates" do
+            assert_equal Date.today, @subscription.last_billing_at.to_date  # dates are easier to compare than timestamps
+            assert_equal Time.now.utc.beginning_of_day + 1.month, @subscription.next_billing_at
+          end
+
+          should "have 3 total payments" do
+            assert_equal [@authorization, @paid_payment, @authorization2], @subscription.payments
+          end
+
+          should "have 2 authorized payments" do
+            assert_equal [@authorization, @authorization2], @subscription.payments.authorized
+          end
+
+          should "have billing errors count == 0" do
+            assert_equal 0, @subscription.billing_errors_count
+          end
+
         end
       end
       
@@ -95,6 +126,38 @@ class SubscriptionTest < ActiveSupport::TestCase
           assert @subscription.authorized?
         end
       end
+      
+      
+      context "update credit card (after authorization and before billing)" do
+        
+        setup do
+          @credit_card2  = credit_card(:number => '1')
+          @authorization2      = @subscription.authorize(@credit_card2)
+          @subscription.reload
+        end
+
+        should "keep subscription at authorized state" do
+          assert @subscription.authorized?
+        end
+
+        should "have next billing date == today" do
+          assert_equal Time.now.utc.beginning_of_day, @subscription.next_billing_at
+        end
+
+        should "have 2 total payments" do
+          assert_equal [@authorization, @authorization2], @subscription.payments
+        end
+
+        should "have 2 authorized payments" do
+          assert_equal [@authorization, @authorization2], @subscription.payments.authorized
+        end
+
+        should "have billing errors count == 0" do
+          assert_equal 0, @subscription.billing_errors_count
+        end
+
+      end
+      
     end
 
     context "authorize with an invalid credit card" do
