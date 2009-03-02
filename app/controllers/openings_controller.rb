@@ -23,6 +23,15 @@ class OpeningsController < ApplicationController
     # initialize time
     @time       = params[:time].from_url_param if params[:time]
 
+    # initialize location & locations
+    if params[:location_id]
+      session[:location_id] = params[:location_id].to_i
+      @current_location = @current_locations.select { |l| l.id == session[:location_id] }.first
+      @current_location = Location.anywhere if @current_location.blank?
+    end
+
+    @locations = current_locations
+
     # initialize service, default to nothing
     @service    = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
 
@@ -43,7 +52,7 @@ class OpeningsController < ApplicationController
       end
       array
     end
-
+    
     if @when.blank?
       logger.debug("*** showing empty page with help text")
       # render empty page with help text

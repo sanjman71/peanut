@@ -268,11 +268,11 @@ $.fn.init_add_note = function () {
 
 // Change session location onchange
 $.fn.init_change_location = function() {
-  $("select#location_id").change(function () {
-    var href = '/locations/' + this.value + '/select';
-    window.location = href;
-    return false;
-  })
+  // $("select#location_id").change(function () {
+  //   var href = '/locations/' + this.value + '/select';
+  //   window.location = href;
+  //   return false;
+  // })
 }
 
 $.fn.init_datepicker = function(s) {
