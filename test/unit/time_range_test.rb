@@ -8,12 +8,14 @@ class TimeRangeTest < ActiveSupport::TestCase
       @time_range  = TimeRange.new(:day => @tomorrow, :start_at => "1 pm", :end_at => "3 pm")
     end
     
-    should "start tomorrow at 1 pm" do
-      assert_equal Chronic.parse("tomorrow 1 pm"), @time_range.start_at
+    should "start tomorrow at 1 pm local time" do
+      assert_equal @tomorrow, @time_range.start_at.to_s(:appt_schedule_day)
+      assert_equal 13, @time_range.start_at.hour
     end
     
-    should "end tomorrow at 3 pm" do
-      assert_equal Chronic.parse("tomorrow 3 pm"), @time_range.end_at
+    should "end tomorrow at 3 pm local time" do
+      assert_equal @tomorrow, @time_range.start_at.to_s(:appt_schedule_day)
+      assert_equal 15, @time_range.end_at.hour
     end
     
     should "have duration of 120 minutes" do
@@ -24,15 +26,18 @@ class TimeRangeTest < ActiveSupport::TestCase
   context "time range created using 24 hour notation" do
     context "morning appointment" do
       setup do
-        @time_range = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "0300", :end_at => "0500")
+        @today      = Time.now.to_s(:appt_schedule_day)
+        @time_range = TimeRange.new(:day => @today, :start_at => "0300", :end_at => "0500")
       end
     
-      should "start today at 3 am" do
-        assert_equal Chronic.parse("today 3 am"), @time_range.start_at
+      should "start today at 3 am local time" do
+        assert_equal @today, @time_range.start_at.to_s(:appt_schedule_day)
+        assert_equal 3, @time_range.start_at.hour
       end
     
-      should "start today at 5 am" do
-        assert_equal Chronic.parse("today 5 am"), @time_range.end_at
+      should "end today at 5 am local time" do
+        assert_equal @today, @time_range.end_at.to_s(:appt_schedule_day)
+        assert_equal 5, @time_range.end_at.hour
       end
     
       should "have duration of 120 minutes" do
@@ -42,15 +47,18 @@ class TimeRangeTest < ActiveSupport::TestCase
     
     context "afternoon apointment" do
       setup do
-        @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "1500", :end_at => "1800")
+        @today      = Time.now.to_s(:appt_schedule_day)
+        @time_range = TimeRange.new(:day => @today, :start_at => "1500", :end_at => "1800")
       end
       
-      should "start today at 3 pm" do
-        assert_equal Chronic.parse("today 3 pm"), @time_range.start_at
+      should "start today at 3 pm local time" do
+        assert_equal @today, @time_range.start_at.to_s(:appt_schedule_day)
+        assert_equal 15, @time_range.start_at.hour
       end
       
-      should "start today at 6 pm" do
-        assert_equal Chronic.parse("today 6 pm"), @time_range.end_at
+      should "end today at 6 pm local time" do
+        assert_equal @today, @time_range.end_at.to_s(:appt_schedule_day)
+        assert_equal 18, @time_range.end_at.hour
       end
       
       should "have duration of 180 minutes" do
@@ -60,15 +68,18 @@ class TimeRangeTest < ActiveSupport::TestCase
     
     context "appointment ending at noon" do
       setup do
-        @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day), :start_at => "1100", :end_at => "1200")
+        @today      = Time.now.to_s(:appt_schedule_day)
+        @time_range = TimeRange.new(:day => @today, :start_at => "1100", :end_at => "1200")
       end
       
-      should "start today at 11 am" do
-        assert_equal Chronic.parse("today 11 am"), @time_range.start_at
+      should "start today at 11 am local time" do
+        assert_equal @today, @time_range.start_at.to_s(:appt_schedule_day)
+        assert_equal 11, @time_range.start_at.hour
       end
       
-      should "end today at noon" do
-        assert_equal Chronic.parse("today 12 pm"), @time_range.end_at
+      should "end today at noon local time" do
+        assert_equal @today, @time_range.end_at.to_s(:appt_schedule_day)
+        assert_equal 12, @time_range.end_at.hour
       end
       
       should "have duration of 60 minutes" do
@@ -88,6 +99,7 @@ class TimeRangeTest < ActiveSupport::TestCase
     
     should "end today at end of day (2400)" do 
       assert_equal Chronic.parse("today midnight"), @time_range.end_at
+      
     end
   end
   

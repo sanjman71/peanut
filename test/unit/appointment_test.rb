@@ -158,12 +158,16 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt  = Appointment.new(:time_range => {:day => @today, :start_at => "1 pm", :end_at => "3 pm"})
     end
     
-    should "have start time today at 1 pm" do
-      assert_equal Chronic.parse("today 1 pm"), @appt.start_at
+    should "have start time today at 1 pm local time" do
+      assert_equal @today, @appt.start_at.to_s(:appt_schedule_day)
+      assert_equal 13, @appt.start_at.hour
+      assert_equal 0, @appt.start_at.min
     end
     
-    should "have end time today at 3 pm" do
-      assert_equal Chronic.parse("today 3 pm"), @appt.end_at
+    should "have end time today at 3 pm local time" do
+      assert_equal @today, @appt.end_at.to_s(:appt_schedule_day)
+      assert_equal 15, @appt.end_at.hour
+      assert_equal 0, @appt.end_at.min
     end
   end
   
@@ -174,12 +178,16 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt       = Appointment.new(:time_range => @time_range)
     end
 
-    should "have start time today at 10 am" do
-      assert_equal Chronic.parse("today 10 am"), @appt.start_at
+    should "have start time today at 10 am local time" do
+      assert_equal @today, @appt.start_at.to_s(:appt_schedule_day)
+      assert_equal 10, @appt.start_at.hour
+      assert_equal 0, @appt.start_at.min
     end
     
-    should "have end time today at noon" do
-      assert_equal Chronic.parse("today 12 pm"), @appt.end_at
+    should "have end time today at noon local time" do
+      assert_equal @today, @appt.end_at.to_s(:appt_schedule_day)
+      assert_equal 12, @appt.end_at.hour
+      assert_equal 0, @appt.end_at.min
     end
   end
   
