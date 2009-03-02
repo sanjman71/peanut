@@ -12,10 +12,16 @@ class ServiceTest < ActiveSupport::TestCase
   should_have_many          :memberships
   should_have_many          :users, :through => :memberships
   
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+    @company      = Factory(:company, :subscription => @subscription)
+    assert_valid @company
+  end
+  
   context "create service" do
     setup do
-      @company = Factory(:company)
-      assert_valid @company
       @service = @company.services.create(:name => "boring job", :duration => 0, :mark_as => "busy", :price => 1.00)
       assert_valid @service
     end

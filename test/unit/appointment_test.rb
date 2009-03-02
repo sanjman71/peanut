@@ -17,12 +17,16 @@ class AppointmentTest < ActiveSupport::TestCase
   should_belong_to          :owner
   should_have_one           :invoice
   
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+  end
+  
   context "free appointment" do
     setup do
-      @company        = Factory(:company)
-      @johnny         = Factory(:user, :name => "Johnny")
-      @company.resources.push(@johnny)
-      
+      @company        = Factory(:company, :subscription => @subscription)
+      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
       @start_at_utc   = Time.now.utc.beginning_of_day
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
@@ -52,7 +56,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "work appointment" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny")
       @company.resources.push(@johnny)
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
@@ -73,7 +77,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "appointment by building owner association" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
@@ -113,7 +117,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "afternoon appointment" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
       @user     = Factory(:user)

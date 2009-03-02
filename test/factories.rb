@@ -53,6 +53,11 @@ Factory.define :monthly_plan, :class => Plan do |o|
   o.between_billing_time_unit     "months"
 end
 
+Factory.define :subscription do |o|
+  o.plan        { |o| Factory(:montly_plan, :name => "Monthly Subscription")}
+  o.user        { |o| Factory(:user) }
+end
+
 Factory.define :appointment_today, :class => Appointment do |a|
   a.mark_as         { |o| o.service.mark_as }
   a.start_at        { |o| Factory.next :today_hour }  # choose an hour from today

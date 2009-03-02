@@ -35,6 +35,12 @@ class Company < ActiveRecord::Base
   has_one                   :subscription
   has_one                   :company_owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
+
+  def validate
+    if self.subscription.blank?
+      errors.add_to_base("Subscription is not valid")
+    end
+  end
   
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database

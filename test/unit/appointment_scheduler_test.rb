@@ -3,8 +3,14 @@ require 'test/factories'
 
 class AppointmentScheduleTest < ActiveSupport::TestCase
 
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+  end
+  
   def test_should_schedule_work_at_start_of_free_appointment
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     free      = company.services.free.first
@@ -60,7 +66,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   end
 
   def test_should_schedule_work_in_middle_of_free_appointment
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     free      = company.services.free.first
@@ -116,7 +122,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   end
   
   def test_should_schedule_work_at_end_of_free_appointment
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :company => company, :price => 1.00)
     free      = company.services.free.first
@@ -171,7 +177,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   end
   
   def test_should_schedule_job_at_start_of_available_timeslot
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     free      = company.services.free.first
     owner     = Factory(:user)
@@ -214,7 +220,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   end
   
   def test_should_schedule_job_in_middle_of_available_timeslot
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     free      = company.services.free.first
     owner     = Factory(:user)
@@ -272,7 +278,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
   end
 
   def test_should_schedule_job_at_end_of_available_timeslot
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     free      = company.services.free.first
     owner     = Factory(:user)
@@ -320,7 +326,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
 
   def test_should_create_free_appointment
     # should create free time for the entire day
-    company   = Factory(:company)
+    company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     lisa      = Factory(:user, :name => "Lisa", :companies => [company])
     free      = company.services.free.first
