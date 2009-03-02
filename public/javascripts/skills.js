@@ -42,9 +42,9 @@ $.fn.init_search_button = function () {
   
   // only show the search button if a service is selected (service id of 0 means no service)
   if (service_id == 0) {
-    $("#search").hide();
+    $("#search_submit").attr("disabled","disabled");
   } else {
-    $("#search").show();
+    $("#search_submit").removeAttr("disabled");
   }
 }
 

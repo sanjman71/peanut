@@ -6,7 +6,13 @@
       = "#{current_company.name} -"
       = yield :title
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
-    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'green'
+    = stylesheet_link_tag 'blueprint/screen', :media=>"screen, projection"
+    = stylesheet_link_tag 'blueprint/print', :media =>"print"
+    <!--[if IE]>
+    = stylesheet_link_tag 'blueprint/ie', :media =>"screen, projection"
+    <![endif]-->
+    = stylesheet_link_tag 'peanut', 'errors', 'green'
+    = stylesheet_link_tag 'peanut_print', :media => "print"
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
     = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'application'
@@ -16,14 +22,7 @@
     #header
       .container
         .span-24.last
-          .span-7{:id => "locations_count_#{current_locations.size}"}
-            - if current_locations.size > 1
-              = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :class => 'locations')
-            - else
-              - # no locations, fill div with something
-              .empty== &nbsp;
-              
-          .span-6.prepend-11.last{:style => 'color: #DDDDDD; text-align: right;'}
+          .span-6.prepend-18.last{:style => 'color: #DDDDDD; text-align: right;'}
             = render :partial => 'users/user_links.html.haml'
             
         .span-24.last
