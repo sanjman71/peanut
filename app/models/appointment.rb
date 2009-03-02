@@ -180,13 +180,13 @@ class Appointment < ActiveRecord::Base
       self.time_start_at  = time_range.first
       self.time_end_at    = time_range.last
     else
-      # set time of day values based on appointment start, end times
+      # set time of day values based on appointment start, end times in utc format
       if self.start_at
-        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.min * 60
+        self.time_start_at = self.start_at.utc.hour * 3600 + self.start_at.utc.min * 60
       end
 
       if self.end_at
-        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.min * 60
+        self.time_end_at = self.end_at.utc.hour * 3600 + self.end_at.utc.min * 60
       end
     end
   end
@@ -276,8 +276,7 @@ class Appointment < ActiveRecord::Base
   end
   
   def start_at_string=(s)
-    # chronic parses times into the current time zone,
-    # but its stored by activerecord in utc format
+    # chronic parses times into the current time zone, but stored by activerecord in utc format
     self.start_at = Chronic.parse(s)
   end
 
@@ -286,8 +285,7 @@ class Appointment < ActiveRecord::Base
   end
   
   def end_at_string=(s)
-    # chronic parses times into the current time zone,
-    # but its stored by activerecord in utc format
+    # chronic parses times into the current time zone, but stored by activerecord in utc format
     self.end_at = Chronic.parse(s)
   end
   

@@ -166,26 +166,26 @@ class AppointmentScheduler
     # find all appointments over the specified daterange, order by start_at
     appointments = appointments || company.appointments.resource(resource).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
     
-    # group appointments by day
-    appointments_by_day = appointments.group_by { |appt| appt.start_at.beginning_of_day.to_s(:appt_schedule_day) }
+    # group appointments by day; note that we use the appt start_at utc value to build the day
+    appointments_by_day = appointments.group_by { |appt| appt.start_at.utc.to_s(:appt_schedule_day) }
     
     unscheduled_hash = daterange.inject(Hash.new) do |hash, date|
       # build formatted appointment day string
-      day_string      = date.to_s(:appt_schedule_day)
+      day_string        = date.to_s(:appt_schedule_day)
 
-      # start with appointment for the entire day
-      day_start_at    = Time.parse(day_string).beginning_of_day
-      day_end_at      = day_start_at + 1.day
-      day_appointment = Appointment.new(:start_at => day_start_at, :end_at => day_end_at, :mark_as => Appointment::NONE)
+      # start with appointment for the entire day, in utc format
+      day_start_at_utc  = Time.parse(day_string).utc.beginning_of_day
+      day_end_at_utc    = day_start_at_utc + 1.day
+      day_appointment   = Appointment.new(:start_at => day_start_at_utc, :end_at => day_end_at_utc, :mark_as => Appointment::NONE)
       
       # find appointments for the day
-      day_appts       = appointments_by_day[day_string] || []
+      day_appts         = appointments_by_day[day_string] || []
       
       # initialize array value
       hash[day_string]  = Array.new
       
       if day_appts.empty?
-        # entire day is unscheduled
+        # entire day is unscheduled, add full day appointment in utc format
         hash[day_string].push(day_appointment)
       else
         # note: we can build time ranges like this because the appointments are sorted by start_at times
@@ -193,8 +193,9 @@ class AppointmentScheduler
         # the first unscheduled time range is from the start of the day to the start of the first appointment
         first_appt = day_appts.first
         
-        if first_appt.start_at > day_start_at
-          appt_none = Appointment.new(:start_at => day_start_at, :end_at => first_appt.start_at, :mark_as => Appointment::NONE)
+        if first_appt.start_at.utc > day_start_at_utc
+          # add unscheduled at beginning of day, in utc format
+          appt_none = Appointment.new(:start_at => day_start_at_utc, :end_at => first_appt.start_at.utc, :mark_as => Appointment::NONE)
           hash[day_string].push(appt_none)
         end
         
@@ -203,15 +204,17 @@ class AppointmentScheduler
           appt_j = day_appts[i+1]
           next if appt_j.blank?
           next if appt_i.end_at == appt_j.start_at
-          appt_none = Appointment.new(:start_at => appt_i.end_at, :end_at => appt_j.start_at, :mark_as => Appointment::NONE)
+          # add unscheduled in middle of day, in utc format
+          appt_none = Appointment.new(:start_at => appt_i.end_at.utc, :end_at => appt_j.start_at.utc, :mark_as => Appointment::NONE)
           hash[day_string].push(appt_none)
         end
         
         # the last set of unscheduled time ranges is between the end of the last appointment and the end of the day
         last_appt = day_appts.last
         
-        if last_appt.end_at < day_end_at
-          appt_none = Appointment.new(:start_at => last_appt.end_at, :end_at => day_end_at, :mark_as => Appointment::NONE)
+        if last_appt.end_at.utc < day_end_at_utc
+          # add unscheduled at end of day, in utc format
+          appt_none = Appointment.new(:start_at => last_appt.end_at.utc, :end_at => day_end_at_utc, :mark_as => Appointment::NONE)
           hash[day_string].push(appt_none)
         end
       end

@@ -52,8 +52,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal @days_left_in_week[Time.now.wday], @daterange.days
     end
 
-    should 'have start day of today' do
-      assert_equal Time.now.beginning_of_day, @daterange.start_at
+    should 'have start day == beginning of today in utc format' do
+      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
 
     should 'be named This Week' do
@@ -90,8 +90,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 14, @daterange.days
     end
 
-    should 'have start day as today' do
-      assert_equal Time.now.beginning_of_day, @daterange.start_at
+    should 'have start day == beginning of today in utc format' do
+      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
 
     should 'be named Next 2 Weeks' do
@@ -107,8 +107,8 @@ class DateRangeTest < ActiveSupport::TestCase
       @days_to_add = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1][Date.today.wday]
     end
     
-    should 'have start day of today' do
-      assert_equal Time.now.beginning_of_day, @daterange.start_at
+    should 'have start day == beginning of today in utc format' do
+      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
     
     should "have last day a sunday" do
@@ -134,8 +134,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 42, @daterange.days
     end
 
-    should 'have start day as today' do
-      assert_equal Time.now.beginning_of_day, @daterange.start_at
+    should 'have start day == beginning of today in utc format' do
+      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
     
     should 'be named Next 6 Weeks' do
