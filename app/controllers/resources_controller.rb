@@ -9,16 +9,11 @@ class ResourcesController < ApplicationController
     @search = params[:search]
     
     if !@search.blank?
-      @resources    = current_company.resources.select { |r| r.name.match(/#{@search}/i) }
-      @search_text  = "Resources matching '#{@search}'"
+      @company_resources  = current_company.companies_resources.select { |cr| cr.resource.name.match(/#{@search}/i) }
+      @search_text        = "Resources matching '#{@search}'"
     else
-      @resources    = current_company.resources.all
-      @search_text  = @resources.blank? ? "No Resources" : "All Resources"
-    end
-    
-    respond_to do |format|
-      format.html # index.html.erb
-      format.js
+      @company_resources  = current_company.companies_resources
+      @search_text        = @company_resources.blank? ? "No Resources" : "All Resources"
     end
   end
 
@@ -26,6 +21,8 @@ class ResourcesController < ApplicationController
   def add
     # find users that are not resources
     @non_resources = current_company.authorized_users - current_company.users
+    
+    logger.debug("*** non resources: #{@non_resources}")
   end
   
 end

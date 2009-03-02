@@ -1,6 +1,6 @@
 class CompaniesResourcesController < ApplicationController
   
-  # POST /company_resources/create
+  # POST /companies_resources/create
   def create
     @company_resource = CompaniesResource.create(params[:resource].update(:company_id => current_company.id))
     
@@ -8,10 +8,11 @@ class CompaniesResourcesController < ApplicationController
       logger.debug("*** errors: #{@company_resource.errors.full_messages}")
     end
     
-    render_component(:controller => 'resources', :action => 'add', :layout => false, :method => :get)
+    render_component(:controller => 'resources', :action => 'add', :layout => false,
+                     :params => {:authenticity_token => params[:authenticity_token] })
   end
   
-  # DELETE /services/1
+  # DELETE /companies_resources/1
   def destroy
     @company_resource = CompaniesResource.find(params[:id])
     @company_resource.destroy
