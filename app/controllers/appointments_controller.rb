@@ -124,7 +124,7 @@ class AppointmentsController < ApplicationController
   # POST  /waitlist/people/3/services/8/this week/anytime
   def new
     # build appointment hash differently for schedule vs waitlist appointment requests
-    hash = {:service_id => params[:service_id], :resource_id => params[:person_id], :resource_type => 'Person', :company_id => current_company.id}
+    hash = {:service_id => params[:service_id], :resource_id => params[:id], :resource_type => params[:resource].to_s.classify, :company_id => current_company.id}
     
     if request.url.match(/\/waitlist\//)
       # add when, time, mark_as attributes
