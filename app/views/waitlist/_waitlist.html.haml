@@ -5,7 +5,7 @@
 - appointments.each do |appointment|
   .span-18.last.letterbox.appointment{:class => cycle("shaded", ""), :id => appointment.id}
     .span-4.prepend-1.name
-      %h3{:style => "margin-bottom: 2px;"}= (appointment.resource || Person.anyone).name
+      %h3{:style => "margin-bottom: 2px;"}= (appointment.resource || User.anyone).name
       = appointment.service.name
     .span-4.when
       %h3{:style => "margin-bottom: 2px;"}= appointment.when.titleize

@@ -20,7 +20,9 @@ class AppointmentTest < ActiveSupport::TestCase
   context "free appointment" do
     setup do
       @company        = Factory(:company)
-      @johnny         = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny         = Factory(:user, :name => "Johnny")
+      @company.resources.push(@johnny)
+      
       @time_start_at  = Time.now.beginning_of_day
       @time_end_at    = @time_start_at + 1.hour
       @daterange      = DateRange.parse_range(@time_start_at.to_s(:appt_schedule_day), @time_start_at.to_s(:appt_schedule_day))
@@ -47,7 +49,8 @@ class AppointmentTest < ActiveSupport::TestCase
   context "work appointment" do
     setup do
       @company  = Factory(:company)
-      @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny   = Factory(:user, :name => "Johnny")
+      @company.resources.push(@johnny)
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
       # create appointment at 2 pm
@@ -67,7 +70,7 @@ class AppointmentTest < ActiveSupport::TestCase
   context "appointment by building owner association" do
     setup do
       @company  = Factory(:company)
-      @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
       # should create a new owner when building the new appointment
@@ -80,8 +83,8 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     # should create appointment and user
-    should_change "Appointment.count", :by => 1    
-    should_change "User.count", :by => 1
+    should_change "Appointment.count", :by => 1
+    should_change "User.count", :by => 2
     
     should "have an owner" do
       assert_valid @appt.owner
@@ -107,7 +110,7 @@ class AppointmentTest < ActiveSupport::TestCase
   context "afternoon appointment" do
     setup do
       @company  = Factory(:company)
-      @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
       @user     = Factory(:user)
 

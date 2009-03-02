@@ -1,9 +1,9 @@
 - javascript('appointments')
 
-.span-17
-  .span-17.box
+.span-16
+  .span-15.box
     - form_tag(search_appointments_path(:subdomain => current_subdomain), :method => :post, :id => "search_appointments_form") do |f|
-      .span-17
+      .span-16
         = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
         %br
         = text_field('appointment', 'code', :value => @code, :class => 'title big required')
@@ -11,7 +11,7 @@
         %span#submit= submit_tag 'Search', :name => nil, :class => 'submit button big'
         %span.hide#progress= image_tag 'blueredsphere.gif', :size => '25x25', :style => 'vertical-align: text-bottom;'
 
-.span-6.prepend-1.last
+.span-7.prepend-1.last
   .sidebar.instructions.padding-5
     == How do I find my appointment?
     %ul
@@ -28,7 +28,7 @@
     %ul
       %l1== Select the 'forgot my password' link and you will be emailed a new password.
 
-.span-18.last
+.span-16.last
   %span.code#message
     = @error_message
 

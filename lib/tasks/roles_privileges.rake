@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :people, :products, :waitlist]
+  task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :resources, :products, :waitlist]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -164,18 +164,18 @@ namespace :rp do
 
   end
 
-  desc "Initialize people management roles & privileges"
-  task :people do
+  desc "Initialize resource management roles & privileges"
+  task :resources do
     
-    puts "adding people management roles & privileges"
+    puts "adding resources management roles & privileges"
     
     cm = Badges::Role.find_by_name('company manager')
     ce = Badges::Role.find_by_name('company employee')
 
-    c = Badges::Privilege.create(:name=>"create people")
-    r = Badges::Privilege.create(:name=>"read people")
-    u = Badges::Privilege.create(:name=>"update people")
-    d = Badges::Privilege.create(:name=>"delete people")
+    c = Badges::Privilege.create(:name=>"create resources")
+    r = Badges::Privilege.create(:name=>"read resources")
+    u = Badges::Privilege.create(:name=>"update resources")
+    d = Badges::Privilege.create(:name=>"delete resources")
 
     # Company manager can manage people
     Badges::RolePrivilege.create(:role=>cm,:privilege=>c)

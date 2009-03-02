@@ -37,35 +37,42 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # openings search path, scoped by person (optional) and service
-  map.connect   'people/:person_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
+  # openings search/index path, scoped by person (optional) and service
+  map.connect   ':resource/:id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
-  # appointments index path, scoped by person
-  map.connect   'people/:person_id/appointments/when/:when', :controller => 'appointments', :action => 'index'
-  map.connect   'people/:person_id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
+  # appointments search/index path, scoped by resource
+  map.connect   ':resource/:id/appointments/when/:when', :controller => 'appointments', :action => 'index'
+  map.connect   ':resource/:id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
+  map.connect   ':resource/:id/appointments', :controller => 'appointments', :action => 'index'
 
-  # override 'appointments/new' path
-  map.schedule  'schedule/people/:person_id/services/:service_id/:start_at',    :controller => 'appointments', :action => 'new'
-  map.waitlist  'waitlist/people/:person_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
+  # search appointments path, scoped by resource
+  map.connect   ':resource/:id/appointments/search', :controller => 'appointments', :action => 'search'
+
+  # appointment new path, with support for a specific resource
+  map.schedule  'schedule/:resource/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.waitlist  'waitlist/:resource/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
-  map.connect   'people/:person_id/free/:style', :controller => 'free', :action => 'new'
+  # map.connect   'people/:person_id/free/:style', :controller => 'free', :action => 'new'
+
+  map.resources :resources, :collection => {:add => :get}
+  map.resources :companies_resources, :only => [:create, :destroy]
   
-  map.resources :people do |resource|
-    # nested appointments routes
-    resource.resources :appointments, :collection => {:search => :post}
-    # nested openings routes
-    resource.resources :openings, :only => [:index]
-    
-    # nested services routes
-    resource.resources :services, :has_many => [:appointments, :openings]
-    
-    # manage free time
-    resource.resources :free, :only => [:new, :create]
-  end
+  # map.resources :people do |resource|
+  #   # nested appointments routes
+  #   resource.resources :appointments
+  #   # nested openings routes
+  #   resource.resources :openings, :only => [:index]
+  #   
+  #   # nested services routes
+  #   resource.resources :services, :has_many => [:appointments, :openings]
+  #   
+  #   # manage free time
+  #   resource.resources :free, :only => [:new, :create]
+  # end
   
   # services, products
-  map.resources :services, :has_many => [:openings]
+  map.resources :services
   map.resources :products
   
   # customers with nested resources

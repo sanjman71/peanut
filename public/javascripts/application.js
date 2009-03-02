@@ -25,15 +25,30 @@ Function.prototype.sleep = function (millisecond_delay) {
 }
 */
 
-// Add a membership (person to service mapping)
-$.fn.init_new_membership = function () {
-  // Bind to person drop-down used to create memberships
-  $("#person_id").change(function () {
-    $("#membership_resource_id").attr("value", $("#person_id option:selected").attr("value"));
+// Add a membership (resource to service mapping)
+$.fn.init_new_membership = function() {
+  // bind to resource drop-down used to create memberships
+  $("#resource_id").change(function () {
+    // split selected value into resource id and type
+    var tuple         = $("#resource_id option:selected").attr("value").split(",");
+    var resource_id   = tuple[0];
+    var resource_type = tuple[1];
+    $("#membership_resource_id").attr("value", resource_id);
+    $("#membership_resource_type").attr("value", resource_type);
     $.post($("#new_membership").attr("action"), $("#new_membership").serialize(), null, "script");
     return false;
   })
-} 
+}
+
+// Add company/resource mapping
+$.fn.init_add_company_resource = function() {
+  $(".add_company_resource").click(function() {
+    resource_type = $(this).attr("resource_type");
+    resource_id   = $(this).attr("resource_id");
+    $.post($(this).attr("href"), {"resource[resource_type]" : resource_type, "resource[resource_id]" : resource_id}, null, "script");
+    return false;
+  })
+}
 
 // Add a new object (e.g. person, service, product)
 $.fn.init_new_object = function(form_id) {
@@ -126,6 +141,7 @@ $.fn.init_schedule_search = function () {
     // replace the search button with a progress image onsubmit
     $("#search_submit").addClass('hide');
     $("#search_progress").removeClass('hide');
+    return true;
   })
 }
 
@@ -143,10 +159,10 @@ $.fn.init_highlight_appointments = function () {
   )
 } 
 
-// Show appointment schedule for the selected person
-$.fn.init_select_person_for_appointment_calendar = function () {
-  $("#person_id").change(function () {
-    var href = '/people/' + this.value + '/appointments';
+// Show appointment schedule for the selected resource
+$.fn.init_select_resource_for_appointment_calendar = function () {
+  $("#resource_id").change(function () {
+    var href = '/' + this.value + '/appointments';
     window.location = href;
     return false;
   })
@@ -176,8 +192,8 @@ $.fn.init_highlight_timeslots = function () {
 } 
 
 // Live people search
-$.fn.init_live_people_search = function () {
-  $("#live_search_for_people").keyup(function () {
+$.fn.init_live_resources_search = function () {
+  $("#live_search_for_resources").keyup(function () {
     var search_url  = this.url;
     var search_term = this.value;
     // execute search, throttle how often its called
@@ -276,7 +292,6 @@ $.fn.init_change_location = function() {
 }
 
 $.fn.init_datepicker = function(s) {
-
   var defaults = {start_date : "01/01/2009", end_date : "12/31/2009", max_days : 7}
   s = $.extend({}, defaults, s);
   
@@ -314,6 +329,31 @@ $.fn.init_datepicker = function(s) {
       }
     }
   );
+  
+  // check date fields before submit
+  $("#appointment_submit").click(function() {
+    var errors = 0;
+    
+    if ($('#start_date').attr("value") == '') {
+      $('#start_date').addClass('highlighted');
+      errors += 1;
+    } else {
+      $('#start_date').removeClass('highlighted');
+    }
+
+    if ($('#end_date').attr("value") == '') {
+      $('#end_date').addClass('highlighted');
+      errors += 1;
+    } else {
+      $('#end_date').removeClass('highlighted');
+    }
+    
+    if (errors > 0 ) {
+      return false
+    } else {
+      return true;
+    }
+  })
 }
 
 $.fn.init_toggle_dates = function() {

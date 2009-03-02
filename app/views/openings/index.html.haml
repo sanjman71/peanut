@@ -4,10 +4,9 @@
 
 .span-16
   .prepend-1
-    %h2
-      Schedule an Appointment
+    %h2== Schedule an Appointment
+    = hidden_field_tag 'initial_resource_id', @resource.id
   - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
-    = hidden_field_tag 'initial_person_id', @person.id
     .span-16.last
       .span-3.text-align-right
         == What?
@@ -16,7 +15,7 @@
       .span-3.text-align-right
         == Who?
       .span-5.last.field#who
-        = select_tag('person_id', options_for_select(@people.collect{ |r| [r.name, r.id]}, @person.id), :style => "width: 125px;")
+        = select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :style => "width: 125px;")
     %br
     .span-16.last
       .span-3.text-align-right
@@ -37,9 +36,10 @@
       = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
       %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
 
+-# skills mapping services to resources
 .span-16.skills.hide
   - @skills.each do |skill|
-    .skill{:service_id => skill[0], :person_id => skill[1], :person_name => skill[2]}
+    .skill{:service_id => skill[0], :resource_id => skill[1], :resource_name => skill[2], :resource_type => skill[3]}
           
 .span-7.prepend-1.last
   .sidebar.instructions.padding-5
@@ -60,32 +60,32 @@
         %span== or
         %li== Select the waitlist to be notified of an opening
           
-.span-16.prepend-1.last
+.span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
     %h2
-      == Before customers can schedule appointments, there must be at least 1 person
-      = link_to '(add)', people_path
+      == Before customers can schedule appointments, there must be at least 1 resource
+      = link_to '(add)', resources_path
       == and 1 service
       = link_to '(add)', services_path
       == .
       
   - unless @when.blank?
-    %h3.span-16
+    %h2.span-15
       - if @free_timeslots.blank?
         -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :person_id => @person.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :resource => @resource.tableize, :id => @resource.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
         
-    %h3.span-16.last
+    .span-15.last
       -# Show appointment when range
-      == #{@when.titleize}
+      %h3== #{@when.titleize}
 
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
-      .span-16.last#free_calendar
+      .span-15.last#free_calendar
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-      .span-16.last.timeslots#free_timeslots
+      .span-15.last.timeslots#free_timeslots
         = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
 

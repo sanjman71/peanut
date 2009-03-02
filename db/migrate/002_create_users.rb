@@ -17,6 +17,7 @@ class CreateUsers < ActiveRecord::Migration
       t.datetime  :deleted_at
       t.integer   :invitation_id
       t.integer   :invitation_limit
+      t.integer   :services_count,            :default => 0   # counter cache
     end
     
     add_index :users, [:email], :unique => true

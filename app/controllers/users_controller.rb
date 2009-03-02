@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
   
   def index
-    @users = @current_company.authorized_users
+    @users = current_company.authorized_users
   end
   
   def new

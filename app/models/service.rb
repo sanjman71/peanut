@@ -5,7 +5,8 @@ class Service < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "can only be scheduled as free, busy or work"
   belongs_to                  :company
   has_many                    :appointments
-  has_many_polymorphs         :resources, :from => [:people], :through => :memberships
+  has_many_polymorphs         :resources, :from => [:users], :through => :memberships
+  before_validation           :init_duration
   before_save                 :titleize_name
   
   # name constants
@@ -25,11 +26,7 @@ class Service < ActiveRecord::Base
       o.send(:id=, 0)
     end
   end
-  
-  def before_validation
-    self.duration = @@default_duration if self.duration.blank? or self.duration == 0
-  end
-  
+    
   # return true if its the special service 'nothing'
   def nothing?
     self.id == 0
@@ -39,7 +36,17 @@ class Service < ActiveRecord::Base
     self.duration * 60
   end
   
+  # return true if the service is provided by the selected resource
+  def provided_by?(resource)
+    # can't use resources.include?(resource) here, not sure why but possibly because of polymorphic
+    resources.any? { |r| r == resource }
+  end
+  
   private
+  
+  def init_duration
+    self.duration = @@default_duration if self.duration.blank? or self.duration == 0
+  end
   
   def titleize_name
     self.name = self.name.titleize
