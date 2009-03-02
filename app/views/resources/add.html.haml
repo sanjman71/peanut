@@ -1,0 +1,19 @@
+- stylesheet('resources')
+- javascript('resources')
+
+.span-16
+  .span-15.box
+    %h2== Add a Resource
+      
+  .span-14.prepend-1.append-1.last
+    = display_flash(:notice)
+    
+  = render(:partial => 'non_resources.html.haml', :locals => {:non_resources => @non_resources})
+  
+  
+.span-7.prepend-1.last
+  .sidebar.instructions.padding-5
+    == How do I add a resource?
+    %ul
+      %li== Select a resource from the list.
+

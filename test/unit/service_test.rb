@@ -10,7 +10,7 @@ class ServiceTest < ActiveSupport::TestCase
   should_belong_to          :company
   should_have_many          :appointments
   should_have_many          :memberships
-  should_have_many          :people
+  should_have_many          :users, :through => :memberships
   
   context "create service" do
     setup do
@@ -24,21 +24,30 @@ class ServiceTest < ActiveSupport::TestCase
       assert_equal "Boring Job", @service.name
     end
     
-    should "have default duration" do
+    should "have default duration of 30 minutes" do
       assert_equal 30, @service.duration
     end
     
-    context "create person with skillset" do
+    context "create user resource that provides this service" do
       setup do
-        @person1 = Factory(:person, :name => "Sanjay", :companies => [@company])
-        assert_valid @person1
-        @service.resources.push(@person1)
+        @user1 = Factory(:user, :name => "Sanjay")
+        assert_valid @user1
+        @service.resources.push(@user1)
         @service.reload
+        @user1.reload
       end
       
-      should "have service provided by person" do
-        assert_equal [@person1], @service.resources
-        assert_equal [@person1], @service.people
+      should "have service resources collection == user resource" do
+        assert_equal [@user1], @service.resources
+        assert_equal [@user1], @service.users
+      end
+      
+      should "have service provided_by? return true" do
+        assert @service.provided_by?(@user1)
+      end
+      
+      should "have user services count == 1" do
+        assert_equal 1, @user1.services_count
       end
     end
   end

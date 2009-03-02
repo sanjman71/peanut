@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   # Accounting and plans
   has_many                  :subscriptions
   has_many                  :plans, :through => :subscriptions
-  has_many                  :companies, :through => :subscriptions
+  has_many                  :owned_companies, :through => :subscriptions, :source => :company
 
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100
@@ -57,6 +57,23 @@ class User < ActiveRecord::Base
     !mobile_carrier.blank?
   end
 
+  # the special user person
+  def self.anyone
+    r = User.new do |o|
+      o.name = "Anyone"
+      o.send(:id=, 0)
+    end
+  end
+  
+  # return true if its the special user 'anyone'
+  def anyone?
+    self.id == 0
+  end
+
+  def tableize
+    self.class.to_s.tableize
+  end
+  
   protected
     
   def make_activation_code

@@ -113,14 +113,14 @@ module ApplicationHelper
 
     end
       
-    if has_privilege?('read people', current_company)
+    if has_privilege?('read resources', current_company)
 
-      # 'People' tab
-      name = 'People'
-      if current_controller.controller_name == 'people' and ['index', 'show'].include?(current_controller.action_name)
-        link = link_to(name, people_path, :class => 'current')
+      # 'Resources' tab
+      name = 'Resources'
+      if current_controller.controller_name == 'resources' and ['index', 'show'].include?(current_controller.action_name)
+        link = link_to(name, resources_path, :class => 'current')
       else
-        link = link_to(name, people_path)
+        link = link_to(name, resources_path)
       end
 
       yield link

@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => ["rp:init", "plans:init", :admin_users, :regular_users, :companies]
+  task :dev_data  => ["rp:init", "plans:init", :admin_users, :companies, :regular_users]
 
   desc "Initialize production data"
   task :prod_data  => ["rp:init", "plans:init", :admin_users]
@@ -30,30 +30,30 @@ namespace :init do
   
   desc "Initialize regular users"
   task :regular_users do 
-    # Create admin users
-    puts "adding user: johnny@peanut.com, password: peanut"
+    # create company managers
+    company1 = Company.find_by_name('Company 1')
+    noelrose = Company.find_by_name('Noel Rose')
+    
+    puts "adding user: johnny@peanut.com, password: peanut as company manager for #{company1.name}"
     a = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
                     :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
     a.register!
     a.activate!
+    a.grant_role('company manager', company1)
 
-    a.grant_role('company manager', Company.find_by_name('Company 1'))
-
-    puts "adding user: mary@peanut.com, password: peanut"
+    puts "adding user: mary@peanut.com, password: peanut as company manager for #{company1.name}"
     a = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
                     :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
     a.register!
     a.activate!
+    a.grant_role('company employee', company1)
     
-    a.grant_role('company employee', Company.find_by_name('Company 1'))
-    
-    puts "adding user: erika@peanut.com, password: peanut"
+    puts "adding user: erika@peanut.com, password: peanut as company manager for #{noelrose.name}"
     a = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
                     :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
     a.register!
     a.activate!
-    
-    a.grant_role('company manager', Company.find_by_name('Noel Rose'))
+    a.grant_role('company manager', noelrose)
 
     puts "#{Time.now}: completed"
   end
@@ -74,17 +74,17 @@ namespace :init do
     mens_haircut    = company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     womens_haircut  = company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
   
-    person1         = company1.people.create(:name => "Johnny")
-    person2         = company1.people.create(:name => "Mary")
+    # person1         = company1.people.create(:name => "Johnny")
+    # person2         = company1.people.create(:name => "Mary")
   
     # apply rules to what services can be performed by what resources
-    mens_haircut.resources.push(person1)
-    womens_haircut.resources.push(person2)
+    # mens_haircut.resources.push(person1)
+    # womens_haircut.resources.push(person2)
 
     puts "#{Time.now}: adding noelrose services and people ..."
     # create noelrose people, services, products
-    person1         = noelrose.people.create(:name => "Erika Maechtle")
-    person2         = noelrose.people.create(:name => "Josie")
+    # person1         = noelrose.people.create(:name => "Erika Maechtle")
+    # person2         = noelrose.people.create(:name => "Josie")
   
     mens_haircut    = noelrose.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     womens_haircut  = noelrose.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
@@ -98,16 +98,16 @@ namespace :init do
   
     puts "#{Time.now}: adding skillsets ..."
     # add skillsets
-    mens_haircut.resources.push(person1)
-    mens_haircut.resources.push(person2)
-    womens_haircut.resources.push(person1)
-    womens_haircut.resources.push(person2)
-    color1.resources.push(person1)
-    color1.resources.push(person2)
-    color2.resources.push(person1)
-    color2.resources.push(person2)
-    color3.resources.push(person1)
-    color3.resources.push(person2)
+    # mens_haircut.resources.push(person1)
+    # mens_haircut.resources.push(person2)
+    # womens_haircut.resources.push(person1)
+    # womens_haircut.resources.push(person2)
+    # color1.resources.push(person1)
+    # color1.resources.push(person2)
+    # color2.resources.push(person1)
+    # color2.resources.push(person2)
+    # color3.resources.push(person1)
+    # color3.resources.push(person2)
     
     puts "#{Time.now}: adding company plans and account owners ..."
     

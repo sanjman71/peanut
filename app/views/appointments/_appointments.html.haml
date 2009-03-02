@@ -1,16 +1,16 @@
 - appointments_by_day.each do |day, appointments|
-  .span-16.last
+  .span-15.last
     %h3== #{day.to_s(:appt_day)}
   - reset_cycle
   - appointments.each do |appointment|
-    .span-16.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("shaded", "")], :id => 'appointment_'+appointment.id.to_s}
+    .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("shaded", "")], :id => 'appointment_'+appointment.id.to_s}
       .span-4.time
         %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
       .span-3.location
         %h6= appointment.location.name
       .span-3.service{:class => appointment.mark_as}
         %h6= appointment.service.name
-      .span-3.owner
+      .span-2.owner
         %h6= appointment.owner ? appointment.owner.name : "&nbsp;"
       .span-2.prepend-1.last.action.hide{:id => "hover_appointment_#{appointment.id}"}
         - if appointment.service.mark_as == Appointment::FREE and has_privilege?("delete free appointments", current_company)

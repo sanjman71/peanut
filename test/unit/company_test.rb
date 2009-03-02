@@ -2,9 +2,13 @@ require 'test/test_helper'
 
 class CompanyTest < ActiveSupport::TestCase
 
-  # shoulda
-  should_require_attributes :name
-  should_require_attributes :time_zone
+  should_require_attributes   :name
+  should_require_attributes   :time_zone
+  should_have_many            :services
+  should_have_many            :products
+  should_have_many            :appointments
+  should_have_many            :invitations
+  should_have_many            :companies_resources
   
   context "create company" do
     setup do
@@ -20,7 +24,7 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal "Mary's Hair Salon", @company.name
     end
     
-    should "create basic services" do
+    should "with basic services" do
       assert_equal 1, @company.services_count
       assert_equal 0, @company.work_services_count
       assert_equal 1, @company.services.free.size
@@ -31,7 +35,7 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal 0, @company.locations_count
     end
     
-    context "add location" do
+    context "with a location" do
       setup do
         @chicago = Location.new(:name => 'Chicago')
         @company.locations.push(@chicago)
@@ -46,6 +50,22 @@ class CompanyTest < ActiveSupport::TestCase
       
       should "increment locations count" do
         assert_equal 1, @company.locations_count
+      end
+    end
+    
+    context "with a user resource" do
+      setup do 
+        @user1 = Factory(:user, :name => "User Resource")
+        assert_valid @user1
+        @company.resources.push(@user1)
+      end
+      
+      should "have company resources collection == [@user1]" do
+        assert_equal [@user1], @company.resources
+      end
+      
+      should "have has_resource? return true" do
+        assert @company.has_resource?(@user1)
       end
     end
   end

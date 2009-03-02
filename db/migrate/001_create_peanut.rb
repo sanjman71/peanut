@@ -59,14 +59,14 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :memberships, [:service_id, :resource_id, :resource_type], :name => 'index_on_services_and_resources'
     
     # Polymorphic resource type
-    create_table :people do |t|
-      t.string  :name
-      t.integer :services_count, :default => 0   # counter cache
+    # create_table :people do |t|
+    #   t.string  :name
+    #   t.integer :services_count, :default => 0   # counter cache
+    # 
+    #   t.timestamps
+    # end
 
-      t.timestamps
-    end
-
-    add_index :people, :name
+    # add_index :people, :name
     
     create_table :mobile_carriers do |t|
       t.string :name

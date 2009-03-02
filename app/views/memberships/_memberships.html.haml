@@ -6,5 +6,5 @@
       = link_to("Remove", membership_path(membership, :subdomain => current_subdomain), :class => 'admin ujs delete')
 - unless @non_members.blank?
   .span-20.prepend-1.last.add_user
-    = select_tag('person_id', options_for_select([['Add a person to this service', 0]] + non_members.sort_by{ |o| o.name }.collect{ |o| [o.name, o.id]}, 0))
+    = select_tag('resource_id', options_for_select([['Add a resource to this service', 0]] + non_members.sort_by{ |o| o.name }.collect{ |o| [o.name, [o.id, o.class].join(",")]}, 0))
     

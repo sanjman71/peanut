@@ -9,7 +9,7 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
   context "create appointment and invoice" do
     setup do
       @company  = Factory(:company)
-      @johnny   = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price_in_cents => 500)
       @user     = Factory(:user)
 

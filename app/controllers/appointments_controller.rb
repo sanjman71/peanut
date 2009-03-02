@@ -3,8 +3,8 @@ class AppointmentsController < ApplicationController
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
-  # GET /people/1/appointments/when/next-week
-  # GET /people/1/appointments/range/20090101..20090201
+  # GET /resources/1/appointments/when/next-week
+  # GET /resources/1/appointments/range/20090101..20090201
   def index
     if params[:customer_id]
       @customer     = User.find(params[:customer_id])
@@ -12,15 +12,15 @@ class AppointmentsController < ApplicationController
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
 
-    if current_company.people_count == 0
+    if current_company.resources_count == 0
       # show message that people need to be added before viewing schedules
       return
     end
     
-    if params[:person_id].blank?
-      # redirect to a specific person
-      person = current_company.people.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :person_id => person.id)) and return
+    if params[:resource].blank? or params[:id].blank?
+      # redirect to a specific resource
+      resource = current_company.resources.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :resource => resource.class.to_s.tableize, :id => resource.id)) and return
     end
     
     manage_appointments
@@ -30,8 +30,8 @@ class AppointmentsController < ApplicationController
   def create
     # build new free appointment
     service       = current_company.services.free.first
-    person        = current_company.resources.find(params[:person_id])
-    @appointment  = Appointment.new(params[:appointment].merge(:resource => person,
+    resource      = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
+    @appointment  = Appointment.new(params[:appointment].merge(:resource => resource,
                                                                :service => service,
                                                                :company => current_company,
                                                                :location_id => current_location.id))
@@ -58,8 +58,12 @@ class AppointmentsController < ApplicationController
 
     logger.debug("*** created free time")
         
-    # check waitlist for any possible openings because of this new free appointment
-    WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
+    begin
+      # check waitlist for any possible openings because of this new free appointment
+      WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
+    rescue Exception => e
+      logger.debug("*** could not check waitlist appointments: #{e.message}")
+    end
     
     manage_appointments
   end
@@ -77,17 +81,17 @@ class AppointmentsController < ApplicationController
       # redirect to waitlist index
       @redirect = waitlist_index_path(:subdomain => current_subdomain)
     else
-      # redirect to person's appointment path 
-      @person   = @appointment.resource
-      @redirect = person_appointments_path(@person)
+      # redirect to resource appointment path
+      @resource = @appointment.resource
+      @redirect = url_for(:action => 'index', :resource => @resource.class.to_s.tableize, :id => @resource.id)
     end
   end
   
   # shared method for managing free/work appointments
   def manage_appointments
-    # initialize person, default to anyone
-    @person       = current_company.people.find_by_id(params[:person_id])
-    @people       = current_company.people.all
+    # initialize resource, default to anyone
+    @resource     = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
+    @resources    = current_company.resources.all
 
     if params[:start_date] and params[:end_date]
       # build daterange using range values
@@ -100,12 +104,8 @@ class AppointmentsController < ApplicationController
       @daterange  = DateRange.parse_when(@when)
     end
 
-    # initialize date range parameters
-    # @when         = (params[:when] || @@default_when).from_url_param
-    # @daterange    = DateRange.parse_when(@when)
-    
-    # find free, work appointments for a person
-    @appointments = current_company.appointments.resource(@person).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
+    # find free, work appointments for a resource
+    @appointments = current_company.appointments.resource(@resource).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     

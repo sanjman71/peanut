@@ -22,13 +22,13 @@ class Company < ActiveRecord::Base
   before_validation         :init_subdomain, :downcase_subdomain
 
   validates_presence_of     :time_zone
-  has_many_polymorphs       :resources, :from => [:people]
+  has_many_polymorphs       :resources, :from => [:users], :through => :companies_resources
   has_many                  :services
   has_many                  :products
   has_many                  :appointments
   has_many                  :owners, :through => :appointments, :uniq => true
   has_many                  :invitations
-
+  
   after_create              :init_basic_services
 
   # Accounting info
@@ -44,10 +44,16 @@ class Company < ActiveRecord::Base
     self.name = self.name.titleize unless self.name.blank?
   end
   
-  def people_count
-    people.count
+  # return true if the company contains the specified resource
+  def has_resource?(resource)
+    # can't use resources.include?(resource) here, not sure why but possibly because of polymorphic
+    resources.any? { |r| r == resource }
   end
-  memoize :people_count
+  
+  def resources_count
+    resources.count
+  end
+  memoize :resources_count
   
   def services_count
     services.count
@@ -59,9 +65,9 @@ class Company < ActiveRecord::Base
   end
   memoize :work_services_count
   
-  # returns true if the company has at least 1 person and 1 work service
+  # returns true if the company has at least 1 resource and 1 work service
   def can_schedule_appointments?
-    return false if people_count == 0 or work_services_count == 0
+    return false if resources_count == 0 or work_services_count == 0
     true
   end
   

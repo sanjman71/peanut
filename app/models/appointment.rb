@@ -194,14 +194,10 @@ class Appointment < ActiveRecord::Base
   def validate
     if self.when == :error
       errors.add_to_base("When is invalid")
-    elsif self.when == :blank
-      # errors.add_to_base("When is empty")
     end
 
     if self.time == :error
       errors.add_to_base("Time is invalid")
-    elsif self.time == :blank
-      # errors.add_to_base("Time is empty")
     end
     
     if self.start_at and self.end_at
@@ -211,9 +207,9 @@ class Appointment < ActiveRecord::Base
       end
     end
     
-    if self.resource
+    if self.resource and self.company
       # resource must belong to the same company
-      if !self.resource.companies.include?(self.company)
+      if !self.company.has_resource?(self.resource)
         errors.add_to_base("Resource is not associated to this company")
       end
     end

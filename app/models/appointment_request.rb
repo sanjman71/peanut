@@ -8,15 +8,14 @@ class AppointmentRequest < Appointment
     
     if resource.anyone?
       # find free appointments for any resource, order by start times
-      collection  = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appts = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     else
       # find free appointments for a specific resource, order by start times
-      collection  = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      appts = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     end
     
-    # filter appointments by the people who can provide the service
-    people = service.people
-    collection.select { |o| people.include?(o.resource) }
+    # filter appointments by the resources who can provide the service
+    appts.select { |appt| service.provided_by?(appt.resource) }
   end
   
   # find free time slots based on appointment request [start_at, end_at]

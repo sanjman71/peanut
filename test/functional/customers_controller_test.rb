@@ -34,7 +34,7 @@ class CustomersControllerTest < ActionController::TestCase
     setup do
       # create customer with a valid appointment
       @customer     = Factory(:user, :name => 'Booty Licious')
-      @johnny       = Factory(:person, :name => "Johnny", :companies => [@company])
+      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
       @appointment  = Factory(:appointment_today, :company => @company, :owner => @customer, :resource => @johnny, :service => @haircut)
       assert_valid @appointment

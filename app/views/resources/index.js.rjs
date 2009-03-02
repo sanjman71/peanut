@@ -1,0 +1,8 @@
+# update search text
+page["#search_text"].html(@search_text)
+
+# update resources list
+page["#resources"].html(render(:partial => 'resources.html.haml', :locals => {:resources => @resources}))
+
+# hide search progress bar
+page["#search_progress"].hide();
