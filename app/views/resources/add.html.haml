@@ -8,7 +8,8 @@
   .span-14.prepend-1.append-1.last
     = display_flash(:notice)
     
-  = render(:partial => 'non_resources.html.haml', :locals => {:non_resources => @non_resources})
+  .span-16.last#non_resources
+    = render(:partial => 'company_non_resources', :locals => {:non_resources => @non_resources})
   
   
 .span-7.prepend-1.last

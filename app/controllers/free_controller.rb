@@ -1,26 +1,26 @@
 class FreeController < ApplicationController
   # privilege_required 'read companies', :only => [:index]
 
-  # GET /people/1/free/daily
+  # GET /users/1/free/calendar
   def new
-    if params[:person_id].blank?
-      # redirect to a specific person
-      person = current_company.people.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :person_id => person.id)) and return
+    if params[:resource].blank? or params[:id].blank?
+      # redirect to a specific resource
+      resource = current_company.resources.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :resource => resource.tableize, :id => resource.id)) and return
     end
         
-    # initialize person, default to anyone
-    @person     = current_company.people.find(params[:person_id]) if params[:person_id]
-    @person     = Person.anyone if @person.blank?     
+    # initialize resource, default to anyone
+    @resource   = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
+    @resource   = User.anyone if @resource.blank?
     
-    # build list of people to allow the scheduled to be adjusted by person
-    @people     = current_company.people.all
+    # build list of resources to allow the scheduled to be adjusted by resource
+    @resources  = current_company.resources.all
     
     # initialize daterange, start calendar on sunday, end calendar on sunday
     @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
     
     # find unscheduled time
-    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @person, @daterange)
+    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @resource, @daterange)
     
     # build calendar markings
     @calendar_markings  = build_calendar_markings(@unscheduled_appts.values.flatten)

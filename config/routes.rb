@@ -37,23 +37,24 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # openings search/index path, scoped by person (optional) and service
+  # openings search/index path, scoped by service and (optional) resource
   map.connect   ':resource/:id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
-  # appointments search/index path, scoped by resource
+  # appointments search/index path scoped by resource
   map.connect   ':resource/:id/appointments/when/:when', :controller => 'appointments', :action => 'index'
   map.connect   ':resource/:id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
   map.connect   ':resource/:id/appointments', :controller => 'appointments', :action => 'index'
 
-  # search appointments path, scoped by resource
+  # search appointments path scoped by resource
   map.connect   ':resource/:id/appointments/search', :controller => 'appointments', :action => 'search'
 
-  # appointment new path, with support for a specific resource
+  # appointment new path scoped by resource
   map.schedule  'schedule/:resource/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
   map.waitlist  'waitlist/:resource/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
-  # map.connect   'people/:person_id/free/:style', :controller => 'free', :action => 'new'
+  # add free time for a specific resource
+  map.connect   ':resource/:id/free/:style', :controller => 'free', :action => 'new'
 
   map.resources :resources, :collection => {:add => :get}
   map.resources :companies_resources, :only => [:create, :destroy]

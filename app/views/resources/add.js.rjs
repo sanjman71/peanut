@@ -1,0 +1,3 @@
+# update non resources list
+page["#non_resources"].html(render(:partial => 'company_non_resources', :locals => {:non_resources => @non_resources}))
+

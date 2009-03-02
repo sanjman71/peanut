@@ -170,8 +170,8 @@ $.fn.init_select_resource_for_appointment_calendar = function () {
 
 // Show free/available calendar for the selected person
 $.fn.init_select_person_for_free_calendar = function () {
-  $("#person_id").change(function () {
-    var href = '/people/' + this.value + '/free/calendar';
+  $("#resource_id").change(function () {
+    var href = '/' + this.value + '/free/calendar';
     window.location = href;
     return false;
   })
