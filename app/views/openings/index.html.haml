@@ -12,10 +12,10 @@
         == What?
       .span-5.field#what
         = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-      .span-3.text-align-right
-        == Who?
-      .span-5.last.field#who
-        = select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :style => "width: 125px;")
+      .span-4.text-align-right
+        == Who/What to schedule?
+      .span-4.last.field#who
+        = select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :style => "width: 125px; align: top;")
     %br
     .span-16.last
       .span-3.text-align-right
@@ -26,9 +26,9 @@
         %span.field#time
           = select_tag('time', options_for_select(Appointment::TIMES, @time))
       - if @locations.size > 1
-        .span-3.text-align-right
+        .span-4.text-align-right
           == Where?
-        .span-5.last.field#where
+        .span-4.last.field#where
           = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
       - else
         .span-8.last
