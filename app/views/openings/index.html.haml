@@ -51,8 +51,8 @@
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
     %h2
-      == Before customers can schedule appointments, there must be at least 1 person
-      = link_to '(add)', people_path
+      == Before customers can schedule appointments, there must be at least 1 resource
+      = link_to '(add)', resources_path
       == and 1 service
       = link_to '(add)', services_path
       == .
