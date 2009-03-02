@@ -83,7 +83,7 @@ class AppointmentsController < ApplicationController
     else
       # redirect to resource appointment path
       @resource = @appointment.resource
-      @redirect = url_for(:action => 'index', :resource => @resource.class.to_s.tableize, :id => @resource.id)
+      @redirect = url_for(:action => 'index', :resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain)
     end
   end
   
