@@ -1,0 +1,10 @@
+- skills.sort_by{ |s| s.provider.name }.each do |skill|
+  .span-15.prepend-1.last.skill{:class => cycle("shaded", "")}
+    .span-4.person
+      %h3= skill.provider.name
+    .span-1.last.action
+      = link_to("Remove", skill_path(skill, :subdomain => current_subdomain), :class => 'admin ujs delete')
+- unless non_providers.blank?
+  .span-15.prepend-1.last.add_provider
+    = select_tag('provider', options_for_select([['Add a service provider', 0]] + non_providers.sort_by{ |o| o.name }.collect{ |o| [o.name, "#{o.class}/#{o.id}"]}, 0))
+    

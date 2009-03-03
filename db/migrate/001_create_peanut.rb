@@ -48,15 +48,15 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :companies_resources, [:resource_id, :resource_type], :name => 'index_on_resources'
     add_index :companies_resources, [:company_id, :resource_id, :resource_type], :name => 'index_on_companies_and_resources'
 
-    # Polymorphic relationship mapping services to different resources (e.g. people)
-    create_table :memberships do |t|
+    # Polymorphic relationship mapping services to providers (e.g. users)
+    create_table :skills do |t|
       t.references  :service
-      t.references  :resource, :polymorphic => true
+      t.references  :provider, :polymorphic => true
 
       t.timestamps
     end
 
-    add_index :memberships, [:service_id, :resource_id, :resource_type], :name => 'index_on_services_and_resources'
+    add_index :skills, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
     
     # Polymorphic resource type
     # create_table :people do |t|

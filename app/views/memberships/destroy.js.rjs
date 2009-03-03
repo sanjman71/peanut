@@ -1,3 +1,0 @@
-# rebuild people list
-page[:memberships_list].replace_html  :partial => "services/memberships.html.haml", 
-                                      :locals => {:memberships => @memberships, :non_members => @non_members}

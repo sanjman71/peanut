@@ -5,7 +5,7 @@ class Service < ActiveRecord::Base
   validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "can only be scheduled as free, busy or work"
   belongs_to                  :company
   has_many                    :appointments
-  has_many_polymorphs         :resources, :from => [:users], :through => :memberships
+  has_many_polymorphs         :providers, :from => [:users], :through => :skills
   before_validation           :init_duration
   before_save                 :titleize_name
   
@@ -36,10 +36,10 @@ class Service < ActiveRecord::Base
     self.duration * 60
   end
   
-  # return true if the service is provided by the selected resource
-  def provided_by?(resource)
-    # can't use resources.include?(resource) here, not sure why but possibly because of polymorphic
-    resources.any? { |r| r == resource }
+  # return true if the service is provided by the specfied provider
+  def provided_by?(o)
+    # can't use providers.include?(provider) here, not sure why but possibly because of polymorphic
+    providers.any? { |provider| provider == o }
   end
   
   private

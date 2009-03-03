@@ -46,9 +46,9 @@ class AppointmentRequestTest < ActiveSupport::TestCase
       end
     end
     
-    context "add user resource who provides the service" do
+    context "add user who provides the service" do
       setup do
-        @haircut.resources.push(@johnny)
+        @haircut.providers.push(@johnny)
         @haircut.reload
       end
       

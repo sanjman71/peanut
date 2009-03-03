@@ -18,7 +18,6 @@ class ServicesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @service }
     end
   end
 
@@ -30,17 +29,17 @@ class ServicesController < ApplicationController
 
   # GET /services/1/edit
   def edit
-    @service      = current_company.services.find(params[:id])
-    @memberships  = @service.memberships
-    @non_members  = current_company.resources.all - @service.resources
+    @service        = current_company.services.find(params[:id])
+    @skills         = @service.skills
+    @non_providers  = current_company.resources.all - @service.providers
   end
 
-  # COMPONENT - GET /services/1/memberships
-  # show all service memberships
-  def memberships
-    @service      = current_company.services.find(params[:id])
-    @memberships  = @service.memberships
-    @non_members  = current_company.resources.all - @service.resources
+  # COMPONENT - GET /services/1/providers
+  # show all service providers
+  def providers
+    @service        = current_company.services.find(params[:id])
+    @skills         = @service.skills
+    @non_providers  = current_company.resources.all - @service.providers
   end
   
   # POST /services

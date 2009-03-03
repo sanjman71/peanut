@@ -9,8 +9,8 @@ class ServiceTest < ActiveSupport::TestCase
   
   should_belong_to          :company
   should_have_many          :appointments
-  should_have_many          :memberships
-  should_have_many          :users, :through => :memberships
+  should_have_many          :skills
+  should_have_many          :users, :through => :skills
   
   def setup
     @owner        = Factory(:user, :name => "Owner")
@@ -34,17 +34,17 @@ class ServiceTest < ActiveSupport::TestCase
       assert_equal 30, @service.duration
     end
     
-    context "create user resource that provides this service" do
+    context "create user and assign it as a service provider" do
       setup do
         @user1 = Factory(:user, :name => "Sanjay")
         assert_valid @user1
-        @service.resources.push(@user1)
+        @service.providers.push(@user1)
         @service.reload
         @user1.reload
       end
       
-      should "have service resources collection == user resource" do
-        assert_equal [@user1], @service.resources
+      should "have service providers collection == [@user]" do
+        assert_equal [@user1], @service.providers
         assert_equal [@user1], @service.users
       end
       

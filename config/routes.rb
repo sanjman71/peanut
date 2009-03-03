@@ -32,7 +32,7 @@ ActionController::Routing::Routes.draw do |map|
                 :collection => { :search => [:get, :post] }
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.resources :notes, :only => [:create]
-  map.resources :memberships, :only => [:create, :destroy]
+  map.resources :skills, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]

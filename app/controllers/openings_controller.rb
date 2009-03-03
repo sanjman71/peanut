@@ -40,15 +40,15 @@ class OpeningsController < ApplicationController
                                          :location => current_location)
 
     # build resources collection, resources are restricted by the services they perform
-    @resources  = Array(User.anyone) + @service.resources
+    @resources  = Array(User.anyone) + @service.providers
     
     # find services collection, services are restricted by the company they belong to
     @services   = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
 
-    # build skills collection mapping services to people/resources
+    # build skills collection mapping services to providers
     @skills     = current_company.services.work.inject([]) do |array, service|
-      service.resources.each do |resource|
-        array << [service.id, resource.id, resource.name, resource.tableize]
+      service.providers.each do |provider|
+        array << [service.id, provider.id, provider.name, provider.tableize]
       end
       array
     end

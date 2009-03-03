@@ -6,9 +6,9 @@
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
     .span-6.prepend-1.name
       %h2.margin-bottom-0= service.name
-      -# show all resources for this service
-      - resources = service.resources.collect { |r| r.name }.sort
-      = resources.join(", ")
+      -# show all service providers
+      - providers = service.providers.collect { |r| r.name }.sort
+      = providers.join(", ")
     .span-3.duration
       %h3== #{service.duration} minutes
     .span-3.price

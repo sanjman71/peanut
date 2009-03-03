@@ -1,10 +1,10 @@
 - stylesheet('services')
 - javascript('services')
 
-- form_for(Membership.new, :url => memberships_path(:subdomain => current_subdomain), :method => :post, :html => {:id => 'new_membership'}) do |f|
-  = hidden_field_tag "membership[service_id]", @service.id, :id => 'membership_service_id'
-  = hidden_field_tag "membership[resource_type]", 'Person', :id => 'membership_resource_type'
-  = hidden_field_tag "membership[resource_id]", '', :id => 'membership_resource_id'
+- form_for(Skill.new, :url => skills_path(:subdomain => current_subdomain), :method => :post, :html => {:id => 'new_skill'}) do |f|
+  = hidden_field_tag "skill[service_id]", @service.id, :id => 'skill_service_id'
+  = hidden_field_tag "skill[provider_type]", '', :id => 'skill_provider_type'
+  = hidden_field_tag "skill[provider_id]", '', :id => 'skill_provider_id'
     
 - form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 
@@ -40,8 +40,8 @@
   .span-20.prepend-1.last
     %h3
       == People who provide this service
-  #memberships
-    = render(:partial => 'memberships/memberships.html.haml', :locals => {:memberships => @memberships, :non_members => @non_members})
+  #skills
+    = render(:partial => 'skills/skills.html.haml', :locals => {:skills => @skills, :non_providers => @non_providers})
   %hr.space
   .span-20.prepend-1.last
     = button_to "Done", :url => services_path(:subdomain => current_subdomain)

@@ -25,22 +25,21 @@ Function.prototype.sleep = function (millisecond_delay) {
 }
 */
 
-// Add a membership (resource to service mapping)
-$.fn.init_new_membership = function() {
-  // bind to resource drop-down used to create memberships
-  $("#resource_id").change(function () {
-    // split selected value into resource id and type
-    var tuple         = $("#resource_id option:selected").attr("value").split(",");
-    var resource_id   = tuple[0];
-    var resource_type = tuple[1];
-    $("#membership_resource_id").attr("value", resource_id);
-    $("#membership_resource_type").attr("value", resource_type);
-    $.post($("#new_membership").attr("action"), $("#new_membership").serialize(), null, "script");
+// Add a skill mapping a service to a provider
+$.fn.init_add_skill = function() {
+  $("#provider").change(function () {
+    // split selected provider value into provider type and id
+    var tuple         = $("#provider option:selected").attr("value").split("/");
+    var provider_type = tuple[0];
+    var provider_id   = tuple[1];
+    $("#skill_provider_id").attr("value", provider_id);
+    $("#skill_provider_type").attr("value", provider_type);
+    $.post($("#new_skill").attr("action"), $("#new_skill").serialize(), null, "script");
     return false;
   })
 }
 
-// Add company/resource mapping
+// Add a company to resource mapping
 $.fn.init_add_company_resource = function() {
   $(".add_company_resource").click(function() {
     resource_type = $(this).attr("resource_type");

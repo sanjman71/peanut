@@ -115,9 +115,11 @@ namespace :init do
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
   
-    # add skillsets by mapping services to resources
-    @mens_haircut.resources.push(@johnny)
-    @womens_haircut.resources.push(@mary)
+    puts "#{Time.now}: adding company1 service providers ..."
+  
+    # add service providers
+    @mens_haircut.providers.push(@johnny)
+    @womens_haircut.providers.push(@mary)
 
     puts "#{Time.now}: adding noelrose services and products ..."
     # create noelrose services, products
@@ -131,7 +133,7 @@ namespace :init do
     @conditioner      = @noelrose.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
     @pomade           = @noelrose.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
   
-    puts "#{Time.now}: adding skillsets ..."
+    puts "#{Time.now}: adding service providers ..."
     # add skillsets by mapping services to resources
     # mens_haircut.resources.push(person1)
     # mens_haircut.resources.push(person2)
