@@ -11,7 +11,7 @@ ActionController::Routing::Routes.draw do |map|
   # company signup route
   map.signup        '/signup',       :controller => 'signup', :action => 'index'
   map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
-  
+
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
@@ -44,13 +44,16 @@ ActionController::Routing::Routes.draw do |map|
   # appointments search/index path scoped by resource
   map.connect   ':resource/:id/appointments/when/:when', :controller => 'appointments', :action => 'index'
   map.connect   ':resource/:id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
-  map.connect   ':resource/:id/appointments', :controller => 'appointments', :action => 'index'
+  map.resource_appointments   ':resource/:id/appointments', :controller => 'appointments', :action => 'index'
 
   # search appointments path scoped by resource
   map.connect   ':resource/:id/appointments/search', :controller => 'appointments', :action => 'search'
 
   # appointment new path scoped by resource
-  map.schedule  'schedule/:resource/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new'
+  map.schedule  'schedule/:resource/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
+                :conditions => {:method => :get}
+  map.schedule  'schedule/:resource/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
+                :conditions => {:method => :post}
   map.waitlist  'waitlist/:resource/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
   # add free time for a specific resource

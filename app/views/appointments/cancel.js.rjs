@@ -1,1 +1,1 @@
-page.redirect_to(person_appointments_path(@person, :subdomain => current_subdomain))
+page.redirect_to(resource_appointments_path(:resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain))

@@ -43,8 +43,8 @@ class FreeController < ApplicationController
   def create
     # build new free appointment base parameters
     service       = current_company.services.free.first
-    person        = current_company.resources.find(params[:person_id])
-    base_hash     = Hash[:resource => person, :service => service, :company => current_company, :location_id => current_location.id]
+    resource      = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
+    base_hash     = Hash[:resource => resource, :service => service, :company => current_company, :location_id => current_location.id]
     
     # track valid and invalid appointments
     @errors       = Hash.new

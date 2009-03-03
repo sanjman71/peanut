@@ -74,7 +74,7 @@ select.locations                                  { color: #008800; font-size: 1
  
 /* body styles */
 
-div.container div.box                             { background: #EDF3FE; padding: 13px 0px 13px 40px; }
+div.container div.box                             { padding: 13px 0px 13px 40px; }
 
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
@@ -156,3 +156,6 @@ div.plan-heading                                  { text-align: center;}
 div.plan                                          { height: 200px;}
 
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}
+
+div.mat                                           { background: #EDF3FE; }
+h3.select_label                                   { padding-top: 10px; }

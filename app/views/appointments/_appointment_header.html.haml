@@ -1,21 +1,35 @@
-.what.padding-5
-  .span-2.padding-bottom-5
-    == What:
-  .span-10.padding-bottom-5.last
-    = appointment.service.name
-.with.padding-5
-  .span-2.padding-bottom-5
-    == With:
-  .span-10.padding-bottom-5.last
-    = appointment.resource.name
-.when.padding-5
-  .span-2.padding-bottom-5
-    == When:
-  .span-10.padding-bottom-5.last
-    = appointment.start_at.to_s(:appt_day_date_time)
-- unless appointment.owner.blank?
-  .owner.padding-5.span-12.last
-    = link_to appointment.owner.name, customer_path(appointment.owner)
-.confirmation.padding-5.span-12.last
-  == Confirmation code:
-  = appointment.confirmation_code
+%h3.span-14.last
+  .what.padding-5
+    .span-4.padding-bottom-5.text-align-right
+      == What:
+    .span-8.padding-bottom-5.last
+      = appointment.service.name
+  %br
+  .with.padding-5
+    .span-4.padding-bottom-5.text-align-right
+      == With:
+    .span-8.padding-bottom-5.last
+      = (appointment.resource || User.anyone).name
+  %br
+  .when.padding-5
+    .span-4.padding-bottom-5.text-align-right
+      == When:
+    .span-8.padding-bottom-5.last
+      - if appointment.waitlist?
+        == #{appointment.time.titleize}, #{appointment.when.titleize}
+      - else
+        = appointment.start_at.to_s(:appt_day_date_time)
+  - unless appointment.owner.blank?
+    %br
+      .owner.padding-5
+        .span-4.padding-bottom-5.text-align-right
+          == For:
+        .span-8.last
+          = link_to appointment.owner.name, customer_path(appointment.owner, :subdomain => current_subdomain)
+  - unless appointment.confirmation_code.blank?
+    %br
+      .confirmation.padding-5
+        .span-4.padding-bottom-5.text-align-right
+          == Confirmation code:
+        .span-8.last
+          = appointment.confirmation_code

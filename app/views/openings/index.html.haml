@@ -2,23 +2,22 @@
 - stylesheet('appointments', 'calendar')
 - javascript('skills', 'openings')
 
-.span-16
-  .prepend-1
-    %h2== Schedule an Appointment
-    = hidden_field_tag 'initial_resource_id', @resource.id
+.span-15.prepend-1.mat
+  %h2== Schedule an Appointment
+  = hidden_field_tag 'initial_resource_id', @resource.id
   - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
-    .span-16.last
-      .span-3.text-align-right
+    .span-14.last
+      .span-2.text-align-right
         == What?
       .span-5.field#what
         = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-      .span-4.text-align-right
+      .span-3.text-align-right
         == Who/What to schedule?
       .span-4.last.field#who
         = select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :style => "width: 125px; align: top;")
     %br
-    .span-16.last
-      .span-3.text-align-right
+    .span-14.last
+      .span-2.text-align-right
         == When?
       .span-5
         %span.field#when
@@ -26,12 +25,12 @@
         %span.field#time
           = select_tag('time', options_for_select(Appointment::TIMES, @time))
       - if @locations.size > 1
-        .span-4.text-align-right
+        .span-3.text-align-right
           == Where?
         .span-4.last.field#where
           = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
       - else
-        .span-8.last
+        .span-7.last
     .span-4.prepend-1.last
       = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
       %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
