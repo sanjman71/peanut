@@ -2,6 +2,8 @@
 class SessionsController < ApplicationController
 
   def new
+    # We show a signup form also, which requires a @user object
+    @user = User.new
     if @current_company.blank?
       # use home layout
       render(:action => 'new', :layout => 'home')
@@ -13,7 +15,6 @@ class SessionsController < ApplicationController
 
   def create
     logout_keeping_session!
-    
     # authenticate user within a company domain; admins login with a company id of 0
     company_id  = @current_company.blank? ? 0 : @current_company.id
     user        = User.authenticate(params[:email], params[:password], :company_id => company_id)
@@ -26,12 +27,11 @@ class SessionsController < ApplicationController
       self.current_user = user
       new_cookie_flag   = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
-      # force redirect to home page
-      session[:return_to] = '/'
       redirect_back_or_default('/')
       flash[:notice] = "Logged in successfully"
     else
       note_failed_signin
+      @user        = User.new
       @email       = params[:email]
       @remember_me = params[:remember_me]
       
@@ -43,7 +43,7 @@ class SessionsController < ApplicationController
         render :action => 'new'
       end
     end
-  end
+  end  
 
   def destroy
     logout_killing_session!

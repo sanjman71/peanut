@@ -1,32 +1,7 @@
 - title('Welcome to Peanut')
 
-.span-17
-  .span-17.last.box
-    %h2== Log In
-
-.span-16.prepend-1
-  = display_flash(:notice)
-
-.span-16.prepend-1
-  = display_flash(:error)
-  
-.span-17.prepend-1
-  - form_tag session_path do
-    .span-17.last.padding-bottom-10
-      .span-3
-        %h2== Email:
-      .span-14.last
-        = text_field_tag 'email', @email, :class => 'title', :style => 'width: 250px; margin: 0px;'
-    .span-17.last.padding-bottom-10
-      .span-3
-        %h2== Password:
-      .span-14.last
-        = password_field_tag 'password', nil, :class => 'title', :style => 'width: 250px; margin: 0px;'
-    
-    .span-17.last
-      = submit_tag 'Log in', :name => nil, :style => 'font-size: 15px;'
-      
-    -# Uncomment this if you want this functionality
-    -#= label_tag 'remember_me', 'Remember me'
-    -#= check_box_tag 'remember_me', '1', @remember_me
-
+.span-24.last
+  .span-12
+    = render :partial => 'sessions/login_form'
+  .span-12.last
+    = render :partial => 'sessions/user_form'

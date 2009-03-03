@@ -40,25 +40,30 @@ class UsersController < ApplicationController
  
   def create
     logout_keeping_session!
-    @invitation = Invitation.find_by_token(params[:invitation_token])
-    if @invitation.blank?
-      @error = true
-      return
+    if params[:invitation_token]
+      @invitation = Invitation.find_by_token(params[:invitation_token])
+      if @invitation.blank?
+        flash[:error] = "Your invitation code is invalid."
+        @error = true
+        return
+      end
     end
     
     @user = User.new(params[:user])
     @user.register! if @user && @user.valid?
     success = @user && @user.valid?
     if success && @user.errors.empty?
-      # Grant the user basic access to the company
-      @user.grant_role('company employee', @invitation.company)
+      if !@invitation.blank?
+        # Grant the user basic access to the company
+        @user.grant_role('company employee', @invitation.company)
+      end
       # activate user, redirect to login page
       @user.activate!
-      redirect_back_or_default('/login')
       flash[:notice] = "Your account was successfully created. Login to continue."
+      redirect_to('/login')
     else
       flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
-      render :action => 'new'
+      render :template => 'sessions/new'
     end
   end
 

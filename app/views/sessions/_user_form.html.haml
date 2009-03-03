@@ -1,0 +1,33 @@
+.span-12.last.mat
+  .span-11.last
+    .span-10.prepend-1.last
+      %h2== Signup
+      %hr
+    - form_for("user", @user, :url => register_path ) do |user_form|
+      -# show any user errors
+      - unless @user.errors.blank?
+        .span-11.notice
+          = error_messages_for('user', :header_message => nil)
+      .span-11.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+        .span-7.last
+          = user_form.text_field :name, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-11.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
+        .span-7.last
+          = user_form.text_field :email, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-11.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
+        .span-7.last
+          = user_form.password_field :password, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-11.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+        .span-7.last
+          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 250px; margin: 0px;'
+      .span-11.last.padding-bottom-10
+        .span-9.prepend-2.last
+          = submit_tag 'Sign up!', :name => nil, :style => 'font-size: 15px;'
