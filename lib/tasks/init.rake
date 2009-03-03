@@ -100,25 +100,24 @@ namespace :init do
     @noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription2)
     @noelrose.save
 
-    @ziptrucks      = Company.create(:name => "Zip Trucks", :subdomain => "ziptrucks", :time_zone => "Central Time (US & Canada)", 
-                                     :subscription => @subscription3)
-    @ziptrucks.save
-
     # add user roles
     @johnny.grant_role('company manager', @company1)
     @mary.grant_role('company employee', @company1)
     @erika.grant_role('company manager', @noelrose)
-    @mac.grant_role('company manager', @ziptrucks)
     
     puts "#{Time.now}: adding company1 services and products ..."
+    
+    # assign company resources
+    @company1.resources.push(@johnny)
+    @company1.resources.push(@mary)
     
     # create company1 services and people
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
   
     # add skillsets by mapping services to resources
-    # @mens_haircut.resources.push(@johnny)
-    # @womens_haircut.resources.push(@mary)
+    @mens_haircut.resources.push(@johnny)
+    @womens_haircut.resources.push(@mary)
 
     puts "#{Time.now}: adding noelrose services and products ..."
     # create noelrose services, products
@@ -145,26 +144,6 @@ namespace :init do
     # color3.resources.push(person1)
     # color3.resources.push(person2)
     
-    puts "#{Time.now}: adding company plans and account owners ..."
-    
-    # plans     = Plan.order_by_cost
-    # free     = plans[0]
-    # basic    = plans[1]
-    # premium  = plans[2]
-    # max      = plans[3]
-    # 
-    # u1        = User.find_by_email("admin@killianmurphy.com")
-    # u2        = User.find_by_email("sanjay@jarna.com")
-    # 
-    # [{:company => company1, :user => u1, :plan => basic},
-    #  {:company => noelrose, :user => u2, :plan => premium}].each do |hash|
-    #    # create subscription
-    #    subscription = Subscription.create(:user => hash[:user], :plan => hash[:plan], :company => hash[:company])
-    #    
-    #    # authorize bogus, but valid credit card
-    #    payment      = subscription.authorize(bogus_credit_card)
-    # end
-
     puts "#{Time.now}: completed"
   end
 
