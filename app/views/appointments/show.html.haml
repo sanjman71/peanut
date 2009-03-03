@@ -1,12 +1,17 @@
 - stylesheet('appointments', 'notes')
-- javascript('appointments', 'notes')
+- javascript('date', 'jquery.datePicker', 'appointments', 'notes')
 
-.span-18
-  .span-18.last.box
-    .span-14
+.span-16
+  .span-15.last.box
+    .span-10.last
+      - if @confirmation
+        %h2==Appointment confirmation
+      - else
+        %h2==Appointment information    
+    .span-15.last
       %h3
         = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
-    .span-4.last
+    .span-8.last
       - if @appointment.state == 'upcoming'
         -# upcoming appointments can be canceled and checked-out
         = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs confirm', :question => "Are you sure you want to cancel this appointment?")
@@ -14,12 +19,6 @@
         = link_to('Checkout', checkout_appointment_path(@appointment), :class => 'admin')
   
 .span-15.prepend-1.last
-  - if @confirmation
-    -# show appointment confirmation notice
-    .notice
-      == A confirmation email has also been sent to
-      = @appointment.owner.email unless @appointment.owner.blank?
-      
   - if @appointment.state == 'completed'
     -# show invoice
     #invoice

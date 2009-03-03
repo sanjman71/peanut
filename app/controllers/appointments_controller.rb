@@ -123,77 +123,62 @@ class AppointmentsController < ApplicationController
   # GET   /waitlist/people/3/services/8/this week/anytime
   # POST  /waitlist/people/3/services/8/this week/anytime
   def new
-    # build appointment hash differently for schedule vs waitlist appointment requests
-    hash = {:service_id => params[:service_id], :resource_id => params[:id], :resource_type => params[:resource].to_s.classify, :company_id => current_company.id}
-    
-    if request.url.match(/\/waitlist\//)
-      # add when, time, mark_as attributes
-      hash.update(:time => params[:time], :when => params[:when], :mark_as => Appointment::WAIT)
-    elsif request.url.match(/\/schedule\//)
-      # add start_at attribute
-      hash.update(:start_at => params[:start_at])
-    else
-      raise ArgumentError
-    end
-
-    if logged_in?
-      # fill in owner id from current user
-      params[:appointment] ||= {}
-      params[:appointment][:owner_id] = current_user.id
-    end
-
-    # add appointment attributes
-    hash.update(params[:appointment]) if params[:appointment]
-    
-    # build appointment object
-    @appointment = Appointment.new(hash)
-    
+    @appointment = new_appointment_from_params()
     logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
-    
+
+  end
+  
+  def create
+    @appointment = new_appointment_from_params()
+
     if !@appointment.valid?
       # ask for owner/user info
       logger.debug("*** appointment is missing owner info")
-      return
-    end
-    
-    if @appointment.waitlist?
-      # add waitlist appointment
-      logger.debug("*** adding waitlist appointment")
+      redirect_to schedule_path(:resource => params[:resource], :id => params[:id], :service_id => params[:service_id], :start_at => params[:start_at])
+    else
+      if @appointment.waitlist?
+        # add waitlist appointment
+        logger.debug("*** adding waitlist appointment")
       
-      begin
-        @appointment.save!
+        @appointment.save
 
-        # send waitlist confirmation
-        MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+        begin
+          # send waitlist email confirmation
+          MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+          flash[:notice] = "Sent email confirmation message for your waitlist appointment to #{appointment.owner.email}."
+        rescue Exception => e
+          flash[:error] = "Could not send email confirmation message for your waitlist appointment."
+        end
 
         if @appointment.owner.sms?
-          # send sms waitilist confirmation 
-          SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+          begin
+            # send sms waitilist confirmation 
+            SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+            flash[:notice] = "Sent confirmation text message for your waitlist appointment to #{appointment.owner.phone}."
+          rescue Exception => e
+            flash[:error] = "Could not send confirmation text message for your waitlist appointment to  #{appointment.owner.phone}."
+          end
         end
-      rescue Exception => e
-        logger.debug("*** could not create waitlist appointment: #{e.message}")
-        return
-      end
 
-      # show waitlist
-      return redirect_to(waitlist_index_path)
-    elsif @appointment.conflicts?
-      # resolve conflicts and schedule
-      logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
+        # show waitlist
+        return redirect_to(waitlist_index_path)
+      elsif @appointment.conflicts?
+        # resolve conflicts and schedule
+        logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
       
-      begin
         # create work appointment
         @work_appointment = AppointmentScheduler.create_work_appointment(@appointment)
-        
-        # send appointment confirmation
-        MailWorker.async_send_appointment_confirmation(:id => @work_appointment.id)
-      rescue Exception => e
-        logger.debug("*** could not schedule appointment: #{e.message}")
-        return
-      end
+      
+        begin
+          # send appointment confirmation
+          MailWorker.async_send_appointment_confirmation(:id => @work_appointment.id)
+        rescue Exception => e
+          flash[:error] = "Could not send email confirmation message for your appointment."
+        end
 
-      # show appointment confirmation
-      return redirect_to(confirmation_appointment_path(@work_appointment))
+        # show appointment confirmation
+        return redirect_to(confirmation_appointment_path(@work_appointment))
+      end
     end
   end
   
@@ -250,7 +235,7 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1/cancel
   def cancel
     @appointment  = Appointment.find(params[:id])
-    @person       = @appointment.resource
+    @resource     = @appointment.resource
     
     # cancel the work appointment
     AppointmentScheduler.cancel_work_appointment(@appointment)
@@ -258,7 +243,7 @@ class AppointmentsController < ApplicationController
     # redirect to the resource's schedule page
     respond_to do |format|
       format.js
-      format.html { redirect_to(person_appointments_path(@person)) }
+      format.html { redirect_to(resource_appointments_path(:resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain)) }
     end
   end
   
@@ -289,4 +274,35 @@ class AppointmentsController < ApplicationController
     end
   end
     
+  protected
+  
+  def new_appointment_from_params
+    # build appointment hash differently for schedule vs waitlist appointment requests
+    hash = {:service_id => params[:service_id], :resource_id => params[:id], :resource_type => params[:resource].to_s.classify, :company_id => current_company.id}
+    
+    if request.url.match(/\/waitlist\//)
+      # add when, time, mark_as attributes
+      hash.update(:time => params[:time], :when => params[:when], :mark_as => Appointment::WAIT)
+    elsif request.url.match(/\/schedule\//)
+      # add start_at attribute
+      hash.update(:start_at => params[:start_at])
+    else
+      raise ArgumentError
+    end
+
+    if logged_in?
+      # fill in owner id from current user
+      params[:appointment] ||= {}
+      params[:appointment][:owner_id] = current_user.id
+    end
+
+    # add appointment attributes
+    hash.update(params[:appointment]) if params[:appointment]
+    
+    # build appointment object
+    appointment = Appointment.new(hash)
+    
+    appointment
+  end
+  
 end
