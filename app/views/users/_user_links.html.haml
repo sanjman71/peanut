@@ -10,7 +10,6 @@
     = link_to 'Company Info', edit_company_root_path(:subdomain => current_subdomain), :class => 'admin header'
     == &nbsp;|&nbsp;
     
-  = link_to('Log-out', logout_path, :class => 'admin header')
+  = link_to('Log out', logout_path, :class => 'admin header')
 - else
-  = link_to('Log-in', login_path, :class => 'admin header')
-
+  = link_to('Log in or Sign up', login_path, :class => 'admin header')

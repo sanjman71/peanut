@@ -3,7 +3,7 @@
 - stylesheet('appointments', 'calendar', 'datePicker')
 
 .span-16
-  .span-15.last.box
+  .span-15.prepend-1.last.mat
     - if current_company.resources_count == 0
       %h2
         == There must be at least 1 resource
@@ -46,32 +46,31 @@
         = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
   
 - unless current_company.resources_count == 0
-  .span-6.prepend-1.last
-    .span-6.box
-      = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
-      - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :resource => @resource.class, :id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
-        = hidden_field_tag :when, @when
-        .add_free_time
-          .span-7.last.when
-            == When
-          .span-7.last
-            = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
-          .span-7.last#start_at_label
-            == Start
-          .span-7.last#start_at_text
-            = text_field 'appointment[time_range]', 'start_at', :size => 10, :class => 'required'
-            %span.example== e.g. 8:15 am
-          .span-7.last#end_at_label
-            == End
-          .span-7.last.append-bottom#end_at_text
-            = text_field 'appointment[time_range]', 'end_at', :size => 10, :class => 'required'
-            %span.example== e.g. 5:30 pm
-          .span-7.last
-            #submit= f.submit 'Add', :name => nil, :class => 'button big'
-            .hide#progress= image_tag 'barbershop.gif'
-         
-      %hr.space   
-      %h4== or
-      %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain), :class => 'rounded button'
-      %h4= link_to "Schedule blocks of available time (version 2)", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
+  .span-6.prepend-1.last.mat
+    = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
+    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :resource => @resource.class, :id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+      = hidden_field_tag :when, @when
+      .add_free_time
+        .span-7.last.when
+          == When
+        .span-7.last
+          = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+        .span-7.last#start_at_label
+          == Start
+        .span-7.last#start_at_text
+          = text_field 'appointment[time_range]', 'start_at', :size => 10, :class => 'required'
+          %span.example== e.g. 8:15 am
+        .span-7.last#end_at_label
+          == End
+        .span-7.last.append-bottom#end_at_text
+          = text_field 'appointment[time_range]', 'end_at', :size => 10, :class => 'required'
+          %span.example== e.g. 5:30 pm
+        .span-7.last
+          #submit= f.submit 'Add', :name => nil, :class => 'button big'
+          .hide#progress= image_tag 'barbershop.gif'
+       
+    %hr.space   
+    %h4== or
+    %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain), :class => 'rounded button'
+    %h4= link_to "Schedule blocks of available time (version 2)", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
 

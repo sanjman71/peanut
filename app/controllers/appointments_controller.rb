@@ -125,6 +125,12 @@ class AppointmentsController < ApplicationController
   def new
     @appointment = new_appointment_from_params()
     logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
+    
+    if !logged_in?
+      flash[:notice] = "To finalize your appointment, please log in or sign up."
+      store_location
+      redirect_to login_path
+    end
 
   end
   
