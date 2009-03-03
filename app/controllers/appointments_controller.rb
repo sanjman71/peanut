@@ -252,7 +252,7 @@ class AppointmentsController < ApplicationController
     end
   end
   
-  # GET /appointments/search
+  # GET  /appointments/search
   # POST /appointments/search
   #  - search for an appointment by code => params[:appointment][:code]
   #  - search for appointments by date range => params[:start_date], params[:end_date]
@@ -296,9 +296,9 @@ class AppointmentsController < ApplicationController
     end
 
     if logged_in?
-      # fill in owner id from current user
+      # fill in customer id from current user
       params[:appointment] ||= {}
-      params[:appointment][:owner_id] = current_user.id
+      params[:appointment][:customer_id] = current_user.id
     end
 
     # add appointment attributes
