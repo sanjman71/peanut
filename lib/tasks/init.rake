@@ -107,13 +107,17 @@ namespace :init do
     
     puts "#{Time.now}: adding company1 services and products ..."
     
+    # assign company resources
+    @company1.resources.push(@johnny)
+    @company1.resources.push(@mary)
+    
     # create company1 services and people
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
   
     # add skillsets by mapping services to resources
-    # @mens_haircut.resources.push(@johnny)
-    # @womens_haircut.resources.push(@mary)
+    @mens_haircut.resources.push(@johnny)
+    @womens_haircut.resources.push(@mary)
 
     puts "#{Time.now}: adding noelrose services and products ..."
     # create noelrose services, products
