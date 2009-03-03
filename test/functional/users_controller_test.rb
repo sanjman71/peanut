@@ -4,8 +4,12 @@ require 'test/factories'
 class UsersControllerTest < ActionController::TestCase
 
   def setup
-    @controller = CustomersController.new
-    @company    = Factory(:company)
+    @controller   = CustomersController.new
+    # create a valid company
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+    @company      = Factory(:company, :subscription => @subscription)
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
   end

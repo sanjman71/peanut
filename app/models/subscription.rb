@@ -1,7 +1,7 @@
 class SubscriptionError < StandardError; end
 
 class Subscription < ActiveRecord::Base
-  validates_presence_of   :plan_id, :user_id, :company_id, :start_billing_at, :paid_count, :billing_errors_count
+  validates_presence_of   :plan_id, :user_id, :company_id, :paid_count, :billing_errors_count
   validates_uniqueness_of :company_id
   belongs_to              :user
   belongs_to              :company
@@ -43,7 +43,7 @@ class Subscription < ActiveRecord::Base
     return unless new_record?
     
     # use plan start billing date, store as utc value
-    self.start_billing_at     = self.plan.start_billing_at.utc unless plan.blank?
+    self.start_billing_at     = self.plan.start_billing_at.utc unless plan.blank? or !plan.billable?
     self.paid_count           = 0
     self.billing_errors_count = 0
   end

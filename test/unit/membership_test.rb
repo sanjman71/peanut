@@ -8,9 +8,11 @@ class MembershipTest < ActiveSupport::TestCase
   should_require_attributes :resource_type
 
   def setup
-    @company   = Factory(:company)
-    @user      = Factory(:user, :name => "Sanjay", :companies => [@company])
-    @haircut   = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+    @user         = Factory(:user, :name => "Sanjay")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @user, :plan => @monthly_plan)
+    @company      = Factory(:company, :subscription => @subscription)
+    @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
   end
   
   context "valid membership" do

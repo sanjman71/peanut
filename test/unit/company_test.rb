@@ -3,17 +3,35 @@ require 'test/test_helper'
 class CompanyTest < ActiveSupport::TestCase
 
   should_require_attributes   :name
+  should_require_attributes   :subdomain
   should_require_attributes   :time_zone
+  should_have_one             :subscription
   should_have_many            :services
   should_have_many            :products
   should_have_many            :appointments
   should_have_many            :invitations
   should_have_many            :companies_resources
   
-  context "create company" do
+  context "create company without a subscription" do
     setup do
       @company = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC")
-      assert @company.valid?
+    end
+    
+    should_not_change "Company.count"
+    
+    should "require a valid subscription" do
+      assert_equal "Subscription is not valid", @company.errors.on_base
+    end
+  end
+
+  context "create company with a subscription" do
+    setup do
+      @user         = Factory(:user)
+      @plan         = Factory(:monthly_plan)
+      @subscription = Subscription.new(:user => @user, :plan => @plan)
+      @company      = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC", :subscription => @subscription)
+      assert_valid @subscription
+      assert_valid @company
     end
     
     should "format and set subdomain" do
@@ -30,7 +48,7 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal 1, @company.services.free.size
       assert_equal false, @company.can_schedule_appointments?
     end
-
+  
     should "have locations_count == 0" do
       assert_equal 0, @company.locations_count
     end

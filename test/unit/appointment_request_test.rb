@@ -2,10 +2,16 @@ require 'test/test_helper'
 
 class AppointmentRequestTest < ActiveSupport::TestCase
   
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+  end
+  
   context "create service without anyone who performs the service and free time" do
     setup do
       # create free time from 8 am to noon
-      @company   = Factory(:company)
+      @company   = Factory(:company, :subscription => @subscription)
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
       @free      = @company.services.free.first

@@ -17,19 +17,26 @@ class AppointmentTest < ActiveSupport::TestCase
   should_belong_to          :owner
   should_have_one           :invoice
   
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+  end
+  
   context "free appointment" do
     setup do
-      @company        = Factory(:company)
-      @johnny         = Factory(:user, :name => "Johnny")
-      @company.resources.push(@johnny)
-      
-      @time_start_at  = Time.now.beginning_of_day
-      @time_end_at    = @time_start_at + 1.hour
-      @daterange      = DateRange.parse_range(@time_start_at.to_s(:appt_schedule_day), @time_start_at.to_s(:appt_schedule_day))
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @time_start_at, @time_end_at)
+      @company        = Factory(:company, :subscription => @subscription)
+      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @start_at_utc   = Time.now.utc.beginning_of_day
+      @end_at_utc     = @start_at_utc + 1.hour
+      @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
+      @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @start_at_utc, @end_at_utc)
       
       # build mapping of unscheduled time
       @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @johnny, @daterange)
+      
+      key = @unscheduled.keys.first
     end
       
     should_change "Appointment.count", :by => 1
@@ -39,16 +46,17 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     should "have 1 unscheduled slot today for 23 hours starting at 1 am" do
-      assert_equal [@time_start_at.to_s(:appt_schedule_day)], @unscheduled.keys
-      assert_equal 1, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].size
-      assert_equal 23*60, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].first.duration
-      assert_equal 1, @unscheduled[@time_start_at.to_s(:appt_schedule_day)].first.start_at.hour
+      assert_equal [@start_at_day], @unscheduled.keys
+      assert_equal 1, @unscheduled[@start_at_day].size
+      assert_equal 23*60, @unscheduled[@start_at_day].first.duration
+      assert_equal 1, @unscheduled[@start_at_day].first.start_at.utc.hour
+      assert_equal 0, @unscheduled[@start_at_day].first.end_at.utc.hour
     end
   end
   
   context "work appointment" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny")
       @company.resources.push(@johnny)
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
@@ -69,7 +77,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "appointment by building owner association" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
@@ -109,25 +117,31 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "afternoon appointment" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
       @user     = Factory(:user)
 
+      # start at 2 pm, local time
+      @start_at_local = Time.now.beginning_of_day + 14.hours
+      @start_at_utc   = @start_at_local.utc
+      
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
                                      :resource => @johnny,
                                      :owner => @user,
-                                     :start_at_string => "today 2 pm")
+                                     :start_at => @start_at_local)
 
       assert_valid @appt
+      
+      @end_at_utc = @appt.end_at.utc
     end
     
-    should "have utc time of day values" do
+    should "have time of day values based on start/end timses converted to utc format" do
       assert_equal '', @appt.time
-      assert_equal (14*3600) - Time.zone.utc_offset, @appt.time_start_at
-      assert_equal (14*3600) + (30*60) - Time.zone.utc_offset, @appt.time_end_at
+      assert_equal ((@start_at_utc.hour * 60) + @start_at_utc.min) * 60, @appt.time_start_at
+      assert_equal ((@end_at_utc.hour * 60) + @end_at_utc.min) * 60, @appt.time_end_at
     end
     
     should "match afternoon and anytime time of day searches" do
@@ -148,12 +162,16 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt  = Appointment.new(:time_range => {:day => @today, :start_at => "1 pm", :end_at => "3 pm"})
     end
     
-    should "have start time today at 1 pm" do
-      assert_equal Chronic.parse("today 1 pm"), @appt.start_at
+    should "have start time today at 1 pm local time" do
+      assert_equal @today, @appt.start_at.to_s(:appt_schedule_day)
+      assert_equal 13, @appt.start_at.hour
+      assert_equal 0, @appt.start_at.min
     end
     
-    should "have end time today at 3 pm" do
-      assert_equal Chronic.parse("today 3 pm"), @appt.end_at
+    should "have end time today at 3 pm local time" do
+      assert_equal @today, @appt.end_at.to_s(:appt_schedule_day)
+      assert_equal 15, @appt.end_at.hour
+      assert_equal 0, @appt.end_at.min
     end
   end
   
@@ -164,12 +182,16 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt       = Appointment.new(:time_range => @time_range)
     end
 
-    should "have start time today at 10 am" do
-      assert_equal Chronic.parse("today 10 am"), @appt.start_at
+    should "have start time today at 10 am local time" do
+      assert_equal @today, @appt.start_at.to_s(:appt_schedule_day)
+      assert_equal 10, @appt.start_at.hour
+      assert_equal 0, @appt.start_at.min
     end
     
-    should "have end time today at noon" do
-      assert_equal Chronic.parse("today 12 pm"), @appt.end_at
+    should "have end time today at noon local time" do
+      assert_equal @today, @appt.end_at.to_s(:appt_schedule_day)
+      assert_equal 12, @appt.end_at.hour
+      assert_equal 0, @appt.end_at.min
     end
   end
   

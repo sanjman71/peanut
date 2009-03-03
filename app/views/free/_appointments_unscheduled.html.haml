@@ -1,7 +1,8 @@
 - unscheduled_appts.keys.sort.each do |key|
   .unscheduled.hide{:id => "unscheduled_#{key}", :style => 'color: #666666;'}
     %h4#date{:style => 'margin-bottom: 3px;'}
-      - date = unscheduled_appts[key].first.start_at
+      -# get date in utc format
+      - date = unscheduled_appts[key].first.start_at.utc
       = date.to_s(:appt_short_month_day_year)
     #times
       - if unscheduled_appts[key].size == 1

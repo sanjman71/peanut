@@ -6,9 +6,15 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
   # shoulda
   should_require_attributes :appointment_id
   
+  def setup
+    @owner        = Factory(:user, :name => "Owner")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+  end
+  
   context "create appointment and invoice" do
     setup do
-      @company  = Factory(:company)
+      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price_in_cents => 500)
       @user     = Factory(:user)

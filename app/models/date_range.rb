@@ -63,33 +63,33 @@ class DateRange
     if (m = s.match(/next (\d{1}) weeks/)) # e.g. 'next 3 weeks'
       # use [today, today + n weeks]
       n         = m[1].to_i
-      start_at  = Time.now.beginning_of_day
+      start_at  = Time.now.utc.beginning_of_day
       end_at    = start_at + n.weeks
     else
       case s
       when 'today'
-        start_at  = Time.now.beginning_of_day
+        start_at  = Time.now.utc.beginning_of_day
         end_at    = start_at + 1.day
       when 'tomorrow'
-        start_at  = Time.now.tomorrow.beginning_of_day
+        start_at  = Time.now.utc.tomorrow.beginning_of_day
         end_at    = start_at + 1.day
       when 'this week'
-        # this week ends on sunday night midnight
-        end_at    = Time.now.end_of_week + 1.second
-        start_at  = Time.now.beginning_of_day
+        # this week ends on sunday night at midnight
+        end_at    = Time.now.utc.end_of_week + 1.second
+        start_at  = Time.now.utc.beginning_of_day
       when 'next week'
         # next week starts on monday
-        start_at  = Time.now.next_week
+        start_at  = Time.now.utc.next_week
         end_at    = start_at + 1.week
       when 'later'
-        # should start after 'next week', and last for 2 weeks
-        start_at  = Time.now.next_week + 1.week
+        # should start after 'next week', and continue for 2 weeks
+        start_at  = Time.now.utc.next_week + 1.week
         end_at    = start_at + 2.weeks
       when 'past week'
-        end_at    = Time.now.end_of_day + 1.second
+        end_at    = Time.now.utc.end_of_day + 1.second
         start_at  = end_at - 1.week
       when 'past 2 weeks'
-        end_at    = Time.now.end_of_day + 1.second
+        end_at    = Time.now.utc.end_of_day + 1.second
         start_at  = end_at - 2.weeks
       when 'past month'
         end_at    = Time.now.end_of_day + 1.second
