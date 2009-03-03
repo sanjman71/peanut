@@ -129,17 +129,16 @@ class AppointmentsController < ApplicationController
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
       store_location
-      redirect_to login_path
+      redirect_to(login_path) and return
     end
-
   end
   
   def create
     @appointment = new_appointment_from_params()
 
     if !@appointment.valid?
-      # ask for owner/user info
-      logger.debug("*** appointment is missing owner info")
+      # ask for customer/user info
+      logger.debug("*** appointment is missing customer info")
       redirect_to schedule_path(:resource => params[:resource], :id => params[:id], :service_id => params[:service_id], :start_at => params[:start_at])
     else
       if @appointment.waitlist?

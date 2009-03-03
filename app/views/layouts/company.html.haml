@@ -47,7 +47,7 @@
     - if RAILS_ENV == 'development'
       .container.showgrid
         .flash.prepend-1.span-14
-          = display_flash
+          = display_flash(:all)
         = yield
     - else
       .container

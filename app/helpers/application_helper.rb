@@ -13,18 +13,15 @@ module ApplicationHelper
     content_for(:stylesheet) { stylesheet_link_tag(*files) }
   end
     
-  FLASH_TYPES = [:error, :warning, :success, :message]
+  FLASH_TYPES = [:error, :warning, :success, :message, :notice]
 
   def display_flash(type = nil)
-    html = ""
-
-    if type.nil?
-      FLASH_TYPES.each { |name| html << display_flash(name) }
+    if type.nil? or type == :all
+      html = FLASH_TYPES.collect { |name| display_flash(name) }
+      return html
     else
       return flash[type].blank? ? "" : "<div class=\"#{type}\">#{flash[type]}</div>"
     end
-
-    html
   end
   
   def display_message(msg, type = :notice)
