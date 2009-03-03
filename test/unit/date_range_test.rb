@@ -12,8 +12,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 1, @daterange.days
     end
     
-    should 'have start day of today' do
-      assert_equal Time.now.beginning_of_day, @daterange.start_at
+    should 'have start at == beginning of today in utc format' do
+      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
     
     should 'be named Today' do
@@ -31,8 +31,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 1, @daterange.days
     end
 
-    should 'have start day of tomorrow' do
-      assert_equal Time.now.beginning_of_day + 1.day, @daterange.start_at
+    should 'have start at == beginning of tomorrow in utc format' do
+      assert_equal Time.now.utc.beginning_of_day + 1.day, @daterange.start_at
     end
 
     should 'be named Tomorrow' do
@@ -48,8 +48,8 @@ class DateRangeTest < ActiveSupport::TestCase
       @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
     end
 
-    should 'have days count based on current day of week' do
-      assert_equal @days_left_in_week[Time.now.wday], @daterange.days
+    should 'have days count based on current utc time and day of week' do
+      assert_equal @days_left_in_week[Time.now.utc.wday], @daterange.days
     end
 
     should 'have start day == beginning of today in utc format' do
@@ -90,7 +90,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 14, @daterange.days
     end
 
-    should 'have start day == beginning of today in utc format' do
+    should 'have start at == beginning of today in utc format' do
       assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
 
@@ -104,10 +104,10 @@ class DateRangeTest < ActiveSupport::TestCase
       @daterange = DateRange.parse_when('next 2 weeks', :end_on => 0)
       assert_valid @daterange
       # calculate days to add based on current day and end on day
-      @days_to_add = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1][Date.today.wday]
+      @days_to_add = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1][Time.now.utc.wday]
     end
     
-    should 'have start day == beginning of today in utc format' do
+    should 'have start at == beginning of today in utc format' do
       assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
     

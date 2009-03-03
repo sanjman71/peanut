@@ -51,6 +51,15 @@ Factory.define :monthly_plan, :class => Plan do |o|
   o.start_billing_in_time_unit    "months"
   o.between_billing_time_amount   1
   o.between_billing_time_unit     "months"
+  o.enabled                       true
+end
+
+Factory.define :free_plan, :class => Plan do |o|
+  o.name                          "Free"
+  o.cost                          0  # cents
+  o.enabled                       true
+  o.max_resources                 1
+  o.max_locations                 1
 end
 
 Factory.define :subscription do |o|

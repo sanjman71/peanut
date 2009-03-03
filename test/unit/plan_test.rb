@@ -14,6 +14,10 @@ class PlanTest < ActiveSupport::TestCase
     end
     
     should_change "Plan.count", :by => 1
+
+    should "be billable" do
+      assert @monthly_plan.billable?
+    end
     
     should "have start billing at in 1 month" do
       assert_equal Time.now.utc.beginning_of_day + 1.month, @monthly_plan.start_billing_at
@@ -34,6 +38,10 @@ class PlanTest < ActiveSupport::TestCase
     end
 
     should_change "Plan.count", :by => 1
+
+    should "not be billable" do
+      assert !@free_plan.billable?
+    end
     
     should "have no start billing at" do
       assert_equal nil, @free_plan.start_billing_at

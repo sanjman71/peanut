@@ -17,26 +17,22 @@ class SignupController < ApplicationController
   def create
     # this requires a transaction
     Company.transaction do
-      @user         = logged_in? ? current_user : User.new(params[:user])
+      # get and remove terms from params
       @terms        = params[:company].delete(:terms).to_i
-      @company      = Company.new(params[:company])
+      @user         = logged_in? ? current_user : User.create(params[:user])
       @plan         = Plan.find(params[:plan_id])
+      # subscription and company objects are dependent on each other
+      @subscription = Subscription.new(:user => @user, :plan => @plan)
+      @company      = Company.create(params[:company].update(:subscription => @subscription))
 
-      # try to create company, user objects
-      @company.save
-      @user.save
-
-      # try to create subscription only if user and company are valid
-      @subscription = Subscription.create(:user => @user, :company => @company, :plan => @plan)
-      
-      # Check credit card details only if the plan has a cost associated with it or if the data has been provided.
-      if @plan.cost > 0 || !params[:cc].blank?
+      # check credit card details only if the plan is billable
+      if @plan.billable?
         @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
         @payment      = @subscription.authorize(@credit_card)
       end
 
       # check terms
-      @terms_error  = 'The terms and conditions must be accepted' unless @terms == 1
+      @terms_error = 'The terms and conditions must be accepted' unless @terms == 1
 
       # rollback unless all objects are valid
       # raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@subscription.errors.empty? or @terms != 1

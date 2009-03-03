@@ -2,7 +2,7 @@ require 'test/test_helper'
 require 'test/factories'
 
 class SubscriptionTest < ActiveSupport::TestCase
-  should_require_attributes :company_id, :user_id, :plan_id, :start_billing_at, :paid_count
+  should_require_attributes :company_id, :user_id, :plan_id, :paid_count, :billing_errors_count
   should_have_many          :payments
   
   def setup
@@ -227,6 +227,21 @@ class SubscriptionTest < ActiveSupport::TestCase
           @subscription.bill(@credit_card)
         end
       end
+    end
+  end
+  
+  context "free subscription" do
+    setup do
+      @free_plan    = Factory(:free_plan)
+      @subscription = Subscription.new(:user => @user, :plan => @free_plan)
+      @company      = Factory(:company, :subscription => @subscription)
+      assert_valid @subscription
+    end
+  
+    should_change "Subscription.count", :by => 1
+  
+    should "start with subscription in initialized state" do
+      assert @subscription.initialized?
     end
   end
   
