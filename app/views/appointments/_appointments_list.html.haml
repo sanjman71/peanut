@@ -13,7 +13,7 @@
         
     .span-3
       %h3{:style => 'padding-top: 5px; margin-bottom: 2px;'}= appointment.service.name
-      %h4= appointment.owner.name
+      %h4= appointment.customer.name
     
     .span-3.last
       %h3{:style => 'padding-top: 5px;'}= appointment.start_at.to_s(:appt_short_month_day_year)

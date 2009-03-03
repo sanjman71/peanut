@@ -19,13 +19,13 @@
         == #{appointment.time.titleize}, #{appointment.when.titleize}
       - else
         = appointment.start_at.to_s(:appt_day_date_time)
-  - unless appointment.owner.blank?
+  - unless appointment.customer.blank?
     %br
-      .owner
+      .customer
         .span-4.padding-bottom-5.text-align-right
           == For:
         .span-10.padding-bottom-5.last
-          = link_to appointment.owner.name, customer_path(appointment.owner, :subdomain => current_subdomain)
+          = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
   - unless appointment.confirmation_code.blank?
     %br
       .confirmation
