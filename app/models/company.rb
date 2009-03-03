@@ -26,14 +26,14 @@ class Company < ActiveRecord::Base
   has_many                  :services
   has_many                  :products
   has_many                  :appointments
-  has_many                  :owners, :through => :appointments, :uniq => true
+  has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations
   
   after_create              :init_basic_services
 
   # Accounting info
   has_one                   :subscription
-  has_one                   :company_owner, :through => :subscription, :source => :user
+  has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
 
   def validate

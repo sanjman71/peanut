@@ -87,7 +87,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer     :company_id
       t.integer     :service_id
       t.references  :resource, :polymorphic => true
-      t.integer     :owner_id       # user who owns the appointment
+      t.integer     :customer_id       # user who booked the appointment
       t.string      :when
       t.datetime    :start_at
       t.datetime    :end_at

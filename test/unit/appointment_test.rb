@@ -14,7 +14,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_belong_to          :company
   should_belong_to          :service
   should_belong_to          :resource
-  should_belong_to          :owner
+  should_belong_to          :customer
   should_have_one           :invoice
   
   def setup
@@ -41,8 +41,8 @@ class AppointmentTest < ActiveSupport::TestCase
       
     should_change "Appointment.count", :by => 1
     
-    should "should not have an owner" do
-      assert_equal nil, @appt.owner
+    should "should not have a customer" do
+      assert_equal nil, @appt.customer
     end
     
     should "have 1 unscheduled slot today for 23 hours starting at 1 am" do
@@ -71,7 +71,7 @@ class AppointmentTest < ActiveSupport::TestCase
     should_not_change "Appointment.count"
     
     should "require owner" do
-      assert_match /blank/, @appt.errors[:owner_id]
+      assert_match /blank/, @appt.errors[:customer_id]
     end
   end
   
@@ -81,12 +81,12 @@ class AppointmentTest < ActiveSupport::TestCase
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
-      # should create a new owner when building the new appointment
+      # should create a new customer when building the new appointment
       @appt     = Appointment.create(:company => @company, 
                                      :service => @haircut,
                                      :resource => @johnny,
-                                     :owner_attributes => {"name" => "User 1", "email" => "user1@peanut.com", "phone" => "4085551212",
-                                                           "password" => "secret", "password_confirmation" => "secret"},
+                                     :customer_attributes => {"name" => "User 1", "email" => "user1@peanut.com", "phone" => "4085551212",
+                                                              "password" => "secret", "password_confirmation" => "secret"},
                                      :start_at_string => "today 2 pm")
     end
     
@@ -94,8 +94,8 @@ class AppointmentTest < ActiveSupport::TestCase
     should_change "Appointment.count", :by => 1
     should_change "User.count", :by => 2
     
-    should "have an owner" do
-      assert_valid @appt.owner
+    should "have a customer" do
+      assert_valid @appt.customer
     end
   end
   
@@ -130,7 +130,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
                                      :resource => @johnny,
-                                     :owner => @user,
+                                     :customer => @user,
                                      :start_at => @start_at_local)
 
       assert_valid @appt

@@ -23,7 +23,7 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
                                      :resource => @johnny,
-                                     :owner => @user,
+                                     :customer => @user,
                                      :start_at_string => "today 2 pm")
 
       assert_valid @appt
