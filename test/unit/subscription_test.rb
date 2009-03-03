@@ -57,7 +57,7 @@ class SubscriptionTest < ActiveSupport::TestCase
         end
         
         should "update last, next billing dates" do
-          assert_equal Date.today, @subscription.last_billing_at.to_date  # dates are easier to compare than timestamps
+          assert_equal Time.now.utc.to_date, @subscription.last_billing_at.utc.to_date  # dates are easier to compare than timestamps
           assert_equal Time.now.utc.beginning_of_day + 1.month, @subscription.next_billing_at
         end
     
@@ -93,7 +93,7 @@ class SubscriptionTest < ActiveSupport::TestCase
           end
 
           should "not change last, next billing dates" do
-            assert_equal Date.today, @subscription.last_billing_at.to_date  # dates are easier to compare than timestamps
+            assert_equal Time.now.utc.to_date, @subscription.last_billing_at.utc.to_date  # dates are easier to compare than timestamps
             assert_equal Time.now.utc.beginning_of_day + 1.month, @subscription.next_billing_at
           end
 
