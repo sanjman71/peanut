@@ -5,8 +5,8 @@
 .span-24.last#what
   .span-15.box
     .span-15.last#person
-      = label_tag "resource_id", "Schedule available time for", :class => 'big'
-      = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@resource.tableize}/#{@resource.id}"), :class => 'text')
+      = label_tag "schedulable_id", "Schedule available time for", :class => 'big'
+      = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br
@@ -22,7 +22,7 @@
       %ul{:style => 'font-size: 11px;'}
         %li== Its the default, since the system has no way of knowing when a person is available to work.
 
-- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :resource => @resource.tableize, :id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :schedulable => @schedulable.tableize, :id => @schedulable.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
        
   .span-14.prepend-1.append-9.last
     = display_flash(:notice)
@@ -76,5 +76,5 @@
       = f.submit "Schedule Available Time", :class => 'big button'
       %span{:style => 'font-size: 11px;'}
         == or
-        = link_to 'Cancel', url_for(:controller => 'appointments', :action => 'index', :resource => @resource.tableize, :id => @resource.id, :subdomain => current_subdomain)
+        = link_to 'Cancel', url_for(:controller => 'appointments', :action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
   

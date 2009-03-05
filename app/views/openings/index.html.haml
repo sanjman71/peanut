@@ -4,7 +4,7 @@
 
 .span-15.prepend-1.mat
   %h2== Schedule an Appointment
-  = hidden_field_tag 'initial_resource_id', @resource.id
+  = hidden_field_tag 'initial_schedulable_id', @schedulable.id
   - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
     .span-14.last
       .span-2.text-align-right
@@ -14,7 +14,7 @@
       .span-3.text-align-right
         == Who/What to schedule?
       .span-4.last.field#who
-        = select_tag('resource_id', options_for_select(@resources.collect{ |r| [r.name, r.id]}, @resource.id), :style => "width: 125px; align: top;")
+        = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, o.id]}, @schedulable.id), :style => "width: 125px; align: top;")
     %br
     .span-14.last
       .span-2.text-align-right
@@ -35,10 +35,10 @@
       = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
       %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
 
--# skills mapping services to resources
+-# skills mapping services to schedulables
 .span-16.skills.hide
   - @skills.each do |skill|
-    .skill{:service_id => skill[0], :resource_id => skill[1], :resource_name => skill[2], :resource_type => skill[3]}
+    .skill{:service_id => skill[0], :schedulable_id => skill[1], :schedulable_name => skill[2], :schedulable_type => skill[3]}
           
 .span-7.prepend-1.last
   .sidebar.instructions.padding-5
@@ -62,8 +62,8 @@
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
     %h2
-      == Before customers can schedule appointments, there must be at least 1 resource
-      = link_to '(add)', resources_path
+      == Before customers can schedule appointments, there must be at least 1 calendar
+      = link_to '(add)', users_path
       == and 1 service
       = link_to '(add)', services_path
       == .
@@ -73,7 +73,7 @@
       - if @free_timeslots.blank?
         -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :resource => @resource.tableize, :id => @resource.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable => @schedulable.tableize, :id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}

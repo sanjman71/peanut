@@ -4,34 +4,34 @@ $.fn.init_skills = function () {
   // build skills array
   $(".skills .skill").each(function(index, skill)
   {
-    var service_id    = $(skill).attr("service_id");
-    var resource_id   = $(skill).attr("resource_id");
-    var resource_name = $(skill).attr("resource_name");
-    var resource_type = $(skill).attr("resource_type");
+    var service_id        = $(skill).attr("service_id");
+    var schedulable_id    = $(skill).attr("schedulable_id");
+    var schedulable_name  = $(skill).attr("schedulable_name");
+    var schedulable_type  = $(skill).attr("schedulable_type");
 
-    // create an array with the service id, resource id and name
-    skills.push([service_id, resource_id, resource_name, resource_type]);
+    // create an array with the service id, schedulable id and name
+    skills.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
   });
 }
 
-$.fn.init_resources = function () {
+$.fn.init_schedulables = function () {
   // find the selected service
   var service_id = $('#service_id').val();
   
-  // remove all resources
-  $('#resource_id').removeOption(/./);
+  // remove all schedulables
+  $('#schedulable_id').removeOption(/./);
   
-  // find the resource initially selected
-  var initial_resource_id = $('#initial_resource_id').attr("value");
+  // find the schedulable initially selected
+  var initial_schedulable_id = $('#initial_schedulable_id').attr("value");
   
-  // add the special anyone resource
-  $('#resource_id').addOption(0, "Anyone", 0 == initial_resource_id);
+  // add the special anyone schedulable
+  $('#schedulable_id').addOption(0, "Anyone", 0 == initial_schedulable_id);
   
-  // add resource providing the selected service
+  // add schedulable providing the selected service
   $.each(skills, function (index, skill) {
     if (skill[0] == service_id)
     {
-      $('#resource_id').addOption(skill[3]+'/'+skill[1], skill[2], skill[1] == initial_resource_id);
+      $('#schedulable_id').addOption(skill[3]+'/'+skill[1], skill[2], skill[1] == initial_schedulable_id);
     }
   })
 }
@@ -50,12 +50,12 @@ $.fn.init_search_button = function () {
 
 $(document).ready(function() {
   $(document).init_skills();
-  $(document).init_resources();
+  $(document).init_schedulables();
   $(document).init_search_button();
     
-  // when a service is selected, rebuild the resource select list and change the search button state
+  // when a service is selected, rebuild the schedulable select list and change the search button state
   $("#service_id").change(function () {
-    $(document).init_resources();
+    $(document).init_schedulables();
     $(document).init_search_button();
     return false;
   })

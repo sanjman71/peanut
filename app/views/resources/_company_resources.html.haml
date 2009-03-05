@@ -1,6 +1,0 @@
-- company_resources.each do |company_resource|
-  .span-15.prepend-1.resource{:class => cycle("shaded", "")}
-    .span-13
-      %h2= company_resource.resource.name
-    .span-2.last
-      = link_to 'Remove', companies_resource_path(company_resource, :subdomain => current_subdomain), :class => 'admin ujs delete'

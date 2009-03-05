@@ -77,7 +77,7 @@ $.fn.init_new_object = function(form_id) {
   })
 }
 
-// Add free time for a resource on a specific day
+// Add free time for a schedulable on a specific day
 $.fn.init_add_free_time = function() {
   // validate the form by binding a callback to the submit function
   $("#add_free_time_form").validate({
@@ -158,18 +158,18 @@ $.fn.init_highlight_appointments = function () {
   )
 } 
 
-// Show appointment schedule for the selected resource
-$.fn.init_select_resource_for_appointment_calendar = function () {
-  $("#resource_id").change(function () {
+// Show appointment schedule for the selected schedulable
+$.fn.init_select_schedulable_for_appointment_calendar = function () {
+  $("#schedulable_id").change(function () {
     var href = '/' + this.value + '/appointments';
     window.location = href;
     return false;
   })
 }
 
-// Show free/available calendar for the selected person
+// Show free/available calendar for the selected schedulable
 $.fn.init_select_person_for_free_calendar = function () {
-  $("#resource_id").change(function () {
+  $("#schedulable_id").change(function () {
     var href = '/' + this.value + '/free/calendar';
     window.location = href;
     return false;
@@ -189,22 +189,6 @@ $.fn.init_highlight_timeslots = function () {
     }
   )
 } 
-
-// Live people search
-$.fn.init_live_resources_search = function () {
-  $("#live_search_for_resources").keyup(function () {
-    var search_url  = this.url;
-    var search_term = this.value;
-    // execute search, throttle how often its called
-    var search_execution = function () {
-      $.get(search_url, {search : search_term}, null, "script");
-      // show search progress bar
-      $('#search_progress').show();
-    }.sleep(300);
-  
-    return false;
-  })
-}
 
 // Live customers search
 $.fn.init_live_customers_search = function () {

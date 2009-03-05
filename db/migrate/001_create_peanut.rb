@@ -4,8 +4,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
-      t.integer :locations_count, :default => 0    # locations counter cache
-      
+      t.integer :locations_count, :default => 0     # counter cache
+      t.integer :calendars_count, :default => 0     # counter cache
       t.timestamps
     end
     
@@ -17,7 +17,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :duration
       t.string  :mark_as
       t.integer :price_in_cents
-      t.integer :resources_count, :default => 0   # counter cache
+      t.integer :schedulables_count, :default => 0   # counter cache
       
       t.timestamps
     end
@@ -30,43 +30,30 @@ class CreatePeanut < ActiveRecord::Migration
       t.string    :name
       t.integer   :inventory
       t.integer   :price_in_cents
-      
       t.timestamps
     end
   
     add_index :products, [:company_id]
     add_index :products, [:company_id, :name]
-    
-    # Polymorphic relationship mapping companies to different resources (e.g. people)
-    create_table :companies_resources do |t|
+
+    # Polymorphic relationship mapping companies to schedulables (e.g. users)
+    create_table :calendars do |t|
       t.references  :company
-      t.references  :resource, :polymorphic => true
-
+      t.references  :schedulable, :polymorphic => true
       t.timestamps
     end
-
-    add_index :companies_resources, [:resource_id, :resource_type], :name => 'index_on_resources'
-    add_index :companies_resources, [:company_id, :resource_id, :resource_type], :name => 'index_on_companies_and_resources'
-
-    # Polymorphic relationship mapping services to providers (e.g. users)
-    create_table :skills do |t|
-      t.references  :service
-      t.references  :provider, :polymorphic => true
-
-      t.timestamps
-    end
-
-    add_index :skills, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
     
-    # Polymorphic resource type
-    # create_table :people do |t|
-    #   t.string  :name
-    #   t.integer :services_count, :default => 0   # counter cache
-    # 
-    #   t.timestamps
-    # end
+    add_index :calendars, [:schedulable_id, :schedulable_type], :name => 'index_on_schedulables'
+    add_index :calendars, [:company_id, :schedulable_id, :schedulable_type], :name => 'index_on_companies_and_schedulables'
 
-    # add_index :people, :name
+    # Polymorphic relationship mapping services to schedulables (e.g. users)
+    create_table :service_providers do |t|
+      t.references  :service
+      t.references  :schedulable, :polymorphic => true
+      t.timestamps
+    end
+
+    add_index :service_providers, [:service_id, :schedulable_id, :schedulable_type], :name => 'index_on_services_and_schedulable'
     
     create_table :mobile_carriers do |t|
       t.string :name
@@ -86,7 +73,7 @@ class CreatePeanut < ActiveRecord::Migration
     create_table :appointments do |t|
       t.integer     :company_id
       t.integer     :service_id
-      t.references  :resource, :polymorphic => true
+      t.references  :schedulable, :polymorphic => true    # e.g. users
       t.integer     :customer_id       # user who booked the appointment
       t.string      :when
       t.datetime    :start_at
@@ -99,7 +86,6 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :state
       t.string      :confirmation_code
       t.integer     :locations_count, :default => 0     # locations counter cache
-      
       t.timestamps
     end
 
@@ -110,20 +96,17 @@ class CreatePeanut < ActiveRecord::Migration
       t.references  :chargeable, :polymorphic => true
       t.integer     :price_in_cents
       t.integer     :tax
-      
       t.timestamps
     end
     
     create_table :appointment_invoices do |t|
       t.integer   :appointment_id
       t.integer   :gratuity_in_cents
-      
       t.timestamps
     end
     
     create_table :notes do |t|
       t.text  :comment
-      
       t.timestamps
     end
     
@@ -136,10 +119,12 @@ class CreatePeanut < ActiveRecord::Migration
   end
 
   def self.down
+    drop_table :companies
     drop_table :appointments
-    drop_table :companies_resources
     drop_table :people
     drop_table :services
-    drop_table :companies
+    drop_table :calendars
+    drop_table :service_providers
+    drop_table :notes
   end
 end

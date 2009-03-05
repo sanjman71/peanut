@@ -3,24 +3,24 @@ class FreeController < ApplicationController
 
   # GET /users/1/free/calendar
   def new
-    if params[:resource].blank? or params[:id].blank?
-      # redirect to a specific resource
-      resource = current_company.resources.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :resource => resource.tableize, :id => resource.id)) and return
+    if params[:schedulable].blank? or params[:id].blank?
+      # redirect to a specific schedulable
+      schedulable = current_company.schedulables.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable => schedulable.tableize, :id => schedulable.id)) and return
     end
         
-    # initialize resource, default to anyone
-    @resource   = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
-    @resource   = User.anyone if @resource.blank?
+    # initialize schedulable, default to anyone
+    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @schedulable  = User.anyone if @schedulable.blank?
     
-    # build list of resources to allow the scheduled to be adjusted by resource
-    @resources  = current_company.resources.all
+    # build list of schedulables to allow the scheduled to be adjusted by resource
+    @schedulables = current_company.schedulables.all
     
     # initialize daterange, start calendar on sunday, end calendar on sunday
-    @daterange  = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
+    @daterange    = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
     
     # find unscheduled time
-    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @resource, @daterange)
+    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @schedulable, @daterange)
     
     # build calendar markings
     @calendar_markings  = build_calendar_markings(@unscheduled_appts.values.flatten)

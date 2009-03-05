@@ -107,9 +107,9 @@ namespace :init do
     
     puts "#{Time.now}: adding company1 services and products ..."
     
-    # assign company resources
-    @company1.resources.push(@johnny)
-    @company1.resources.push(@mary)
+    # assign company schedulables
+    @company1.schedulables.push(@johnny)
+    @company1.schedulables.push(@mary)
     
     # create company1 services and people
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
@@ -118,8 +118,8 @@ namespace :init do
     puts "#{Time.now}: adding company1 service providers ..."
   
     # add service providers
-    @mens_haircut.providers.push(@johnny)
-    @womens_haircut.providers.push(@mary)
+    @mens_haircut.schedulables.push(@johnny)
+    @womens_haircut.schedulables.push(@mary)
 
     puts "#{Time.now}: adding noelrose services and products ..."
     # create noelrose services, products
@@ -133,19 +133,6 @@ namespace :init do
     @conditioner      = @noelrose.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
     @pomade           = @noelrose.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
   
-    puts "#{Time.now}: adding service providers ..."
-    # add skillsets by mapping services to resources
-    # mens_haircut.resources.push(person1)
-    # mens_haircut.resources.push(person2)
-    # womens_haircut.resources.push(person1)
-    # womens_haircut.resources.push(person2)
-    # color1.resources.push(person1)
-    # color1.resources.push(person2)
-    # color2.resources.push(person1)
-    # color2.resources.push(person2)
-    # color3.resources.push(person1)
-    # color3.resources.push(person2)
-    
     puts "#{Time.now}: completed"
   end
 

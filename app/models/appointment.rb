@@ -6,9 +6,9 @@ class AppointmentInvalid < Exception; end
 class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
-  belongs_to              :resource, :polymorphic => true
+  belongs_to              :schedulable, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
-  validates_presence_of   :company_id, :service_id, :resource_id, :resource_type, :start_at, :end_at
+  validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
@@ -26,7 +26,7 @@ class Appointment < ActiveRecord::Base
   CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :resource,      lambda { |resource| { :conditions => {:resource_id => resource.id, :resource_type => resource.class.to_s} }}
+  named_scope :schedulable,   lambda { |schedulable| { :conditions => {:schedulable_id => schedulable.id, :schedulable_type => schedulable.class.to_s} }}
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
@@ -207,10 +207,10 @@ class Appointment < ActiveRecord::Base
       end
     end
     
-    if self.resource and self.company
-      # resource must belong to the same company
-      if !self.company.has_resource?(self.resource)
-        errors.add_to_base("Resource is not associated to this company")
+    if self.schedulable and self.company
+      # schedulable must belong to the same company
+      if !self.company.has_schedulable?(self.schedulable)
+        errors.add_to_base("Schedulable is not associated to this company")
       end
     end
     
@@ -334,11 +334,11 @@ class Appointment < ActiveRecord::Base
       
   # returns all appointment conflicts
   # conflict rules:
-  #  - resource must be the same
+  #  - schedulable must be the same
   #  - start, end times must overlap
   #  - must be marked as 'free' or 'work'
   def conflicts
-    @conflicts ||= self.company.appointments.free_work.resource(resource).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free_work.schedulable(schedulable).overlap(start_at, end_at)
   end
   
   # returns true if this appointment conflicts with any other

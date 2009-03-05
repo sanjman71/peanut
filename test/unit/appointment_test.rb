@@ -5,15 +5,15 @@ class AppointmentTest < ActiveSupport::TestCase
   
   should_require_attributes :company_id
   should_require_attributes :service_id
-  should_require_attributes :resource_id
-  should_require_attributes :resource_type
+  should_require_attributes :schedulable_id
+  should_require_attributes :schedulable_type
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
 
   should_belong_to          :company
   should_belong_to          :service
-  should_belong_to          :resource
+  should_belong_to          :schedulable
   should_belong_to          :customer
   should_have_one           :invoice
   
@@ -58,13 +58,13 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny")
-      @company.resources.push(@johnny)
+      @company.schedulables.push(@johnny)
       @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
 
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
-                                     :resource => @johnny,
+                                     :schedulable => @johnny,
                                      :start_at_string => "today 2 pm")
     end
 
@@ -84,7 +84,7 @@ class AppointmentTest < ActiveSupport::TestCase
       # should create a new customer when building the new appointment
       @appt     = Appointment.create(:company => @company, 
                                      :service => @haircut,
-                                     :resource => @johnny,
+                                     :schedulable => @johnny,
                                      :customer_attributes => {"name" => "User 1", "email" => "user1@peanut.com", "phone" => "4085551212",
                                                               "password" => "secret", "password_confirmation" => "secret"},
                                      :start_at_string => "today 2 pm")
@@ -129,7 +129,7 @@ class AppointmentTest < ActiveSupport::TestCase
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
-                                     :resource => @johnny,
+                                     :schedulable => @johnny,
                                      :customer => @user,
                                      :start_at => @start_at_local)
 

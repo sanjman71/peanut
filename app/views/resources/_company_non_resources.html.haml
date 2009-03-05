@@ -1,6 +1,0 @@
-- non_resources.each do |non_resource|
-  .span-15.prepend-1{:class => cycle("shaded", "")}
-    .span-12
-      %h2= non_resource.name
-    .span-3.last
-      %h4= link_to 'Add', companies_resources_path, :resource_type => non_resource.class.to_s, :resource_id => non_resource.id, :class => "add_company_resource"

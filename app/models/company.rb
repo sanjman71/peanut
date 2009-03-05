@@ -22,19 +22,21 @@ class Company < ActiveRecord::Base
   before_validation         :init_subdomain, :downcase_subdomain
 
   validates_presence_of     :time_zone
-  has_many_polymorphs       :resources, :from => [:users], :through => :companies_resources
+  has_many                  :calendars
+  has_many_polymorphs       :schedulables, :from => [:users], :through => :calendars
   has_many                  :services
   has_many                  :products
   has_many                  :appointments
   has_many                  :customers, :through => :appointments, :uniq => true
   has_many                  :invitations
   
-  after_create              :init_basic_services
-
   # Accounting info
   has_one                   :subscription
   has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
+
+  # after create filter to initialize basic services that are provided by all companies
+  after_create              :init_basic_services
 
   def validate
     if self.subscription.blank?
@@ -50,16 +52,11 @@ class Company < ActiveRecord::Base
     self.name = self.name.titleize unless self.name.blank?
   end
   
-  # return true if the company contains the specified resource
-  def has_resource?(resource)
-    # can't use resources.include?(resource) here, not sure why but possibly because of polymorphic
-    resources.any? { |r| r == resource }
+  # return true if the company contains the specified schedulable
+  def has_schedulable?(object)
+    # can't use schedulables.include?(object) here, not sure why but possibly because of polymorphic
+    schedulables.any? { |o| o == object }
   end
-  
-  def resources_count
-    resources.count
-  end
-  memoize :resources_count
   
   def services_count
     services.count
@@ -71,9 +68,9 @@ class Company < ActiveRecord::Base
   end
   memoize :work_services_count
   
-  # returns true if the company has at least 1 resource and 1 work service
+  # returns true if the company has at least 1 calendar and 1 work service
   def can_schedule_appointments?
-    return false if resources_count == 0 or work_services_count == 0
+    return false if calendars_count == 0 or work_services_count == 0
     true
   end
   

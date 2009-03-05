@@ -19,7 +19,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
-                                          :resource => johnny,
+                                          :schedulable => johnny,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -27,7 +27,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create new appointment object for a haircut
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
-                                      :resource => johnny,
+                                      :schedulable => johnny,
                                       :customer => customer,
                                       :start_at => "20080801000000",
                                       :duration =>  haircut.duration)
@@ -59,7 +59,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.start_at, free2_appointment.start_at
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
-      assert_equal johnny, free2_appointment.resource
+      assert_equal johnny, free2_appointment.schedulable
       # customer id should be nil for a free appointment
       assert_equal nil, free2_appointment.customer_id
     end
@@ -75,7 +75,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
-                                          :resource => johnny,
+                                          :schedulable => johnny,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -83,7 +83,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create new appointment object for a haircut
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
-                                      :resource => johnny,
+                                      :schedulable => johnny,
                                       :customer => customer,
                                       :start_at => "20080801110000",
                                       :duration =>  haircut.duration)
@@ -115,7 +115,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.start_at, free2_appointment.start_at
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
-      assert_equal johnny, free2_appointment.resource
+      assert_equal johnny, free2_appointment.schedulable
       # customer id should be nil for a free appointment
       assert_equal nil, free2_appointment.customer_id
     end
@@ -131,7 +131,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create free timeslot
     free_appointment = Appointment.create(:company => company, 
                                           :service => free,
-                                          :resource => johnny,
+                                          :schedulable => johnny,
                                           :start_at => "20080801000000",
                                           :end_at =>   "20080802000000")  # free all day
     assert free_appointment.valid?
@@ -139,7 +139,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create new appointment object for a haircut
     new_appointment = Appointment.new(:company => company,
                                       :service => haircut,
-                                      :resource => johnny,
+                                      :schedulable => johnny,
                                       :customer => customer,
                                       :start_at => "20080801233000",
                                       :duration =>  haircut.duration)
@@ -171,7 +171,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       assert_equal free_appointment.start_at, free2_appointment.start_at
       assert_equal free_appointment.end_at, free2_appointment.end_at
       assert_equal free, free2_appointment.service
-      assert_equal johnny, free2_appointment.resource
+      assert_equal johnny, free2_appointment.schedulable
       assert_equal nil, free2_appointment.customer_id
     end
   end
@@ -185,7 +185,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :resource => johnny,
+                                        :schedulable => johnny,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -228,7 +228,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :resource => johnny,
+                                        :schedulable => johnny,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -286,7 +286,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     # create big available timeslot
     available_appt = Appointment.create(:company => company, 
                                         :service => free,
-                                        :resource => johnny,
+                                        :schedulable => johnny,
                                         :start_at => "20080801000000",
                                         :end_at =>   "20080802000000")  # available all day
     
@@ -342,7 +342,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
       AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
     end
     
-    # should create free time for another resource
+    # should create free time for another schedulable
     appt  = AppointmentScheduler.create_free_appointment(company, lisa, start_at, end_at)
     assert appt.valid?
     assert_equal 24 * 60, appt.duration

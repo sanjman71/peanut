@@ -9,8 +9,8 @@ class ServiceTest < ActiveSupport::TestCase
   
   should_belong_to          :company
   should_have_many          :appointments
-  should_have_many          :skills
-  should_have_many          :users, :through => :skills
+  should_have_many          :service_providers
+  should_have_many          :users, :through => :service_providers
   
   def setup
     @owner        = Factory(:user, :name => "Owner")
@@ -38,13 +38,13 @@ class ServiceTest < ActiveSupport::TestCase
       setup do
         @user1 = Factory(:user, :name => "Sanjay")
         assert_valid @user1
-        @service.providers.push(@user1)
+        @service.schedulables.push(@user1)
         @service.reload
         @user1.reload
       end
       
-      should "have service providers collection == [@user]" do
-        assert_equal [@user1], @service.providers
+      should "have service schedulables collection == [@user]" do
+        assert_equal [@user1], @service.schedulables
         assert_equal [@user1], @service.users
       end
       
