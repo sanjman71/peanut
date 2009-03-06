@@ -66,7 +66,8 @@ class ApplicationController < ActionController::Base
   # build hash mapping days to appointment attributes that are used as css tags in calendar views
   def build_calendar_markings(appointments)
     appointments.inject(Hash.new) do |hash, appointment|
-      key = appointment.start_at.beginning_of_day.utc.to_s(:appt_schedule_day)
+      # convert appointment start_at to utc format, and use that day as the key 
+      key = appointment.start_at.utc.to_s(:appt_schedule_day)
       hash[key] ||= []
       hash[key].push(appointment.mark_as).uniq!
       
