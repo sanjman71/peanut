@@ -74,6 +74,11 @@ class User < ActiveRecord::Base
     self.class.to_s.tableize
   end
   
+  # returns true if the user has a calendar for the specified company
+  def has_calendar?(company)
+    companies.include?(company)
+  end
+  
   protected
     
   def make_activation_code

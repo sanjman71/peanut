@@ -4,16 +4,16 @@
 
 .span-16
   .span-15.prepend-1.last.mat
-    - if current_company.resources_count == 0
+    - if current_company.calendars_count == 0
       %h2
-        == There must be at least 1 resource
+        == There must be at least 1 calendar
         = link_to '(add)', '' #resources_path
         == before you can view a schedule.
     - else
       .span-8
         %h3
-          = label_tag "resource_id", "Schedule for", :class => 'big'
-          = select_tag('resource_id', options_for_select(@resources.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@resource.tableize}/#{@resource.id}"), :class => 'text')
+          = label_tag "schedulable_id", "Schedule for", :class => 'big'
+          = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
         %h3= @daterange.name
       .span-6.prepend-1.last
         #links
@@ -26,9 +26,9 @@
           = link_to "Use a Date Range", '', :id => 'show_dates'
 
         #dates.hide
-          = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain)})
+          = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :schedulable => @schedulable.class.to_s.tableize, :id => @schedulable.id, :subdomain => current_subdomain)})
       
-  - unless current_company.resources_count == 0
+  - unless current_company.calendars_count == 0
     .span-15.prepend-1.last
       #appointment_flash
 
@@ -45,10 +45,10 @@
       .span-15.last#free_schedule
         = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
   
-- unless current_company.resources_count == 0
+- unless current_company.calendars_count == 0
   .span-6.prepend-1.last.mat
     = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
-    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :resource => @resource.class, :id => @resource.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :schedulable => @schedulable.class, :id => @schedulable.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
       = hidden_field_tag :when, @when
       .add_free_time
         .span-7.last.when

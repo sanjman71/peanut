@@ -1,3 +1,5 @@
+- javascript('users')
+
 .span-24
   .span-15.last.box
     .span-11
@@ -13,5 +15,5 @@
     .highlight#flash
     
   #users
-    = render(:partial => 'users.html.haml', :locals => {:users => @users})
+    = render(:partial => 'users', :locals => {:users => @users})
 

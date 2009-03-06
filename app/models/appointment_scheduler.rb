@@ -40,15 +40,15 @@ class AppointmentScheduler
                                service_end_at.between?(appointment.start_at, appointment.end_at)
     
     # build new appointment
-    new_appt          = Appointment.new
-    new_appt.resource = appointment.resource
-    new_appt.company  = appointment.company
-    new_appt.service  = service
-    new_appt.start_at = service_start_at
-    new_appt.end_at   = service_end_at
-    new_appt.mark_as  = service.mark_as
-    new_appt.duration = service.duration
-    new_appt.customer = options[:customer]  # set to nil if no customer is specified
+    new_appt              = Appointment.new
+    new_appt.schedulable  = appointment.schedulable
+    new_appt.company      = appointment.company
+    new_appt.service      = service
+    new_appt.start_at     = service_start_at
+    new_appt.end_at       = service_end_at
+    new_appt.mark_as      = service.mark_as
+    new_appt.duration     = service.duration
+    new_appt.customer     = options[:customer]  # set to nil if no customer is specified
     
     # build new start, end appointments
     unless service_start_at == appointment.start_at
@@ -91,7 +91,7 @@ class AppointmentScheduler
   end
     
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, resource, start_at, end_at)
+  def self.create_free_appointment(company, schedulable, start_at, end_at)
     # find first service scheduled as 'free'
     service     = company.services.free.first
 
@@ -102,7 +102,7 @@ class AppointmentScheduler
                                   :end_at => end_at, 
                                   :mark_as => service.mark_as, 
                                   :service => service, 
-                                  :resource => resource,
+                                  :schedulable => schedulable,
                                   :company => company)
                               
     if appointment.conflicts?
@@ -128,7 +128,7 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Too many free times that overlap" if free_time_after.size > 1
     
     # combine the work appointment and any free times before/after into a single free appointment
-    resource          = appointment.resource
+    schedulable       = appointment.schedulable
     free_start_at     = appointment.start_at
     free_start_at     = free_time_before.first.start_at unless free_time_before.blank?
     free_end_at       = appointment.end_at
@@ -151,7 +151,7 @@ class AppointmentScheduler
       end
       
       # add the new free appointment
-      free_appointment = create_free_appointment(company, resource, free_start_at, free_end_at)
+      free_appointment = create_free_appointment(company, schedulable, free_start_at, free_end_at)
       if !free_appointment.valid?
         raise ActiveRecord::Rollback
       end
@@ -162,9 +162,9 @@ class AppointmentScheduler
   
   # build collection of all unscheduled appointments over the specified date range
   # returns a hash mapping dates to a appointment collection
-  def self.find_unscheduled_time(company, resource, daterange, appointments=nil)
+  def self.find_unscheduled_time(company, schedulable, daterange, appointments=nil)
     # find all appointments over the specified daterange, order by start_at
-    appointments = appointments || company.appointments.resource(resource).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
+    appointments = appointments || company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
     
     # group appointments by day; note that we use the appt start_at utc value to build the day
     appointments_by_day = appointments.group_by { |appt| appt.start_at.utc.to_s(:appt_schedule_day) }

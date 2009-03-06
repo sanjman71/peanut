@@ -10,7 +10,7 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many            :products
   should_have_many            :appointments
   should_have_many            :invitations
-  should_have_many            :companies_resources
+  should_have_many            :calendars
   
   context "create company without a subscription" do
     setup do
@@ -53,7 +53,7 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal 0, @company.locations_count
     end
     
-    context "with a location" do
+    context "add a location" do
       setup do
         @chicago = Location.new(:name => 'Chicago')
         @company.locations.push(@chicago)
@@ -71,19 +71,28 @@ class CompanyTest < ActiveSupport::TestCase
       end
     end
     
-    context "with a user resource" do
+    context "add a user schedulable" do
       setup do 
         @user1 = Factory(:user, :name => "User Resource")
         assert_valid @user1
-        @company.resources.push(@user1)
+        @company.schedulables.push(@user1)
+        @company.reload
       end
       
-      should "have company resources collection == [@user1]" do
-        assert_equal [@user1], @company.resources
+      should "have company schedulables collection == [@user1]" do
+        assert_equal [@user1], @company.schedulables
       end
       
-      should "have has_resource? return true" do
-        assert @company.has_resource?(@user1)
+      should "have company.has_schedulable?(user) return true" do
+        assert @company.has_schedulable?(@user1)
+      end
+      
+      should "have calendar count == 1" do
+        assert_equal 1, @company.calendars_count
+      end
+      
+      should "have users.has_calendar?(company) return true" do
+        assert @user1.has_calendar?(@company)
       end
     end
   end

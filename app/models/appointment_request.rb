@@ -6,16 +6,16 @@ class AppointmentRequest < Appointment
     # use time range if it was specified, otherwise default to 'anytime'
     time_range  = Appointment.time_range(self.time(:default => 'anytime'))
     
-    if resource.anyone?
-      # find free appointments for any resource, order by start times
+    if schedulable.anyone?
+      # find free appointments for any schedulable, order by start times
       appts = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     else
-      # find free appointments for a specific resource, order by start times
-      appts = company.appointments.resource(resource).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      # find free appointments for a specific schedulable, order by start times
+      appts = company.appointments.schedulable(schedulable).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     end
     
-    # filter appointments by the resources who can provide the service
-    appts.select { |appt| service.provided_by?(appt.resource) }
+    # filter appointments by the schedulables who can provide the service
+    appts.select { |appt| service.provided_by?(appt.schedulable) }
   end
   
   # find free time slots based on appointment request [start_at, end_at]

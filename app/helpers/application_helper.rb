@@ -110,19 +110,19 @@ module ApplicationHelper
 
     end
       
-    if has_privilege?('read resources', current_company)
-
-      # 'Resources' tab
-      name = 'Resources'
-      if current_controller.controller_name == 'resources' and ['index', 'show'].include?(current_controller.action_name)
-        link = link_to(name, resources_path, :class => 'current')
-      else
-        link = link_to(name, resources_path)
-      end
-
-      yield link
-
-    end
+    # if has_privilege?('read resources', current_company)
+    # 
+    #   # 'Resources' tab
+    #   name = 'Resources'
+    #   if current_controller.controller_name == 'resources' and ['index', 'show'].include?(current_controller.action_name)
+    #     link = link_to(name, resources_path, :class => 'current')
+    #   else
+    #     link = link_to(name, resources_path)
+    #   end
+    # 
+    #   yield link
+    # 
+    # end
     
     if has_privilege?('read services', current_company)
 

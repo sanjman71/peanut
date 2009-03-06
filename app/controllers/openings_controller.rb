@@ -1,27 +1,27 @@
 class OpeningsController < ApplicationController
 
   # GET /openings
-  # GET /people/1/services/3/openings?when=this+week&time=morning
-  # GET /services/1/openings?time=anytime&when=this+week
+  # GET /:schedulable/1/services/3/openings/this-week/morning
+  # GET /services/1/openings/this-week/anytime
   def index
-    if params[:id] == "0" or params[:resource] == "0"
-      # /:resource/0/openings is canonicalized to /free; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :resource => nil, :id => nil)))
+    if params[:id] == "0" or params[:schedulable] == "0"
+      # /:schedulable/0/openings is canonicalized to /openings; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable => nil, :id => nil)))
     elsif params[:service_id].to_s == "0"
-      # /services/0/free is canonicalized to /free; preserve subdomain on redirect
+      # /services/0/openings is canonicalized to /openings; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
     end
     
-    # initialize resource, default to anyone
-    @resource   = current_company.resources.find_by_resource_id_and_resource_type(params[:id], params[:resource].to_s.classify)
-    @resource   = User.anyone if @resource.blank?
+    # initialize schedulable, default to anyone
+    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @schedulable  = User.anyone if @schedulable.blank?
     
     # initialize when, no default
-    @when       = params[:when].from_url_param if params[:when]
-    @daterange  = DateRange.parse_when(@when) unless @when.blank?
+    @when         = params[:when].from_url_param if params[:when]
+    @daterange    = DateRange.parse_when(@when) unless @when.blank?
     
     # initialize time
-    @time       = params[:time].from_url_param if params[:time]
+    @time         = params[:time].from_url_param if params[:time]
 
     # initialize location & locations
     if params[:location_id]
@@ -33,22 +33,22 @@ class OpeningsController < ApplicationController
     @locations = current_locations
 
     # initialize service, default to nothing
-    @service    = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
+    @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
 
     # build appointment request for the selected timespan
-    @query      = AppointmentRequest.new(:service => @service, :resource => @resource, :when => @when, :time => @time, :company => current_company,
-                                         :location => current_location)
+    @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time, 
+                                       :company => current_company, :location => current_location)
 
-    # build resources collection, resources are restricted by the services they perform
-    @resources  = Array(User.anyone) + @service.providers
+    # build schedulables collection, schedulables are restricted by the services they perform
+    @schedulables = Array(User.anyone) + @service.schedulables
     
     # find services collection, services are restricted by the company they belong to
-    @services   = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
+    @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
 
-    # build skills collection mapping services to providers
-    @skills     = current_company.services.work.inject([]) do |array, service|
-      service.providers.each do |provider|
-        array << [service.id, provider.id, provider.name, provider.tableize]
+    # build skills collection mapping services to schedulables
+    @skills   = current_company.services.work.inject([]) do |array, service|
+      service.schedulables.each do |schedulable|
+        array << [service.id, schedulable.id, schedulable.name, schedulable.tableize]
       end
       array
     end
@@ -81,7 +81,6 @@ class OpeningsController < ApplicationController
     end
   end
 
-  # temporary fix to format problem
   def search
     # remove 'authenticity_token' params
     params.delete('authenticity_token')
@@ -89,8 +88,8 @@ class OpeningsController < ApplicationController
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]
     end
-    resource, id = params.delete(:resource_id).split('/')
-    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :resource => resource, :id => id))
+    schedulable, id = params.delete(:schedulable_id).split('/')
+    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable => schedulable, :id => id))
   end
   
 end

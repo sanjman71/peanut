@@ -23,10 +23,10 @@ class AppointmentRequestTest < ActiveSupport::TestCase
       assert @appt.valid?
     end
     
-    context "and request appointment for a specific service but no specific resource" do
+    context "and request appointment for a specific service but no specific schedulable" do
       setup do
         @request  = AppointmentRequest.new(:start_at => @start_at + 2.hours, :end_at => @end_at + 2.hours, :company => @company,
-                                           :service => @haircut, :resource => @anyone)
+                                           :service => @haircut, :schedulable => @anyone)
       end
       
       should "find no free appointments" do
@@ -34,10 +34,10 @@ class AppointmentRequestTest < ActiveSupport::TestCase
       end
     end
     
-    context "and request appointment for a specific service with a specific resource, with time range from 10 am to 2 pm" do
+    context "and request appointment for a specific service with a specific schedulable, with time range from 10 am to 2 pm" do
       setup do
         @request = AppointmentRequest.new(:start_at => @start_at + 2.hours, :end_at => @end_at + 2.hours, :company => @company, 
-                                           :service => @haircut, :resource => @johnny)
+                                           :service => @haircut, :schedulable => @johnny)
         
       end
       
@@ -46,16 +46,16 @@ class AppointmentRequestTest < ActiveSupport::TestCase
       end
     end
     
-    context "add user who provides the service" do
+    context "add user schedulable who provides the service" do
       setup do
-        @haircut.providers.push(@johnny)
+        @haircut.schedulables.push(@johnny)
         @haircut.reload
       end
       
       context "and make the same appointment request" do
         setup do
           @request = AppointmentRequest.new(:start_at => @start_at + 2.hours, :end_at => @end_at + 2.hours, :company => @company, 
-                                             :service => @haircut, :resource => @johnny)
+                                             :service => @haircut, :schedulable => @johnny)
 
         end
         
@@ -84,7 +84,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
         context "request appointment from 7 am to 5 pm" do
           setup do
             @request = AppointmentRequest.new(:start_at => @start_at - 1.hour, :end_at => @end_at + 5.hours, :company => @company,
-                                              :service => @haircut, :resource => @johnny)
+                                              :service => @haircut, :schedulable => @johnny)
           end
           
           should "find 8 time slots of 30 minutes each, with start times incremented by 30 minutes" do
@@ -99,7 +99,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
         context "request appointment from noon to 5 pm" do
           setup do
             @request = AppointmentRequest.new(:start_at => @start_at + 4.hours, :end_at => @end_at + 5.hours, :company => @company, 
-                                              :service => @haircut, :resource => @johnny)
+                                              :service => @haircut, :schedulable => @johnny)
           end
 
           should "find 0 time slots" do
