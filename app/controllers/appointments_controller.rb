@@ -12,8 +12,8 @@ class AppointmentsController < ApplicationController
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
 
-    if current_company.calendars_count == 0
-      # show message that calendars need to be added before viewing schedules
+    if current_company.schedulables_count == 0
+      # show message that schedulables need to be added before viewing schedules
       return
     end
     

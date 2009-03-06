@@ -4,7 +4,7 @@
 
 .span-16
   .span-15.prepend-1.last.mat
-    - if current_company.calendars_count == 0
+    - if current_company.schedulables_count == 0
       %h2
         == There must be at least 1 calendar
         = link_to '(add)', '' #resources_path
@@ -28,7 +28,7 @@
         #dates.hide
           = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :schedulable => @schedulable.class.to_s.tableize, :id => @schedulable.id, :subdomain => current_subdomain)})
       
-  - unless current_company.calendars_count == 0
+  - unless current_company.schedulables_count == 0
     .span-15.prepend-1.last
       #appointment_flash
 
@@ -45,7 +45,7 @@
       .span-15.last#free_schedule
         = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
   
-- unless current_company.calendars_count == 0
+- unless current_company.schedulables_count == 0
   .span-6.prepend-1.last.mat
     = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
     - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :schedulable => @schedulable.class, :id => @schedulable.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
