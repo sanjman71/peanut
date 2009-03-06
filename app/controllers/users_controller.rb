@@ -62,7 +62,7 @@ class UsersController < ApplicationController
       flash[:notice] = "Your account was successfully created. Login to continue."
       redirect_to('/login')
     else
-      flash[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
+      flash.now[:error]  = "We couldn't set up that account, sorry.  Please try again, or contact an admin (link is above)."
       render :template => 'sessions/new'
     end
   end
