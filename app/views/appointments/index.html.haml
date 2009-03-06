@@ -48,22 +48,22 @@
 - unless current_company.schedulables_count == 0
   .span-6.prepend-1.last.mat
     = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
-    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create', :schedulable => @schedulable.class, :id => @schedulable.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :schedulable => "#{@schedulable.tableize}/#{@schedulable.id}", :service_id => @free_service), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
       = hidden_field_tag :when, @when
       .add_free_time
         .span-7.last.when
           == When
         .span-7.last
-          = select_tag('appointment[time_range][day]', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+          = select_tag('dates', options_for_select(@daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
         .span-7.last#start_at_label
           == Start
         .span-7.last#start_at_text
-          = text_field 'appointment[time_range]', 'start_at', :size => 10, :class => 'required'
+          = text_field_tag 'start_at', '', :size => 10, :class => 'required'
           %span.example== e.g. 8:15 am
         .span-7.last#end_at_label
           == End
         .span-7.last.append-bottom#end_at_text
-          = text_field 'appointment[time_range]', 'end_at', :size => 10, :class => 'required'
+          = text_field_tag 'end_at', '', :size => 10, :class => 'required'
           %span.example== e.g. 5:30 pm
         .span-7.last
           #submit= f.submit 'Add', :name => nil, :class => 'button big'

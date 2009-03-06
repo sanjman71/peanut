@@ -31,6 +31,8 @@ class FreeController < ApplicationController
     @tod_start  = 'morning'
     @tod_end    = 'afternoon'
     
+    @free_service = current_company.services.free.first
+
     # select the view to show
     style       = params[:style] || 'block'
     
@@ -55,7 +57,7 @@ class FreeController < ApplicationController
     @end_at       = params[:end_at]
     
     # iterate over specified day
-    params[:dates].each do |date|
+    Array(params[:dates]).each do |date|
       # build new appointment
       @time_range   = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
       @appointment  = Appointment.new(base_hash.merge(:time_range => @time_range))

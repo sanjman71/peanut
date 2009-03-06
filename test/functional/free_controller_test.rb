@@ -22,7 +22,7 @@ class FreeControllerTest < ActionController::TestCase
     @controller.stubs(:current_location).returns(Location.anywhere)
   end
 
-  context "create appointment" do
+  context "create appointment multiple dates" do
     setup do
       post :create, 
            {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@owner.id}", :service_id => @free_service.id}
@@ -32,4 +32,13 @@ class FreeControllerTest < ActionController::TestCase
     
   end
 
+  context "create appointment single date" do
+    setup do
+      post :create, 
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@owner.id}", :service_id => @free_service.id}
+    end
+    
+    should_respond_with :success
+    
+  end
 end

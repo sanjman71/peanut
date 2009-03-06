@@ -22,7 +22,7 @@
       %ul{:style => 'font-size: 11px;'}
         %li== Its the default, since the system has no way of knowing when a person is available to work.
 
-- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :schedulable => @schedulable.tableize, :id => @schedulable.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :schedulable => "#{@schedulable.tableize}/#{@schedulable.id}", :service_id => @free_service.id), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
        
   .span-14.prepend-1.append-9.last
     = display_flash(:notice)
@@ -64,7 +64,7 @@
   %hr.space
     
   #dates
-    = text_field_tag 'days[]', 'day', :id => 'template', :class => 'hide'
+    = text_field_tag 'dates[]', 'date', :id => 'template', :class => 'hide'
     = text_field 'start_at', '', :name => 'start_at', :id => 'start_at', :class => 'hide'
     = text_field 'end_at', '', :name => 'end_at', :id => 'end_at', :class => 'hide'
 

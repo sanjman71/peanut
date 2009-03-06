@@ -11,6 +11,8 @@ class AppointmentsController < ApplicationController
       @appointments = @customer.appointments
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
+    
+    @free_service = current_company.services.free.first
 
     if current_company.schedulables_count == 0
       # show message that schedulables need to be added before viewing schedules
