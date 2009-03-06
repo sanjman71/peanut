@@ -59,7 +59,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny")
       @company.schedulables.push(@johnny)
-      @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
 
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
@@ -79,7 +79,7 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
 
       # should create a new customer when building the new appointment
       @appt     = Appointment.create(:company => @company, 
@@ -119,7 +119,7 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
       @user     = Factory(:user)
 
       # start at 2 pm, local time

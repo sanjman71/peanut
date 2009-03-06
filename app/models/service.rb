@@ -1,9 +1,9 @@
 class Service < ActiveRecord::Base
-  validates_presence_of       :company_id, :name, :duration, :price_in_cents
-  validates_uniqueness_of     :name, :scope => :company_id
+  validates_presence_of       :name, :duration, :price_in_cents
   validates_inclusion_of      :duration, :in => 1..24*60*7, :message => "must be a non-zero reasonable value"
   validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "can only be scheduled as free, busy or work"
-  belongs_to                  :company
+  has_many                    :company_services
+  has_many                    :companies, :through => :company_services
   has_many                    :appointments
   has_many_polymorphs         :schedulables, :from => [:users], :through => :service_providers
   before_validation           :init_duration

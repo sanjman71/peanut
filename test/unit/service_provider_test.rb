@@ -12,7 +12,7 @@ class ServiceProviderTest < ActiveSupport::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @user, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    @haircut      = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
   end
   
   context "create valid service provider" do

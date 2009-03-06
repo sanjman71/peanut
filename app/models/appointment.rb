@@ -208,15 +208,15 @@ class Appointment < ActiveRecord::Base
     end
     
     if self.schedulable and self.company
-      # schedulable must belong to the same company
+      # schedulable must belong to this same company
       if !self.company.has_schedulable?(self.schedulable)
         errors.add_to_base("Schedulable is not associated to this company")
       end
     end
     
     if self.service
-      # service must belong to the same company
-      if self.service.company_id != self.company_id
+      # service must be provided by this company
+      if !self.service.companies.include?(self.company)
         errors.add_to_base("Service is not offered by this company")
       end
     end

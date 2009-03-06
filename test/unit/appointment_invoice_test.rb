@@ -16,7 +16,7 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
     setup do
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :company => @company, :price_in_cents => 500)
+      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price_in_cents => 500)
       @user     = Factory(:user)
 
       # create appointment at 2 pm

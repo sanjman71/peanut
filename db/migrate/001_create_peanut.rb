@@ -5,6 +5,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :time_zone
       t.string  :subdomain
       t.integer :locations_count, :default => 0       # counter cache
+      t.integer :services_count, :default => 0        # counter cache
       t.integer :schedulables_count, :default => 0    # counter cache
       t.timestamps
     end
@@ -12,19 +13,29 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :companies, [:subdomain]
     
     create_table :services do |t|
-      t.integer :company_id
       t.string  :name
       t.integer :duration
       t.string  :mark_as
       t.integer :price_in_cents
-      t.integer :schedulables_count, :default => 0   # counter cache
+      t.integer :schedulables_count, :default => 0    # counter cache
       
       t.timestamps
     end
 
-    add_index :services, [:company_id]
-    add_index :services, [:company_id, :mark_as]
+    add_index :services, [:mark_as]
 
+    # create free service used by all companies
+    Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+    
+    # Map services to companies
+    create_table :company_services do |t|
+      t.integer :company_id
+      t.integer :service_id
+    end
+
+    add_index :company_services, [:company_id]
+    add_index :company_services, [:service_id]
+    
     create_table :products do |t|
       t.integer   :company_id
       t.string    :name
@@ -36,7 +47,7 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :products, [:company_id]
     add_index :products, [:company_id, :name]
 
-    # Polymorphic relationship mapping companies to schedulables (e.g. users)
+    # Map polymorphic schedulablesd (e.g. users) to companies
     create_table :company_schedulables do |t|
       t.references  :company
       t.references  :schedulable, :polymorphic => true

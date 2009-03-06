@@ -30,6 +30,7 @@ class CompanyTest < ActiveSupport::TestCase
       @plan         = Factory(:monthly_plan)
       @subscription = Subscription.new(:user => @user, :plan => @plan)
       @company      = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC", :subscription => @subscription)
+      @company.reload
       assert_valid @subscription
       assert_valid @company
     end

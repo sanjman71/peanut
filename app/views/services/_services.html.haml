@@ -7,7 +7,7 @@
     .span-6.prepend-1.name
       %h2.margin-bottom-0= service.name
       -# show all service providers
-      - providers = service.providers.collect { |r| r.name }.sort
+      - providers = service.schedulables.collect { |r| r.name }.sort
       = providers.join(", ")
     .span-3.duration
       %h3== #{service.duration} minutes

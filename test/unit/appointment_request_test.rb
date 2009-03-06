@@ -13,7 +13,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
       # create free time from 8 am to noon
       @company   = Factory(:company, :subscription => @subscription)
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :company => @company, :price => 1.00)
+      @haircut   = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
       @free      = @company.services.free.first
       @anyone    = User.anyone
 

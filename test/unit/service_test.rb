@@ -2,12 +2,11 @@ require 'test/test_helper'
 
 class ServiceTest < ActiveSupport::TestCase
   
-  should_require_attributes :company_id
   should_require_attributes :name
   should_require_attributes :price_in_cents
   should_allow_values_for   :mark_as, "free", "busy", "work"
   
-  should_belong_to          :company
+  should_have_many          :companies, :through => :company_services
   should_have_many          :appointments
   should_have_many          :service_providers
   should_have_many          :users, :through => :service_providers

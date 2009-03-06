@@ -24,7 +24,8 @@ class Company < ActiveRecord::Base
   validates_presence_of     :time_zone
   has_many                  :company_schedulables
   has_many_polymorphs       :schedulables, :from => [:users], :through => :company_schedulables
-  has_many                  :services
+  has_many                  :company_services
+  has_many                  :services, :through => :company_services
   has_many                  :products
   has_many                  :appointments
   has_many                  :customers, :through => :appointments, :uniq => true
@@ -58,11 +59,6 @@ class Company < ActiveRecord::Base
     schedulables.any? { |o| o == object }
   end
   
-  def services_count
-    services.count
-  end
-  memoize :services_count
-
   def work_services_count
     services.work.count
   end
@@ -102,7 +98,8 @@ class Company < ActiveRecord::Base
   
   # initialize company's basic services
   def init_basic_services
-    services.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+    # add company free service
+    services.push(Service.find_or_create_by_name(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00))
   end
   
 end
