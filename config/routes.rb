@@ -37,6 +37,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
+  # add free time for a specific schedulable
+  map.resources :free
+  map.connect   ':schedulable/:id/free/:style', :controller => 'free', :action => 'new'
+  # map.connect   ':schedulable/:service_id', :controller => 'free', :action => 'post', :conditions => {:method => :post}
+
   # openings search/index path, scoped by service and (optional) schedulable
   map.connect   ':schedulable/:id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
@@ -56,10 +61,7 @@ ActionController::Routing::Routes.draw do |map|
                 :conditions => {:method => :post}
   map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
-  # add free time for a specific schedulable
-  map.connect   ':schedulable/:id/free/:style', :controller => 'free', :action => 'new'
-
-  # toggle a schedulable calendar
+  # toggle a schedulable's calendar
   map.connect   'calendars/:schedulable/:id/toggle', :controller => 'calendars', :action => 'toggle', :conditions => {:method => :post}
    
   # map.resources :people do |resource|

@@ -26,7 +26,7 @@ class AppointmentsController < ApplicationController
     manage_appointments
   end
     
-  # POST /people/1/create
+  # POST /users/1/create
   def create
     # build new free appointment
     service       = current_company.services.free.first
