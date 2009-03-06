@@ -13,7 +13,7 @@ class AppointmentTimeslot
     @duration     = (@end_at.to_i - @start_at.to_i) / 60
   end
   
-  def resource
-    @appointment.resource if @appointment
+  def schedulable
+    @appointment.schedulable if @appointment
   end
 end
