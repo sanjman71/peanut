@@ -64,6 +64,11 @@ class Company < ActiveRecord::Base
   end
   memoize :work_services_count
   
+  # return the company free service
+  def free_service
+    services.free.first
+  end
+  
   # returns true if the company has at least 1 schedulable and 1 work service
   def can_schedule_appointments?
     return false if schedulables_count == 0 or work_services_count == 0

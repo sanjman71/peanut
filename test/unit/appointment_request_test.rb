@@ -8,7 +8,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
   end
   
-  context "create service without anyone who performs the service and free time" do
+  context "create service without anyone who performs the service and create free time" do
     setup do
       # create free time from 8 am to noon
       @company   = Factory(:company, :subscription => @subscription)
@@ -19,7 +19,7 @@ class AppointmentRequestTest < ActiveSupport::TestCase
 
       @start_at  = Time.now.beginning_of_day + 8.hours
       @end_at    = @start_at + 4.hours
-      @appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @start_at, @end_at)
+      @appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @company.free_service, :start_at => @start_at, :end_at => @end_at)
       assert @appt.valid?
     end
     

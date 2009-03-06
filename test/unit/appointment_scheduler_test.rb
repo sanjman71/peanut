@@ -16,29 +16,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     free      = company.services.free.first
     customer  = Factory(:user)
     
-    # create free timeslot
-    free_appointment = Appointment.create(:company => company, 
-                                          :service => free,
-                                          :schedulable => johnny,
-                                          :start_at => "20080801000000",
-                                          :end_at =>   "20080802000000")  # free all day
+    # create free timeslot (all day)
+    free_appointment  = AppointmentScheduler.create_free_appointment(company, johnny, free, :start_at => "20080801000000", :end_at => "20080802000000")
     assert free_appointment.valid?
     
-    # create new appointment object for a haircut
-    new_appointment = Appointment.new(:company => company,
-                                      :service => haircut,
-                                      :schedulable => johnny,
-                                      :customer => customer,
-                                      :start_at => "20080801000000",
-                                      :duration =>  haircut.duration)
-                                      
-    assert new_appointment.valid?
-    
     assert_difference('Appointment.count', 1) do
-      # should be conflicts
-      assert new_appointment.conflicts?
       # schedule the work appointment, the free appointment should be split into free/work time
-      work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
+      work_appointment = AppointmentScheduler.create_work_appointment(company, johnny, haircut, customer, :start_at => "20080801000000")
       assert work_appointment.valid?
       # work appointment should have the correct customer and job
       assert_equal customer, work_appointment.customer
@@ -72,29 +56,13 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     free      = company.services.free.first
     customer  = Factory(:user)
     
-    # create free timeslot
-    free_appointment = Appointment.create(:company => company, 
-                                          :service => free,
-                                          :schedulable => johnny,
-                                          :start_at => "20080801000000",
-                                          :end_at =>   "20080802000000")  # free all day
+    # create free timeslot (all day)
+    free_appointment  = AppointmentScheduler.create_free_appointment(company, johnny, free, :start_at => "20080801000000", :end_at => "20080802000000")
     assert free_appointment.valid?
     
-    # create new appointment object for a haircut
-    new_appointment = Appointment.new(:company => company,
-                                      :service => haircut,
-                                      :schedulable => johnny,
-                                      :customer => customer,
-                                      :start_at => "20080801110000",
-                                      :duration =>  haircut.duration)
-                                      
-    assert new_appointment.valid?
-  
     assert_difference('Appointment.count', 2) do
-      # should be conflicts
-      assert new_appointment.conflicts?
       # schedule the work appointment, the free appointment should be split into free/work time
-      work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
+      work_appointment = AppointmentScheduler.create_work_appointment(company, johnny, haircut, customer, :start_at => "20080801110000")
       assert work_appointment.valid?
       # work appointment should have the correct owner and job
       assert_equal customer, work_appointment.customer
@@ -125,32 +93,16 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
     haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [company], :price => 1.00)
-    free      = company.services.free.first
+    free      = company.free_service
     customer  = Factory(:user)
     
-    # create free timeslot
-    free_appointment = Appointment.create(:company => company, 
-                                          :service => free,
-                                          :schedulable => johnny,
-                                          :start_at => "20080801000000",
-                                          :end_at =>   "20080802000000")  # free all day
+    # create free timeslot (all day)
+    free_appointment  = AppointmentScheduler.create_free_appointment(company, johnny, free, :start_at => "20080801000000", :end_at => "20080802000000")
     assert free_appointment.valid?
     
-    # create new appointment object for a haircut
-    new_appointment = Appointment.new(:company => company,
-                                      :service => haircut,
-                                      :schedulable => johnny,
-                                      :customer => customer,
-                                      :start_at => "20080801233000",
-                                      :duration =>  haircut.duration)
-                                      
-    assert new_appointment.valid?
-    
     assert_difference('Appointment.count', 1) do
-      # should be conflicts
-      assert new_appointment.conflicts?
       # schedule the work appointment, the free appointment should be split into free/work time
-      work_appointment = AppointmentScheduler.create_work_appointment(new_appointment)
+      work_appointment = AppointmentScheduler.create_work_appointment(company, johnny, haircut, customer, :start_at => "20080801233000")
       assert work_appointment.valid?
       # work appointment should have the correct customer and job
       assert_equal customer, work_appointment.customer
@@ -176,18 +128,41 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     end
   end
   
+  def test_should_schedule_work_replacing_free_appointment
+    company   = Factory(:company, :subscription => @subscription)
+    johnny    = Factory(:user, :name => "Johnny", :companies => [company])
+    haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [company], :price => 1.00)
+    free      = company.free_service
+    customer  = Factory(:user)
+  
+    # create free timeslot for 30 minutes
+    free_appointment  = AppointmentScheduler.create_free_appointment(company, johnny, free, :start_at => "20080801000000", :end_at => "20080801003000")
+    assert free_appointment.valid?
+  
+    assert_difference('Appointment.count', 0) do
+      # schedule the work appointment, the free appointment should be replace by work time
+      work_appointment = AppointmentScheduler.create_work_appointment(company, johnny, haircut, customer, :start_at => "20080801000000")
+      assert work_appointment.valid?
+      # work appointment should have the correct customer and job
+      assert_equal customer, work_appointment.customer
+      assert_equal haircut, work_appointment.service
+      # work appointment should have the correct start and end times
+      assert_equal "20080801T000000", work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal "20080801T003000", work_appointment.end_at.to_s(:appt_schedule)
+      # confirmation codes should be different
+      assert_not_equal work_appointment.confirmation_code, free_appointment.confirmation_code
+    end
+  
+  end
+  
   def test_should_schedule_job_at_start_of_available_timeslot
     company   = Factory(:company, :subscription => @subscription)
     johnny    = Factory(:user, :name => "Johnny", :companies => [company])
-    free      = company.services.free.first
+    free      = company.free_service
     customer  = Factory(:user)
     
-    # create big available timeslot
-    available_appt = Appointment.create(:company => company, 
-                                        :service => free,
-                                        :schedulable => johnny,
-                                        :start_at => "20080801000000",
-                                        :end_at =>   "20080802000000")  # available all day
+    # create available timeslot all day
+    available_appt = AppointmentScheduler.create_free_appointment(company, johnny, free, :start_at => "20080801000000", :end_at => "20080802000000")
     
     # split appointment
     haircut           = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [company], :price => 1.00)
@@ -333,17 +308,17 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     
     start_at  = Time.now.beginning_of_day
     end_at    = start_at + 1.day
-    appt      = AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
+    appt      = AppointmentScheduler.create_free_appointment(company, johnny, company.free_service, :start_at => start_at, :end_at => end_at)
     assert appt.valid?
     assert_equal 24 * 60, appt.duration
     
     assert_raise TimeslotNotEmpty do
       # should throw error
-      AppointmentScheduler.create_free_appointment(company, johnny, start_at, end_at)
+      AppointmentScheduler.create_free_appointment(company, johnny, company.free_service, :start_at => start_at, :end_at => end_at)
     end
     
     # should create free time for another schedulable
-    appt  = AppointmentScheduler.create_free_appointment(company, lisa, start_at, end_at)
+    appt  = AppointmentScheduler.create_free_appointment(company, lisa, company.free_service, :start_at => start_at, :end_at => end_at)
     assert appt.valid?
     assert_equal 24 * 60, appt.duration
   end

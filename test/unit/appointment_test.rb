@@ -31,7 +31,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @start_at_utc, @end_at_utc)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @company.free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
       
       # build mapping of unscheduled time
       @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @johnny, @daterange)

@@ -1,21 +1,49 @@
 class AppointmentScheduler
   
+  # create a free appointment in the specified timeslot
+  def self.create_free_appointment(company, schedulable, service, date_time_options)
+    # find company free service
+    service     = company.free_service
+
+    raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
+    
+    # create a new appointment object
+    free_hash         = {:company => company, :service => service, :schedulable => schedulable}.merge(date_time_options)
+    free_appointment  = Appointment.new(free_hash)
+                              
+    if free_appointment.conflicts?
+      raise TimeslotNotEmpty
+    end
+    
+    # save appointment
+    free_appointment.save
+    
+    raise AppointmentInvalid unless free_appointment.valid?
+    
+    free_appointment
+  end
+  
   # create a work appointment by scheduling the specified appointment within a free timeslot
-  def self.create_work_appointment(appointment)
-    raise AppointmentInvalid if !appointment.valid?
+  def self.create_work_appointment(company, schedulable, service, customer, date_time_options)
+    # should be a service that is not marked as work
+    raise AppointmentInvalid if service.mark_as != Appointment::WORK
     
-    # should be a service that is not marked as free
-    raise AppointmentInvalid if appointment.service.mark_as != Appointment::WORK
+    work_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer}.merge(date_time_options)
+    work_appointment  = Appointment.new(work_hash)
     
-    # should have exactly 1 conflict
-    raise TimeslotNotEmpty if appointment.conflicts.size != 1
+    if !work_appointment.valid?
+      raise AppointmentInvalid
+    end
     
-    # conflict should be free time
-    raise TimeslotNotEmpty if appointment.conflicts.first.service.mark_as != Appointment::FREE
+    # should have exactly 1 free time conflic
+    raise TimeslotNotEmpty if work_appointment.conflicts.size != 1
+    raise TimeslotNotEmpty if work_appointment.conflicts.first.service.mark_as != Appointment::FREE
     
-    # split the free appointment into free/work appointments
-    free_appointment  = appointment.conflicts.first
-    new_appointments  = self.split_free_appointment(free_appointment, appointment.service, appointment.start_at, appointment.end_at, :commit => 1, :customer => appointment.customer)
+    # split the free appointment into free/work appointments, and return the work appointment
+    free_appointment  = work_appointment.conflicts.first
+    work_start_at     = work_appointment.start_at
+    work_end_at       = work_appointment.end_at
+    new_appointments  = self.split_free_appointment(free_appointment, service, work_start_at, work_end_at, :commit => 1, :customer => customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
   end
   
@@ -33,8 +61,13 @@ class AppointmentScheduler
     service_end_at   = Time.zone.parse(service_end_at) if service_end_at.is_a?(String)
     
     # time arguments should now be ActiveSupport::TimeWithZone objects
-    raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
+    # raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
         
+    if !(service_start_at.between?(appointment.start_at, appointment.end_at) and 
+         service_end_at.between?(appointment.start_at, appointment.end_at))
+      puts "*** argument error, #{appointment.start_at}::#{appointment.end_at}, #{service_start_at}::#{service_end_at}"
+    end
+    
     # check that the service_start_at and service_end_at times fall within the appointment timeslot
     raise ArgumentError unless service_start_at.between?(appointment.start_at, appointment.end_at) and 
                                service_end_at.between?(appointment.start_at, appointment.end_at)
@@ -89,31 +122,6 @@ class AppointmentScheduler
     
     appointments
   end
-    
-  # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, schedulable, start_at, end_at)
-    # find first service scheduled as 'free'
-    service     = company.services.free.first
-
-    raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
-    
-    # create a new appointment object
-    appointment = Appointment.new(:start_at => start_at, 
-                                  :end_at => end_at, 
-                                  :mark_as => service.mark_as, 
-                                  :service => service, 
-                                  :schedulable => schedulable,
-                                  :company => company)
-                              
-    if appointment.conflicts?
-      raise TimeslotNotEmpty
-    end
-    
-    # save appointment
-    appointment.save
-    
-    appointment
-  end
   
   # cancel the work appointment, and reclaim the necessary free time
   def self.cancel_work_appointment(appointment)
@@ -151,7 +159,7 @@ class AppointmentScheduler
       end
       
       # add the new free appointment
-      free_appointment = create_free_appointment(company, schedulable, free_start_at, free_end_at)
+      free_appointment = create_free_appointment(company, schedulable, company.free_service, :start_at => free_start_at, :end_at => free_end_at)
       if !free_appointment.valid?
         raise ActiveRecord::Rollback
       end
