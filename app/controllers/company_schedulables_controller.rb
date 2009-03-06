@@ -1,9 +1,9 @@
-class CalendarsController < ApplicationController
+class CompanySchedulablesController < ApplicationController
   
   # POST /calendars/:schedulable/:id/toggle
   def toggle
     logger.debug("*** toggle: #{params}")
-    @calendar = Calendar.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @calendar = CompanySchedulable.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
     
     if @calendar
       # remove calendar
@@ -14,7 +14,7 @@ class CalendarsController < ApplicationController
         # add calendar
         @schedulable  = eval("#{params[:schedulable].to_s.classify}.find_by_id(#{params[:id]})")
         logger.debug("*** schedulable: #{@schedulable}")
-        @calendar     = Calendar.create(:schedulable => @schedulable, :company => current_company)
+        @calendar     = CompanySchedulable.create(:schedulable => @schedulable, :company => current_company)
       rescue Exception => e
         logger.debug("*** schedulable error: #{e.message}")
       end

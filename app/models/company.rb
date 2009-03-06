@@ -22,8 +22,8 @@ class Company < ActiveRecord::Base
   before_validation         :init_subdomain, :downcase_subdomain
 
   validates_presence_of     :time_zone
-  has_many                  :calendars
-  has_many_polymorphs       :schedulables, :from => [:users], :through => :calendars
+  has_many                  :company_schedulables
+  has_many_polymorphs       :schedulables, :from => [:users], :through => :company_schedulables
   has_many                  :services
   has_many                  :products
   has_many                  :appointments
@@ -68,9 +68,9 @@ class Company < ActiveRecord::Base
   end
   memoize :work_services_count
   
-  # returns true if the company has at least 1 calendar and 1 work service
+  # returns true if the company has at least 1 schedulable and 1 work service
   def can_schedule_appointments?
-    return false if calendars_count == 0 or work_services_count == 0
+    return false if schedulables_count == 0 or work_services_count == 0
     true
   end
   

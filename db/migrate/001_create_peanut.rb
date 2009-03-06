@@ -4,8 +4,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
-      t.integer :locations_count, :default => 0     # counter cache
-      t.integer :calendars_count, :default => 0     # counter cache
+      t.integer :locations_count, :default => 0       # counter cache
+      t.integer :schedulables_count, :default => 0    # counter cache
       t.timestamps
     end
     
@@ -37,14 +37,14 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :products, [:company_id, :name]
 
     # Polymorphic relationship mapping companies to schedulables (e.g. users)
-    create_table :calendars do |t|
+    create_table :company_schedulables do |t|
       t.references  :company
       t.references  :schedulable, :polymorphic => true
       t.timestamps
     end
     
-    add_index :calendars, [:schedulable_id, :schedulable_type], :name => 'index_on_schedulables'
-    add_index :calendars, [:company_id, :schedulable_id, :schedulable_type], :name => 'index_on_companies_and_schedulables'
+    add_index :company_schedulables, [:schedulable_id, :schedulable_type], :name => 'index_on_schedulables'
+    add_index :company_schedulables, [:company_id, :schedulable_id, :schedulable_type], :name => 'index_on_companies_and_schedulables'
 
     # Polymorphic relationship mapping services to schedulables (e.g. users)
     create_table :service_providers do |t|

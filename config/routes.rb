@@ -63,7 +63,7 @@ ActionController::Routing::Routes.draw do |map|
   map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
   # toggle a schedulable's calendar
-  map.connect   'calendars/:schedulable/:id/toggle', :controller => 'calendars', :action => 'toggle', :conditions => {:method => :post}
+  map.connect   'calendars/:schedulable/:id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
    
   # map.resources :people do |resource|
   #   # nested appointments routes

@@ -10,7 +10,7 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many            :products
   should_have_many            :appointments
   should_have_many            :invitations
-  should_have_many            :calendars
+  should_have_many            :company_schedulables
   
   context "create company without a subscription" do
     setup do
@@ -87,8 +87,8 @@ class CompanyTest < ActiveSupport::TestCase
         assert @company.has_schedulable?(@user1)
       end
       
-      should "have calendar count == 1" do
-        assert_equal 1, @company.calendars_count
+      should "have schedulables count == 1" do
+        assert_equal 1, @company.schedulables_count
       end
       
       should "have users.has_calendar?(company) return true" do
