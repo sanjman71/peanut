@@ -9,7 +9,7 @@
     .span-4.padding-bottom-5.text-align-right
       == With:
     .span-10.padding-bottom-5.last
-      = (appointment.resource || User.anyone).name
+      = (appointment.schedulable || User.anyone).name
   %br
   .when
     .span-4.padding-bottom-5.text-align-right

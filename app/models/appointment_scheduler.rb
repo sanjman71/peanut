@@ -24,7 +24,7 @@ class AppointmentScheduler
   end
   
   # create a work appointment by scheduling the specified appointment within a free timeslot
-  def self.create_work_appointment(company, schedulable, service, customer, date_time_options)
+  def self.create_work_appointment(company, schedulable, service, customer, date_time_options, options={})
     # should be a service that is not marked as work
     raise AppointmentInvalid if service.mark_as != Appointment::WORK
     
@@ -40,10 +40,12 @@ class AppointmentScheduler
     raise TimeslotNotEmpty if work_appointment.conflicts.first.service.mark_as != Appointment::FREE
     
     # split the free appointment into free/work appointments, and return the work appointment
+    # if options[:commit] == 0, then split the appointments but don't commit them
     free_appointment  = work_appointment.conflicts.first
     work_start_at     = work_appointment.start_at
     work_end_at       = work_appointment.end_at
-    new_appointments  = self.split_free_appointment(free_appointment, service, work_start_at, work_end_at, :commit => 1, :customer => customer)
+    commit            = options[:commit] ? options[:commit].to_i : 1 
+    new_appointments  = self.split_free_appointment(free_appointment, service, work_start_at, work_end_at, :commit => commit, :customer => customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
   end
   
@@ -61,13 +63,8 @@ class AppointmentScheduler
     service_end_at   = Time.zone.parse(service_end_at) if service_end_at.is_a?(String)
     
     # time arguments should now be ActiveSupport::TimeWithZone objects
-    # raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
+    raise ArgumentError if !service_start_at.is_a?(ActiveSupport::TimeWithZone) or !service_end_at.is_a?(ActiveSupport::TimeWithZone)
         
-    if !(service_start_at.between?(appointment.start_at, appointment.end_at) and 
-         service_end_at.between?(appointment.start_at, appointment.end_at))
-      puts "*** argument error, #{appointment.start_at}::#{appointment.end_at}, #{service_start_at}::#{service_end_at}"
-    end
-    
     # check that the service_start_at and service_end_at times fall within the appointment timeslot
     raise ArgumentError unless service_start_at.between?(appointment.start_at, appointment.end_at) and 
                                service_end_at.between?(appointment.start_at, appointment.end_at)

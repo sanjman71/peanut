@@ -92,7 +92,6 @@ class FreeControllerTest < ActionController::TestCase
     should_assign_to :customer, :equals => "@customer"
   end
 
-
   context "create work appointment for a single date with free time, splitting free time" do
     setup do
       # create free time from 9 am to 3 pm local time

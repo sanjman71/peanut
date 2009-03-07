@@ -120,19 +120,29 @@ class AppointmentsController < ApplicationController
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
-  # GET   /schedule/people/1/services/1/20081231T000000
-  # POST  /schedule/people/1/services/1/20081231T000000
-  # GET   /waitlist/people/3/services/8/this week/anytime
-  # POST  /waitlist/people/3/services/8/this week/anytime
+  # GET   /schedule/users/1/services/1/20081231T000000
+  # POST  /schedule/users/1/services/1/20081231T000000
+  # GET   /waitlist/users/3/services/8/this week/anytime
+  # POST  /waitlist/users/3/services/8/this week/anytime
   def new
-    @appointment = new_appointment_from_params()
-    logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
+    # get appointment parameters
+    @service      = current_company.services.find_by_id(params[:service_id])
+    # note: the send method can generate an exception
+    @schedulable  = current_company.send(params[:schedulable]).find_by_id(params[:id])
+    @customer     = current_user
+    
+    # @appointment = new_appointment_from_params()
+    # logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
     
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
       store_location
       redirect_to(login_path) and return
     end
+    
+    # create work appointment, but don't commit the changes
+    @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer,
+                                                                {:start_at => params[:start_at]}, :commit => 0)
   end
   
   def create

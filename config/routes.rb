@@ -56,9 +56,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':schedulable/:id/appointments/search', :controller => 'appointments', :action => 'search'
 
   # appointment new path scoped by schedulable
-  map.schedule  'schedule/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
+  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
                 :conditions => {:method => :get}
-  map.schedule  'schedule/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
+  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
                 :conditions => {:method => :post}
   map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
