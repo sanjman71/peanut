@@ -2,7 +2,7 @@
 - javascript('date', 'jquery.bgiframe', 'jquery.datePicker', 'appointments')
 - stylesheet('appointments', 'calendar', 'datePicker')
 
-.span-16
+.span-17
   .span-15.prepend-1.last.mat
     - if current_company.schedulables_count == 0
       %h2
@@ -48,8 +48,10 @@
 - unless current_company.schedulables_count == 0
   .span-6.prepend-1.last.mat
     = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
-    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'free', :action => 'create', :schedulable => "#{@schedulable.tableize}/#{@schedulable.id}", :service_id => @free_service), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+    - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
       = hidden_field_tag :when, @when
+      = hidden_field_tag :schedulable, "#{@schedulable.tableize}/#{@schedulable.id}"
+      = hidden_field_tag :service_id, @free_service.id
       .add_free_time
         .span-7.last.when
           == When

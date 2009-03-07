@@ -29,46 +29,46 @@ class AppointmentsController < ApplicationController
   end
     
   # POST /users/1/create
-  def create
-    # build new free appointment
-    service       = current_company.services.free.first
-    schedulable   = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
-    @appointment  = Appointment.new(params[:appointment].merge(:schedulable => schedulable,
-                                                               :service => service,
-                                                               :company => current_company,
-                                                               :location_id => current_location.id))
-    
-    # check if appointment is valid                                                           
-    if !@appointment.valid?
-      @error      = true
-      @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
-      logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
-      return
-    end
-
-    # check for conflicts
-    if @appointment.conflicts?
-      @error      = true
-      @error_text = "Appointment conflict"
-      logger.debug("xxx create free time conflict: #{@appointment.errors.full_messages}")
-      return
-    end
-    
-    # save appointment
-    @appointment.save
-    @notice_text = "Created free time"
-
-    logger.debug("*** created free time")
-        
-    begin
-      # check waitlist for any possible openings because of this new free appointment
-      WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
-    rescue Exception => e
-      logger.debug("*** could not check waitlist appointments: #{e.message}")
-    end
-    
-    manage_appointments
-  end
+  # def create
+  #   # build new free appointment
+  #   service       = current_company.services.free.first
+  #   schedulable   = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+  #   @appointment  = Appointment.new(params[:appointment].merge(:schedulable => schedulable,
+  #                                                              :service => service,
+  #                                                              :company => current_company,
+  #                                                              :location_id => current_location.id))
+  #   
+  #   # check if appointment is valid                                                           
+  #   if !@appointment.valid?
+  #     @error      = true
+  #     @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
+  #     logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
+  #     return
+  #   end
+  # 
+  #   # check for conflicts
+  #   if @appointment.conflicts?
+  #     @error      = true
+  #     @error_text = "Appointment conflict"
+  #     logger.debug("xxx create free time conflict: #{@appointment.errors.full_messages}")
+  #     return
+  #   end
+  #   
+  #   # save appointment
+  #   @appointment.save
+  #   @notice_text = "Created free time"
+  # 
+  #   logger.debug("*** created free time")
+  #       
+  #   begin
+  #     # check waitlist for any possible openings because of this new free appointment
+  #     WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
+  #   rescue Exception => e
+  #     logger.debug("*** could not check waitlist appointments: #{e.message}")
+  #   end
+  #   
+  #   manage_appointments
+  # end
   
   # DELETE /appointments/1
   def destroy
@@ -140,62 +140,116 @@ class AppointmentsController < ApplicationController
       redirect_to(login_path) and return
     end
     
-    # create work appointment, but don't commit the changes
+    # try to schedule the work appointment without committing the changes
     @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer,
                                                                 {:start_at => params[:start_at]}, :commit => 0)
   end
   
+  # def create
+  #   @appointment = new_appointment_from_params()
+  # 
+  #   if !@appointment.valid?
+  #     # ask for customer/user info
+  #     logger.debug("*** appointment is missing customer info")
+  #     redirect_to schedule_path(:resource => params[:resource], :id => params[:id], :service_id => params[:service_id], :start_at => params[:start_at])
+  #   else
+  #     if @appointment.waitlist?
+  #       # add waitlist appointment
+  #       logger.debug("*** adding waitlist appointment")
+  #     
+  #       @appointment.save
+  # 
+  #       begin
+  #         # send waitlist email confirmation
+  #         MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+  #         flash[:notice] = "Sent email confirmation message for your waitlist appointment to #{appointment.owner.email}."
+  #       rescue Exception => e
+  #         flash[:error] = "Could not send email confirmation message for your waitlist appointment."
+  #       end
+  # 
+  #       if @appointment.owner.sms?
+  #         begin
+  #           # send sms waitilist confirmation 
+  #           SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
+  #           flash[:notice] = "Sent confirmation text message for your waitlist appointment to #{appointment.owner.phone}."
+  #         rescue Exception => e
+  #           flash[:error] = "Could not send confirmation text message for your waitlist appointment to  #{appointment.owner.phone}."
+  #         end
+  #       end
+  # 
+  #       # show waitlist
+  #       return redirect_to(waitlist_index_path)
+  #     elsif @appointment.conflicts?
+  #       # resolve conflicts and schedule
+  #       logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
+  #     
+  #       # create work appointment
+  #       @work_appointment = AppointmentScheduler.create_work_appointment(@appointment)
+  #     
+  #       begin
+  #         # send appointment confirmation
+  #         MailWorker.async_send_appointment_confirmation(:id => @work_appointment.id)
+  #       rescue Exception => e
+  #         flash[:error] = "Could not send email confirmation message for your appointment."
+  #       end
+  # 
+  #       # show appointment confirmation
+  #       return redirect_to(confirmation_appointment_path(@work_appointment))
+  #     end
+  #   end
+  # end
+  
   def create
-    @appointment = new_appointment_from_params()
+    # get appointment parameters
+    @service      = current_company.services.find_by_id(params[:service_id])
+    klass, id     = params[:schedulable].split('/')
+    # note: the send method can generate an exception
+    @schedulable  = current_company.send(klass).find_by_id(id)
+    @customer     = User.find_by_id(params[:customer_id])
+    
+    # track valid and invalid appointments
+    @errors       = Hash.new
+    @success      = Hash.new
+    
+    @start_at     = params[:start_at]
+    @end_at       = params[:end_at]
+    
+    # iterate over the specified dates
+    Array(params[:dates]).each do |date|
+      # build time range
+      @time_range = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
 
-    if !@appointment.valid?
-      # ask for customer/user info
-      logger.debug("*** appointment is missing customer info")
-      redirect_to schedule_path(:resource => params[:resource], :id => params[:id], :service_id => params[:service_id], :start_at => params[:start_at])
-    else
-      if @appointment.waitlist?
-        # add waitlist appointment
-        logger.debug("*** adding waitlist appointment")
-      
-        @appointment.save
-
-        begin
-          # send waitlist email confirmation
-          MailWorker.async_send_waitlist_confirmation(:id => @appointment.id)
-          flash[:notice] = "Sent email confirmation message for your waitlist appointment to #{appointment.owner.email}."
-        rescue Exception => e
-          flash[:error] = "Could not send email confirmation message for your waitlist appointment."
+      begin
+        case @service.mark_as
+        when Appointment::WORK
+          # create work appointment
+          @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, :time_range => @time_range)
+        when Appointment::FREE
+          # create free appointment
+          @appointment = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, :time_range => @time_range)
         end
-
-        if @appointment.owner.sms?
-          begin
-            # send sms waitilist confirmation 
-            SmsWorker.async_send_waitlist_confirmation(:id => @appointment.id)
-            flash[:notice] = "Sent confirmation text message for your waitlist appointment to #{appointment.owner.phone}."
-          rescue Exception => e
-            flash[:error] = "Could not send confirmation text message for your waitlist appointment to  #{appointment.owner.phone}."
-          end
-        end
-
-        # show waitlist
-        return redirect_to(waitlist_index_path)
-      elsif @appointment.conflicts?
-        # resolve conflicts and schedule
-        logger.debug("*** found appointment conflicts, resolving and scheduling the appointment")
-      
-        # create work appointment
-        @work_appointment = AppointmentScheduler.create_work_appointment(@appointment)
-      
-        begin
-          # send appointment confirmation
-          MailWorker.async_send_appointment_confirmation(:id => @work_appointment.id)
-        rescue Exception => e
-          flash[:error] = "Could not send email confirmation message for your appointment."
-        end
-
-        # show appointment confirmation
-        return redirect_to(confirmation_appointment_path(@work_appointment))
+        
+        logger.debug("*** created #{@appointment.mark_as} appointment")
+        @success[date] = "Created #{@appointment.mark_as} appointment"
+      rescue Exception => e
+        logger.debug("xxx create appointment error: #{e.message}")
+        @errors[date] = e.message
       end
+    end
+    
+    logger.debug("*** errors: #{@errors}")
+    logger.debug("*** success: #{@success}")
+    
+    if @errors.keys.size > 0
+      flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
+      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+    else
+      flash[:notice]  = "Created appointment(s)"
+      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+    end
+    
+    respond_to do |format|
+      format.js
     end
   end
   
@@ -292,6 +346,10 @@ class AppointmentsController < ApplicationController
   end
     
   protected
+  
+  def appointment_free_time_scheduled_at(appointment)
+    "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
+  end
   
   def new_appointment_from_params
     # build appointment hash differently for schedule vs waitlist appointment requests

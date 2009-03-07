@@ -1,4 +1,6 @@
-if @error
+if @redirect
+  page.redirect_to(@redirect)
+elsif @error
   # clear any errors
   page["#appointment_time_range_start_at"].add_class('highlighted')
   page["#appointment_time_range_end_at"].add_class('highlighted')

@@ -1,5 +1,5 @@
 class FreeController < ApplicationController
-  # privilege_required 'read companies', :only => [:index]
+  # privilege_required 'read appointments', :only => [:index]
 
   # GET /users/1/free/calendar
   def new
@@ -39,67 +39,6 @@ class FreeController < ApplicationController
     respond_to do |format|
       format.html { render(:action => "free_#{style}")}
     end
-  end
-  
-  # POST /users/1/free
-  def create
-    # get appointment parameters
-    @service      = current_company.services.find_by_id(params[:service_id])
-    klass, id     = params[:schedulable].split('/')
-    # note: the send method can generate an exception
-    @schedulable  = current_company.send(klass).find_by_id(id)
-    @customer     = User.find_by_id(params[:customer_id])
-    
-    # track valid and invalid appointments
-    @errors       = Hash.new
-    @success      = Hash.new
-    
-    @start_at     = params[:start_at]
-    @end_at       = params[:end_at]
-    
-    # iterate over the specified dates
-    Array(params[:dates]).each do |date|
-      # build time range
-      @time_range = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-
-      begin
-        case @service.mark_as
-        when Appointment::WORK
-          # create work appointment
-          @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, :time_range => @time_range)
-        when Appointment::FREE
-          # create free appointment
-          @appointment = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, :time_range => @time_range)
-        end
-        
-        logger.debug("*** created #{@appointment.mark_as} appointment")
-        @success[date] = "Created #{@appointment.mark_as} appointment on #{appointment_free_time_scheduled_at(@appointment)}"
-      rescue Exception => e
-        logger.debug("xxx create appointment error: #{e.message}")
-        @errors[date] = e.message
-      end
-    end
-    
-    logger.debug("*** errors: #{@errors}")
-    logger.debug("*** success: #{@success}")
-    
-    if @errors.keys.size > 0
-      flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect       = url_for(:action => 'new', :style => 'calendar', :subdomain => current_subdomain) 
-    else
-      flash[:notice]  = "Created available time"
-      @redirect       = url_for(:action => 'new', :style => 'calendar', :subdomain => current_subdomain) 
-    end
-    
-    respond_to do |format|
-      format.js
-    end
-  end
-  
-  protected
-  
-  def appointment_free_time_scheduled_at(appointment)
-    "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
   end
   
 end
