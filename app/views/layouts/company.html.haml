@@ -28,7 +28,7 @@
         .span-24.last
           .span-19
             %h2#company_name{:style => 'color: #FFFFFF;'}
-              = current_company.name
+              = link_to current_company.name, root_path(:subdomain => current_subdomain)
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')

@@ -45,6 +45,9 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':schedulable/:id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
+  # openings search/index path, scoped by duraton
+  map.connect   ':schedulable/:id/duration/:duration_size/:duration_units/openings/:when/:time', :controller => 'openings', :action => 'index'
+
   # appointments search/index path scoped by schedulable
   map.connect   ':schedulable/:id/appointments/when/:when', :controller => 'appointments', :action => 'index'
   map.connect   ':schedulable/:id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
@@ -98,7 +101,7 @@ ActionController::Routing::Routes.draw do |map|
   map.badges 'badges/:action/:id', :controller => 'badges'
 
   # map the root to the home controller
-  map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => "www" }
+  map.root                  :controller => 'home', :action => 'index', :conditions => { :subdomain => "www" }
   
   # map the company root to the companies controller
   map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }

@@ -2,7 +2,7 @@ class AppointmentRequest < Appointment
 
   def find_free_appointments(options={})
     # find free appointments with duration >= appointment request's service duration
-    duration    = service.duration
+    duration    = self.duration || self.service.duration
     # use time range if it was specified, otherwise default to 'anytime'
     time_range  = Appointment.time_range(self.time(:default => 'anytime'))
     
@@ -15,7 +15,7 @@ class AppointmentRequest < Appointment
     end
     
     # filter appointments by the schedulables who can provide the service
-    appts.select { |appt| service.provided_by?(appt.schedulable) }
+    appts.select { |appt| self.service.provided_by?(appt.schedulable) }
   end
   
   # find free time slots based on appointment request [start_at, end_at]
@@ -31,7 +31,7 @@ class AppointmentRequest < Appointment
     collection  = Array(collection)
     
     # iterate over free appointments
-    duration    = self.service.duration
+    duration    = self.duration || self.service.duration
     timeslots   = collection.inject([]) do |array, appointment|
       # narrow appointments by request start, end times
       appointment.narrow_by_time_range!(self.start_at, self.end_at)

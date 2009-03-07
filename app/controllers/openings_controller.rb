@@ -34,10 +34,20 @@ class OpeningsController < ApplicationController
 
     # initialize service, default to nothing
     @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
+    
+    # initialize duration
+    @duration = nil
+    @duration_size = 1
+    @duration_units = 'hours'
+    if params[:duration_size] && params[:duration_units]
+      @duration_size = params[:duration_size].to_i
+      @duration_units = params[:duration_units]
+      @duration = eval("#{params[:duration_size]}.#{params[:duration_units]}") if (@duration_size && @duration_units)
+    end
 
     # build appointment request for the selected timespan
     @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time, 
-                                       :company => current_company, :location => current_location)
+                                       :company => current_company, :location => current_location, :duration => @duration)
 
     # build schedulables collection, schedulables are restricted by the services they perform
     @schedulables = Array(User.anyone) + @service.schedulables
