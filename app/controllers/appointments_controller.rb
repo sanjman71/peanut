@@ -19,10 +19,10 @@ class AppointmentsController < ApplicationController
       return
     end
     
-    if params[:schedulable].blank? or params[:id].blank?
+    if params[:schedulable_type].blank? or params[:schedulable_id].blank?
       # redirect to a specific schedulable
       schedulable = current_company.schedulables.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable => schedulable.class.to_s.tableize, :id => schedulable.id)) and return
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable_type => schedulable.class.to_s.tableize, :schedulable_id => schedulable.id)) and return
     end
     
     manage_appointments
@@ -85,14 +85,14 @@ class AppointmentsController < ApplicationController
     else
       # redirect to schedulable appointment path
       @schedulable  = @appointment.schedulable
-      @redirect     = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect     = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     end
   end
   
   # shared method for managing free/work appointments
   def manage_appointments
     # initialize resource, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulables = current_company.schedulables.all
 
     if params[:start_date] and params[:end_date]
@@ -128,7 +128,7 @@ class AppointmentsController < ApplicationController
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
     # note: the send method can generate an exception
-    @schedulable  = current_company.send(params[:schedulable]).find_by_id(params[:id])
+    @schedulable  = current_company.send(params[:schedulable_type]).find_by_id(params[:schedulable_id])
     @customer     = current_user
     
     # @appointment = new_appointment_from_params()
@@ -242,10 +242,10 @@ class AppointmentsController < ApplicationController
     
     if @errors.keys.size > 0
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect       = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     else
       flash[:notice]  = "Created appointment(s)"
-      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect       = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     end
     
     respond_to do |format|

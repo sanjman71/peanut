@@ -55,8 +55,8 @@ class OpeningsController < ApplicationController
     # find services collection, services are restricted by the company they belong to
     @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
 
-    # build skills collection mapping services to schedulables
-    @skills   = current_company.services.work.inject([]) do |array, service|
+    # build service providers collection mapping services to schedulables
+    @sps          = current_company.services.work.inject([]) do |array, service|
       service.schedulables.each do |schedulable|
         array << [service.id, schedulable.id, schedulable.name, schedulable.tableize]
       end
@@ -98,8 +98,8 @@ class OpeningsController < ApplicationController
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]
     end
-    schedulable, id = params.delete(:schedulable_id).split('/')
-    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable => schedulable, :id => id))
+    schedulable_type, schedulable_id = params.delete(:schedulable).split('/')
+    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable_type => schedulable_type, :schedulable_id => schedulable_id))
   end
   
 end

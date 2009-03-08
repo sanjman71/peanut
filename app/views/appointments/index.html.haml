@@ -12,8 +12,8 @@
     - else
       .span-8
         %h3
-          = label_tag "schedulable_id", "Schedule for", :class => 'big'
-          = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+          = label_tag "schedulable", "Schedule for", :class => 'big'
+          = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
         %h3= @daterange.name
       .span-6.prepend-1.last
         #links
@@ -26,7 +26,7 @@
           = link_to "Use a Date Range", '', :id => 'show_dates'
 
         #dates.hide
-          = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :schedulable => @schedulable.class.to_s.tableize, :id => @schedulable.id, :subdomain => current_subdomain)})
+          = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :schedulable_type => @schedulable.class.to_s.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)})
       
   - unless current_company.schedulables_count == 0
     .span-15.prepend-1.last

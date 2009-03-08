@@ -5,8 +5,8 @@
 .span-24.last#what
   .span-15.box
     .span-15.last#person
-      = label_tag "schedulable_id", "Schedule available time for", :class => 'big'
-      = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+      = label_tag "schedulable", "Schedule available time for", :class => 'big'
+      = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br
@@ -78,5 +78,5 @@
       = f.submit "Schedule Available Time", :class => 'big button'
       %span{:style => 'font-size: 11px;'}
         == or
-        = link_to 'Cancel', url_for(:controller => 'appointments', :action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+        = link_to 'Cancel', url_for(:controller => 'appointments', :action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
   

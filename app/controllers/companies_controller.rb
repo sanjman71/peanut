@@ -22,11 +22,10 @@ class CompaniesController < ApplicationController
     # find services collection, services are restricted by the company they belong to. Initially no service is selected
     @service  = Service.nothing
     @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
-
+    
     # Set up schedulables. Initially no schedulable is selected
     @schedulable  = User.anyone
-    @service_schedulables = Array(User.anyone) + @service.schedulables
-    @company_schedulables = current_company.schedulables
+    @schedulables = Array(User.anyone) + @service.schedulables
 
     # Set up time
     @when = @time = nil
@@ -45,8 +44,8 @@ class CompaniesController < ApplicationController
     @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time, 
                                        :company => current_company, :location => current_location)
 
-    # Set up skills
-    @skills   = current_company.services.work.inject([]) do |array, service|
+    # Set up service providers
+    @sps      = current_company.services.work.inject([]) do |array, service|
       service.schedulables.each do |schedulable|
         array << [service.id, schedulable.id, schedulable.name, schedulable.tableize]
       end

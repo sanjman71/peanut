@@ -1,11 +1,11 @@
 - title("Schedule an Apppointment")
 - stylesheet('appointments', 'calendar')
-- javascript('skills', 'openings')
+- javascript('service_providers', 'openings')
 
--# skills mapping services to schedulables
-.span-16.skills.hide
-  - @skills.each do |skill|
-    .skill{:service_id => skill[0], :schedulable_id => skill[1], :schedulable_name => skill[2], :schedulable_type => skill[3]}
+-# service providers mapping services to schedulables
+.span-16.service_providers.hide
+  - @sps.each do |sp|
+    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3]}
           
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
@@ -21,7 +21,7 @@
       - if @free_timeslots.blank?
         -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable => @schedulable.tableize, :id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}
@@ -58,6 +58,7 @@
   .span-7.last.mat
     %h2== Change Search:
     = hidden_field_tag 'initial_schedulable_id', @schedulable.id
+    = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
     - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
       .span-7.last
         .span-2.text-align-right
@@ -69,7 +70,7 @@
         .span-2.text-align-right
           == With?
         .span-5.last.field#who
-          = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, o.id]}, @schedulable.id), :style => "width: 125px; align: top;")
+          = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
       %br
       .span-7.last
         .span-2.text-align-right

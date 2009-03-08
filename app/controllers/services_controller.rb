@@ -30,16 +30,16 @@ class ServicesController < ApplicationController
   # GET /services/1/edit
   def edit
     @service        = current_company.services.find(params[:id])
-    @skills         = @service.skills
-    @non_providers  = current_company.resources.all - @service.providers
+    @service_providers   = @service.service_providers
+    @non_providers  = current_company.schedulables.all - @service.schedulables
   end
 
   # COMPONENT - GET /services/1/providers
   # show all service providers
   def providers
     @service        = current_company.services.find(params[:id])
-    @skills         = @service.skills
-    @non_providers  = current_company.resources.all - @service.providers
+    @service_providers = @service.service_providers
+    @non_providers  = current_company.schedulables.all - @service.schedulables
   end
   
   # POST /services
