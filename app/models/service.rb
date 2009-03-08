@@ -42,6 +42,18 @@ class Service < ActiveRecord::Base
     schedulables.any? { |schedulable| schedulable == o }
   end
   
+  def free?
+    self.mark_as == Appointment::FREE    
+  end
+  
+  def work?
+    self.mark_as == Appointment::FREE    
+  end
+
+  def busy?
+    self.mark_as == Appointment::BUSY
+  end
+
   private
   
   def init_duration
