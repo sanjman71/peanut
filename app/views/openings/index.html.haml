@@ -5,7 +5,11 @@
 -# service providers mapping services to schedulables
 .span-16.service_providers.hide
   - @sps.each do |sp|
-    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3], :allow_custom_duration => sp[4], :service_duration => "Typically #{sp[5]} minutes"}
+    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3]}
+
+.span-16.services.hide
+  - @sps.each do |sp|
+    .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => service_duration_in_words(sp[5])}
           
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
@@ -67,7 +71,7 @@
           = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
       %br
       .duration.span-7.last
-        .span-5.prepend-2.last#duration_words
+        .span-5.prepend-2.last#duration_in_words
           == Typically x minutes
           %br
         .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}

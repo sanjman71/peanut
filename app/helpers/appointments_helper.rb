@@ -23,4 +23,15 @@ module AppointmentsHelper
     end
   end
   
+  def service_duration_in_words(duration_in_minutes)
+    if duration_in_minutes >= 60
+      # use hours
+      hours, mins = [duration_in_minutes / 60, duration_in_minutes % 60]
+      mins > 0 ? "Typically #{pluralize(hours, 'hour')}, #{pluralize(mins, 'minute')}" : "Typically #{pluralize(hours, 'hour')}"
+    else
+      # use minutes
+      "Typically #{duration_in_minutes} minutes"
+    end
+  end
+  
 end

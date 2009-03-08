@@ -1,18 +1,30 @@
 var service_providers = new Array();
+var services          = new Array();
 
 $.fn.init_service_providers = function () {
   // build service_providers array
-  $(".service_providers .service_provider").each(function(index, service_provider)
+  $(".service_providers.hide .service_provider").each(function(index, service_provider)
   {
     var service_id        = $(service_provider).attr("service_id");
     var schedulable_id    = $(service_provider).attr("schedulable_id");
     var schedulable_name  = $(service_provider).attr("schedulable_name");
     var schedulable_type  = $(service_provider).attr("schedulable_type");
-    var allow_custom_duration = $(service_provider).attr("allow_custom_duration");
-    var service_duration  = $(service_provider).attr("service_duration");
     
-    // create an array with the service id, schedulable id and name
-    service_providers.push([service_id, schedulable_id, schedulable_name, schedulable_type, allow_custom_duration, service_duration]);
+    // populate array with the service id, schedulable id and name
+    service_providers.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
+  });
+}
+
+$.fn.init_services = function() {
+  // build services array
+  $(".services.hide .service").each(function(index, service)
+  {
+    var service_id            = $(service).attr("service_id");
+    var allow_custom_duration = $(service).attr("allow_custom_duration");
+    var service_duration      = $(service).attr("service_duration");
+
+    // populate array with the custom duration and service duration info
+    services.push([service_id, allow_custom_duration, service_duration]);
   });
 }
 
@@ -29,8 +41,6 @@ $.fn.init_schedulables = function () {
   
   // add schedulables who provide the selected service
   var num_providers = 0;
-  var allow_custom_duration = false;
-  var service_duration = '';
   
   $.each(service_providers, function (index, service_provider) {
     if (service_provider[0] == service_id)
@@ -38,15 +48,23 @@ $.fn.init_schedulables = function () {
       // add the schedulable type and id (e.g. users/3) as the type, and the schedulable name as the value 
       $('#schedulable').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_schedulable_id) && (service_provider[3] == initial_schedulable_type));
       num_providers += 1;
-      
-      if (service_provider[4] == 1)
+    }
+  })
+
+  var allow_custom_duration     = false;
+  var default_duration_in_words = '';
+
+  $.each(services, function (index, service) {
+    if (service[0] == service_id)
+    {
+      if (service[1] == 1)
       {
         // the service allows a custom duration
         allow_custom_duration = true;
       }
       
       // store the service duration string
-      service_duration = service_provider[5];
+      default_duration_in_words = service[2];
     }
   })
   
@@ -57,9 +75,9 @@ $.fn.init_schedulables = function () {
   
   if (allow_custom_duration)
   {
-    // show the duration select elements and text
+    // show the duration elements
     $(".duration").show();
-    $("#duration_words").html(service_duration);
+    $("#duration_in_words").html(default_duration_in_words);
   } else {
     $(".duration").hide();
   }
@@ -68,6 +86,7 @@ $.fn.init_schedulables = function () {
 
 $(document).ready(function() {
   $(document).init_service_providers();
+  $(document).init_services();
   $(document).init_schedulables();
     
   // when a service is selected, rebuild the schedulable service provider select list
