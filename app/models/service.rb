@@ -12,7 +12,6 @@ class Service < ActiveRecord::Base
   # name constants
   AVAILABLE                   = "Available"
   UNAVAILABLE                 = "Unavailable"
-  CUSTOM                      = "Custom"
   
   named_scope :free,          { :conditions => {:mark_as => Appointment::FREE} }
   named_scope :busy,          { :conditions => {:mark_as => Appointment::BUSY} }
@@ -31,10 +30,6 @@ class Service < ActiveRecord::Base
   # return true if its the special service 'nothing'
   def nothing?
     self.id == 0
-  end
-  
-  def custom?
-    self.name == CUSTOM
   end
   
   def duration_to_seconds

@@ -1,10 +1,10 @@
 class OpeningsController < ApplicationController
 
   # GET /openings
-  # GET /:schedulable/1/services/3/openings/this-week/morning
+  # GET /users/1/services/3/openings/this-week/morning
   # GET /services/1/openings/this-week/anytime
   def index
-    if (params[:id] == "0") or (params[:schedulable_type] == "0") or (params[:schedulable_id] == "0")
+    if (params[:schedulable_type] == "0") or (params[:schedulable_id] == "0")
       # /:schedulable/0/openings is canonicalized to /openings; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable_type => nil, :schedulable_id => nil)))
     elsif params[:service_id].to_s == "0"
@@ -39,15 +39,20 @@ class OpeningsController < ApplicationController
     @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time,
                                        :company => current_company, :location => current_location)
 
-     # initialize duration
-     @duration = 0
-     if params[:duration_size] && params[:duration_units]
-       duration_size = params[:duration_size].to_i
-       duration_units = params[:duration_units]
-       @duration = eval("#{params[:duration_size]}.#{params[:duration_units]}") if (duration_size && duration_units)
-       # @duration holds the custom duration in seconds. We need this in minutes.
-       @query.duration = @duration / 60
-     end
+    # if we have a custom duration, and the service allows this, then set this in the appointment request
+    if @service.allow_custom_duration && params[:duration_size] && params[:duration_units]
+      @duration_size = params[:duration_size].to_i
+      @duration_units = params[:duration_units]
+      if (@duration_size && @duration_units)
+        begin
+          # Get the duration in minutes.
+          duration = eval("#{@duration_size}.#{@duration_units}") / 60
+          # Assign this to the appointment request
+          @query.duration = duration
+        rescue
+        end
+      end
+    end
 
     # build schedulables collection, schedulables are restricted by the services they perform
     @schedulables = Array(User.anyone) + @service.schedulables

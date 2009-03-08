@@ -17,7 +17,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :duration
       t.string  :mark_as
       t.integer :price_in_cents
-      t.integer :schedulables_count, :default => 0    # counter cache
+      t.integer :schedulables_count, :default => 0          # counter cache
+      t.boolean :allow_custom_duration, :default => false   # by default no custom duration
       
       t.timestamps
     end
@@ -26,8 +27,6 @@ class CreatePeanut < ActiveRecord::Migration
 
     # create free service used by all companies
     Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
-    # create custom service used by all companies
-    Service.create(:name => Service::CUSTOM, :duration => 0, :mark_as => "work", :price => 0.00)
     
     # Map services to companies
     create_table :company_services do |t|

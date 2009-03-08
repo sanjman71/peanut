@@ -153,7 +153,11 @@ class Appointment < ActiveRecord::Base
     end
     
     # initialize duration (in minutes)
-    self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
+    if self.service.nil?
+      self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
+    else
+      self.duration = self.service.duration
+    end
     
     # initialize mark_as if its blank
     if self.mark_as.blank? and self.service

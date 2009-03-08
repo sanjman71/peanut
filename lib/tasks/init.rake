@@ -116,10 +116,8 @@ namespace :init do
     @company1.schedulables.push(@mary)
     
     # create company1 services and people
-    @custom_service  = Service.find_by_name("Custom")
-    @company1.services.push(@custom_service)
-    @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
-    @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
+    @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00, :allow_custom_duration => false)
+    @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00, :allow_custom_duration => true)
   
     puts "#{Time.now}: adding company1 service providers ..."
   
@@ -129,7 +127,6 @@ namespace :init do
 
     puts "#{Time.now}: adding noelrose services and products ..."
     # create noelrose services, products
-    @noelrose.services.push(@custom_service)
     @mens_haircut     = @noelrose.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)
     @womens_haircut   = @noelrose.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00)
     @color1           = @noelrose.services.create(:name => "Single Process Color", :duration => 120, :mark_as => "work", :price => 65.00)

@@ -3,10 +3,10 @@ class AppointmentRequest < Appointment
   def find_free_appointments(options={})
 
     # find free appointments with duration >= appointment request's service duration
-    if self.service.custom?
-      duration = self.duration
+    if self.service.allow_custom_duration
+      duration  = self.duration
     else
-      duration    = self.service.duration
+      duration  = self.service.duration
     end
 
     # use time range if it was specified, otherwise default to 'anytime'
@@ -37,10 +37,10 @@ class AppointmentRequest < Appointment
     collection  = Array(collection)
     
     # iterate over free appointments
-    if self.service.custom?
-      duration = self.duration
+    if self.service.allow_custom_duration
+      duration  = self.duration
     else
-      duration    = self.service.duration
+      duration  = self.service.duration
     end
 
     timeslots   = collection.inject([]) do |array, appointment|
