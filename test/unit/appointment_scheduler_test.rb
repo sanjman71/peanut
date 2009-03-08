@@ -306,7 +306,7 @@ class AppointmentScheduleTest < ActiveSupport::TestCase
     lisa      = Factory(:user, :name => "Lisa", :companies => [company])
     free      = company.services.free.first
     
-    start_at  = Time.now.beginning_of_day
+    start_at  = Time.now.utc.beginning_of_day
     end_at    = start_at + 1.day
     appt      = AppointmentScheduler.create_free_appointment(company, johnny, company.free_service, :start_at => start_at, :end_at => end_at)
     assert appt.valid?
