@@ -1,7 +1,7 @@
 You are confirmed on the waitlist:
 
 What: <%= @appointment.service.name %>
-With: <%= (@appointment.resource || User.anyone).name %>
+With: <%= (@appointment.schedulable || User.anyone).name %>
 When: <%= @appointment.time.titleize %>, <%= @appointment.when.titleize %>
 
 Your confirmation code is <%= @appointment.confirmation_code %>

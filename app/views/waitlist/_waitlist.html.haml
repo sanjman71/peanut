@@ -1,11 +1,11 @@
 - if appointments.blank?
-  .span-18.prepend-1
+  .span-23.prepend-1
     %h2== The waitlist is empty
     
 - appointments.each do |appointment|
-  .span-18.last.letterbox.appointment{:class => cycle("shaded", ""), :id => appointment.id}
+  .span-24.last.letterbox.appointment{:class => cycle("shaded", ""), :id => appointment.id}
     .span-4.prepend-1.name
-      %h3{:style => "margin-bottom: 2px;"}= (appointment.resource || User.anyone).name
+      %h3{:style => "margin-bottom: 2px;"}= (appointment.schedulable || User.anyone).name
       = appointment.service.name
     .span-4.when
       %h3{:style => "margin-bottom: 2px;"}= appointment.when.titleize

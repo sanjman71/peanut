@@ -167,5 +167,22 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :end_at, :equals => '"1100"'
     should_assign_to :mark_as, :equals => '"work"'
   end
-  
+
+  context "create waitlist appointment for this week" do
+    setup do
+      # create waitlist appointment
+      post :create,
+           {:dates => 'this-week', :when => "this-week", :time => 'anytime', :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
+            :customer_id => @customer.id, :mark_as => 'wait'}
+    end
+    
+    should_change "Appointment.count", :by => 1
+    
+    should_assign_to :service, :equals => "@haircut"
+    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :customer, :equals => "@customer"
+    should_assign_to :when, :equals => '"this week"'
+    should_assign_to :time, :equals => '"anytime"'
+    should_assign_to :mark_as, :equals => '"wait"'
+  end
 end

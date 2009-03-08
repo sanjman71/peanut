@@ -16,7 +16,7 @@ class SmsWorker < Workling::Base
       send_sms_to_customer(customer, message)
     when Appointment::WAIT
       customer  = appointment.customer
-      message   = "Waitlist for #{appointment.service.name}, confirmation #{appointment.confirmation_code}"
+      message   = "Your are waitlisted for a #{appointment.service.name}. Your waitlist confirmation number is #{appointment.confirmation_code}"
       send_sms_to_customer(customer, message)
     end
   end

@@ -253,12 +253,12 @@ class AppointmentScheduler
   end
   
   # options:
-  #  - email => true|false, defaults to true
+  #  - email => true|false, defaults to false
   #  - sms   => true|false, defaults to false
   def self.send_confirmation(appointment, options={})
     confirmations_sent = 0
     
-    email = options.has_key?(:email) ? options[:email] : true
+    email = options.has_key?(:email) ? options[:email] : false
     sms   = options.has_key?(:sms) ? options[:sms] : false
     
     if email
@@ -278,12 +278,12 @@ class AppointmentScheduler
       begin
         case appointment.mark_as
         when Appointment::WORK, Appointment::WAIT
-          SmsWorker.async_send_appointment_confirmation(:id => @appointment.id)
+          SmsWorker.async_send_appointment_confirmation(:id => appointment.id)
         end
         confirmations_sent += 1
         RAILS_DEFAULT_LOGGER.debug("Sent sms #{appointment.mark_as} appointment confirmation")
       rescue Exception => e
-        RAILS_DEFAULT_LOGGER.debug("Error sending sms confirmation message for your appointment.")
+        RAILS_DEFAULT_LOGGER.debug("Error sending sms confirmation message for your appointment - #{e.message}")
       end
     end
     
