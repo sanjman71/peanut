@@ -10,7 +10,7 @@ $.fn.init_service_providers = function () {
     var schedulable_type  = $(service_provider).attr("schedulable_type");
 
     // create an array with the service id, schedulable id and name
-    service_provider.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
+    service_providers.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
   });
 }
 
