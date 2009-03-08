@@ -5,7 +5,7 @@
 -# service providers mapping services to schedulables
 .span-16.service_providers.hide
   - @sps.each do |sp|
-    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3], :allow_custom_duration => sp[4]}
+    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3], :allow_custom_duration => sp[4], :service_duration => "Typically #{sp[5]} minutes"}
           
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
@@ -61,16 +61,16 @@
     = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
     - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
       .span-7.last
-        .span-2.text-align-right#what_text
+        .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
           == What?
         .span-5.last.field#what
           = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
       %br
       .duration.span-7.last
-        .span-5.prepend-2.last
+        .span-5.prepend-2.last#duration_words
           == Typically x minutes
           %br
-        .span-2.text-align-right
+        .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
           == How long?
         .span-5.last
           %span.field#when
@@ -79,13 +79,13 @@
             = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
         %br
       .span-7.last
-        .span-2.text-align-right
+        .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
           == With?
         .span-5.last.field#who
           = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
       %br
       .span-7.last
-        .span-2.text-align-right
+        .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
           == When?
         .span-5.last
           %span.field#when

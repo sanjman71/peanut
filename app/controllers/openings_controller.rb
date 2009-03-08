@@ -63,7 +63,7 @@ class OpeningsController < ApplicationController
     # build service providers collection mapping services to schedulables
     @sps          = current_company.services.work.inject([]) do |array, service|
       service.schedulables.each do |schedulable|
-        array << [service.id, schedulable.id, schedulable.name, schedulable.tableize, (service.allow_custom_duration ? 1 : 0)]
+        array << [service.id, schedulable.id, schedulable.name, schedulable.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
       end
       array
     end

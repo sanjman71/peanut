@@ -141,15 +141,9 @@ $.fn.init_schedule_search = function () {
     var service_id = $('#service_id').val();
 
     if (service_id == "0") {
-      // highlight the what text field
-      $("#what_text").addClass("highlight");
-      
       // alert the user
       alert("Please select a service");
       return false;
-    } else {
-      // remove any previous highlights 
-      $("#what_text").removeClass("highlight");
     }
     
     // replace the search button with a progress image onsubmit
