@@ -67,7 +67,7 @@ namespace :init do
   task :companies do
     puts "#{Time.now}: adding test data ..."
   
-    puts "#{Time.now}: adding companies company1 and noelrose ..."
+    puts "#{Time.now}: adding companies company1, noelrose, meatheads ..."
     
     @max_plan       = Plan.find_by_name("Max") || Plan.first
     
@@ -87,35 +87,46 @@ namespace :init do
     @erika.register!
     @erika.activate!
     
-    @mac            = User.create(:name => "Mac Manager", :email => "mac@peanut.com", 
+    @meathead       = User.create(:name => "Meathead Manager", :email => "meathead@peanut.com", 
                                   :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
-    @mac.register!
-    @mac.activate!
+    @meathead.register!
+    @meathead.activate!
+
+    @wimpy          = User.create(:name => "Wimpy Arms", :email => "wimpy@peanut.com", 
+                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+    @wimpy.register!
+    @wimpy.activate!
+
+    @skinny         = User.create(:name => "Skinny Legs", :email => "skinny@peanut.com", 
+                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+    @skinny.register!
+    @skinny.activate!
     
     # create subscriptions
     @subscription1  = Subscription.new(:user => @johnny, :plan => @max_plan)
     @subscription2  = Subscription.new(:user => @johnny, :plan => @max_plan)
-    @subscription3  = Subscription.new(:user => @mac, :plan => @max_plan)
+    @subscription3  = Subscription.new(:user => @meathead, :plan => @max_plan)
     
     # create test companies
     @company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)", :subscription => @subscription1)
-    @company1.save
-    
     @noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription2)
-    @noelrose.save
+    @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription3)
 
     # add user roles
     @johnny.grant_role('company manager', @company1)
     @mary.grant_role('company employee', @company1)
     @erika.grant_role('company manager', @noelrose)
+    @meathead.grant_role('company manager', @meatheads)
+    @wimpy.grant_role('company employee', @meatheads)
+    @skinny.grant_role('company employee', @meatheads)
     
     puts "#{Time.now}: adding company1 services and products ..."
     
-    # assign company schedulables
+    # assign schedulables
     @company1.schedulables.push(@johnny)
     @company1.schedulables.push(@mary)
     
-    # create company1 services and people
+    # create services
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00, :allow_custom_duration => false)
     @womens_haircut  = @company1.services.create(:name => "Women's Haircut", :duration => 60, :mark_as => "work", :price => 50.00, :allow_custom_duration => true)
   
@@ -136,6 +147,18 @@ namespace :init do
     @shampoo          = @noelrose.products.create(:name => "Shampoo", :inventory => 5, :price => 10.00)
     @conditioner      = @noelrose.products.create(:name => "Conditioner", :inventory => 5, :price => 15.00)
     @pomade           = @noelrose.products.create(:name => "Pomade", :inventory => 5, :price => 12.00)
+  
+    puts "#{Time.now}: adding meathead services and products ..."
+    
+    # assign schedulables
+    @meatheads.schedulables.push(@meathead)
+
+    # create services
+    @training         = @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
+  
+    # add service providers
+    @training.schedulables.push(@wimpy)
+    @training.schedulables.push(@skinny)
   
     puts "#{Time.now}: completed"
   end
