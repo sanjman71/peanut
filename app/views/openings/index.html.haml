@@ -5,7 +5,7 @@
 -# service providers mapping services to schedulables
 .span-16.service_providers.hide
   - @sps.each do |sp|
-    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3]}
+    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3], :allow_custom_duration => sp[4]}
           
 .span-15.prepend-1.last
   - if !@current_company.can_schedule_appointments?
@@ -66,6 +66,18 @@
         .span-5.last.field#what
           = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
       %br
+      .duration.span-7.last
+        .span-5.prepend-2.last
+          == Typically x minutes
+          %br
+        .span-2.text-align-right
+          == How long?
+        .span-5.last
+          %span.field#when
+            = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
+          %span.field#time
+            = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
+        %br
       .span-7.last
         .span-2.text-align-right
           == With?
@@ -87,16 +99,6 @@
             == Where?
           .span-4.last.field#where
             = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
-      - if !@duration.blank?
-        %br
-        .span-7.last
-          .span-2.text-align-right
-            == How long?
-          .span-5.last
-            %span.field#when
-              = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
-            %span.field#time
-              = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
       %br
       .span-4.prepend-1.last
         = f.submit 'Search again', :name => nil, :class => 'submit', :id => 'search_submit'

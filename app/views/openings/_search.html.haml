@@ -1,38 +1,42 @@
 - form_for(@query, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
-  .span-14.last
+  .span-7.last
     .span-2.text-align-right
       == What?
-    .span-5.field#what
+    .span-5.last.field#what
       = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
+  %br
+  .span-7.last
+    .span-2.text-align-right
+      == How long?
+    .span-5.last
+      %span.field#duration-size
+        = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
+      %span.field#duration-units
+        = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
+  %br
+  .span-7.last
     .span-3.text-align-right
       == Who/What to schedule?
     .span-4.last.field#who
       = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
   %br
-  .span-14.last
+  .span-7.last
     .span-2.text-align-right
       == When?
-    .span-5
+    .span-5.last
       %span.field#when
         = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
       %span.field#time
         = select_tag('time', options_for_select(Appointment::TIMES, @time))
-    - if @locations.size > 1
+  - if @locations.size > 1
+    %br
+    .span-7.last
       .span-3.text-align-right
         == Where?
       .span-4.last.field#where
         = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
-    - else
-      .span-7.last
-  %br
-  .span-14.last
-    .span-2.text-align-right
-      == How long?
-    .span-5
-      %span.field#duration-size
-        = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
-      %span.field#duration-units
-        = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
+  - else
+    .span-7.last
   .span-4.prepend-1.last
     = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
