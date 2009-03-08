@@ -153,7 +153,7 @@ class Appointment < ActiveRecord::Base
     end
     
     # initialize duration (in minutes)
-    if self.service.nil?
+    if self.service.nil? || self.service.free?
       self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
     else
       self.duration = self.service.duration
