@@ -25,6 +25,7 @@
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
   = hidden_field_tag :schedulable, "#{@schedulable.tableize}/#{@schedulable.id}"
   = hidden_field_tag :service_id, @free_service.id
+  = hidden_field_tag :mark_as, Appointment::FREE
   
   .span-14.prepend-1.append-9.last
     = display_flash(:notice)
