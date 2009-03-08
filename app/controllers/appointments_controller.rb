@@ -28,48 +28,6 @@ class AppointmentsController < ApplicationController
     manage_appointments
   end
     
-  # POST /users/1/create
-  # def create
-  #   # build new free appointment
-  #   service       = current_company.services.free.first
-  #   schedulable   = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
-  #   @appointment  = Appointment.new(params[:appointment].merge(:schedulable => schedulable,
-  #                                                              :service => service,
-  #                                                              :company => current_company,
-  #                                                              :location_id => current_location.id))
-  #   
-  #   # check if appointment is valid                                                           
-  #   if !@appointment.valid?
-  #     @error      = true
-  #     @error_text = "#{@appointment.errors.full_messages}" # TODO: cleanup this error message
-  #     logger.debug("xxx create free time error: #{@appointment.errors.full_messages}")
-  #     return
-  #   end
-  # 
-  #   # check for conflicts
-  #   if @appointment.conflicts?
-  #     @error      = true
-  #     @error_text = "Appointment conflict"
-  #     logger.debug("xxx create free time conflict: #{@appointment.errors.full_messages}")
-  #     return
-  #   end
-  #   
-  #   # save appointment
-  #   @appointment.save
-  #   @notice_text = "Created free time"
-  # 
-  #   logger.debug("*** created free time")
-  #       
-  #   begin
-  #     # check waitlist for any possible openings because of this new free appointment
-  #     WaitlistWorker.async_check_appointment_waitlist(:id => @appointment.id)
-  #   rescue Exception => e
-  #     logger.debug("*** could not check waitlist appointments: #{e.message}")
-  #   end
-  #   
-  #   manage_appointments
-  # end
-  
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
@@ -81,11 +39,11 @@ class AppointmentsController < ApplicationController
         
     if @appointment.waitlist?
       # redirect to waitlist index
-      @redirect = waitlist_index_path(:subdomain => current_subdomain)
+      @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
     else
       # redirect to schedulable appointment path
-      @schedulable  = @appointment.schedulable
-      @redirect     = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @schedulable    = @appointment.schedulable
+      @redirect_path  = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
     end
   end
   
@@ -122,27 +80,40 @@ class AppointmentsController < ApplicationController
 
   # GET   /schedule/users/1/services/1/20081231T000000
   # POST  /schedule/users/1/services/1/20081231T000000
-  # GET   /waitlist/users/3/services/8/this week/anytime
-  # POST  /waitlist/users/3/services/8/this week/anytime
+  # GET   /waitlist/users/1/services/8/this-week/anytime
+  # POST  /waitlist/users/1/services/8/this-week/anytime
   def new
-    # get appointment parameters
-    @service      = current_company.services.find_by_id(params[:service_id])
-    # note: the send method can generate an exception
-    @schedulable  = current_company.send(params[:schedulable]).find_by_id(params[:id])
-    @customer     = current_user
-    
-    # @appointment = new_appointment_from_params()
-    # logger.debug("*** appointment waitlist: #{@appointment.waitlist?}, valid: #{@appointment.valid?}, #{@appointment.errors.full_messages.join(",")}")
-    
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
       store_location
       redirect_to(login_path) and return
     end
     
-    # try to schedule the work appointment without committing the changes
-    @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer,
-                                                                {:start_at => params[:start_at]}, :commit => 0)
+    # get appointment parameters
+    @service      = current_company.services.find_by_id(params[:service_id])
+    # note: the send method can generate an exception
+    @schedulable  = current_company.send(params[:schedulable]).find_by_id(params[:id])
+    @customer     = current_user
+    
+    case (@mark_as = params[:mark_as])
+    when Appointment::WORK
+      # schedule the work appointment without committing the changes
+      @start_at             = params[:start_at]
+      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, {:start_at => @start_at}, :commit => false)
+    
+      # show appointment date, start and end times in local time
+      @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
+      @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
+      @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
+    when Appointment::WAIT
+      # build waitlist parameters
+      @when                 = params[:when].from_url_param
+      @time                 = params[:time].from_url_param
+      @daterange            = DateRange.parse_when(@when)
+      @options              = {:time => @time, :when => @when, :start_at => @daterange.start_at, :end_at => @daterange.end_at}
+      # create waitlist object, but don't save it
+      @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => false)
+    end
   end
   
   # def create
@@ -202,31 +173,35 @@ class AppointmentsController < ApplicationController
   def create
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
-    klass, id     = params[:schedulable].split('/')
+    klass, id     = params[:schedulable].to_s.match(/[a-z]+\/\d+/) ? params[:schedulable].split('/') : [params[:schedulable], params[:id]]
     # note: the send method can generate an exception
     @schedulable  = current_company.send(klass).find_by_id(id)
     @customer     = User.find_by_id(params[:customer_id])
+
+    @mark_as      = params[:mark_as]
+    @start_at     = params[:start_at]
+    @end_at       = params[:end_at]
     
     # track valid and invalid appointments
     @errors       = Hash.new
     @success      = Hash.new
     
-    @start_at     = params[:start_at]
-    @end_at       = params[:end_at]
-    
     # iterate over the specified dates
     Array(params[:dates]).each do |date|
       # build time range
-      @time_range = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+      @time_range   = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+      @options      = {:time_range => @time_range}
 
       begin
         case @service.mark_as
         when Appointment::WORK
           # create work appointment
-          @appointment = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, :time_range => @time_range)
+          @appointment  = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
+          # send confirmation
+          AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE
           # create free appointment
-          @appointment = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, :time_range => @time_range)
+          @appointment  = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, @options)
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")
@@ -242,13 +217,14 @@ class AppointmentsController < ApplicationController
     
     if @errors.keys.size > 0
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
     else
       flash[:notice]  = "Created appointment(s)"
-      @redirect       = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = url_for(:action => 'index', :schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
     end
     
     respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
       format.js
     end
   end
@@ -276,7 +252,7 @@ class AppointmentsController < ApplicationController
     
     # only show confirmations for upcoming appointments
     unless @appointment.state == 'upcoming'
-      return redirect_to(appointment_path(@appointment))
+      redirect_to(appointment_path(@appointment)) and return
     end
     
     # render show action
@@ -293,28 +269,33 @@ class AppointmentsController < ApplicationController
       @appointment.checkout!
 
       # redirect to show action
-      redirect_to(appointment_path(@appointment, :subdomain => @subdomain))
+      redirect_to(appointment_path(@appointment, :subdomain => @subdomain)) and return
     else
       # create/get invoice
       @invoice    = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
 
       # redirect to invoices controller
-      redirect_to(invoice_path(@invoice, :subdomain => current_subdomain))
+      redirect_to(invoice_path(@invoice, :subdomain => current_subdomain)) and return
     end
   end
 
   # GET /appointments/1/cancel
   def cancel
     @appointment  = Appointment.find(params[:id])
-    @resource     = @appointment.resource
+    @schedulable  = @appointment.schedulable
     
     # cancel the work appointment
     AppointmentScheduler.cancel_work_appointment(@appointment)
     
-    # redirect to the resource's schedule page
+    # redirect to the schedule page
+    @redirect_path = appointments_path(:schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+    
+    # set flash
+    flash[:notice] = "Canceled appointment"
+    
     respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
       format.js
-      format.html { redirect_to(resource_appointments_path(:resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain)) }
     end
   end
   
@@ -349,35 +330,6 @@ class AppointmentsController < ApplicationController
   
   def appointment_free_time_scheduled_at(appointment)
     "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
-  end
-  
-  def new_appointment_from_params
-    # build appointment hash differently for schedule vs waitlist appointment requests
-    hash = {:service_id => params[:service_id], :resource_id => params[:id], :resource_type => params[:resource].to_s.classify, :company_id => current_company.id}
-    
-    if request.url.match(/\/waitlist\//)
-      # add when, time, mark_as attributes
-      hash.update(:time => params[:time], :when => params[:when], :mark_as => Appointment::WAIT)
-    elsif request.url.match(/\/schedule\//)
-      # add start_at attribute
-      hash.update(:start_at => params[:start_at])
-    else
-      raise ArgumentError
-    end
-
-    if logged_in?
-      # fill in customer id from current user
-      params[:appointment] ||= {}
-      params[:appointment][:customer_id] = current_user.id
-    end
-
-    # add appointment attributes
-    hash.update(params[:appointment]) if params[:appointment]
-    
-    # build appointment object
-    appointment = Appointment.new(hash)
-    
-    appointment
   end
   
 end

@@ -1,7 +1,7 @@
 Your appointment has been confirmed:
 
 What: <%= @appointment.service.name %>
-With: <%= @appointment.resource.name %>
+With: <%= @appointment.schedulable.name %>
 When: <%= @appointment.start_at.to_s(:appt_day_date_time) %>
 
 Your confirmation code is <%= @appointment.confirmation_code %>

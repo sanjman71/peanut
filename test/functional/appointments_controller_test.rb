@@ -10,15 +10,21 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :post, 'schedulables/1/appointments/search', 
                :controller => 'appointments', :action => 'search', :schedulable => 'schedulables', :id => 1
   
-  # create/schedule a waitlist appointment for a specific schedulable
-  should_route :post, 'waitlist/users/1/services/5/this-week/morning', 
-               :controller => 'appointments', :action => 'new', :schedulable => 'users', :id => 1, :service_id => 5, :when => 'this-week', :time => 'morning'
+  # schedule a waitlist appointment for a specific schedulable
+  should_route :get, 'waitlist/users/1/services/5/this-week/morning',
+               :controller => 'appointments', :action => 'new', :schedulable => 'users', :id => 1, :service_id => 5, 
+               :when => 'this-week', :time => 'morning', :mark_as => 'wait'
+  should_route :post, 'waitlist/users/1/services/5/this-week/morning',
+               :controller => 'appointments', :action => 'create', :schedulable => 'users', :id => 1, :service_id => 5, 
+               :when => 'this-week', :time => 'morning', :mark_as => 'wait'
   
   # book a new apppointment for a specific schedulable
   should_route :get, 'book/users/3/services/3/20090303T113000',
-               :controller => 'appointments', :action => 'new', :schedulable => 'users', :id => 3, :service_id => 3, :start_at => '20090303T113000'
+               :controller => 'appointments', :action => 'new', :schedulable => 'users', :id => 3, :service_id => 3, 
+               :start_at => '20090303T113000', :mark_as => 'work'
   should_route :post, 'book/users/3/services/3/20090303T113000',
-               :controller => 'appointments', :action => 'create', :schedulable => 'users', :id => 3, :service_id => 3, :start_at => '20090303T113000'
+               :controller => 'appointments', :action => 'create', :schedulable => 'users', :id => 3, :service_id => 3, 
+               :start_at => '20090303T113000', :mark_as => 'work'
         
   def setup
     @controller   = AppointmentsController.new
@@ -50,57 +56,68 @@ class AppointmentsControllerTest < ActionController::TestCase
       get :new, :schedulable => 'users', :id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime
     end
     
-    should_assign_to :service, :equals => "@haircut"
-    should_assign_to :schedulable, :equals => "@johnny"
-    should_not_assign_to :customer
+    should_respond_with :redirect
     should_redirect_to "login_path"
   end
   
   context "create free appointment for multiple dates" do
     setup do
-      @start_at = "0900"
-      @end_at   = "1100"
       post :create,
-           {:dates => ["20090201", "20090203"], :start_at => @start_at, :end_at => @end_at, :schedulable => "users/#{@johnny.id}", :service_id => @free_service.id}
+           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}",
+            :service_id => @free_service.id, :mark_as => 'free'}
     end
     
     should_change "Appointment.count", :by => 2
     
-    should_respond_with :success
-    should_render_template 'appointments/create.js.rjs'
+    should_respond_with :redirect
+    should "redirect to users/:id/appointments path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    end
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
-    should_assign_to :start_at, :equals => "@start_at"
-    should_assign_to :end_at, :equals => "@end_at"
+    should_assign_to :start_at, :equals => '"0900"'
+    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :mark_as, :equals => '"free"'
   end
   
   context "create free appointment for a single date" do
     setup do
       post :create,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @free_service.id}
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", 
+            :service_id => @free_service.id, :mark_as => 'free'}
     end
   
     should_change "Appointment.count", :by => 1
     
-    should_respond_with :success
-    should_render_template 'appointments/create.js.rjs'
+    should_respond_with :redirect
+    should "redirect to users/:id/appointments path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    end
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :start_at, :equals => '"0900"'
+    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :mark_as, :equals => '"free"'
   end
   
   context "create work appointment for a single date that has no free time" do
     setup do
       post :create,
            {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id}
+            :customer_id => @customer.id, :mark_as => 'work'}
     end
   
     should_not_change "Appointment.count"
   
-    should_respond_with :success
-    should_render_template 'appointments/create.js.rjs'
+    should_respond_with :redirect
+    should "redirect to users/:id/appointments path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    end
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :start_at, :equals => '"0900"'
+    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :mark_as, :equals => '"work"'
   end
 
   context "create work appointment for a single date with free time, replacing free time" do
@@ -113,7 +130,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create work appointment, today from 9 am to 11 am
       post :create,
            {:dates => @today, :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id}
+            :customer_id => @customer.id, :mark_as => 'work'}
     end
     
     # free appointment should be replaced with work appointment
@@ -122,6 +139,9 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
+    should_assign_to :start_at, :equals => '"0900"'
+    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :mark_as, :equals => '"work"'
   end
 
   context "create work appointment for a single date with free time, splitting free time" do
@@ -134,7 +154,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create work appointment, today from 10 am to 11 am local time
       post :create,
            {:dates => @today, :start_at => "1000", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id}
+            :customer_id => @customer.id, :mark_as => 'work'}
     end
     
     # free appointment should be split into work appointment and 2 free appointments, so we should have 3 appointments total
@@ -143,6 +163,9 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
+    should_assign_to :start_at, :equals => '"1000"'
+    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :mark_as, :equals => '"work"'
   end
   
 end

@@ -10,7 +10,8 @@ class AppointmentScheduler
     # create a new appointment object
     free_hash         = {:company => company, :service => service, :schedulable => schedulable}.merge(date_time_options)
     free_appointment  = Appointment.new(free_hash)
-                              
+                      
+    # free appointments should not have conflicts
     if free_appointment.conflicts?
       raise TimeslotNotEmpty
     end
@@ -23,7 +24,9 @@ class AppointmentScheduler
     free_appointment
   end
   
-  # create a work appointment by scheduling the specified appointment within a free timeslot
+  # create a work appointment by scheduling the specified appointment in a free timeslot
+  # options:
+  #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
   def self.create_work_appointment(company, schedulable, service, customer, date_time_options, options={})
     # should be a service that is not marked as work
     raise AppointmentInvalid if service.mark_as != Appointment::WORK
@@ -31,22 +34,41 @@ class AppointmentScheduler
     work_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)
     
-    if !work_appointment.valid?
-      raise AppointmentInvalid
-    end
+    raise AppointmentInvalid if !work_appointment.valid?
     
-    # should have exactly 1 free time conflic
+    # should have exactly 1 free time conflict
     raise TimeslotNotEmpty if work_appointment.conflicts.size != 1
     raise TimeslotNotEmpty if work_appointment.conflicts.first.service.mark_as != Appointment::FREE
     
     # split the free appointment into free/work appointments, and return the work appointment
-    # if options[:commit] == 0, then split the appointments but don't commit them
+    # if options[:commit] == true, then split the appointments but don't commit them
     free_appointment  = work_appointment.conflicts.first
     work_start_at     = work_appointment.start_at
     work_end_at       = work_appointment.end_at
-    commit            = options[:commit] ? options[:commit].to_i : 1 
+    commit            = options.has_key?(:commit) ? options[:commit] : true
     new_appointments  = self.split_free_appointment(free_appointment, service, work_start_at, work_end_at, :commit => commit, :customer => customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
+  end
+  
+  # create a waitlist appointment
+  # options:
+  #  - commit => if true, commit the waitlist appoitnmetn; otherwise, create the object but don't save; default is true
+  def self.create_waitlist_appointment(company, schedulable, service, customer, date_time_options, options={})
+    # should be a service that is not marked as work
+    raise AppointmentInvalid if service.mark_as != Appointment::WORK
+    
+    wait_commit       = options.has_key?(:commit) ? options[:commit] : true
+    wait_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
+    wait_appointment  = Appointment.new(wait_hash)
+
+    raise AppointmentInvalid if !wait_appointment.valid?
+    
+    if wait_commit
+      # save appointment
+      wait_appointment.save
+    end
+    
+    wait_appointment
   end
   
   # split a free appointment into multiple appointments using the specified service and time
@@ -99,7 +121,7 @@ class AppointmentScheduler
     
     appointments = [start_appt, new_appt, end_appt].compact
     
-    if options[:commit].to_i == 1
+    if options[:commit]
       
       # commit the apointment changes
       Appointment.transaction do
@@ -230,4 +252,41 @@ class AppointmentScheduler
     unscheduled_hash
   end
   
+  # options:
+  #  - email => true|false, defaults to true
+  #  - sms   => true|false, defaults to false
+  def self.send_confirmation(appointment, options={})
+    confirmations_sent = 0
+    
+    email = options.has_key?(:email) ? options[:email] : true
+    sms   = options.has_key?(:sms) ? options[:sms] : false
+    
+    if email
+      begin
+        case appointment.mark_as
+        when Appointment::WORK, Appointment::WAIT
+          MailWorker.async_send_appointment_confirmation(:id => appointment.id)
+        end
+        confirmations_sent += 1
+        RAILS_DEFAULT_LOGGER.debug("Sent email #{appointment.mark_as} appointment confirmation")
+      rescue Exception => e
+        RAILS_DEFAULT_LOGGER.debug("Error sending email confirmation message for your appointment.")
+      end
+    end
+    
+    if sms
+      begin
+        case appointment.mark_as
+        when Appointment::WORK, Appointment::WAIT
+          SmsWorker.async_send_appointment_confirmation(:id => @appointment.id)
+        end
+        confirmations_sent += 1
+        RAILS_DEFAULT_LOGGER.debug("Sent sms #{appointment.mark_as} appointment confirmation")
+      rescue Exception => e
+        RAILS_DEFAULT_LOGGER.debug("Error sending sms confirmation message for your appointment.")
+      end
+    end
+    
+    confirmations_sent
+  end
 end

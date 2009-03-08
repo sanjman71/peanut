@@ -1,20 +1,20 @@
 %h3.span-14.last
   .what
-    .span-4.padding-bottom-5.text-align-right
+    .span-3.padding-bottom-5.text-align-right
       == What:
-    .span-10.padding-bottom-5.last
+    .span-11.padding-bottom-5.last
       = appointment.service.name
   %br
   .with
-    .span-4.padding-bottom-5.text-align-right
+    .span-3.padding-bottom-5.text-align-right
       == With:
-    .span-10.padding-bottom-5.last
+    .span-11.padding-bottom-5.last
       = (appointment.schedulable || User.anyone).name
   %br
   .when
-    .span-4.padding-bottom-5.text-align-right
+    .span-3.padding-bottom-5.text-align-right
       == When:
-    .span-10.padding-bottom-5.last
+    .span-11.padding-bottom-5.last
       - if appointment.waitlist?
         == #{appointment.time.titleize}, #{appointment.when.titleize}
       - else
@@ -22,14 +22,14 @@
   - unless appointment.customer.blank?
     %br
       .customer
-        .span-4.padding-bottom-5.text-align-right
+        .span-3.padding-bottom-5.text-align-right
           == For:
-        .span-10.padding-bottom-5.last
+        .span-11.padding-bottom-5.last
           = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
   - unless appointment.confirmation_code.blank?
     %br
       .confirmation
-        .span-4.padding-bottom-5.text-align-right
-          == Confirmation code:
-        .span-10.padding-bottom-5.last
+        .span-3.padding-bottom-5.text-align-right
+          == Confirmation:
+        .span-11.padding-bottom-5.last
           = appointment.confirmation_code

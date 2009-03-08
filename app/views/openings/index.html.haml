@@ -73,7 +73,7 @@
       - if @free_timeslots.blank?
         -# No available appointments
         == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable => @schedulable.tableize, :id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable => @schedulable.tableize, :id => @schedulable.id, :service_id => @service.id, :when => @when.to_url_param, :time => @time)
       - else
         -# Show count of available appointments
         == #{pluralize(@free_timeslots.size, 'Available Appointment')}

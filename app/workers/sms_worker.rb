@@ -1,7 +1,7 @@
 class SmsWorker < Workling::Base
   include SMSFu
   
-  def send_waitlist_confirmation(options)
+  def send_appointment_confirmation(options)
     appointment = Appointment.find_by_id(options[:id].to_i)
     
     if appointment.blank?
@@ -9,9 +9,16 @@ class SmsWorker < Workling::Base
       return
     end
     
-    customer  = appointment.customer
-    message   = "Waitlist for #{appointment.service.name}, confirmation #{appointment.confirmation_code}"
-    send_sms_to_customer(customer, message)
+    case appointment.mark_as
+    when Appointment::WORK
+      customer  = appointment.customer
+      message   = "#{appointment.service.name} confirmation #{appointment.confirmation_code}"
+      send_sms_to_customer(customer, message)
+    when Appointment::WAIT
+      customer  = appointment.customer
+      message   = "Waitlist for #{appointment.service.name}, confirmation #{appointment.confirmation_code}"
+      send_sms_to_customer(customer, message)
+    end
   end
   
   private

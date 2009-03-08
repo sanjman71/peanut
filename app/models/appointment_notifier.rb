@@ -1,6 +1,6 @@
 class AppointmentNotifier < ActionMailer::Base
 
-  def appointment_confirmation(appointment)
+  def work_confirmation(appointment)
     setup_email(appointment, appointment.customer)
     @subject = "#{appointment.company.name} Appointment Confirmation - #{appointment.confirmation_code}"
   end

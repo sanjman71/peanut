@@ -3,13 +3,23 @@
     %h2== Please confirm your appointment.
       
   .schedule_form.span-15.prepend-1
-    - url = @appointment.waitlist? ? waitlist_path(:subdomain => current_subdomain) : schedule_path(:subdomain => current_subdomain) 
-    - form_for(@appointment, :url => url) do |f|
+    - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post}) do |f|
+      = hidden_field_tag :schedulable, "#{@schedulable.tableize}/#{@schedulable.id}"
+      = hidden_field_tag :service_id, @service.id
+      = hidden_field_tag :customer_id, @customer.id
+      = hidden_field_tag :dates, @appt_date
+      = hidden_field_tag :mark_as, @mark_as
+      = hidden_field_tag :start_at, @appt_time_start_at
+      = hidden_field_tag :end_at, @appt_time_end_at
+      = hidden_field_tag :when, @when.to_url_param
+      = hidden_field_tag :time, @time.to_url_param
+      = hidden_field_tag :type, @type
+      
       - unless @appointment.errors.blank?
         .span-14.notice.last
           = error_messages_for('appointment', :header_message => nil)
       .span-14.last
         = render :partial => 'appointment_header.html.haml', :locals => { :appointment => @appointment }
       %hr.space
-      .span-10.prepend-1.last
-        = f.submit "Confirm", :style => 'font-size: 15px;'    
+      .span-15.prepend-1.last
+        = f.submit "Confirm", :name => '', :style => 'font-size: 15px;'

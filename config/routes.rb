@@ -53,29 +53,19 @@ ActionController::Routing::Routes.draw do |map|
   # search appointments path scoped by schedulable
   map.connect   ':schedulable/:id/appointments/search', :controller => 'appointments', :action => 'search'
 
-  # appointment new path scoped by schedulable
-  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
+  # appointment new and create paths scoped by schedulable, used for bookings and waitlist appointments
+  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new', :mark_as => 'work',
                 :conditions => {:method => :get}
-  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
+  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create', :mark_as => 'work',
                 :conditions => {:method => :post}
-  map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
+  map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time', :controller => 'appointments', :action => 'new', :mark_as => 'wait',
+                :conditions => {:method => :get}
+  map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time', :controller => 'appointments', :action => 'create', :mark_as => 'wait',
+                :conditions => {:method => :post}
     
   # toggle a schedulable's calendar
   map.connect   'calendars/:schedulable/:id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
-   
-  # map.resources :people do |resource|
-  #   # nested appointments routes
-  #   resource.resources :appointments
-  #   # nested openings routes
-  #   resource.resources :openings, :only => [:index]
-  #   
-  #   # nested services routes
-  #   resource.resources :services, :has_many => [:appointments, :openings]
-  #   
-  #   # manage free time
-  #   resource.resources :free, :only => [:new, :create]
-  # end
-  
+     
   # services, products
   map.resources :services
   map.resources :products

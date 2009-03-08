@@ -1,1 +1,3 @@
-page.redirect_to(resource_appointments_path(:resource => @resource.class.to_s.tableize, :id => @resource.id, :subdomain => current_subdomain))
+if @redirect_path
+  page.redirect_to(@redirect_path)
+end

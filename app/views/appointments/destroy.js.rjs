@@ -1,5 +1,5 @@
-if @redirect
-  page.redirect_to(@redirect)
+if @redirect_path
+  page.redirect_to(@redirect_path)
 else
   # update flash message
   page["#appointment_flash"].add_class('notice')

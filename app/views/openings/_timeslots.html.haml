@@ -1,5 +1,5 @@
 - timeslots_by_day.each do |day, timeslots|
-  .span-16.last
+  .span-15.last
     %h3== #{day.to_s(:appt_day)}
   -# group timeslots by people
   - reset_cycle
@@ -8,7 +8,7 @@
       -# use appointment, timeslot to create a unique id
       - appt = timeslot.appointment
       - id   = "appointment_#{appt.id}_timeslot_#{i}"
-      .span-16.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
+      .span-15.last.timeslot{:id => "#{id}", :class => cycle("shaded", "")}
         .span-5.schedulable
           %h4{:style => 'margin-left: 5px;'}= schedulable.name
         .span-4.time
