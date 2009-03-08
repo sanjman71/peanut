@@ -4,16 +4,16 @@ class OpeningsController < ApplicationController
   # GET /:schedulable/1/services/3/openings/this-week/morning
   # GET /services/1/openings/this-week/anytime
   def index
-    if params[:id] == "0" or params[:schedulable] == "0"
+    if (params[:id] == "0") or (params[:schedulable_type] == "0") or (params[:schedulable_id] == "0")
       # /:schedulable/0/openings is canonicalized to /openings; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable => nil, :id => nil)))
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable_type => nil, :schedulable_id => nil)))
     elsif params[:service_id].to_s == "0"
       # /services/0/openings is canonicalized to /openings; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
     end
     
     # initialize schedulable, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulable  = User.anyone if @schedulable.blank?
     
     # initialize when, no default
@@ -34,10 +34,20 @@ class OpeningsController < ApplicationController
 
     # initialize service, default to nothing
     @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
-
+    
     # build appointment request for the selected timespan
     @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time,
                                        :company => current_company, :location => current_location)
+
+     # initialize duration
+     @duration = 0
+     if params[:duration_size] && params[:duration_units]
+       duration_size = params[:duration_size].to_i
+       duration_units = params[:duration_units]
+       @duration = eval("#{params[:duration_size]}.#{params[:duration_units]}") if (duration_size && duration_units)
+       # @duration holds the custom duration in seconds. We need this in minutes.
+       @query.duration = @duration / 60
+     end
 
     # build schedulables collection, schedulables are restricted by the services they perform
     @schedulables = Array(User.anyone) + @service.schedulables
@@ -45,8 +55,8 @@ class OpeningsController < ApplicationController
     # find services collection, services are restricted by the company they belong to
     @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
 
-    # build skills collection mapping services to schedulables
-    @skills   = current_company.services.work.inject([]) do |array, service|
+    # build service providers collection mapping services to schedulables
+    @sps          = current_company.services.work.inject([]) do |array, service|
       service.schedulables.each do |schedulable|
         array << [service.id, schedulable.id, schedulable.name, schedulable.tableize]
       end
@@ -88,8 +98,8 @@ class OpeningsController < ApplicationController
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]
     end
-    schedulable, id = params.delete(:schedulable_id).split('/')
-    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable => schedulable, :id => id))
+    schedulable_type, schedulable_id = params.delete(:schedulable).split('/')
+    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable_type => schedulable_type, :schedulable_id => schedulable_id))
   end
   
 end

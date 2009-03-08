@@ -17,16 +17,16 @@ class ServiceProviderTest < ActiveSupport::TestCase
   
   context "create valid service provider" do
     setup do
-      @skill = ServiceProvider.create(:schedulable => @user, :service => @haircut)
-      assert_valid @skill
+      @service_provider = ServiceProvider.create(:schedulable => @user, :service => @haircut)
+      assert_valid @service_provider
     end
     
     should_change "ServiceProvider.count", :by => 1
   end
   
-  context "skill with invalid provider" do
+  context "service_provider with invalid provider" do
     setup do
-      @skill = ServiceProvider.create(:schedulable_id => -1, :schedulable_type => "User", :service => @haircut)
+      @service_provider = ServiceProvider.create(:schedulable_id => -1, :schedulable_type => "User", :service => @haircut)
     end
     
     should_not_change "ServiceProvider.count"
@@ -34,7 +34,7 @@ class ServiceProviderTest < ActiveSupport::TestCase
 
   context "skil with invalid service" do
     setup do
-      @skill = ServiceProvider.create(:schedulable => @user, :service_id => 0)
+      @service_provider = ServiceProvider.create(:schedulable => @user, :service_id => 0)
     end
 
     should_not_change "ServiceProvider.count"

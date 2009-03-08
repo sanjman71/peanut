@@ -4,7 +4,8 @@ class HomeController < ApplicationController
   def index
     if @current_company
       # show company home page
-      render(:template => 'companies/show', :layout => 'company') and return
+      redirect_to show_company_root_path(:subdomain => current_subdomain)
+      # render(:template => 'companies/show', :layout => 'company') and return
     else
       # show www/root home page
       render(:action => :index, :layout => 'home') and return

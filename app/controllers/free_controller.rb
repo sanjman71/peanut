@@ -3,14 +3,14 @@ class FreeController < ApplicationController
 
   # GET /users/1/free/calendar
   def new
-    if params[:schedulable].blank? or params[:id].blank?
+    if params[:schedulable_type].blank? or params[:schedulable_id].blank?
       # redirect to a specific schedulable
       schedulable = current_company.schedulables.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable => schedulable.tableize, :id => schedulable.id)) and return
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id)) and return
     end
         
     # initialize schedulable, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:id], params[:schedulable].to_s.classify)
+    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulable  = User.anyone if @schedulable.blank?
     
     # build list of schedulables to allow the scheduled to be adjusted by resource

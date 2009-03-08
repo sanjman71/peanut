@@ -1,45 +1,41 @@
 - title("Schedule an Apppointment")
 - stylesheet('appointments', 'calendar')
-- javascript('skills', 'openings')
+- javascript('service_providers', 'openings')
 
-.span-15.prepend-1.mat
-  %h2== Schedule an Appointment
-  = hidden_field_tag 'initial_schedulable_id', @schedulable.id
-  - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
-    .span-14.last
-      .span-2.text-align-right
-        == What?
-      .span-5.field#what
-        = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-      .span-3.text-align-right
-        == Who/What to schedule?
-      .span-4.last.field#who
-        = select_tag('schedulable_id', options_for_select(@schedulables.collect{ |o| [o.name, o.id]}, @schedulable.id), :style => "width: 125px; align: top;")
-    %br
-    .span-14.last
-      .span-2.text-align-right
-        == When?
-      .span-5
-        %span.field#when
-          = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
-        %span.field#time
-          = select_tag('time', options_for_select(Appointment::TIMES, @time))
-      - if @locations.size > 1
-        .span-3.text-align-right
-          == Where?
-        .span-4.last.field#where
-          = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
-      - else
-        .span-7.last
-    .span-4.prepend-1.last
-      = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
-      %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-
--# skills mapping services to schedulables
-.span-16.skills.hide
-  - @skills.each do |skill|
-    .skill{:service_id => skill[0], :schedulable_id => skill[1], :schedulable_name => skill[2], :schedulable_type => skill[3]}
+-# service providers mapping services to schedulables
+.span-16.service_providers.hide
+  - @sps.each do |sp|
+    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3]}
           
+.span-15.prepend-1.last
+  - if !@current_company.can_schedule_appointments?
+    %h2
+      == Before customers can schedule appointments, there must be at least 1 calendar
+      = link_to '(add)', users_path
+      == and 1 service
+      = link_to '(add)', services_path
+      == .
+      
+  - unless @when.blank?
+    %h2.span-15
+      - if @free_timeslots.blank?
+        -# No available appointments
+        == No Available Appointments -
+        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
+      - else
+        -# Show count of available appointments
+        == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+        
+    .span-15.last
+      -# Show appointment when range
+      %h3== #{@when.titleize}
+
+    - cache(@openings_cache_key, :expires_in => 5.minutes) do
+      .span-15.last#free_calendar
+        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      .span-15.last.timeslots#free_timeslots
+        = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+
 .span-7.prepend-1.last
   .sidebar.instructions.padding-5
     - if @when.blank?
@@ -58,33 +54,52 @@
         %li== Select different appointment criteria and search again
         %span== or
         %li== Select the waitlist to be notified of an opening
-          
-.span-15.prepend-1.last
-  - if !@current_company.can_schedule_appointments?
-    %h2
-      == Before customers can schedule appointments, there must be at least 1 calendar
-      = link_to '(add)', users_path
-      == and 1 service
-      = link_to '(add)', services_path
-      == .
-      
-  - unless @when.blank?
-    %h2.span-15
-      - if @free_timeslots.blank?
-        -# No available appointments
-        == No Available Appointments -
-        = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable => @schedulable.tableize, :id => @schedulable.id, :service_id => @service.id, :when => @when.to_url_param, :time => @time)
-      - else
-        -# Show count of available appointments
-        == #{pluralize(@free_timeslots.size, 'Available Appointment')}
-        
-    .span-15.last
-      -# Show appointment when range
-      %h3== #{@when.titleize}
 
-    - cache(@openings_cache_key, :expires_in => 5.minutes) do
-      .span-15.last#free_calendar
-        = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-      .span-15.last.timeslots#free_timeslots
-        = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+  .span-7.last.mat
+    %h2== Change Search:
+    = hidden_field_tag 'initial_schedulable_id', @schedulable.id
+    = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
+      .span-7.last
+        .span-2.text-align-right
+          == What?
+        .span-5.last.field#what
+          = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
+      %br
+      .span-7.last
+        .span-2.text-align-right
+          == With?
+        .span-5.last.field#who
+          = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
+      %br
+      .span-7.last
+        .span-2.text-align-right
+          == When?
+        .span-5.last
+          %span.field#when
+            = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
+          %span.field#time
+            = select_tag('time', options_for_select(Appointment::TIMES, @time))
+      - if @locations.size > 1
+        %br
+        .span-7.last
+          .span-3.text-align-right
+            == Where?
+          .span-4.last.field#where
+            = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
+      - if !@duration.blank?
+        %br
+        .span-7.last
+          .span-2.text-align-right
+            == How long?
+          .span-5.last
+            %span.field#when
+              = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
+            %span.field#time
+              = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
+      %br
+      .span-4.prepend-1.last
+        = f.submit 'Search again', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
+        %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+
 

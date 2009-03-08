@@ -1,3 +1,3 @@
-# rebuild service providers skills list
-page["#skills"].html(render(:partial => "skills/skills.html.haml", 
-                            :locals => {:skills => @skills, :non_providers => @non_providers}))
+# rebuild service providers list
+page["#service_providers"].html(render(:partial => "service_providers/service_providers.html.haml", 
+                            :locals => {:service_providers => @service_providers, :non_providers => @non_providers}))

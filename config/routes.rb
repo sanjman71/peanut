@@ -33,39 +33,52 @@ ActionController::Routing::Routes.draw do |map|
                 :collection => { :search => [:get, :post] }
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.resources :notes, :only => [:create]
-  map.resources :skills, :only => [:create, :destroy]
+  map.resources :service_providers, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
   # show free time for a specific schedulable
-  map.connect   ':schedulable/:id/free/:style', :controller => 'free', :action => 'new'
+  map.connect   ':schedulable_type/:schedulable_id/free/:style', :controller => 'free', :action => 'new'
 
   # openings search/index path, scoped by service and (optional) schedulable
-  map.connect   ':schedulable/:id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
+  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
+  # openings search/index path, scoped by duraton
+  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/duration/:duration_size/:duration_units/openings/:when/:time', :controller => 'openings', :action => 'index'
+
   # appointments search/index path scoped by schedulable
-  map.connect   ':schedulable/:id/appointments/when/:when', :controller => 'appointments', :action => 'index'
-  map.connect   ':schedulable/:id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
-  map.resource_appointments   ':schedulable/:id/appointments', :controller => 'appointments', :action => 'index'
+  map.connect   ':schedulable_type/:schedulable_id/appointments/when/:when', :controller => 'appointments', :action => 'index'
+  map.connect   ':schedulable_type/:schedulable_id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
+  map.resource_appointments   ':schedulable_type/:schedulable_id/appointments', :controller => 'appointments', :action => 'index'
 
   # search appointments path scoped by schedulable
-  map.connect   ':schedulable/:id/appointments/search', :controller => 'appointments', :action => 'search'
+  map.connect   ':schedulable_type/:schedulable_id/appointments/search', :controller => 'appointments', :action => 'search'
 
-  # appointment new and create paths scoped by schedulable, used for bookings and waitlist appointments
-  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new', :mark_as => 'work',
+  # appointment new path scoped by schedulable
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
                 :conditions => {:method => :get}
-  map.schedule  'book/:schedulable/:id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create', :mark_as => 'work',
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
                 :conditions => {:method => :post}
-  map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time', :controller => 'appointments', :action => 'new', :mark_as => 'wait',
-                :conditions => {:method => :get}
-  map.waitlist  'waitlist/:schedulable/:id/services/:service_id/:when/:time', :controller => 'appointments', :action => 'create', :mark_as => 'wait',
-                :conditions => {:method => :post}
+  map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
     
   # toggle a schedulable's calendar
-  map.connect   'calendars/:schedulable/:id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
-     
+  map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
+   
+  # map.resources :people do |resource|
+  #   # nested appointments routes
+  #   resource.resources :appointments
+  #   # nested openings routes
+  #   resource.resources :openings, :only => [:index]
+  #   
+  #   # nested services routes
+  #   resource.resources :services, :has_many => [:appointments, :openings]
+  #   
+  #   # manage free time
+  #   resource.resources :free, :only => [:new, :create]
+  # end
+  
   # services, products
   map.resources :services
   map.resources :products
@@ -88,7 +101,7 @@ ActionController::Routing::Routes.draw do |map|
   map.badges 'badges/:action/:id', :controller => 'badges'
 
   # map the root to the home controller
-  map.root                  :controller => 'home', :action => 'index', :requires => { :subdomain => "www" }
+  map.root                  :controller => 'home', :action => 'index', :conditions => { :subdomain => "www" }
   
   # map the company root to the companies controller
   map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }

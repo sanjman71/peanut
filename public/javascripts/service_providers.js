@@ -1,16 +1,16 @@
-var skills = new Array();
+var service_providers = new Array();
 
-$.fn.init_skills = function () {
-  // build skills array
-  $(".skills .skill").each(function(index, skill)
+$.fn.init_service_providers = function () {
+  // build service_providers array
+  $(".service_providers .service_provider").each(function(index, service_provider)
   {
-    var service_id        = $(skill).attr("service_id");
-    var schedulable_id    = $(skill).attr("schedulable_id");
-    var schedulable_name  = $(skill).attr("schedulable_name");
-    var schedulable_type  = $(skill).attr("schedulable_type");
+    var service_id        = $(service_provider).attr("service_id");
+    var schedulable_id    = $(service_provider).attr("schedulable_id");
+    var schedulable_name  = $(service_provider).attr("schedulable_name");
+    var schedulable_type  = $(service_provider).attr("schedulable_type");
 
     // create an array with the service id, schedulable id and name
-    skills.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
+    service_providers.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
   });
 }
 
@@ -19,19 +19,20 @@ $.fn.init_schedulables = function () {
   var service_id = $('#service_id').val();
   
   // remove all schedulables
-  $('#schedulable_id').removeOption(/./);
+  $('#schedulable').removeOption(/./);
   
   // find the schedulable initially selected
   var initial_schedulable_id = $('#initial_schedulable_id').attr("value");
+  var initial_schedulable_type = $('#initial_schedulable_type').attr("value");
   
   // add the special anyone schedulable
-  $('#schedulable_id').addOption(0, "Anyone", 0 == initial_schedulable_id);
+  $('#schedulable').addOption(0, "Anyone", 0 == initial_schedulable_id);
   
   // add schedulable providing the selected service
-  $.each(skills, function (index, skill) {
-    if (skill[0] == service_id)
+  $.each(service_providers, function (index, service_provider) {
+    if (service_provider[0] == service_id)
     {
-      $('#schedulable_id').addOption(skill[3]+'/'+skill[1], skill[2], skill[1] == initial_schedulable_id);
+      $('#schedulable').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_schedulable_id) && (service_provider[3] == initial_schedulable_type));
     }
   })
 }
@@ -49,7 +50,7 @@ $.fn.init_search_button = function () {
 }
 
 $(document).ready(function() {
-  $(document).init_skills();
+  $(document).init_service_providers();
   $(document).init_schedulables();
   $(document).init_search_button();
     

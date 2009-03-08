@@ -26,6 +26,8 @@ class CreatePeanut < ActiveRecord::Migration
 
     # create free service used by all companies
     Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+    # create custom service used by all companies
+    Service.create(:name => Service::CUSTOM, :duration => 0, :mark_as => "work", :price => 0.00)
     
     # Map services to companies
     create_table :company_services do |t|
