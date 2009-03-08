@@ -25,39 +25,35 @@ $.fn.init_schedulables = function () {
   var initial_schedulable_id = $('#initial_schedulable_id').attr("value");
   var initial_schedulable_type = $('#initial_schedulable_type').attr("value");
   
-  // add the special anyone schedulable
-  $('#schedulable').addOption(0, "Anyone", 0 == initial_schedulable_id);
-  
-  // add schedulable providing the selected service
+  // add schedulables who provide the selected service
+  var num_providers = 0;
   $.each(service_providers, function (index, service_provider) {
     if (service_provider[0] == service_id)
     {
+      // add the schedulable type and id (e.g. users/3) as the type, and the schedulable name as the value 
       $('#schedulable').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_schedulable_id) && (service_provider[3] == initial_schedulable_type));
+      num_providers += 1;
     }
   })
-}
-
-$.fn.init_search_button = function () {
-  // find the selected service
-  var service_id = $('#service_id').val();
   
-  // only show the search button if a service is selected (service id of 0 means no service)
-  if (service_id == 0) {
-    $("#search_submit").attr("disabled","disabled");
-  } else {
-    $("#search_submit").removeAttr("disabled");
+  // add the special 'Anyone' schedulable iff a service has been selected and the service has 0 or > 1 providers
+  if (service_id != 0 && (num_providers == 0 || num_providers > 1)) {
+    $('#schedulable').addOption(0, "Anyone", 0 == initial_schedulable_id);
+  }
+  
+  if (service_id != 0) {
+    // remove any error visuals
+    $("#what_text").removeClass("highlight");
   }
 }
 
 $(document).ready(function() {
   $(document).init_service_providers();
   $(document).init_schedulables();
-  $(document).init_search_button();
     
-  // when a service is selected, rebuild the schedulable select list and change the search button state
+  // when a service is selected, rebuild the schedulable service provider select list
   $("#service_id").change(function () {
     $(document).init_schedulables();
-    $(document).init_search_button();
     return false;
   })
 })
