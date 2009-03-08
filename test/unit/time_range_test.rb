@@ -90,16 +90,20 @@ class TimeRangeTest < ActiveSupport::TestCase
   
   context "time range created with default start and end times" do
     setup do
-      @time_range  = TimeRange.new(:day => Date.today.to_s(:appt_schedule_day))
+      @now        = Time.now
+      @time_range = TimeRange.new(:day => @now.to_s(:appt_schedule_day))
     end
     
-    should "start today at beginning of day (0000)" do
-      assert_equal Chronic.parse("yesterday midnight"), @time_range.start_at
+    should "start today at 0000 hours" do
+      assert_equal 0, @time_range.start_at.hour
+      assert_equal 0, @time_range.start_at.min
+      assert_equal @now.yday, @time_range.start_at.yday
     end
     
-    should "end today at end of day (2400)" do 
-      assert_equal Chronic.parse("today midnight"), @time_range.end_at
-      
+    should "end tomorrow at 0000" do
+      assert_equal 0, @time_range.end_at.hour
+      assert_equal 0, @time_range.end_at.min
+      assert_equal @now.yday+1, @time_range.end_at.yday
     end
   end
   

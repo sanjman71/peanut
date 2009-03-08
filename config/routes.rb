@@ -57,11 +57,14 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':schedulable_type/:schedulable_id/appointments/search', :controller => 'appointments', :action => 'search'
 
   # appointment new path scoped by schedulable
-  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'new',
-                :conditions => {:method => :get}
-  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', :controller => 'appointments', :action => 'create',
-                :conditions => {:method => :post}
-  map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',  :controller => 'appointments', :action => 'new'
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', 
+                :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', 
+                :controller => 'appointments', :action => 'create', :mark_as => 'work', :conditions => {:method => :post}
+  map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',  
+                :controller => 'appointments', :action => 'new', :mark_as => 'wait', :conditions => {:method => :get}
+  map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',
+                :controller => 'appointments', :action => 'create', :mark_as => 'wait', :conditions => {:method => :post}
     
   # toggle a schedulable's calendar
   map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}

@@ -30,7 +30,7 @@ class TimeRange
 
     if @end_at.blank? and @day
       # default to end of 'day'
-      @end_at = Time.parse(@day).beginning_of_day + 1.day
+      @end_at = Time.parse(@day).end_of_day + 1.second
     end
     
     # initialize duration (in minutes)

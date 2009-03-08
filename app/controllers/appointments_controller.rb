@@ -175,10 +175,10 @@ class AppointmentsController < ApplicationController
     
     if @errors.keys.size > 0
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect       = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     else
       flash[:notice]  = "Created appointment(s)"
-      @redirect       = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     end
     
     respond_to do |format|
