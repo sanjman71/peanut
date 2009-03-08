@@ -59,9 +59,9 @@
     %h2== Change Search:
     = hidden_field_tag 'initial_schedulable_id', @schedulable.id
     = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
-    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
+    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
       .span-7.last
-        .span-2.text-align-right
+        .span-2.text-align-right#what_text
           == What?
         .span-5.last.field#what
           = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
@@ -99,7 +99,7 @@
               = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
       %br
       .span-4.prepend-1.last
-        = f.submit 'Search again', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
+        = f.submit 'Search again', :name => nil, :class => 'submit', :id => 'search_submit'
         %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
 
 

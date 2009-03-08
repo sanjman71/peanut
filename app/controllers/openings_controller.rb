@@ -55,7 +55,7 @@ class OpeningsController < ApplicationController
     end
 
     # build schedulables collection, schedulables are restricted by the services they perform
-    @schedulables = Array(User.anyone) + @service.schedulables
+    @schedulables = @service.schedulables
     
     # find services collection, services are restricted by the company they belong to
     @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
