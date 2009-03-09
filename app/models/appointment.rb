@@ -108,10 +108,6 @@ class Appointment < ActiveRecord::Base
                                'evening'    => [17*3600,  21*3600],     # 5pm - 9pm
                                'never'      => [0,        0]
                               }
-                              
-  # valid duration values
-  DURATION_SIZES            = (1..24).to_a
-  DURATION_UNITS            = ['minutes', 'hours', 'days']
 
   # BEGIN acts_as_state_machhine
   include AASM

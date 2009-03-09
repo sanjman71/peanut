@@ -46,7 +46,10 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
   # openings search/index path, scoped by duraton
-  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/duration/:duration_size/:duration_units/openings/:when/:time', :controller => 'openings', :action => 'index'
+  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/duration/:duration/openings/:when/:time', 
+                 :controller => 'openings', :action => 'index'
+  map.connect   'services/:service_id/duration/:duration/openings/:when/:time', 
+                 :controller => 'openings', :action => 'index'
 
   # appointments search/index path scoped by schedulable
   map.connect   ':schedulable_type/:schedulable_id/appointments/when/:when', :controller => 'appointments', :action => 'index'

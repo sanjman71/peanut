@@ -9,10 +9,8 @@
     .span-2.text-align-right
       == How long?
     .span-5.last
-      %span.field#duration-size
-        = select_tag('duration_size', options_for_select(Appointment::DURATION_SIZES, @duration_size))
-      %span.field#duration-units
-        = select_tag('duration_units', options_for_select(Appointment::DURATION_UNITS, @duration_units))
+      %span.field#duration
+        = select_tag('duration', options_for_select(service_duration_select_options, @duration))
   %br
   .span-7.last
     .span-3.text-align-right

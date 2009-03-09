@@ -40,18 +40,8 @@ class OpeningsController < ApplicationController
                                        :company => current_company, :location => current_location)
 
     # if we have a custom duration, and the service allows this, then set this in the appointment request
-    if @service.allow_custom_duration && params[:duration_size] && params[:duration_units]
-      @duration_size = params[:duration_size].to_i
-      @duration_units = params[:duration_units]
-      if (@duration_size && @duration_units)
-        begin
-          # Get the duration in minutes.
-          duration = eval("#{@duration_size}.#{@duration_units}") / 60
-          # Assign this to the appointment request
-          @query.duration = duration
-        rescue
-        end
-      end
+    if @service.allow_custom_duration && (@duration = params[:duration].to_i)
+      @query.duration = @duration
     end
 
     # build schedulables collection, schedulables are restricted by the services they perform

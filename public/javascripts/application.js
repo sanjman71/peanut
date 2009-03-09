@@ -135,7 +135,7 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
 }
 
 // Search schedules for available appointments
-$.fn.init_schedule_search = function () {
+$.fn.init_search_openings = function () {
   $("#search_openings_form").submit(function () {
     // validate search inputs
     var service_id = $('#service_id').val();
@@ -144,6 +144,11 @@ $.fn.init_schedule_search = function () {
       // alert the user
       alert("Please select a service");
       return false;
+    }
+    
+    // remove duration if its not visible
+    if (!$(".duration").is(":visible")) {
+      $(".duration").remove();
     }
     
     // replace the search button with a progress image onsubmit
