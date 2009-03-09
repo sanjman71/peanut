@@ -22,7 +22,7 @@
     #header
       .container
         .span-24.last
-          .span-6.prepend-18.last{:style => 'color: #DDDDDD; text-align: right;'}
+          .span-10.prepend-14.last{:style => 'color: #DDDDDD; text-align: right;'}
             = render :partial => 'users/user_links.html.haml'
             
         .span-24.last
@@ -44,13 +44,7 @@
             - build_admin_tab_links do |tab|
               %li= tab
             
-    - if RAILS_ENV == 'development'
-      .container.showgrid
-        .flash.prepend-1.span-14
-          = display_flash(:all)
-        = yield
-    - else
-      .container
-        .flash.prepend-1.span-14
-          = display_flash
-        = yield
+    .container{:class => $BlueprintGrid ? 'showgrid' : ''}
+      .flash.prepend-1.span-14
+        = display_flash
+      = yield

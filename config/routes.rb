@@ -72,19 +72,6 @@ ActionController::Routing::Routes.draw do |map|
   # toggle a schedulable's calendar
   map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
    
-  # map.resources :people do |resource|
-  #   # nested appointments routes
-  #   resource.resources :appointments
-  #   # nested openings routes
-  #   resource.resources :openings, :only => [:index]
-  #   
-  #   # nested services routes
-  #   resource.resources :services, :has_many => [:appointments, :openings]
-  #   
-  #   # manage free time
-  #   resource.resources :free, :only => [:new, :create]
-  # end
-  
   # services, products
   map.resources :services
   map.resources :products
@@ -113,6 +100,9 @@ ActionController::Routing::Routes.draw do |map|
   map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
   map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :conditions => { :subdomain => /.+/ }
 
+  # debug controller
+  map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
+  
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

@@ -18,3 +18,8 @@
   = link_to('Log-out', logout_path, :class => 'signup')
 - else
   = link_to('Log-in', login_path, :class => 'signup')
+  
+- if RAILS_ENV == 'development'
+  == &nbsp;|&nbsp;
+  = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'signup')
+

@@ -38,6 +38,9 @@ config.to_prepare do
       :login    => 'demo', 
       :password => 'password' 
   ) 
-end 
+end
+
+# Blueprint grid toggle switch
+$BlueprintGrid = true
 
 require 'ruby-debug'
