@@ -41,7 +41,7 @@
         = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
 
 .span-7.prepend-1.last
-  .sidebar.instructions.padding-5
+  .span-7.last.sidebar.instructions
     - if @when.blank?
       == How do I schedule an appointment?
       %ul

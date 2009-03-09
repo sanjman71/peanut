@@ -34,6 +34,7 @@ a.rounded, .rounded.button                        { outline: none; border: none;
 .padding-5                                        { padding: 5px; }
 .padding-bottom-5                                 { padding-bottom: 5px; }
 .padding-bottom-10                                { padding-bottom: 10px; }
+.padding-right-10                                 { padding-right: 10px; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
 
@@ -79,6 +80,9 @@ div.container div.box                             { padding: 13px 0px 13px 40px;
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
 
+div.mat                                           { background: #EDF3FE; }
+div.mat.last                                      { padding-right: 10px;}
+
 /* form styles */
 
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
@@ -113,7 +117,6 @@ div.sidebar                                       { background: #EDF3FE none rep
 /* instruction styles */
 
 div.instructions, div.instructions.sidebar        { background: #FFFFCC; padding: 5px; font-size: 12px; border: 1px solid #FFD324; }
-
 div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
@@ -157,5 +160,4 @@ div.plan                                          { height: 200px;}
 
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}
 
-div.mat                                           { background: #EDF3FE; }
 h3.select_label                                   { padding-top: 10px; }
