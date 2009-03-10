@@ -11,7 +11,7 @@
   - @sps.each do |sp|
     .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => service_duration_in_words(sp[5])}
           
-.span-15.prepend-1.last
+.span-15.prepend-1.append-1.last
   - if !@current_company.can_schedule_appointments?
     %h2
       == Before customers can schedule appointments, there must be at least 1 calendar
@@ -40,7 +40,7 @@
       .span-15.last.appointments#free_appointments
         = render(:partial => 'appointments/free_appointments.html.haml', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
 
-.span-7.prepend-1.last
+.span-7.last
   .span-7.last.sidebar.instructions
     - if @when.blank?
       == How do I schedule an appointment?
