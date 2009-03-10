@@ -134,30 +134,6 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   })
 }
 
-// Search schedules for available appointments
-$.fn.init_search_openings = function () {
-  $("#search_openings_form").submit(function () {
-    // validate search inputs
-    var service_id = $('#service_id').val();
-
-    if (service_id == "0") {
-      // alert the user
-      alert("Please select a service");
-      return false;
-    }
-    
-    // remove duration change element if its not visible
-    if (!$(".duration .change").is(":visible")) {
-      $(".duration .change").remove();
-    }
-    
-    // replace the search button with a progress image onsubmit
-    $("#search_submit").addClass('hide');
-    $("#search_progress").removeClass('hide');
-    return true;
-  })
-}
-
 // Highlight appointments and show edit/delete options on hover
 $.fn.init_highlight_appointments = function () {
   $(".appointment").hover(

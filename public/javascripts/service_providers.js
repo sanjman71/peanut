@@ -73,17 +73,24 @@ $.fn.init_schedulables = function () {
     $('#schedulable').addOption(0, "Anyone", 0 == initial_schedulable_id);
   }
   
+  // check if the selected service allows a custom duration
   if (allow_custom_duration)
   {
-    // show the duration select list
+    // show the duration select div
     $(".duration .change").show();
   } else {
-    // hide the duration select list
+    // hide the duration select div
     $(".duration .change").hide();
   }
 
   // update default duration text
   $("#duration_in_words").html(default_duration_in_words);
+}
+
+$.fn.init_default_duration = function() {
+  // set the duration selected value based on the duration text
+  var duration_text = $("#duration_in_words").text().replace("Typically ", '');
+  $("select#duration option:contains(" + duration_text + ")").attr("selected", 'selected');
 }
 
 $(document).ready(function() {
@@ -94,6 +101,7 @@ $(document).ready(function() {
   // when a service is selected, rebuild the schedulable service provider select list
   $("#service_id").change(function () {
     $(document).init_schedulables();
+    $(document).init_default_duration();
     return false;
   })
 })
