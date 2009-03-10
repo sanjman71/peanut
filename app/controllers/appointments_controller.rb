@@ -78,8 +78,8 @@ class AppointmentsController < ApplicationController
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
   end
 
-  # GET   /schedule/users/1/services/1/20081231T000000
-  # POST  /schedule/users/1/services/1/20081231T000000
+  # GET   /schedule/users/1/services/1/duration/60/20081231T000000
+  # POST  /schedule/users/1/services/1/duration/60/20081231T000000
   # GET   /waitlist/users/1/services/8/this-week/anytime
   # POST  /waitlist/users/1/services/8/this-week/anytime
   def new
@@ -98,6 +98,7 @@ class AppointmentsController < ApplicationController
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
       # schedule the work appointment without committing the changes
+      @duration             = params[:duration]
       @start_at             = params[:start_at]
       @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, {:start_at => @start_at}, :commit => false)
     

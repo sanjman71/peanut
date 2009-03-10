@@ -41,7 +41,8 @@ class OpeningsController < ApplicationController
 
     # if we have a custom duration, and the service allows this, then set this in the appointment request
     if @service.allow_custom_duration && (@duration = params[:duration].to_i)
-      @query.duration = @duration
+      @query.duration   = @duration
+      @service.duration = @duration
     end
 
     # build schedulables collection, schedulables are restricted by the services they perform
@@ -66,17 +67,19 @@ class OpeningsController < ApplicationController
 
     logger.debug("*** finding free time #{@when}")
     
-    # find free appointments, and free timeslots for each free apppointment
-    @free_appointments  = @query.find_free_appointments
-    @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|
-      timeslots += @query.find_free_timeslots(:appointments => free_appointment, :limit => 2)
-    end
-    @free_timeslots_by_day = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
+    # find free appointments, group by day (use appt utc time)
+    @free_appointments        = @query.find_free_appointments
+    @free_appointments_by_day = @free_appointments.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
-    logger.debug("*** found #{@free_appointments.size} free appointments, #{@free_timeslots.size} free timeslots over #{@daterange.days} days")
+    # @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|
+    #   timeslots += @query.find_free_timeslots(:appointments => free_appointment, :limit => 2)
+    # end
+    # @free_timeslots_by_day = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
+    
+    logger.debug("*** found #{@free_appointments.size} free appointments over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings  = build_calendar_markings(@free_timeslots)
+    @calendar_markings  = build_calendar_markings(@free_appointments)
 
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)

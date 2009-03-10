@@ -1,6 +1,6 @@
 - title("Manage Schedules")
 - stylesheet('calendar')
-- javascript('free_calendar')
+- javascript('free_calendar', 'time_range_slider')
 
 .span-24.last#what
   .span-15.box
@@ -49,8 +49,10 @@
       = select_tag('start_time_of_day', options_for_select(@tod, @tod_start), :class => 'text', :style => 'margin: 0px;')
       %span{:id => 'start_time', :style => 'font-size 13px; padding-left: 5px;'}==
   .span-14.prepend-1.sliders#slider_start
-    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'start_time'})
-    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'start_time'})
+    .span-20.slider.hide{:id => 'morning'}
+      = render(:partial => 'free/time_range_slider', :locals => {:start_hour => 8, :start_minute => 0, :end_hour => 12, :end_minute => 0, :minute_interval => 15, :display => 'start_time'})
+    .span-20.slider.hide{:id => 'afternoon'}
+      = render(:partial => 'free/time_range_slider', :locals => {:start_hour => 12, :start_minute => 0, :end_hour => 17, :end_minute => 0, :minute_interval => 15, :display => 'start_time'})
 
   %hr.space
 
@@ -61,8 +63,10 @@
       = select_tag('end_time_of_day', options_for_select(@tod, @tod_end), :class => 'text', :style => 'margin: 0px;')
       %span{:id => 'end_time', :style => 'font-size 13px; padding-left: 5px;'}==
   .span-14.prepend-1.sliders#slider_end
-    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'morning', :hour_start => 8, :hour_end => 12, :display => 'end_time'})
-    = render(:partial => 'free/time_range_slider', :locals => {:time_of_day => 'afternoon', :hour_start => 12, :hour_end => 17, :display => 'end_time'})
+    .span-20.slider.hide{:id => 'morning'}
+      = render(:partial => 'free/time_range_slider', :locals => {:start_hour => 8, :start_minute => 0, :end_hour => 12, :end_minute => 0, :minute_interval => 15, :display => 'end_time'})
+    .span-20.slider.hide{:id => 'afternoon'}
+      = render(:partial => 'free/time_range_slider', :locals => {:start_hour => 12, :start_minute => 0, :end_hour => 17, :end_minute => 0, :minute_interval => 15, :display => 'end_time'})
   
   %hr.space
     

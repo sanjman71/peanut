@@ -146,9 +146,9 @@ $.fn.init_search_openings = function () {
       return false;
     }
     
-    // remove duration if its not visible
-    if (!$(".duration").is(":visible")) {
-      $(".duration").remove();
+    // remove duration change element if its not visible
+    if (!$(".duration .change").is(":visible")) {
+      $(".duration .change").remove();
     }
     
     // replace the search button with a progress image onsubmit

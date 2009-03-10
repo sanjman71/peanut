@@ -11,6 +11,7 @@ div.schedule_form input.submit                    { font-size: 12px; }
 div.appointment                                   { padding: 7px 0 7px 0; }
 
 div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
+div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
 div.appointment.work                              { background-color: #FFCC00; }  /* yellowish */
 
 div.timeslot                                      { padding: 7px 0 7px 0; }

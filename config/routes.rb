@@ -45,7 +45,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':schedulable_type/:schedulable_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
 
-  # openings search/index path, scoped by duraton
+  # openings search/index path, for a specified service and duration, and an optional schedulable
   map.connect   ':schedulable_type/:schedulable_id/services/:service_id/duration/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/duration/:duration/openings/:when/:time', 
@@ -59,11 +59,13 @@ ActionController::Routing::Routes.draw do |map|
   # search appointments path scoped by schedulable
   map.connect   ':schedulable_type/:schedulable_id/appointments/search', :controller => 'appointments', :action => 'search'
 
-  # appointment new path scoped by schedulable
-  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', 
+  # schedule a work appointment with a schedulable for a specified service and duration
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/duration/:duration/:start_at', 
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/:start_at', 
+  map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/duration/:duration/:start_at', 
                 :controller => 'appointments', :action => 'create', :mark_as => 'work', :conditions => {:method => :post}
+
+  # schedule a waitlist appointment with a schedulable for a specific service, during a specified when range
   map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',  
                 :controller => 'appointments', :action => 'new', :mark_as => 'wait', :conditions => {:method => :get}
   map.waitlist  'waitlist/:schedulable_type/:schedulable_id/services/:service_id/:when/:time',

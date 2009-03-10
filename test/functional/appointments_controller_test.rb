@@ -18,13 +18,13 @@ class AppointmentsControllerTest < ActionController::TestCase
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
                :when => 'this-week', :time => 'morning', :mark_as => 'wait'
   
-  # book a new apppointment for a specific schedulable
-  should_route :get, 'book/users/3/services/3/20090303T113000',
+  # schedule a work apppointment for a specific schedulable and service with a specific duration
+  should_route :get, 'book/users/3/services/3/duration/60/20090303T113000',
                :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
-               :start_at => '20090303T113000', :mark_as => 'work'
-  should_route :post, 'book/users/3/services/3/20090303T113000',
+               :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
+  should_route :post, 'book/users/3/services/3/duration/60/20090303T113000',
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
-               :start_at => '20090303T113000', :mark_as => 'work'
+               :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
         
   def setup
     @controller   = AppointmentsController.new

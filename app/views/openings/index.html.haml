@@ -1,6 +1,6 @@
 - title("Schedule an Apppointment")
 - stylesheet('appointments', 'calendar')
-- javascript('service_providers', 'openings')
+- javascript('service_providers', 'openings', 'time_range_slider')
 
 -# service providers mapping services to schedulables
 .span-16.service_providers.hide
@@ -22,13 +22,13 @@
       
   - unless @when.blank?
     %h2.span-15
-      - if @free_timeslots.blank?
+      - if @free_appointments.blank?
         -# No available appointments
         == No Available Appointments -
         = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :when => @when, :time => @time)
       - else
         -# Show count of available appointments
-        == #{pluralize(@free_timeslots.size, 'Available Appointment')}
+        == #{pluralize(@free_appointments.size, 'Available Appointment')}
         
     .span-15.last
       -# Show appointment when range
@@ -37,8 +37,8 @@
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
       .span-15.last#free_calendar
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-      .span-15.last.timeslots#free_timeslots
-        = render(:partial => 'timeslots.html.haml', :locals => {:timeslots_by_day => @free_timeslots_by_day, :service => @service})
+      .span-15.last.appointments#free_appointments
+        = render(:partial => 'appointments/free_appointments.html.haml', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
 
 .span-7.prepend-1.last
   .span-7.last.sidebar.instructions
@@ -70,15 +70,16 @@
         .span-5.last.field#what
           = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
       %br
-      .duration.span-7.last{:style => 'display: none;'}
+      .span-7.last.duration
         .span-5.prepend-2.last#duration_in_words
+          = service_duration_in_words(@service.duration) if @service
         %br
-        .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
-          == How long?
-        .span-5.last
-          %span.field#duration
-            = select_tag('duration', options_for_select(service_duration_select_options, @duration))
-        %br
+        .span-7.last.change
+          .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
+            == How long?
+          .span-5.last
+            %span.field#duration
+              = select_tag('duration', options_for_select(service_duration_select_options, @duration))
       .span-7.last
         .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
           == With?

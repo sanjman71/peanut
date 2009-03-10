@@ -1,18 +1,24 @@
 -# arguments
--# time_of_day, e.g. 'morning', 'afternoon'
--# hour_start
--# hour_end
+-# time_of_day => e.g. 'morning', 'afternoon'
+-# start_hour, start_minute => e.g. 9, 30
+-# end_hour, end_minute => 15, 30
+-# minute_interval
 -# display - id of element to show display time
 
-.span-20.slider.hide{:id => time_of_day}
-  - hour_interval = 15
-  - hour_start.upto(hour_end) do |hour|
-    -# the end hour is shown with 1 increment
-    - increments = (hour == hour_end) ? 1 : 60/hour_interval
-    - 0.upto(increments - 1) do |i|
-      - minute    = i * hour_interval
-      - time_show = "#{sprintf("%d", hour == 12 ? hour : hour % 12)}:#{sprintf("%02d", minute)}"
-      - time_army = "#{sprintf("%02d", hour)}#{sprintf("%02d", minute)}"
-      - ampm      = hour < 12 ? "am" : "pm"
-      %span.time{:style => 'font-size: 10px; padding-left: 1px; padding-right: 1px;', :id => time_army, :ampm => ampm, :display => display}= time_show
+-# build minute increments
+- minute_increments = (0..59).step(60/(60/minute_interval)).collect { |i| i }
+
+- start_hour.upto(end_hour) do |hour|
+  - first_hour = (hour == start_hour)
+  - last_hour  = (hour == end_hour)
+  - minute_increments.each do |minute|
+    -# if its the first hour, check that the minute after the start minute
+    - next if first_hour and minute < start_minute
+    -# if its the last hour, check that the minute is before the end minute
+    - next if last_hour and minute > end_minute
+    -# show time in am/pm format
+    - time_show = "#{sprintf("%d", hour == 12 ? hour : hour % 12)}:#{sprintf("%02d", minute)}"
+    - time_army = "#{sprintf("%02d", hour)}#{sprintf("%02d", minute)}"
+    - ampm      = hour < 12 ? "am" : "pm"
+    %span.time{:style => 'font-size: 10px; padding-left: 1px; padding-right: 1px;', :id => time_army, :ampm => ampm, :display => display}= time_show
   

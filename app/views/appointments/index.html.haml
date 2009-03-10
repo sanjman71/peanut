@@ -52,6 +52,8 @@
       = hidden_field_tag :when, @when
       = hidden_field_tag :schedulable, "#{@schedulable.tableize}/#{@schedulable.id}"
       = hidden_field_tag :service_id, @free_service.id
+      = hidden_field_tag :mark_as, Appointment::FREE
+      
       .add_free_time
         .span-7.last.when
           == When

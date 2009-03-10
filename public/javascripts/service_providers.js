@@ -75,13 +75,15 @@ $.fn.init_schedulables = function () {
   
   if (allow_custom_duration)
   {
-    // show the duration elements
-    $(".duration").show();
-    $("#duration_in_words").html(default_duration_in_words);
+    // show the duration select list
+    $(".duration .change").show();
   } else {
-    $(".duration").hide();
+    // hide the duration select list
+    $(".duration .change").hide();
   }
-  
+
+  // update default duration text
+  $("#duration_in_words").html(default_duration_in_words);
 }
 
 $(document).ready(function() {
