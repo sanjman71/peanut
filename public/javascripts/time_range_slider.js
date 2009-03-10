@@ -14,8 +14,9 @@ $(document).ready(function() {
   );
 
   $(".slider .time").click(function () {
-    // unmark all marked items from parent sliders div
-    $(this).parents(".sliders").find(".mark").removeClass('mark');
+    // unmark all marked items from this and all sibling slider divs
+    $(this).parents(".slider").find(".mark").removeClass('mark');
+    $(this).parents(".slider").siblings(".slider").find(".mark").removeClass('mark');
     
     // mark this object
     $(this).addClass('mark');
