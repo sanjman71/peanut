@@ -67,4 +67,22 @@ $(document).ready(function() {
     $book_it.find("a").text("Book " + book_time);
   })
   
+  // set hover states to show selected date, ignore past dates
+  $(".weekday.free:not(.past),.weekend.free:not(.past)").hover(
+    function() {
+      // highlight date
+      $(this).addClass('hover');
+      
+      // hide all appointment dates except this one
+      $(".appointments.date").hide();
+      $("#appointments_" + $(this).attr("id")).show();
+    },
+    function() {
+      // un-highlight date
+      $(this).removeClass('hover');
+      // show all dates
+      $(".appointments.date").show();
+    }
+  );
+  
 })

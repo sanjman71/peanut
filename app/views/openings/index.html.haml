@@ -63,7 +63,7 @@
     %h2== Change Search:
     = hidden_field_tag 'initial_schedulable_id', @schedulable.id
     = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
-    - form_for(@query, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
+    - form_for(Appointment.new, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
       .span-7.last
         .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
           == What?

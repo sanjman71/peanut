@@ -60,7 +60,7 @@ class DateRange
   #   - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
   #   - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
   def self.parse_when(s, options={})
-    if (m = s.match(/next (\d{1}) weeks/)) # e.g. 'next 3 weeks'
+    if (m = s.match(/next (\d{1}) week/)) # e.g. 'next 3 weeks', 'next 1 week'
       # use [today, today + n weeks]
       n         = m[1].to_i
       start_at  = Time.now.utc.beginning_of_day

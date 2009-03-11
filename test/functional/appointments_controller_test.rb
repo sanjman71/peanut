@@ -33,8 +33,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @johnny, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription, :users => [@johnny])
-    # create a work service
-    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+    # create a work service, and assign johnny as a service provider
+    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
     # get company free service
     @free_service = @company.free_service
     # create a customer

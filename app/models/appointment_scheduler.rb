@@ -1,10 +1,43 @@
 class AppointmentScheduler
   
+  # find free appointments in the 
+  def self.find_free_appointments(company, location, schedulable, service, duration, daterange, date_time_options={}, options={})
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "location is required" if location.blank?
+    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "service is required" if service.blank?
+    raise ArgumentError, "duration is required" if duration.blank?
+    raise ArgumentError, "daterange is required" if daterange.blank?
+    
+    # use daterange to build start_at, end_at
+    start_at    = daterange.start_at
+    end_at      = daterange.end_at
+    
+    # use time range if it was specified, default to 'anytime'
+    time        = date_time_options.has_key?(:time) ? date_time_options[:time] : 'anytime'
+    time_range  = Appointment.time_range(time)
+    
+    if schedulable.anyone?
+      # find free appointments for any schedulable, order by start times
+      appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+    else
+      # find free appointments for a specific schedulable, order by start times
+      appointments = company.appointments.schedulable(schedulable).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+    end
+    
+    # remove appointments that have ended (when compared to Time.now) or appointment schedulables that do not provide the requested service
+    appointments.select { |appt| appt.end_at.utc > Time.now.utc and service.provided_by?(appt.schedulable) }
+  end
+  
   # create a free appointment in the specified timeslot
   def self.create_free_appointment(company, schedulable, service, date_time_options)
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "service is required" if service.blank?
+    
     # find company free service
     service     = company.free_service
-
+    
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
     # create a new appointment object
@@ -28,8 +61,16 @@ class AppointmentScheduler
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
   def self.create_work_appointment(company, schedulable, service, customer, date_time_options, options={})
-    # should be a service that is not marked as work
+    raise ArgumentError, "company is required" if company.blank?
+    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "service is required" if service.blank?
+    raise ArgumentError, "customer is required" if customer.blank?
+    
+    # should be a work service
     raise AppointmentInvalid if service.mark_as != Appointment::WORK
+    
+    # should be a service provided by the schedulable
+    raise AppointmentInvalid if !service.provided_by?(schedulable)
     
     work_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)

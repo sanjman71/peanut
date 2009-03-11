@@ -35,13 +35,11 @@ class OpeningsController < ApplicationController
     # initialize service, default to nothing
     @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
     
-    # build appointment request for the selected timespan
-    @query    = AppointmentRequest.new(:service => @service, :schedulable => @schedulable, :when => @when, :time => @time,
-                                       :company => current_company, :location => current_location)
-
-    # if we have a custom duration, and the service allows this, then set this in the appointment request
-    if @service.allow_custom_duration && (@duration = params[:duration].to_i)
-      @query.duration   = @duration
+    # initialize duration
+    @duration = params[:duration] ? params[:duration].to_i : @service.duration
+    
+    # if we have a custom duration, and the service allows this, then set the service duration
+    if @service.allow_custom_duration && @duration
       @service.duration = @duration
     end
 
@@ -68,7 +66,8 @@ class OpeningsController < ApplicationController
     logger.debug("*** finding free time #{@when}")
     
     # find free appointments, group by day (use appt utc time)
-    @free_appointments        = @query.find_free_appointments
+    @free_appointments        = AppointmentScheduler.find_free_appointments(current_company, current_location, 
+                                                                            @schedulable, @service, @duration, @daterange, :time => @time)
     @free_appointments_by_day = @free_appointments.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
     # @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|

@@ -1,7 +1,7 @@
 # define exception classes
 class AppointmentNotFree < Exception; end
-class TimeslotNotEmpty < Exception; end
 class AppointmentInvalid < Exception; end
+class TimeslotNotEmpty < Exception; end
 
 class Appointment < ActiveRecord::Base
   belongs_to              :company
