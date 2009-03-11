@@ -27,6 +27,6 @@
           
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .flash.prepend-1.span-14
-        = display_flash
+        = display_flash(:all) if flash_header_enabled?
       = yield
   
