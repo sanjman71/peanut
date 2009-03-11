@@ -34,7 +34,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     @subscription = Subscription.new(:user => @johnny, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription, :users => [@johnny])
     # create a work service, and assign johnny as a service provider
-    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+    @haircut      = Factory(:work_service, :duration => 30, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
     # get company free service
     @free_service = @company.free_service
     # create a customer
@@ -63,7 +63,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create free appointment for multiple dates" do
     setup do
       post :create,
-           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}",
+           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
             :service_id => @free_service.id, :mark_as => 'free'}
     end
     
@@ -83,7 +83,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create free appointment for a single date" do
     setup do
       post :create,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", 
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}", 
             :service_id => @free_service.id, :mark_as => 'free'}
     end
   
@@ -103,8 +103,8 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create work appointment for a single date that has no free time" do
     setup do
       post :create,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id, :mark_as => 'work'}
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
     end
   
     should_not_change "Appointment.count"
@@ -129,8 +129,8 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # create work appointment, today from 9 am to 11 am
       post :create,
-           {:dates => @today, :start_at => "0900", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id, :mark_as => 'work'}
+           {:dates => @today, :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+            :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
     end
     
     # free appointment should be replaced with work appointment
@@ -141,7 +141,16 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :start_at, :equals => '"0900"'
     should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :duration, :equals => '120'
     should_assign_to :mark_as, :equals => '"work"'
+
+    should "have appointment duration of 120 minutes" do
+      assert_equal 120, assigns(:appointment).duration
+      assert_equal 9, assigns(:appointment).start_at.hour
+      assert_equal 0, assigns(:appointment).start_at.min
+      assert_equal 11, assigns(:appointment).end_at.hour
+      assert_equal 0, assigns(:appointment).end_at.min
+    end
   end
 
   context "create work appointment for a single date with free time, splitting free time" do
@@ -151,34 +160,77 @@ class AppointmentsControllerTest < ActionController::TestCase
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
       
-      # create work appointment, today from 10 am to 11 am local time
+      # create work appointment, today from 10 am to 10:30 am local time
       post :create,
-           {:dates => @today, :start_at => "1000", :end_at => "1100", :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id, :mark_as => 'work'}
+           {:dates => @today, :start_at => "1000", :end_at => "1030", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+            :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
     end
     
     # free appointment should be split into work appointment and 2 free appointments, so we should have 3 appointments total
+    should_change "Appointment.count", :by => 3
+  
+    should_assign_to :service, :equals => "@haircut"
+    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :customer, :equals => "@customer"
+    should_assign_to :start_at, :equals => '"1000"'
+    should_assign_to :end_at, :equals => '"1030"'
+    should_assign_to :duration, :equals => '30'
+    should_assign_to :mark_as, :equals => '"work"'
+    
+    should "have appointment duration of 30 minutes" do
+      assert_equal 30, assigns(:appointment).duration
+      assert_equal 10, assigns(:appointment).start_at.hour
+      assert_equal 0, assigns(:appointment).start_at.min
+      assert_equal 10, assigns(:appointment).end_at.hour
+      assert_equal 30, assigns(:appointment).end_at.min
+    end
+  end
+
+  context "create work appointment for a single date with free time, using a custom duration" do
+    setup do
+      # create free time from 9 am to 3 pm local time
+      @today          = Time.now.utc.to_s(:appt_schedule_day)
+      @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+      
+      # create work appointment, today from 10 am to 12 pm local time
+      post :create,
+           {:dates => @today, :start_at => "1000", :end_at => "1200", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+            :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
+    end
+
+    # free appointment should be replaced with 1 work and 2 free appointments
     should_change "Appointment.count", :by => 3
 
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :start_at, :equals => '"1000"'
-    should_assign_to :end_at, :equals => '"1100"'
+    should_assign_to :end_at, :equals => '"1200"'
+    should_assign_to :duration, :equals => '120'
     should_assign_to :mark_as, :equals => '"work"'
-  end
 
+    should "have appointment duration of 120 minutes" do
+      assert_equal 120, assigns(:appointment).duration
+      assert_equal 10, assigns(:appointment).start_at.hour
+      assert_equal 0, assigns(:appointment).start_at.min
+      assert_equal 12, assigns(:appointment).end_at.hour
+      assert_equal 0, assigns(:appointment).end_at.min
+    end
+  end
+  
   context "create waitlist appointment for this week" do
     setup do
       # create waitlist appointment
       post :create,
-           {:dates => 'this-week', :when => "this-week", :time => 'anytime', :schedulable => "users/#{@johnny.id}", :service_id => @haircut.id,
-            :customer_id => @customer.id, :mark_as => 'wait'}
+           {:dates => 'this-week', :when => "this-week", :time => 'anytime', :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
     end
     
     should_change "Appointment.count", :by => 1
     
     should_assign_to :service, :equals => "@haircut"
+    should_not_assign_to :duration
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :when, :equals => '"this week"'

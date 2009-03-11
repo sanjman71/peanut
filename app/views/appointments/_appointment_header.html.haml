@@ -1,4 +1,4 @@
-%h3.span-14.last
+%h3.span-15.last
   .what
     .span-3.padding-bottom-5.text-align-right
       == What:
@@ -19,6 +19,13 @@
         == #{appointment.time.titleize}, #{appointment.when.titleize}
       - else
         = appointment.start_at.to_s(:appt_day_date_time)
+  %br
+  .duration
+    .span-3.padding-bottom-5.text-align-right
+      == How Long:
+    .span-11.padding-bottom-5.last
+      = service_duration_in_words(duration)
+      
   - unless appointment.customer.blank?
     %br
       .customer

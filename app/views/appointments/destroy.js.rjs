@@ -13,6 +13,6 @@ else
   page["#appointments_count"].html(render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size}))
 
   # update appointments
-  page["#free_schedule"].html(render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day}))
+  page["#free_schedule"].html(render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day}))
 end
 

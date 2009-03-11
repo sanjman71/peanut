@@ -43,7 +43,7 @@
       %h3.span-15.last#appointments_count
         = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
       .span-15.last#free_schedule
-        = render(:partial => 'appointments.html.haml', :locals => {:appointments_by_day => @appointments_by_day})
+        = render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
   
 - unless current_company.schedulables_count == 0
   .span-6.prepend-1.last.mat

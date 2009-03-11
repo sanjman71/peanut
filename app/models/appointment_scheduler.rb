@@ -60,7 +60,7 @@ class AppointmentScheduler
   # create a work appointment by scheduling the specified appointment in a free timeslot
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
-  def self.create_work_appointment(company, schedulable, service, customer, date_time_options, options={})
+  def self.create_work_appointment(company, schedulable, service, duration, customer, date_time_options, options={})
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "schedulable is required" if schedulable.blank?
     raise ArgumentError, "service is required" if service.blank?
@@ -72,7 +72,7 @@ class AppointmentScheduler
     # should be a service provided by the schedulable
     raise AppointmentInvalid if !service.provided_by?(schedulable)
     
-    work_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer}.merge(date_time_options)
+    work_hash         = {:company => company, :schedulable => schedulable, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)
     
     raise AppointmentInvalid if !work_appointment.valid?
@@ -87,7 +87,7 @@ class AppointmentScheduler
     work_start_at     = work_appointment.start_at
     work_end_at       = work_appointment.end_at
     commit            = options.has_key?(:commit) ? options[:commit] : true
-    new_appointments  = self.split_free_appointment(free_appointment, service, work_start_at, work_end_at, :commit => commit, :customer => customer)
+    new_appointments  = self.split_free_appointment(free_appointment, service, duration, work_start_at, work_end_at, :commit => commit, :customer => customer)
     work_appointment  = new_appointments.select { |a| a.mark_as == Appointment::WORK }.first
   end
   
@@ -113,7 +113,7 @@ class AppointmentScheduler
   end
   
   # split a free appointment into multiple appointments using the specified service and time
-  def self.split_free_appointment(appointment, service, service_start_at, service_end_at, options={})
+  def self.split_free_appointment(appointment, service, duration, service_start_at, service_end_at, options={})
     # validate service argument
     raise ArgumentError if service.blank? or !service.is_a?(Service)
     raise ArgumentError if appointment.service.mark_as != Appointment::FREE
@@ -140,7 +140,7 @@ class AppointmentScheduler
     new_appt.start_at     = service_start_at
     new_appt.end_at       = service_end_at
     new_appt.mark_as      = service.mark_as
-    new_appt.duration     = service.duration
+    new_appt.duration     = duration
     new_appt.customer     = options[:customer]  # set to nil if no customer is specified
     
     # build new start, end appointments
@@ -149,7 +149,7 @@ class AppointmentScheduler
       start_appt          = Appointment.new(appointment.attributes)
       start_appt.start_at = appointment.start_at
       start_appt.end_at   = new_appt.start_at
-      start_appt.duration -= service.duration
+      start_appt.duration -= duration
     end
     
     unless service_end_at == appointment.end_at
@@ -157,7 +157,7 @@ class AppointmentScheduler
       end_appt            = Appointment.new(appointment.attributes)
       end_appt.start_at   = new_appt.end_at
       end_appt.end_at     = appointment.end_at
-      end_appt.duration   -= service.duration
+      end_appt.duration   -= duration
     end
     
     appointments = [start_appt, new_appt, end_appt].compact

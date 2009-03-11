@@ -8,7 +8,7 @@ class Appointment < ActiveRecord::Base
   belongs_to              :service
   belongs_to              :schedulable, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
-  validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at
+  validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at, :duration
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
@@ -143,18 +143,20 @@ class Appointment < ActiveRecord::Base
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
     
-    if self.start_at and self.service and self.end_at.blank?
-      # initialize end_at
-      self.end_at = self.start_at + self.service.duration_to_seconds
-    end
-    
     # initialize duration (in minutes)
-    if self.service.nil? || self.service.free?
+    if (self.service.nil? || self.service.free?) and self.duration.blank?
+      # initialize duration based on start and end times
       self.duration = (self.end_at.to_i - self.start_at.to_i) / 60
-    else
+    elsif self.service and self.duration.blank?
+      # initialize duration based on service duration
       self.duration = self.service.duration
     end
-    
+
+    if self.start_at and self.duration
+      # force end_at to be start_at + duration
+      self.end_at = self.start_at + self.duration*60 # convert duration to seconds
+    end
+        
     # initialize mark_as if its blank
     if self.mark_as.blank? and self.service
       self.mark_as = self.service.mark_as

@@ -50,17 +50,30 @@ module AppointmentsHelper
     hash.update(:minute_interval => minute_interval).update(options)
   end
   
-  def service_duration_in_words(duration_in_minutes)
+  # return duration as a string description
+  # options:
+  #  - exact => if true, use exact wording, otherwise use 'typically' in phrase; defaults to true
+  def service_duration_in_words(duration_in_minutes, options={})
     return '' if duration_in_minutes.blank? or duration_in_minutes == 0
+
+    use_exact_phrase    = options.has_key?(:exact) ? options[:exact] : true
+    
+    # force duration to integer
+    duration_in_minutes = duration_in_minutes.to_i
     
     if duration_in_minutes >= 60
       # use hours
       hours, mins = [duration_in_minutes / 60, duration_in_minutes % 60]
-      mins > 0 ? "Typically #{pluralize(hours, 'hour')}, #{pluralize(mins, 'minute')}" : "Typically #{pluralize(hours, 'hour')}"
+      phrase = mins > 0 ? "#{pluralize(hours, 'hour')}, #{pluralize(mins, 'minute')}" : "#{pluralize(hours, 'hour')}"
     else
       # use minutes
-      "Typically #{duration_in_minutes} minutes"
+      phrase = "#{duration_in_minutes} minutes"
     end
+    
+    # format phrase based on exact option
+    phrase = "Typically #{phrase}" if !use_exact_phrase
+    
+    phrase
   end
   
   def service_duration_select_options

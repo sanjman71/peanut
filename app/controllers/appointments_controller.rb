@@ -98,9 +98,9 @@ class AppointmentsController < ApplicationController
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
       # schedule the work appointment without committing the changes
-      @duration             = params[:duration]
+      @duration             = params[:duration].to_i if params[:duration]
       @start_at             = params[:start_at]
-      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, {:start_at => @start_at}, :commit => false)
+      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, {:start_at => @start_at}, :commit => false)
     
       # show appointment date, start and end times in local time
       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
@@ -123,12 +123,13 @@ class AppointmentsController < ApplicationController
   def create
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
-    klass, id     = params[:schedulable].to_s.match(/[a-z]+\/\d+/) ? params[:schedulable].split('/') : [params[:schedulable], params[:id]]
+    klass, id     = [params[:schedulable_type], params[:schedulable_id]]
     # note: the send method can generate an exception
     @schedulable  = current_company.send(klass).find_by_id(id)
     @customer     = User.find_by_id(params[:customer_id])
 
     @mark_as      = params[:mark_as]
+    @duration     = params[:duration].to_i if params[:duration]
     @start_at     = params[:start_at]
     @end_at       = params[:end_at]
     
@@ -146,7 +147,7 @@ class AppointmentsController < ApplicationController
         case @mark_as
         when Appointment::WORK
           # create work appointment
-          @appointment  = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
+          @appointment  = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE

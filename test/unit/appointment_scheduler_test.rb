@@ -48,7 +48,6 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
-      # @customer  = Factory(:user)
 
       # create free appointment that ended 1 hour ago
       @end_at             = (Time.now - 3.minutes).to_s(:appt_schedule)
@@ -74,7 +73,6 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
-      # @customer  = Factory(:user)
 
       @haircut.reload
       @johnny.reload
@@ -110,7 +108,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @customer, :start_at => "20080801000000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801000000")
       assert_valid @work_appointment
     end
     
@@ -121,8 +119,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_equal @customer, @work_appointment.customer
     end
     
-    should "have work appointment with haircut service" do
+    should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
+      assert_equal 30, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do
@@ -134,7 +133,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
     
-    context "then cancel work appointment" do
+    context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
@@ -153,18 +152,19 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   end
   
-  context "schedule work appointment in the middle of a free appointment" do
+  context "schedule work appointment with a custom duration in the middle of a free appointment" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
       @customer  = Factory(:user)
 
       # create free appointment (all day)
-      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => "20080801000000", :end_at => "20080802000000")
+      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service,
+                                                                        :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
       
-      # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @customer, :start_at => "20080801110000")
+      # schedule the work appointment, with a custom duration, the free appointment should be split into free/work time
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 60, @customer, :start_at => "20080801100000")
       assert_valid @work_appointment
     end
   
@@ -175,20 +175,21 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_equal @customer, @work_appointment.customer
     end
     
-    should "have work appointment with haircut service" do
+    should "have work appointment with haircut service and custom duration" do
       assert_equal @haircut, @work_appointment.service
+      assert_equal 60, @work_appointment.duration
     end
   
     should "have work appointment with correct start and end times" do
-      assert_equal "20080801T110000", @work_appointment.start_at.to_s(:appt_schedule)
-      assert_equal "20080801T113000", @work_appointment.end_at.to_s(:appt_schedule)
+      assert_equal "20080801T100000", @work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal "20080801T110000", @work_appointment.end_at.to_s(:appt_schedule)
     end
   
-    should "have work appointment different confirmation code" do
+    should "have work appointment with a different confirmation code" do
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
   
-    context "then cancel work appointment" do
+    context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
@@ -220,7 +221,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @customer, :start_at => "20080801233000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801233000")
       assert_valid @work_appointment
     end
   
@@ -231,8 +232,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_equal @customer, @work_appointment.customer
     end
     
-    should "have work appointment with haircut service" do
+    should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
+      assert_equal 30, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do
@@ -244,7 +246,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
 
-    context "then cancel work appointment" do
+    context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
@@ -275,7 +277,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @customer, :start_at => "20080801000000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801000000")
       assert_valid @work_appointment
     end
   
@@ -286,8 +288,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_equal @customer, @work_appointment.customer
     end
     
-    should "have work appointment with haircut service" do
+    should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
+      assert_equal 30, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do
@@ -299,7 +302,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
 
-    context "then cancel work appointment" do
+    context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end

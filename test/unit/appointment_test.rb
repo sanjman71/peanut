@@ -9,6 +9,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :schedulable_type
   should_require_attributes :start_at
   should_require_attributes :end_at
+  should_require_attributes :duration
   should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
 
   should_belong_to          :company
@@ -18,25 +19,46 @@ class AppointmentTest < ActiveSupport::TestCase
   should_have_one           :invoice
   
   def setup
-    @owner        = Factory(:user, :name => "Owner")
-    @monthly_plan = Factory(:monthly_plan)
-    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+    @owner          = Factory(:user, :name => "Owner")
+    @monthly_plan   = Factory(:monthly_plan)
+    @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
+    @company        = Factory(:company, :subscription => @subscription)
   end
   
-  context "free appointment" do
+  context "create free appointment with mismatched duration and end_at values" do
     setup do
-      @company        = Factory(:company, :subscription => @subscription)
+      @free_service   = @company.free_service
+      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @start_at       = Time.now.beginning_of_day
+      @end_at         = @start_at + 1.hour
+      @start_at_day   = @start_at.to_s(:appt_schedule_day)
+      @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
+                                                                     :start_at => @start_at, :end_at => @end_at, :duration => 120)
+    end
+
+    should_change "Appointment.count", :by => 1
+    
+    should "have duration of 2 hours, and end_at time adjusted" do
+      assert_equal 120, @appt.duration
+      assert_equal 0, @appt.start_at.hour
+      assert_equal 2, @appt.end_at.hour
+    end
+  end
+  
+  context "create free appointment and test unscheduled time" do
+    setup do
+      @free_service   = @company.free_service
       @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
       @start_at_utc   = Time.now.utc.beginning_of_day
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @company.free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
+                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc)
       
       # build mapping of unscheduled time
       @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @johnny, @daterange)
-      
-      key = @unscheduled.keys.first
     end
       
     should_change "Appointment.count", :by => 1
@@ -54,70 +76,65 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "work appointment" do
+  context "create free time" do
     setup do
-      @company  = Factory(:company, :subscription => @subscription)
-      @johnny   = Factory(:user, :name => "Johnny")
-      @company.schedulables.push(@johnny)
-      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
-
-      # create appointment at 2 pm
-      @appt     = Appointment.create(:company => @company,
-                                     :service => @haircut,
-                                     :schedulable => @johnny,
-                                     :start_at_string => "today 2 pm")
+      # create free time from 10 am to 12 pm
+      @free_service   = @company.free_service
+      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @today          = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
     end
 
-    should_not_change "Appointment.count"
-    
-    should "require owner" do
-      assert_match /blank/, @appt.errors[:customer_id]
-    end
-  end
-  
-  context "appointment by building owner association" do
-    setup do
-      @company  = Factory(:company, :subscription => @subscription)
-      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
-
-      # should create a new customer when building the new appointment
-      @appt     = Appointment.create(:company => @company, 
-                                     :service => @haircut,
-                                     :schedulable => @johnny,
-                                     :customer_attributes => {"name" => "User 1", "email" => "user1@peanut.com", "phone" => "4085551212",
-                                                              "password" => "secret", "password_confirmation" => "secret"},
-                                     :start_at_string => "today 2 pm")
-    end
-    
-    # should create appointment and user
     should_change "Appointment.count", :by => 1
-    should_change "User.count", :by => 2
     
-    should "have a customer" do
-      assert_valid @appt.customer
+    context "and schedule work appointment without a customer" do
+      setup do
+        @haircut = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+      end
+      
+      should "raise exception" do
+        assert_raise ArgumentError do
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration)
+        end
+      end
+    end
+    
+    context "and schedule work appointment and test confirmation code" do
+      setup do
+        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @customer   = Factory(:user)
+        @options    = {:start_at => @free_appt.start_at}
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
+        assert_valid @work_appt
+      end
+      
+      should "have confirmation code of exactly 5 characters" do
+        assert_equal 5, @work_appt.confirmation_code.size
+        assert_match /([A-Z]|[0-9])+/, @work_appt.confirmation_code
+      end
+    end
+    
+    context "and schedule work appointment with a custom service duration" do
+      setup do
+        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @customer   = Factory(:user)
+        @options    = {:start_at => @free_appt.start_at}
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 120, @customer, @options)
+        assert_valid @work_appt
+      end
+
+      should "have haircut service with duration of 120 minutes" do
+        assert_equal @haircut, @work_appt.service
+        assert_equal 120, @work_appt.duration
+        assert_equal 10, @work_appt.start_at.hour
+        assert_equal 12, @work_appt.end_at.hour
+      end
     end
   end
-  
-  # def test_should_build_customer_association
-  #   company = Factory(:company)
-  #   johnny  = Factory(:person, :name => "Johnny", :companies => [company])
-  #   haircut = Factory(:work_service, :name => "Haircut", :company => company, :price => 1.00)
-  #   
-  #   # should create a new customer when building the new appointment
-  #   assert_difference('Customer.count', 1) do
-  #     appt = Appointment.new(:company => company, 
-  #                            :service => haircut,
-  #                            :resource => johnny,
-  #                            :customer_attributes => {"name" => "Customer 1", "email" => "customer1@peanut.com", "phone" => "4085551212"},
-  #                            :start_at_string => "today 2 pm")
-  #   
-  #     assert appt.valid?
-  #   end
-  
-  context "afternoon appointment" do
+    
+  context "create an afternoon appointment to test time overlap searching" do
     setup do
-      @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
       @user     = Factory(:user)
@@ -156,7 +173,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create appointment with time range attributes and am/pm times" do
+  context "build new appointment with time range attributes and am/pm times" do
     setup do
       @today = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
       @appt  = Appointment.new(:time_range => {:day => @today, :start_at => "1 pm", :end_at => "3 pm"})
@@ -175,7 +192,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create appointment with time range object and numeric times" do
+  context "build new appointment with time range object and numeric times" do
     setup do
       @today      = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})

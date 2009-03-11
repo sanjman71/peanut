@@ -9,7 +9,7 @@
 
 .span-16.services.hide
   - @sps.each do |sp|
-    .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => service_duration_in_words(sp[5])}
+    .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => service_duration_in_words(sp[5], :exact => false)}
           
 .span-15.prepend-1.append-1.last
   - if !@current_company.can_schedule_appointments?
@@ -72,7 +72,7 @@
       %br
       .span-7.last.duration
         .span-5.prepend-2.last#duration_in_words
-          = service_duration_in_words(@service.duration) if @service
+          = service_duration_in_words(@service.duration, :exact => false) if @service
         %br
         .span-7.last.change
           .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
