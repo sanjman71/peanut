@@ -1,6 +1,7 @@
 class FreeController < ApplicationController
+  before_filter :disable_flash_header
   # privilege_required 'read appointments', :only => [:index]
-
+  
   # GET /users/1/free/calendar
   def new
     if params[:schedulable_type].blank? or params[:schedulable_id].blank?

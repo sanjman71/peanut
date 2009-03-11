@@ -124,10 +124,19 @@ class AppointmentsController < ApplicationController
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
     klass, id     = [params[:schedulable_type], params[:schedulable_id]]
-    # note: the send method can generate an exception
-    @schedulable  = current_company.send(klass).find_by_id(id)
     @customer     = User.find_by_id(params[:customer_id])
-
+        
+    begin
+      # find the schedulable, but beware that the send method can generate an exception
+      @schedulable = current_company.send(klass).find_by_id(id)
+    rescue Exception => e
+      logger.debug("xxx create appointment error: #{e.message}")
+      flash[:error] = "Error creating appointment"
+      # set redirect path
+      @redirect_path = request.referer
+      return
+    end
+    
     @mark_as      = params[:mark_as]
     @duration     = params[:duration].to_i if params[:duration]
     @start_at     = params[:start_at]
@@ -177,10 +186,10 @@ class AppointmentsController < ApplicationController
     
     if @errors.keys.size > 0
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = build_create_redirect_path(@schedulable, request.referer)
     else
       flash[:notice]  = "Created appointment(s)"
-      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      @redirect_path  = build_create_redirect_path(@schedulable, request.referer)
     end
     
     respond_to do |format|
@@ -290,6 +299,20 @@ class AppointmentsController < ApplicationController
   
   def appointment_free_time_scheduled_at(appointment)
     "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
+  end
+  
+  def build_create_redirect_path(schedulable, referer)
+    default_path  = url_for(:action => 'index', :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :subdomain => current_subdomain)
+    
+    return default_path if referer.blank?
+
+    if referer.match(/free/)
+      # use referer path
+      referer
+    else
+      # use default path
+      default_path
+    end
   end
   
 end

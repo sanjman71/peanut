@@ -31,9 +31,10 @@ else
   
   # update appointments
   page["#free_schedule"].html(render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day}))
+
+  # reset submit button and progress bar
+  page["#submit"].show();
+  page["#progress"].hide();
 end 
 
-# always reset submit button and progress bar
-page["#submit"].show();
-page["#progress"].hide();
 

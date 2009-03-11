@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   
   # Make the following methods available to all helpers
-  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges
+  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :flash_header_enabled?
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -61,6 +61,16 @@ class ApplicationController < ActionController::Base
   
   def current_privileges
     @current_privileges ||= []
+  end
+  
+  # controls whether the flash may be displayed in the header, defaults to true
+  def flash_header_enabled?
+    @flash_header = true if @flash_header.nil?
+    return @flash_header
+  end
+  
+  def disable_flash_header
+    @flash_header = false
   end
   
   # build hash mapping days to appointment attributes that are used as css tags in calendar views
