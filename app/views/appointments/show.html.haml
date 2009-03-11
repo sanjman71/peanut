@@ -10,7 +10,7 @@
         %h2==Appointment information    
     .span-15.last
       %h3
-        = render(:partial => 'appointment_header.html.haml', :locals => {:appointment => @appointment})
+        = render(:partial => 'appointment_header', :locals => {:appointment => @appointment, :duration => @appointment.duration})
     .span-8.last
       - if @appointment.state == 'upcoming'
         -# upcoming appointments can be canceled and checked-out
