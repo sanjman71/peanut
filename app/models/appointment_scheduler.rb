@@ -227,10 +227,15 @@ class AppointmentScheduler
     
     free_appointment
   end
+
+  # build collection of all unscheduled appointments over the specified date range
+  def self.find_free_work_appointments(company, location, schedulable, daterange, appointments=nil)
+    company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
+  end
   
   # build collection of all unscheduled appointments over the specified date range
   # returns a hash mapping dates to a appointment collection
-  def self.find_unscheduled_time(company, schedulable, daterange, appointments=nil)
+  def self.find_unscheduled_time(company, location, schedulable, daterange, appointments=nil)
     # find all appointments over the specified daterange, order by start_at
     appointments = appointments || company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
     

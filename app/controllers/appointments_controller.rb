@@ -65,7 +65,7 @@ class AppointmentsController < ApplicationController
     end
 
     # find free, work appointments for a resource
-    @appointments = current_company.appointments.schedulable(@schedulable).free_work.overlap(@daterange.start_at, @daterange.end_at).general_location(@current_location.id).order_start_at
+    @appointments = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @schedulable, @daterange)
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     

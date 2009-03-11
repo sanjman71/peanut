@@ -1,0 +1,17 @@
+- free_work_appts_by_day.keys.sort.each do |key|
+  - schedule_day = key.to_s(:appt_schedule_day)
+  - text_day     = key.to_s(:appt_short_month_day_year)
+  .free_work.hide{:id => "free_work_#{schedule_day}", :style => 'color: #666666;'}
+    %h4#date{:style => 'margin-bottom: 3px;'}
+      = text_day
+    #appointments
+      - free_work_appts_by_day[key].each do |appt|
+        %span{:style => 'margin-right: 3px;'}
+          = appt.service.name
+          == :
+        %span
+          = appt.start_at.to_s(:appt_time)
+          == -
+          = appt.end_at.to_s(:appt_time)
+          %br
+      

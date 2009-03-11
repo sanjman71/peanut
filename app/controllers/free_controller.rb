@@ -18,12 +18,15 @@ class FreeController < ApplicationController
     
     # initialize daterange, start calendar on sunday, end calendar on sunday
     @daterange    = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
-    
-    # find unscheduled time
-    @unscheduled_appts  = AppointmentScheduler.find_unscheduled_time(current_company, @schedulable, @daterange)
+        
+    # find free work appointments
+    @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @schedulable, @daterange)
+
+    # group appointments by day
+    @free_work_appts_by_day = @free_work_appts.group_by { |appt| appt.start_at.utc.beginning_of_day }
     
     # build calendar markings
-    @calendar_markings  = build_calendar_markings(@unscheduled_appts.values.flatten)
+    @calendar_markings  = build_calendar_markings(@free_work_appts)
     
     # build time of day collection
     # TODO xxx - need a better way of mapping these times to start, end hours

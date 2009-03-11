@@ -7,15 +7,15 @@ $(document).ready(function() {
     function() {
       // highlight date
       $(this).addClass('hover');
-      // show unscheduled time
+      // show free_work notes
       var id = $(this).attr("id");
-      $("#unscheduled_" + id).removeClass('hide');
+      $("#free_work_" + id).show();
     },
     function() {
       $(this).removeClass('hover');
-      // hide unscheduled time
+      // hide free/work notes
       var id = $(this).attr("id");
-      $("#unscheduled_" + id).addClass('hide');
+      $("#free_work_" + id).hide();
     }
   );
 

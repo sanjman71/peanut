@@ -23,6 +23,7 @@ class AppointmentTest < ActiveSupport::TestCase
     @monthly_plan   = Factory(:monthly_plan)
     @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company        = Factory(:company, :subscription => @subscription)
+    @anywhere       = Location.anywhere
   end
   
   context "create free appointment with mismatched duration and end_at values" do
@@ -58,7 +59,7 @@ class AppointmentTest < ActiveSupport::TestCase
                                                                      :start_at => @start_at_utc, :end_at => @end_at_utc)
       
       # build mapping of unscheduled time
-      @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @johnny, @daterange)
+      @unscheduled    = AppointmentScheduler.find_unscheduled_time(@company, @anywhere, @johnny, @daterange)
     end
       
     should_change "Appointment.count", :by => 1
