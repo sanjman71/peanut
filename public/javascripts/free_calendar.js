@@ -94,6 +94,10 @@ $(document).ready(function() {
     // ajax post
     $.post(this.action, $(this).serialize(), null, "script");
     
+    // hide the submit button and show the progress bar
+    $(this).find("#submit").hide();
+    $(this).find("#progress").show();
+    
     return false;
   });
   
