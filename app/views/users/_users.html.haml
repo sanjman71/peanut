@@ -7,7 +7,7 @@
       = user.roles.collect(&:name).join(", ")
     .span-3.calendar
       - id = "schedulable_#{user.class.to_s.underscore}_#{user.id}"
-      = check_box_tag 'Calendar', 'yes', user.has_calendar?(current_company), :id => id, :class => 'checkbox user', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable => user.tableize, :id => user.id, :subdomain => current_subdomain)
+      = check_box_tag 'Calendar', 'yes', user.has_calendar?(current_company), :id => id, :class => 'checkbox user', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable_type => user.tableize, :schedulable_id => user.id, :subdomain => current_subdomain)
       = label_tag id, 'Calendar', :class => 'checkbox label'
       %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
     .span-2.action.last

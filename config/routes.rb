@@ -73,7 +73,7 @@ ActionController::Routing::Routes.draw do |map|
                 :controller => 'appointments', :action => 'create', :mark_as => 'wait', :conditions => {:method => :post}
     
   # toggle a schedulable's calendar
-  map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', 
+  map.connect   ':schedulable_type/:schedulable_id/calendar/toggle',
                 :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
    
   # services, products
