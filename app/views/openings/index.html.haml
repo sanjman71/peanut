@@ -45,4 +45,4 @@
     -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
     
   -#%div{:class => @when ? "span-7" : "span-24"}
-  = render(:partial => 'openings/search', :locals => {:title => @when ? "Modify Your Search" : "Make an Appointment", :submit_text => @when ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @when ? :small : :large})
+  = render(:partial => 'openings/search', :locals => {:title => @when ? "Modify Your Search" : "Make an Appointment", :submit_text => @when ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @when ? :narrow : :wide})
