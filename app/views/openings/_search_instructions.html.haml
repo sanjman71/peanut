@@ -1,0 +1,16 @@
+- if when_range.blank?
+  == How do I schedule an appointment?
+  %ul
+    %li== Select appointment criteria and click on 'Search'
+- elsif !free_appointments.blank?
+  == What can I do here?
+  %ul
+    %li== Select an available appointment
+    %span== or
+    %li== Select different appointment criteria and search again
+- else
+  == What can I do here?
+  %ul
+    %li== Select different appointment criteria and search again
+    %span== or
+    %li== Select the waitlist to be notified of an opening

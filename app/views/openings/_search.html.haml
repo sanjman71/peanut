@@ -1,40 +1,46 @@
-- form_for(@query, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'schedule_search_form'}) do |f|
-  .span-7.last
-    .span-2.text-align-right
+%h2.prepend-1
+  = title
+= hidden_field_tag 'initial_schedulable_id', schedulable.id
+= hidden_field_tag 'initial_schedulable_type', schedulable.tableize
+- form_for(Appointment.new, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
+  .last{:class => size == :large ? "span-24" : "span-7"}
+    .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
       == What?
     .span-5.last.field#what
-      = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
+      = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id))
   %br
-  .span-7.last
-    .span-2.text-align-right
-      == How long?
-    .span-5.last
-      %span.field#duration
-        = select_tag('duration', options_for_select(service_duration_select_options, @duration))
+  .last.duration{:class => size == :large ? "span-24" : "span-7"}
+    .span-5.prepend-2.last#duration_in_words
+      = service_duration_in_words(duration, :exact => false) if @service
+    %br
+    .span-7.last.change
+      .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
+        == How long?
+      .span-5.last
+        %span.field#duration
+          = select_tag('duration', options_for_select(service_duration_select_options, duration))
+  .last{:class => size == :large ? "span-24" : "span-7"}
+    .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
+      == With?
+    .span-5.last.field#who
+      = select_tag('schedulable', options_for_select(schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{schedulable.tableize}/#{schedulable.id}"), :style => "width: 125px; align: top;")
   %br
-  .span-7.last
-    .span-3.text-align-right
-      == Who/What to schedule?
-    .span-4.last.field#who
-      = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
-  %br
-  .span-7.last
-    .span-2.text-align-right
+  .last{:class => size == :large ? "span-24" : "span-7"}
+    .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
       == When?
     .span-5.last
       %span.field#when
-        = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
+        = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, when_range))
       %span.field#time
-        = select_tag('time', options_for_select(Appointment::TIMES, @time))
+        = select_tag('time', options_for_select(Appointment::TIMES, time))
   - if @locations.size > 1
     %br
-    .span-7.last
+    .last{:class => size == :large ? "span-24" : "span-7"}
       .span-3.text-align-right
         == Where?
       .span-4.last.field#where
-        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
-  - else
-    .span-7.last
-  .span-4.prepend-1.last
-    = f.submit 'Search', :name => nil, :class => 'submit', :id => 'search_submit', :disabled => @when ? 'false' : 'true'
+        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px;")
+  %br
+  .last{:class => size == :large ? "span-24" : "span-7", :style => 'margin-left: 15px; padding-top: 10px;'}
+    = f.submit submit_text, :name => nil, :class => 'submit', :id => 'search_submit'
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

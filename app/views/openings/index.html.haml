@@ -40,70 +40,9 @@
       .span-15.last.appointments#free_appointments
         = render(:partial => 'appointments/free_appointments.html.haml', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
 
-.span-7.last
-  .span-7.last.sidebar.instructions
-    - if @when.blank?
-      == How do I schedule an appointment?
-      %ul
-        %li== Select appointment criteria and click on 'Search'
-    - elsif !@free_timeslots.blank?
-      == What can I do here?
-      %ul
-        %li== Select an available appointment
-        %span== or
-        %li== Select different appointment criteria and search again
-    - else
-      == What can I do here?
-      %ul
-        %li== Select different appointment criteria and search again
-        %span== or
-        %li== Select the waitlist to be notified of an opening
-
-  .span-7.last.mat
-    %h2== Change Search:
-    = hidden_field_tag 'initial_schedulable_id', @schedulable.id
-    = hidden_field_tag 'initial_schedulable_type', @schedulable.tableize
-    - form_for(Appointment.new, :url => url_for(:action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
-      .span-7.last
-        .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
-          == What?
-        .span-5.last.field#what
-          = select_tag('service_id', options_for_select(@services.collect{ |s| [s.name, s.id]}, @service.id))
-      %br
-      .span-7.last.duration
-        .span-5.prepend-2.last#duration_in_words
-          = service_duration_in_words(@service.duration, :exact => false) if @service
-        %br
-        .span-7.last.change
-          .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}
-            == How long?
-          .span-5.last
-            %span.field#duration
-              = select_tag('duration', options_for_select(service_duration_select_options, @duration))
-      .span-7.last
-        .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
-          == With?
-        .span-5.last.field#who
-          = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :style => "width: 125px; align: top;")
-      %br
-      .span-7.last
-        .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
-          == When?
-        .span-5.last
-          %span.field#when
-            = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, @when))
-          %span.field#time
-            = select_tag('time', options_for_select(Appointment::TIMES, @time))
-      - if @locations.size > 1
-        %br
-        .span-7.last
-          .span-3.text-align-right
-            == Where?
-          .span-4.last.field#where
-            = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style =>      "width: 125px;")
-      %br
-      .span-4.prepend-1.last
-        = f.submit 'Search again', :name => nil, :class => 'submit', :id => 'search_submit'
-        %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-
-
+.last.mat{:class => @when ? "span-7" : "span-24"}
+  -#.span-7.last.sidebar.instructions
+    -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
+    
+  -#%div{:class => @when ? "span-7" : "span-24"}
+  = render(:partial => 'openings/search', :locals => {:title => @when ? "Modify Your Search" : "Make an Appointment", :submit_text => @when ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @when ? :small : :large})
