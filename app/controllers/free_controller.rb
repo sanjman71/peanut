@@ -1,5 +1,5 @@
 class FreeController < ApplicationController
-  before_filter :disable_flash_header
+  before_filter :disable_global_flash
   # privilege_required 'read appointments', :only => [:index]
   
   # GET /users/1/free/calendar
