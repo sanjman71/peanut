@@ -149,7 +149,7 @@ $.fn.init_highlight_appointments = function () {
 } 
 
 // Show calendar for the selected schedulable
-$.fn.init_select_schedulable_for_appointment_calendar = function () {
+$.fn.init_select_schedulable_for_calendar_show = function () {
   $("#schedulable").change(function () {
     var href = '/' + this.value + '/calendar';
     window.location = href;
