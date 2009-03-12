@@ -32,7 +32,7 @@ module ApplicationHelper
   def build_tab_links(current_controller)
     # 'Openings' tab
     name = 'Openings'
-    if current_controller.controller_name == 'openings' and current_controller.action_name == 'index'
+    if current_controller.controller_name == 'openings' and ['index'].include?(current_controller.action_name)
       link = link_to(name, openings_path(:subdomain => @subdomain), :class => 'current')
     else
       link = link_to(name, openings_path(:subdomain => @subdomain))
@@ -44,7 +44,7 @@ module ApplicationHelper
 
       # 'Schedules' tab
       name = 'Schedules'
-      if current_controller.controller_name == 'calendar' and ['edit', 'show'].include?(current_controller.action_name)
+      if current_controller.controller_name == 'calendar' and ['show', 'edit'].include?(current_controller.action_name)
         link = link_to(name, url_for(:controller => 'calendar', :action => 'index', :subdomain => @subdomain), :class => 'current')
       else
         link = link_to(name, url_for(:controller => 'calendar', :action => 'index', :subdomain => @subdomain))
@@ -62,6 +62,20 @@ module ApplicationHelper
         link = link_to(name, waitlist_index_path, :class => 'current')
       else
         link = link_to(name, waitlist_index_path)
+      end
+
+      yield link
+
+    end
+
+    if has_privilege?('read work appointments', current_company)
+
+      # 'Appointments' tab
+      name = 'Appointments'
+      if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
+        link = link_to(name, search_appointments_path, :class => 'current')
+      else
+        link = link_to(name, search_appointments_path)
       end
 
       yield link
@@ -96,34 +110,6 @@ module ApplicationHelper
 
     end
     
-    if has_privilege?('read work appointments', current_company)
-
-      # 'Appointments' tab
-      name = 'Appointments'
-      if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
-        link = link_to(name, search_appointments_path, :class => 'current')
-      else
-        link = link_to(name, search_appointments_path)
-      end
-
-      yield link
-
-    end
-      
-    # if has_privilege?('read resources', current_company)
-    # 
-    #   # 'Resources' tab
-    #   name = 'Resources'
-    #   if current_controller.controller_name == 'resources' and ['index', 'show'].include?(current_controller.action_name)
-    #     link = link_to(name, resources_path, :class => 'current')
-    #   else
-    #     link = link_to(name, resources_path)
-    #   end
-    # 
-    #   yield link
-    # 
-    # end
-    
     if has_privilege?('read services', current_company)
 
       # 'Services' tab
@@ -150,6 +136,19 @@ module ApplicationHelper
 
       yield link
       
+    end
+    
+    if has_privilege?('read users', current_company)
+    
+      # 'Users' tab
+      name = 'Users'
+      if current_controller.controller_name == 'users' and ['index', 'show', 'edit'].include?(current_controller.action_name)
+        link = link_to(name, users_path, :class => 'current')
+      else
+        link = link_to(name, users_path)
+      end
+
+      yield link
     end
   end
   
