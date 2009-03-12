@@ -1,6 +1,6 @@
 // Search schedules for available appointments
-$.fn.init_search_openings = function () {
-  $("#search_openings_form").submit(function () {
+$.fn.init_search_openings = function() {
+  $("#search_submit").click(function() {
     // validate search inputs
     var service_id = $('#service_id').val();
 
@@ -15,10 +15,14 @@ $.fn.init_search_openings = function () {
       $(".duration .change").remove();
     }
     
+    // post the search query
+    $.post($("#search_openings_form").attr("action"), $("#search_openings_form").serialize(), null, "script");
+
     // replace the search button with a progress image onsubmit
-    $("#search_submit").addClass('hide');
-    $("#search_progress").removeClass('hide');
-    return true;
+    $("#search_submit").hide();
+    $("#search_progress").show();
+    
+    return false;
   })
 }
 
@@ -26,6 +30,9 @@ $.fn.init_search_openings = function () {
 $(document).ready(function() {
   $(document).init_highlight_timeslots();
   $(document).init_search_openings();
+  
+  // rounded corners
+  $('#search_submit').corners("7px");
   
   // show sliders
   $(".pick_time").click(function () {

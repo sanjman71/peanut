@@ -96,7 +96,14 @@ class OpeningsController < ApplicationController
       params[s] = params[s].to_url_param if params[s]
     end
     schedulable_type, schedulable_id = params.delete(:schedulable).split('/')
-    redirect_to url_for(params.update(:subdomain => @subdomain, :action => 'index', :schedulable_type => schedulable_type, :schedulable_id => schedulable_id))
+    
+    # build redirect path
+    @redirect_path = url_for(params.update(:subdomain => current_subdomain, :action => 'index', :schedulable_type => schedulable_type, :schedulable_id => schedulable_id))
+
+    respond_to do |format|
+      format.html  { redirect_to(@redirect_path) }
+      format.js
+    end
   end
   
 end

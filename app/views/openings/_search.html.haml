@@ -42,5 +42,6 @@
         = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px;")
   %br
   .last{:class => size == :wide ? "span-24" : "span-7", :style => 'margin-left: 15px; padding-top: 10px;'}
-    = f.submit submit_text, :name => nil, :class => 'submit', :id => 'search_submit'
+    -#= f.submit submit_text, :name => nil, :class => 'submit', :id => 'search_submit'
+    %h4= link_to submit_text, '', :class => 'rounded button color', :id => 'search_submit'
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
