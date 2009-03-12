@@ -31,6 +31,7 @@ Rails::Initializer.run do |config|
   config.gem "starling", :version => '0.9.8'
   config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
+  config.gem 'ruport', :version => '1.6.1'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -95,5 +96,10 @@ ExceptionNotifier.email_prefix          = "[app] "
 # 
 DOMAIN = '.peanutcalendar.com'
 
-# Use will_paginate
+# Define all gem requirements
 require "will_paginate"
+require "ruport"
+
+# Require reports directory based on ruport (which must be required before this)
+require "#{RAILS_ROOT}/app/reports/calendar_controller.rb"
+require "#{RAILS_ROOT}/app/reports/calendar_pdf.rb"

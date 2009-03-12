@@ -55,6 +55,15 @@ class CalendarController < ApplicationController
     
     # group appointments by day
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    
+    respond_to do |format|
+      format.html
+      format.pdf do
+        # create pdf and stream it to the caller
+        pdf = Reports::CalendarController.render_pdf(:appointments => @appointments, :title => "Calendar Title")
+        send_data pdf, :type => "application/pdf"
+      end
+    end
   end
   
   # GET  /appointments/search

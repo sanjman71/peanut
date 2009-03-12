@@ -48,10 +48,13 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'services/:service_id/duration/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
 
-  # show/edit calendars scoped by schedulable
+  # show/edit calendars scoped by schedulable (and optional format)
   map.connect   ':schedulable_type/:schedulable_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
   map.connect   ':schedulable_type/:schedulable_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
   map.connect   ':schedulable_type/:schedulable_id/calendar', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar.:format', :controller => 'calendar', :action => 'show'
   map.connect   ':schedulable_type/:schedulable_id/calendar/edit', :controller => 'calendar', :action => 'edit'
   
   # search calendars scoped by schedulable
@@ -70,7 +73,8 @@ ActionController::Routing::Routes.draw do |map|
                 :controller => 'appointments', :action => 'create', :mark_as => 'wait', :conditions => {:method => :post}
     
   # toggle a schedulable's calendar
-  map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
+  map.connect   'calendars/:schedulable_type/:schedulable_id/toggle', 
+                :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
    
   # services, products
   map.resources :services

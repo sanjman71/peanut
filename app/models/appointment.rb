@@ -413,25 +413,7 @@ class Appointment < ActiveRecord::Base
       self.duration       = 0
     end
   end
-  
-  # split appointment into timeslots of the specified duration
-  def timeslots(duration, options={})
-    chunks = self.duration / duration
-    
-    # apply limit based on current array size
-    # chunks = (limit - array.size) if limit
-    
-    timeslots = Range.new(0,chunks-1).inject([]) do |collection, i|
-      # clone timeslot, then increment start_at based on chunk index
-      start_at_i = self.start_at + (i * duration).minutes
-      end_at_i   = start_at_i + duration.minutes
-      timeslot_i = AppointmentTimeslot.new(:appointment => self, :start_at => start_at_i, :end_at => end_at_i)
-      collection << timeslot_i
-    end
-    
-    timeslots
-  end
-  
+
   protected
   
   def make_confirmation_code

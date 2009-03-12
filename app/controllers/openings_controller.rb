@@ -70,11 +70,6 @@ class OpeningsController < ApplicationController
                                                                             @schedulable, @service, @duration, @daterange, :time => @time)
     @free_appointments_by_day = @free_appointments.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
-    # @free_timeslots     = @free_appointments.inject([]) do |timeslots, free_appointment|
-    #   timeslots += @query.find_free_timeslots(:appointments => free_appointment, :limit => 2)
-    # end
-    # @free_timeslots_by_day = @free_timeslots.group_by { |timeslot| timeslot.start_at.beginning_of_day }
-    
     logger.debug("*** found #{@free_appointments.size} free appointments over #{@daterange.days} days")
     
     # build hash of calendar markings

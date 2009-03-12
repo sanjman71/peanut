@@ -2,7 +2,7 @@
 - javascript('date', 'jquery.bgiframe', 'jquery.datePicker', 'appointments')
 - stylesheet('appointments', 'calendar', 'datePicker')
 
-.span-17
+.span-16.append-1
   .span-15.prepend-1.last.mat
     - if current_company.schedulables_count == 0
       %h2
@@ -14,7 +14,7 @@
         %h3
           = label_tag "schedulable", "Schedule for", :class => 'big'
           = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
-        %h3= @daterange.name
+        %h5= link_to 'PDF Version', url_for(:format => 'pdf', :subdomain => current_subdomain)
       .span-6.prepend-1.last
         #links
           - build_calendar_when_links(@schedulable, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
