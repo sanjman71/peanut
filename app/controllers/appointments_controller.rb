@@ -1,83 +1,5 @@
 class AppointmentsController < ApplicationController
   
-  # Default when value
-  @@default_when = Appointment::WHEN_THIS_WEEK
-  
-  # GET /schedulable/1/appointments/when/next-week
-  # GET /schedulable/1/appointments/range/20090101..20090201
-  def index
-    if params[:customer_id]
-      @customer     = User.find(params[:customer_id])
-      @appointments = @customer.appointments
-      raise Exception, "todo: show customer appointments: #{@appointments.size}"
-    end
-    
-    @free_service = current_company.services.free.first
-
-    if current_company.schedulables_count == 0
-      # show message that schedulables need to be added before viewing schedules
-      return
-    end
-    
-    if params[:schedulable_type].blank? or params[:schedulable_id].blank?
-      # redirect to a specific schedulable
-      schedulable = current_company.schedulables.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable_type => schedulable.class.to_s.tableize, :schedulable_id => schedulable.id)) and return
-    end
-    
-    manage_appointments
-  end
-    
-  # DELETE /appointments/1
-  def destroy
-    @appointment  = current_company.appointments.find(params[:id])
-    @appointment.destroy
-    
-    # set flash
-    flash[:notice] = "Deleted appointment"
-    logger.debug("*** deleted appointment #{@appointment.id}")
-        
-    if @appointment.waitlist?
-      # redirect to waitlist index
-      @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
-    else
-      # redirect to schedulable appointment path
-      @schedulable  = @appointment.schedulable
-      @redirect     = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
-    end
-  end
-  
-  # shared method for managing free/work appointments
-  def manage_appointments
-    # initialize resource, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
-    @schedulables = current_company.schedulables.all
-
-    if params[:start_date] and params[:end_date]
-      # build daterange using range values
-      @start_date = params[:start_date]
-      @end_date   = params[:end_date]
-      @daterange  = DateRange.parse_range(@start_date, @end_date)
-    else
-      # build daterange using when
-      @when       = (params[:when] || @@default_when).from_url_param
-      @daterange  = DateRange.parse_when(@when)
-    end
-
-    # find free, work appointments for a resource
-    @appointments = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @schedulable, @daterange)
-        
-    logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
-    
-    # build hash of calendar markings
-    @calendar_markings = build_calendar_markings(@appointments)
-
-    logger.debug("*** calendar markings: #{@calendar_markings}")
-    
-    # group appointments by day
-    @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
-  end
-
   # GET   /schedule/users/1/services/1/duration/60/20081231T000000
   # POST  /schedule/users/1/services/1/duration/60/20081231T000000
   # GET   /waitlist/users/1/services/8/this-week/anytime
@@ -268,30 +190,46 @@ class AppointmentsController < ApplicationController
     end
   end
   
+  # DELETE /appointments/1
+  def destroy
+    @appointment  = current_company.appointments.find(params[:id])
+    @appointment.destroy
+    
+    # set flash
+    flash[:notice] = "Deleted appointment"
+    logger.debug("*** deleted appointment #{@appointment.id}")
+        
+    if @appointment.waitlist?
+      # redirect to waitlist index
+      @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
+    else
+      # redirect to schedulable appointment path
+      @schedulable  = @appointment.schedulable
+      @redirect     = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+    end
+  end
+  
   # GET  /appointments/search
   # POST /appointments/search
   #  - search for an appointment by code => params[:appointment][:code]
-  #  - search for appointments by date range => params[:start_date], params[:end_date]
   def search
     if request.post?
-      if params[:appointment] and params[:appointment][:code]
-        # check confirmation code, limit search to work appointments
-        @code         = params[:appointment][:code].to_s.strip
-        @appointment  = Appointment.work.find_by_confirmation_code(@code)
-      
-        if @appointment
-          # redirect to appointment show
-          @redirect = appointment_path(@appointment, :subdomain => current_subdomain)
-        else
-          # show error message?
-          logger.debug("*** could not find appointment #{@code}")
-        end
-      elsif params[:start_date] and params[:end_date]
-        # reformat start_date, end_date strings, and redirect to index action
-        start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
-        end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
-        redirect_to url_for(:action => 'index', :start_date => start_date, :end_date => end_date, :subdomain => current_subdomain)
+      # check confirmation code, limit search to work appointments
+      @code         = params[:appointment][:code].to_s.strip
+      @appointment  = Appointment.work.find_by_confirmation_code(@code)
+    
+      if @appointment
+        # redirect to appointment show
+        @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
+      else
+        # show error message?
+        logger.debug("*** could not find appointment #{@code}")
       end
+    end
+
+    respond_to do |format|
+      format.html { @redirect_path ? redirect_to(@redirect_path) : render(:action => 'search') }
+      format.js
     end
   end
     
@@ -302,11 +240,12 @@ class AppointmentsController < ApplicationController
   end
   
   def build_create_redirect_path(schedulable, referer)
-    default_path  = url_for(:action => 'index', :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :subdomain => current_subdomain)
+    # default to the schedulable's calendar show
+    default_path  = url_for(:controller => 'calendar', :action => 'show', :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :subdomain => current_subdomain)
     
     return default_path if referer.blank?
 
-    if referer.match(/free/)
+    if referer.match(/calendar/)
       # use referer path
       referer
     else

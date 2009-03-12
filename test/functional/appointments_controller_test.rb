@@ -3,13 +3,6 @@ require 'test/factories'
 
 class AppointmentsControllerTest < ActionController::TestCase
 
-  # show appointment schedule for a specific schedulable
-  should_route :get, 'users/1/appointments',  :controller => 'appointments', :action => 'index', :schedulable_type => 'users', :schedulable_id => 1
-  
-  # search appointments for a specific schedulable
-  should_route :post, 'schedulables/1/appointments/search', 
-               :controller => 'appointments', :action => 'search', :schedulable_type => 'schedulables', :schedulable_id => 1
-  
   # schedule a waitlist appointment for a specific schedulable
   should_route :get, 'waitlist/users/1/services/5/this-week/morning',
                :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
@@ -70,8 +63,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 2
     
     should_respond_with :redirect
-    should "redirect to users/:id/appointments path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    should "redirect to user calendar path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
@@ -90,8 +83,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 1
     
     should_respond_with :redirect
-    should "redirect to users/:id/appointments path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    should "redirect to user calendar path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
@@ -110,8 +103,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_not_change "Appointment.count"
   
     should_respond_with :redirect
-    should "redirect to users/:id/appointments path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/appointments")
+    should "redirect to user calendar path" do
+      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"

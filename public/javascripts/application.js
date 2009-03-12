@@ -29,9 +29,9 @@ Function.prototype.sleep = function (millisecond_delay) {
 $.fn.init_add_service_provider = function() {
   $("#provider").change(function () {
     // split selected provider value into provider type and id
-    var tuple         = $("#provider option:selected").attr("value").split("/");
-    var schedulable_type = tuple[0];
-    var schedulable_id   = tuple[1];
+    var tuple             = $("#provider option:selected").attr("value").split("/");
+    var schedulable_type  = tuple[0];
+    var schedulable_id    = tuple[1];
     $("#service_provider_schedulable_id").attr("value", schedulable_id);
     $("#service_provider_schedulable_type").attr("value", schedulable_type);
     $.post($("#new_service_provider").attr("action"), $("#new_service_provider").serialize(), null, "script");
@@ -148,19 +148,19 @@ $.fn.init_highlight_appointments = function () {
   )
 } 
 
-// Show appointment schedule for the selected schedulable
+// Show calendar for the selected schedulable
 $.fn.init_select_schedulable_for_appointment_calendar = function () {
   $("#schedulable").change(function () {
-    var href = '/' + this.value + '/appointments';
+    var href = '/' + this.value + '/calendar';
     window.location = href;
     return false;
   })
 }
 
-// Show free/available calendar for the selected schedulable
-$.fn.init_select_person_for_free_calendar = function () {
+// Edit calendar for the selected schedulable
+$.fn.init_select_schedulable_for_calendar_edit = function () {
   $("#schedulable").change(function () {
-    var href = '/' + this.value + '/free/calendar';
+    var href = '/' + this.value + '/calendar/edit';
     window.location = href;
     return false;
   })

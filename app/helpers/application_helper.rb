@@ -44,10 +44,10 @@ module ApplicationHelper
 
       # 'Schedules' tab
       name = 'Schedules'
-      if current_controller.controller_name == 'appointments' and current_controller.action_name == 'index'
-        link = link_to(name, appointments_path(:subdomain => @subdomain), :class => 'current')
+      if current_controller.controller_name == 'calendar' and ['edit', 'show'].include?(current_controller.action_name)
+        link = link_to(name, url_for(:controller => 'calendar', :action => 'index', :subdomain => @subdomain), :class => 'current')
       else
-        link = link_to(name, appointments_path(:subdomain => @subdomain))
+        link = link_to(name, url_for(:controller => 'calendar', :action => 'index', :subdomain => @subdomain))
       end
 
       yield link

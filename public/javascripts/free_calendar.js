@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-  $(document).init_select_person_for_free_calendar();
+  $(document).init_select_schedulable_for_calendar_edit();
   
   // set hover states to show selected date, ignore past dates
   $(".weekday:not(.past),.weekend:not(.past)").hover(

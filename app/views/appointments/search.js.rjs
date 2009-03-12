@@ -1,5 +1,5 @@
-if @redirect
-  page.redirect_to(@redirect)
+if @redirect_path
+  page.redirect_to(@redirect_path)
 else
   page["#progress"].hide();  # Hide progress bar
   page["#submit"].show();    # Show submit button 

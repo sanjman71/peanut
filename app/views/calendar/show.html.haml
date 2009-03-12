@@ -17,7 +17,7 @@
         %h3= @daterange.name
       .span-6.prepend-1.last
         #links
-          - build_appointment_when_links(@person, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
+          - build_calendar_when_links(@schedulable, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
             = link
             = separator
           %br
@@ -38,12 +38,12 @@
     .span-15.prepend-1.last
       %h2
         = @daterange.name
-      .span-15.last#free_calendar
+      .span-15.last#free_work_calendar
         = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
       %h3.span-15.last#appointments_count
-        = render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size})
+        = render(:partial => 'appointments/appointments_count.html.haml', :locals => {:count => @appointments.size})
       .span-15.last#free_schedule
-        = render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
+        = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
   
 - unless current_company.schedulables_count == 0
   .span-6.prepend-1.last.mat
@@ -76,6 +76,5 @@
        
     %hr.space   
     %h4== or
-    %h4= link_to "Schedule blocks of available time", url_for(:controller => 'free', :action => 'new', :style => 'calendar', :subdomain => current_subdomain), :class => 'rounded button'
-    %h4= link_to "Schedule blocks of available time (version 2)", url_for(:controller => 'free', :action => 'new', :style => 'daily', :subdomain => current_subdomain)
+    %h4= link_to "Schedule blocks of available time", url_for(:controller => 'calendar', :action => 'edit', :subdomain => current_subdomain), :class => 'rounded button'
 

@@ -38,9 +38,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # show free time for a specific schedulable
-  map.connect   ':schedulable_type/:schedulable_id/free/:style', :controller => 'free', :action => 'new'
-
   # openings search/index path, scoped by service and (optional) schedulable
   map.connect   ':schedulable_type/:schedulable_id/services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/openings/:when/:time', :controller => 'openings', :action => 'index'
@@ -51,13 +48,14 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'services/:service_id/duration/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
 
-  # appointments search/index path scoped by schedulable
-  map.connect   ':schedulable_type/:schedulable_id/appointments/when/:when', :controller => 'appointments', :action => 'index'
-  map.connect   ':schedulable_type/:schedulable_id/appointments/range/:start_date..:end_date', :controller => 'appointments', :action => 'index'
-  map.resource_appointments   ':schedulable_type/:schedulable_id/appointments', :controller => 'appointments', :action => 'index'
-
-  # search appointments path scoped by schedulable
-  map.connect   ':schedulable_type/:schedulable_id/appointments/search', :controller => 'appointments', :action => 'search'
+  # show/edit calendars scoped by schedulable
+  map.connect   ':schedulable_type/:schedulable_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar', :controller => 'calendar', :action => 'show'
+  map.connect   ':schedulable_type/:schedulable_id/calendar/edit', :controller => 'calendar', :action => 'edit'
+  
+  # search calendars scoped by schedulable
+  map.connect   ':schedulable_type/:schedulable_id/calendar/search', :controller => 'calendar', :action => 'search'
 
   # schedule a work appointment with a schedulable for a specified service and duration
   map.schedule  'book/:schedulable_type/:schedulable_id/services/:service_id/duration/:duration/:start_at', 
