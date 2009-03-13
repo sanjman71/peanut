@@ -15,12 +15,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :price => 1.00)
       @customer  = Factory(:user)
-
+  
       # create free appointment (all day)
       @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
                                                                          :start_at => "20100101000000", :end_at => "20100102000000")
       assert_valid @free_appointment
-
+  
       # search for free appointments
       @daterange          = DateRange.parse_range("20100101000000", "20100301000000")
       @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
@@ -37,7 +37,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         # search for free appointments
         @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
-
+  
       should "find 1 free appointment" do
         assert_equal [@free_appointment], @free_appointments
       end
@@ -48,7 +48,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
-
+  
       # create free appointment that ended 1 hour ago
       @end_at             = (Time.now - 3.minutes).to_s(:appt_schedule)
       @start_at           = (Time.now - 10.hours).to_s(:appt_schedule)
@@ -68,26 +68,28 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
     end
   end
-
+  
   context "create a free appointment that starts in the future" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
-
+  
       @haircut.reload
       @johnny.reload
       
       # create a free appointment that starts in 1 hour
       @start_at           = (Time.now + 1.hour).to_s(:appt_schedule)
       @end_at             = (Time.now + 3.hours).to_s(:appt_schedule)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :duration => 120, :end_at => @end_at)
       assert_valid @free_appointment
     end
-
+  
+    should_change "Appointment.count", :by => 1
+  
     context "and search for free appointments" do
       setup do
         # search for free appointments using a wider date range (in utc format)
-        @daterange          = DateRange.parse_range((Time.now - 3.days).utc.to_s(:appt_schedule), (Time.now + 3.days).utc.to_s(:appt_schedule))
+        @daterange          = DateRange.parse_range((Time.now - 30.days).to_s(:appt_schedule), (Time.now + 30.days).to_s(:appt_schedule))
         @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
       
@@ -102,7 +104,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
       @customer  = Factory(:user)
-
+  
       # create free appointment (all day)
       @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
@@ -137,10 +139,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
-
+  
       # should have 1 free ppointment
       should_change "Appointment.count", :by => -1
-
+  
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
@@ -157,7 +159,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
       @customer  = Factory(:user)
-
+  
       # create free appointment (all day)
       @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service,
                                                                         :start_at => "20080801000000", :end_at => "20080802000000")
@@ -193,10 +195,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
-
+  
       # should have 1 free appointment again
       should_change "Appointment.count", :by => -2
-
+  
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
@@ -208,7 +210,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   
   end
-
+  
   context "schedule work appointment at the end of a free appointment" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
@@ -245,15 +247,15 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     should "have work appointment with a different confirmation code" do
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
-
+  
     context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
-
+  
       # should have 1 free ppointment
       should_change "Appointment.count", :by => -1
-
+  
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
@@ -270,7 +272,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
       @customer  = Factory(:user)
-
+  
       # create free appointment (all day)
       @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
                                                                         :start_at => "20080801000000", :end_at => "20080801003000")
@@ -301,15 +303,15 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     should "have work appointment with a different confirmation code" do
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
-
+  
     context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
-
+  
       # should have 1 free appointment
       should_not_change "Appointment.count"
-
+  
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at

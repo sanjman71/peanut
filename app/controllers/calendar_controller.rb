@@ -40,7 +40,7 @@ class CalendarController < ApplicationController
     else
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
-      @daterange  = DateRange.parse_when(@when)
+      @daterange  = DateRange.parse_when(@when, :include => :today)
     end
 
     # find free, work appointments for a resource

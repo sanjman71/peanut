@@ -101,7 +101,7 @@ class Appointment < ActiveRecord::Base
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
   TIMES_EXTENDED            = ['anytime', 'early morning', 'morning', 'afternoon', 'evening', 'late night']
   
-  # convert time of day to a seconds range
+  # convert time of day to a seconds range, in utc format
   TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
                                'morning'    => [8*3600,   12*3600],     # 8am - 12pm
                                'afternoon'  => [12*3600,  17*3600],     # 12pm - 5pm
@@ -109,7 +109,7 @@ class Appointment < ActiveRecord::Base
                                'never'      => [0,        0]
                               }
 
-  # BEGIN acts_as_state_machhine
+  # BEGIN acts_as_state_machine
   include AASM
   
   aasm_column           :state
@@ -133,9 +133,14 @@ class Appointment < ActiveRecord::Base
     time_zone_aware_attributes && skip_time_zone_conversion_for_attributes && !skip_time_zone_conversion_for_attributes.include?(name.to_sym) && [:datetime, :timestamp].include?(column.type)
   end
   
-  # map time of day string to a utc time range in seconds
+  # map time of day string to a numeric time range, and then adjust for the time zone
+  # note: no adjustment needed for anytime or never
   def self.time_range(s)
-    array = (TIMES_HASH[s] || TIMES_HASH['never']).map { |x| x - Time.zone.utc_offset }
+    if ['never', 'anytime'].include?(s)
+      array = (TIMES_HASH[s] || TIMES_HASH['never'])
+    else
+      array = (TIMES_HASH[s] || TIMES_HASH['never']).map { |x| x - Time.zone.utc_offset }
+    end
     Range.new(array[0], array[1])
   end
   

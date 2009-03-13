@@ -57,42 +57,49 @@ class DateRange
   
   # parse when string into a valid date range
   # options:
-  #   - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
-  #   - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
+  #  - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at
+  #  - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at
+  #  - include   => :today, add today if utc day <> local time day 
   def self.parse_when(s, options={})
+    # initialize now to utc time
+    now = Time.now.utc
+    
     if (m = s.match(/next (\d{1}) week/)) # e.g. 'next 3 weeks', 'next 1 week'
       # use [today, today + n weeks]
       n         = m[1].to_i
-      start_at  = Time.now.utc.beginning_of_day
+      start_at  = now.beginning_of_day
       end_at    = start_at + n.weeks
     else
       case s
       when 'today'
-        start_at  = Time.now.utc.beginning_of_day
+        start_at  = now.beginning_of_day
         end_at    = start_at + 1.day
       when 'tomorrow'
-        start_at  = Time.now.utc.tomorrow.beginning_of_day
+        start_at  = now.tomorrow.beginning_of_day
         end_at    = start_at + 1.day
       when 'this week'
         # this week ends on sunday night at midnight
-        end_at    = Time.now.utc.end_of_week + 1.second
-        start_at  = Time.now.utc.beginning_of_day
+        end_at    = now.end_of_week + 1.second
+        start_at  = now.beginning_of_day
+        if options[:include] == :today
+          start_at -= 1.day if now.yday > Time.now.yday
+        end
       when 'next week'
         # next week starts on monday
-        start_at  = Time.now.utc.next_week
+        start_at  = now.next_week
         end_at    = start_at + 1.week
       when 'later'
         # should start after 'next week', and continue for 2 weeks
-        start_at  = Time.now.utc.next_week + 1.week
+        start_at  = now.next_week + 1.week
         end_at    = start_at + 2.weeks
       when 'past week'
-        end_at    = Time.now.utc.end_of_day + 1.second
+        end_at    = now.end_of_day + 1.second
         start_at  = end_at - 1.week
       when 'past 2 weeks'
-        end_at    = Time.now.utc.end_of_day + 1.second
+        end_at    = now.end_of_day + 1.second
         start_at  = end_at - 2.weeks
       when 'past month'
-        end_at    = Time.now.end_of_day + 1.second
+        end_at    = now.end_of_day + 1.second
         start_at  = end_at - 1.month
       else
         return DateRange.new(Hash[:name => 'error'])
@@ -117,8 +124,9 @@ class DateRange
     
     # build name from start, end dates
     range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
+    # build start_at, end_at times in utc format
     start_at    = Time.parse(start_date).utc.beginning_of_day
-    end_at      = Time.parse(end_date).beginning_of_day
+    end_at      = Time.parse(end_date).utc.beginning_of_day
     
     if inclusive
       # include the last day by adjusting to the end of the day

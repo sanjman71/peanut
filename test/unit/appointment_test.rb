@@ -156,7 +156,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at_utc = @appt.end_at.utc
     end
     
-    should "have time of day values based on start/end timses converted to utc format" do
+    should "have time of day values based on start/end times in utc format" do
       assert_equal '', @appt.time
       assert_equal ((@start_at_utc.hour * 60) + @start_at_utc.min) * 60, @appt.time_start_at
       assert_equal ((@end_at_utc.hour * 60) + @end_at_utc.min) * 60, @appt.time_end_at

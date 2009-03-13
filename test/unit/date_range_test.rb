@@ -40,20 +40,23 @@ class DateRangeTest < ActiveSupport::TestCase
     end
   end
 
-  context 'this week' do
+  context 'this week, including today' do
     setup do
-      @daterange = DateRange.parse_when('this week')
+      @daterange = DateRange.parse_when('this week', :include => :today)
       assert_valid @daterange
       # sunday is day 0, saturday is day 6
       @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
+      
+      # check if including today adds an extra day
+      @add_today_day     = Time.now.utc.yday > Time.now.yday ? 1 : 0
     end
 
     should 'have days count based on current utc time and day of week' do
-      assert_equal @days_left_in_week[Time.now.utc.wday], @daterange.days
+      assert_equal @days_left_in_week[Time.now.utc.wday] + @add_today_day, @daterange.days
     end
 
-    should 'have start day == beginning of today in utc format' do
-      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
+    should 'have start day == beginning of today (adjusting for today) in utc format' do
+      assert_equal Time.now.utc.beginning_of_day - @add_today_day.day, @daterange.start_at
     end
 
     should 'be named This Week' do

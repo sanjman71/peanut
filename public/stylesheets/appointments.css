@@ -12,12 +12,13 @@ div.appointment                                   { padding: 7px 0 7px 0; }
 
 div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
 div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
-div.appointment.work                              { background-color: #FFCC00; }  /* yellowish */
+div.appointment.work                              { background-color: #EDF3FE; }  /* yellowish */
+
+div.appointment.work div.service h6               { color: #009900; }
 
 div.timeslot                                      { padding: 7px 0 7px 0; }
 
-div.timeslot a, div.appointment a
-                                                  { color: #5500BB; font-weight: bold; }
+div.timeslot a, div.appointment a                 { color: #5500BB; font-weight: bold; }
                                                   
 div.timeslot a:hover, div.appointment a:hover
                                                   { color: #5500BB; background-color: #FF6600; }

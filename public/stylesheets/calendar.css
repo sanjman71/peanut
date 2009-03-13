@@ -11,7 +11,7 @@ table.calendar td                                 { background: #F5F5F5 none rep
                                                     vertical-align: top;}
 
 table.calendar td.free                            { background: #EDF3FE none repeat scroll 0 0; color: #333333; font-weight: bold; }
-table.calendar td.work                            { background: #FFCC00 none repeat scroll 0 0; color: #333333; font-weight: bold; }
+table.calendar td.work                            { background: #009900 none repeat scroll 0 0; color: #333333; font-weight: bold; }
 table.calendar td.busy                            { background: #444444 none repeat scroll 0 0; color: #FFFFFF; font-weight: bold; }
 
 table.calendar span                               { margin: 3px 0 0; padding: 0; font-size: 9px;}
