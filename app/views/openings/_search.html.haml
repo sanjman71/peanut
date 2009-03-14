@@ -10,7 +10,7 @@
       = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id))
   .last.duration{:class => size == :wide ? "span-24" : "span-7"}
     .span-5.prepend-2.last#duration_in_words
-      = service_duration_in_words(duration, :exact => false) if @service
+      = Duration.to_words(duration, :prepend => "Typically") if @service
     %br
     .span-7.last.change
       .span-2.text-align-right#duration_text{:style => 'padding-top: 7px;'}

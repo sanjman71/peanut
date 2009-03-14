@@ -84,6 +84,7 @@ end
 require "#{RAILS_ROOT}/lib/range.rb"
 require "#{RAILS_ROOT}/lib/array.rb"
 require "#{RAILS_ROOT}/lib/string.rb"
+require "#{RAILS_ROOT}/lib/duration.rb"
 
 # Initialize workling to use starling
 Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
