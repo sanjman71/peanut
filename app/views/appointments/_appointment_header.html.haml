@@ -29,7 +29,7 @@
       .span-3.padding-bottom-5.text-align-right
         == How Long:
       .span-12.padding-bottom-5.last
-        = Duration.to_words(duration)
+        = Duration.to_words(appointment.duration)
       
   - unless appointment.customer.blank?
     .customer
