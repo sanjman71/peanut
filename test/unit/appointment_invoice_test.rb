@@ -24,7 +24,8 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
                                      :service => @haircut,
                                      :schedulable => @johnny,
                                      :customer => @user,
-                                     :start_at_string => "today 2 pm")
+                                     :start_at_string => "today 2 pm",
+                                     :duration => @haircut.duration)
 
       assert_valid @appt
 

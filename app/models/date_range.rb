@@ -19,8 +19,8 @@ class DateRange
       return
     end
     
-    @start_at     = options[:start_at] if options[:start_at]
-    @end_at       = options[:end_at] if options[:end_at]
+    @start_at = options[:start_at] if options[:start_at]
+    @end_at   = options[:end_at] if options[:end_at]
     
     if @start_at and @end_at
       # if end_at ends at 59 minutes and 59 seconds, add 1 second to make sure the days calculation is correct
@@ -53,6 +53,18 @@ class DateRange
   
   def self.today
     Time.today.utc
+  end
+  
+  # return string date range (e.g. "20090101..20090201")
+  def to_url_param(options={})
+    case options[:for]
+    when :start_date
+      @start_at.to_s(:appt_schedule_day)
+    when :end_date
+      @end_at.to_s(:appt_schedule_day)
+    else
+      "#{@start_at.to_s(:appt_schedule_day)}..#{@end_at.to_s(:appt_schedule_day)}"
+    end
   end
   
   # parse when string into a valid date range
@@ -124,9 +136,9 @@ class DateRange
     
     # build name from start, end dates
     range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
-    # build start_at, end_at times in utc format
-    start_at    = Time.parse(start_date).utc.beginning_of_day
-    end_at      = Time.parse(end_date).utc.beginning_of_day
+    # build start_at, end_at times in local time format
+    start_at    = Time.parse(start_date).beginning_of_day
+    end_at      = Time.parse(end_date).beginning_of_day
     
     if inclusive
       # include the last day by adjusting to the end of the day
@@ -134,8 +146,8 @@ class DateRange
     end
 
     # adjust calendar based on start_on, end_on day
-    start_at  = adjust_start_day_to_start_on(start_at, options)
-    end_at    = adjust_end_day_to_end_on(end_at, options)
+    start_at  = options[:start_on] ? adjust_start_day_to_start_on(start_at, options) : start_at
+    end_at    = options[:end_on] ? adjust_end_day_to_end_on(end_at, options) : end_at
     
     DateRange.new(Hash[:name => range_name, :start_at => start_at, :end_at => end_at])
   end

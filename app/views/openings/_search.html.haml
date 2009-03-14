@@ -8,7 +8,6 @@
       == What?
     .span-5.last.field#what
       = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id))
-  %br
   .last.duration{:class => size == :wide ? "span-24" : "span-7"}
     .span-5.prepend-2.last#duration_in_words
       = service_duration_in_words(duration, :exact => false) if @service
@@ -24,15 +23,47 @@
       == With?
     .span-5.last.field#who
       = select_tag('schedulable', options_for_select(schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{schedulable.tableize}/#{schedulable.id}"), :style => "width: 125px; align: top;")
-  %br
   .last{:class => size == :wide ? "span-24" : "span-7"}
+    .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
+      == Time of Day?
+    .span-5.last
+      %span.field#time_of_day
+        = select_tag('time', options_for_select(Appointment::TIMES, time))
+        
+  -# when select list
+  .last#when_select{:class => size == :wide ? "span-24" : "span-7"}
     .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
       == When?
     .span-5.last
       %span.field#when
         = select_tag('when', options_for_select(Appointment::WHEN_WEEKS, when_range))
-      %span.field#time
-        = select_tag('time', options_for_select(Appointment::TIMES, time))
+      %span{:style => 'padding-left: 5px;'}
+        == or
+  .last#when_select_cancel{:class => size == :wide ? "span-24" : "span-7"}
+    .span-5.prepend-2.last
+      = link_to 'Specify a Date Range', '', :id => 'show_when_date_range'
+      
+  -# when date range fields
+  .last#when_date_range_start.hide{:class => size == :wide ? "span-24" : "span-7"}
+    .span-2.text-align-right#when_text{:style => 'padding-top: 0px;'}
+      == When?
+    .span-5.last
+      %span.field#start_date
+        == Start:
+        %br
+        = text_field_tag 'start_date', '', :style => 'width: 90px;', :class => 'date-pick'
+
+  .last#when_date_range_end.hide{:class => size == :wide ? "span-24" : "span-7"}
+    .span-5.prepend-2.last
+      %span.field#end_date
+        == End:
+        %br
+        = text_field_tag 'end_date', '', :style => 'width: 90px;', :class => 'date-pick'
+  .last#when_date_range_cancel.hide{:class => size == :wide ? "span-24" : "span-7"}
+    .span-5.prepend-2.last
+      = link_to 'Cancel', '', :id => 'show_when_select'
+        
+  -# show location select if necessary
   - if @locations.size > 1
     %br
     .last{:class => size == :wide ? "span-24" : "span-7"}
@@ -42,6 +73,5 @@
         = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px;")
   %br
   .last{:class => size == :wide ? "span-24" : "span-7", :style => 'margin-left: 15px; padding-top: 10px;'}
-    -#= f.submit submit_text, :name => nil, :class => 'submit', :id => 'search_submit'
     %h4= link_to submit_text, '', :class => 'rounded button color', :id => 'search_submit'
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

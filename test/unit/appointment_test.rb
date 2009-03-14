@@ -134,6 +134,30 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
     
+  context "create waitlist appointment" do
+    setup do
+      # create free time from 10 am to 12 pm
+      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
+      @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+      @customer     = Factory(:user)
+      @daterange    = DateRange.parse_range("20090201", "20090208")
+      @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
+      @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
+    end
+
+    should_change "Appointment.count", :by => 1
+    
+    should "have a start date of 20090201 and end date of 20090208" do
+      assert_equal "20090201", @wait_appt.start_at.to_s(:appt_schedule_day)
+      assert_equal "20090208", @wait_appt.end_at.to_s(:appt_schedule_day)
+    end
+    
+    should "have a time of day of 'anytime'" do
+      assert_equal 0, @wait_appt.time_start_at
+      assert_equal 86400, @wait_appt.time_end_at
+    end
+  end
+  
   context "create an afternoon appointment to test time overlap searching" do
     setup do
       @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
@@ -149,7 +173,8 @@ class AppointmentTest < ActiveSupport::TestCase
                                      :service => @haircut,
                                      :schedulable => @johnny,
                                      :customer => @user,
-                                     :start_at => @start_at_local)
+                                     :start_at => @start_at_local,
+                                     :duration => @haircut.duration)
 
       assert_valid @appt
       

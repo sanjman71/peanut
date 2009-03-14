@@ -19,6 +19,14 @@ class DateRangeTest < ActiveSupport::TestCase
     should 'be named Today' do
       assert_equal 'Today', @daterange.name
     end
+
+    should 'have url param for today' do
+      @today = Time.now.utc.to_s(:appt_schedule_day)
+      @next  = (Time.now.utc + 1.day).to_s(:appt_schedule_day)
+      assert_equal "#{@today}..#{@next}", @daterange.to_url_param
+      assert_equal @today, @daterange.to_url_param(:for => :start_date)
+      assert_equal @next, @daterange.to_url_param(:for => :end_date)
+    end
   end
   
   context 'tomorrow' do
@@ -175,7 +183,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
   end
   
-  context 'date range inclusive' do
+  context 'date range with inclusive dates' do
     setup do
       @daterange = DateRange.parse_range('20090101', '20090107')
       assert_valid @daterange
@@ -196,9 +204,15 @@ class DateRangeTest < ActiveSupport::TestCase
     should 'have name with start and end dates' do
       assert_equal 'Jan 01 2009 - Jan 07 2009', @daterange.name
     end
+    
+    should 'have url param 20090101..20090107' do
+      assert_equal "20090101..20090107", @daterange.to_url_param
+      assert_equal "20090101", @daterange.to_url_param(:for => :start_date)
+      assert_equal "20090107", @daterange.to_url_param(:for => :end_date)
+    end
   end
 
-  context 'date range exclusive' do
+  context 'date range with exclusive dates' do
     setup do
       @daterange = DateRange.parse_range('20090101', '20090107', :inclusive => false)
       assert_valid @daterange
@@ -210,6 +224,12 @@ class DateRangeTest < ActiveSupport::TestCase
 
     should 'have name with start and end dates' do
       assert_equal 'Jan 01 2009 - Jan 07 2009', @daterange.name
+    end
+
+    should 'have url param 20090101..20090107' do
+      assert_equal "20090101..20090107", @daterange.to_url_param
+      assert_equal "20090101", @daterange.to_url_param(:for => :start_date)
+      assert_equal "20090107", @daterange.to_url_param(:for => :end_date)
     end
   end
   

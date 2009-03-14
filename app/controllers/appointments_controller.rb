@@ -1,4 +1,5 @@
 class AppointmentsController < ApplicationController
+  before_filter :disable_global_flash, :only => [:show, :confirmation]
   
   # GET   /schedule/users/1/services/1/duration/60/20081231T000000
   # POST  /schedule/users/1/services/1/duration/60/20081231T000000
@@ -19,26 +20,27 @@ class AppointmentsController < ApplicationController
     
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
-      # schedule the work appointment without committing the changes
+      # build the work appointment without committing the changes
       @duration             = params[:duration].to_i if params[:duration]
       @start_at             = params[:start_at]
-      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, {:start_at => @start_at}, :commit => false)
+      @options              = {:start_at => @start_at}
+      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => false)
     
-      # show appointment date, start and end times in local time
+      # set appointment date, start_at and end_at times in local time
       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
       @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
       @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
     when Appointment::WAIT
       # build waitlist parameters
-      @when                 = params[:when].from_url_param
-      @time                 = params[:time].from_url_param
-      @daterange            = DateRange.parse_when(@when)
-      @options              = {:time => @time, :when => @when, :start_at => @daterange.start_at, :end_at => @daterange.end_at}
-      # create waitlist object without committing the changes
+      @daterange            = DateRange.parse_range(params[:start_date], params[:end_date], :inclusive => true)
+      @options              = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
+      # build the  waitlist appointment without committing the changes
       @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => false)
       
-      # set appointment date to when parameter
-      @appt_date            = @when.to_url_param
+      # set appointment date to daterange name, set start_at and end_at times in schedule format
+      @appt_date            = @daterange.name
+      @appt_time_start_at   = @appointment.start_at.to_s(:appt_schedule_day)
+      @appt_time_end_at     = @appointment.end_at.to_s(:appt_schedule_day)
     end
   end
     
@@ -59,44 +61,54 @@ class AppointmentsController < ApplicationController
       return
     end
     
-    @mark_as      = params[:mark_as]
-    @duration     = params[:duration].to_i if params[:duration]
-    @start_at     = params[:start_at]
-    @end_at       = params[:end_at]
+    @mark_as        = params[:mark_as]
+    @duration       = params[:duration].to_i if params[:duration]
+    @start_at       = params[:start_at]
+    @end_at         = params[:end_at]
     
     # track errors and appointments created
-    @errors       = Hash.new
-    @success      = Hash.new
+    @errors         = Hash.new
+    @created        = Hash.new
+    
+    # set default redirect path
+    @redirect_path  = request.referer
     
     # iterate over the specified dates
     Array(params[:dates]).each do |date|
-      # build time range
-      @time_range   = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-      @options      = {:time_range => @time_range}
-
       begin
         case @mark_as
         when Appointment::WORK
+          # build time range
+          @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+          @options        = {:time_range => @time_range}
           # create work appointment
-          @appointment  = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
+          @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
+          # set redirect path
+          @redirect_path  = confirmation_appointment_path(@appointment)
+          flash[:notice]  = "Created appointment"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE
+          # build time range
+          @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+          @options        = {:time_range => @time_range}
           # create free appointment
-          @appointment  = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, @options)
+          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, @options)
         when Appointment::WAIT
-          @when         = params[:when].from_url_param
-          @time         = params[:time].from_url_param
-          @daterange    = DateRange.parse_when(@when)
-          @options      = {:time => @time, :when => @when, :start_at => @daterange.start_at, :end_at => @daterange.end_at}
+          # build date range
+          @daterange      = DateRange.parse_range(@start_at, @end_at, :inclusive => true)
+          @options        = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
           # create waitlist appointment
-          @appointment  = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
+          @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
+          # set redirect path
+          @redirect_path  = confirmation_appointment_path(@appointment)
+          flash[:notice]  = "Created waitlist appointment"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")
-        @success[date] = "Created #{@appointment.mark_as} appointment"
+        @created[date] = "Created #{@appointment.mark_as} appointment"
       rescue Exception => e
         logger.debug("xxx create appointment error: #{e.message}")
         @errors[date] = e.message
@@ -104,14 +116,14 @@ class AppointmentsController < ApplicationController
     end
     
     logger.debug("*** errors: #{@errors}")
-    logger.debug("*** success: #{@success}")
+    logger.debug("*** created: #{@created}")
     
     if @errors.keys.size > 0
+      # set the flash
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
       @redirect_path  = build_create_redirect_path(@schedulable, request.referer)
     else
-      flash[:notice]  = "Created appointment(s)"
-      @redirect_path  = build_create_redirect_path(@schedulable, request.referer)
+      @redirect_path  = @redirect_path || build_create_redirect_path(@schedulable, request.referer)
     end
     
     respond_to do |format|
@@ -121,13 +133,12 @@ class AppointmentsController < ApplicationController
   end
   
   # GET /appointments/1
-  # GET /appointments/1.xml
   def show
     @appointment  = current_company.appointments.find(params[:id])
     @note         = Note.new
     @confirmation = params[:confirmation].to_i == 1
     
-    # invoices for completed appointments
+    # show invoices for completed appointments
     @invoice      = @appointment.invoice
     @services     = current_company.services.work.all
     @products     = current_company.products.instock
@@ -135,6 +146,10 @@ class AppointmentsController < ApplicationController
     
     # build notes collection, most recent first 
     @notes        = @appointment.notes.sort_recent
+
+    respond_to do |format|
+      format.html
+    end
   end
   
   # GET /appointments/1/confirmation

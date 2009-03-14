@@ -101,6 +101,8 @@ class Appointment < ActiveRecord::Base
   TIMES                     = ['anytime', 'morning', 'afternoon', 'evening']
   TIMES_EXTENDED            = ['anytime', 'early morning', 'morning', 'afternoon', 'evening', 'late night']
   
+  TIME_ANYTIME              = 'anytime'
+  
   # convert time of day to a seconds range, in utc format
   TIMES_HASH                = {'anytime'    => [0,        24*3600],     # entire day
                                'morning'    => [8*3600,   12*3600],     # 8am - 12pm
@@ -147,7 +149,17 @@ class Appointment < ActiveRecord::Base
   def after_initialize
     # after_initialize can also be called when retrieving objects from the database
     return unless new_record?
-    
+
+    # initialize mark_as if its blank and we have a service
+    if self.mark_as.blank? and self.service
+      self.mark_as = self.service.mark_as
+    end
+
+    # for free and work appointments, force end_at to be start_at + duration (converted to seconds)
+    if [FREE, WORK].include?(self.mark_as) and self.start_at and self.duration
+      self.end_at = self.start_at + self.duration*60
+    end
+
     # initialize duration (in minutes)
     if (self.service.nil? || self.service.free?) and self.duration.blank?
       # initialize duration based on start and end times
@@ -156,18 +168,8 @@ class Appointment < ActiveRecord::Base
       # initialize duration based on service duration
       self.duration = self.service.duration
     end
-
-    if self.start_at and self.duration
-      # force end_at to be start_at + duration
-      self.end_at = self.start_at + self.duration*60 # convert duration to seconds
-    end
         
-    # initialize mark_as if its blank
-    if self.mark_as.blank? and self.service
-      self.mark_as = self.service.mark_as
-    end
-    
-    # initialize when, time attributes
+    # initialize when, time attributes with default values
 
     if self.when.nil?
       self.when = ''
@@ -180,12 +182,9 @@ class Appointment < ActiveRecord::Base
     # initialize time of day attributes
     
     if self.mark_as == WAIT
-      # special case of a waitlist appointment
-      if self.when == 'this week'
-        # set start_at to beginning of day
-        self.start_at = self.start_at.beginning_of_day
-      end
-
+      # set time to anytime for wait appointments
+      self.time           = TIME_ANYTIME
+      
       # set time of day values based on time value
       time_range          = Appointment.time_range(self.time)
       self.time_start_at  = time_range.first
@@ -356,14 +355,24 @@ class Appointment < ActiveRecord::Base
   def conflicts?
     self.conflicts.size > 0
   end
+
+  def free?
+    self.mark_as == FREE
+  end
+
+  def work?
+    self.mark_as == WORK
+  end
   
-  # return true if the appointment is on the waitlist
-  def waitlist?
+  def wait?
     self.mark_as == WAIT
   end
   
-  # return the collection of waitlist appointments that overlap with a free appointment
+  alias :waitlist? :wait?
+  
+  # return the collection of waitlist appointments that overlap with this free appointment
   def waitlist
+    # check that this is a free appointment
     return [] if self.mark_as != FREE
     # find wait appointments that overlap in both date and time ranges
     @waitlist ||= self.company.appointments.wait.overlap(start_at, end_at).time_overlap(self.time_range)

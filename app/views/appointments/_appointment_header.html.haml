@@ -2,41 +2,45 @@
   .what
     .span-3.padding-bottom-5.text-align-right
       == What:
-    .span-11.padding-bottom-5.last
+    .span-12.padding-bottom-5.last
       = appointment.service.name
-  %br
   .with
     .span-3.padding-bottom-5.text-align-right
       == With:
-    .span-11.padding-bottom-5.last
+    .span-12.padding-bottom-5.last
       = (appointment.schedulable || User.anyone).name
-  %br
+    
+  -# when is different for a work appointment vs. a waitlist apointment
   .when
+  - if appointment.waitlist?
     .span-3.padding-bottom-5.text-align-right
       == When:
-    .span-11.padding-bottom-5.last
-      - if appointment.waitlist?
-        == #{appointment.time.titleize}, #{appointment.when.titleize}
-      - else
-        = appointment.start_at.to_s(:appt_day_date_time)
-  %br
-  .duration
+    .span-12.padding-bottom-5.last
+      == #{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}
+  - else
     .span-3.padding-bottom-5.text-align-right
-      == How Long:
-    .span-11.padding-bottom-5.last
-      = service_duration_in_words(duration)
+      == When:
+    .span-12.padding-bottom-5.last
+      = appointment.start_at.to_s(:appt_day_date_time)
+
+  -# waitlist appointments have no duration
+  - unless appointment.waitlist?
+    .duration
+      .span-3.padding-bottom-5.text-align-right
+        == How Long:
+      .span-12.padding-bottom-5.last
+        = service_duration_in_words(duration)
       
   - unless appointment.customer.blank?
-    %br
-      .customer
-        .span-3.padding-bottom-5.text-align-right
-          == For:
-        .span-11.padding-bottom-5.last
-          = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
+    .customer
+      .span-3.padding-bottom-5.text-align-right
+        == Customer:
+      .span-12.padding-bottom-5.last
+        = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
+        
   - unless appointment.confirmation_code.blank?
-    %br
-      .confirmation
-        .span-3.padding-bottom-5.text-align-right
-          == Confirmation:
-        .span-11.padding-bottom-5.last
-          = appointment.confirmation_code
+    .confirmation
+      .span-3.padding-bottom-5.text-align-right
+        == Confirmation:
+      .span-12.padding-bottom-5.last
+        = appointment.confirmation_code

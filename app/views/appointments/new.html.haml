@@ -21,7 +21,7 @@
         .span-14.notice.last
           = error_messages_for('appointment', :header_message => nil)
       .span-15.last
-        = render :partial => 'appointment_header.html.haml', :locals => { :appointment => @appointment, :duration => @duration }
+        = render :partial => 'appointment_header', :locals => {:appointment => @appointment}
       %hr.space
       .span-14.prepend-1.last
         = f.submit "Confirm", :name => '', :style => 'font-size: 15px;'

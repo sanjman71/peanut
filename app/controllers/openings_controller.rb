@@ -16,9 +16,16 @@ class OpeningsController < ApplicationController
     @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulable  = User.anyone if @schedulable.blank?
     
-    # initialize when, no default
-    @when         = params[:when].from_url_param if params[:when]
-    @daterange    = DateRange.parse_when(@when) unless @when.blank?
+    if params[:start_date] and params[:end_date]
+      # build daterange using range values
+      @start_date = params[:start_date]
+      @end_date   = params[:end_date]
+      @daterange  = DateRange.parse_range(@start_date, @end_date)
+    elsif params[:when]
+      # build daterange using when value, don't use a default
+      @when       = params[:when].from_url_param 
+      @daterange  = DateRange.parse_when(@when)
+    end
     
     # initialize time
     @time         = params[:time].from_url_param if params[:time]
@@ -57,7 +64,7 @@ class OpeningsController < ApplicationController
       array
     end
     
-    if @when.blank?
+    if @daterange.blank?
       logger.debug("*** showing empty page with help text")
       # render empty page with help text
       return
@@ -86,10 +93,18 @@ class OpeningsController < ApplicationController
   def search
     # remove 'authenticity_token' params
     params.delete('authenticity_token')
-    # url format parameters
+    
+    # url format 'when' parameters parameters
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]
     end
+    
+    # parse date parameters
+    ['start_date', 'end_date'].each do |s|
+      params[s] = sprintf("%s", params[s].split('/').reverse.swap!(1,2).join) if params[s]
+    end
+    
+    # get schedulable object
     schedulable_type, schedulable_id = params.delete(:schedulable).split('/')
     
     # build redirect path

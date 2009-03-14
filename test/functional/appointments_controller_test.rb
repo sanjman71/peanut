@@ -3,19 +3,19 @@ require 'test/factories'
 
 class AppointmentsControllerTest < ActionController::TestCase
 
-  # schedule a waitlist appointment for a specific schedulable
-  should_route :get, 'waitlist/users/1/services/5/this-week/morning',
+  # schedule a waitlist appointment for a specific schedulable, with a date range
+  should_route :get, 'book/wait/users/1/services/5/20090101..20090201',
                :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
-               :when => 'this-week', :time => 'morning', :mark_as => 'wait'
-  should_route :post, 'waitlist/users/1/services/5/this-week/morning',
+               :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
+  should_route :post, 'book/wait/users/1/services/5/20090101..20090201',
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
-               :when => 'this-week', :time => 'morning', :mark_as => 'wait'
+               :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
   
-  # schedule a work apppointment for a specific schedulable and service with a specific duration
-  should_route :get, 'book/users/3/services/3/duration/60/20090303T113000',
+  # schedule a work apppointment for a specific schedulable, service and duration
+  should_route :get, 'book/work/users/3/services/3/60/20090303T113000',
                :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
-  should_route :post, 'book/users/3/services/3/duration/60/20090303T113000',
+  should_route :post, 'book/work/users/3/services/3/60/20090303T113000',
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
         
@@ -66,6 +66,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should "redirect to user calendar path" do
       assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
+
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
@@ -86,6 +87,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should "redirect to user calendar path" do
       assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
+    
     should_assign_to :service, :equals => "@free_service"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
@@ -106,6 +108,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should "redirect to user calendar path" do
       assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
     end
+
     should_assign_to :service, :equals => "@haircut"
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
@@ -212,22 +215,56 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
   
-  context "create waitlist appointment for this week" do
+  context "request a waitlist appointment for a date range" do
+    setup do
+      # stub the current user and logged_in? state
+      @controller.stubs(:logged_in?).returns(true)
+      @controller.stubs(:current_user).returns(@customer)
+      
+      # request a waitlist appointment
+      get :new,
+          {:start_date => "20090201", :end_date => "20090208", :time => 'anytime', :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
+           :service_id => @haircut.id, :mark_as => 'wait'}
+    end
+
+    should_respond_with :success
+    should_render_template 'appointments/new.html.haml'
+
+    should_not_change "Appointment.count"
+
+    should_assign_to :daterange
+    should_assign_to :appointment
+    
+    should "be a valid appointment" do
+      assert assigns(:appointment).valid?
+    end
+    
+    should "have a waitlist start date of 20090201 and end date of 20090208" do
+      assert_equal "20090201", assigns(:appointment).start_at.to_s(:appt_schedule_day)
+      assert_equal "20090208", assigns(:appointment).end_at.to_s(:appt_schedule_day)
+    end
+  end
+  
+  context "create waitlist appointment" do
     setup do
       # create waitlist appointment
       post :create,
-           {:dates => 'this-week', :when => "this-week", :time => 'anytime', :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
             :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
     end
-    
+
     should_change "Appointment.count", :by => 1
     
     should_assign_to :service, :equals => "@haircut"
     should_not_assign_to :duration
     should_assign_to :schedulable, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
-    should_assign_to :when, :equals => '"this week"'
-    should_assign_to :time, :equals => '"anytime"'
     should_assign_to :mark_as, :equals => '"wait"'
+    should_assign_to :redirect_path, :equal => '"foo"'
+    
+    should_respond_with :redirect
+    should "redirect to appointment confirmation path" do
+      assert_redirected_to "appointments/#{assigns(:appointment).id}/confirmation"
+    end
   end
 end
