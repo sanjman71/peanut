@@ -2,8 +2,8 @@
 - javascript('services')
 
 - if_privilege('read services', @current_company) do
-  .span-16
-    .span-15.last.box
+  .span-16.append-1
+    .span-15.prepend-1.last.mat
       %h2== Services
     %hr.space
     .span-14.prepend-1.append-1.last
@@ -12,20 +12,19 @@
       = render(:partial => 'services.html.haml', :locals => {:services => @services})
 
 - if_privilege('create services', @current_company) do
-  .span-6.prepend-1.last
-    .span-6.box
-      - form_for(Service.new, :url => services_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_service', :id => 'new_service_form'}) do |f|
-        = hidden_field_tag "service[mark_as]", 'work'
-        = hidden_field_tag "service[price]", 0
-        = hidden_field_tag "service[duration]", 0
-        .span-6.last
-          = label_tag "new_service_name", "Add a service", :class => 'big'
-        .span-6.last
-          = text_field_tag "service[name]", '', :id => 'new_service_name', :class => 'title big required', :style => 'width: 200px;'
-        .span-6.last
-          %em{:style => "color: #666666; font-size: 12px;"}== Examples: Hair Color, Bikini Wax
-        %hr.space
-        .span-6.last
-          #submit= submit_tag "Create", :name => nil, :class => 'button big'
-          #progress.hide= image_tag 'barbershop.gif'
+  .span-6.prepend-1.last.mat
+    - form_for(Service.new, :url => services_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_service', :id => 'new_service_form'}) do |f|
+      = hidden_field_tag "service[mark_as]", 'work'
+      = hidden_field_tag "service[price]", 0
+      = hidden_field_tag "service[duration]", 0
+      .span-6.last
+        = label_tag "new_service_name", "Add a service", :class => 'big'
+      .span-6.last
+        = text_field_tag "service[name]", '', :id => 'new_service_name', :class => 'title big required', :style => 'width: 200px;'
+      .span-6.last
+        %em{:style => "color: #666666; font-size: 12px;"}== Examples: Hair Color, Bikini Wax
+      %hr.space
+      .span-6.last
+        #submit= submit_tag "Create", :name => nil, :class => 'button big'
+        #progress.hide= image_tag 'barbershop.gif'
     

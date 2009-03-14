@@ -8,7 +8,7 @@
     
 - form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 
-  .span-23.last.box
+  .span-23.prepend-1.last.mat
     = label_tag "service_name", "Service Name", :class => 'big'
     %br
     = text_field_tag "service[name]", @service.name, :class => 'title highlight muted'
