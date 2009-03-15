@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :resources, :products, :waitlist]
+  task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :resources, :products]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -48,26 +48,42 @@ namespace :rp do
     cm = Badges::Role.find_by_name('company manager')
     ce = Badges::Role.find_by_name('company employee')
 
-    # Appointments are broken into free and work appointments
-    # In general, the public can view free appointments and create work appointments
+    # Appointments are broken into free, work and wait appointments
+    # In general, the public can view free appointments and create work and wait appointments
     cfa = Badges::Privilege.create(:name=>"create free appointments")
-    rwa = Badges::Privilege.create(:name=>"read free appointments")
+    rfa = Badges::Privilege.create(:name=>"read free appointments")
     dfa = Badges::Privilege.create(:name=>"delete free appointments")
 
-    cfa = Badges::Privilege.create(:name=>"create work appointments")
+    cwa = Badges::Privilege.create(:name=>"create work appointments")
     rwa = Badges::Privilege.create(:name=>"read work appointments")
     uwa = Badges::Privilege.create(:name=>"update work appointments")
     dwa = Badges::Privilege.create(:name=>"delete work appointments")
 
-    # Company manager can fully manage schedule
+    cw2a = Badges::Privilege.create(:name=>"create wait appointments")
+    rw2a = Badges::Privilege.create(:name=>"read wait appointments")
+    uw2a = Badges::Privilege.create(:name=>"update wait appointments")
+    dw2a = Badges::Privilege.create(:name=>"delete wait appointments")
+
+    # Company manager can fully manage schedules
     Badges::RolePrivilege.create(:role=>cm,:privilege=>cfa)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>rfa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>dfa)
+    
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>cwa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>rwa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>uwa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>dwa)
 
-    # Company employee can read schedule
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>cw2a)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>rw2a)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>uw2a)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>dw2a)
+
+    # Company employee can read schedules
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>cwa)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>cw2a)
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rwa)
+    Badges::RolePrivilege.create(:role=>ce,:privilege=>rw2a)
   end
   
   desc "Initialize calendars roles and privileges"
@@ -229,25 +245,5 @@ namespace :rp do
     # Company employee can view products
     Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
   end
-  
-  desc "Initialize waitlist management roles & privileges"
-  task :waitlist do
     
-    puts "adding waitlist management roles & privileges"
-    
-    cm = Badges::Role.find_by_name('company manager')
-    ce = Badges::Role.find_by_name('company employee')
-
-    c = Badges::Privilege.create(:name=>"create waitlist")
-    r = Badges::Privilege.create(:name=>"read waitlist")
-    u = Badges::Privilege.create(:name=>"update waitlist")
-    d = Badges::Privilege.create(:name=>"delete waitlist")
-
-    # Company manager can manage a company's waitlist
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
-
-    # TODO - add more privileges and roles here as appropriate
-
-  end
-  
 end

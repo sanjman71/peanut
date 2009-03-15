@@ -42,6 +42,10 @@ class AppointmentsController < ApplicationController
       @appt_time_start_at   = @appointment.start_at.to_s(:appt_schedule_day)
       @appt_time_end_at     = @appointment.end_at.to_s(:appt_schedule_day)
     end
+
+    respond_to do |format|
+      format.html
+    end
   end
     
   def create
@@ -72,6 +76,11 @@ class AppointmentsController < ApplicationController
     
     # set default redirect path
     @redirect_path  = request.referer
+    
+    # check that the user has the privilege to create the specified appointment type
+    if !has_privilege?("create #{@mark_as} appointments", current_company)
+      redirect_to(unauthorized_path) and return
+    end
     
     # iterate over the specified dates
     Array(params[:dates]).each do |date|
