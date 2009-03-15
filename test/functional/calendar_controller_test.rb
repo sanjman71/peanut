@@ -83,8 +83,11 @@ class CalendarControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'calendar/show.html.haml'
     
-    should_assign_to :schedulables, :appointments
     should_assign_to :schedulable, :equals => '@johnny'
+    should_assign_to :schedulables, :class => Array
+    should_assign_to :appointments, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
     should_assign_to :when, :equals => '"this week"'
+    should_assign_to :daterange, :class => DateRange
   end
 end
