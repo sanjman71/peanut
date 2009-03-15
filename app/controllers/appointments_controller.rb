@@ -85,7 +85,7 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = confirmation_appointment_path(@appointment)
-          flash[:notice]  = "Created appointment"
+          flash[:notice]  = "Booked your #{@service.name} appointment"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE
@@ -94,6 +94,9 @@ class AppointmentsController < ApplicationController
           @options        = {:time_range => @time_range}
           # create free appointment
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, @options)
+          # set redirect path
+          @redirect_path  = request.referer
+          flash[:notice]  = "Created available time"
         when Appointment::WAIT
           # build date range
           @daterange      = DateRange.parse_range(@start_at, @end_at, :inclusive => true)
@@ -102,7 +105,7 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = confirmation_appointment_path(@appointment)
-          flash[:notice]  = "Created waitlist appointment"
+          flash[:notice]  = "Created your waitlist appointment"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         end
@@ -219,8 +222,8 @@ class AppointmentsController < ApplicationController
       @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
     else
       # redirect to schedulable appointment path
-      @schedulable  = @appointment.schedulable
-      @redirect     = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      @schedulable    = @appointment.schedulable
+      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     end
   end
   

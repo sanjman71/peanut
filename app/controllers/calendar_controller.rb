@@ -1,12 +1,18 @@
 class CalendarController < ApplicationController
   before_filter :disable_global_flash
   
+  privilege_required 'read calendars', :only => [:index, :show, :search], :on => :current_company
+  privilege_required 'update calendars', :only => [:edit], :on => :current_company
+  
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
   def index
     # redirect to a specific schedulable
     schedulable = current_company.schedulables.first
+    if schedulable.blank?
+      redirect_to root_path(:subdomain => current_subdomain) and return
+    end
     url_params  = {:action => 'show', :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :subdomain => current_subdomain}
     redirect_to url_for(url_params) and return
   end

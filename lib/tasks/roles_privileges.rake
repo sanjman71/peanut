@@ -70,6 +70,26 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rwa)
   end
   
+  desc "Initialize calendars roles and privileges"
+  task :calendars do
+  
+    puts "adding calendars roles & privileges"
+
+    cm = Badges::Role.find_by_name('company manager')
+    ce = Badges::Role.find_by_name('company employee')
+
+    # Calendars
+    rc = Badges::Privilege.create(:name=>"read calendars")
+    uc = Badges::Privilege.create(:name=>"update calendars")
+
+    # Company manager can fully manage calendars
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>rc)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>uc)
+
+    # Company employee can read calendars
+    Badges::RolePrivilege.create(:role=>ce,:privilege=>rc)
+  end
+  
   desc "Initialize invoices roles and privileges"
   task :invoices do
     

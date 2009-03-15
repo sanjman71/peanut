@@ -1,5 +1,3 @@
-#require 'controllers/application'
-
 class ApplicationController < ActionController::Base 
 
   # These before filters are not necessary, but are used to mirror the real app
@@ -13,6 +11,17 @@ class ApplicationController < ActionController::Base
     logger.debug("*** checking privilege #{p}, on authorizable #{authorizable ? authorizable.name : ""}, for user #{user ? user.name : ""}")
     return false if current_privileges.blank?
     return current_privileges.include?(p)
+  end
+
+  # these flash methods are needed for the functional tests
+  
+  def global_flash?
+    @global_flash = true if @global_flash.nil?
+    return @global_flash
+  end
+  
+  def disable_global_flash
+    @global_flash = false
   end
 
   private

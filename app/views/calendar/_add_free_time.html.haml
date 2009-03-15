@@ -1,0 +1,30 @@
+.span-6.prepend-1.last.mat
+  = label_tag 'add_free_time_form', "Schedule Available Time", :class => 'big'
+  - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+    = hidden_field_tag :schedulable_type, schedulable.tableize
+    = hidden_field_tag :schedulable_id, schedulable.id
+    = hidden_field_tag :service_id, service.id
+    = hidden_field_tag :mark_as, Appointment::FREE
+    
+    .add_free_time
+      .span-6.last.when
+        == When
+      .span-6.last
+        = select_tag('dates', options_for_select(daterange.collect { |x| [x.to_s(:appt_day), x.to_s(:appt_schedule_day)] }))
+      .span-6.last#start_at_label
+        == Start
+      .span-6.last#start_at_text
+        = text_field_tag 'start_at', '', :size => 10, :class => 'required'
+        %span.example== e.g. 8:15 am
+      .span-6.last#end_at_label
+        == End
+      .span-7.last.append-bottom#end_at_text
+        = text_field_tag 'end_at', '', :size => 10, :class => 'required'
+        %span.example== e.g. 5:30 pm
+      .span-6.last
+        #submit= f.submit 'Add', :name => nil, :class => 'button big'
+        .hide#progress= image_tag 'barbershop.gif'
+     
+  %hr.space   
+  %h4== or
+  %h4= link_to "Schedule blocks of available time", url_for(:controller => 'calendar', :action => 'edit', :subdomain => current_subdomain), :class => 'rounded button'
