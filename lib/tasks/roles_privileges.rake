@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :invoices, :services, :users, :customers, :resources, :products]
+  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :products]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -111,6 +111,28 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rc)
   end
   
+  desc "Initialize user management roles & privileges"
+  task :users do
+
+    puts "adding user management roles & privileges"
+    
+    cm = Badges::Role.find_by_name('company manager')
+    ce = Badges::Role.find_by_name('company employee')
+    
+    cu = Badges::Privilege.create(:name=>"create users")
+    ru = Badges::Privilege.create(:name=>"read users")
+    uu = Badges::Privilege.create(:name=>"update users")
+    du = Badges::Privilege.create(:name=>"delete users")
+
+    # Company manager can manage a company's users
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>ru)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>uu)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>du)
+
+    # Company employee can view users
+    Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
+  end
+  
   desc "Initialize invoices roles and privileges"
   task :invoices do
     
@@ -164,27 +186,6 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rs)
   end
   
-  desc "Initialize user management roles & privileges"
-  task :users do
-
-    puts "adding user management roles & privileges"
-    
-    cm = Badges::Role.find_by_name('company manager')
-    ce = Badges::Role.find_by_name('company employee')
-    
-    cu = Badges::Privilege.create(:name=>"create users")
-    ru = Badges::Privilege.create(:name=>"read users")
-    uu = Badges::Privilege.create(:name=>"update users")
-    du = Badges::Privilege.create(:name=>"delete users")
-
-    # Company manager can manage a company's users
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ru)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uu)
-
-    # Company employee can view users
-    Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
-  end
-  
   desc "Initialize customer management roles & privileges"
   task :customers do
     
@@ -205,29 +206,6 @@ namespace :rp do
 
   end
 
-  desc "Initialize resource management roles & privileges"
-  task :resources do
-    
-    puts "adding resources management roles & privileges"
-    
-    cm = Badges::Role.find_by_name('company manager')
-    ce = Badges::Role.find_by_name('company employee')
-
-    c = Badges::Privilege.create(:name=>"create resources")
-    r = Badges::Privilege.create(:name=>"read resources")
-    u = Badges::Privilege.create(:name=>"update resources")
-    d = Badges::Privilege.create(:name=>"delete resources")
-
-    # Company manager can manage people
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>c)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>d)
-
-    # Company employee can view people
-    Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
-  end
-  
   desc "Initialize products management roles & privileges"
   task :products do
     

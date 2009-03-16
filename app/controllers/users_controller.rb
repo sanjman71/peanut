@@ -10,7 +10,7 @@ class UsersController < ApplicationController
   
   def index
     # find all company users
-    @users            = current_company.authorized_users.order_by_name
+    @users            = current_company.authorized_users.order_by_name.uniq
     
     # check if current user is a company manager
     @company_manager  = current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
