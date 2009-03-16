@@ -7,7 +7,7 @@
     .span-8
       %h3
         = label_tag "schedulable", "Schedule for", :class => 'big'
-        = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+        = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
       %h6{:style => 'margin-bottom: 20px; font-weight: normal;'}= link_to 'PDF Version', url_for(:format => 'pdf', :subdomain => current_subdomain)
     .span-6.prepend-1.last
       #links
@@ -37,6 +37,7 @@
       = render(:partial => 'appointments/appointments_count.html.haml', :locals => {:count => @appointments.size})
     .span-15.last#free_schedule
       = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
-  
 
-= render(:partial => 'calendar/add_free_time', :locals => {:schedulable => @schedulable, :service => @free_service, :daterange => @daterange})
+-# show add free time form if the user is a calendar manager for this calendar
+- if @calendar_manager
+  = render(:partial => 'calendar/add_free_time', :locals => {:schedulable => @schedulable, :service => @free_service, :daterange => @daterange})

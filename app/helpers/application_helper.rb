@@ -159,6 +159,12 @@ module ApplicationHelper
     end
   end
   
+  # build schedulable display name based on context of the current user
+  def schedulable_display_name(schedulable, current_user)
+    return "" if schedulable.blank?
+    (schedulable == current_user) ? "Me" : schedulable.name
+  end
+  
   def build_company_location_select_options
     anywhere = Location.anywhere
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}

@@ -133,10 +133,10 @@ class ApplicationController < ActionController::Base
     if logged_in?
       if @current_company
         # load privileges on current company (includes privileges on no authorizable object)
-        @current_privileges = current_user.privileges(@current_company).collect { |p| p.name }
+        @current_privileges = current_user.privileges(@current_company).collect(&:name)
       else
         # load privileges without an authorizable object
-        @current_privileges = current_user.privileges.collect { |p| p.name }
+        @current_privileges = current_user.privileges.collect(&:name)
       end
     else
       @current_privileges = []

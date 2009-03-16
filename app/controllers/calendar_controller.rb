@@ -4,6 +4,21 @@ class CalendarController < ApplicationController
   privilege_required 'read calendars', :only => [:index, :show, :search], :on => :current_company
   privilege_required 'update calendars', :only => [:edit], :on => :current_company
   
+  def has_privilege?(p, *args)
+    case p
+    when 'update calendars'
+      # users may update their own calendar
+      authorizable  = args[0]
+      user          = args[1] || current_user
+      schedulable   = find_schedulable_from_params
+      return true if user == schedulable
+      # delegate to base class
+      super
+    else
+      super
+    end
+  end
+  
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
@@ -17,9 +32,9 @@ class CalendarController < ApplicationController
     redirect_to url_for(url_params) and return
   end
   
-  # GET /schedulable/1/calendar
-  # GET /schedulable/1/calendar/when/next-week
-  # GET /schedulable/1/calendar/range/20090101..20090201
+  # GET /users/1/calendar
+  # GET /users/1/calendar/when/next-week
+  # GET /users/1/calendar/range/20090101..20090201
   def show
     if params[:customer_id]
       @customer     = current_company.users.find(params[:customer_id])
@@ -27,15 +42,15 @@ class CalendarController < ApplicationController
       raise Exception, "todo: show customer appointments: #{@appointments.size}"
     end
     
-    @free_service = current_company.free_service
-
     if current_company.schedulables_count == 0
-      # show message that schedulables need to be added before viewing schedules
-      return
+      # redirect to company home page
+      redirect_to root_path(:subdomain => current_subdomain) and return
     end
     
-    # initialize resource, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
+    @free_service = current_company.free_service
+
+    # initialize schedulable
+    @schedulable  = find_schedulable_from_params
     @schedulables = current_company.schedulables.all
 
     if params[:start_date] and params[:end_date]
@@ -61,7 +76,10 @@ class CalendarController < ApplicationController
     
     # group appointments by day
     @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
-    
+
+    # check if current user is a calendar manager for the specified calendar
+    @calendar_manager = current_user.has_privilege?('update calendars', current_company) || current_user == @schedulable
+        
     respond_to do |format|
       format.html
       format.pdf do
@@ -72,8 +90,8 @@ class CalendarController < ApplicationController
     end
   end
   
-  # GET  /appointments/search
-  # POST /appointments/search
+  # GET  /calendar/search
+  # POST /calendar/search
   #  - search for a schedulable's calendar by date range => params[:start_date], params[:end_date]
   def search
     if request.post?
@@ -87,13 +105,13 @@ class CalendarController < ApplicationController
   # GET /users/1/calendar/edit
   def edit
     if params[:schedulable_type].blank? or params[:schedulable_id].blank?
-      # redirect to a specific schedulable
+      # no schedulable was specified, redirect to the company's first schedulable
       schedulable = current_company.schedulables.first
       redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id)) and return
     end
         
     # initialize schedulable, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
+    @schedulable  = find_schedulable_from_params
     @schedulable  = User.anyone if @schedulable.blank?
     
     # build list of schedulables to allow the scheduled to be adjusted by resource
@@ -108,7 +126,7 @@ class CalendarController < ApplicationController
     # group appointments by day
     @free_work_appts_by_day = @free_work_appts.group_by { |appt| appt.start_at.utc.beginning_of_day }
     
-    # build calendar markings
+    # build calendar markings from free appointments
     @calendar_markings  = build_calendar_markings(@free_work_appts)
     
     # build time of day collection
@@ -124,4 +142,10 @@ class CalendarController < ApplicationController
     end
   end
   
+  protected
+  
+  # find scheduable from the params hash
+  def find_schedulable_from_params
+    current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
+  end
 end
