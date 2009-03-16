@@ -48,6 +48,7 @@ class UsersController < ApplicationController
  
   def create
     logout_keeping_session!
+    
     if params[:invitation_token]
       @invitation = Invitation.find_by_token(params[:invitation_token])
       if @invitation.blank?
@@ -62,8 +63,10 @@ class UsersController < ApplicationController
     success = @user && @user.valid?
     if success && @user.errors.empty?
       if !@invitation.blank?
-        # Grant the user basic access to the company
+        # Grant the user basic access to the company as a 'company employee'
         @user.grant_role('company employee', @invitation.company)
+        # Add the user as a company schedulable
+        @invitation.company.schedulables.push(@user)
       end
       # activate user, redirect to login page
       @user.activate!

@@ -1,7 +1,7 @@
 - javascript('appointments')
 
 .span-16
-  .span-15.prepend-1.mat
+  .span-15.prepend-1.mat.padding-bottom-10
     - form_tag(search_appointments_path(:subdomain => current_subdomain), :method => :post, :id => "search_appointments_form") do |f|
       .span-15.last
         = label_tag "appointment_code", "Find an appointment by typing a confirmation code", :class => 'big'
