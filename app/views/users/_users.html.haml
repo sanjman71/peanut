@@ -1,14 +1,26 @@
 - users.each do |user|
-  .span-16.last.letterbox.user{:class => cycle("shaded", "")}
-    .span-9.prepend-1.name
+  .span-24.last.letterbox.user{:class => cycle("shaded", "")}[user]
+    .span-7.prepend-1.name
       %h2{:style => "margin-bottom: 3px;"}= user.name
-      %h3{:style => "margin-bottom: 2px;"}= user.email
       -# show user roles
       = user.roles.collect(&:name).join(", ")
-    .span-3.calendar
-      - id = "schedulable_#{user.class.to_s.underscore}_#{user.id}"
-      = check_box_tag 'Calendar', 'yes', user.has_calendar?(current_company), :id => id, :class => 'checkbox user', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable_type => user.tableize, :schedulable_id => user.id, :subdomain => current_subdomain)
-      = label_tag id, 'Calendar', :class => 'checkbox label'
-      %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+    .span-6.email
+      %h3{:style => "margin-bottom: 2px;"}= user.email
+    .span-4.roles
+      -# allow company managers to toggle manager role
+      - if @company_manager
+        - if current_user == user
+          -# 'me' is a company manager
+          %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
+        - else
+          = check_box_tag 'Company Manager', 'yes', user.has_role?('company manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'users', :action => :toggle_manager, :id => user.id, :subdomain => current_subdomain)
+          = label_tag '', 'Company Manager', :class => 'checkbox label'
+          %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+    .span-4.calendar
+      -# allow company managers to toggle user calendar
+      - if @company_manager
+        = check_box_tag 'Show Calendar', 'yes', user.has_calendar?(current_company), :class => 'checkbox calendar', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable_type => user.tableize, :schedulable_id => user.id, :subdomain => current_subdomain)
+        = label_tag '', 'Show Calendar', :class => 'checkbox label'
+        %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
     .span-2.action.last
-      = link_to "Edit", edit_user_path(user, :subdomain => current_subdomain), :class => 'admin'
+      -#= link_to "Edit", edit_user_path(user, :subdomain => current_subdomain), :class => 'admin'

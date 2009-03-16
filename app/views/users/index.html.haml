@@ -1,11 +1,11 @@
 - javascript('users')
 
 .span-24
-  .span-15.last.box
-    .span-11
+  .span-23.prepend-1.last.mat
+    .span-17
       %h2== Users
     .span-4.last
-      %h3= link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
+      %h3{:style => 'padding-top: 5px;'}= link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
   %hr.space
   
   .span-14.prepend-1.append-1.last

@@ -1,11 +1,19 @@
 class UsersController < ApplicationController
+  before_filter :disable_global_flash, :only => [:index]
+  
+  privilege_required 'read users', :only => [:index], :on => :current_company
+  privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:suspend, :unsuspend, :destroy, :purge]
+  before_filter :find_user, :only => [:edit, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
   
   def index
-    @users = current_company.authorized_users
+    # find all company users
+    @users            = current_company.authorized_users.order_by_name
+    
+    # check if current user is a company manager
+    @company_manager  = current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
   end
   
   def new
@@ -67,6 +75,11 @@ class UsersController < ApplicationController
     end
   end
 
+  # /users/1/edit
+  def edit
+    
+  end
+  
   def activate
     logout_keeping_session!
     user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
@@ -84,11 +97,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # /users/1/edit
-  def edit
-    @user = User.find(params[:id])
-  end
-  
   def suspend
     @user.suspend! 
     redirect_to users_path
@@ -107,6 +115,22 @@ class UsersController < ApplicationController
   def purge
     @user.destroy
     redirect_to users_path
+  end
+  
+  # POST /users/:id/toggle_manager
+  def toggle_manager
+    if @user.has_role?('company manager', current_company)
+      # revoke manager, grant employee
+      @user.revoke_role('company manager', current_company)
+      @user.grant_role('company employee', current_company)
+    else
+      # upgrade from employee to manager
+      @user.revoke_role('company employee', current_company)
+      @user.grant_role('company manager', current_company)
+    end
+
+    render_component(:controller => 'users',  :action => 'index', :layout => false, 
+                     :params => {:authenticity_token => params[:authenticity_token] })
   end
   
   # There's no page here to update or destroy a user.  If you add those, be

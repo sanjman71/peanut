@@ -84,6 +84,11 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>cm,:privilege=>cw2a)
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rwa)
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rw2a)
+    
+    # Authenticated users can create work and wait appointments
+    auth = Badges::Role.find_by_name('authenticated')
+    Badges::RolePrivilege.create(:role=>auth,:privilege=>cwa)
+    Badges::RolePrivilege.create(:role=>auth,:privilege=>cw2a)
   end
   
   desc "Initialize calendars roles and privileges"
@@ -176,7 +181,7 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>cm,:privilege=>ru)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>uu)
 
-    # Company employee can view services
+    # Company employee can view users
     Badges::RolePrivilege.create(:role=>ce,:privilege=>ru)
   end
   

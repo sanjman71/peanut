@@ -35,6 +35,7 @@ class User < ActiveRecord::Base
   attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(name) REGEXP '%s'", s.downcase] }}
+  named_scope               :order_by_name, { :order => :name }
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
