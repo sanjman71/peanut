@@ -1,6 +1,6 @@
 class AppointmentsController < ApplicationController
   before_filter :disable_global_flash, :only => [:show, :confirmation]
-  
+    
   # GET   /schedule/users/1/services/1/duration/60/20081231T000000
   # POST  /schedule/users/1/services/1/duration/60/20081231T000000
   # GET   /waitlist/users/1/services/8/this-week/anytime
@@ -260,6 +260,36 @@ class AppointmentsController < ApplicationController
     end
   end
     
+  def index
+    if !logged_in?
+      redirect_to(unauthorized_path) and return
+    end
+    
+    if params[:customer_id].blank?
+      # redirect to customer appointments path
+      redirect_to(customer_appointments_path(current_user)) and return
+    end
+    
+    # validate customer is the current user
+    @customer = User.find(params[:customer_id])
+    
+    if @customer != current_user
+      redirect_to(unauthorized_path) and return
+    end
+    
+    # check if current user is a company user or customer
+    if @customer.has_role?('company manager', current_company) || @customer.has_role?('company employee', current_company)
+      # customer is a company user - what should we do here?
+    end
+        
+    # find my appointments
+    @my_appointments = current_company.appointments.work.customer(@customer)
+    
+    respond_to do |format|
+      format.html
+    end
+  end
+  
   protected
   
   def appointment_free_time_scheduled_at(appointment)

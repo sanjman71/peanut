@@ -72,10 +72,10 @@ module ApplicationHelper
 
       # 'Appointments' tab
       name = 'Appointments'
-      if current_controller.controller_name == 'appointments' and ['search', 'show'].include?(current_controller.action_name)
-        link = link_to(name, search_appointments_path, :class => 'current')
+      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
+        link = link_to(name, appointments_path, :class => 'current')
       else
-        link = link_to(name, search_appointments_path)
+        link = link_to(name, appointments_path)
       end
 
       yield link

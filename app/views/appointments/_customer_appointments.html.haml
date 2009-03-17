@@ -1,0 +1,23 @@
+- appointments.each do |appointment|
+  .span-23.prepend-1.last{:class => cycle("shaded", "")}
+    .span-5
+      %h3{:style => 'padding-top: 5px; margin-bottom: 2px;'}= appointment.service.name
+      = appointment.start_at.to_s(:appt_short_month_day_year)
+      == @
+      = appointment.start_at.to_s(:appt_time)
+      
+    .span-5
+      %h3{:style => 'padding-top: 5px; margin-bottom: 2px;'}= (appointment.schedulable || User.anyone).name
+      
+    .span-6
+      - if appointment.invoice
+        %h3= appointment.invoice.total_as_money
+        .invoice.hide
+          = appointment.invoice.line_items.collect{ |li| li.chargeable.name }.join(", ")
+      - else
+        %h4{:style => 'padding-top: 5px;'}= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+        
+    .span-3{:style => 'margin-top: 3px;'}
+      = link_to 'Details', ''
+  
+    

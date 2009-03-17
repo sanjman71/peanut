@@ -18,7 +18,12 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :post, 'book/work/users/3/services/3/60/20090303T113000',
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
-        
+      
+  # show customer appointments
+  should_route :get, 'customers/1/appointments',
+               :controller => 'appointments', :action => 'index', :customer_id => 1
+
+
   def setup
     @controller   = AppointmentsController.new
     # create a valid company
