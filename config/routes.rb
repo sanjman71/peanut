@@ -38,12 +38,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # openings search/index path, scoped by service and (optional) schedulable
-  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/openings/:when/:time', 
-                 :controller => 'openings', :action => 'index'
-  map.connect   'services/:service_id/openings/:when/:time', 
-                 :controller => 'openings', :action => 'index'
-
   # search openings for a specified service and duration, and an optional schedulable
   map.connect   ':schedulable_type/:schedulable_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
                 :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
