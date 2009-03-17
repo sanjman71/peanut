@@ -45,19 +45,13 @@ class OpeningsController < ApplicationController
     # initialize duration
     @duration = params[:duration].to_i
     
-    # 0 duration is not allowed
-    if @duration == 0
-      # use default service duration
-      redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
-    end
-    
-    # if we have a custom duration, and the service allows this, then set the service duration; otherwise use the default duration
-    if @service.allow_custom_duration && @duration
+    # if the service allows a custom duration, then set the service duration; otherwise use the default service duration
+    if @service.allow_custom_duration and @duration > 0
       @service.duration = @duration
     end
 
-    # make sure the service duration matches the specified duration
-    if @service.duration != @duration
+    # make sure the service duration matches the specified duration, unless its the special 'nothing' service
+    if !@service.nothing? and @service.duration != @duration
       # use the default service duration
       redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
     end
