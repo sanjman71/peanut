@@ -17,7 +17,7 @@
           -# free appointments can be deleted with delete permissions
           = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
         - elsif appointment.service.mark_as == Appointment::WORK and has_privilege?("update work appointments", current_company)
-          -# work appointments can be changed with update permissions
-          = link_to "Change", appointment_path(appointment, :subdomain => current_subdomain)
+          -# work appointments can be edited with update permissions
+          = link_to "Edit", appointment_path(appointment, :subdomain => current_subdomain)
   %hr.space
             
