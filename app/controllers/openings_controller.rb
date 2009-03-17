@@ -43,13 +43,25 @@ class OpeningsController < ApplicationController
     @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
     
     # initialize duration
-    @duration = params[:duration] ? params[:duration].to_i : @service.duration
+    @duration = params[:duration].to_i
     
-    # if we have a custom duration, and the service allows this, then set the service duration
+    # 0 duration is not allowed
+    if @duration == 0
+      # use default service duration
+      redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
+    end
+    
+    # if we have a custom duration, and the service allows this, then set the service duration; otherwise use the default duration
     if @service.allow_custom_duration && @duration
       @service.duration = @duration
     end
 
+    # make sure the service duration matches the specified duration
+    if @service.duration != @duration
+      # use the default service duration
+      redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
+    end
+    
     # build schedulables collection, schedulables are restricted by the services they perform
     @schedulables = @service.schedulables
     
@@ -70,8 +82,6 @@ class OpeningsController < ApplicationController
       return
     end
 
-    logger.debug("*** finding free time #{@when}")
-    
     # find free appointments, group by day (use appt utc time)
     @free_appointments        = AppointmentScheduler.find_free_appointments(current_company, current_location, 
                                                                             @schedulable, @service, @duration, @daterange, :time => @time)
