@@ -54,7 +54,7 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read waitlist', current_company)
+    if has_privilege?('read wait appointments', current_company)
 
       # 'Waitlist' tab
       name = 'Waitlist'
