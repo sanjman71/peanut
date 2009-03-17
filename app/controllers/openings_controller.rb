@@ -82,6 +82,9 @@ class OpeningsController < ApplicationController
     # build hash of calendar markings
     @calendar_markings  = build_calendar_markings(@free_appointments)
 
+    # flag to show waitlist link
+    @show_waitlist      = @free_appointments.blank?
+    
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
     

@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   
   # Make the following methods available to all helpers
-  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :global_flash?
+  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :show_location?, :global_flash?
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -61,6 +61,11 @@ class ApplicationController < ActionController::Base
   
   def current_privileges
     @current_privileges ||= []
+  end
+  
+  # returns true if there is more than 1 company location
+  def show_location?
+    @current_locations.size > 1
   end
   
   # controls whether the flash may be displayed in the header, defaults to true
@@ -125,7 +130,7 @@ class ApplicationController < ActionController::Base
       @current_location = @current_locations.select { |l| l.id == session[:location_id] }.first
       @current_location = Location.anywhere if @current_location.blank?
 
-      logger.debug("*** current_location: #{@current_location.name}")
+      logger.debug("*** current_location: #{@current_location.name}, count: #{@current_locations.size}")
     end
   end
     

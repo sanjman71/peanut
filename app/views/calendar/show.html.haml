@@ -29,12 +29,19 @@
     = display_flash(:notice)
     
   .span-15.prepend-1.last
-    %h2
-      = @daterange.name
+    %h2= @daterange.name
+      
+    -# show free, work calendar
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      
+    -# show count of work appointments across a daterange
     %h3.span-15.last#appointments_count
-      = render(:partial => 'appointments/appointments_count.html.haml', :locals => {:count => @appointments.size})
+      %span{:style => 'background-color: #5500BB; color: #FFFFFF; padding: 0 5px 0 5px;'}
+        = @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
+        == over #{pluralize(@daterange.days, 'Day')}
+      
+    -# show free and work appointments
     .span-15.last#free_schedule
       = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
 

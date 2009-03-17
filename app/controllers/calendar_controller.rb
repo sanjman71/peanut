@@ -64,21 +64,22 @@ class CalendarController < ApplicationController
       @daterange  = DateRange.parse_when(@when, :include => :today)
     end
 
-    # find free, work appointments for a resource
+    # find free, work appointments for the specified schedulable over a daterange
     @appointments = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @schedulable, @daterange)
         
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings = build_calendar_markings(@appointments)
+    @calendar_markings    = build_calendar_markings(@appointments)
 
-    logger.debug("*** calendar markings: #{@calendar_markings}")
-    
     # group appointments by day
-    @appointments_by_day = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
+    @appointments_by_day  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
 
+    # find work appointments
+    @work_appointments    = @appointments.select { |appt| appt.mark_as == Appointment::WORK }
+     
     # check if current user is a calendar manager for the specified calendar
-    @calendar_manager = current_user.has_privilege?('update calendars', current_company) || current_user == @schedulable
+    @calendar_manager     = current_user.has_privilege?('update calendars', current_company) || current_user == @schedulable
         
     respond_to do |format|
       format.html
