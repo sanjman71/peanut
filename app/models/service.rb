@@ -24,6 +24,7 @@ class Service < ActiveRecord::Base
     r = Service.new do |o|
       o.name = options[:name] || ""
       o.send(:id=, 0)
+      o.duration = 0
       o.allow_custom_duration = false
     end
   end

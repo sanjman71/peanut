@@ -41,9 +41,8 @@ class OpeningsControllerTest < ActionController::TestCase
     ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
   end
   
-  context "search company openings" do
+  context "search company openings with no service specified" do
     setup do
-      @nothing = Service.nothing
       get :index
     end
 
@@ -55,5 +54,27 @@ class OpeningsControllerTest < ActionController::TestCase
       assert assigns(:service).nothing?
     end
   end
-  
+
+  context "search company openings with an invalid service" do
+    setup do
+      get :index, :service_id => 157
+    end
+
+    should_respond_with :redirect
+    should_redirect_to "openings_path"
+  end
+
+  context "search company openings with a valid service, but invalid duration" do
+    setup do
+      # create company service that does not allow a custom duration
+      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
+      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 10.00, :duration => 30)
+      get :index, :service_id => @haircut.id, :duration => 60, :when => 'this-week', :time => 'anytime'
+    end
+
+    should_respond_with :redirect
+    should "redirect to openings services path with default duration value" do
+      assert_redirected_to("http://www.test.host/services/#{@haircut.id}/30/openings/this-week/anytime")
+    end
+  end
 end

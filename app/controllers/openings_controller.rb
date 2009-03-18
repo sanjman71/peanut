@@ -1,5 +1,8 @@
 class OpeningsController < ApplicationController
 
+  # Handle RecordNotFound exceptions with a redirect
+  rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }
+    
   # GET /openings
   # GET /users/1/services/3/openings/this-week/morning
   # GET /services/1/openings/this-week/anytime
@@ -40,19 +43,19 @@ class OpeningsController < ApplicationController
     @locations = current_locations
 
     # initialize service, default to nothing
-    @service  = current_company.services.find_by_id(params[:service_id].to_i) || Service.nothing
+    @service  = params[:service_id] ? current_company.services.find(params[:service_id].to_i) : Service.nothing
     
     # initialize duration
-    @duration = params[:duration].to_i
+    @duration = params[:duration] ? params[:duration].to_i : @service.duration
     
     # if the service allows a custom duration, then set the service duration; otherwise use the default service duration
-    if @service.allow_custom_duration and @duration > 0
+    if @service.allow_custom_duration
       @service.duration = @duration
     end
 
-    # make sure the service duration matches the specified duration, unless its the special 'nothing' service
-    if !@service.nothing? and @service.duration != @duration
-      # use the default service duration
+    # make sure the service duration matches the specified duration
+    if @service.duration != @duration
+      # redirect using the default service duration
       redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
     end
     

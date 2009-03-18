@@ -18,9 +18,10 @@ Factory.define :person do |p|
 end
 
 Factory.define :work_service, :class => Service do |s|
-  s.name      "Work"
-  s.mark_as   "work"
-  s.duration  30
+  s.name                    "Work"
+  s.mark_as                 "work"
+  s.duration                30
+  s.allow_custom_duration   false
 end
 
 Factory.define :free_service, :class => Service do |s|
