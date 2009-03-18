@@ -39,7 +39,8 @@
     %h3.span-15.last#appointments_count
       %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}
         = @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
-        == over #{pluralize(@daterange.days, 'day')}
+        == between #{@daterange.start_at.to_s(:appt_short_month_day)}
+        == and #{@daterange.end_at.to_s(:appt_short_month_day)}
       
     -# show free and work appointments
     .span-15.last#free_schedule
