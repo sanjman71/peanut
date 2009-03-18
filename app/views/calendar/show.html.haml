@@ -37,7 +37,7 @@
       
     -# show count of work appointments across a daterange
     %h3.span-15.last#appointments_count
-      %span{:style => 'background-color: #5500BB; color: #FFFFFF; padding: 0 5px 0 5px;'}
+      %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}
         = @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
         == over #{pluralize(@daterange.days, 'Day')}
       
