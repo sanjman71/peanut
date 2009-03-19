@@ -98,7 +98,7 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = confirmation_appointment_path(@appointment)
-          flash[:notice]  = "Booked your #{@service.name} appointment"
+          flash[:notice]  = "Your #{@service.name} appointment has been confirmed. A confirmation email will also be sent to #{@customer.email}"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE
@@ -118,7 +118,7 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = confirmation_appointment_path(@appointment)
-          flash[:notice]  = "Created your waitlist appointment"
+          flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         end

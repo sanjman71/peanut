@@ -9,7 +9,7 @@ $.fn.init_autocomplete_customer_data = function() {
             var customers = []
             $.each(data, function(i, item) {
               // add customer data as a hash with keys 'name' and 'id'
-              console.log(item.user.name + ":" + item.user.id);
+              console.log(item.user.name + ":" + item.user.id + ":" + item.user.email);
               customers.push({name:item.user.name, id:item.user.id});
             })
             
@@ -21,10 +21,6 @@ $.fn.init_autocomplete_customer_data = function() {
 }
 
 $.fn.init_change_appointment_customer = function() {
-  // test autocomplete
-  var data = "Sanjay Killian Sam Kirby".split(" ");
-  //$("#customer_search_text").autocomplete(data, {autofill:false});
-  
   $("#customer_search_text").result(function(event, data, formatted) {
     console.log("selected: " + data.name + ":", data.id);
     // save the search customer selected
@@ -40,6 +36,26 @@ $.fn.init_change_appointment_customer = function() {
   $("a#hide_customer_search").click(function() {
     $("span#customer_search").hide();
     $("span#customer_default").show();
+    return false;
+  })
+}
+
+$.fn.init_confirm_appointment = function() {
+  $("#confirm_appointment_submit").click(function() {
+    // check if the appointment customer has changed
+    var customer_search_id = $("#customer_search_id").attr("value");
+    if (customer_search_id != "0") {
+      // change the form's customer id
+      $("#customer_id").attr("value", customer_search_id);
+    }
+    
+    // post the search query
+    $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
+    
+    // show progress bar
+    $(this).hide();
+    $("#confirm_appointment_submit_progress").show();
+    
     return false;
   })
 }
@@ -63,6 +79,7 @@ $(document).ready(function() {
   
   $(document).init_autocomplete_customer_data();
   $(document).init_change_appointment_customer();
+  $(document).init_confirm_appointment();
 })
 
 // Re-bind after an ajax call

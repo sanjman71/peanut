@@ -7,7 +7,7 @@
     %h2== Please confirm your appointment.
       
   .schedule_form.span-15.prepend-1
-    - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post}) do |f|
+    - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
       = hidden_field_tag :schedulable_type, @schedulable.tableize
       = hidden_field_tag :schedulable_id, @schedulable.id
       = hidden_field_tag :service_id, @service.id
@@ -28,4 +28,5 @@
         = render :partial => 'appointment_header', :locals => {:appointment => @appointment}
       .span-14.prepend-1.last
         %br
-        = f.submit "Confirm", :name => '', :style => 'font-size: 15px;'
+        = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em;'
+        %span#confirm_appointment_submit_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

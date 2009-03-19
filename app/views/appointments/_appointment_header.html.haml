@@ -38,8 +38,10 @@
       .span-12.last.padding-bottom-5
         %span#customer_default
           = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
-          == or
-          %span= link_to 'Choose a Customer', '', :id => 'hide_customer_default', :class => 'admin'
+          -# the user can choose a customer for a new appointment
+          - if appointment.new_record?
+            == or
+            %span= link_to 'Choose a Customer', '', :id => 'hide_customer_default', :class => 'admin'
         %span#customer_search.hide
           = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: normal; color: #5500BB;'
           %br
@@ -47,7 +49,7 @@
           %br
           = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
           %span{:style => 'font-size: 0.8em;'}== or
-          = link_to 'Create a New Customer', '', :class => 'admin'
+          = link_to 'Create a New Customer', new_user_path, :class => 'admin'
           = hidden_field_tag :customer_search_id, 0
           
   -# work appointments have confirmation codes only after being created
