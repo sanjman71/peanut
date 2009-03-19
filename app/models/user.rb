@@ -25,6 +25,7 @@ class User < ActiveRecord::Base
 
   has_many                  :sent_invitations, :class_name => 'Invitation'
   has_many                  :received_invitations, :class_name => 'Invitation'
+  belongs_to                :invitation
   
   has_many                  :appointments, :class_name => 'User'
   belongs_to                :mobile_carrier
@@ -32,7 +33,7 @@ class User < ActiveRecord::Base
   # HACK HACK HACK -- how to do attr_accessible from here?
   # prevents a user from submitting a crafted form that bypasses activation
   # anything else you want your user to change should be added here.
-  attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id
+  attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id, :invitation_id
 
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => :name }

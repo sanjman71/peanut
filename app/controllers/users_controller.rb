@@ -60,6 +60,9 @@ class UsersController < ApplicationController
         flash[:error] = "Your invitation code is invalid."
         @error = true
         return
+      else
+        # update the user params hash with the invitation id
+        params[:user].update(:invitation_id => @invitation.id)
       end
     end
     
@@ -72,6 +75,9 @@ class UsersController < ApplicationController
         @user.grant_role('company employee', @invitation.company)
         # Add the user as a company schedulable
         @invitation.company.schedulables.push(@user)
+        # Mark the user as the invitation recipient
+        @invitation.recipient = @user
+        @invitation.save
       end
       # activate user, redirect to login page
       @user.activate!

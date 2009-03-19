@@ -61,15 +61,27 @@ class UsersControllerTest < ActionController::TestCase
         assert_valid @invitation
         post :create, {:invitation_token => @invitation.token, 
                        :user => {:email => @recipient_email, :name => "Invited User", :password => 'secret', :password_confirmation => 'secret'}}
+        @invitation.reload
       end
       
       should_assign_to :invitation, :equals => '@invitation'
       should_assign_to :user
       
-      should "have created new user as a company employee and a company schedulable" do
+      should "have a valid user" do
         assert assigns(:user).valid?
+      end
+      
+      should "have created user as a company employee and as a company schedulable" do
         assert_equal ['company employee'], assigns(:user).roles.collect(&:name).sort
         assert_equal [@company], assigns(:user).companies
+      end
+      
+      should "have changed invitation's recipient to the new user" do
+        assert_equal assigns(:user), @invitation.recipient
+      end
+      
+      should "have marked user with the invitation" do
+        assert_equal @invitation, assigns(:user).invitation
       end
     end
   end

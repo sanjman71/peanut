@@ -165,6 +165,18 @@ module ApplicationHelper
     (schedulable == current_user) ? "Me" : schedulable.name
   end
   
+  # build customer display name based on context of the current user
+  def customer_display_name(customer, current_user)
+    return "" if customer.blank?
+    (customer == current_user) ? "Me" : customer.name
+  end
+
+  # build user display name based on context of the current user
+  def user_display_name(user, current_user)
+    return "" if user.blank?
+    (user == current_user) ? "Me" : user.name
+  end
+  
   def build_company_location_select_options
     anywhere = Location.anywhere
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}

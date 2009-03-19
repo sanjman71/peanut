@@ -37,11 +37,11 @@
         == Customer:
       .span-12.last.padding-bottom-5
         %span#customer_default
-          = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
+          = link_to customer_display_name(appointment.customer, current_user), customer_path(appointment.customer, :subdomain => current_subdomain)
           -# the user can choose a customer for a new appointment
           - if appointment.new_record?
             == or
-            %span= link_to 'Choose a Customer', '', :id => 'hide_customer_default', :class => 'admin'
+            %span= link_to 'Change Customer', '', :id => 'hide_customer_default', :class => 'admin'
         %span#customer_search.hide
           = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: normal; color: #5500BB;'
           %br

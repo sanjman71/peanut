@@ -3,6 +3,11 @@ require 'test/factories'
 
 class UserTest < ActiveSupport::TestCase
 
+  should_belong_to    :mobile_carrier
+  should_belong_to    :invitation
+  should_have_many    :subscriptions
+  should_have_many    :plans, :through => :subscriptions
+  
   context "create without an invitation" do
     setup do
       @user1 = User.create(:company_id => 0, :name => "User 1", :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
