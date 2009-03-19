@@ -8,12 +8,14 @@ $.fn.init_autocomplete_customer_data = function() {
           success: function(data) {
             var customers = []
             $.each(data, function(i, item) {
+              // add customer data as a hash with keys 'name' and 'id'
               console.log(item.user.name + ":" + item.user.id);
-              customers.push(item.user.name)
+              customers.push({name:item.user.name, id:item.user.id});
             })
             
-            // init autocomplete field with customer info
-            $("#customer_search_text").autocomplete(customers, {autofill:false, matchContains:true});
+            // init autocomplete field with customer data
+            $("#customer_search_text").autocomplete(customers, 
+                                                   {matchContains:true, formatItem: function(item) {return item.name}});
           }
         });
 }
@@ -24,7 +26,9 @@ $.fn.init_change_appointment_customer = function() {
   //$("#customer_search_text").autocomplete(data, {autofill:false});
   
   $("#customer_search_text").result(function(event, data, formatted) {
-    console.log("result: " + data);
+    console.log("selected: " + data.name + ":", data.id);
+    // save the search customer selected
+    $("#customer_search_id").attr("value", data.id);
   })
 
   $("a#hide_customer_default").click(function() {

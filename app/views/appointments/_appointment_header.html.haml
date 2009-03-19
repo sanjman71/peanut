@@ -48,7 +48,8 @@
           = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
           %span{:style => 'font-size: 0.8em;'}== or
           = link_to 'Create a New Customer', '', :class => 'admin'
-        
+          = hidden_field_tag :customer_search_id, 0
+          
   -# work appointments have confirmation codes only after being created
   - unless appointment.confirmation_code.blank?
     .span-15.last.confirmation
