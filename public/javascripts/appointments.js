@@ -1,8 +1,8 @@
 $.fn.init_autocomplete_customer_data = function() {
   // post json, override global ajax beforeSend defined in application.js
   $.ajax({
-          type: "POST",
-          url: "/users/index",
+          type: "GET",
+          url: $("#customer_search_text").attr("url"),
           dataType: "json",
           beforeSend: function(xhr) {xhr.setRequestHeader("Accept", "application/json");},
           success: function(data) {

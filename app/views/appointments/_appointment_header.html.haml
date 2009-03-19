@@ -43,7 +43,7 @@
         %span#customer_search.hide
           = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: normal; color: #5500BB;'
           %br
-          = text_field_tag("", "", :id => 'customer_search_text', :class => 'title')
+          = text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => users_path)
           %br
           = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
           %span{:style => 'font-size: 0.8em;'}== or
