@@ -17,7 +17,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json { render(:json => @users.to_json(:only => ['id', 'name'])) }
+      format.json { render(:json => @users.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
   

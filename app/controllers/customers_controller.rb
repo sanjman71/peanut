@@ -16,7 +16,7 @@ class CustomersController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @customers.to_json(:only => ['id', 'name'])) }
+      format.json { render(:json => @customers.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
 
