@@ -15,6 +15,10 @@ class OpeningsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
     end
     
+    if !current_company.setup?
+      redirect_to(setup_company_path(current_company)) and return
+    end
+    
     # initialize schedulable, default to anyone
     @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulable  = User.anyone if @schedulable.blank?

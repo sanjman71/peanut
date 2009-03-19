@@ -1,4 +1,8 @@
-.span-24.mat
+- title(@title)
+- javascript('appointments')
+- stylesheet('jquery.autocomplete')
+
+.span-24.mat.padding-bottom-10
   .span-15.prepend-1
     %h2== Please confirm your appointment.
       
@@ -22,6 +26,6 @@
           = error_messages_for('appointment', :header_message => nil)
       .span-15.last
         = render :partial => 'appointment_header', :locals => {:appointment => @appointment}
-      %hr.space
       .span-14.prepend-1.last
+        %br
         = f.submit "Confirm", :name => '', :style => 'font-size: 15px;'

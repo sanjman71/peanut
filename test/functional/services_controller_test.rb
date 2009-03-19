@@ -12,6 +12,7 @@ class ServicesControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
+    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
 
   context "create service" do

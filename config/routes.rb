@@ -27,7 +27,7 @@ ActionController::Routing::Routes.draw do |map|
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
-  map.resources :companies, :only => [:index, :show, :edit, :update, :destroy]
+  map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
                 :collection => { :search => [:get, :post] }

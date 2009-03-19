@@ -25,11 +25,14 @@ class OpeningsControllerTest < ActionController::TestCase
 
   def setup
     @controller   = OpeningsController.new
-    # create a valid company
+    # create a valid company, with 1 schedulable and 1 work service
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
+    @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
+    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 10.00, :duration => 30)
+    @company.reload
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -67,9 +70,7 @@ class OpeningsControllerTest < ActionController::TestCase
   context "search company openings with a valid service, but invalid duration" do
     setup do
       # create company service that does not allow a custom duration
-      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 10.00, :duration => 30)
-      get :index, :service_id => @haircut.id, :duration => 60, :when => 'this-week', :time => 'anytime'
+      get :index, :service_id => @haircut.id, :duration => 90, :when => 'this-week', :time => 'anytime'
     end
 
     should_respond_with :redirect

@@ -25,21 +25,33 @@
 
   -# waitlist appointments have no duration
   - unless appointment.waitlist?
-    .duration
+    .span-15.last.duration
       .span-3.padding-bottom-5.text-align-right
         == How Long:
       .span-12.padding-bottom-5.last
         = Duration.to_words(appointment.duration)
       
   - unless appointment.customer.blank?
-    .customer
+    .span-15.last.customer{:style => 'padding-top: 10px;'}
       .span-3.padding-bottom-5.text-align-right
         == Customer:
-      .span-12.padding-bottom-5.last
-        = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
+      .span-12.last.padding-bottom-5
+        %span#customer_default
+          = link_to appointment.customer.name, customer_path(appointment.customer, :subdomain => current_subdomain)
+          == or
+          %span= link_to 'Choose a Customer', '', :id => 'hide_customer_default', :class => 'admin'
+        %span#customer_search.hide
+          = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: normal; color: #5500BB;'
+          %br
+          = text_field_tag("", "", :id => 'customer_search_text', :class => 'title')
+          %br
+          = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
+          %span{:style => 'font-size: 0.8em;'}== or
+          = link_to 'Create a New Customer', '', :class => 'admin'
         
+  -# work appointments have confirmation codes only after being created
   - unless appointment.confirmation_code.blank?
-    .confirmation
+    .span-15.last.confirmation
       .span-3.padding-bottom-5.text-align-right
         == Confirmation:
       .span-12.padding-bottom-5.last

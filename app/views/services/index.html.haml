@@ -1,18 +1,19 @@
+- title('Services')
 - stylesheet('services')
 - javascript('services')
 
-- if_privilege('read services', @current_company) do
-  .span-16.append-1
-    .span-15.prepend-1.last.mat
+- if_privilege('read services', current_company) do
+  .span-15.append-2
+    .span-15.prepend-1.last.mat.padding-bottom-10
       %h2== Services
     %hr.space
     .span-14.prepend-1.append-1.last
       .highlight#flash
     #services
-      = render(:partial => 'services.html.haml', :locals => {:services => @services})
+      = render(:partial => 'services', :locals => {:services => @services})
 
-- if_privilege('create services', @current_company) do
-  .span-6.prepend-1.last.mat
+- if_privilege('create services', current_company) do
+  .span-6.prepend-1.last.mat.padding-bottom-10
     - form_for(Service.new, :url => services_path(:subdomain => current_subdomain), :method => :post, :html => {:class => 'new_service', :id => 'new_service_form'}) do |f|
       = hidden_field_tag "service[mark_as]", 'work'
       = hidden_field_tag "service[price]", 0

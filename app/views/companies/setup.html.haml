@@ -1,0 +1,23 @@
+- title("Setup")
+
+.span-23.prepend-1.last.mat.padding-bottom-10
+  %h1{:style => 'font-size: 2.5em;'}== Setup Wizard
+  
+%hr.space
+
+.span-22.prepend-1.last
+  %p{:style => "font-size: 1.8em;"}
+    == There are a few things you need to do before your site is setup and your customers can start scheduling appointments online.
+  %p{:style => "font-size: 1.8em;"}
+    == The first step is to add
+    %span{:style => 'background-color: #FFFF99;'}== company employees and managers.
+    == Click
+    = link_to 'here', users_path, :style => 'color: #FF6600;'
+    == to add employees and/or managers.
+  %p{:style => "font-size: 1.8em;"}
+    == The next step is to add
+    %span{:style => 'background-color: #FFFF99;'}== services.
+    == Click
+    = link_to 'here', services_path, :style => 'color: #FF6600;'
+    == to add services.
+  

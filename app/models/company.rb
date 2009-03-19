@@ -19,7 +19,7 @@ class Company < ActiveRecord::Base
                             :in => %w( support blog www billing help api ),
                             :message => "The subdomain <strong>{{value}}</strong> is reserved and unavailable."
 
-  before_validation         :init_subdomain, :downcase_subdomain
+  before_validation         :init_subdomain, :downcase_subdomain, :titleize_name
 
   validates_presence_of     :time_zone
   has_many                  :company_schedulables
@@ -44,18 +44,10 @@ class Company < ActiveRecord::Base
       errors.add_to_base("Subscription is not valid")
     end
   end
-  
-  def after_initialize
-    # after_initialize can also be called when retrieving objects from the database
-    return unless new_record?
-    
-    # titleize name
-    self.name = self.name.titleize unless self.name.blank?
-  end
-  
+
   # return true if the company contains the specified schedulable
   def has_schedulable?(object)
-    # can't use schedulables.include?(object) here, not sure why but possibly because of polymorphic
+    # can't use schedulables.include?(object) here, not sure why but possibly because its polymorphic
     schedulables.any? { |o| o == object }
   end
   
@@ -70,7 +62,7 @@ class Company < ActiveRecord::Base
   end
   
   # returns true if the company has at least 1 schedulable and 1 work service
-  def can_schedule_appointments?
+  def setup?
     return false if schedulables_count == 0 or work_services_count == 0
     true
   end
@@ -97,8 +89,12 @@ class Company < ActiveRecord::Base
   # initialize subdomain based on company name
   def init_subdomain
     if !attribute_present?("subdomain")
-      self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '') unless name.blank?
+      self.subdomain = self.name.downcase.gsub(/[^\w\d]/, '') unless self.name.blank?
     end
+  end
+  
+  def titleize_name
+    self.name = self.name.titleize unless self.name.blank?
   end
   
   # initialize company's basic services

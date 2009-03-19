@@ -1,10 +1,8 @@
 class AppointmentsController < ApplicationController
   before_filter :disable_global_flash, :only => [:show, :confirmation]
     
-  # GET   /schedule/users/1/services/1/duration/60/20081231T000000
-  # POST  /schedule/users/1/services/1/duration/60/20081231T000000
-  # GET   /waitlist/users/1/services/8/this-week/anytime
-  # POST  /waitlist/users/1/services/8/this-week/anytime
+  # GET   /book/work/users/1/services/3/duration/60/20081231T000000
+  # GET   /book/wait/users/1/services/3/20090101..20090108
   def new
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
@@ -30,6 +28,9 @@ class AppointmentsController < ApplicationController
       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
       @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
       @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
+      
+      # set title
+      @title                = "Book Appointment"
     when Appointment::WAIT
       # build waitlist parameters
       @daterange            = DateRange.parse_range(params[:start_date], params[:end_date], :inclusive => true)
@@ -41,6 +42,9 @@ class AppointmentsController < ApplicationController
       @appt_date            = @daterange.name
       @appt_time_start_at   = @appointment.start_at.to_s(:appt_schedule_day)
       @appt_time_end_at     = @appointment.end_at.to_s(:appt_schedule_day)
+
+      # set title
+      @title                = "Waitlist Appointment"
     end
 
     respond_to do |format|

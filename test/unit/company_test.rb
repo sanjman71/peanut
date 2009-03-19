@@ -47,7 +47,7 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal 1, @company.services_count
       assert_equal 0, @company.work_services_count
       assert_equal 1, @company.services.free.size
-      assert_equal false, @company.can_schedule_appointments?
+      assert_equal false, @company.setup?
     end
   
     should "have locations_count == 0" do
@@ -80,7 +80,7 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
       
-      should "have company schedulables collection == [@user1]" do
+      should "have company schedulables == [@user1]" do
         assert_equal [@user1], @company.schedulables
       end
       
@@ -92,7 +92,7 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal 1, @company.schedulables_count
       end
       
-      should "have users.has_calendar?(company) return true" do
+      should "have user1.has_calendar?(company) return true" do
         assert @user1.has_calendar?(@company)
       end
     end
