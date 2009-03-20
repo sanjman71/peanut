@@ -161,3 +161,8 @@ div.plan                                          { height: 200px;}
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}
 
 h3.select_label                                   { padding-top: 10px; }
+
+div.short_description textarea                    { height: 100px;}
+div.description textarea                          { height: 200px;}
+#company_name { float: left;}
+.short_description { float: left;}

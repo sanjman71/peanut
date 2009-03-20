@@ -38,7 +38,13 @@
         %h2= link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
     
 .last.mat{:class => @daterange ? "span-7" : "span-24"}
+  .span-7
+    = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
+  - if @daterange.blank?
+    .span-10.last
+      = Sanitize.clean(current_company.description, Sanitize::Config::BASIC)
+  - else
+    .last
+
   -#.span-7.last.sidebar.instructions
     -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
-    
-  = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})

@@ -182,4 +182,14 @@ module ApplicationHelper
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}
   end
   
+  def use_tiny_mce
+    # Avoid multiple inclusions
+    unless @content_for_tiny_mce
+      @content_for_tiny_mce = "" 
+      content_for :tiny_mce do
+        javascript_include_tag('tiny_mce/tiny_mce') + javascript_include_tag('tiny_mce_editor')
+      end
+    end
+  end
+  
 end

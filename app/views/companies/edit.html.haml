@@ -1,13 +1,16 @@
+/ First, turn on TinyMCE for use with the description field
+- use_tiny_mce
+
 .span-20.box
   %h2
     == Editing
     = @company.name
 
-  .span-20
-    .span-17.prepend-1
-      = display_flash(:notice)
-      = display_flash(:error)
-
+  / .span-20
+  /   .span-17.prepend-1
+  /     = display_flash(:notice)
+  /     = display_flash(:error)
+  / 
   .span-17.prepend-1
     .span-8
       = "Currently subscribed to the <strong>#{@company.plan.name}</strong> plan."
@@ -35,8 +38,18 @@
       .span-5.last
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
     .span-19.prepend-1.last
+      .span-19.last
+        %h3== Short description (shown in header):
+      .span-18.last.short_description
+        = f.text_area :short_description, :class => "tiny-mce-editor", :rows => 5
+    .span-19.prepend-1.last
+      .span-19.last
+        %h3== Full description (shown on new appointments page):
+      .span-18.last.description
+        = f.text_area :description, :class => "tiny-mce-editor"
+    .span-19.prepend-1.last
       .span-5
-        = f.submit 'Update Timezone', :class => 'button big'
+        = f.submit 'Update Company Information', :class => 'button big'
 
   %hr
 

@@ -18,6 +18,17 @@
     = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'jquery.datePicker', 'application'
     = yield :javascript
     
+    / Pull in the TinyMCE support if required
+    / Implementation is based on the comments at the end of this page:
+    / http://wiki.rubyonrails.org/rails/pages/HowToUseTinyMCE
+    / Note that I do _not_ use the TinyMCE plugin
+    / 
+    / To use TinyMCE for text areas on a view page, just do:
+    /   use_tiny_mce
+    / at the top of the view file, and add the class tiny-mce-editor to your text_areas
+    /   f.text_area :excerpt, :size => '50x5', :class => "tiny-mce-editor"
+    = yield :tiny_mce    
+    
   %body
     #header
       .container
@@ -27,8 +38,11 @@
             
         .span-24.last
           .span-19
-            %h2#company_name{:style => 'color: #FFFFFF;'}
-              = link_to current_company.name, root_path(:subdomain => current_subdomain)
+            .company_name_short_desc.span-19.last
+              %h2#company_name{:style => 'color: #FFFFFF;'}
+                = link_to current_company.name, root_path(:subdomain => current_subdomain)
+              .short_description.prepend-1.last
+                = current_company.short_description unless current_company.short_description.blank?
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')

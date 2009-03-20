@@ -4,6 +4,8 @@ class CreatePeanut < ActiveRecord::Migration
       t.string  :name
       t.string  :time_zone
       t.string  :subdomain
+      t.text    :short_description
+      t.text    :description
       t.integer :locations_count, :default => 0       # counter cache
       t.integer :services_count, :default => 0        # counter cache
       t.integer :schedulables_count, :default => 0    # counter cache
