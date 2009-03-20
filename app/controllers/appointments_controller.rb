@@ -1,12 +1,12 @@
 class AppointmentsController < ApplicationController
   before_filter :disable_global_flash, :only => [:show, :confirmation]
+  after_filter  :store_location, :only => [:new]
     
   # GET   /book/work/users/1/services/3/duration/60/20081231T000000
   # GET   /book/wait/users/1/services/3/20090101..20090108
   def new
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
-      store_location
       redirect_to(login_path) and return
     end
     

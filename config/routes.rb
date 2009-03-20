@@ -4,19 +4,22 @@ ActionController::Routing::Routes.draw do |map|
   map.login     '/login',         :controller => 'sessions', :action => 'new', :conditions => {:method => :get}
   map.login     '/login',         :controller => 'sessions', :action => 'create', :conditions => {:method => :post}
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
-  map.register  '/register',      :controller => 'users', :action => 'create'
 
   # user activation
   map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
   # company signup route
-  map.signup        '/signup',       :controller => 'signup', :action => 'index'
+  map.signup        '/signup',          :controller => 'signup', :action => 'index'
   map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
+  map.connect   '/employees/new',     :controller => 'users', :action => 'new', :type => 'employee', :conditions => {:method => :get}
+  map.connect   '/employees/create',  :controller => 'users', :action => 'create', :type => 'employee', :conditions => {:method => :post}
+  map.connect   '/customers/new',     :controller => 'users', :action => 'new', :type => 'customer', :conditions => {:method => :get}
+  map.connect   '/customers/create',  :controller => 'users', :action => 'create', :type => 'customer', :conditions => {:method => :post}
   map.resources :invitations, :only => [:new, :create]
   map.resource  :session
 

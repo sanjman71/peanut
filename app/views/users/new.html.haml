@@ -1,44 +1,8 @@
 - title('User Signup')
 
-- if @error
-  .span-20.box
-    %h2== Your invitation is invalid
+- if @error_message
+  .span-23.prepend-1.mat.padding-bottom-10
+    %h2= @error_message
+    %h4{:style => 'font-size: 1.5em;'}== Please check your invitation and try again
 - else
-  - form_for(@user, :url => users_path, :method => :post, :html => {:class => 'new_user'}) do |f|
-    = hidden_field_tag :invitation_token, @invitation.token
-  
-    .span-20.box
-      .span-20.last
-        %h2== Create your user account
-      .span-18.last
-        %hr
-
-      -# show any user errors
-      - unless @user.errors.blank?
-        .span-18.notice
-          = error_messages_for('user', :header_message => nil)
-
-      .span-18.last
-        .span-6
-          %h2.text-align-right== Name:
-        .span-12.last
-          = f.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-18.last
-        .span-6
-          %h2.text-align-right== Email:
-        .span-12.last
-          = f.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-18.last
-        .span-6
-          %h2.text-align-right== Password:
-        .span-12.last
-          = f.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-        .span-18.last
-          .span-6
-            %h2.text-align-right== Password Confirmation:
-          .span-12.last
-            = f.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
-      .span-18
-        = submit_tag "Create", :name => nil, :class => 'button big'
-
-      
+  = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :type => @type, :subdomain => current_subdomain), :title_text => "#{@type.titleize} Signup", :submit_text => 'Create'}

@@ -1,11 +1,16 @@
+- title("Employees")
 - javascript('users')
 
 .span-24
-  .span-23.prepend-1.last.mat
-    .span-17
+  .span-23.prepend-1.last.mat.padding-bottom-10
+    .span-15
       %h2== Users
-    .span-4.last
-      %h3{:style => 'padding-top: 5px;'}= link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
+    .span-7.last.text-align-right
+      %h4{:style => 'padding-top: 5px; font-size: 1.3em;'}
+        = link_to 'Add an employee', url_for(:controller => 'users', :action => 'new', :type => 'employee', :subdomain => current_subdomain)
+        == &nbsp;|&nbsp;
+        = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
+      
   %hr.space
   
   .span-14.prepend-1.append-1.last

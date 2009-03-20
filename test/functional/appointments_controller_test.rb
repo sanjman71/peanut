@@ -73,6 +73,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # stub current user
       @controller.stubs(:logged_in?).returns(true)
       @controller.stubs(:current_user).returns(@customer)
+      ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
       
       # book a haircut with johnny during his free time
       get :new, 
@@ -291,6 +292,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # stub the current user and logged_in? state
       @controller.stubs(:logged_in?).returns(true)
       @controller.stubs(:current_user).returns(@customer)
+      ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
       
       # request a waitlist appointment
       get :new,

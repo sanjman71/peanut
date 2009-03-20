@@ -1,5 +1,6 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
+  before_filter :disable_global_flash, :only => [:create]
 
   def new
     # We show a signup form also, which requires a @user object

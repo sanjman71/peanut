@@ -140,8 +140,8 @@ module ApplicationHelper
     
     if has_privilege?('read users', current_company)
     
-      # 'Users' tab
-      name = 'Users'
+      # 'Employees' tab
+      name = 'Employees'
       if current_controller.controller_name == 'users' and ['index', 'show', 'edit'].include?(current_controller.action_name)
         link = link_to(name, users_path, :class => 'current')
       else

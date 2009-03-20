@@ -1,33 +1,52 @@
+-# if there is a user logged in, this user is being created by somebody else as their proxy
+- creator = current_user ? "user" : "anonymous"
+  
 .span-12.last.mat
-  .span-11.last
-    .span-10.prepend-1.last
-      %h2== Signup
-      %hr
-    - form_for("user", @user, :url => register_path ) do |user_form|
-      -# show any user errors
-      - unless @user.errors.blank?
-        .span-11.notice
-          = error_messages_for('user', :header_message => nil)
-      .span-11.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
-        .span-7.last
-          = user_form.text_field :name, :class => 'title big', :style => 'width: 250px; margin: 0px;'
-      .span-11.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
-        .span-7.last
-          = user_form.text_field :email, :class => 'title big', :style => 'width: 250px; margin: 0px;'
-      .span-11.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
-        .span-7.last
-          = user_form.password_field :password, :class => 'title big', :style => 'width: 250px; margin: 0px;'
-      .span-11.last.padding-bottom-10
-        .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
-        .span-7.last
-          = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 250px; margin: 0px;'
-      .span-11.last.padding-bottom-10
-        .span-9.prepend-2.last
-          = submit_tag 'Sign up!', :name => nil, :style => 'font-size: 15px;'
+  -# form title
+  .span-11.prepend-1.last
+    %h2= title_text
+    %hr
+
+    -# show any user errors
+    - unless @user.errors.blank?
+      .span-10.prepend-1.last.notice
+        = error_messages_for('user', :header_message => nil)
+
+  - form_for("user", @user, :url => submit_url) do |user_form|
+    = hidden_field_tag 'creator', creator
+    
+    -# name field
+    .span-12.last.padding-bottom-10
+      .span-4
+        %h3.text-align-right{:style => "padding-top: 10px;"}== Name:
+      .span-8.last
+        = user_form.text_field :name, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        
+    -# email field
+    .span-12.last.padding-bottom-10
+      .span-4
+        %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
+      .span-8.last
+        = user_form.text_field :email, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+
+    -# password fields are not shown if the creator is logged in
+    .span-12.last.padding-bottom-10{:class => (creator == "user") ? 'hide' : ''}
+      .span-4
+        %h3.text-align-right{:style => "padding-top: 10px;"}== Password:
+      .span-8.last
+        = user_form.password_field :password, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        
+    .span-12.last.padding-bottom-10{:class => (creator == "user")  ? 'hide' : ''}
+      .span-4
+        %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+      .span-8.last
+        = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        
+    .span-10.prepend-2.last.padding-bottom-10{:class => (creator == "user")  ? '' : 'hide'}
+      %em.span-10.last{:style => 'font-size: 1.2em;'}
+        == The user's password will be automatically generated and emailed to them. 
+        
+    -# submit
+    .span-12.last.padding-bottom-10
+      .span-10.prepend-2.last
+        = submit_tag submit_text, :name => nil, :style => 'font-size: 15px;'
