@@ -101,7 +101,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
     end
     
-    context "and schedule work appointment and test confirmation code" do
+    context "and schedule work appointment to test confirmation code" do
       setup do
         @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
         @customer   = Factory(:user)
@@ -113,6 +113,21 @@ class AppointmentTest < ActiveSupport::TestCase
       should "have confirmation code of exactly 5 characters" do
         assert_equal 5, @work_appt.confirmation_code.size
         assert_match /([A-Z]|[0-9])+/, @work_appt.confirmation_code
+      end
+    end
+
+    context "and schedule work appointment to test customer role" do
+      setup do
+        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @customer   = Factory(:user)
+        @options    = {:start_at => @free_appt.start_at}
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
+        assert_valid @work_appt
+        @customer.reload
+      end
+
+      should "have customer with customer role" do
+        assert_equal [Company.customer_role], @customer.roles
       end
     end
     

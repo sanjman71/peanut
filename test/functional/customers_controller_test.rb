@@ -10,27 +10,44 @@ class CustomersControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
+    # create customer role
+    @role         = Badges::Role.create(:name=>"customer")
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
   end
   
   context "search an empty customers database with an empty search" do
-    setup do
-      get :index
+    context "and without 'read users' privilege" do
+      setup do
+        # stub privileges
+        @controller.stubs(:current_privileges).returns([])
+        get :index
+      end
+      
+      should_respond_with :redirect
+      should_redirect_to 'unauthorized_path'
     end
+    
+    context "and with 'read users' privilege" do
+      setup do
+        # stub privileges
+        @controller.stubs(:current_privileges).returns(['read users'])
+        get :index
+      end
 
-    should_respond_with :success
-    should_render_template 'customers/index.html.haml'
-    should_not_set_the_flash
-    should_assign_to :customers, :search_text
-    should_not_assign_to :search
+      should_respond_with :success
+      should_render_template 'customers/index.html.haml'
+      should_not_set_the_flash
+      should_assign_to :customers, :search_text
+      should_not_assign_to :search
     
-    should "find 0 customers" do
-      assert_equal [], assigns(:customers)
-    end
+      should "find no customers" do
+        assert_equal [], assigns(:customers)
+      end
     
-    should "have search text" do
-      assert_equal "No Customers", assigns(:search_text)
+      should "have search text 'No Customers'" do
+        assert_equal "No Customers", assigns(:search_text)
+      end
     end
   end
   
@@ -44,8 +61,10 @@ class CustomersControllerTest < ActionController::TestCase
       assert_valid @appointment
     end
 
-    context "with an ajax search for 'boo'" do
+    context "with an ajax search for 'boo' with 'read users' privilege" do
       setup do
+        # stub privileges
+        @controller.stubs(:current_privileges).returns(['read users'])
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
     

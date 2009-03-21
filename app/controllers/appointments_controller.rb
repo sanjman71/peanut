@@ -281,8 +281,8 @@ class AppointmentsController < ApplicationController
       redirect_to(unauthorized_path) and return
     end
     
-    # check if current user is a company user or customer
-    if @customer.has_role?('company manager', current_company) || @customer.has_role?('company employee', current_company)
+    # check if current user is a company employee
+    if @customer.has_role?('company employee', current_company)
       # customer is a company user - what should we do here?
     end
         

@@ -142,10 +142,10 @@ module ApplicationHelper
     
       # 'Employees' tab
       name = 'Employees'
-      if current_controller.controller_name == 'users' and ['index', 'show', 'edit'].include?(current_controller.action_name)
-        link = link_to(name, users_path, :class => 'current')
+      if current_controller.controller_name == 'employees' and ['index', 'show', 'edit'].include?(current_controller.action_name)
+        link = link_to(name, employees_path, :class => 'current')
       else
-        link = link_to(name, users_path)
+        link = link_to(name, employees_path)
       end
 
       yield link

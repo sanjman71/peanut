@@ -1,9 +1,10 @@
 class UsersController < ApplicationController
-  before_filter :disable_global_flash, :only => [:index, :new, :create]
-  after_filter  :store_location, :only => [:index]
+  before_filter :disable_global_flash, :only => [:new, :create]
   
-  privilege_required 'read users', :only => [:index], :on => :current_company
-  privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
+  # Protect these actions behind an admin login
+  # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
+  before_filter :find_user, :only => [:edit, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
+  
   privilege_required 'create users', :only => [:new, :create], :on => :current_company
   
   def has_privilege?(p, *args)
@@ -35,23 +36,6 @@ class UsersController < ApplicationController
       super
     else
       super
-    end
-  end
-  
-  # Protect these actions behind an admin login
-  # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:edit, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
-  
-  def index
-    # find all company employees
-    @users            = current_company.authorized_users.order_by_name.uniq
-    
-    # check if current user is a company manager
-    @company_manager  = current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
-
-    respond_to do |format|
-      format.html
-      format.json { render(:json => @users.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
   
@@ -93,7 +77,8 @@ class UsersController < ApplicationController
     @user = User.new(params[:user])
     @user.invitation = @invitation if @invitation
     
-    @creator = params[:creator]
+    # initialize creator, default to anonymous
+    @creator = params[:creator] ? params[:creator] : 'anonymous'
     
     if @creator == 'user' and (params[:user][:password].blank? or params[:user][:password_confirmation].blank?)
       # generate random password for the new user
@@ -104,13 +89,18 @@ class UsersController < ApplicationController
     success = @user && @user.valid?
     
     if success && @user.errors.empty?
-      if @type == 'employee'
-        # if there was an invitation, then use invitation company; otherwise use the current company
-        @company = @invitation ? @invitation.company : current_company
+      # if there was an invitation, then use the invitation company; otherwise use the current company
+      @company = @invitation ? @invitation.company : current_company
+      
+      case @type
+      when 'employee'
         # grant the user basic access to the company as a 'company employee'
         @user.grant_role('company employee', @company)
         # add the user as a company schedulable
         @company.schedulables.push(@user)
+      when 'customer'
+        # grant the user the 'customer' role
+        @user.grant_role('customer', @company)
       end
 
       if @invitation
@@ -123,11 +113,14 @@ class UsersController < ApplicationController
       @user.activate!
       
       # set flash based on who created the user
+      # set redirect path based on creator and type
       case @creator
       when 'user'
-        flash[:notice] = "#{@type.titleize} #{@user.name} was successfully created."
+        @redirect_path  = "/#{@type.pluralize}"
+        flash[:notice]  = "#{@type.titleize} #{@user.name} was successfully created."
       when 'anonymous'
-        flash[:notice] = "Your account was successfully created. Login to continue."
+        @redirect_path  = "/login" 
+        flash[:notice]  = "Your account was successfully created. Login to continue."
       end
     else
       @error    = true
@@ -139,7 +132,7 @@ class UsersController < ApplicationController
       if @error
         format.html { render(:template => template) }
       else
-        format.html { redirect_back_or_default('/login') }
+        format.html { redirect_back_or_default(@redirect_path) }
       end
     end
   end
@@ -186,22 +179,6 @@ class UsersController < ApplicationController
     redirect_to users_path
   end
   
-  # POST /users/:id/toggle_manager
-  def toggle_manager
-    if @user.has_role?('company manager', current_company)
-      # revoke manager, grant employee
-      @user.revoke_role('company manager', current_company)
-      @user.grant_role('company employee', current_company)
-    else
-      # upgrade from employee to manager
-      @user.revoke_role('company employee', current_company)
-      @user.grant_role('company manager', current_company)
-    end
-
-    render_component(:controller => 'users',  :action => 'index', :layout => false, 
-                     :params => {:authenticity_token => params[:authenticity_token] })
-  end
-  
   # There's no page here to update or destroy a user.  If you add those, be
   # smart -- make sure you check that the visitor is authorized to do so, that they
   # supply their old password along with a new one to update it, etc.
@@ -213,7 +190,7 @@ class UsersController < ApplicationController
   end
   
   def random_password
-    'secret'
+    'peanut'
     # User.make_token
   end
 end

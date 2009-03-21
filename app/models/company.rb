@@ -39,6 +39,22 @@ class Company < ActiveRecord::Base
   # after create filter to initialize basic services that are provided by all companies
   after_create              :init_basic_services
 
+  def self.customer_role_name
+    'customer'
+  end
+  
+  def self.customer_role
+    Badges::Role.find_by_name(customer_role_name)
+  end
+
+  def self.employee_role
+    Badges::Role.find_by_name("company employee")
+  end
+
+  def self.manager_role
+    Badges::Role.find_by_name("company manager")
+  end
+
   def validate
     if self.subscription.blank?
       errors.add_to_base("Subscription is not valid")

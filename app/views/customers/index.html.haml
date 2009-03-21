@@ -3,14 +3,20 @@
 - javascript('customers')
 
 .span-20.last.box
-  = label_tag "live_search_for_customers", "Find a customer by typing their name", :class => 'big'
-  %br
-  = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => current_subdomain))
-  %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+  .span-16
+    = label_tag "live_search_for_customers", "Find a customer by typing their name", :class => 'big'
+    %br
+    = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => current_subdomain))
+    %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+  .span-4.last
+    %h4= link_to 'Add a customer', url_for(:controller => 'users', :action => 'new', :type => 'customer', :subdomain => current_subdomain)
+    
+.span-15.prepend-1.last
+  = display_flash(:all)
   
-.span-20.last
+.span-16.last
   .prepend-1.append-bottom.customers.header#customer_search_text
     = @search_text
   #customers
-    = render(:partial => 'customers.html.haml', :locals => {:customers => @customers})
+    = render(:partial => 'customers', :locals => {:customers => @customers})
     

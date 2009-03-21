@@ -45,7 +45,8 @@ class SignupController < ApplicationController
         @user.activate!
       end
 
-      # set user role on the specific company
+      # set user roles on the specific company
+      @user.grant_role('company employee', @company)
       @user.grant_role('company manager', @company)
 
       # signup completed, redirect to login page

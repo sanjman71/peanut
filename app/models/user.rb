@@ -35,8 +35,8 @@ class User < ActiveRecord::Base
   # anything else you want your user to change should be added here.
   attr_accessible :email, :name, :password, :password_confirmation, :phone, :mobile_carrier_id, :invitation_id
 
-  named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(name) REGEXP '%s'", s.downcase] }}
-  named_scope               :order_by_name, { :order => :name }
+  named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
+  named_scope               :order_by_name, { :order => 'users.name' }
 
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #

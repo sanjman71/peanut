@@ -12,6 +12,7 @@ namespace :rp do
     puts "adding company roles & privileges"
     cm = Badges::Role.create(:name=>"company manager")
     ce = Badges::Role.create(:name=>"company employee")
+    cu = Badges::Role.create(:name=>"customer")
 
     cc = Badges::Privilege.create(:name=>"create companies")
     rc = Badges::Privilege.create(:name=>"read companies")
@@ -24,6 +25,8 @@ namespace :rp do
 
     # Company employee can read company                   
     Badges::RolePrivilege.create(:role=>ce,:privilege=>rc)
+    
+    # Customer has no privileges
   end
   
   desc "Initialize roles & privileges roles and privileges"

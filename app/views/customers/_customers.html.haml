@@ -1,14 +1,12 @@
 - customers.each do |customer|
-  .prepend-1.customer
+  .span-15.prepend-1.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
     .span-7
-      %h2= link_to customer.name, customer_path(customer, :subdomain => current_subdomain)
-    .span-8
-      .email
-        %h3= mail_to(customer.email)
-      .phone
-        %h3
-          = customer.phone
-          = "(#{customer.mobile_carrier.name})" if customer.mobile_carrier
+      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, customer_path(customer, :subdomain => current_subdomain)
+      %h3.email= mail_to(customer.email)
+    .span-5
+      %h3.phone
+        = customer.phone
+        = "(#{customer.mobile_carrier.name})" if customer.mobile_carrier
     .span-3.last
-      %h4= link_to "Appointments", customer_appointments_path(customer)
+      %h4= link_to "Appointments", ''
         

@@ -13,6 +13,7 @@ class Appointment < ActiveRecord::Base
   validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
   has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
   before_save             :make_confirmation_code
+  after_create            :add_customer_role_for_work_appointments
   
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
@@ -442,6 +443,12 @@ class Appointment < ActiveRecord::Base
         self.confirmation_code  = CONFIRMATION_CODE_ZERO
       end
     end
+  end
+  
+  # add the 'customer' role to a work appointment's customer
+  def add_customer_role_for_work_appointments
+    return if self.mark_as != WORK or self.customer.blank?
+    self.customer.grant_role(Company.customer_role_name, self.company)
   end
   
 end

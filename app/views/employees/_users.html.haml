@@ -13,7 +13,7 @@
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
         - else
-          = check_box_tag 'Company Manager', 'yes', user.has_role?('company manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'users', :action => :toggle_manager, :id => user.id, :subdomain => current_subdomain)
+          = check_box_tag 'Company Manager', 'yes', user.has_role?('company manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'employees', :action => 'toggle_manager', :id => user.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
     .span-4.calendar

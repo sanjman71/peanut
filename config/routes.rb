@@ -16,6 +16,7 @@ ActionController::Routing::Routes.draw do |map|
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
+  map.resources :employees, :member => { :toggle_manager => :post }, :only => [:index]
   map.connect   '/employees/new',     :controller => 'users', :action => 'new', :type => 'employee', :conditions => {:method => :get}
   map.connect   '/employees/create',  :controller => 'users', :action => 'create', :type => 'employee', :conditions => {:method => :post}
   map.connect   '/customers/new',     :controller => 'users', :action => 'new', :type => 'customer', :conditions => {:method => :get}
