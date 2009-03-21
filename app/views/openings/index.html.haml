@@ -11,8 +11,8 @@
   - @sps.each do |sp|
     .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
           
-.span-15.prepend-1.append-1.last
-  - unless @daterange.blank?
+- unless @daterange.blank?
+  .span-15.prepend-1
     %h2.span-15.last
       -# show count of available timeslots
       = @free_appointments.blank? ? "No Available Timeslots" : pluralize(@free_appointments.size, 'Available Timeslots')
@@ -37,11 +37,11 @@
       - if @show_waitlist
         %h2= link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
     
-.last.mat{:class => @daterange ? "span-7" : "span-24"}
-  .span-7
+.last{:class => @daterange ? "span-7 prepend-1" : "span-23 prepend-1"}
+  .span-7.mat
     = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
-  - if @daterange.blank?
-    .span-10.last
+  - if @daterange.blank? && !current_company.description.blank?
+    .span-16.last
       = Sanitize.clean(current_company.description, Sanitize::Config::BASIC)
   - else
     .last

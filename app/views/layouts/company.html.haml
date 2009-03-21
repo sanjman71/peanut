@@ -39,9 +39,10 @@
         .span-24.last
           .span-19
             .company_name_short_desc.span-19.last
-              %h2#company_name{:style => 'color: #FFFFFF;'}
-                = link_to current_company.name, root_path(:subdomain => current_subdomain)
-              .short_description.prepend-1.last
+              .company_name.append-1
+                %h2
+                  = link_to current_company.name, root_path(:subdomain => current_subdomain)
+              .short_description.last
                 = current_company.short_description unless current_company.short_description.blank?
           .span-5.last.text-align-right
             - if logged_in?
