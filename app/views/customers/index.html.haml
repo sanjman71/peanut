@@ -14,8 +14,8 @@
 .span-15.prepend-1.last
   = display_flash(:all)
   
-.span-16.last
-  .prepend-1.append-bottom.customers.header#customer_search_text
+.span-24.last
+  .span-23.prepend-1.append-bottom.customers.header#customer_search_text
     = @search_text
   #customers
     = render(:partial => 'customers', :locals => {:customers => @customers})

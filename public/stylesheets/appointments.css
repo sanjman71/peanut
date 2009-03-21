@@ -21,7 +21,11 @@ div.appointment.work div.service h6               { color: #009900; }
 div.appointment a                                 { color: #5500BB; font-weight: bold; }
 div.appointment a:hover                           { color: #5500BB; background-color: #FF6600; }
 div.appointment a:visited                         { color: #5500BB; font-weight: bold; }
-                                                  
+
+a.notify.waitlist                                 { color: #008800; font-weight: bold; }
+a:hover.notify.waitlist                           { color: #008800; background-color: #FF6600; }
+a:visited.notify.waitlist                         { color: #008800; font-weight: bold; }
+
 div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
 

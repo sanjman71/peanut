@@ -20,7 +20,7 @@ class CompanySchedulablesController < ApplicationController
       end
     end
     
-    render_component(:controller => 'users',  :action => 'index',
+    render_component(:controller => 'employees',  :action => 'index',
                      :layout => false, :params => {:authenticity_token => params[:authenticity_token] })
   end
   

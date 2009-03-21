@@ -35,7 +35,7 @@
       == Customer:
     .span-12.last
       %span#customer_default.data
-        = customer_display_name(appointment.customer, current_user)
+        %span{:id => 'customer_name'}= customer_display_name(appointment.customer, current_user)
         -# the user can choose a customer for a new appointment, with the right privileges
         - if appointment.new_record? and current_user.has_privilege?('company employee', current_company)
           %span{:style => 'font-size: 0.8em; color: #333333;'}== or

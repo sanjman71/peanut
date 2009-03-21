@@ -35,7 +35,7 @@
     .span-15.last
       -# show waitlist link if the @show_waitlist flag is set
       - if @show_waitlist
-        %h2= link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date))
+        %h2= link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
     
 .last.mat{:class => @daterange ? "span-7" : "span-24"}
   -#.span-7.last.sidebar.instructions

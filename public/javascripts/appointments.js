@@ -22,15 +22,26 @@ $.fn.init_autocomplete_customers = function() {
         });
 }
 
+$.fn.show_appointment_customer = function() {
+  // hide search view, show default text view
+  $("span#customer_search").hide();
+  $("span#customer_default").fadeIn(200);
+  // clear customer text
+  $("#customer_search_text").attr("value", '');
+}
+
 $.fn.init_change_appointment_customer = function() {
+  // called when the user selects a customer from the autocomplete list
   $("#customer_search_text").result(function(event, data, formatted) {
     console.log("selected: " + data.name + ":", data.id);
-    // save the search customer selected
-    $("#customer_search_id").attr("value", data.id);
+    // change the customer name and id
+    $("#customer_name").html(data.name);
+    $("#customer_id").attr("value", data.id);
+    $(document).show_appointment_customer();
   })
 
   $("a#hide_customer_default").click(function() {
-    // initialize the customer collection before the first search
+    // initialize the customer collection before the first search, and make it a synchronous call
     if (customers.length == 0) {
       $(document).init_autocomplete_customers();
     }
@@ -40,23 +51,13 @@ $.fn.init_change_appointment_customer = function() {
   })
 
   $("a#hide_customer_search").click(function() {
-    $("span#customer_search").hide();
-    $("span#customer_default").show();
-    // clear customer text
-    $("#customer_search_text").attr("value", '');
+    $(document).show_appointment_customer();
     return false;
   })
 }
 
 $.fn.init_confirm_appointment = function() {
   $("#confirm_appointment_submit").click(function() {
-    // check if the appointment customer has changed
-    var customer_search_id = $("#customer_search_id").attr("value");
-    if (customer_search_id != "0") {
-      // change the form's customer id
-      $("#customer_id").attr("value", customer_search_id);
-    }
-    
     // post the search query
     $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
     

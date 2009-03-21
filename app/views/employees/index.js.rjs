@@ -1,2 +1,0 @@
-# update users list
-page["#users"].html(render(:partial => 'users', :locals => {:users => @users}))
