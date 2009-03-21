@@ -1,12 +1,14 @@
-$.fn.init_autocomplete_customer_data = function() {
+var customers = new Array();
+
+$.fn.init_autocomplete_customers = function() {
   // post json, override global ajax beforeSend defined in application.js
   $.ajax({
           type: "GET",
           url: $("#customer_search_text").attr("url"),
           dataType: "json",
+          async:false,
           beforeSend: function(xhr) {xhr.setRequestHeader("Accept", "application/json");},
           success: function(data) {
-            var customers = []
             $.each(data, function(i, item) {
               // add customer data as a hash with keys 'name' and 'id'
               console.log(item.user.name + ":" + item.user.id + ":" + item.user.email);
@@ -15,7 +17,7 @@ $.fn.init_autocomplete_customer_data = function() {
             
             // init autocomplete field with customer data
             $("#customer_search_text").autocomplete(customers, 
-                                                   {matchContains:true, formatItem: function(item) {return item.name}});
+                                                   {matchContains:true, minChars:0, formatItem: function(item) {return item.name}});
           }
         });
 }
@@ -28,6 +30,10 @@ $.fn.init_change_appointment_customer = function() {
   })
 
   $("a#hide_customer_default").click(function() {
+    // initialize the customer collection before the first search
+    if (customers.length == 0) {
+      $(document).init_autocomplete_customers();
+    }
     $("span#customer_default").hide();
     $("span#customer_search").show();
     return false;
@@ -36,6 +42,8 @@ $.fn.init_change_appointment_customer = function() {
   $("a#hide_customer_search").click(function() {
     $("span#customer_search").hide();
     $("span#customer_default").show();
+    // clear customer text
+    $("#customer_search_text").attr("value", '');
     return false;
   })
 }
@@ -73,12 +81,11 @@ $(document).ready(function() {
   $(document).init_datepicker({start_date : (new Date()).asString(), end_date : (new Date()).addMonths(1).asString(), max_days:10});
   $(document).init_toggle_dates();
 
-  // rounded corners
-  $('.rounded').corners();
-  
-  $(document).init_autocomplete_customer_data();
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
+
+  // rounded corners
+  $('.rounded').corners();
 })
 
 // Re-bind after an ajax call
