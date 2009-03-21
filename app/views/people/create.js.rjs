@@ -1,7 +1,0 @@
-if @error
-  page["#person_name"].addClass('highlighted')
-  page["#progress"].hide();  # hide progress bar
-  page["#submit"].show();    # show submit button 
-elsif @redirect_path
-  page.redirect_to(@redirect_path)
-end
