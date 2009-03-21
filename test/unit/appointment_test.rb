@@ -127,7 +127,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
 
       should "have customer with customer role" do
-        assert_equal [Company.customer_role], @customer.roles
+        assert_equal ['customer'], @customer.roles.collect(&:name)
       end
     end
     
@@ -170,6 +170,10 @@ class AppointmentTest < ActiveSupport::TestCase
     should "have a time of day of 'anytime'" do
       assert_equal 0, @wait_appt.time_start_at
       assert_equal 86400, @wait_appt.time_end_at
+    end
+    
+    should "have customer with customer role" do
+      assert_equal ['customer'], @customer.roles.collect(&:name)
     end
   end
   
