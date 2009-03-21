@@ -1,32 +1,36 @@
 - title(@title)
 - javascript('appointments')
-- stylesheet('jquery.autocomplete')
+- stylesheet('appointments', 'jquery.autocomplete')
 
 .span-24.mat.padding-bottom-10
   .span-15.prepend-1
-    %h2== Please confirm your appointment.
+    %h2== Review and confirm your appointment
       
-  .schedule_form.span-15.prepend-1
-    - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
-      = hidden_field_tag :schedulable_type, @schedulable.tableize
-      = hidden_field_tag :schedulable_id, @schedulable.id
-      = hidden_field_tag :service_id, @service.id
-      = hidden_field_tag :customer_id, @customer.id
-      = hidden_field_tag :dates, @appt_date
-      = hidden_field_tag :mark_as, @mark_as
-      = hidden_field_tag :start_at, @appt_time_start_at
-      = hidden_field_tag :end_at, @appt_time_end_at
-      = hidden_field_tag :duration, @duration
-      = hidden_field_tag :when, @when.to_url_param unless @when.blank?
-      = hidden_field_tag :time, @time.to_url_param unless @time.blank?
-      = hidden_field_tag :type, @type
-      
-      - unless @appointment.errors.blank?
-        .span-14.notice.last
-          = error_messages_for('appointment', :header_message => nil)
-      .span-15.last
-        = render :partial => 'appointment_header', :locals => {:appointment => @appointment}
-      .span-14.prepend-1.last
-        %br
-        = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em;'
-        %span#confirm_appointment_submit_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+%hr.space
+
+.appointment.review.span-15.prepend-1
+  - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
+    = hidden_field_tag :schedulable_type, @schedulable.tableize
+    = hidden_field_tag :schedulable_id, @schedulable.id
+    = hidden_field_tag :service_id, @service.id
+    = hidden_field_tag :customer_id, @customer.id
+    = hidden_field_tag :dates, @appt_date
+    = hidden_field_tag :mark_as, @mark_as
+    = hidden_field_tag :start_at, @appt_time_start_at
+    = hidden_field_tag :end_at, @appt_time_end_at
+    = hidden_field_tag :duration, @duration
+    = hidden_field_tag :when, @when.to_url_param unless @when.blank?
+    = hidden_field_tag :time, @time.to_url_param unless @time.blank?
+    = hidden_field_tag :type, @type
+    
+    - unless @appointment.errors.blank?
+      -# show any appointment errors
+      .span-14.notice.last
+        = error_messages_for('appointment', :header_message => nil)
+        
+    .span-15.last
+      = render :partial => 'appointment', :locals => {:appointment => @appointment}
+    .span-14.prepend-1.last
+      %br
+      = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 0.8em; color: #FFFFFF; font-weight: normal;'
+      %span#confirm_appointment_submit_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

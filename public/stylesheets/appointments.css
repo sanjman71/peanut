@@ -1,30 +1,27 @@
-/* appointment, timeslot styles */
+/* appointment styles */
                                                     
-div.appointments, div.timeslots                   { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
+div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 
-div.schedule_form                                 { font-size: 13px; font-weight: bold; }
-
+div.appointment.review                            { font-size: 1.8em; font-weight: normal; }
+/*
 div.schedule_form span.field                      { margin: 3px 0 3px; padding-right: 7px; }
-
 div.schedule_form input.submit                    { font-size: 12px; }
+*/
+div.appointment.review .label                     { color: #999999; }
+div.appointment.review .data                      { color: #007700; }
 
 div.appointment                                   { padding: 7px 0 7px 0; }
 
 div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
 div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
-div.appointment.work                              { background-color: #EDF3FE; }  /* yellowish */
+div.appointment.work                              { background-color: #EDF3FE; }  /* light blue */
 
 div.appointment.work div.service h6               { color: #009900; }
 
-div.timeslot                                      { padding: 7px 0 7px 0; }
-
-div.timeslot a, div.appointment a                 { color: #5500BB; font-weight: bold; }
-                                                  
-div.timeslot a:hover, div.appointment a:hover
-                                                  { color: #5500BB; background-color: #FF6600; }
-                                                  
-div.timeslot a:visited, div.appointment a:visited
-                                                  { color: #5500BB; font-weight: bold; }
+div.appointment a                                 { color: #5500BB; font-weight: bold; }
+div.appointment a:hover                           { color: #5500BB; background-color: #FF6600; }
+div.appointment a:visited                         { color: #5500BB; font-weight: bold; }
                                                   
 div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
+

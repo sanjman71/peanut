@@ -134,20 +134,6 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   })
 }
 
-// Highlight appointments and show edit/delete options on hover
-$.fn.init_highlight_appointments = function () {
-  $(".appointment").hover(
-    function () {
-      $("#hover_" + this.id).show();
-      $(this).addClass("highlighted");
-    },
-    function () {
-      $("#hover_" + this.id).hide();
-      $(this).removeClass("highlighted");
-    }
-  )
-} 
-
 // Show calendar for the selected schedulable
 $.fn.init_select_schedulable_for_calendar_show = function () {
   $("#schedulable").change(function () {
