@@ -1,0 +1,51 @@
+.span-15.last{:syle => 'font-size: 1.5em;'}
+
+  -# what and with are common across all types of appointments
+  .span-3.label.text-align-right
+    == What:
+  .span-12.last.data
+    = appointment.service.name
+  .span-3.label.text-align-right
+    == With:
+  .span-12.last.data
+    = (appointment.schedulable || User.anyone).name
+
+
+  -# when is different for a work appointment vs. a waitlist apointment
+  - if appointment.waitlist?
+    .span-3.label.text-align-right
+      == When:
+    .span-12.last.data
+      == #{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}
+  - else
+    .span-3.label.text-align-right
+      == When:
+    .span-12.last.data
+      = appointment.start_at.to_s(:appt_day_date_time)
+
+  -# waitlist appointments have no duration
+  - unless appointment.waitlist?
+    .span-3.label.text-align-right
+      == How Long:
+    .span-12.last
+      = Duration.to_words(appointment.duration)
+
+  - unless appointment.customer.blank?
+    .span-3.label.text-align-right
+      == Customer:
+    .span-12.last
+      %span#customer_default.data
+        = customer_display_name(appointment.customer, current_user)
+        -# the user can choose a customer for a new appointment
+        - if appointment.new_record?
+          %span{:style => 'font-size: 0.8em; color: #333333;'}== or
+          %span= link_to 'Change Customer', '', :id => 'hide_customer_default', :class => 'admin'
+      %span#customer_search.hide
+        = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: normal; color: #5500BB;'
+        %br
+        = text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => customers_path)
+        %br
+        = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
+        %span{:style => 'font-size: 0.7em;'}== or
+        = link_to 'Create a New Customer', url_for(:controller => 'users', :action => 'new', :type => 'customer', :subdomain => current_subdomain), :class => 'admin'
+        = hidden_field_tag :customer_search_id, 0
