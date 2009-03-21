@@ -50,3 +50,6 @@
     .span-12.last.padding-bottom-10
       .span-10.prepend-2.last
         = submit_tag submit_text, :name => nil, :style => 'font-size: 15px;'
+        - if back_path
+          == or
+          = link_to 'Cancel', back_path

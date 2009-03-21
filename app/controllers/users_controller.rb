@@ -66,6 +66,9 @@ class UsersController < ApplicationController
     # We're creating a new user. Initialize the email from the invitation. The user gets to change this, however
     @user       = User.new
     @user.email = @invitation.recipient_email if @invitation
+    
+    # initialize back path to either the caller or the resource index page (e.g. /customers, /employees), but only if there is a current user
+    @back_path  = current_user ? (request.referer || "/#{@type.pluralize}") : nil
   end
  
   def create
