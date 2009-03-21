@@ -40,6 +40,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     @customer     = Factory(:user, :name => "Customer")
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
+    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
     # stub user privileges, all users should be able to create work and wait appointments
     @controller.stubs(:current_privileges).returns(["create work appointments", "create wait appointments"])
   end
