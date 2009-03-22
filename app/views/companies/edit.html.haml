@@ -42,14 +42,14 @@
           = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-20.last
         .span-20.last
-          %h3== Short description (shown in header on company pages):
-        .span-20.last.short_description
-          = f.text_area :short_description, :class => "tiny-mce-editor", :rows => 5
+          %h3== Slogan (shown in header on company pages):
+        .span-20.last.slogan
+          = f.text_field :slogan, :size => 80, :class => "span-20 last"
       .span-20.last
         .span-20.last
           %h3== Full description (shown on new appointments page):
         .span-20.last.description
-          = f.text_area :description, :class => "tiny-mce-editor"
+          = f.text_area :description, :class => "tiny-mce-editor span-20 last"
       .span-20.last
         .span-5
           = f.submit 'Update Company Information', :class => 'button big'

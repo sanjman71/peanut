@@ -38,12 +38,12 @@
             
         .span-24.last
           .span-19
-            .company_name_short_desc.span-19.last
+            .company_name_slogan.span-19.last
               .company_name.append-1
                 %h2
                   = link_to current_company.name, root_path(:subdomain => current_subdomain)
-              .short_description.last
-                = current_company.short_description unless current_company.short_description.blank?
+              .slogan.last
+                = h current_company.slogan unless current_company.slogan.blank?
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')
