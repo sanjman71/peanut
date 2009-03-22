@@ -1,16 +1,20 @@
-.span-20.box
+/ First, turn on TinyMCE for use with the description field
+- use_tiny_mce
+
+.span-23.prepend-1
   %h2
     == Editing
     = @company.name
 
-  .span-20
-    .span-17.prepend-1
-      = display_flash(:notice)
-      = display_flash(:error)
-
-  .span-17.prepend-1
-    .span-8
-      = "Currently subscribed to the <strong>#{@company.plan.name}</strong> plan."
+  / .span-20
+  /   .span-17.prepend-1
+  /     = display_flash(:notice)
+  /     = display_flash(:error)
+  / 
+  .span-21.prepend-1.mat
+    %h2 Billing Plan
+    .span-10
+      = "You are currently subscribed to the <strong>#{@company.plan.name}</strong> plan."
       %br
       - if @company.subscription.start_billing_at
         = "Your first bill of #{number_to_currency(@company.plan.cost/100)} will be charged on #{@company.subscription.start_billing_at.to_date.to_s(:long)}."
@@ -20,32 +24,44 @@
       = link_to "Change subscription", change_subscription_path(:subdomain => current_subdomain)
       %br
       = link_to "Update Credit Card information", edit_cc_subscription_path(current_company.subscription, :subdomain => current_subdomain)
-    .span-5.last
+    .span-10.prepend-1.last
       = render :partial => 'plans/plan', :object => @company.plan
 
 
-  %hr
+  %hr.space
 
-  - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
-    = f.error_messages
-  
-    .span-19.prepend-1.last
-      .span-3
-        %h2== Timezone:
-      .span-5.last
-        = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
-    .span-19.prepend-1.last
-      .span-5
-        = f.submit 'Update Timezone', :class => 'button big'
+  .span-21.prepend-1.mat
+    %h2 Company Information
+    - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
+      = f.error_messages
 
-  %hr
+      .span-20.last
+        .span-3
+          %h3== Timezone:
+        .span-5.last
+          = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-20.last
+        .span-20.last
+          %h3== Slogan (shown in header on company pages):
+        .span-20.last.slogan
+          = f.text_field :slogan, :size => 80, :class => "span-20 last"
+      .span-20.last
+        .span-20.last
+          %h3== Full description (shown on new appointments page):
+        .span-20.last.description
+          = f.text_area :description, :class => "tiny-mce-editor span-20 last"
+      .span-20.last
+        .span-5
+          = f.submit 'Update Company Information', :class => 'button big'
 
+  %hr.space
 
-  .span-19.prepend-1.last
+  .span-21.prepend-1.mat.last
     %h2
       == Company Locations
     = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
 
-    %hr.space
-    = link_to 'Go back to company site', root_path(:subdomain => current_subdomain), :style => 'font-size: 12px;'
+  %hr.space
 
+  .span-21.prepend-1.last
+    = link_to 'Go back to company site', root_path(:subdomain => current_subdomain), :style => 'font-size: 12px;'

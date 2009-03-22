@@ -38,6 +38,9 @@ class CompaniesController < ApplicationController
   # PUT /companies/1.xml
   def update
     @company = Company.find(params[:id])
+    if params[:company][:description]
+      params[:company][:description] = Sanitize.clean(params[:company][:description], Sanitize::Config::RELAXED)
+    end
 
     respond_to do |format|
       if @company.update_attributes(params[:company])

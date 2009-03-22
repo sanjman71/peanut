@@ -26,7 +26,7 @@ class EmployeesController < ApplicationController
     
     if @user.has_role?('company manager', current_company)
       # revoke manager role
-      @user.revoke_role('company manager', current_company)
+      @user.revoke_role('company manager', current_company) unless (@user == current_user)
     else
       # grant manager role
       @user.grant_role('company manager', current_company)

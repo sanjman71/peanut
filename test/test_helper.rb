@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'mocha'
 
+include AuthenticatedTestHelper
 include AuthenticatedSystem
 
 class Test::Unit::TestCase
@@ -67,4 +68,9 @@ class Test::Unit::TestCase
       :zip      => '90210' 
     }.update(options) 
   end
+end
+
+class ActionView::Base
+  include ApplicationHelper
+  include AuthenticatedSystem
 end

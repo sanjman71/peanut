@@ -185,4 +185,14 @@ module ApplicationHelper
   def mobile_carrier_select_options
     [["Select a carrier", nil]] + MobileCarrier.all.collect { |o| [o.name, o.id] }
   end
+  def use_tiny_mce
+    # Avoid multiple inclusions
+    unless @content_for_tiny_mce
+      @content_for_tiny_mce = "" 
+      content_for :tiny_mce do
+        javascript_include_tag('tiny_mce/tiny_mce') + javascript_include_tag('tiny_mce_editor')
+      end
+    end
+  end
+  
 end

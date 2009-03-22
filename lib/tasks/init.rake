@@ -105,9 +105,9 @@ namespace :init do
     @skinny.activate!
     
     # create subscriptions
-    @subscription1  = Subscription.new(:user => @johnny, :plan => @max_plan)
-    @subscription2  = Subscription.new(:user => @johnny, :plan => @max_plan)
-    @subscription3  = Subscription.new(:user => @meathead, :plan => @max_plan)
+    @subscription1  = Subscription.create(:user => @johnny, :plan => @max_plan)
+    @subscription2  = Subscription.create(:user => @johnny, :plan => @max_plan)
+    @subscription3  = Subscription.create(:user => @meathead, :plan => @max_plan)
     
     # create test companies
     @company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)", :subscription => @subscription1)
