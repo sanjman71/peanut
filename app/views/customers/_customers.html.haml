@@ -1,13 +1,13 @@
 - customers.each do |customer|
   .span-24.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
-    .span-8.prepend-1
-      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, customer_path(customer, :subdomain => current_subdomain)
-      %h3.email= mail_to(customer.email)
-    .span-10
-      %h3.phone
-        = customer.phone
-        = "(#{customer.mobile_carrier.name})" if customer.mobile_carrier
+    .span-6.prepend-1
+      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, customer_path(customer, :subdomain => current_subdomain), :class => 'customer name'
+      %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email
+    .span-3
+      %h3.customer.phone= number_to_phone(customer.phone)
+    .span-5
+      %h4{:class => customer.sms? ? 'customer sms' : 'customer nosms'}= customer.sms? ? "Text messaging enabled" : "No text messaging"
     .span-3
       %h4= link_to "Appointments", ''
     .span-2.last
-      = link_to "Edit", edit_user_path(customer, :subdomain => current_subdomain), :class => 'admin'
+      = link_to "Edit", url_for(:controller =>'customers', :action => 'edit', :id => customer.id, :subdomain => current_subdomain), :class => 'admin'

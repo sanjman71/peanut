@@ -3,16 +3,18 @@ class UsersController < ApplicationController
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:edit, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
+  before_filter :find_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
+  before_filter :find_type, :only => [:edit, :update]
   
   privilege_required 'create users', :only => [:new, :create], :on => :current_company
+  privilege_required 'update users', :only => [:edit, :update], :on => :current_company
   
   def has_privilege?(p, *args)
     case p
     when 'create users'
       authorizable  = args[0]
-      user          = args[1] || current_user
-      @type         = params[:type]
+      user          = args[1]
+      @type         = find_type
       
       begin
         @invitation = params[:invitation_token] ? Invitation.find_by_token!(params[:invitation_token]) : nil
@@ -32,6 +34,15 @@ class UsersController < ApplicationController
         # not allowed
         return false
       end
+      # delegate to base class
+      super
+    when 'update users'
+      authorizable  = args[0]
+      user          = args[1] || find_user
+      @type         = find_type
+
+      # user can always update themselves
+      return true if user and user == current_user
       # delegate to base class
       super
     else
@@ -58,8 +69,9 @@ class UsersController < ApplicationController
         @user.received_invitations << @invitation
         # add the user to the company
         @user.grant_role('company employee', @invitation.company)
-        redirect_back_or_default('/login')
+        # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
+        redirect_back_or_default('/login') and return
       end
     end  
 
@@ -142,7 +154,30 @@ class UsersController < ApplicationController
 
   # /users/1/edit
   def edit
+    # @type and @user are initialized here
     
+    # build the index path based on the user type
+    @index_path = "/#{@type.pluralize}"
+    
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  def update
+    # @type and @user are initialized here
+
+    # build the index path based on the user type
+    @index_path = "/#{@type.pluralize}"
+    
+    respond_to do |format|
+      if @user.update_attributes(params[:user])
+        flash[:notice] = "#{@type.titleize} #{@user.name} was successfully updated"
+        format.html { redirect_to(@index_path) }
+      else
+        
+      end
+    end
   end
   
   def activate
@@ -190,6 +225,18 @@ class UsersController < ApplicationController
   
   def find_user
     @user = User.find(params[:id])
+  end
+  
+  def find_type
+    @type = params[:type]
+    
+    if @type.blank?
+      # figure out type based on user
+      return @type if @user.blank?
+      @type = @user.has_role?('company employee', current_company) ? 'employee' : 'customer'
+    end
+    
+    @type
   end
   
   def random_password

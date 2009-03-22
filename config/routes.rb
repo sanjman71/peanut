@@ -16,11 +16,17 @@ ActionController::Routing::Routes.draw do |map|
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
-  map.resources :employees, :member => { :toggle_manager => :post }, :only => [:index, :edit]
   map.connect   '/employees/new',       :controller => 'users', :action => 'new', :type => 'employee', :conditions => {:method => :get}
   map.connect   '/employees/create',    :controller => 'users', :action => 'create', :type => 'employee', :conditions => {:method => :post}
+  map.connect   '/employees/:id/edit',  :controller => 'users', :action => 'edit', :type => 'employee', :conditions => {:method => :get}
+  map.connect   '/employees/:id',       :controller => 'users', :action => 'update', :type => 'employee', :conditions => {:method => :put}
   map.connect   '/customers/new',       :controller => 'users', :action => 'new', :type => 'customer', :conditions => {:method => :get}
   map.connect   '/customers/create',    :controller => 'users', :action => 'create', :type => 'customer', :conditions => {:method => :post}
+  map.connect   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :type => 'customer', :conditions => {:method => :get}
+  map.connect   '/customers/:id',       :controller => 'users', :action => 'update', :type => 'customer', :conditions => {:method => :put}
+  map.resources :employees, :member => { :toggle_manager => :post }
+  # customers with nested resources
+  map.resources :customers, :has_many => [:appointments]
   map.resources :invitations, :only => [:new, :create]
   map.resource  :session
 
@@ -86,9 +92,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :services
   map.resources :products
   
-  # customers with nested resources
-  map.resources :customers,         :has_many => [:appointments]
-
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations,         :member => {:select => :get}

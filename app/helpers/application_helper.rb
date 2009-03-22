@@ -182,4 +182,7 @@ module ApplicationHelper
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}
   end
   
+  def mobile_carrier_select_options
+    [["Select a carrier", nil]] + MobileCarrier.all.collect { |o| [o.name, o.id] }
+  end
 end

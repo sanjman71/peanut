@@ -3,6 +3,15 @@ require 'test/factories'
 
 class CustomersControllerTest < ActionController::TestCase
 
+  # generic users controller routes
+  should_route :get,  '/customers/new', :controller => 'users', :action => 'new', :type => 'customer'
+  should_route :post, '/customers/create', :controller => 'users', :action => 'create', :type => 'customer'
+  should_route :get,  '/customers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :type => 'customer'
+  should_route :put,  '/customers/1', :controller => 'users', :action => 'update', :id => '1', :type => 'customer'
+
+  # customers controller routes
+  should_route :get,  '/customers/1', :controller => 'customers', :action => 'show', :id => '1'
+
   def setup
     @controller   = CustomersController.new
     # create a valid company

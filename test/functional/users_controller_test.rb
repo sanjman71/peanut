@@ -324,4 +324,55 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
+  context "edit employee" do
+    context "as anonymous user" do
+      setup do
+        @controller.stubs(:current_user).returns(nil)
+        @controller.stubs(:current_privileges).returns([])
+        get :edit, :id => @owner.id, :type => 'employee'
+      end
+      
+      should_respond_with :redirect
+      should_redirect_to 'unauthorized_path'
+    end
+    
+    context "without 'update users' privilege as another user" do
+      setup do
+        @employee = Factory(:user, :name => "Employee")
+        @controller.stubs(:current_user).returns(@owner)
+        @controller.stubs(:current_privileges).returns([])
+        get :edit, :id => @employee.id, :type => 'employee'
+      end
+      
+      should_respond_with :redirect
+      should_redirect_to 'unauthorized_path'
+    end
+
+    context "without 'update users' privilege, but as the user" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        @controller.stubs(:current_privileges).returns([])
+        get :edit, :id => @owner.id, :type => 'employee'
+      end
+      
+      should_respond_with :success
+      should_render_template "users/edit.html.haml"
+      
+      should_assign_to :index_path, :equals => '"/employees"'
+    end
+
+    context "with 'update users' privilege" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        @controller.stubs(:current_privileges).returns(['update users'])
+        get :edit, :id => @owner.id, :type => 'employee'
+      end
+
+      should_respond_with :success
+      should_render_template "users/edit.html.haml"
+      
+      should_assign_to :index_path, :equals => '"/employees"'
+    end
+  end
+
 end

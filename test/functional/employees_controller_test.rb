@@ -3,6 +3,15 @@ require 'test/factories'
 
 class EmployeesControllerTest < ActionController::TestCase
 
+  # generic users controller routes
+  should_route :get,  '/employees/new', :controller => 'users', :action => 'new', :type => 'employee'
+  should_route :post, '/employees/create', :controller => 'users', :action => 'create', :type => 'employee'
+  should_route :get,  '/employees/1/edit', :controller => 'users', :action => 'edit', :id => '1', :type => 'employee'
+  should_route :put,  '/employees/1', :controller => 'users', :action => 'update', :id => '1', :type => 'employee'
+
+  # employees controller routes
+  should_route :get,  '/employees/1', :controller => 'employees', :action => 'show', :id => '1'
+  
   def setup
     @controller   = EmployeesController.new
     # create a valid company
@@ -52,9 +61,8 @@ class EmployeesControllerTest < ActionController::TestCase
     should_assign_to :users, :class => Array
     should_not_assign_to :company_manager
   
-    should "not be able to change manager role or toggle user calendar" do
+    should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0
-      assert_select "input.checkbox.calendar", 0
     end
   end
 
@@ -75,10 +83,6 @@ class EmployeesControllerTest < ActionController::TestCase
     should_render_template 'employees/index.html.haml'
     should_assign_to :users, :class => Array
     should_assign_to :company_manager, :equals => 'true'
-    
-    should "be able to change user calendar for 2 employees" do
-      assert_select "input.checkbox.calendar", 2
-    end
     
     should "be able to change manager role for 1 employee" do
       assert_select "input.checkbox.manager", 1

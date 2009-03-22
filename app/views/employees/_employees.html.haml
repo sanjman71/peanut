@@ -24,6 +24,6 @@
         -#= label_tag '', text, :class => 'checkbox label'
         -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
     .span-2.action.last
+      -# allow company managers or edit all users, and user to edit himself
       - if @company_manager or user == current_user
-        -# allow company managers or edit all users, and user to edit himself
-        = link_to "Edit", edit_user_path(user, :subdomain => current_subdomain), :class => 'admin'
+        = link_to "Edit", url_for(:controller => 'employees', :action => 'edit', :id => user.id, :subdomain => current_subdomain), :class => 'admin'
