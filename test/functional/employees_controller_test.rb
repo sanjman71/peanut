@@ -76,10 +76,6 @@ class EmployeesControllerTest < ActionController::TestCase
     should_assign_to :users, :class => Array
     should_assign_to :company_manager, :equals => 'true'
     
-    should "be able to change user calendar for 2 employees" do
-      assert_select "input.checkbox.calendar", 2
-    end
-    
     should "be able to change manager role for 1 employee" do
       assert_select "input.checkbox.manager", 1
     end
