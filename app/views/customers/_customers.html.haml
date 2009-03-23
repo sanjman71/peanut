@@ -9,5 +9,9 @@
       %h4{:class => customer.sms? ? 'customer sms' : 'customer nosms'}= customer.sms? ? "Text messaging enabled" : "No text messaging"
     .span-3
       %h4= link_to "Appointments", ''
-    .span-2.last
-      = link_to "Edit", url_for(:controller =>'customers', :action => 'edit', :id => customer.id, :subdomain => current_subdomain), :class => 'admin'
+    .span-6.last
+      -# allow company managers or edit all users, and user to edit himself
+      - if @company_manager or user == current_user
+        = link_to "Edit", url_for(:controller =>'customers', :action => 'edit', :id => customer.id, :subdomain => current_subdomain), :class => 'admin'
+        == &nbsp;
+        = link_to 'Reset Password', url_for(:controller => 'users', :id => customer.id, :action => 'notify', :type => 'reset', :subdomain => current_subdomain), :class => 'admin'

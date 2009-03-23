@@ -9,7 +9,6 @@ class MailWorker < Workling::Base
       return
     end
 
-    # send appointment confirmation
     InvitationNotifier.deliver_invitation(invitation, signup_url)
     logger.debug("*** mail worker: sent invitation to #{invitation.recipient_email}")
   end
@@ -32,4 +31,24 @@ class MailWorker < Workling::Base
     end    
   end
 
+  def send_account_created(options)
+    company   = Company.find_by_id(options[:company_id].to_i)
+    user      = User.find_by_id(options[:user_id].to_i)
+    creator   = User.find_by_id(options[:creator_id].to_i)
+    password  = options[:password]
+    login_url = options[:login_url]
+    
+    UserMailer.deliver_account_created(company, user, creator, password, login_url)
+    logger.debug("*** mail worker: sent account created email to #{user.email}")
+  end
+
+  def send_account_reset(options)
+    company   = Company.find_by_id(options[:company_id].to_i)
+    user      = User.find_by_id(options[:user_id].to_i)
+    password  = options[:password]
+    login_url = options[:login_url]
+    
+    UserMailer.deliver_account_reset(company, user, password, login_url)
+    logger.debug("*** mail worker: sent account reset email to #{user.email}")
+  end
 end

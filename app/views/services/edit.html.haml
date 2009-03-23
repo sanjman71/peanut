@@ -8,10 +8,12 @@
     
 - form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 
-  .span-23.prepend-1.last.mat
+  .span-23.prepend-1.last.mat.padding-bottom-20
     = label_tag "service_name", "Service Name", :class => 'big'
     %br
     = text_field_tag "service[name]", @service.name, :class => 'title highlight muted'
+  
+  %hr.space
   
   .span-15.prepend-1.last
     = display_flash(:error)

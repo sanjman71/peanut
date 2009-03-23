@@ -35,6 +35,7 @@ a.rounded, .rounded.button                        { outline: none; border: none;
 .padding-5                                        { padding: 5px; }
 .padding-bottom-5                                 { padding-bottom: 5px; }
 .padding-bottom-10                                { padding-bottom: 10px; }
+.padding-bottom-20                                { padding-bottom: 20px; }
 .padding-right-10                                 { padding-right: 10px; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }

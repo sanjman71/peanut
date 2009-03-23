@@ -3,11 +3,11 @@ class UsersController < ApplicationController
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :toggle_manager]
+  before_filter :find_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :notify]
   before_filter :find_type, :only => [:edit, :update]
   
   privilege_required 'create users', :only => [:new, :create], :on => :current_company
-  privilege_required 'update users', :only => [:edit, :update], :on => :current_company
+  privilege_required 'update users', :only => [:edit, :update, :notify], :on => :current_company
   
   def has_privilege?(p, *args)
     case p
@@ -133,6 +133,13 @@ class UsersController < ApplicationController
       when 'user'
         @redirect_path  = "/#{@type.pluralize}"
         flash[:notice]  = "#{@type.titleize} #{@user.name} was successfully created."
+        begin
+          # send account created notification
+          MailWorker.async_send_account_created(:company_id => current_company.id, :creator_id => current_user.id, 
+                                                :user_id => @user.id, :password => @user.password, :login_url => login_url)
+        rescue Exception => e
+          logger.debug("xxx error sending account created notification")
+        end
       when 'anonymous'
         @redirect_path  = "/login" 
         flash[:notice]  = "Your account was successfully created. Login to continue."
@@ -215,6 +222,32 @@ class UsersController < ApplicationController
   def purge
     @user.destroy
     redirect_to users_path
+  end
+  
+  # GET /users/1/notify/reset
+  def notify
+    @type = params[:type]
+    
+    case @type
+    when 'reset'
+      # reset password and send an email with the new password
+      @user.password = random_password
+      @user.save
+      
+      begin
+        # send account reset notification
+        MailWorker.async_send_account_reset(:company_id => current_company.id, :user_id => @user.id, :password => @user.password,
+                                            :login_url => login_url)
+        flash[:notice] = "The account password has been reset.  An email with the new password will be sent to #{@user.email}"
+      rescue Exception => e
+        flash[:error] = "There was an error resetting the account password"
+        logger.debug("xxx error sending account created notification: #{e.message}")
+      end
+    end
+    
+    respond_to do |format|
+      format.html { redirect_to(request.referer) }
+    end
   end
   
   # There's no page here to update or destroy a user.  If you add those, be

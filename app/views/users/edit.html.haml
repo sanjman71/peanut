@@ -1,10 +1,14 @@
 - title('Edit User')
-- stylesheet('customers')
+- stylesheet('users')
 
-.span-23.prepend-1.last.mat.padding-bottom-5
-  %h2== Edit #{@user.name}
-  
 - form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :type => @type, :subdomain => current_subdomain), :method => :post) do |f|
+  
+  .span-23.prepend-1.last.mat.padding-bottom-20
+    = label_tag "user_name", "Name", :class => 'big'
+    %br
+    = text_field_tag "user[name]", @user.name, :class => 'title highlight muted'
+  
+  %hr.space
   
   -# email
   .span-20.last

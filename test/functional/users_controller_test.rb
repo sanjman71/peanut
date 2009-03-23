@@ -3,6 +3,8 @@ require 'test/factories'
 
 class UsersControllerTest < ActionController::TestCase
 
+  should_route :get,  '/users/1/notify/create', :controller => 'users', :action => 'notify', :id => '1', :type => 'create'
+
   def setup
     @controller   = UsersController.new
     # create a valid company

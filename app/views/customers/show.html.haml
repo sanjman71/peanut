@@ -1,24 +1,30 @@
-- stylesheet('customers', 'notes')
+- stylesheet('users', 'notes')
 - javascript('customers', 'notes')
 
-.span-20
-  .span-18.last.box
-    %h2= @customer.name
+.span-24
+  .span-23.prepend-1.last.mat.padding-bottom-10
+    %h2
+      = @customer.name
+      %span{:style => 'font-size: 0.5em; padding-left: 10px;'}= link_to 'Edit', url_for(:action => 'edit', :subdomain => current_subdomain)
     
+%hr.space
+
 .span-20
   .span-15.last.prepend-1
     -# customer contact info
-    .block
+    .block{:style => 'margin-bottom: 10px;'}
       == Contact info
-  .span-10.last.prepend-1
-    .span-2.padding-5
-      %h3== Email
-    .span-4.last.padding-5
+      
+  .span-15.last.prepend-1
+    .span-2.text-align-right
+      %h3== Email:
+    .span-13.last
       %h3= mail_to(@customer.email)
-  .span-10.last.prepend-1
-    .span-2.padding-5
-      %h3== Phone
-    .span-4.last.padding-5
+      
+  .span-20.last.prepend-1
+    .span-2.text-align-right
+      %h3== Phone:
+    .span-13.last
       %h3= @customer.phone
 
   .span-15.prepend-1
