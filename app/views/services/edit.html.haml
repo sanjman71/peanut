@@ -8,24 +8,29 @@
     
 - form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 
-  .span-23.prepend-1.last.mat.padding-bottom-20
-    = label_tag "service_name", "Service Name", :class => 'big'
-    %br
-    = text_field_tag "service[name]", @service.name, :class => 'title highlight muted'
+  .span-23.prepend-1.last.mat.padding-bottom-20.padding-top-10
+    %h3{:style => 'font-size: 2.0em;'}== Edit Service
   
   %hr.space
   
   .span-15.prepend-1.last
-    = display_flash(:error)
+    = display_flash(:all)
+
+  -# name
+  .span-20.last
+    .span-3.prepend-1
+      %h2= label_tag "service_name", "Name"
+    .span-16.last
+      = text_field_tag "service[name]", @service.name, :class => 'text', :style => "width: 200px;"
     
-  -# service price
+  -# price
   .span-20.last
     .span-3.prepend-1
       %h2= label_tag "service_price", "Price"
     .span-16.last
       = text_field_tag "service[price]", @service.price, :class => 'text', :style => "width: 100px;"
       
-  -# service duration
+  -# duration
   .span-20.last
     .span-3.prepend-1
       %h2= label_tag "service_duration", "Duration"

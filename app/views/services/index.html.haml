@@ -7,8 +7,13 @@
     .span-15.prepend-1.last.mat.padding-bottom-10
       %h2== Services
     %hr.space
+    
+    -# show flash messages
     .span-14.prepend-1.append-1.last
       .highlight#flash
+    .span-14.prepend-1.append-1.last
+      = display_flash(:all)
+      
     #services
       = render(:partial => 'services', :locals => {:services => @services})
 

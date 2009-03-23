@@ -4,11 +4,16 @@
 - form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :type => @type, :subdomain => current_subdomain), :method => :post) do |f|
   
   .span-23.prepend-1.last.mat.padding-bottom-20
-    = label_tag "user_name", "Name", :class => 'big'
-    %br
-    = text_field_tag "user[name]", @user.name, :class => 'title highlight muted'
+    %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit #{@type.titleize}
   
   %hr.space
+  
+  -# name
+  .span-20.last
+    .span-4.text-align-right
+      %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_name", "Name:"
+    .span-16.last
+      = text_field_tag "user[name]", @user.name, :class => 'text title', :style => "width: 300px;"
   
   -# email
   .span-20.last

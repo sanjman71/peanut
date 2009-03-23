@@ -1,4 +1,6 @@
 class ServicesController < ApplicationController
+  before_filter :disable_global_flash, :only => [:index]
+  
   privilege_required 'create services', :only => [:new, :create], :on => :current_company
   privilege_required 'read services', :only => [:index, :show], :on => :current_company
   privilege_required 'update services', :only => [:edit, :update], :on => :current_company
@@ -69,6 +71,8 @@ class ServicesController < ApplicationController
     if !@status
       flash[:error] = @service.errors.full_messages
       redirect_to(edit_service_path(@service, :subdomain => @subdomain)) and return
+    else
+      flash[:notice] = "Updated service #{@service.name}"
     end
     
     redirect_to(services_path)
