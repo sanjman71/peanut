@@ -25,7 +25,7 @@ class Company < ActiveRecord::Base
   has_many                  :company_schedulables
   has_many_polymorphs       :schedulables, :from => [:users], :through => :company_schedulables
   has_many                  :company_services
-  has_many                  :services, :through => :company_services
+  has_many                  :services, :through => :company_services, :after_add => :added_service, :after_remove => :removed_service
   has_many                  :products
   has_many                  :appointments
   has_many                  :customers, :through => :appointments, :uniq => true
@@ -66,11 +66,6 @@ class Company < ActiveRecord::Base
     # can't use schedulables.include?(object) here, not sure why but possibly because its polymorphic
     schedulables.any? { |o| o == object }
   end
-  
-  def work_services_count
-    services.work.count
-  end
-  memoize :work_services_count
   
   # return the company free service
   def free_service
@@ -119,4 +114,21 @@ class Company < ActiveRecord::Base
     services.push(Service.find_or_create_by_name(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00))
   end
   
+  # manage both the services count and work service count
+  def added_service(service)
+    Company.increment_counter(:services_count, self.id)
+    if service.mark_as == Appointment::WORK
+      # increment company work services count
+      Company.increment_counter(:work_services_count, self.id)
+    end
+  end
+
+  # manage both the services count and work service count
+  def removed_service(service)
+    Company.decrement_counter(:services_count, self.id)
+    if service.mark_as == Appointment::WORK
+      # increment company work services count
+      Company.decrement_counter(:work_services_count, self.id)
+    end
+  end
 end

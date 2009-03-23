@@ -33,6 +33,7 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
       assert_valid @subscription
       assert_valid @company
+      @free_service = @company.free_service
     end
     
     should "format and set subdomain" do
@@ -43,11 +44,17 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal "Mary's Hair Salon", @company.name
     end
     
-    should "with basic services" do
-      assert_equal 1, @company.services_count
-      assert_equal 0, @company.work_services_count
-      assert_equal 1, @company.services.free.size
+    should "not be setup" do
       assert_equal false, @company.setup?
+    end
+    
+    should "have 1 free service" do
+      assert_equal 1, @company.services_count
+      assert_equal 1, @company.services.free.size
+    end
+  
+    should "have 0 work services" do
+      assert_equal 0, @company.work_services_count
     end
   
     should "have locations_count == 0" do
@@ -72,7 +79,40 @@ class CompanyTest < ActiveSupport::TestCase
       end
     end
     
-    context "add a user schedulable" do
+    context "and add a company service" do
+      setup do
+        # add the service using the push syntax to ensure the callbacks are used
+        @haircut = Factory(:work_service, :name => "Haircut", :price => 10.00)
+        assert_valid @haircut
+        @company.services.push(@haircut)
+        @company.reload
+      end
+      
+      should "have 1 work service" do
+        assert_equal 1, @company.work_services_count
+      end
+
+      should "have 2 services" do
+        assert_equal 2, @company.services_count
+      end
+      
+      context "then remove the company service" do
+        setup do
+          @company.services.delete(@haircut)
+          @company.reload
+          assert_equal [@free_service], @company.services
+        end
+
+        should "have 0 work services" do
+          assert_equal 0, @company.work_services_count
+        end
+
+        should "have 1 service" do
+          assert_equal 1, @company.services_count
+        end
+      end
+    end
+    context "and add a user schedulable" do
       setup do 
         @user1 = Factory(:user, :name => "User Resource")
         assert_valid @user1

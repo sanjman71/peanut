@@ -8,6 +8,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.text    :description
       t.integer :locations_count, :default => 0       # counter cache
       t.integer :services_count, :default => 0        # counter cache
+      t.integer :work_services_count, :default => 0   # counter cache
       t.integer :schedulables_count, :default => 0    # counter cache
       t.timestamps
     end
@@ -30,7 +31,7 @@ class CreatePeanut < ActiveRecord::Migration
     # create free service used by all companies
     Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
     
-    # Map services to companies
+    # map services to companies
     create_table :company_services do |t|
       t.integer :company_id
       t.integer :service_id

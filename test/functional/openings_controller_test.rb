@@ -31,7 +31,9 @@ class OpeningsControllerTest < ActionController::TestCase
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
-    @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 10.00, :duration => 30)
+    @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 10.00, :duration => 30)
+    # add haircut as a company service
+    @company.services.push(@haircut)
     @company.reload
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
