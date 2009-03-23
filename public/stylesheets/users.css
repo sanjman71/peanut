@@ -1,13 +1,13 @@
 /* customer and employee styles */
 
-div.customers.header                              { font-size: 15px; font-weight: bold; }
+div.customers.header                              { font-size: 15px; font-weight: bold; color: #666666; }
 
 a.customer.name                                   { color: #111111; font-weight: normal; }
 a:hover.customer.name                             { color: #111111; background-color: #FF6600; text-decoration: none; }
 a:visited.customer.name                           { color: #111111; }
 
 .customer.email                                   { color: #5500BB; }
-.customer.sms                                     { color: #008800; }
+.customer.sms                                     { color: #5500BB; }
 .customer.nosms                                   { color: #666666; }
 .customer.phone                                   { color: #333333; }
 
