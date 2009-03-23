@@ -23,6 +23,8 @@ class User < ActiveRecord::Base
   validates_uniqueness_of   :email,    :case_sensitive => false
   validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
+  before_validation         :format_phone
+
   has_many                  :sent_invitations, :class_name => 'Invitation'
   has_many                  :received_invitations, :class_name => 'Invitation'
   belongs_to                :invitation
@@ -88,4 +90,8 @@ class User < ActiveRecord::Base
     self.activation_code = self.class.make_token
   end
 
+  # format phone by removing all non-digits
+  def format_phone
+    self.phone.gsub!(/[^\d]/, '') unless self.phone.blank?
+  end
 end
