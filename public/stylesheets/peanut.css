@@ -83,7 +83,8 @@ div.container div.box                             { padding: 13px 0px 13px 40px;
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 10px; }
 
-div.mat                                           { background: #EDF3FE; }
+div.mat                                           { background: #EDF3FE none repeat scroll 0 0; }
+div.mat.shaded                                    { background: #E5ECF9 none repeat scroll 0 0; }
 
 /* form styles */
 
