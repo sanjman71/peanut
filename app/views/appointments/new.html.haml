@@ -34,3 +34,5 @@
       %br
       = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 0.8em; color: #FFFFFF; font-weight: normal;'
       %span#confirm_appointment_submit_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+      == or
+      %span{:style => 'font-size: 0.7em;'}= link_to 'Cancel', request.referer || openings_path
