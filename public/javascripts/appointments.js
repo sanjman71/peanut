@@ -78,18 +78,28 @@ $.fn.init_send_message = function() {
   })
   
   $("#send_email_message").click(function () {
-    var url       = '/messages/deliver/email';
+    var url       = $(this).attr('url');
     var appt_id   = $(this).attr('appointment_id');
     var message   = $("#message_textarea").attr("value");
     $.post(url, {appointment_id:appt_id, message:message}, null, "script");
+
+    // show progress bar
+    $("#message").hide();
+    $("#message_progress").show();
+    
     return false;
   })
 
   $("#send_sms_message").click(function () {
-    var url       = '/messages/deliver/sms';
+    var url       = $(this).attr('url');
     var appt_id   = $(this).attr('appointment_id');
     var message   = $("#message_textarea").attr("value");
     $.post(url, {appointment_id:appt_id, message:message}, null, "script");
+    
+    // show progress bar
+    $("#message").hide();
+    $("#message_progress").show();
+    
     return false;
   })
   

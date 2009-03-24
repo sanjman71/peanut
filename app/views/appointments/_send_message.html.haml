@@ -5,9 +5,13 @@
   %br
   = text_area_tag 'message', nil, :class => 'message', :id => 'message_textarea'
   %h4
-    = link_to 'Send Email', '', :class => 'rounded button color', :id => 'send_email_message', :url => "/messages/send", :appointment_id => appointment.id
-    == &nbsp;
-    = link_to 'Send Text', '', :class => 'rounded button color', :id => 'send_sms_message', :url => "/messages/send", :appointment_id => appointment.id
+    = link_to 'Send Email', '', :class => 'rounded button color', :id => 'send_email_message', :url => "/messages/deliver/email", :appointment_id => appointment.id
+    -# show text option if customer has sms enabled
+    - if appointment.customer.sms?
+      == &nbsp;
+      = link_to 'Send Text', '', :class => 'rounded button color', :id => 'send_sms_message', :url => "/messages/deliver/sms", :appointment_id => appointment.id
     == &nbsp;
     = link_to 'Cancel', '', :class => 'rounded button', :id => 'cancel_message'
+    
+%span#message_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
   

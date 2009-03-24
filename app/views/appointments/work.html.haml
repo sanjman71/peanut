@@ -7,11 +7,11 @@
     %h2= @title
     %h3
       - if Time.now < @appointment.start_at
-        == Starts in
+        == Starts in:
         = distance_of_time_in_words_to_now(@appointment.start_at)
         == from now
       - else
-        == Ended at
+        == Ended at:
         = distance_of_time_in_words_to_now(@appointment.start_at)
         == ago
         
