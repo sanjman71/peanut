@@ -11,7 +11,7 @@ class Appointment < ActiveRecord::Base
   validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at, :duration
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
-  has_one                 :invoice, :class_name => "AppointmentInvoice", :dependent => :destroy
+  has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
   before_save             :make_confirmation_code
   after_create            :add_customer_role
   

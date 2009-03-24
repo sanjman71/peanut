@@ -106,17 +106,17 @@ class CreatePeanut < ActiveRecord::Migration
 
     add_index :appointments, [:company_id, :start_at, :end_at, :duration, :time_start_at, :time_end_at, :mark_as], :name => "index_on_openings"
     
-    create_table :appointment_invoice_line_items do |t|
-      t.integer     :appointment_invoice_id
+    create_table :invoice_line_items do |t|
+      t.integer     :invoice_id
       t.references  :chargeable, :polymorphic => true
       t.integer     :price_in_cents
       t.integer     :tax
       t.timestamps
     end
     
-    create_table :appointment_invoices do |t|
-      t.integer   :appointment_id
-      t.integer   :gratuity_in_cents
+    create_table :invoices do |t|
+      t.references  :invoiceable, :polymorphic => true
+      t.integer     :gratuity_in_cents
       t.timestamps
     end
     

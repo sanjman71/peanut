@@ -1,10 +1,12 @@
 require 'test/test_helper'
 require 'test/factories'
 
-class AppointmentInvoiceTest < ActiveSupport::TestCase
+class InvoiceTest < ActiveSupport::TestCase
   
   # shoulda
-  should_require_attributes :appointment_id
+  should_require_attributes :invoiceable_id
+  should_require_attributes :invoiceable_type
+  should_have_many          :invoice_line_items
   
   def setup
     @owner        = Factory(:user, :name => "Owner")
@@ -30,17 +32,17 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
       assert_valid @appt
 
       # create invoice
-      @appt.invoice  = AppointmentInvoice.create
-      @invoice       = @appt.invoice
+      @invoice  = Invoice.create(:invoiceable => @appt)
       assert_valid @invoice
       
-      # get first line item
-      @li1          = @invoice.line_items.first
+      # add line item
+      @li_collection = @invoice.invoice_line_items.push(InvoiceLineItem.new(:chargeable => @haircut, :price_in_cents => @haircut.price_in_cents))
+      @li1 = @li_collection.first
     end
   
     should "have 1 invoice line item" do
-      assert_equal 1, @invoice.line_items.size
-      assert_equal @haircut, @li1.chargeable
+      assert_equal 1, @invoice.invoice_line_items.size
+      assert_equal @haircut, @invoice.invoice_line_items.first.chargeable
     end
 
     should "have invoice total equal to service price" do
@@ -51,14 +53,14 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
     context "add product to invoice" do
       setup do
         @shampoo = Factory(:product, :name => "Shampoo", :company => @company)
-        @li2     = AppointmentInvoiceLineItem.new(:chargeable => @shampoo, :price_in_cents => 375)
-        @invoice.line_items.push(@li2)
+        @li2     = InvoiceLineItem.new(:chargeable => @shampoo, :price_in_cents => 375)
+        @invoice.invoice_line_items.push(@li2)
         @invoice.reload
       end
       
       should "have 2 invoice line items" do
         assert_equal @shampoo, @li2.chargeable
-        assert_equal [@li1, @li2], @invoice.line_items
+        assert_equal [@li1, @li2], @invoice.invoice_line_items
       end
 
       should "have an updated invoice total" do
@@ -68,12 +70,12 @@ class AppointmentInvoiceTest < ActiveSupport::TestCase
       
       context "remove product from invoice" do
         setup do
-          @invoice.line_items.delete(@li2)
+          @invoice.invoice_line_items.delete(@li2)
           @invoice.reload
         end
         
         should "have 1 invoice line item" do
-          assert_equal [@li1], @invoice.line_items
+          assert_equal [@li1], @invoice.invoice_line_items
         end
         
         should "have an updated invoice total" do
