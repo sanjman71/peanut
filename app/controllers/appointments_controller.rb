@@ -5,6 +5,23 @@ class AppointmentsController < ApplicationController
   privilege_required 'update work appointments', :only => [:work], :on => :current_company
   privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
   
+  def has_privilege?(p, *args)
+    case p
+    when 'update work appointments'
+      # users may update their own work appointments
+      authorizable  = args[0]
+      user          = args[1] || current_user
+      appointment   = find_appointment_from_params
+      
+      return true if appointment.work? and appointment.customer == user
+      
+      # delegate to base class
+      super
+    else
+      super
+    end
+  end
+  
   # GET   /book/work/users/1/services/3/duration/60/20081231T000000
   # GET   /book/wait/users/1/services/3/20090101..20090108
   def new
@@ -236,7 +253,7 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/cancel
   def cancel
-    @appointment  = Appointment.find(params[:id])
+    @appointment  = current_company.appointments.find(params[:id])
     @schedulable  = @appointment.schedulable
     
     # cancel the work appointment
@@ -328,6 +345,11 @@ class AppointmentsController < ApplicationController
   end
   
   protected
+  
+  # find appointment from the params hash
+  def find_appointment_from_params
+    current_company.appointments.find(params[:id])
+  end
   
   def appointment_free_time_scheduled_at(appointment)
     "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"

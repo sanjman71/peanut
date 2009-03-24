@@ -54,14 +54,15 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read wait appointments', current_company)
+    if logged_in?
 
-      # 'Waitlist' tab
-      name = 'Waitlist'
-      if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
-        link = link_to(name, waitlist_index_path, :class => 'current')
+      # 'My Appointments' tab, appointments scoped by customer
+      name = 'My Appointments'
+      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name) and
+        params.has_key?(:customer_id)
+        link = link_to(name, customer_appointments_path(current_user), :class => 'current')
       else
-        link = link_to(name, waitlist_index_path)
+        link = link_to(name, customer_appointments_path(current_user))
       end
 
       yield link
@@ -72,10 +73,25 @@ module ApplicationHelper
 
       # 'Appointments' tab
       name = 'Appointments'
-      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
+      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name) and
+        !params.has_key?(:customer_id)
         link = link_to(name, appointments_path, :class => 'current')
       else
         link = link_to(name, appointments_path)
+      end
+
+      yield link
+
+    end
+
+    if has_privilege?('read wait appointments', current_company)
+
+      # 'Waitlist' tab
+      name = 'Waitlist'
+      if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
+        link = link_to(name, waitlist_index_path, :class => 'current')
+      else
+        link = link_to(name, waitlist_index_path)
       end
 
       yield link
