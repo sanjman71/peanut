@@ -6,7 +6,7 @@ a.customer.name                                   { color: #111111; font-weight:
 a:hover.customer.name                             { color: #111111; background-color: #FF6600; text-decoration: none; }
 a:visited.customer.name                           { color: #111111; }
 
-.customer.email                                   { color: #5500BB; }
+.customer.email                                   { color: #111111; }
 .customer.sms                                     { color: #5500BB; }
 .customer.nosms                                   { color: #666666; }
 .customer.phone                                   { color: #333333; }

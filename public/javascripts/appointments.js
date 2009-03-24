@@ -77,10 +77,16 @@ $.fn.init_send_message = function() {
     return false;
   })
   
-  $("#send_email_message").click(function () {
+  $("#send_email_message, #send_sms_message").click(function () {
     var url       = $(this).attr('url');
     var appt_id   = $(this).attr('appointment_id');
     var message   = $("#message_textarea").attr("value");
+    
+    if (message == '') {
+      alert("Message is empty");
+      return false;
+    }
+    
     $.post(url, {appointment_id:appt_id, message:message}, null, "script");
 
     // show progress bar
@@ -90,19 +96,6 @@ $.fn.init_send_message = function() {
     return false;
   })
 
-  $("#send_sms_message").click(function () {
-    var url       = $(this).attr('url');
-    var appt_id   = $(this).attr('appointment_id');
-    var message   = $("#message_textarea").attr("value");
-    $.post(url, {appointment_id:appt_id, message:message}, null, "script");
-    
-    // show progress bar
-    $("#message").hide();
-    $("#message_progress").show();
-    
-    return false;
-  })
-  
   $("#cancel_message").click(function() {
     $("#message_textarea").attr("value", '');
     $("#message").hide();
