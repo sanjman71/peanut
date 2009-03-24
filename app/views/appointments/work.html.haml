@@ -1,0 +1,41 @@
+- title(@title)
+- stylesheet('appointments', 'notes')
+- javascript('appointments', 'notes')
+
+.span-24.mat.padding-top-10.padding-bottom-10
+  .span-23.prepend-1
+    %h2= @title
+    %h3
+      - if Time.now < @appointment.start_at
+        == Starts in
+        = distance_of_time_in_words_to_now(@appointment.start_at)
+        == from now
+      - else
+        == Ended at
+        = distance_of_time_in_words_to_now(@appointment.start_at)
+        == ago
+        
+  .span-13.last
+  
+%hr.space
+
+.span-15.prepend-1
+  = display_flash(:all)
+  
+.span-23.prepend-1
+  = render(:partial => 'appointment', :locals => {:appointment => @appointment})
+  
+%hr.space
+
+.span-23.prepend-1.text
+  = render(:partial => 'send_message', :locals => {:appointment => @appointment})
+
+%hr.space
+
+.span-23.prepend-1.text
+  %h3== Add Invoice
+    
+
+
+
+

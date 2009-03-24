@@ -152,20 +152,6 @@ $.fn.init_select_schedulable_for_calendar_edit = function () {
   })
 }
 
-// Highlights timeslots and show edit/delete options on hover
-$.fn.init_highlight_timeslots = function () {
-  $(".timeslot").hover(
-    function () {
-      $("#hover_" + this.id).show();
-      $(this).addClass("highlighted");
-    },
-    function () {
-      $("#hover_" + this.id).hide();
-      $(this).removeClass("highlighted");
-    }
-  )
-} 
-
 // Live customers search
 $.fn.init_live_customers_search = function () {
   $("#live_search_for_customers").keyup(function () {

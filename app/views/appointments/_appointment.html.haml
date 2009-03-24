@@ -1,4 +1,4 @@
-.span-15.last{:syle => 'font-size: 1.5em;'}
+.appointment.review.span-15.last{:syle => 'font-size: 1.5em;'}
 
   -# what and with are common across all types of appointments
   .span-3.label.text-align-right
@@ -27,9 +27,17 @@
   - unless appointment.waitlist?
     .span-3.label.text-align-right
       == How Long:
-    .span-12.last
+    .span-12.last.data
       = Duration.to_words(appointment.duration)
 
+  -# show confirmation code for confirmed work appointments
+  - if appointment.work? and !appointment.new_record?
+    .span-3.label.text-align-right
+      == Code:
+    .span-12.last.data
+      = appointment.confirmation_code
+      
+  -# show customer for work and wait appointments
   - unless appointment.customer.blank?
     .span-3.label.text-align-right
       == Customer:

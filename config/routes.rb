@@ -40,7 +40,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :appointments, 
-                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post] },
+                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post], :work => :get, :wait => :get },
                 :collection => { :search => [:get, :post] }
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.resources :notes, :only => [:create]
@@ -104,6 +104,9 @@ ActionController::Routing::Routes.draw do |map|
   map.change_subscription   '/change_subscription', :controller => 'subscriptions', :action => 'edit'
   map.update_subscription   '/update_subscription/:plan_id', :controller => 'subscriptions', :action => 'update'
 
+  # Messages controller
+  map.connect   '/messages/deliver/:type', :controller => 'messages', :action => 'deliver', :conditions => {:method => :post}
+  
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
 

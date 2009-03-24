@@ -1,0 +1,13 @@
+= link_to 'Send a Message', '', :id => 'send_message_link', :style => 'font-size: 1.5em;'
+
+%span#message.hide
+  = label_tag 'message_textarea', 'Message'
+  %br
+  = text_area_tag 'message', nil, :class => 'message', :id => 'message_textarea'
+  %h4
+    = link_to 'Send Email', '', :class => 'rounded button color', :id => 'send_email_message', :url => "/messages/send", :appointment_id => appointment.id
+    == &nbsp;
+    = link_to 'Send Text', '', :class => 'rounded button color', :id => 'send_sms_message', :url => "/messages/send", :appointment_id => appointment.id
+    == &nbsp;
+    = link_to 'Cancel', '', :class => 'rounded button', :id => 'cancel_message'
+  

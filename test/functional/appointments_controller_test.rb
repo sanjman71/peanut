@@ -18,8 +18,12 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :post, 'book/work/users/3/services/3/60/20090303T113000',
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
-      
-  # show customer appointments
+
+  # show appointments by type
+  should_route :get, 'appointments/1/work', :controller => 'appointments', :action => 'work', :id => 1
+  should_route :get, 'appointments/1/wait', :controller => 'appointments', :action => 'wait', :id => 1
+  
+  # show all of a customer's appointments
   should_route :get, 'customers/1/appointments',
                :controller => 'appointments', :action => 'index', :customer_id => 1
 
@@ -295,9 +299,13 @@ class AppointmentsControllerTest < ActionController::TestCase
       @controller.stubs(:current_user).returns(@customer)
       ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
       
+      # build daterange start, end times in utc format
+      @start_date_utc = Time.parse("20090201").utc.to_s(:appt_schedule_day)
+      @end_date_utc   = Time.parse("20090208").utc.to_s(:appt_schedule_day)
+      
       # request a waitlist appointment
       get :new,
-          {:start_date => "20090201", :end_date => "20090208", :time => 'anytime', :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
+          {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
            :service_id => @haircut.id, :mark_as => 'wait'}
     end
 
@@ -313,9 +321,9 @@ class AppointmentsControllerTest < ActionController::TestCase
       assert assigns(:appointment).valid?
     end
     
-    should "have a waitlist start date of 20090201 and end date of 20090208" do
-      assert_equal "20090201", assigns(:appointment).start_at.to_s(:appt_schedule_day)
-      assert_equal "20090208", assigns(:appointment).end_at.to_s(:appt_schedule_day)
+    should "have a waitlist start date of 20090201 and end date of 20090209 (daterange is inclusive)" do
+      assert_equal "20090201", assigns(:appointment).start_at.utc.to_s(:appt_schedule_day) # utc format
+      assert_equal "20090209", assigns(:appointment).end_at.utc.to_s(:appt_schedule_day) # utc format
     end
   end
   

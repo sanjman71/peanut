@@ -127,18 +127,19 @@ class DateRange
   
   # parse start, end dates - e.g. "20090101", defaults to end date inclusive
   # options:
-  #   - inclusive => true|false, if true not include end date in range, default is true
+  #   - inclusive => true|false, if true include end date in range, default is true
   #   - start_on  => [0..6], day of week to start calendar on, 0 is sunday, defaults to start_at.wday
   #   - end_on    => [0..6], day of week to end calendar on, 0 is sunday, defaults to end_at.wday
   def self.parse_range(start_date, end_date, options={})
     # parse options
     inclusive   = options.has_key?(:inclusive) ? options[:inclusive] : true
     
-    # build name from start, end dates
-    range_name  = "#{Time.parse(start_date).to_s(:appt_short_month_day_year)} - #{Time.parse(end_date).to_s(:appt_short_month_day_year)}"
     # build start_at, end_at times in local time format
     start_at    = Time.parse(start_date).beginning_of_day
     end_at      = Time.parse(end_date).beginning_of_day
+
+    # build name from start_at, end_at times
+    range_name  = "#{start_at.to_s(:appt_short_month_day_year)} - #{end_at.to_s(:appt_short_month_day_year)}"
     
     if inclusive
       # include the last day by adjusting to the end of the day

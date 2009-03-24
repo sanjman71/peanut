@@ -63,8 +63,40 @@ $.fn.init_confirm_appointment = function() {
     
     // show progress bar
     $(this).hide();
+    $("#cancel").hide();
     $("#confirm_appointment_submit_progress").show();
     
+    return false;
+  })
+}
+
+$.fn.init_send_message = function() {
+  $("#send_message_link").click(function() {
+    $(this).hide();
+    $("#message").show();
+    return false;
+  })
+  
+  $("#send_email_message").click(function () {
+    var url       = '/messages/deliver/email';
+    var appt_id   = $(this).attr('appointment_id');
+    var message   = $("#message_textarea").attr("value");
+    $.post(url, {appointment_id:appt_id, message:message}, null, "script");
+    return false;
+  })
+
+  $("#send_sms_message").click(function () {
+    var url       = '/messages/deliver/sms';
+    var appt_id   = $(this).attr('appointment_id');
+    var message   = $("#message_textarea").attr("value");
+    $.post(url, {appointment_id:appt_id, message:message}, null, "script");
+    return false;
+  })
+  
+  $("#cancel_message").click(function() {
+    $("#message_textarea").attr("value", '');
+    $("#message").hide();
+    $("#send_message_link").show();
     return false;
   })
 }
@@ -84,7 +116,9 @@ $(document).ready(function() {
 
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
-
+  
+  $(document).init_send_message();
+  
   // rounded corners
   $('.rounded').corners();
 })

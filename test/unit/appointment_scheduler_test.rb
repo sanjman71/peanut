@@ -49,9 +49,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
   
-      # create free appointment that ended 1 hour ago
-      @end_at             = (Time.now - 3.minutes).to_s(:appt_schedule)
-      @start_at           = (Time.now - 10.hours).to_s(:appt_schedule)
+      # create free appointment that ended a few minutes ago
+      @end_at             = (Time.now.utc - 3.minutes).to_s(:appt_schedule)
+      @start_at           = (Time.now.utc - 10.hours).to_s(:appt_schedule)
       @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
     end
@@ -63,8 +63,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
       
-      should "find no free appointments" do
-        assert_equal [], @free_appointments
+      should "find 1 free appointment1" do
+        assert_equal [@free_appointment], @free_appointments
       end
     end
   end

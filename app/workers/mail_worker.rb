@@ -51,4 +51,14 @@ class MailWorker < Workling::Base
     UserMailer.deliver_account_reset(company, user, password, login_url)
     logger.debug("*** mail worker: sent account reset email to #{user.email}")
   end
+  
+  def send_message(options)
+    company   = Company.find_by_id(options[:company_id].to_i)
+    user      = User.find_by_id(options[:user_id].to_i)
+    message   = options[:message]
+
+    UserMailer.deliver_message(company, user, message)
+    logger.debug("*** mail worker: sent message to #{user.email}")
+  end
+  
 end

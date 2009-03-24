@@ -1,6 +1,19 @@
+// show appointment data (e.g. edit/delete links) on hover
+$.fn.init_show_appointment_on_hover = function () {
+  $(".appointment").hover(
+    function () {
+      $("#hover_" + this.id).show();
+    },
+    function () {
+      $("#hover_" + this.id).hide();
+    }
+  )
+} 
+
 $(document).ready(function() {
 
   $(document).init_select_schedulable_for_calendar_edit();
+  $(document).init_show_appointment_on_hover();
   
   // set hover states to show selected date, ignore past dates
   $(".weekday:not(.past),.weekend:not(.past)").hover(

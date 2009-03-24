@@ -1,7 +1,10 @@
 class AppointmentsController < ApplicationController
-  before_filter :disable_global_flash, :only => [:show, :confirmation]
+  before_filter :disable_global_flash, :only => [:show, :confirmation, :work, :wait]
   after_filter  :store_location, :only => [:new]
     
+  privilege_required 'update work appointments', :only => [:work], :on => :current_company
+  privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
+  
   # GET   /book/work/users/1/services/3/duration/60/20081231T000000
   # GET   /book/wait/users/1/services/3/20090101..20090108
   def new
@@ -163,6 +166,36 @@ class AppointmentsController < ApplicationController
     # build notes collection, most recent first 
     @notes        = @appointment.notes.sort_recent
 
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  # GET /apppointments/1/work
+  def work
+    @appointment  = current_company.appointments.find(params[:id])
+    @note         = Note.new
+    
+    # build notes collection, most recent first 
+    @notes        = @appointment.notes.sort_recent
+
+    @title        = "Appointment Details"
+    
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  # GET /apppointments/1/wait
+  def wait
+    @appointment  = current_company.appointments.find(params[:id])
+    @note         = Note.new
+    
+    # build notes collection, most recent first 
+    @notes        = @appointment.notes.sort_recent
+    
+    @title        = "Waitlist Details"
+    
     respond_to do |format|
       format.html
     end

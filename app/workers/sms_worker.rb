@@ -13,29 +13,36 @@ class SmsWorker < Workling::Base
     when Appointment::WORK
       customer  = appointment.customer
       message   = "#{appointment.service.name} confirmation #{appointment.confirmation_code}"
-      send_sms_to_customer(customer, message)
+      send_sms_to_user(customer, message)
     when Appointment::WAIT
       customer  = appointment.customer
       message   = "Your are waitlisted for a #{appointment.service.name}. Your waitlist confirmation number is #{appointment.confirmation_code}"
-      send_sms_to_customer(customer, message)
+      send_sms_to_user(customer, message)
     end
+  end
+  
+  def send_message(options)
+    company   = Company.find_by_id(options[:company_id].to_i)
+    user      = User.find_by_id(options[:user_id].to_i)
+    message   = options[:message]
+    send_sms_to_user(user, "#{company.name}: #{message}")
   end
   
   private
   
-  def send_sms_to_customer(customer, message)
-    if customer.blank? or message.blank?
-      logger.debug("xxx sms error, customer or message blank")
+  def send_sms_to_user(user, message)
+    if user.blank? or message.blank?
+      logger.debug("xxx sms error, user or message blank")
       return
     end
     
-    if customer.mobile_carrier.blank?
+    if user.mobile_carrier.blank?
       logger.debug("xxx sms error, mobile carrier is undefined")
       return
     end
     
-    logger.debug("*** sending sms - customer: #{customer.name}, carrier: #{customer.mobile_carrier.name}, message: #{message}")
-    deliver_sms(customer.phone, customer.mobile_carrier.key, message)
+    logger.debug("*** sending sms - user: #{user.name}, carrier: #{user.mobile_carrier.name}, message: #{message}")
+    deliver_sms(user.phone, user.mobile_carrier.key, message)
   end
   
 end

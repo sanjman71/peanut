@@ -30,20 +30,20 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       @free_service   = @company.free_service
       @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
-      @start_at       = Time.now.beginning_of_day
-      @end_at         = @start_at + 1.hour
-      @start_at_day   = @start_at.to_s(:appt_schedule_day)
+      @start_at_utc   = Time.now.utc.beginning_of_day
+      @end_at_utc     = @start_at_utc + 1.hour
+      @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
       @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
-                                                                     :start_at => @start_at, :end_at => @end_at, :duration => 120)
+                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120)
     end
 
     should_change "Appointment.count", :by => 1
     
     should "have duration of 2 hours, and end_at time adjusted" do
       assert_equal 120, @appt.duration
-      assert_equal 0, @appt.start_at.hour
-      assert_equal 2, @appt.end_at.hour
+      assert_equal 0, @appt.start_at.utc.hour
+      assert_equal 2, @appt.end_at.utc.hour
     end
   end
   
@@ -151,20 +151,22 @@ class AppointmentTest < ActiveSupport::TestCase
     
   context "create waitlist appointment" do
     setup do
-      # create free time from 10 am to 12 pm
       @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
       @customer     = Factory(:user)
-      @daterange    = DateRange.parse_range("20090201", "20090208")
+      # build start, end date ranges in utc time
+      @start_date   = Time.now.utc.to_s(:appt_schedule_day)
+      @end_date     = (Time.now.utc + 7.days).to_s(:appt_schedule_day)
+      @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
       @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
       @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
     end
 
     should_change "Appointment.count", :by => 1
     
-    should "have a start date of 20090201 and end date of 20090208" do
-      assert_equal "20090201", @wait_appt.start_at.to_s(:appt_schedule_day)
-      assert_equal "20090208", @wait_appt.end_at.to_s(:appt_schedule_day)
+    should "have a start date of today and end date in 1 week" do
+      assert_equal @start_date, @wait_appt.start_at.utc.to_s(:appt_schedule_day) # utc format
+      assert_equal @end_date, @wait_appt.end_at.utc.to_s(:appt_schedule_day) # utc format
     end
     
     should "have a time of day of 'anytime'" do
@@ -172,7 +174,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 86400, @wait_appt.time_end_at
     end
     
-    should "have customer with customer role" do
+    should "add 'customer' role to customer" do
       assert_equal ['customer'], @customer.roles.collect(&:name)
     end
   end

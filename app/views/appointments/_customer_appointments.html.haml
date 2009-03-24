@@ -1,6 +1,6 @@
 - appointments.each do |appointment|
-  .span-23.prepend-1.last{:class => cycle("shaded", "")}
-    .span-5
+  .span-24.last.letterbox.appointment{:class => cycle("shaded", "")}
+    .span-5.prepend-1
       %h3{:style => 'padding-top: 5px; margin-bottom: 2px;'}= appointment.service.name
       = appointment.start_at.to_s(:appt_short_month_day_year)
       == @
@@ -18,6 +18,6 @@
         %h4{:style => 'padding-top: 5px;'}= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
         
     .span-3{:style => 'margin-top: 3px;'}
-      = link_to 'Details', ''
+      = link_to 'Details', url_for(:controller => 'appointments', :action => appointment.mark_as, :id => appointment.id, :subdomain => current_subdomain)
   
     

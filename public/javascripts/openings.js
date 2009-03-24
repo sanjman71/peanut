@@ -68,7 +68,6 @@ $(document).ready(function() {
   
   $(document).init_datepicker({start_date : (new Date()).addDays(0).asString(), end_date : (new Date()).addMonths(1).asString(), max_days:6});
   
-  $(document).init_highlight_timeslots();
   $(document).init_search_openings();
   $(document).init_search_when_toggle();
   

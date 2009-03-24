@@ -59,7 +59,7 @@ class Appointment < ActiveRecord::Base
   named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
   named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
 
-  # order by sorting
+  # order by start_at
   named_scope :order_start_at, {:order => 'start_at'}
   
   
