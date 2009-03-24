@@ -22,6 +22,8 @@ div.appointment a                                 { color: #5500BB; font-weight:
 div.appointment a:hover                           { color: #5500BB; background-color: #FF6600; }
 div.appointment a:visited                         { color: #5500BB; font-weight: bold; }
 
+a.bookit                                          { background-color: #FFCC00; }
+
 a.notify.waitlist                                 { color: #008800; font-weight: bold; }
 a:hover.notify.waitlist                           { color: #008800; background-color: #FF6600; }
 a:visited.notify.waitlist                         { color: #008800; font-weight: bold; }
