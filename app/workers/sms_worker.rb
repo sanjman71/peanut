@@ -12,11 +12,11 @@ class SmsWorker < Workling::Base
     case appointment.mark_as
     when Appointment::WORK
       customer  = appointment.customer
-      message   = "#{appointment.service.name} confirmation #{appointment.confirmation_code}"
+      message   = "#{appointment.service.name} confirmation"
       send_sms_to_user(customer, message)
     when Appointment::WAIT
       customer  = appointment.customer
-      message   = "Your are waitlisted for a #{appointment.service.name}. Your waitlist confirmation number is #{appointment.confirmation_code}"
+      message   = "Your are waitlisted for a #{appointment.service.name}"
       send_sms_to_user(customer, message)
     end
   end
