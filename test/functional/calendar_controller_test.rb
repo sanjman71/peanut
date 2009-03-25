@@ -43,6 +43,7 @@ class CalendarControllerTest < ActionController::TestCase
 
   context "search company calendars for a company with no schedulables" do
     setup do
+      @controller.stubs(:current_user).returns(@owner)
       @controller.stubs(:current_privileges).returns(["read calendars"])
       get :index
     end
@@ -57,6 +58,8 @@ class CalendarControllerTest < ActionController::TestCase
     setup do
       # add company schedulable
       @johnny = Factory(:user, :name => "Johnny", :companies => [@company])
+      # stub current user as owner, who is not a company schedulable
+      @controller.stubs(:current_user).returns(@owner)
       # stub user privileges
       @controller.stubs(:current_privileges).returns(["read calendars"])
       get :index
