@@ -2,17 +2,17 @@ class AppointmentNotifier < ActionMailer::Base
 
   def work_confirmation(appointment)
     setup_email(appointment, appointment.customer)
-    @subject = "#{appointment.company.name} Appointment Confirmation - #{appointment.confirmation_code}"
+    @subject = "#{appointment.company.name}: Appointment confirmation"
   end
 
   def waitlist_confirmation(appointment)
     setup_email(appointment, appointment.customer)
-    @subject = "#{appointment.company.name} Waitlist Confirmation - #{appointment.confirmation_code}"
+    @subject = "#{appointment.company.name}: Waitlist confirmation"
   end
   
   def waitlist_opening(appointment)
     setup_email(appointment, appointment.customer)
-    @subject = "#{appointment.company.name} Waitlist Opening - #{appointment.confirmation_code}"
+    @subject = "#{appointment.company.name}: Waitlist opening"
   end
   
   protected

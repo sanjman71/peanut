@@ -30,13 +30,6 @@
     .span-12.last.data
       = Duration.to_words(appointment.duration)
 
-  -# show confirmation code for confirmed work appointments
-  - if appointment.work? and !appointment.new_record?
-    .span-3.label.text-align-right
-      == Code:
-    .span-12.last.data
-      = appointment.confirmation_code
-      
   -# show customer for work and wait appointments
   - unless appointment.customer.blank?
     .span-3.label.text-align-right
