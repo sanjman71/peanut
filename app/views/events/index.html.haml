@@ -8,8 +8,8 @@
       %h2== Events
       
 %hr.space
-  
-.span-22.prepend-1
+
+.span-23.prepend-1.mat
   %h3 Add an Event
   - form_for(Event.new, :url => events_url(:subdomain => current_subdomain), :method => :post) do |f|
     = hidden_field_tag :event_company_id, current_company.id
@@ -18,5 +18,7 @@
     = f.label :message, "Message: "
     = f.text_field :message
     = f.submit
+
+%hr.space
 
 = render(:partial => 'events.html.haml')

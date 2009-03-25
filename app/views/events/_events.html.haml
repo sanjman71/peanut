@@ -1,10 +1,13 @@
 #events
-  .urgent.span-22.prepend-1.append-1.last
-    %h2==Urgent
-    = render(:partial => 'events_subset', :locals => {:events => @urgent})
-  .approval.span-22.prepend-1.append-1.last
-    %h2==Approval
-    = render(:partial => 'events_subset', :locals => {:events => @approval})
-  .informational.span-22.prepend-1.append-1.last
-    %h2==Informational
-    = render(:partial => 'events_subset', :locals => {:events => @informational})
+  - unless @urgent.empty?
+    .urgent.span-22.prepend-1.append-1.last
+      %h3==Urgent
+      = render(:partial => 'events_subset', :locals => {:events => @urgent})
+  - unless @approval.empty?
+    .approval.span-22.prepend-1.append-1.last
+      %h3==Approval
+      = render(:partial => 'events_subset', :locals => {:events => @approval})
+  - unless @informational.empty?
+    .informational.span-22.prepend-1.append-1.last
+      %h3==Informational
+      = render(:partial => 'events_subset', :locals => {:events => @informational})
