@@ -8,7 +8,7 @@
     .span-5
       %h4{:class => customer.sms? ? 'customer sms' : 'customer nosms'}= customer.sms? ? "Text messaging enabled" : "No text messaging"
     .span-3
-      %h4= link_to "Appointments", ''
+      %h4= link_to "Appointments", customer_appointments_path(customer), :class => 'admin'
     .span-6.last
       -# allow company managers or edit all users, and user to edit himself
       - if @company_manager or user == current_user

@@ -10,15 +10,14 @@ class Appointment < ActiveRecord::Base
   belongs_to              :customer, :class_name => 'User'
   validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at, :duration
   validates_presence_of   :customer_id, :if => :customer_required?
-  validates_inclusion_of  :mark_as, :in => %w(free busy work wait)
+  validates_inclusion_of  :mark_as, :in => %w(free work wait)
   has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
   before_save             :make_confirmation_code
   after_create            :add_customer_role
   
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
-  BUSY                    = 'busy'      # busy appointments can not be scheduled
-  WORK                    = 'work'      # work appointments are items that can be scheduled in free timeslots
+  WORK                    = 'work'      # work appointments can be scheduled in free timeslots
   WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
   
   NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
@@ -50,7 +49,6 @@ class Appointment < ActiveRecord::Base
 
   # find appointments by mark_as value
   named_scope :free,        { :conditions => {:mark_as => FREE} }
-  named_scope :busy,        { :conditions => {:mark_as => BUSY} }
   named_scope :work,        { :conditions => {:mark_as => WORK} }
   named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}

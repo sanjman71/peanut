@@ -19,14 +19,15 @@ class AppointmentsControllerTest < ActionController::TestCase
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
 
-  # show appointments by type
+  # show an appointment by type
   should_route :get, 'appointments/1/work', :controller => 'appointments', :action => 'work', :id => 1
   should_route :get, 'appointments/1/wait', :controller => 'appointments', :action => 'wait', :id => 1
   
-  # show all of a customer's appointments
-  should_route :get, 'customers/1/appointments',
-               :controller => 'appointments', :action => 'index', :customer_id => 1
-
+  # list work appointments by state
+  should_route :get, 'appointments/work/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
+  
+  # list a customer's appointments
+  should_route :get, 'customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1
 
   def setup
     @controller   = AppointmentsController.new

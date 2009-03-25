@@ -4,7 +4,7 @@ class ServiceTest < ActiveSupport::TestCase
   
   should_require_attributes :name
   should_require_attributes :price_in_cents
-  should_allow_values_for   :mark_as, "free", "busy", "work"
+  should_allow_values_for   :mark_as, "free", "work"
   
   should_have_many          :companies, :through => :company_services
   should_have_many          :appointments
@@ -21,7 +21,7 @@ class ServiceTest < ActiveSupport::TestCase
   
   context "create service" do
     setup do
-      @service = @company.services.create(:name => "boring job", :duration => 0, :mark_as => "busy", :price => 1.00)
+      @service = @company.services.create(:name => "boring job", :duration => 0, :mark_as => "work", :price => 1.00)
       assert_valid @service
     end
     

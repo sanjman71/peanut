@@ -319,26 +319,52 @@ class AppointmentsController < ApplicationController
       redirect_to(unauthorized_path) and return
     end
     
-    if params[:customer_id].blank?
-      # redirect to customer appointments path
-      redirect_to(customer_appointments_path(current_user)) and return
-    end
+    # if params[:customer_id].blank?
+    #   # redirect to customer appointments path
+    #   redirect_to(customer_appointments_path(current_user)) and return
+    # end
+
+    if params.has_key?(:customer_id)
+      # validate customer is the current user
+      @customer = User.find(params[:customer_id])
     
-    # validate customer is the current user
-    @customer = User.find(params[:customer_id])
+      # should check permissions before we get here
+      
+      # if @customer != current_user
+      #   redirect_to(unauthorized_path) and return
+      # end
     
-    if @customer != current_user
-      redirect_to(unauthorized_path) and return
-    end
-    
-    # check if current user is a company employee
-    if @customer.has_role?('company employee', current_company)
-      # customer is a company user - what should we do here?
+      # check if current user is a company employee
+      if @customer.has_role?('company employee', current_company)
+        # customer is a company user - what should we do here?
+      end
+
+      # find customer appointments
+      @appointments = current_company.appointments.work.customer(@customer)
+      
+      # set title
+      @title  = "My Appointments"
+    else
+      @type   = params[:type].to_s
+      @state  = params[:state].to_s
+      
+      case [@type, @state]
+      when ['work', 'upcoming'], ['wait', 'upcoming'], ['work', 'completed']
+        # show appointments scoped by type and state
+        @appointments = current_company.appointments.send(@type).send(@state).order_start_at
+      when ['', '']
+        # show all appointments
+        @appointments = current_company.appointments.order_start_at
+      else
+        # redirect to default route
+        redirect_to(appointments_path) and return
+      end
+      
+
+      # set title
+      @title  = "Appointments"
     end
         
-    # find my appointments
-    @my_appointments = current_company.appointments.work.customer(@customer)
-    
     respond_to do |format|
       format.html
     end

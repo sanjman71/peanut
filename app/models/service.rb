@@ -1,7 +1,7 @@
 class Service < ActiveRecord::Base
   validates_presence_of       :name, :duration, :price_in_cents
   validates_inclusion_of      :duration, :in => 1..24*60*7, :message => "must be a non-zero reasonable value"
-  validates_inclusion_of      :mark_as, :in => %w(free busy work), :message => "can only be scheduled as free, busy or work"
+  validates_inclusion_of      :mark_as, :in => %w(free work), :message => "can only be scheduled as free or work"
   has_many                    :company_services
   has_many                    :companies, :through => :company_services
   has_many                    :appointments
@@ -14,7 +14,6 @@ class Service < ActiveRecord::Base
   UNAVAILABLE                 = "Unavailable"
   
   named_scope :free,          { :conditions => {:mark_as => Appointment::FREE} }
-  named_scope :busy,          { :conditions => {:mark_as => Appointment::BUSY} }
   named_scope :work,          { :conditions => {:mark_as => Appointment::WORK} }
   
   # default duration value
@@ -50,10 +49,6 @@ class Service < ActiveRecord::Base
   
   def work?
     self.mark_as == Appointment::FREE    
-  end
-
-  def busy?
-    self.mark_as == Appointment::BUSY
   end
 
   private

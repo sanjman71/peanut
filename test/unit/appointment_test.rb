@@ -10,7 +10,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_require_attributes :duration
-  should_allow_values_for   :mark_as, "free", "busy", "work", "wait"
+  should_allow_values_for   :mark_as, "free", "work", "wait"
 
   should_belong_to          :company
   should_belong_to          :service

@@ -42,6 +42,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :appointments, 
                 :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post], :work => :get, :wait => :get },
                 :collection => { :search => [:get, :post] }
+  map.connect   '/appointments/work/:state', :controller => 'appointments', :action => 'index', :type => 'work'
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
