@@ -36,12 +36,6 @@ class CalendarController < ApplicationController
   # GET /users/1/calendar/when/next-week
   # GET /users/1/calendar/range/20090101..20090201
   def show
-    if params[:customer_id]
-      @customer     = current_company.users.find(params[:customer_id])
-      @appointments = @customer.appointments
-      raise Exception, "todo: show customer appointments: #{@appointments.size}"
-    end
-    
     if current_company.schedulables_count == 0
       # redirect to company home page
       redirect_to root_path(:subdomain => current_subdomain) and return

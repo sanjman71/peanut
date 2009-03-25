@@ -3,11 +3,11 @@
 - stylesheet('appointments', 'calendar', 'datePicker')
 
 .span-16.append-1
-  .span-15.prepend-1.last.mat
+  .span-15.prepend-1.last.mat.padding-top-10
     .span-8
       %h3
-        = label_tag "schedulable", "Schedule for", :class => 'big'
-        = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+        = label_tag "show_schedulable", "Schedule for", :class => 'big'
+        = select_tag('show_schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
       %h6{:style => 'margin-bottom: 20px; font-weight: normal;'}= link_to 'PDF Version', url_for(:format => 'pdf', :subdomain => current_subdomain)
     .span-6.prepend-1.last
       #links

@@ -1,5 +1,14 @@
 var customers = new Array();
 
+// show appointments for the selected customer
+$.fn.init_select_appointments_customer = function () {
+  $("#customer").change(function () {
+    var href = '/customers/' + this.value + '/appointments';
+    window.location = href;
+    return false;
+  })
+}
+
 $.fn.init_autocomplete_customers = function() {
   // post json, override global ajax beforeSend defined in application.js
   $.ajax({
@@ -106,7 +115,6 @@ $.fn.init_send_message = function() {
 
 $(document).ready(function() {
   $(document).init_add_free_time(); // don't need to rebind after an ajax call
-  $(document).init_select_schedulable_for_calendar_show();
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
   $('#appointment_code').focus();
   $('#appointment_time_range_start_at').focus();
@@ -117,16 +125,12 @@ $(document).ready(function() {
   $(document).init_datepicker({start_date : (new Date()).asString(), end_date : (new Date()).addMonths(1).asString(), max_days:10});
   $(document).init_toggle_dates();
 
+  $(document).init_select_appointments_customer();
+  
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
-  
   $(document).init_send_message();
   
   // rounded corners
   $('.rounded').corners();
-})
-
-// Re-bind after an ajax call
-$(document).ajaxComplete(function(request, settings) {
-  $(document).init_select_schedulable_for_calendar_show();
 })

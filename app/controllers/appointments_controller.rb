@@ -3,12 +3,13 @@ class AppointmentsController < ApplicationController
   after_filter  :store_location, :only => [:new]
     
   privilege_required 'update work appointments', :only => [:work], :on => :current_company
-  privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
+  privilege_required 'update work appointments', :only => [:work], :on => :current_company
+  privilege_required 'read work appointments', :only => [:index], :on => :current_company
   
   def has_privilege?(p, *args)
     case p
     when 'update work appointments'
-      # users may update their own work appointments
+      # users may update their work appointments
       authorizable  = args[0]
       user          = args[1] || current_user
       appointment   = find_appointment_from_params
@@ -17,13 +18,21 @@ class AppointmentsController < ApplicationController
       
       # delegate to base class
       super
+    when 'read work appointments'
+      # users may read their work appointments
+      authorizable  = args[0]
+      @customer     = find_customer_from_params
+      
+      return true if @customer == current_user
+      # delegate to base class
+      super
     else
       super
     end
   end
   
-  # GET   /book/work/users/1/services/3/duration/60/20081231T000000
-  # GET   /book/wait/users/1/services/3/20090101..20090108
+  # GET /book/work/users/1/services/3/duration/60/20081231T000000
+  # GET /book/wait/users/1/services/3/20090101..20090108
   def new
     if !logged_in?
       flash[:notice] = "To finalize your appointment, please log in or sign up."
@@ -315,56 +324,34 @@ class AppointmentsController < ApplicationController
   end
     
   def index
-    if !logged_in?
-      redirect_to(unauthorized_path) and return
+    if params[:customer_id].to_s == "0"
+      # /customers/0/appointments is canonicalized to /appointments; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :customer_id => nil)))
     end
     
-    # if params[:customer_id].blank?
-    #   # redirect to customer appointments path
-    #   redirect_to(customer_appointments_path(current_user)) and return
-    # end
+    # find state (default to 'upcoming') and customer (default to 'anyone')
+    @state      = params[:state] ? params[:state].to_s : 'upcoming'
+    @customer   = params.has_key?(:customer_id) ? User.find(params[:customer_id]) : User.anyone
 
-    if params.has_key?(:customer_id)
-      # validate customer is the current user
-      @customer = User.find(params[:customer_id])
-    
-      # should check permissions before we get here
-      
-      # if @customer != current_user
-      #   redirect_to(unauthorized_path) and return
-      # end
-    
-      # check if current user is a company employee
-      if @customer.has_role?('company employee', current_company)
-        # customer is a company user - what should we do here?
-      end
-
-      # find customer appointments
-      @appointments = current_company.appointments.work.customer(@customer)
-      
-      # set title
-      @title  = "My Appointments"
+    case @customer.id
+    when 0
+      # find appointments for anyone with the specified state
+      @appointments = current_company.appointments.work.order_start_at.send(@state)
     else
-      @type   = params[:type].to_s
-      @state  = params[:state].to_s
-      
-      case [@type, @state]
-      when ['work', 'upcoming'], ['wait', 'upcoming'], ['work', 'completed']
-        # show appointments scoped by type and state
-        @appointments = current_company.appointments.send(@type).send(@state).order_start_at
-      when ['', '']
-        # show all appointments
-        @appointments = current_company.appointments.order_start_at
-      else
-        # redirect to default route
-        redirect_to(appointments_path) and return
-      end
-      
-
-      # set title
-      @title  = "Appointments"
+      # find customer appointments with the specified state
+      @appointments = current_company.appointments.work.customer(@customer).order_start_at.send(@state)
     end
-        
+
+    # find set of customers based on user role
+    if company_manager?
+      @customers  = [User.anyone] + current_company.authorized_users.with_role(Company.customer_role).order_by_name
+    else
+      @customers  = Array(current_user)
+    end
+    
+    # set title based on customer
+    @title = @customer.anyone? ? "All Appointments" : "Appointments for #{@customer.name}"
+    
     respond_to do |format|
       format.html
     end
@@ -375,6 +362,20 @@ class AppointmentsController < ApplicationController
   # find appointment from the params hash
   def find_appointment_from_params
     current_company.appointments.find(params[:id])
+  end
+
+  # find customer from the params hash, return nil if we can't find the customer
+  def find_customer_from_params
+    begin
+      current_company.authorized_users.with_role(Company.customer_role).find(params[:customer_id])
+    rescue
+      nil
+    end
+  end
+
+  # find customer from the params hash, throw exception if we can't find the customer
+  def find_customer_from_params!
+    current_company.authorized_users.with_role(Company.customer_role).find(params[:customer_id])
   end
   
   def appointment_free_time_scheduled_at(appointment)

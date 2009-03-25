@@ -5,8 +5,8 @@
 .span-24.last#what
   .span-15.box
     .span-15.last.schedulable
-      = label_tag "schedulable", "Schedule available time for", :class => 'big'
-      = select_tag('schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+      = label_tag "edit_schedulable", "Schedule available time for", :class => 'big'
+      = select_tag('edit_schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br

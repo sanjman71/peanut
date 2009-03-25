@@ -1,12 +1,17 @@
+- title(@title)
 - stylesheet('appointments')
-- javascript('appointments')
+- javascript('waitlist')
 
-.span-24
-  .span-23.prepend-1.last.mat
-    %h2== Waitlist
-    %h3== Today is #{Time.now.to_s(:appt_day)}
-  %hr.space
-  .span-18.prepend-1.append-1.last
-    .highlight#flash
-  #waitlist
-    = render(:partial => 'waitlist.html.haml', :locals => {:appointments => @appointments})
+.span-23.prepend-1.last.mat.padding-top-10
+  %h3
+    = label_tag "search_schedulable", "Waitlist for", :class => 'big'
+    = select_tag('search_schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+  %h3{:style => 'font-size: 1.3em;'}== Today is #{Time.now.to_s(:appt_day)}
+  
+%hr.space
+
+.span-15.prepend-1.last
+  .highlight#flash
+  
+#waitlist
+  = render(:partial => 'waitlist.html.haml', :locals => {:appointments => @appointments})

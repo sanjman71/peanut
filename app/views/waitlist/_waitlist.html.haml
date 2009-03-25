@@ -1,6 +1,9 @@
 - if appointments.blank?
   .span-23.prepend-1
     %h2== The waitlist is empty
+- else
+  .span-23.prepend-1
+    %h4= pluralize(appointments.size, "Appointment")
     
 - appointments.each do |appointment|
   .span-24.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]

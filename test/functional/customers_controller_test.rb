@@ -43,8 +43,6 @@ class CustomersControllerTest < ActionController::TestCase
         @controller.stubs(:current_privileges).returns(['read users'])
         # stub current_user method
         @controller.stubs(:current_user).returns(@owner)
-        # stub has_role? method
-        @owner.stubs(:has_role?).returns(true)
         get :index
       end
 
@@ -80,8 +78,7 @@ class CustomersControllerTest < ActionController::TestCase
         @controller.stubs(:current_privileges).returns(['read users'])
         # stub current_user method
         @controller.stubs(:current_user).returns(@owner)
-        # stub has_role? method
-        @owner.stubs(:has_role?).returns(true)
+        ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
     

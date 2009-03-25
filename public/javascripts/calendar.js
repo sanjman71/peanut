@@ -10,9 +10,28 @@ $.fn.init_show_appointment_on_hover = function () {
   )
 } 
 
+// show calendar for the selected schedulable
+$.fn.init_select_calendar_show_schedulable = function () {
+  $("#show_schedulable").change(function () {
+    var href = '/' + this.value + '/calendar';
+    window.location = href;
+    return false;
+  })
+}
+
+// edit calendar for the selected schedulable
+$.fn.init_select_calendar_edit_schedulable = function () {
+  $("#edit_schedulable").change(function () {
+    var href = '/' + this.value + '/calendar/edit';
+    window.location = href;
+    return false;
+  })
+}
+
 $(document).ready(function() {
 
-  $(document).init_select_schedulable_for_calendar_edit();
+  $(document).init_select_calendar_show_schedulable();
+  $(document).init_select_calendar_edit_schedulable();
   $(document).init_show_appointment_on_hover();
   
   // set hover states to show selected date, ignore past dates
@@ -114,4 +133,9 @@ $(document).ready(function() {
     return false;
   });
   
+})
+
+// Re-bind after an ajax call
+$(document).ajaxComplete(function(request, settings) {
+  $(document).init_select_calendar_show_schedulable();
 })

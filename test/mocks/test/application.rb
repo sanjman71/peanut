@@ -13,6 +13,11 @@ class ApplicationController < ActionController::Base
     return current_privileges.include?(p)
   end
 
+  # return true if the current user is a company manager
+  def company_manager?
+    current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
+  end
+
   # these flash methods are needed for the functional tests
   
   def global_flash?

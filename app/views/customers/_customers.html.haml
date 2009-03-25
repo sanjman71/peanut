@@ -11,7 +11,7 @@
       %h4= link_to "Appointments", customer_appointments_path(customer), :class => 'admin'
     .span-6.last
       -# allow company managers or edit all users, and user to edit himself
-      - if @company_manager or user == current_user
+      - if @company_manager or customer == current_user
         = link_to "Edit", url_for(:controller =>'customers', :action => 'edit', :id => customer.id, :subdomain => current_subdomain), :class => 'admin'
         == &nbsp;
         = link_to 'Reset Password', url_for(:controller => 'users', :id => customer.id, :action => 'notify', :type => 'reset', :subdomain => current_subdomain), :class => 'admin'

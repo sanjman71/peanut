@@ -51,15 +51,13 @@ class EmployeesControllerTest < ActionController::TestCase
       # stub current user methods
       @controller.stubs(:current_user).returns(@owner)
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-      # ignore owner as company manager
-      @owner.stubs(:has_role?).returns(false)
       get :index
     end
   
     should_respond_with :success
     should_render_template 'employees/index.html.haml'
     should_assign_to :users, :class => Array
-    should_not_assign_to :company_manager
+    should_assign_to :company_manager
   
     should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0

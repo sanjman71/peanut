@@ -56,28 +56,12 @@ module ApplicationHelper
 
     if logged_in?
 
-      # 'My Appointments' tab, appointments scoped by customer
-      name = 'My Appointments'
-      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name) and
-        params.has_key?(:customer_id)
+      # 'Appointments' tab for customer work appointments
+      name = 'Appointments'
+      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
         link = link_to(name, customer_appointments_path(current_user), :class => 'current')
       else
         link = link_to(name, customer_appointments_path(current_user))
-      end
-
-      yield link
-
-    end
-
-    if has_privilege?('read work appointments', current_company)
-
-      # 'Appointments' tab
-      name = 'Appointments'
-      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name) and
-        !params.has_key?(:customer_id)
-        link = link_to(name, appointments_path, :class => 'current')
-      else
-        link = link_to(name, appointments_path)
       end
 
       yield link

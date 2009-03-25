@@ -11,7 +11,7 @@ class EmployeesController < ApplicationController
     @users  = current_company.authorized_users.with_role(@role).order_by_name.uniq
     
     # check if current user is a company manager
-    @company_manager = current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
+    @company_manager = company_manager?
 
     respond_to do |format|
       format.html

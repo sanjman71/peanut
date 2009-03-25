@@ -134,24 +134,6 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   })
 }
 
-// Show calendar for the selected schedulable
-$.fn.init_select_schedulable_for_calendar_show = function () {
-  $("#schedulable").change(function () {
-    var href = '/' + this.value + '/calendar';
-    window.location = href;
-    return false;
-  })
-}
-
-// Edit calendar for the selected schedulable
-$.fn.init_select_schedulable_for_calendar_edit = function () {
-  $("#schedulable").change(function () {
-    var href = '/' + this.value + '/calendar/edit';
-    window.location = href;
-    return false;
-  })
-}
-
 // Live customers search
 $.fn.init_live_customers_search = function () {
   $("#live_search_for_customers").keyup(function () {
