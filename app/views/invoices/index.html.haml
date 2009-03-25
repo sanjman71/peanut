@@ -17,7 +17,7 @@
         = link_to "Use a Date Range", '', :id => 'show_dates'
         
       #dates.hide
-        = render(:partial => 'shared/date_range', :locals => {:object => AppointmentInvoice.new, :url => search_invoices_path})
+        = render(:partial => 'shared/date_range', :locals => {:object => Invoice.new, :url => search_invoices_path})
           
   .span-16.prepend-1
     - if @appointments.blank?
