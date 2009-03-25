@@ -13,9 +13,14 @@ class ApplicationController < ActionController::Base
     return current_privileges.include?(p)
   end
 
+  # check if current user has the specified role, and optionally on the authorizable object
+  def has_role?(role_name, authorizable=nil)
+    current_user.blank? ? false : current_user.has_role?(role_name, authorizable)
+  end
+
   # return true if the current user is a company manager
   def company_manager?
-    current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
+    has_role?('company manager', current_company) || has_role?('admin')
   end
 
   # these flash methods are needed for the functional tests

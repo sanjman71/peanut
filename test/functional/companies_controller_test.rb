@@ -73,8 +73,10 @@ class CompaniesControllerTest < ActionController::TestCase
     
     context "as the company owner" do
       setup do
+        @controller.stubs(:current_user).returns(@user)
         ActionView::Base.any_instance.stubs(:current_user).returns(@user)
-        @controller.stubs(:current_privileges).returns(['update companies'])      
+        @controller.stubs(:current_privileges).returns(['update companies'])   
+        ActionView::Base.any_instance.stubs(:has_role?).returns(true)
       end
       
       context "edit company" do
@@ -84,7 +86,6 @@ class CompaniesControllerTest < ActionController::TestCase
         
         should_respond_with :success
         should_render_template 'companies/edit.html.haml'
-        
       end
     end
     

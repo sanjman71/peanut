@@ -10,10 +10,12 @@
         == Starts in:
         = distance_of_time_in_words_to_now(@appointment.start_at)
         == from now
-      - else
+      - elsif Time.now > @appointment.end_at
         == Ended at:
         = distance_of_time_in_words_to_now(@appointment.start_at)
         == ago
+      - else
+        == Its happening now
         
   .span-13.last
   

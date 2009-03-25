@@ -54,20 +54,6 @@ module ApplicationHelper
 
     end
 
-    if logged_in?
-
-      # 'Appointments' tab for customer work appointments
-      name = 'Appointments'
-      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
-        link = link_to(name, customer_appointments_path(current_user), :class => 'current')
-      else
-        link = link_to(name, customer_appointments_path(current_user))
-      end
-
-      yield link
-
-    end
-
     if has_privilege?('read wait appointments', current_company)
 
       # 'Waitlist' tab
@@ -76,6 +62,20 @@ module ApplicationHelper
         link = link_to(name, waitlist_index_path, :class => 'current')
       else
         link = link_to(name, waitlist_index_path)
+      end
+
+      yield link
+
+    end
+
+    if has_role?(Company.customer_role_name, current_company)
+
+      # 'Appointments' tab for customer work appointments
+      name = 'Appointments'
+      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
+        link = link_to(name, customer_appointments_path(current_user), :class => 'current')
+      else
+        link = link_to(name, customer_appointments_path(current_user))
       end
 
       yield link

@@ -5,8 +5,8 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   
   # Make the following methods available to all helpers
-  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :company_manager?, 
-                :show_location?, :global_flash?
+  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :company_manager?,
+                :has_role?, :show_location?, :global_flash?
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -44,6 +44,11 @@ class ApplicationController < ActionController::Base
     return current_privileges.include?(p)
   end
 
+  # check if current user has the specified role, on the optional authorizable object
+  def has_role?(role_name, authorizable=nil)
+    current_user.blank? ? false : current_user.has_role?(role_name, authorizable)
+  end
+  
   #
   # Note: current_subdomain is already defined by the subdomain_fu plugin
   #
@@ -66,7 +71,7 @@ class ApplicationController < ActionController::Base
   
   # return true if the current user is a company manager
   def company_manager?
-    current_user.has_role?('company manager', current_company) || current_user.has_role?('admin')
+    has_role?('company manager', current_company) || has_role?('admin')
   end
   
   # returns true if there is more than 1 company location

@@ -3,7 +3,7 @@ class AppointmentsController < ApplicationController
   after_filter  :store_location, :only => [:new]
     
   privilege_required 'update work appointments', :only => [:work], :on => :current_company
-  privilege_required 'update work appointments', :only => [:work], :on => :current_company
+  privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
   privilege_required 'read work appointments', :only => [:index], :on => :current_company
   
   def has_privilege?(p, *args)
