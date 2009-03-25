@@ -120,6 +120,8 @@ ActionController::Routing::Routes.draw do |map|
   
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
+  
+  map.resources :events
 
   # map the root to the home controller
   map.root                  :controller => 'home', :action => 'index', :conditions => { :subdomain => "www" }
