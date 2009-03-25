@@ -23,8 +23,8 @@ class CalendarController < ApplicationController
   @@default_when = Appointment::WHEN_THIS_WEEK
   
   def index
-    # redirect to a specific schedulable
-    schedulable = current_company.schedulables.first
+    # redirect to a specific schedulable, try the current first and default to the first company schedulable
+    schedulable = current_company.users.find_by_id(current_user.id) || current_company.schedulables.first
     if schedulable.blank?
       redirect_to root_path(:subdomain => current_subdomain) and return
     end

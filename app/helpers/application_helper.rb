@@ -40,7 +40,7 @@ module ApplicationHelper
     
     yield link
 
-    if has_privilege?('read work appointments', current_company)
+    if has_privilege?('read calendars', current_company)
 
       # 'Schedules' tab
       name = 'Schedules'

@@ -53,10 +53,6 @@ namespace :rp do
 
     # Appointments are broken into free, work and wait appointments
     # In general, the public can view free appointments and create work and wait appointments
-    cfa = Badges::Privilege.create(:name=>"create free appointments")
-    rfa = Badges::Privilege.create(:name=>"read free appointments")
-    dfa = Badges::Privilege.create(:name=>"delete free appointments")
-
     cwa = Badges::Privilege.create(:name=>"create work appointments")
     rwa = Badges::Privilege.create(:name=>"read work appointments")
     uwa = Badges::Privilege.create(:name=>"update work appointments")
