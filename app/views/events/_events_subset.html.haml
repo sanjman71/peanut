@@ -1,0 +1,23 @@
+.events_subset
+  - if events.blank?
+    No events
+  - else
+    - events.each do |event|
+      .span-22.last.letterbox.event{:class => cycle("shaded #{event.type}", "#{event.type}")}[event]
+        .span-5.user
+          = event.user.name
+        .span-10.message
+          = event.message
+        .span-5.approval
+          - if event.etype == Event::APPROVAL && !event.approve_url.blank? && !event.reject_url.blank?
+            link_to "Approve", event.approve_url
+            %br
+            link_to "Reject", event.reject_url
+          - elsif !event.action_user_id.blank?
+            = "Approved by #{event.action_user.name} on #{event.action_dt}"
+            %br
+            = "#{event.action_message}"
+          - else
+            No approval required
+        .span-2.delete.last
+          = link_to_remote "Delete", :url => event_path(event), :method => :delete

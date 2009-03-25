@@ -1,0 +1,22 @@
+- title("Events")
+/ - stylesheet('events')
+/ - javascript('events')
+
+.span-24
+  .span-23.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
+    .span-15
+      %h2== Events
+      
+%hr.space
+  
+.span-22.prepend-1
+  %h3 Add an Event
+  - form_for(Event.new, :url => events_url(:subdomain => current_subdomain), :method => :post) do |f|
+    = hidden_field_tag :event_company_id, current_company.id
+    = hidden_field_tag :event_user_id, current_user.id
+    = f.select :etype, [["Urgent", 1], ["Approval", 2], ["Informational", 3]], {:selected => nil}
+    = f.label :message, "Message: "
+    = f.text_field :message
+    = f.submit
+
+= render(:partial => 'events.html.haml')
