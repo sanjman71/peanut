@@ -234,9 +234,9 @@ class AppointmentScheduler
     appointment.cancel!
   end
   
-  # build collection of all unscheduled appointments over the specified date range
+  # build collection of all free and work appointments that have not been canceled over the specified date range
   def self.find_free_work_appointments(company, location, schedulable, daterange, appointments=nil)
-    company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
+    company.appointments.schedulable(schedulable).free_work.upcoming_completed.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
   end
   
   # build collection of all unscheduled appointments over the specified date range
