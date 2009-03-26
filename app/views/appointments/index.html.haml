@@ -26,6 +26,9 @@
   %hr.space
   
   .span-23.prepend-1
-    %h3== #{pluralize(@appointments.size, 'appointment')}
+    - if @appointments.blank?
+      %h2== No appointments
+    - else
+      %h3== #{pluralize(@appointments.size, 'appointment')}
     
   = render(:partial => 'customer_appointments', :locals => {:appointments => @appointments})
