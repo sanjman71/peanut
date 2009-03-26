@@ -140,8 +140,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
-      # should have 1 free ppointment
-      should_change "Appointment.count", :by => -1
+      # should have 1 free appointment and 1 work appointment in a 'canceled' state
+      should_not_change "Appointment.count"
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -150,6 +150,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @johnny, @free2_appointment.schedulable
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
+      end
+      
+      should "have work appointment in canceled state" do
+        @work_appointment.reload
+        assert_equal "canceled", @work_appointment.state
       end
     end
   end
@@ -196,8 +201,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
-      # should have 1 free appointment again
-      should_change "Appointment.count", :by => -2
+      # should have 1 free appointment, and 1 work appointment in a 'canceled' state
+      should_change "Appointment.count", :by => -1
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -206,6 +211,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @johnny, @free2_appointment.schedulable
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
+      end
+
+      should "have work appointment in a canceled state" do
+        @work_appointment.reload
+        assert_equal "canceled", @work_appointment.state
       end
     end
   
@@ -253,8 +263,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
-      # should have 1 free ppointment
-      should_change "Appointment.count", :by => -1
+      # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
+      should_not_change "Appointment.count"
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -263,6 +273,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @johnny, @free2_appointment.schedulable
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
+      end
+
+      should "have work appointment in a canceled state" do
+        @work_appointment.reload
+        assert_equal "canceled", @work_appointment.state
       end
     end
   end
@@ -309,8 +324,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
-      # should have 1 free appointment
-      should_not_change "Appointment.count"
+      # should have 1 free appointment + 1 work appointment in a canceled state
+      should_change "Appointment.count", :by => 1
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -319,6 +334,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @johnny, @free2_appointment.schedulable
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
+      end
+      
+      should "have work appointment in a canceled state" do
+        @work_appointment.reload
+        assert_equal "canceled", @work_appointment.state
       end
     end
   end

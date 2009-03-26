@@ -36,7 +36,7 @@ class AppointmentScheduler
     raise ArgumentError, "service is required" if service.blank?
     
     # find company free service
-    service     = company.free_service
+    service = company.free_service
     
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
@@ -206,8 +206,8 @@ class AppointmentScheduler
     
     # commit the apointment changes
     Appointment.transaction do
-      # remove the existing work appointment
-      appointment.destroy
+      # change work appointment state to canceled
+      appointment.cancel!
       
       # remove any existing free appointments
       free_time_before.each do |appointment|

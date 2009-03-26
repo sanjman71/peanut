@@ -31,8 +31,8 @@ class Appointment < ActiveRecord::Base
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
   # find appointments based on a named time range, use lambda to ensure time value is evaluated at run-time
-  named_scope :upcoming,      lambda { { :conditions => ["start_at >= ?", Time.now] } }
-  named_scope :past,          lambda { { :conditions => ["start_at <= ?", Time.now] } }
+  named_scope :future,        lambda { { :conditions => ["start_at >= ?", Time.now] } }
+  named_scope :past,          lambda { { :conditions => ["end_at <= ?", Time.now] } }
   
   # find appointments overlapping a time range
   named_scope :overlap,       lambda { |start_at, end_at| { :conditions => ["(start_at < ? AND end_at > ?) OR (start_at < ? AND end_at > ?) OR 
@@ -53,10 +53,10 @@ class Appointment < ActiveRecord::Base
   named_scope :wait,        { :conditions => {:mark_as => WAIT} }
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
-  # find appointments by state, eager load the associated invoice for completed appointments
-  named_scope :completed,   { :include => :invoice, :conditions => {:state => 'completed'} }
-  named_scope :upcoming,    { :conditions => {:state => 'upcoming'} }
-
+  # find appointments by state is part of the AASM plugin
+  # add special named scopes for special state queries
+  named_scope :upcoming_completed, { :conditions => ["state = ? or state = ?", 'upcoming', 'completed'] }
+  
   # order by start_at
   named_scope :order_start_at, {:order => 'start_at'}
   
@@ -346,8 +346,9 @@ class Appointment < ActiveRecord::Base
   #  - schedulable must be the same
   #  - start, end times must overlap
   #  - must be marked as 'free' or 'work'
+  #  - state must not be 'upcoming' or 'completed'
   def conflicts
-    @conflicts ||= self.company.appointments.free_work.schedulable(schedulable).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free_work.upcoming_completed.schedulable(schedulable).overlap(start_at, end_at)
   end
   
   # returns true if this appointment conflicts with any other

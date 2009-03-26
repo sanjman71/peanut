@@ -2,12 +2,25 @@ class AppointmentsController < ApplicationController
   before_filter :disable_global_flash, :only => [:show, :confirmation, :work, :wait]
   after_filter  :store_location, :only => [:new]
     
+  privilege_required 'update calendars', :only =>[:create], :on => :current_company
   privilege_required 'update work appointments', :only => [:work, :complete], :on => :current_company
   privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
   privilege_required 'read work appointments', :only => [:index], :on => :current_company
   
   def has_privilege?(p, *args)
     case p
+    when 'update calendars'
+      case params[:mark_as]
+      when Appointment::WORK, Appointment::WAIT
+        # anyone can create work, wait appointments
+        return true
+      when Appointment::FREE
+        # delegate to base class
+        super
+      else
+        # delegate to base class
+        super
+      end
     when 'update work appointments'
       # users may update their work appointments
       authorizable  = args[0]
@@ -102,18 +115,13 @@ class AppointmentsController < ApplicationController
     @duration       = params[:duration].to_i if params[:duration]
     @start_at       = params[:start_at]
     @end_at         = params[:end_at]
-    
+
     # track errors and appointments created
     @errors         = Hash.new
     @created        = Hash.new
     
     # set default redirect path
     @redirect_path  = request.referer
-    
-    # check that the user has the privilege to create the specified appointment type
-    if !has_privilege?("create #{@mark_as} appointments", current_company)
-      redirect_to(unauthorized_path) and return
-    end
     
     # iterate over the specified dates
     Array(params[:dates]).each do |date|
@@ -230,7 +238,7 @@ class AppointmentsController < ApplicationController
       format.html
     end
   end
-  
+
   # GET /appointments/1/confirmation
   def confirmation
     @appointment  = current_company.appointments.find(params[:id])
@@ -295,8 +303,8 @@ class AppointmentsController < ApplicationController
       @appointment.destroy
     end
     
-    # redirect to the schedule page
-    @redirect_path = appointments_path(:schedulable => @schedulable.tableize, :id => @schedulable.id, :subdomain => current_subdomain)
+    # redirect to the appointment page
+    @redirect_path = work_appointment_path(@appointment)
     
     # set flash
     flash[:notice] = "Canceled appointment"

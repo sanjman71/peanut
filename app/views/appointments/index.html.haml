@@ -14,6 +14,8 @@
         = link_to 'Upcoming', url_for(:state => 'upcoming', :subdomain => current_subdomain)
         == &nbsp;|&nbsp;
         = link_to 'Completed', url_for(:state => 'completed', :subdomain => current_subdomain)
+        == &nbsp;|&nbsp;
+        = link_to 'Canceled', url_for(:state => 'canceled', :subdomain => current_subdomain)
     .span-23.last
       %h3{:style => 'font-size: 1.3em;'}== Today is #{Time.now.to_s(:appt_day)}
     

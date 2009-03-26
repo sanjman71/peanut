@@ -25,8 +25,10 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   '/customers/create',    :controller => 'users', :action => 'create', :type => 'customer', :conditions => {:method => :post}
   map.connect   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :type => 'customer', :conditions => {:method => :get}
   map.connect   '/customers/:id',       :controller => 'users', :action => 'update', :type => 'customer', :conditions => {:method => :put}
-  map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :conditions => {:method => :get}
-  map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', :conditions => {:method => :get, :state => /upcoming|completed/}
+  map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', 
+                                        :conditions => {:method => :get, :state => /upcoming|completed/}
+  map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', 
+                                        :conditions => {:method => :get, :state => /upcoming|completed/}
   map.resources :employees, :member => { :toggle_manager => :post }
   map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
   
@@ -42,8 +44,7 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :appointments,
-                :member => {:confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post], :work => :get, :wait => :get, 
-                            :complete => :post},
+                :member => {:confirmation => :get, :checkout => [:get, :put], :cancel => :get, :work => :get, :wait => :get, :complete => :post},
                 :collection => { :search => [:get, :post] }
   map.connect   '/appointments/work/:state', :controller => 'appointments', :action => 'index', :type => 'work'
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]

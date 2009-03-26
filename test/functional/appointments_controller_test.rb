@@ -102,7 +102,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :appt_time_end_at, :equals => '"0930"'
   end
   
-  context "create free appointment without privilege ['create free appointments']" do
+  context "create free appointment without privilege ['update calendars']" do
     setup do
       post :create,
            {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
@@ -116,8 +116,8 @@ class AppointmentsControllerTest < ActionController::TestCase
   
   context "create free appointment for multiple dates" do
     setup do
-      # allow user to create free appointments
-      @controller.stubs(:current_privileges).returns(["create work appointments", "create wait appointments", "create free appointments"])
+      # allow user to update calendar
+      @controller.stubs(:current_privileges).returns(["update calendars"])
       post :create,
            {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
             :service_id => @free_service.id, :mark_as => 'free'}
@@ -140,7 +140,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create free appointment for a single date" do
     setup do
       # allow user to create free appointments
-      @controller.stubs(:current_privileges).returns(["create work appointments", "create wait appointments", "create free appointments"])
+      @controller.stubs(:current_privileges).returns(["update calendars"])
       post :create,
            {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}", 
             :service_id => @free_service.id, :mark_as => 'free'}
