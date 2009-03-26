@@ -20,4 +20,4 @@
           - else
             No approval required
         .span-2.delete.last
-          = link_to_remote "Delete", :url => event_path(event), :method => :delete
+          = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'events', :action => 'destroy', :id => event.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this event?")

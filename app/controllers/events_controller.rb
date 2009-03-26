@@ -44,7 +44,6 @@ class EventsController < ApplicationController
   end
   
   def destroy
-    debugger
     @event = Event.find(params[:id])
     
     if @event && @event.delete

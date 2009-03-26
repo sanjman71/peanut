@@ -1,2 +1,2 @@
-page["#flash"].html(render(:partial => 'shared/flash', :locals => {:flash => flash}))
+# page["#flash"].html(display_flash(:all))
 page["#events"].html(render(:partial => 'events/events.html.haml'))
