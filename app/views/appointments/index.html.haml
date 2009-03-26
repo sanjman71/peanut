@@ -5,21 +5,21 @@
 .span-24
   .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
     .span-23.last
-      -# show appointment schedulables
       .span-8
+        -# appointment schedulables
         %h3{:style => 'margin-bottom: 3px;'}
           = label_tag "customer", "Appointments for", :class => 'big'
           = select_tag('customer', options_for_select(@customers.collect{ |o| [customer_display_name(o, current_user), o.id]}, @customer.id), :class => 'text')
+        -# explicitly call out the current state
         %h3{:style => 'color: #008800; font-size: 1.3em;'}= @state.titleize
 
-      -# links to appointment states
+      -# appointment state links
       .span-15.last{:style => 'padding-top: 7px;'}
-        = link_to 'Upcoming', url_for(:state => 'upcoming', :subdomain => current_subdomain)
-        == &nbsp;|&nbsp;
-        = link_to 'Completed', url_for(:state => 'completed', :subdomain => current_subdomain)
-        == &nbsp;|&nbsp;
-        = link_to 'Canceled', url_for(:state => 'canceled', :subdomain => current_subdomain)
-        
+        #links
+          - build_appointment_state_when_links(params, ['upcoming', 'completed', 'canceled'], @state, :default => 'upcoming') do |link, separator|
+            = link
+            = separator
+      
     .span-23.last
       %h3{:style => 'font-size: 1.3em;'}== Today is #{Time.now.to_s(:appt_day)}
     

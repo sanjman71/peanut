@@ -12,7 +12,7 @@
     -# allow employees and managers to change appointment state
     - if (@employee or @manager) and @state == 'upcoming'
       %h4
-        = link_to 'Cancel', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
+        = link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
       
     -# just for testing purposes
     %h4= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"

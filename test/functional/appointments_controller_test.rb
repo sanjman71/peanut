@@ -27,8 +27,8 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :get, 'appointments/work/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
   
   # show a customer's appointments, with optional state parameter
-  should_route :get, 'customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1
-  should_route :get, 'customers/1/appointments/upcoming', :controller => 'appointments', :action => 'index', :customer_id => 1, :state => 'upcoming'
+  should_route :get, '/customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1
+  should_route :get, '/customers/1/appointments/upcoming', :controller => 'appointments', :action => 'index', :customer_id => 1, :state => 'upcoming'
   should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :state => 'upcoming'
 
   def setup

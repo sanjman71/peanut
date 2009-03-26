@@ -1,5 +1,27 @@
 module AppointmentsHelper
   
+  def build_appointment_state_when_links(url_params, state_collection, current_state, options={})
+    default = options[:default]
+    
+    state_collection.each do |state|
+      # add css 'current' class for the current link
+      klass = (state == current_state) ? 'current' : ''
+      
+      if state == default
+        # no state parameter for the default value
+        link  = link_to(state.titleize, url_for(url_params.update(:state => nil, :subdomain => current_subdomain)), :class => klass)
+      else
+        # use state parameter
+        link  = link_to(state.titleize, url_for(url_params.update(:state => state.to_url_param, :subdomain => current_subdomain)), :class => klass)
+      end
+      
+      # use separator unless its the last element
+      separator = (state == state_collection.last) ? '' : '&nbsp;|&nbsp;'
+      
+      yield link, separator
+    end
+  end
+  
   # return hash of possible start time values
   def free_appointment_possible_start_times(appointment, duration_in_minutes, options={})
     # initialize hash with apointment start_at hour and minute
