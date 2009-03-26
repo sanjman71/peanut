@@ -214,8 +214,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment confirmaton path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/confirmation")
+    should "redirect to appointment work path" do
+      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
     end
   end
 
@@ -252,8 +252,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment confirmaton path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/confirmation")
+    should "redirect to appointment work path" do
+      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
     end
   end
 
@@ -290,8 +290,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment confirmaton path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/confirmation")
+    should "redirect to appointment work path" do
+      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
     end
   end
   
@@ -348,8 +348,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :redirect_path, :equal => '"foo"'
     
     should_respond_with :redirect
-    should "redirect to appointment confirmation path" do
-      assert_redirected_to "appointments/#{assigns(:appointment).id}/confirmation"
+    should "redirect to appointment wait path" do
+      assert_redirected_to "appointments/#{assigns(:appointment).id}/wait"
     end
   end
 end

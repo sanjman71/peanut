@@ -1,5 +1,5 @@
 class AppointmentsController < ApplicationController
-  before_filter :disable_global_flash, :only => [:show, :confirmation, :work, :wait]
+  before_filter :disable_global_flash, :only => [:show, :work, :wait]
   after_filter  :store_location, :only => [:new]
     
   privilege_required 'update calendars', :only =>[:create], :on => :current_company
@@ -251,19 +251,6 @@ class AppointmentsController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end
-
-  # GET /appointments/1/confirmation
-  def confirmation
-    @appointment  = current_company.appointments.find(params[:id])
-    
-    # only show confirmations for upcoming appointments
-    unless @appointment.state == 'upcoming'
-      redirect_to(appointment_path(@appointment)) and return
-    end
-    
-    # render show action
-    render_component(:action => 'show', :id => @appointment.id, :params => {:confirmation => 1})
   end
 
   # GET /appointments/1/checkout - show invoice
