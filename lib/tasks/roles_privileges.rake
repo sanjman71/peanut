@@ -64,10 +64,6 @@ namespace :rp do
     dw2a = Badges::Privilege.create(:name=>"delete wait appointments")
 
     # Company manager can fully manage schedules
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cfa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rfa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>dfa)
-    
     Badges::RolePrivilege.create(:role=>cm,:privilege=>cwa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>rwa)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>uwa)
