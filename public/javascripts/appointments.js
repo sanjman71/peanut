@@ -79,6 +79,16 @@ $.fn.init_confirm_appointment = function() {
   })
 }
 
+$.fn.init_complete_appointment = function() {
+  $("#complete_appointment").click(function() {
+    $.post($(this).attr("href"), {}, null, "script");
+    // show progress bar
+    $(this).hide();
+    $("#mark_progress").show();
+    return false;
+  })
+}
+
 $.fn.init_send_message = function() {
   $("#send_message_link").click(function() {
     $(this).hide();
@@ -129,6 +139,7 @@ $(document).ready(function() {
   
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
+  $(document).init_complete_appointment();
   $(document).init_send_message();
   
   // rounded corners

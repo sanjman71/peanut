@@ -46,4 +46,15 @@ module AppointmentsHelper
     collection
   end
   
+  def appointment_starts_at_distance_in_words(appointment, time=Time.now)
+    if time < @appointment.start_at
+      # appointment starts in the future
+      "#{distance_of_time_in_words_to_now(@appointment.start_at)} from now"
+    elsif time > @appointment.end_at
+      # appointment has ended
+      "#{distance_of_time_in_words_to_now(@appointment.end_at)} ago"
+    else
+      "Its happening now"
+    end
+  end
 end

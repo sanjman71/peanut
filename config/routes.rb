@@ -41,8 +41,9 @@ ActionController::Routing::Routes.draw do |map|
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
   map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
-  map.resources :appointments, 
-                :member => { :confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post], :work => :get, :wait => :get },
+  map.resources :appointments,
+                :member => {:confirmation => :get, :checkout => [:get, :put], :cancel => [:get, :post], :work => :get, :wait => :get, 
+                            :complete => :post},
                 :collection => { :search => [:get, :post] }
   map.connect   '/appointments/work/:state', :controller => 'appointments', :action => 'index', :type => 'work'
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]

@@ -79,6 +79,16 @@ class ApplicationController < ActionController::Base
     @current_locations.size > 1
   end
   
+  # return the relationship(s) between the appointment and the user
+  # returns a tuple with true/false values for: ['customer', 'employee', 'manager']
+  def appointment_roles(appointment, user=nil)
+    user      = user || current_user
+    customer  = appointment.customer == user ? true : false
+    employee  = appointment.schedulable == user ? true : false
+    manager   = company_manager?
+    [customer, employee, manager]
+  end
+  
   # controls whether the flash may be displayed in the header, defaults to true
   def global_flash?
     @global_flash = true if @global_flash.nil?

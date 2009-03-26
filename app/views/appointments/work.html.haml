@@ -4,21 +4,23 @@
 
 .span-24.mat.padding-top-10.padding-bottom-10
   .span-23.prepend-1
-    %h2= @title
-    %h3
-      - if Time.now < @appointment.start_at
-        == Starts in:
-        = distance_of_time_in_words_to_now(@appointment.start_at)
-        == from now
-      - elsif Time.now > @appointment.end_at
-        == Ended at:
-        = distance_of_time_in_words_to_now(@appointment.start_at)
-        == ago
-      - else
-        == Its happening now
-        
-  .span-13.last
-  
+    %h2{:style => 'margin-bottom: 5px;'}= @title
+
+    -# appointment state and when it started/ended
+    %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}: #{appointment_starts_at_distance_in_words(@appointment)}
+      
+    -# allow employees and managers to change appointment state
+    - if (@employee or @manager) and @state == 'upcoming'
+      %h4
+        = link_to 'Mark as completed', complete_appointment_path(@appointment), :id => 'complete_appointment', :class => 'admin'
+        %span#mark_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+        %span{:style => 'font-size: 0.8em;'}== &nbsp;|&nbsp;
+        = link_to 'Cancel', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
+      
+    -# just for testing purposes
+    %h4= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"
+    
+    
 %hr.space
 
 .span-15.prepend-1
@@ -30,12 +32,16 @@
 %hr.space
 
 .span-23.prepend-1.text
-  = render(:partial => 'send_message', :locals => {:appointment => @appointment})
+  - # allow employees and managers to send the customer a message
+  - if @employee or @manager
+    = render(:partial => 'send_message', :locals => {:appointment => @appointment})
 
 %hr.space
 
 .span-23.prepend-1.text
-  %h3== Add Invoice
+  - # allow employees and managers add invoices
+  - if @employee or @manager
+    %h3== Add Invoice
     
 
 
