@@ -33,14 +33,14 @@
 
 .span-23.prepend-1.text
   - # allow employees and managers to send the customer a message
-  - if @employee or @manager
+  - if (@employee or @manager) and !@appointment.canceled?
     = render(:partial => 'send_message', :locals => {:appointment => @appointment})
 
 %hr.space
 
 .span-23.prepend-1.text
   - # allow employees and managers add invoices
-  - if @employee or @manager
+  - if (@employee or @manager) and !@appointment.canceled?
     %h3== Add Invoice
     
 

@@ -1,14 +1,16 @@
 .appointment.review.span-15.last{:syle => 'font-size: 1.5em;'}
 
+  - tag = appointment.canceled? ? 'del' : 'span'
+  
   -# what and with are common across all types of appointments
   .span-3.label.text-align-right
     == What:
   .span-12.last.data
-    = appointment.service.name
+    ~ "<#{tag}>#{appointment.service.name}</#{tag}>"
   .span-3.label.text-align-right
     == With:
   .span-12.last.data
-    = (appointment.schedulable || User.anyone).name
+    ~ "<#{tag}>#{(appointment.schedulable || User.anyone).name}</#{tag}>"
 
 
   -# when is different for a work appointment vs. a waitlist apointment
@@ -16,19 +18,19 @@
     .span-3.label.text-align-right
       == When:
     .span-12.last.data
-      == #{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}
+      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}</#{tag}>"
   - else
     .span-3.label.text-align-right
       == When:
     .span-12.last.data
-      = appointment.start_at.to_s(:appt_day_date_time)
+      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_day_date_time)}</#{tag}>"
 
   -# waitlist appointments have no duration
   - unless appointment.waitlist?
     .span-3.label.text-align-right
       == How Long:
     .span-12.last.data
-      = Duration.to_words(appointment.duration)
+      ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
 
   -# show customer for work and wait appointments
   - unless appointment.customer.blank?
