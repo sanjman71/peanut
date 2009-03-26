@@ -25,7 +25,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   '/customers/create',    :controller => 'users', :action => 'create', :type => 'customer', :conditions => {:method => :post}
   map.connect   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :type => 'customer', :conditions => {:method => :get}
   map.connect   '/customers/:id',       :controller => 'users', :action => 'update', :type => 'customer', :conditions => {:method => :put}
-  map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', 
+  map.connect   '/customers/:customer_id/appointments/:state', 
+                                        :controller => 'appointments', :action => 'index', 
                                         :conditions => {:method => :get, :state => /upcoming|completed/}
   map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', 
                                         :conditions => {:method => :get, :state => /upcoming|completed/}
@@ -77,6 +78,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':schedulable_type/:schedulable_id/calendar/search', :controller => 'calendar', :action => 'search'
 
   # search waitlist scoped by schedulable
+  map.connect   ':schedulable_type/:schedulable_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
   map.connect   ':schedulable_type/:schedulable_id/waitlist', :controller => 'waitlist', :action => 'index'
 
   # schedule a work appointment with a schedulable for a specified service and duration

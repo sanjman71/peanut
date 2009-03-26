@@ -12,7 +12,11 @@ class WaitlistController < ApplicationController
     @schedulable  = find_schedulable_from_params
     @schedulables = current_company.schedulables.all
     
-    @appointments = @current_company.appointments.wait.schedulable(@schedulable)
+    # find state (default to 'upcoming')
+    @state        = params[:state] ? params[:state].to_s : 'upcoming'
+    
+    # find a schedulable's waitlist appointments by state
+    @appointments = @current_company.appointments.wait.schedulable(@schedulable).send(@state)
     
     logger.debug("*** #{@appointments.size} waitlist appointments")
     

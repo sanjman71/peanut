@@ -228,6 +228,12 @@ class AppointmentScheduler
     free_appointment
   end
 
+  # cancel the wait appointment
+  def self.cancel_wait_appointment(appointment)
+    raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
+    appointment.cancel!
+  end
+  
   # build collection of all unscheduled appointments over the specified date range
   def self.find_free_work_appointments(company, location, schedulable, daterange, appointments=nil)
     company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at

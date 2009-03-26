@@ -4,9 +4,18 @@
 
 .span-24.mat.padding-top-10
   .span-23.prepend-1
-    %h2=@title
-        
-  .span-13.last
+    %h2{:style => 'margin-bottom: 5px;'}= @title
+
+    -# appointment state
+    %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}
+    
+    -# allow employees and managers to change appointment state
+    - if (@employee or @manager) and @state == 'upcoming'
+      %h4
+        = link_to 'Cancel', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
+      
+    -# just for testing purposes
+    %h4= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"
   
 %hr.space
 
@@ -15,5 +24,3 @@
 
 .span-23.prepend-1
   = render :partial => 'appointment', :locals => {:appointment => @appointment}
-  
-%hr.space

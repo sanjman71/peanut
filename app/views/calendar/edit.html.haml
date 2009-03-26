@@ -84,6 +84,6 @@
       = f.submit "Schedule Available Time", :class => 'big button'
       %span{:style => 'font-size: 11px;'}
         == or
-        = link_to 'Cancel', url_for(:controller => 'appointments', :action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+        = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
     %h2.hide#progress= image_tag 'barbershop.gif'
   

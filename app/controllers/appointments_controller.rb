@@ -31,6 +31,16 @@ class AppointmentsController < ApplicationController
       
       # delegate to base class
       super
+    when 'update wait appointments'
+      # users may update their work appointments
+      authorizable  = args[0]
+      user          = args[1] || current_user
+      @appointment  = find_appointment_from_params
+      
+      return true if @appointment.wait? and @appointment.customer == user
+      
+      # delegate to base class
+      super
     when 'read work appointments'
       # users may read their work appointments
       authorizable  = args[0]
@@ -226,12 +236,16 @@ class AppointmentsController < ApplicationController
 
   # GET /apppointments/1/wait
   def wait
-    @appointment  = current_company.appointments.find(params[:id])
-    @note         = Note.new
+    # @appointment has been initialized in before filter
     
     # build notes collection, most recent first 
+    @note         = Note.new
     @notes        = @appointment.notes.sort_recent
+
+    # find appointment roles
+    @customer, @employee, @manager = appointment_roles(@appointment)
     
+    @state        = @appointment.state
     @title        = "Waitlist Details"
     
     respond_to do |format|
@@ -295,16 +309,18 @@ class AppointmentsController < ApplicationController
     @appointment  = current_company.appointments.find(params[:id])
     @schedulable  = @appointment.schedulable
     
-    if @appointment.work?
+    case @appointment.mark_as
+    when  Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
-    elsif @appointment.wait?
-      # delete the waitlist appointment
-      @appointment.destroy
+      # redirect to the appointment page
+      @redirect_path = work_appointment_path(@appointment)
+    when Appointment::WAIT
+      # cancel the wait appointment
+      AppointmentScheduler.cancel_wait_appointment(@appointment)
+      # redirect to the appointment page
+      @redirect_path = wait_appointment_path(@appointment)
     end
-    
-    # redirect to the appointment page
-    @redirect_path = work_appointment_path(@appointment)
     
     # set flash
     flash[:notice] = "Canceled appointment"

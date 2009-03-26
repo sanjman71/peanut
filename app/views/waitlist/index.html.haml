@@ -3,9 +3,22 @@
 - javascript('waitlist')
 
 .span-23.prepend-1.last.mat.padding-top-10
-  %h3
-    = label_tag "search_schedulable", "Waitlist for", :class => 'big'
-    = select_tag('search_schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+  .span-23.last
+    .span-8
+      -# show waitlist schedulables
+      %h3{:style => 'margin-bottom: 3px;'}
+        = label_tag "search_schedulable", "Waitlist for", :class => 'big'
+        = select_tag('search_schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+
+      -# links to appointment states
+      %h3{:style => 'color: #008800; font-size: 1.3em;'}= @state.titleize
+  
+    -# waitlist states
+    .span-15.last{:style => 'padding-top: 7px;'}
+      = link_to 'Upcoming', url_for(:state => 'upcoming', :subdomain => current_subdomain)
+      == &nbsp;|&nbsp;
+      = link_to 'Canceled', url_for(:state => 'canceled', :subdomain => current_subdomain)
+  
   %h3{:style => 'font-size: 1.3em;'}== Today is #{Time.now.to_s(:appt_day)}
   
 %hr.space

@@ -19,5 +19,3 @@
       %h4= appointment.customer.name
     .span-8.last.action
       = link_to('Details', url_for(:controller => 'appointments', :action => appointment.mark_as, :id => appointment.id, :subdomain => current_subdomain), :class => 'admin')
-      == &nbsp;
-      = link_to("Cancel", cancel_appointment_path(appointment), :class => 'admin')
