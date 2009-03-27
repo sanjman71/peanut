@@ -13,17 +13,18 @@
       
 %hr.space
 
-.span-23.prepend-1.mat
-  %h3 Add an Event
-  - form_for(Event.new, :url => events_url(:subdomain => current_subdomain), :method => :post) do |f|
-    = hidden_field_tag :event_company_id, current_company.id
-    = hidden_field_tag :event_user_id, current_user.id
-    = f.select :etype, [["Urgent", 1], ["Approval", 2], ["Informational", 3]], {:selected => nil}
-    = f.label :message, "Message: "
-    = f.text_field :message
-    = f.submit
+- if has_privilege?('create events', current_company)
+  .span-23.prepend-1.mat
+    %h3 Add an Event
+    - form_for(Event.new, :url => events_url(:subdomain => current_subdomain), :method => :post) do |f|
+      = hidden_field_tag :event_company_id, current_company.id
+      = hidden_field_tag :event_user_id, current_user.id
+      = f.select :etype, [["Urgent", 1], ["Approval", 2], ["Informational", 3]], {:selected => nil}
+      = f.label :message, "Message: "
+      = f.text_field :message
+      = f.submit
 
-%hr.space
+  %hr.space
 
 #events
   - unless @urgent.empty?

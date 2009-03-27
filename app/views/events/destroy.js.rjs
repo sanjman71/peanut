@@ -1,2 +1,0 @@
-# page["#flash"].html(display_flash(:all))
-page["#events"].html(render(:partial => 'events/events.html.haml'))

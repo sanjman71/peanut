@@ -150,6 +150,25 @@ module ApplicationHelper
 
       yield link
     end
+    
+    if has_privilege?('read events', current_company)
+
+      # 'Dashboard' tab
+      name = 'Dashboard'
+      if current_controller.controller_name == 'events' and ['index'].include?(current_controller.action_name)
+        link = link_to(name, dashboard_path, :class => 'current')
+      else
+        if current_company.events.urgent.unseen.size > 0
+          link = link_to(name, dashboard_path, :class => 'urgent')
+        elsif current_company.events.approval.unseen.size > 0
+          link = link_to(name, dashboard_path, :class => 'approval')
+        else
+          link = link_to(name, dashboard_path)
+        end
+      end
+
+     yield link
+    end
   end
   
   def build_admin_tab_links

@@ -1,9 +1,10 @@
 class EventsController < ApplicationController
 
   # Everyone can create an event, though they generally won't know it.
-  privilege_required  'read events', :only => [:index, :show]
-  privilege_required  'delete events', :only => [:destroy]
-  privilege_required  'update events', :only => [:edit, :update]
+  privilege_required  'read events', :only => [:index]
+  privilege_required  'update events', :only => [:mark_as_seen]
+  privilege_required  'create events', :only => [:create]
+  privilege_required  'delete events', :only => [:delete]
 
   def index
     

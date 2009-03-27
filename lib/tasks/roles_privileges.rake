@@ -237,10 +237,9 @@ namespace :rp do
     u = Badges::Privilege.create(:name=>"update events")
     d = Badges::Privilege.create(:name=>"delete events")
 
-    # Company manager can manage events - but not explicitly create them
+    # Company manager can manage events
     Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
     Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>d)
 
     # Company employee can view events
     Badges::RolePrivilege.create(:role=>ce,:privilege=>r)

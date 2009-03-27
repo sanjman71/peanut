@@ -171,5 +171,4 @@ class ApplicationController < ActionController::Base
       @current_privileges = []
     end
   end
-
 end

@@ -5,6 +5,8 @@ div#header                                        { background-color: #008800; }
 div#tabs a                                        { border-color: #008800; background-color: #008800; border-bottom-color: #008800; }
 
 div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; background-color: #006600; border-bottom-color: #006600; }
+div#tabs a.urgent                                 { background-color: #ff0000; border-bottom-color: #E5E5E5; }
+div#tabs a.approval                               { background-color: #FF8040; border-bottom-color: #E5E5E5; }
 
 div#tabs a:hover                                  { background-color: #003300; }
 
