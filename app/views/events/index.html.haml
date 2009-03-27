@@ -6,6 +6,10 @@
   .span-23.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
     .span-15
       %h2== Events
+      - if (@seen == true)
+        %h3== #{link_to "Unseen", events_url(:subdomain => current_subdomain)} | Seen
+      - else
+        %h3== Unseen | #{link_to "Seen", events_url(:subdomain => current_subdomain, :seen => true)}
       
 %hr.space
 

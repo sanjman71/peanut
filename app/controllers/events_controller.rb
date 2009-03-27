@@ -6,10 +6,18 @@ class EventsController < ApplicationController
   privilege_required  'update events', :only => [:edit, :update]
 
   def index
-
-    @urgent = current_company.events.urgent
-    @approval = current_company.events.approval
-    @informational = current_company.events.informational
+    
+    if params[:seen].blank? || params[:seen] != "true"
+      @seen = false
+      @urgent = current_company.events.urgent.unseen
+      @approval = current_company.events.approval.unseen
+      @informational = current_company.events.informational.unseen
+    else
+      @seen = true
+      @urgent = current_company.events.urgent.seen
+      @approval = current_company.events.approval.seen
+      @informational = current_company.events.informational.seen
+    end
     
     respond_to do |format|
       format.html
@@ -17,15 +25,18 @@ class EventsController < ApplicationController
     
   end
   
-  def show
+  def mark_as_seen
+    @event = Event.find(params[:id])
+    if @event
+      @event.seen = true
+    end
+    if @event.save
+      flash[:notice] = "Event marked as seen"
+    else
+      flash[:error] = "Couldn't mark event as seen"
+    end
     
-  end
-  
-  def edit
-    
-  end
-  
-  def update
+    redirect_to events_path(:subdomain => current_subdomain) and return
     
   end
   
