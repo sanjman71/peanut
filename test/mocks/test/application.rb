@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base 
 
-  include RescheduleHelper
+  include RescheduleLib
   
   # These before filters are not necessary, but are used to mirror the real app
   before_filter :init_current_company
