@@ -37,7 +37,7 @@ class EventsController < ApplicationController
       flash[:error] = "Couldn't mark event as seen"
     end
     
-    redirect_to events_path(:subdomain => current_subdomain) and return
+    redirect_to dashboard_path(:subdomain => current_subdomain) and return
     
   end
   
@@ -51,7 +51,7 @@ class EventsController < ApplicationController
       flash[:error] = "Problem creating event"
     end
     
-    redirect_to events_path(:subdomain => current_subdomain) and return
+    redirect_to dashboard_path(:subdomain => current_subdomain) and return
     
   end
   
@@ -67,7 +67,7 @@ class EventsController < ApplicationController
     @approval = current_company.events.approval
     @informational = current_company.events.informational
     respond_to do |format|
-      format.html { redirect_to events_path(:subdomain => current_subdomain)}
+      format.html { redirect_to dashboard_path(:subdomain => current_subdomain)}
       format.js
     end
     

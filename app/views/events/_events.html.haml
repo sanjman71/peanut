@@ -3,7 +3,7 @@
     No events
   - else
     - events.each do |event|
-      .span-22.last.letterbox.event{:class => cycle("shaded #{event.type}", "#{event.type}")}[event]
+      .span-22.last.letterbox.event{:class => cycle("shaded #{event.class}", "#{event.class}")}[event]
         .span-4.user
           == By #{event.user.name}
         .span-4.user
