@@ -45,10 +45,11 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :appointments,
-                :member => {:checkout => [:get, :put], :cancel => :get, :work => :get, :wait => :get, :complete => :post},
+                :member => {:checkout => [:get, :put], :cancel => :get, :work => :get, :wait => :get, :complete => :post, :reschedule => [:get, :post]},
                 :collection => { :search => [:get, :post] }
   map.connect   '/appointments/work/:state', :controller => 'appointments', :action => 'index', :type => 'work'
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
+  map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]

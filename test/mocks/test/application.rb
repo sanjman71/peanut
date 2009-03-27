@@ -1,5 +1,7 @@
 class ApplicationController < ActionController::Base 
 
+  include RescheduleHelper
+  
   # These before filters are not necessary, but are used to mirror the real app
   before_filter :init_current_company
   before_filter :init_current_privileges

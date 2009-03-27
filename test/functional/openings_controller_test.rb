@@ -3,6 +3,10 @@ require 'test/factories'
 
 class OpeningsControllerTest < ActionController::TestCase
 
+  # basic index and reschedule paths
+  should_route :get, '/openings', :controller => 'openings', :action => 'index'
+  should_route :get, '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule'
+  
   # search appointments for a specified schedulable, duration and service, with a when range
   should_route :post, 'users/1/services/3/45/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 3, 

@@ -1,5 +1,6 @@
 class AppointmentsController < ApplicationController
   before_filter :disable_global_flash, :only => [:show, :work, :wait]
+  before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
     
   privilege_required 'update calendars', :only =>[:create], :on => :current_company
@@ -145,7 +146,22 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = work_appointment_path(@appointment)
-          flash[:notice]  = "Your #{@service.name} appointment has been confirmed. A confirmation email will also be sent to #{@customer.email}"
+          # set flash message
+          flash[:notice]  = "Your #{@service.name} appointment has been confirmed."
+
+          # check if its an appointment reschedule
+          if has_reschedule_id?
+            # cancel the old work appointment
+            AppointmentScheduler.cancel_work_appointment(get_reschedule_appointment)
+            # reset reschedule id
+            reset_reschedule_id
+            # reset flash message
+            flash[:notice]  = "Your #{@service.name} appointment has been confirmed, and your old appointment has been canceled."
+          end
+          
+          # append to the flash message
+          flash[:notice] += "<br/>A confirmation email will also be sent to #{@customer.email}"
+          
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
         when Appointment::FREE
@@ -191,6 +207,23 @@ class AppointmentsController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
+      format.js
+    end
+  end
+  
+  # GET /appointments/1/reschedule
+  def reschedule
+    @appointment  = current_company.appointments.find(params[:id])
+
+    if request.post?
+      # start the re-schedule process
+      logger.debug("*** starting the re-schedule process")
+      set_reschedule_id(@appointment)
+      @redirect_path = url_for(:controller => 'openings', :action => 'index', :type => 'reschedule', :subdomain => current_subdomain)
+    end
+    
+    respond_to do |format|
+      format.html
       format.js
     end
   end

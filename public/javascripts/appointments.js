@@ -123,6 +123,13 @@ $.fn.init_send_message = function() {
   })
 }
 
+$.fn.init_reschedule_appointment = function() {
+  $("#reschedule_link").click(function() {
+    $.post($(this).attr("href"), {}, null, "script");
+    return false;
+  })
+}
+
 $(document).ready(function() {
   $(document).init_add_free_time(); // don't need to rebind after an ajax call
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
@@ -141,6 +148,7 @@ $(document).ready(function() {
   $(document).init_confirm_appointment();
   $(document).init_complete_appointment();
   $(document).init_send_message();
+  $(document).init_reschedule_appointment();
   
   // rounded corners
   $('.rounded').corners();

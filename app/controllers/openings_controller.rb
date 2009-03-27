@@ -1,5 +1,5 @@
 class OpeningsController < ApplicationController
-
+  
   # Handle RecordNotFound exceptions with a redirect
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }
     
@@ -78,8 +78,10 @@ class OpeningsController < ApplicationController
     end
     
     if @daterange.blank?
-      logger.debug("*** showing empty page with help text")
+      # reset reschedule id based on params
+      reset_reschedule_id_from_params
       # render empty page with help text
+      logger.debug("*** showing empty page with help text")
       return
     end
 

@@ -3,8 +3,11 @@
 - stylesheet('appointments', 'jquery.autocomplete')
 
 .span-24.mat.padding-bottom-10
-  .span-15.prepend-1
+  .span-22.prepend-1
     %h2== Review and confirm your appointment
+  .span-22.prepend-1
+    - if @reschedule_id
+      %span{:style => 'background-color: #FFCC00; font-size: 1.2em;'}== When you confirm this appointment, your old appointment will automatically be canceled.
       
 %hr.space
 

@@ -17,7 +17,7 @@
         %span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
         = link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
         %span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
-        = link_to 'Re-schedule appointment', '', :class => 'admin', :id => 'reschedule_appointment'
+        = link_to 'Re-schedule appointment', reschedule_appointment_path(@appointment), :class => 'admin', :id => 'reschedule_appointment'
         
     -# just for testing purposes
     %em= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"
