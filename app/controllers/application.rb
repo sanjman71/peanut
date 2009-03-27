@@ -171,4 +171,15 @@ class ApplicationController < ActionController::Base
       @current_privileges = []
     end
   end
+
+  def help
+    Helper.instance
+  end
+
+  class Helper
+    include Singleton
+    include ActionView::Helpers::TextHelper
+    include ActionView::Helpers::UrlHelper
+  end
+
 end

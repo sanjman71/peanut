@@ -164,7 +164,8 @@ class AppointmentsController < ApplicationController
           
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          current_company.events << Event.create(:company_id => current_company.id, :user_id => current_user.id, :etype => Event::INFORMATIONAL, :message => "Appointment confirmed with #{@customer.name}.")
+          current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL,
+                                        :message => "Appointment confirmed with #{@customer.name}.")
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
@@ -185,7 +186,7 @@ class AppointmentsController < ApplicationController
           flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          current_company.events << Event.create(:company_id => current_company.id, :user_id => current_user.id, :etype => Event::INFORMATIONAL, :message => "#{@customer.name} added to waitlist.")
+          current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :message => "#{@customer.name} added to waitlist.")
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")

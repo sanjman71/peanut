@@ -21,7 +21,10 @@ class HomeController < ApplicationController
       layout = 'home'
     end
     
-    render :action => :unauthorized, :layout => layout
+    respond_to do |format|
+      format.html {render :action => :unauthorized, :layout => layout}
+      format.js {page.redirect_to :action => :unauthorized}
+    end
   end
   
 end
