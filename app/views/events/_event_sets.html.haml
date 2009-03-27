@@ -1,0 +1,13 @@
+#events
+  - unless @urgent.empty?
+    .urgent.span-22.prepend-1.append-1.last
+      %h3==Urgent
+      = render(:partial => 'events', :object => @urgent)
+  - unless @approval.empty?
+    .approval.span-22.prepend-1.append-1.last
+      %h3==Approval
+      = render(:partial => 'events', :object => @approval)
+  - unless @informational.empty?
+    .informational.span-22.prepend-1.append-1.last
+      %h3==Informational
+      = render(:partial => 'events', :object => @informational)
