@@ -18,4 +18,4 @@
     .span-7.customer
       %h4= appointment.customer.name
     .span-8.last.action
-      = link_to('Details', url_for(:controller => 'appointments', :action => appointment.mark_as, :id => appointment.id, :subdomain => current_subdomain), :class => 'admin')
+      = link_to('Details', appointment_path(appointment, :subdomain => current_subdomain), :class => 'admin')

@@ -3,10 +3,10 @@ class AppointmentsController < ApplicationController
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
     
-  privilege_required 'update calendars', :only =>[:create], :on => :current_company
-  privilege_required 'update work appointments', :only => [:work, :complete], :on => :current_company
-  privilege_required 'update wait appointments', :only => [:wait], :on => :current_company
   privilege_required 'read work appointments', :only => [:index], :on => :current_company
+  privilege_required 'read %s appointments', :only => [:show], :on => :current_company
+  privilege_required 'update calendars', :only =>[:create], :on => :current_company
+  privilege_required 'update work appointments', :only => [:complete], :on => :current_company
   
   def has_privilege?(p, *args)
     case p
@@ -22,33 +22,26 @@ class AppointmentsController < ApplicationController
         # delegate to base class
         super
       end
-    when 'update work appointments'
-      # users may update their work appointments
-      authorizable  = args[0]
-      user          = args[1] || current_user
-      @appointment  = find_appointment_from_params
-      
-      return true if @appointment.work? and @appointment.customer == user
-      
-      # delegate to base class
-      super
-    when 'update wait appointments'
-      # users may update their work appointments
-      authorizable  = args[0]
-      user          = args[1] || current_user
-      @appointment  = find_appointment_from_params
-      
-      return true if @appointment.wait? and @appointment.customer == user
-      
-      # delegate to base class
-      super
     when 'read work appointments'
       # users may read their work appointments
       authorizable  = args[0]
+      user          = args[1] || current_user
       @customer     = find_customer_from_params
       
-      return true if @customer == current_user
+      return true if @customer == user
       # delegate to base class
+      super
+    when 'read %s appointments'
+      # users may read their work/wait appointments
+      authorizable  = args[0]
+      user          = args[1] || current_user
+      @appointment  = find_appointment_from_params
+      
+      return false if @appointment.blank?
+      return true if @appointment.customer == user
+      
+      # set permission based on appointment type, and delegate to base class
+      p = p % @appointment.mark_as
       super
     else
       super
@@ -145,7 +138,7 @@ class AppointmentsController < ApplicationController
           # create work appointment
           @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
-          @redirect_path  = work_appointment_path(@appointment)
+          @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
           # set flash message
           flash[:notice]  = "Your #{@service.name} appointment has been confirmed."
 
@@ -180,7 +173,7 @@ class AppointmentsController < ApplicationController
           # create waitlist appointment
           @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
           # set redirect path
-          @redirect_path  = wait_appointment_path(@appointment)
+          @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
           flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
@@ -230,82 +223,34 @@ class AppointmentsController < ApplicationController
   
   # GET /appointments/1
   def show
-    @appointment  = current_company.appointments.find(params[:id])
-    @note         = Note.new
-    @confirmation = params[:confirmation].to_i == 1
+    # @appointment has been initialized in before filter
+    @state = @appointment.state
+    
+    # find appointment roles
+    @customer, @employee, @manager = appointment_roles(@appointment)
+    
+    case @appointment.mark_as
+    when Appointment::WORK
+      @title = "Appointment Details"
+    when Appointment::WAIT
+      @title = "Waitlist Details"
+    end
     
     # show invoices for completed appointments
-    @invoice      = @appointment.invoice
-    @services     = current_company.services.work.all
-    @products     = current_company.products.instock
-    @mode         = :r
+    # @invoice      = @appointment.invoice
+    # @services     = current_company.services.work.all
+    # @products     = current_company.products.instock
+    # @mode         = :r
     
     # build notes collection, most recent first 
+    @note         = Note.new
     @notes        = @appointment.notes.sort_recent
 
     respond_to do |format|
-      format.html
+      format.html { render(:action => @appointment.mark_as) }
     end
   end
   
-  # GET /apppointments/1/work
-  def work
-    # @appointment has been initialized in before filter
-    
-    # build notes collection, most recent first 
-    @note         = Note.new
-    @notes        = @appointment.notes.sort_recent
-
-    # find appointment roles
-    @customer, @employee, @manager = appointment_roles(@appointment)
-    
-    @state        = @appointment.state
-    @title        = "Appointment Details"
-    
-    respond_to do |format|
-      format.html
-    end
-  end
-
-  # GET /apppointments/1/wait
-  def wait
-    # @appointment has been initialized in before filter
-    
-    # build notes collection, most recent first 
-    @note         = Note.new
-    @notes        = @appointment.notes.sort_recent
-
-    # find appointment roles
-    @customer, @employee, @manager = appointment_roles(@appointment)
-    
-    @state        = @appointment.state
-    @title        = "Waitlist Details"
-    
-    respond_to do |format|
-      format.html
-    end
-  end
-
-  # GET /appointments/1/checkout - show invoice
-  # PUT /appointments/1/checkout - mark appointment as checked-out/completed
-  def checkout
-    @appointment  = current_company.appointments.find(params[:id])
-    
-    if request.put?
-      # mark appointment as checked-out/completed
-      @appointment.checkout!
-
-      # redirect to show action
-      redirect_to(appointment_path(@appointment, :subdomain => @subdomain)) and return
-    else
-      # create/get invoice
-      @invoice    = @appointment.invoice || (@appointment.invoice = AppointmentInvoice.create; @appointment.invoice)
-
-      # redirect to invoices controller
-      redirect_to(invoice_path(@invoice, :subdomain => current_subdomain)) and return
-    end
-  end
-
   # POST /appointments/1/complete
   def complete
     # @appointment has been initialized in before filter
@@ -333,14 +278,13 @@ class AppointmentsController < ApplicationController
     when  Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
-      # redirect to the appointment page
-      @redirect_path = work_appointment_path(@appointment)
     when Appointment::WAIT
       # cancel the wait appointment
       AppointmentScheduler.cancel_wait_appointment(@appointment)
-      # redirect to the appointment page
-      @redirect_path = wait_appointment_path(@appointment)
     end
+
+    # redirect to the appointment page
+    @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
     
     # set flash
     flash[:notice] = "Canceled appointment"

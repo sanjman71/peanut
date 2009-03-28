@@ -16,6 +16,6 @@
       
     -# appointment details
     .span-3{:style => 'margin-top: 3px;'}
-      = link_to 'Details', url_for(:controller => 'appointments', :action => appointment.mark_as, :id => appointment.id, :subdomain => current_subdomain)
+      = link_to 'Details', appointment_path(appointment, :subdomain => current_subdomain)
   
-    
+

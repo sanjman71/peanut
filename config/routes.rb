@@ -25,11 +25,20 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   '/customers/create',    :controller => 'users', :action => 'create', :type => 'customer', :conditions => {:method => :post}
   map.connect   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :type => 'customer', :conditions => {:method => :get}
   map.connect   '/customers/:id',       :controller => 'users', :action => 'update', :type => 'customer', :conditions => {:method => :put}
-  map.connect   '/customers/:customer_id/appointments/:state', 
-                                        :controller => 'appointments', :action => 'index', 
-                                        :conditions => {:method => :get, :state => /upcoming|completed/}
-  map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', 
-                                        :conditions => {:method => :get, :state => /upcoming|completed/}
+  map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work',
+                :conditions => {:method => :get, :state => /upcoming|completed|canceled/}
+  map.connect   '/customers/:customer_id/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
+                :conditions => {:method => :get}
+
+  # appointment routes
+  map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work', :state => /upcoming|completed|canceled/,
+                :conditions => {:method => :get}
+  map.connect   '/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
+                :conditions => {:method => :get}
+  map.resources :appointments,
+                :member => {:cancel => :get, :complete => :post, :reschedule => [:get, :post]},
+                :collection => { :search => [:get, :post] }
+                                        
   map.resources :employees, :member => { :toggle_manager => :post }
   map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
   
@@ -44,10 +53,6 @@ ActionController::Routing::Routes.draw do |map|
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
   map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
-  map.resources :appointments,
-                :member => {:checkout => [:get, :put], :cancel => :get, :work => :get, :wait => :get, :complete => :post, :reschedule => [:get, :post]},
-                :collection => { :search => [:get, :post] }
-  map.connect   '/appointments/work/:state', :controller => 'appointments', :action => 'index', :type => 'work'
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
   map.resources :notes, :only => [:create]

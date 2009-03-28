@@ -19,17 +19,16 @@ class AppointmentsControllerTest < ActionController::TestCase
                :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
 
-  # show an appointment by type
-  should_route :get, 'appointments/1/work', :controller => 'appointments', :action => 'work', :id => 1
-  should_route :get, 'appointments/1/wait', :controller => 'appointments', :action => 'wait', :id => 1
+  # show an appointment
+  should_route :get, '/appointments/1', :controller => 'appointments', :action => 'show', :id => 1
   
   # show work appointments by state
-  should_route :get, 'appointments/work/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
+  should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
   
-  # show a customer's appointments, with optional state parameter
-  should_route :get, '/customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1
-  should_route :get, '/customers/1/appointments/upcoming', :controller => 'appointments', :action => 'index', :customer_id => 1, :state => 'upcoming'
-  should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :state => 'upcoming'
+  # show a customer's work appointments, with an optional state parameter
+  should_route :get, '/customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work'
+  should_route :get, '/customers/1/appointments/completed', 
+                     :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work', :state => 'completed'
 
   def setup
     @controller   = AppointmentsController.new
@@ -214,8 +213,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment work path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
+    should "redirect to appointment path" do
+      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
     end
   end
 
@@ -252,8 +251,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment work path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
+    should "redirect to appointment path" do
+      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
     end
   end
 
@@ -290,8 +289,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment work path" do
-      assert_redirected_to("http://test.host/appointments/#{assigns(:appointment).id}/work")
+    should "redirect to appointment path" do
+      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
     end
   end
   
@@ -346,10 +345,11 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :mark_as, :equals => '"wait"'
     should_assign_to :redirect_path, :equal => '"foo"'
+    should_assign_to :appointment
     
     should_respond_with :redirect
-    should "redirect to appointment wait path" do
-      assert_redirected_to "appointments/#{assigns(:appointment).id}/wait"
+    should "redirect to appointment path" do
+      assert_redirected_to "http://www.test.host/appointments/#{assigns(:appointment).id}"
     end
   end
 end
