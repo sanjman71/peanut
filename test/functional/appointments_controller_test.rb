@@ -187,6 +187,9 @@ class AppointmentsControllerTest < ActionController::TestCase
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
       
+      # stub current user
+      @controller.stubs(:current_user).returns(@customer)
+      
       # create work appointment, today from 9 am to 11 am
       post :create,
            {:dates => @today, :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
@@ -224,6 +227,9 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.now.utc.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+      
+      # stub current user
+      @controller.stubs(:current_user).returns(@customer)
       
       # create work appointment, today from 10 am to 10:30 am local time
       post :create,
@@ -263,6 +269,9 @@ class AppointmentsControllerTest < ActionController::TestCase
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
       
+      # stub current user
+      @controller.stubs(:current_user).returns(@customer)
+      
       # create work appointment, today from 10 am to 12 pm local time
       post :create,
            {:dates => @today, :start_at => "1000", :end_at => "1200", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
@@ -279,6 +288,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :end_at, :equals => '"1200"'
     should_assign_to :duration, :equals => '120'
     should_assign_to :mark_as, :equals => '"work"'
+    should_assign_to :appointment
 
     should "have appointment duration of 120 minutes" do
       assert_equal 120, assigns(:appointment).duration
@@ -331,6 +341,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   
   context "create waitlist appointment" do
     setup do
+      # stub current user
+      @controller.stubs(:current_user).returns(@customer)
+      
       # create waitlist appointment
       post :create,
            {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
