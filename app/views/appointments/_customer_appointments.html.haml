@@ -6,13 +6,17 @@
       %h3{:style => 'font-size: 1.3em;'}= (appointment.schedulable || User.anyone).name
       
     -# when
-    .span-10
+    .span-7
       %h4{:style => 'padding-top: 5px;'}
         = appointment.start_at.to_s(:appt_short_month_day_year)
         == @
         = appointment.start_at.to_s(:appt_time)
         %br
         %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+      
+    -# customer name
+    .span-7.customer
+      %h4{:style => 'padding-top: 5px;'}= customer_display_name(appointment.customer, current_user) unless appointment.customer.blank?
       
     -# appointment details
     .span-3{:style => 'margin-top: 3px;'}

@@ -4,8 +4,9 @@
 
 .span-24.mat.padding-top-10.padding-bottom-10
   .span-23.prepend-1
-    %h2{:style => 'margin-bottom: 5px;'}= @title
-
+    %h2{:style => 'margin-bottom: 5px;'}
+      = @title
+      %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
     -# appointment state and when it started/ended
     %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}: #{appointment_starts_at_distance_in_words(@appointment)}
       

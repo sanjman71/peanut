@@ -224,7 +224,10 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   def show
     # @appointment has been initialized in before filter
-    @state = @appointment.state
+    @state  = @appointment.state
+
+    # set back link
+    @back   = request.referer
     
     # find appointment roles
     @customer, @employee, @manager = appointment_roles(@appointment)

@@ -4,7 +4,9 @@
 
 .span-24.mat.padding-top-10
   .span-23.prepend-1
-    %h2{:style => 'margin-bottom: 5px;'}= @title
+    %h2{:style => 'margin-bottom: 5px;'}
+      = @title
+      %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
 
     -# appointment state
     %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}
