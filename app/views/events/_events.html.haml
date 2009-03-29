@@ -15,7 +15,7 @@
           = event.message
         .span-3.eventable
           - unless event.eventable.blank?
-            = link_to(event.eventable_type, url_for(:subdomain => current_subdomain, :controller => event.eventable_type, :action => 'show', :id => event.eventable_id))
+            = link_to(event.eventable_type, url_for(:subdomain => current_subdomain, :controller => event.eventable_type.downcase.pluralize, :action => 'show', :id => event.eventable_id))
           - else
             == No event owner
         
