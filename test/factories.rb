@@ -75,6 +75,10 @@ Factory.define :appointment_today, :class => Appointment do |a|
   a.end_at          { |o| o.start_at + o.service.duration_to_seconds }  # add duration to start_at
 end
 
+Factory.define :event do |e|
+  e.message                       "Test event"
+end
+
 Factory.sequence :user_name do |n|
   "User #{n}"
 end

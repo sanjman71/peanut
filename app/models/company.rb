@@ -36,6 +36,9 @@ class Company < ActiveRecord::Base
   has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
 
+  # Event log
+  has_many                  :events
+
   # after create filter to initialize basic services that are provided by all companies
   after_create              :init_basic_services
 

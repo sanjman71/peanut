@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :products]
+  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :products, :events]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -224,4 +224,25 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
   end
     
+  desc "Initialize events management roles & privileges"
+  task :events do
+    
+    puts "adding events management roles & privileges"
+    
+    cm = Badges::Role.find_by_name('company manager')
+    ce = Badges::Role.find_by_name('company employee')
+
+    c = Badges::Privilege.create(:name=>"create events")
+    r = Badges::Privilege.create(:name=>"read events")
+    u = Badges::Privilege.create(:name=>"update events")
+    d = Badges::Privilege.create(:name=>"delete events")
+
+    # Company manager can manage events
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
+    Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
+
+    # Company employee can view events
+    Badges::RolePrivilege.create(:role=>ce,:privilege=>r)
+  end
+
 end

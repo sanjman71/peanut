@@ -1,0 +1,33 @@
+.events_subset
+  - if events.blank?
+    No events
+  - else
+    - events.each do |event|
+      .span-22.last.letterbox.event{:class => cycle("shaded #{event.class}", "#{event.class}")}[event]
+        .span-4.user
+          == By #{event.user.name}
+        .span-4.user
+          - unless event.customer.blank?
+            == Customer: #{event.customer.name}
+          - else
+            == No customer
+        .span-7.message
+          = event.message
+        .span-3.eventable
+          - unless event.eventable.blank?
+            = link_to(event.eventable_type, url_for(:subdomain => current_subdomain, :controller => event.eventable_type, :action => 'show', :id => event.eventable_id))
+          - else
+            == No event owner
+        
+        .span-3.seen
+          - if event.seen?
+            == Seen
+          - else
+            - if has_privilege?('update events', current_company)
+              = link_to('Mark as seen', url_for(:subdomain => current_subdomain, :controller => 'events', :action => 'mark_as_seen', :id => event.id), :method => 'post')
+            - else
+              == Unseen
+            
+        .span-1.delete.last
+          - if has_privilege?('delete events', current_company)
+            = link_to('Del', url_for(:subdomain => current_subdomain, :controller => 'events', :action => 'destroy', :id => event.id), :method => 'delete')
