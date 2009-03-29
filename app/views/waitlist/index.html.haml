@@ -10,9 +10,6 @@
         = label_tag "search_schedulable", "Waitlist for", :class => 'big'
         = select_tag('search_schedulable', options_for_select(@schedulables.collect{ |o| [schedulable_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
 
-      -# explicitly call out the current state
-      %h3{:style => 'color: #008800; font-size: 1.3em;'}= @state.titleize
-  
     -# waitlist appointment states
     .span-15.last{:style => 'padding-top: 7px;'}
       #links
@@ -27,5 +24,11 @@
 .span-15.prepend-1.last
   .highlight#flash
   
+.span-23.prepend-1
+  - if @appointments.blank?
+    %h2{:style => 'color: #FF6600;'}== The #{@state} waitlist is empty
+  - else
+    %h3{:style => 'color: #FF6600;'}= pluralize(@appointments.size, "#{@state} appointment")
+
 #waitlist
   = render(:partial => 'waitlist.html.haml', :locals => {:appointments => @appointments})

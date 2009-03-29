@@ -10,8 +10,6 @@
         %h3{:style => 'margin-bottom: 3px;'}
           = label_tag "customer", "Appointments for", :class => 'big'
           = select_tag('customer', options_for_select(@customers.collect{ |o| [customer_display_name(o, current_user), o.id]}, @customer.id), :class => 'text')
-        -# explicitly call out the current state
-        %h3{:style => 'color: #008800; font-size: 1.3em;'}= @state.titleize
 
       -# appointment state links
       .span-15.last{:style => 'padding-top: 7px;'}
@@ -27,8 +25,8 @@
   
   .span-23.prepend-1
     - if @appointments.blank?
-      %h2== No appointments
+      %h2{:style => 'color: #5500BB;'}== No #{@state} appointments
     - else
-      %h3== #{pluralize(@appointments.size, 'appointment')}
+      %h3{:style => 'color: #5500BB;'}== #{pluralize(@appointments.size, "#{@state} appointment")}
     
   = render(:partial => 'customer_appointments', :locals => {:appointments => @appointments})

@@ -101,6 +101,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.string      :state
       t.string      :confirmation_code
       t.integer     :locations_count, :default => 0     # locations counter cache
+      t.datetime    :canceled_at
       t.timestamps
     end
 

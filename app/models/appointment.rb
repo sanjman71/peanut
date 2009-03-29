@@ -340,7 +340,12 @@ class Appointment < ActiveRecord::Base
   def location_id=(id)
     self.locations << company.locations.find_by_id(id.to_i) unless (id.blank? || id.to_i == 0)
   end
-      
+  
+  def cancel
+    update_attribute(:canceled_at, Time.now)
+    cancel!
+  end
+  
   # returns all appointment conflicts
   # conflict rules:
   #  - schedulable must be the same

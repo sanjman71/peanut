@@ -7,11 +7,16 @@
     %h2{:style => 'margin-bottom: 5px;'}
       = @title
       %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
-    -# appointment state and when it started/ended
-    %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}: #{appointment_starts_at_distance_in_words(@appointment)}
       
-    -# allow employees and managers to change appointment state
-    - if (@employee or @manager) and @state == 'upcoming'
+    -# appointment state
+    %h4{:style => 'margin-bottom: 5px;'}
+      - if @appointment.canceled?
+        == Canceled: #{@appointment.canceled_at.to_s(:appt_day_date_time)}
+      - else
+        == #{@appointment.state.titleize}: #{appointment_starts_at_distance_in_words(@appointment)}
+    
+    -# allow owners and managers to change appointment state
+    - if (@owner or @manager) and @appointment.upcoming?
       %h4
         = link_to 'Mark as completed', complete_appointment_path(@appointment), :id => 'complete_appointment', :class => 'admin'
         %span#mark_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
@@ -19,11 +24,7 @@
         = link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
         %span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
         = link_to 'Re-schedule appointment', reschedule_appointment_path(@appointment), :class => 'admin', :id => 'reschedule_appointment'
-        
-    -# just for testing purposes
-    %em= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"
-    
-    
+            
 %hr.space
 
 .span-15.prepend-1
@@ -35,15 +36,15 @@
 %hr.space
 
 .span-23.prepend-1.text
-  - # allow employees and managers to send the customer a message
-  - if (@employee or @manager) and !@appointment.canceled?
+  - # allow owners and managers to send the customer a message
+  - if (@owner or @manager) and !@appointment.canceled?
     = render(:partial => 'send_message', :locals => {:appointment => @appointment})
 
 %hr.space
 
 .span-23.prepend-1.text
-  - # allow employees and managers add invoices
-  - if (@employee or @manager) and !@appointment.canceled?
+  - # allow owners and managers add invoices
+  - if (@owner or @manager) and !@appointment.canceled?
     %h3== Add Invoice
     
 

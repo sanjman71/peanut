@@ -2,23 +2,24 @@
 - stylesheet('appointments', 'notes')
 - javascript('appointments', 'notes')
 
-.span-24.mat.padding-top-10
+.span-24.mat.padding-top-10.padding-bottom-10
   .span-23.prepend-1
     %h2{:style => 'margin-bottom: 5px;'}
       = @title
       %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
 
     -# appointment state
-    %h4{:style => 'margin-bottom: 5px;'}== #{@state.titleize}
+    %h4{:style => 'margin-bottom: 5px;'}
+      - if @appointment.canceled?
+        == Canceled: #{@appointment.canceled_at.to_s(:appt_day_date_time)}
+      - else
+        == #{@appointment.state.titleize}
     
-    -# allow employees and managers to change appointment state
-    - if (@employee or @manager) and @state == 'upcoming'
+    -# allow owners and managers to change appointment state
+    - if (@owner or @manager) and @appointment.upcoming?
       %h4
         = link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
       
-    -# just for testing purposes
-    %h4= "Roles: customer:#{@customer}, employee:#{@employee}, manager:#{@manager}"
-  
 %hr.space
 
 .span-15.prepend-1

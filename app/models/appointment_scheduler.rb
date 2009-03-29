@@ -206,8 +206,8 @@ class AppointmentScheduler
     
     # commit the apointment changes
     Appointment.transaction do
-      # change work appointment state to canceled
-      appointment.cancel!
+      # cancel work appointment
+      appointment.cancel
       
       # remove any existing free appointments
       free_time_before.each do |appointment|
@@ -231,7 +231,7 @@ class AppointmentScheduler
   # cancel the wait appointment
   def self.cancel_wait_appointment(appointment)
     raise AppointmentInvalid, "Expected a work appointment" if appointment.blank? or appointment.mark_as != Appointment::WAIT
-    appointment.cancel!
+    appointment.cancel
   end
   
   # build collection of all free and work appointments that have not been canceled over the specified date range

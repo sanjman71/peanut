@@ -159,7 +159,7 @@ class AppointmentsController < ApplicationController
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
           # create event
           current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                        :message => "Appointment confirmed with #{@appointment.customer.name}.", :customer => @appointment.customer)
+                                        :message => "#{@appointment.service.name} confirmed with #{@appointment.customer.name}.", :customer => @appointment.customer)
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
@@ -230,13 +230,12 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   def show
     # @appointment has been initialized in before filter
-    @state  = @appointment.state
-
+    
     # set back link
     @back   = request.referer
     
     # find appointment roles
-    @customer, @employee, @manager = appointment_roles(@appointment)
+    @customer, @owner, @manager = appointment_roles(@appointment)
     
     case @appointment.mark_as
     when Appointment::WORK
@@ -287,9 +286,11 @@ class AppointmentsController < ApplicationController
     when  Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
+      message = "#{@appointment.service.name} cancelled with #{@appointment.customer.name}."
     when Appointment::WAIT
       # cancel the wait appointment
       AppointmentScheduler.cancel_wait_appointment(@appointment)
+      message = "Waitlist appointment cancelled with #{@appointment.customer.name}."
     end
 
     # redirect to the appointment page
@@ -297,7 +298,7 @@ class AppointmentsController < ApplicationController
     
     # create event
     current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                  :message => "Appointment cancelled with #{@appointment.customer.name}.", :customer => @appointment.customer)
+                                  :message => message, :customer => @appointment.customer)
 
     # set flash
     flash[:notice] = "Canceled appointment"
