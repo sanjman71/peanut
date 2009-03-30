@@ -11,8 +11,10 @@
         = appointment.start_at.to_s(:appt_short_month_day_year)
         == @
         = appointment.start_at.to_s(:appt_time)
-        %br
-        %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+        -# show time from now for upcoming appointments
+        - if appointment.upcoming?
+          %br
+          %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
       
     -# customer name
     .span-7.customer
