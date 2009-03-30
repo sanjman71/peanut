@@ -47,6 +47,19 @@
   - if (@owner or @manager) and !@appointment.canceled?
     %h3== Add Invoice
     
+.span-15.prepend-1  
+  -# notes flash message
+  #note_flash
+
+  -# add note
+  .new_note#new_note_container
+    %p
+    %h4{:style => 'color: #ff6600;'}== Add a note about this appointment
+    = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => current_subdomain})
+  %p
+  -# appointment notes
+  #notes_collection
+    = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
 
 
 

@@ -201,14 +201,6 @@ $.fn.reset_chargeables = function () {
   $("#product_id").attr("selectedIndex", 0);
 }
 
-// Add a new note
-$.fn.init_add_note = function () {
-  $("#new_note").submit(function () {
-    $.post(this.action, $(this).serialize(), null, "script");
-    return false;
-  })
-} 
-
 // Change session location onchange
 $.fn.init_change_location = function() {
   // $("select#location_id").change(function () {
