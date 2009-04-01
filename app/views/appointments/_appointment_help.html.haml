@@ -1,0 +1,9 @@
+.sidebar.instructions
+  %ul
+    - case state
+    - when 'upcoming'
+      %li== Upcoming appointments are appointments that have been scheduled and not marked as completed.
+    - when 'completed'
+      %li== Completed appointments have finished and been marked as completed.
+    - when 'canceled'
+      %li== Canceled appointments have been scheduled and canceled before they occurred.
