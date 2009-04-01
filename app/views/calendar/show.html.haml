@@ -28,22 +28,24 @@
   .span-14.prepend-1.last
     = display_flash(:notice)
     
+  %hr.space
+  
   .span-15.prepend-1.last
-    %h2= @daterange.name
+    %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
       
     -# show free, work calendar
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
       
-    -# show count of work appointments across a daterange
-    %h3.span-15.last#appointments_count
-      %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}
+    -# show summary of work and free appointments
+    .span-15.last
+      %h3.calendar.date_range_summary
         = @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
-        == between #{@daterange.start_at.to_s(:appt_short_month_day)}
-        == and #{@daterange.end_at.to_s(:appt_short_month_day)}
-      
+        == and
+        = @free_appointments.size > 0 ? pluralize(@free_appointments.size, 'Available Timeslot') : "No Available Timeslots"
+        
     -# show free and work appointments
-    .span-15.last#free_schedule
+    .span-15.last#free_work_appointments
       = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
 
 -# show add free time form if the user is a calendar manager for this calendar

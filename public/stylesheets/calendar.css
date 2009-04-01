@@ -23,6 +23,11 @@ table.calendar td.hover                           { background: #FFCC00 none rep
 
 table.calendar td.mark                            { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
 
+/* calendar attribute styles */
+
+.calendar.date_range_name                         { color: #5500BB; font-weight: bold; font-size: 1.5em; }
+.calendar.date_range_summary                      { color: #5500BB; font-weight: bold; font-size: 1.5em; }
+
 /* calendar time range slider styles */
 
 .slider .time                                     { color: #333333; }

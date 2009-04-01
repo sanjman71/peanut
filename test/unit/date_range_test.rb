@@ -15,6 +15,10 @@ class DateRangeTest < ActiveSupport::TestCase
     should 'have start at == beginning of today in utc format' do
       assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
     end
+
+    should 'have end at == end of today in utc format' do
+      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+    end
     
     should 'be named Today' do
       assert_equal 'Today', @daterange.name
@@ -22,10 +26,9 @@ class DateRangeTest < ActiveSupport::TestCase
 
     should 'have url param for today' do
       @today = Time.now.utc.to_s(:appt_schedule_day)
-      @next  = (Time.now.utc + 1.day).to_s(:appt_schedule_day)
-      assert_equal "#{@today}..#{@next}", @daterange.to_url_param
+      assert_equal "#{@today}..#{@today}", @daterange.to_url_param
       assert_equal @today, @daterange.to_url_param(:for => :start_date)
-      assert_equal @next, @daterange.to_url_param(:for => :end_date)
+      assert_equal @today, @daterange.to_url_param(:for => :end_date)
     end
   end
   
@@ -43,8 +46,19 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal Time.now.utc.beginning_of_day + 1.day, @daterange.start_at
     end
 
+    should 'have end at == end of tomorrow in utc format' do
+      assert_equal Time.now.utc.end_of_day + 1.day, @daterange.end_at
+    end
+
     should 'be named Tomorrow' do
       assert_equal 'Tomorrow', @daterange.name
+    end
+
+    should 'have url param for tomorrow' do
+      @tomorrow = (Time.now.utc + 1.day).to_s(:appt_schedule_day)
+      assert_equal "#{@tomorrow}..#{@tomorrow}", @daterange.to_url_param
+      assert_equal @tomorrow, @daterange.to_url_param(:for => :start_date)
+      assert_equal @tomorrow, @daterange.to_url_param(:for => :end_date)
     end
   end
 
@@ -78,7 +92,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
 
-    should 'have 7 days in the date range' do
+    should 'have date range of 7 days' do
       assert_equal 7, @daterange.days
     end
 
@@ -97,7 +111,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
 
-    should 'have 14 days in the date range' do
+    should 'have date range of 14 days' do
       assert_equal 14, @daterange.days
     end
 
@@ -141,7 +155,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
     
-    should 'have 42 days in the date range' do
+    should 'have date range of 42 days' do
       assert_equal 42, @daterange.days
     end
 
@@ -160,12 +174,39 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
 
-    should 'have 7 days in the date range' do
+    should 'have end at == end of today in utc format' do
+      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+    end
+
+    should 'have start at == 1 week ago in utc format' do
+      assert_equal Time.now.utc.beginning_of_day - 6.days, @daterange.start_at
+    end
+
+    should 'have date range of 7 days' do
       assert_equal 7, @daterange.days
     end
 
     should 'be named Past Week' do
       assert_equal 'Past Week', @daterange.name
+    end
+  end
+  
+  context 'past month' do
+    setup do
+      @daterange = DateRange.parse_when('past month')
+      assert_valid @daterange
+    end
+  
+    should 'have end at == end of today in utc format' do
+      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+    end
+
+    should 'have start at == 1 month ago in utc format' do
+      assert_equal 1.month.ago.utc.beginning_of_day, @daterange.start_at
+    end
+
+    should 'have date range of 31 days' do
+      assert_equal 31, @daterange.days
     end
   end
   
@@ -189,7 +230,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
 
-    should 'have 7 days in the date range' do
+    should 'have date range of 7 days' do
       assert_equal 7, @daterange.days
     end
     
@@ -218,7 +259,7 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
     end
 
-    should 'have 6 days in the date range' do
+    should 'have date range of 6 days' do
       assert_equal 6, @daterange.days
     end
 

@@ -69,8 +69,8 @@ class CalendarController < ApplicationController
     # group appointments by day
     @appointments_by_day  = @appointments.group_by { |appt| appt.start_at.beginning_of_day }
 
-    # find work appointments
-    @work_appointments    = @appointments.select { |appt| appt.mark_as == Appointment::WORK }
+    # partition into work and free appointments
+    @work_appointments, @free_appointments = @appointments.partition { |appt| appt.mark_as == Appointment::WORK }
      
     # check if current user is a calendar manager for the specified calendar
     @calendar_manager     = current_user.has_privilege?('update calendars', current_company) || current_user == @schedulable

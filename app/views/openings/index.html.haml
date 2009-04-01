@@ -24,7 +24,7 @@
         
     .span-14.last
       -# show daterange name
-      %h3== #{@daterange.name}
+      %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
 
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
       .span-15.last#free_calendar
