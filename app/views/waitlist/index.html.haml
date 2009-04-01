@@ -22,10 +22,8 @@
   
   -# waitlist help
   .span-7.prepend-1.last
-    .sidebar.instructions
-      %ul
-        %li== The waitlist shows appointments that users are waiting to schedule when free time is made available
-
+    = render(:partial => 'waitlist_help', :locals => {:state => @state})
+    
 %hr.space
 
 .span-15.prepend-1.last

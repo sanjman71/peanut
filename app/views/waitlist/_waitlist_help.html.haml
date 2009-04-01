@@ -1,0 +1,6 @@
+.sidebar.instructions
+  %ul
+    - if state == 'upcoming'
+      %li== The upcoming waitlist shows appointments that users are waiting to schedule if/when free time is made available.
+    - elsif state == 'canceled'
+      %li== The canceled waitlist shows waitlist appointments that have been canceled.
