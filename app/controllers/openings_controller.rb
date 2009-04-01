@@ -19,6 +19,14 @@ class OpeningsController < ApplicationController
       redirect_to(setup_company_path(current_company)) and return
     end
     
+    # find services collection for the current company, for services with at least 1 service provider
+    @services     = current_company.services.with_providers.work
+    
+    if @services.empty?
+      # there are no services with any service providers
+      redirect_to(setup_company_path(current_company)) and return
+    end
+    
     # initialize schedulable, default to anyone
     @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
     @schedulable  = User.anyone if @schedulable.blank?
@@ -63,20 +71,20 @@ class OpeningsController < ApplicationController
       redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
     end
     
-    # build schedulables collection, schedulables are restricted by the services they perform
+    # build schedulables collection, which are restricted by the services they perform
     @schedulables = @service.schedulables
     
-    # find services collection, services are restricted by the company they belong to
-    @services     = Array(Service.nothing(:name => "Select a service")) + current_company.services.work
-
     # build service providers collection mapping services to schedulables
-    @sps          = current_company.services.work.inject([]) do |array, service|
+    @sps          = @services.inject([]) do |array, service|
       service.schedulables.each do |schedulable|
         array << [service.id, schedulable.id, schedulable.name, schedulable.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
       end
       array
     end
     
+    # add the 'nothing' service to the services collection
+    @services     = Array(Service.nothing(:name => "Select a service")) + @services
+
     if @daterange.blank?
       # reset reschedule id based on params
       reset_reschedule_id_from_params

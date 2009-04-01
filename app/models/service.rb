@@ -16,6 +16,9 @@ class Service < ActiveRecord::Base
   named_scope :free,          { :conditions => {:mark_as => Appointment::FREE} }
   named_scope :work,          { :conditions => {:mark_as => Appointment::WORK} }
   
+  # find services with at least 1 service provider
+  named_scope :with_providers,  { :conditions => ["schedulables_count > 0"] }
+  
   # default duration value
   @@default_duration          = 30
   
