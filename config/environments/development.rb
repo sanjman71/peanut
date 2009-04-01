@@ -41,6 +41,6 @@ config.to_prepare do
 end
 
 # Blueprint grid toggle switch
-$BlueprintGrid = true
+$BlueprintGrid = false
 
 require 'ruby-debug'
