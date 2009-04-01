@@ -47,6 +47,8 @@ namespace :meatheads do
   
     # assign schedulables
     @meatheads.schedulables.push(@meathead)
+    @meatheads.schedulables.push(@wimpy)
+    @meatheads.schedulables.push(@skinny)
 
     # create services
     @training         = @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
