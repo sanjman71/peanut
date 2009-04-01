@@ -83,6 +83,8 @@ class UsersController < ApplicationController
     @back_path  = current_user ? (request.referer || "/#{@type.pluralize}") : nil
   end
  
+  # POST /customers/create
+  # POST /employees/create
   def create
     # @type (always) and @invitation (if it exists) have been initialized at this point
     
@@ -133,6 +135,7 @@ class UsersController < ApplicationController
       when 'user'
         @redirect_path  = "/#{@type.pluralize}"
         flash[:notice]  = "#{@type.titleize} #{@user.name} was successfully created."
+        
         begin
           # send account created notification
           MailWorker.async_send_account_created(:company_id => current_company.id, :creator_id => current_user.id, 
@@ -141,8 +144,14 @@ class UsersController < ApplicationController
           logger.debug("xxx error sending account created notification")
         end
       when 'anonymous'
-        @redirect_path  = "/login" 
-        flash[:notice]  = "Your account was successfully created. Login to continue."
+        flash[:notice]  = "Your account was successfully created. You are now logged in as #{@user.name}"
+        # cache the return to value (if it exists) before we reset the ression
+        return_to       = session[:return_to]
+        @redirect_path  = return_to || "/"
+        # kill the existing session
+        logout_killing_session!
+        # login as the new user
+        self.current_user = @user
       end
     else
       @error    = true

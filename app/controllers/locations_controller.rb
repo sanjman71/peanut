@@ -1,5 +1,4 @@
 class LocationsController < ApplicationController
-  after_filter  :store_location, :only => [:index, :show]
   
   # GET /locations
   # GET /locations.xml
