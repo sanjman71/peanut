@@ -16,9 +16,6 @@ class CustomersController < ApplicationController
       @search_text  = @customers.blank? ? "No Customers" : "All Customers"
     end
     
-    # check if current user is a company manager
-    @company_manager = company_manager?
-    
     respond_to do |format|
       format.html
       format.js

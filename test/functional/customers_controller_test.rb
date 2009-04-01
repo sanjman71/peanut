@@ -23,6 +23,7 @@ class CustomersControllerTest < ActionController::TestCase
     @role         = Badges::Role.create(:name=>"customer")
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
+    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
   
   context "search an empty customers database with an empty search" do
@@ -79,6 +80,8 @@ class CustomersControllerTest < ActionController::TestCase
         # stub current_user method
         @controller.stubs(:current_user).returns(@owner)
         ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
+        # stub company manager method
+        ActionView::Base.any_instance.stubs(:company_manager?).returns(false)
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
     

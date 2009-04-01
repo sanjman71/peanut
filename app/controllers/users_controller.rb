@@ -144,7 +144,6 @@ class UsersController < ApplicationController
           logger.debug("xxx error sending account created notification")
         end
       when 'anonymous'
-        flash[:notice]  = "Your account was successfully created. You are now logged in as #{@user.name}"
         # cache the return to value (if it exists) before we reset the ression
         return_to       = session[:return_to]
         @redirect_path  = return_to || "/"
@@ -152,6 +151,8 @@ class UsersController < ApplicationController
         logout_killing_session!
         # login as the new user
         self.current_user = @user
+        # set the flash after resetting the session
+        flash[:notice]  = "Your account was successfully created. You are now logged in as #{@user.name}"
       end
     else
       @error    = true

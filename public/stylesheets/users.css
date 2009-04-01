@@ -1,6 +1,6 @@
 /* customer and employee styles */
 
-div.customers.header                              { font-size: 15px; font-weight: bold; color: #666666; }
+div.customers.header                              { font-size: 1.5em; font-weight: bold; color: #5500BB; }
 
 a.customer.name                                   { color: #111111; font-weight: normal; }
 a:hover.customer.name                             { color: #111111; background-color: #FF6600; text-decoration: none; }

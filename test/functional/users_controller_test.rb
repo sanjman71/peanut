@@ -165,7 +165,7 @@ class UsersControllerTest < ActionController::TestCase
         end
 
         should_respond_with :redirect
-        should_redirect_to 'login_path'
+        should_redirect_to '"http://test.host/"'
       end
     end
   
@@ -205,7 +205,7 @@ class UsersControllerTest < ActionController::TestCase
         end
 
         should_respond_with :redirect
-        should_redirect_to 'login_path'
+        should_redirect_to '"http://test.host/"'
       end
 
       context "and with valid user properties and no invitation, as an authenticated user" do
@@ -284,7 +284,7 @@ class UsersControllerTest < ActionController::TestCase
       should_set_the_flash_to /Your account was successfully created/i
 
       should_respond_with :redirect
-      should_redirect_to 'login_path'
+      should_redirect_to '"http://test.host/"'
     end
     
     context "as an authenticated user" do
