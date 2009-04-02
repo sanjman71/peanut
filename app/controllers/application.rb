@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
 
   # return true if the current user is a company employee
   def company_employee?
-    has_role?('company employee', current_company) || has_role?('admin')
+    has_role?('company employee', current_company)
   end
   
   # returns true if the current user is a customer
