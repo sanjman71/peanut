@@ -64,10 +64,12 @@ class AppointmentsController < ApplicationController
     
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
-      # build the work appointment without committing the changes
+      # build the work appointment parameters
       @duration             = params[:duration].to_i if params[:duration]
       @start_at             = params[:start_at]
       @options              = {:start_at => @start_at}
+
+      # build the work appointment without committing the changes
       @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => false)
     
       # set appointment date, start_at and end_at times in local time
@@ -81,8 +83,12 @@ class AppointmentsController < ApplicationController
       # build waitlist parameters
       @daterange            = DateRange.parse_range(params[:start_date], params[:end_date], :inclusive => true)
       @options              = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
-      # build the  waitlist appointment without committing the changes
+      
+      # build the waitlist appointment without committing the changes
       @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => false)
+      
+      # default schedulable is 'anyone' for display purposes
+      @schedulable          = User.anyone if @schedulable.blank?
       
       # set appointment date to daterange name, set start_at and end_at times in schedule format
       @appt_date            = @daterange.name

@@ -2,24 +2,30 @@ class WaitlistController < ApplicationController
   privilege_required 'read wait appointments', :only => [:index], :on => :current_company
 
   def index
-    if params[:schedulable_type].blank? or params[:schedulable_id].blank?
-      # no schedulable was specified, redirect to the company's first schedulable
-      schedulable = current_company.schedulables.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id)) and return
+    if params[:schedulable_id].to_s == "0"
+      # /users/0/waitlist is canonicalized to /waitlist; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable_id => nil, :schedulable_type => nil)))
     end
     
     # initialize schedulable
-    @schedulable  = find_schedulable_from_params
-    @schedulables = current_company.schedulables.all
+    @schedulable  = find_schedulable_from_params || User.anyone
+
+    # build schedulables collection, including 'anyone'
+    @schedulables = [User.anyone] + current_company.schedulables.all
     
     # find state (default to 'upcoming')
     @state        = params[:state] ? params[:state].to_s : 'upcoming'
     
-    # find a schedulable's waitlist appointments by state
-    @appointments = @current_company.appointments.wait.schedulable(@schedulable).send(@state)
+    if @schedulable.anyone?
+      # find waitlist appointments for anyone by state
+      @appointments = @current_company.appointments.wait.no_schedulable.send(@state)
+    else
+      # find waitlist appointments for a schedulable by state
+      @appointments = @current_company.appointments.wait.schedulable(@schedulable).send(@state)
+    end
     
     logger.debug("*** #{@appointments.size} waitlist appointments")
-    
+
     # set title based on schedulable
     @title = "Waitlist for #{@schedulable.name}"
     

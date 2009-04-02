@@ -93,7 +93,7 @@ class AppointmentScheduler
   
   # create a waitlist appointment
   # options:
-  #  - commit => if true, commit the waitlist appoitnmetn; otherwise, create the object but don't save; default is true
+  #  - commit => if true, commit the waitlist appointment; otherwise, create the object but don't save it; default is true
   def self.create_waitlist_appointment(company, schedulable, service, customer, date_time_options, options={})
     # should be a service that is not marked as work
     raise AppointmentInvalid if service.mark_as != Appointment::WORK

@@ -147,7 +147,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
     
-  context "create waitlist appointment" do
+  context "create waitlist appointment with a specific service provider" do
     setup do
       @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
@@ -159,7 +159,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
       @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
     end
-
+  
     should_change "Appointment.count", :by => 1
     
     should "have a start date of today and end date in 1 week" do
@@ -175,6 +175,23 @@ class AppointmentTest < ActiveSupport::TestCase
     should "add 'customer' role to customer" do
       assert_equal ['customer'], @customer.roles.collect(&:name)
     end
+  end
+  
+  context "create waitlist appointment with any service provider" do
+    setup do
+      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
+      @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+      @customer     = Factory(:user)
+      # build start, end date ranges in utc time
+      @start_date   = Time.now.utc.to_s(:appt_schedule_day)
+      @end_date     = (Time.now.utc + 7.days).to_s(:appt_schedule_day)
+      @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
+      @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
+      @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, nil, @haircut, @customer, @options)
+      assert_valid @wait_appt
+    end
+
+    should_change "Appointment.count", :by => 1
   end
   
   context "create an afternoon appointment to test time overlap searching" do

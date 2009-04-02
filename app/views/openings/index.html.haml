@@ -13,11 +13,15 @@
           
 - unless @daterange.blank?
   .span-15.prepend-1.append-1
-    %h2.span-14.last
-      -# show count of available timeslots
-      = @free_appointments.blank? ? "No Available Timeslots" : pluralize(@free_appointments.size, 'Available Timeslots')
-      = "for a #{@service.name}"
-
+    .span-15.last.padding-top-10
+      -# show count of available timeslots for the service and schedulable
+      %h3
+        = @free_appointments.blank? ? "No Available Timeslots" : pluralize(@free_appointments.size, 'Available Timeslot')
+        == -
+        %span{:style => 'background-color: #FFFF99;'}= @service.name
+        == with
+        %span{:style => 'background-color: #FFFF99;'}= @schedulable.name
+        
     .span-14.last
       - unless @free_appointments.blank?
         %h3== Pick a #{Duration.to_words(@duration).singularize} window below

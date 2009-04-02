@@ -8,7 +8,9 @@ class Appointment < ActiveRecord::Base
   belongs_to              :service
   belongs_to              :schedulable, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
-  validates_presence_of   :company_id, :service_id, :schedulable_id, :schedulable_type, :start_at, :end_at, :duration
+  validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
+  validates_presence_of   :schedulable_id, :if => :schedulable_required?
+  validates_presence_of   :schedulable_type, :if => :schedulable_required?
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free work wait)
   has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
@@ -27,6 +29,7 @@ class Appointment < ActiveRecord::Base
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :schedulable,   lambda { |schedulable| { :conditions => {:schedulable_id => schedulable.id, :schedulable_type => schedulable.class.to_s} }}
+  named_scope :no_schedulable, { :conditions => {:schedulable_id => nil, :schedulable_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
@@ -231,12 +234,6 @@ class Appointment < ActiveRecord::Base
     end
   end
   
-  # customers are required for work and waitlist appointments
-  def customer_required?
-    return true if [WORK, WAIT].include?self.mark_as
-    return false
-  end
-  
   # START: override attribute methods
   def when=(s)
     if s.blank?
@@ -435,6 +432,18 @@ class Appointment < ActiveRecord::Base
 
   protected
   
+  # schedulables are required for all appointments except waitlist appointments
+  def schedulable_required?
+    return false if wait?
+    true
+  end
+  
+  # customers are required for work and waitlist appointments
+  def customer_required?
+    return true if work? or wait?
+    false
+  end
+
   def make_confirmation_code
     unless self.confirmation_code
       if [WORK, WAIT].include?(self.mark_as)
