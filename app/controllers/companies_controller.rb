@@ -28,8 +28,16 @@ class CompaniesController < ApplicationController
 
   # GET /companies/1/setup
   def setup
+    # show setup page based on user type
+    if !logged_in?
+      # show customer setup for an anonymous user
+      setup_type = 'customer'
+    else
+      setup_type = company_employee? ? 'employee' : 'customer'
+    end
+    
     respond_to do |format|
-      format.html
+      format.html { render(:action => "setup_#{setup_type}") }
     end
   end
   

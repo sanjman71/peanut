@@ -76,6 +76,16 @@ class ApplicationController < ActionController::Base
   def company_manager?
     has_role?('company manager', current_company) || has_role?('admin')
   end
+
+  # return true if the current user is a company employee
+  def company_employee?
+    has_role?('company employee', current_company) || has_role?('admin')
+  end
+  
+  # returns true if the current user is a customer
+  def customer?
+    has_role?(Company.customer_role_name, current_company)
+  end
   
   # returns true if there is more than 1 company location
   def show_location?
@@ -83,13 +93,13 @@ class ApplicationController < ActionController::Base
   end
   
   # return the relationship(s) between the appointment and the user
-  # returns a tuple with true/false values for: ['customer', 'employee', 'manager']
+  # returns a tuple with true/false values for: ['customer', 'owner', 'manager']
   def appointment_roles(appointment, user=nil)
     user      = user || current_user
     customer  = appointment.customer == user ? true : false
-    employee  = appointment.schedulable == user ? true : false
+    owner     = appointment.schedulable == user ? true : false
     manager   = company_manager?
-    [customer, employee, manager]
+    [customer, owner, manager]
   end
   
   # controls whether the flash may be displayed in the header, defaults to true
