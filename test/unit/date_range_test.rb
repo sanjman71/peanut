@@ -202,7 +202,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have start at == 1 month ago in utc format' do
-      assert_equal 1.month.ago.utc.beginning_of_day, @daterange.start_at
+      assert_equal Time.now.utc.beginning_of_day - 1.month + 1.day, @daterange.start_at
     end
 
     should 'have date range of 31 days' do
