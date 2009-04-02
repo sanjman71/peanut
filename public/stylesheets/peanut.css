@@ -1,13 +1,5 @@
 /* link styles */
 
-/*
-a                                                 { color: #000000; background: transparent none repeat scroll 0 0; }
-
-a.current, a.current:hover                        { color: #000000; text-decoration: none; background: transparent none repeat scroll 0 0; }
-
-a:hover                                           { background-color: #0033BB; color: #FFFFFF; text-decoration: none; }
-*/
-
 a:hover                                           { color: #FFFFFF; background-color: #0033CC; text-decoration: none; }
 
 a.current, a.current:hover                        { text-decoration: none; }
@@ -171,6 +163,5 @@ h3.select_label                                   { padding-top: 10px; }
 
 div.description textarea                          { height: 200px;}
 div.slogan input                                  { width: 100px;}
-div.company_name                                  { float: left;}
 
 textarea.message                                  { height: 30px; width: 500px; }

@@ -40,8 +40,7 @@
           .span-19
             .company_name_slogan.span-19.last
               .company_name.append-1
-                %h2
-                  = link_to current_company.name, root_path(:subdomain => current_subdomain)
+                = current_company.name
               .slogan.last
                 = h current_company.slogan unless current_company.slogan.blank?
           .span-5.last.text-align-right

@@ -192,7 +192,7 @@ class UsersController < ApplicationController
         flash[:notice] = "#{@type.titleize} #{@user.name} was successfully updated"
         format.html { redirect_to(@index_path) }
       else
-        
+        format.html { render(:action => 'edit') }
       end
     end
   end
