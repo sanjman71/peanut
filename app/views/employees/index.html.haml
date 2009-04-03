@@ -2,7 +2,7 @@
 - stylesheet('users')
 - javascript('users')
 
-.span-24
+.span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
     .span-9
       %h2== Employees
@@ -12,18 +12,19 @@
         == &nbsp;|&nbsp;
         = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
       
+  %hr.space
+
+  .span-14.prepend-1.append-1.last
+    = display_flash(:notice)
+
+  .span-14.prepend-1.append-1.last
+    .highlight#flash
+  
+  #employees
+    = render(:partial => 'employees', :locals => {:users => @users})
+
+.span-8.last
   -# employee help
   .span-7.prepend-1.last
     = render(:partial => 'employee_help')
-  
-%hr.space
-
-.span-14.prepend-1.append-1.last
-  = display_flash(:notice)
-
-.span-14.prepend-1.append-1.last
-  .highlight#flash
-  
-#employees
-  = render(:partial => 'employees', :locals => {:users => @users})
 

@@ -1,14 +1,13 @@
 - users.each do |user|
-  .span-24.last.letterbox.user{:class => cycle("shaded", "")}[user]
-    .span-7.prepend-1.name
-      %h2.employee.name{:style => "margin-bottom: 3px;"}= user.name
-      -# show user roles
-      .employee.roles= user.roles.collect(&:name).join(", ")
-    .span-6.employee.email
-      %h3{:style => "margin-bottom: 2px;"}= user.email
-    .span-4.employee.manager
+  .span-16.last.letterbox.user{:class => cycle("shaded", "")}[user]
+    -# employee name and email
+    .span-6.prepend-1.name
+      %h2.employee.name.bottom= user.name
+      %h4=user.email
+      
       -# allow company managers to toggle manager role
-      - if @company_manager
+    .span-5.employee.manager
+      - if company_manager?
         - if current_user == user
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
@@ -16,14 +15,15 @@
           = check_box_tag 'Company Manager', 'yes', user.has_role?('company manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'employees', :action => 'toggle_manager', :id => user.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+          
     -#.span-4.calendar
       -# allow company managers to toggle user calendar
-      -#- if @company_manager
+      -#- if company_manager?
         -#= check_box_tag 'Show Calendar', 'yes', user.has_calendar?(current_company), :class => 'checkbox calendar', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable_type => user.tableize, :schedulable_id => user.id, :subdomain => current_subdomain)
         -#- text = (current_user == user) ? "Show My Calendar" : "Show Calendar"
         -#= label_tag '', text, :class => 'checkbox label'
         -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
-    .span-6.action.last
+    .span-2.prepend-2.action.last
       -# allow company managers or edit all users, and user to edit himself
-      - if @company_manager or user == current_user
+      - if company_manager? or user == current_user
         = link_to "Edit", url_for(:controller => 'employees', :action => 'edit', :id => user.id, :subdomain => current_subdomain), :class => 'admin'

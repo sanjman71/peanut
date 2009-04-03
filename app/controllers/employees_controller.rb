@@ -7,12 +7,8 @@ class EmployeesController < ApplicationController
   # GET /employees
   def index
     # find all company employees
-    @role   = Company.employee_role
-    @users  = current_company.authorized_users.with_role(@role).order_by_name.uniq
+    @users  = current_company.authorized_users.with_role(Company.employee_role).order_by_name.uniq
     
-    # check if current user is a company manager
-    @company_manager = company_manager?
-
     respond_to do |format|
       format.html
       format.js
