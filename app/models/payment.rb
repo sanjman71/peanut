@@ -69,8 +69,9 @@ class Payment < ActiveRecord::Base
   protected
   
   # used to generate a unique order id
-  def number 
-    CGI::Session.generate_unique_id 
+  def number
+    ActiveSupport::SecureRandom.hex(16)
+    # ActionController::Session.generate_unique_id 
   end
   
   def process(action, amount = nil) 

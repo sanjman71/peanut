@@ -57,7 +57,6 @@ class EmployeesControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'employees/index.html.haml'
     should_assign_to :users, :class => Array
-    should_assign_to :company_manager
   
     should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0
@@ -80,7 +79,6 @@ class EmployeesControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'employees/index.html.haml'
     should_assign_to :users, :class => Array
-    should_assign_to :company_manager, :equals => 'true'
     
     should "be able to change manager role for 1 employee" do
       assert_select "input.checkbox.manager", 1

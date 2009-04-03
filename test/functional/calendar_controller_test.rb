@@ -50,7 +50,7 @@ class CalendarControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to company root path" do
-      assert_redirected_to("http://www.test.host/")
+      assert_redirected_to("/")
     end
   end
 
@@ -67,7 +67,7 @@ class CalendarControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to johnny's calendar" do
-      assert_redirected_to("http://www.test.host/#{@johnny.tableize}/#{@johnny.id}/calendar")
+      assert_redirected_to("/#{@johnny.tableize}/#{@johnny.id}/calendar")
     end
   end
   

@@ -132,7 +132,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to user calendar path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
+      assert_redirected_to("/users/#{@johnny.id}/calendar")
     end
   end
   
@@ -155,7 +155,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to user calendar path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
+      assert_redirected_to("/users/#{@johnny.id}/calendar")
     end
   end
   
@@ -176,7 +176,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to user calendar path" do
-      assert_redirected_to("http://www.test.host/users/#{@johnny.id}/calendar")
+      assert_redirected_to("/users/#{@johnny.id}/calendar")
     end
   end
 
@@ -217,7 +217,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to appointment path" do
-      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
+      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
     end
   end
 
@@ -258,7 +258,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to appointment path" do
-      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
+      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
     end
   end
 
@@ -300,7 +300,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to appointment path" do
-      assert_redirected_to("http://www.test.host/appointments/#{assigns(:appointment).id}")
+      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
     end
   end
   
@@ -362,7 +362,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     
       should_respond_with :redirect
       should "redirect to appointment path" do
-        assert_redirected_to "http://www.test.host/appointments/#{assigns(:appointment).id}"
+        assert_redirected_to "/appointments/#{assigns(:appointment).id}"
       end
     end
   end
@@ -392,7 +392,8 @@ class AppointmentsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to appointment path" do
-      assert_redirected_to "http://www.test.host/appointments/#{assigns(:appointment).id}"
+      # assert_redirected_to "http://test.host/appointments/#{assigns(:appointment).id}"
+      assert_redirected_to "/appointments/#{assigns(:appointment).id}"
     end
   end
 end

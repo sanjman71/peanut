@@ -19,8 +19,9 @@ class OpeningsController < ApplicationController
       redirect_to(setup_company_path(current_company)) and return
     end
     
-    # find services collection for the current company, for services with at least 1 service provider
-    @services     = current_company.services.with_providers.work
+    # find services collection for the current company; valid services must have at least 1 service provider
+    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
+    @services     = Array(current_company.services.with_providers.work)
     
     if @services.empty?
       # there are no services with any service providers
@@ -115,9 +116,6 @@ class OpeningsController < ApplicationController
   end
 
   def search
-    # remove 'authenticity_token' params
-    params.delete('authenticity_token')
-    
     # url format 'when' parameters parameters
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]

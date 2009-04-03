@@ -50,7 +50,7 @@ class CompanyTest < ActiveSupport::TestCase
     
     should "have 1 free service" do
       assert_equal 1, @company.services_count
-      assert_equal 1, @company.services.free.size
+      assert @company.free_service
     end
   
     should "have 0 work services" do

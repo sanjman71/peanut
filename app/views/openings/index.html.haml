@@ -18,9 +18,7 @@
       %h3
         = @free_appointments.blank? ? "No Available Timeslots" : pluralize(@free_appointments.size, 'Available Timeslot')
         == -
-        %span{:style => 'background-color: #FFFF99;'}= @service.name
-        == with
-        %span{:style => 'background-color: #FFFF99;'}= @schedulable.name
+        = highlight("#{@service.name} with #{@schedulable.name}", [@service.name, @schedulable.name])
         
     .span-14.last
       - unless @free_appointments.blank?

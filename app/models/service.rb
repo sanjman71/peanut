@@ -13,8 +13,8 @@ class Service < ActiveRecord::Base
   AVAILABLE                   = "Available"
   UNAVAILABLE                 = "Unavailable"
   
-  named_scope :free,          { :conditions => {:mark_as => Appointment::FREE} }
-  named_scope :work,          { :conditions => {:mark_as => Appointment::WORK} }
+  # find services by mark as type
+  Appointment::MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
   
   # find services with at least 1 service provider
   named_scope :with_providers,  { :conditions => ["schedulables_count > 0"] }

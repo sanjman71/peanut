@@ -81,7 +81,7 @@ class OpeningsControllerTest < ActionController::TestCase
 
     should_respond_with :redirect
     should "redirect to openings services path with default duration value" do
-      assert_redirected_to("http://www.test.host/services/#{@haircut.id}/30/openings/this-week/anytime")
+      assert_redirected_to("/services/#{@haircut.id}/30/openings/this-week/anytime")
     end
   end
 end

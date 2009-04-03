@@ -49,7 +49,7 @@ class UsersControllerTest < ActionController::TestCase
           @sender           = Factory(:user)
           @recipient_email  = Factory.next(:user_email)
           @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
-          assert_valid @invitation
+          assert @invitation.valid?
           # stub current user as nobody logged in
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)
@@ -131,7 +131,7 @@ class UsersControllerTest < ActionController::TestCase
           @sender           = Factory(:user, :email => "sender@peanut.com")
           @recipient_email  = Factory.next(:user_email)
           @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
-          assert_valid @invitation
+          assert @invitation.valid?
           # stub current user as nobody
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)

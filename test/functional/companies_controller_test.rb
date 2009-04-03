@@ -10,8 +10,7 @@ class CompaniesControllerTest < ActionController::TestCase
 
   # Make sure we are routing the convenience routes
   # TODO - ideally we should not route www.peanut.com/show in this way - we should only route valid company subdomains. Don't know how to check this
-  should_route :get, 'show', :controller => 'companies', :action => 'show'
-  should_route :get, 'edit', :controller => 'companies', :action => 'edit'
+  should_route :get, '/edit', :controller => 'companies', :action => 'edit'
 
   def setup
     # create a valid company
@@ -20,6 +19,9 @@ class CompaniesControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
+
+    # stub current company method
+    @controller.stubs(:current_company).returns(@company)
   end
   
   context "do not show companies index without privileges" do

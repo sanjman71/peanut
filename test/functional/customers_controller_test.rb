@@ -70,7 +70,7 @@ class CustomersControllerTest < ActionController::TestCase
       @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
       @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @johnny, :service => @haircut)
-      assert_valid @appointment
+      assert @appointment.valid?
     end
 
     context "with an ajax search for 'boo' with 'read users' privilege" do

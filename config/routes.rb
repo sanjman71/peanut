@@ -52,7 +52,7 @@ ActionController::Routing::Routes.draw do |map|
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
-  map.resources :companies, :only => [:index, :edit, :update, :destroy], :member => {:setup => :get}
+  map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
   map.resources :notes, :only => [:create]
@@ -132,9 +132,8 @@ ActionController::Routing::Routes.draw do |map|
   # map the root to the home controller, and let the home controller figure out the subdomain
   map.root :controller => 'home', :action => 'index'
   
-  # map the company root to the companies controller
-  map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
-  map.edit_company_root  '/edit', :controller => 'companies', :action => 'edit', :conditions => { :subdomain => /.+/ }
+  # map the company root edit action to the companies controller
+  map.edit_company_root  'edit', :controller => 'companies', :action => 'edit'
 
   # debug controller
   map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}

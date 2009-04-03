@@ -22,6 +22,8 @@ class Appointment < ActiveRecord::Base
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
   WAIT                    = 'wait'      # wait appointments are waiting to be scheduled in free timeslots
   
+  MARK_AS_TYPES           = [FREE, WORK, WAIT]
+  
   NONE                    = 'none'      # indicates that no appointment is scheduled at this time, and therefore can be scheduled as free time
   
   # appointment confirmation code constants
@@ -50,10 +52,9 @@ class Appointment < ActiveRecord::Base
                                                                        time_range.last, time_range.last, 
                                                                        time_range.first, time_range.last] }}
 
-  # find appointments by mark_as value
-  named_scope :free,        { :conditions => {:mark_as => FREE} }
-  named_scope :work,        { :conditions => {:mark_as => WORK} }
-  named_scope :wait,        { :conditions => {:mark_as => WAIT} }
+  # find appointments by mark_as type
+  MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
+  
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
   
   # find appointments by state is part of the AASM plugin

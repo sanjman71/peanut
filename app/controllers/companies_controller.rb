@@ -27,6 +27,10 @@ class CompaniesController < ApplicationController
     else
       @company = Company.find(params[:id])
     end
+    
+    respond_to do |format|
+      format.html
+    end
   end
 
   # GET /companies/1/setup
