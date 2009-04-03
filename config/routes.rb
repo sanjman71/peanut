@@ -129,8 +129,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :events, :member => {:mark_as_seen => :post}
   map.dashboard 'dashboard', :controller => 'events', :action => 'index'
 
-  # map the root to the home controller
-  map.root                  :controller => 'home', :action => 'index', :conditions => { :subdomain => "www" }
+  # map the root to the home controller, and let the home controller figure out the subdomain
+  map.root :controller => 'home', :action => 'index'
   
   # map the company root to the companies controller
   map.show_company_root  '/show', :controller => 'companies', :action => 'show', :conditions => { :subdomain => /.+/ }
