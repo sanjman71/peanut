@@ -85,6 +85,11 @@ class Subscription < ActiveRecord::Base
     end
   end
   
+  # returns true if the associated plan is billable
+  def billable?
+    plan.billable?
+  end
+  
   # bill the credit card referenced by the vault id, or using the credit card specified
   def bill(credit_card = nil)
     if self.next_billing_at.to_date > Date.today

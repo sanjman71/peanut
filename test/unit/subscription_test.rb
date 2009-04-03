@@ -23,6 +23,19 @@ class SubscriptionTest < ActiveSupport::TestCase
       assert @subscription.initialized?
     end
     
+    should "have start billing at date initialized" do
+      assert @subscription.start_billing_at
+    end
+    
+    should "have no next billing at date" do
+      assert_nil @subscription.next_billing_at
+    end
+    
+    should "have 0 paid cycles and 0 billing errors" do
+      assert_equal 0, @subscription.paid_count
+      assert_equal 0, @subscription.billing_errors_count
+    end
+    
     context "authorize with a valid credit card" do
       setup do
         @credit_card        = credit_card(:number => '1')

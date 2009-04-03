@@ -22,11 +22,8 @@ class SubscriptionsController < ApplicationController
   def edit
     @subscription = current_company.subscription
 
-    plans     = Plan.order_by_cost
-    @free     = plans[0]
-    @basic    = plans[1]
-    @premium  = plans[2]
-    @max      = plans[3]
+    # find all plans
+    @free, @basic, @premium, @max = Plan.order_by_cost
     
     respond_to do |format|
       format.html # edit.html.haml
@@ -45,15 +42,13 @@ class SubscriptionsController < ApplicationController
     end
     
     redirect_to edit_company_root_path(:subdomain => current_company.subdomain)
-        
   end
   
   def edit_cc
-    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])    
+    @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
   end
   
   def update_cc
-
     @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:active_merchant_billing_credit_card])
     @payment      = current_company.subscription.authorize(@credit_card)
     

@@ -8,7 +8,10 @@ class CompaniesController < ApplicationController
   # GET /companies
   # GET /companies.xml
   def index
-    @companies = Company.find(:all)
+    @companies = Company.all
+    
+    # find all companies w/ billing errors
+    @billing_errors = Company.billing_errors
     
     respond_to do |format|
       # use home layout when listing all companies

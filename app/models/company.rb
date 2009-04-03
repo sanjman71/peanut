@@ -42,6 +42,9 @@ class Company < ActiveRecord::Base
   # after create filter to initialize basic services that are provided by all companies
   after_create              :init_basic_services
 
+  # find all subscriptions with billing errors
+  named_scope               :billing_errors, { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
+
   def self.customer_role_name
     'customer'
   end

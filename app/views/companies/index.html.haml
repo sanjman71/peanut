@@ -1,15 +1,20 @@
 - title('Admin Console')
 
-.span-17
-  .span-15.last.box
+.span-16
+  .span-15.prepend-1.last.mat.padding-top-10.padding-bottom-20
     %h2== Companies
+    
   %hr.space
+  
+  .span-15.prepend-1
+    %h3{:style => 'color: #FF6600;'}
+      = pluralize(@companies.size, "Company")
+      == and
+      = pluralize(@billing_errors.size, "Billing Error")
+      
   .span-15.prepend-1.append-1.last
     .highlight#flash
+    
   #companies
     = render(:partial => 'companies.html.haml', :locals => {:companies => @companies})
 
-%hr.space
-
-.span-20.prepend-1
-  %h3= link_to 'Home', root_path
