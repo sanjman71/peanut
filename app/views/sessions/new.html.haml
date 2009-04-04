@@ -1,7 +1,11 @@
 - title('Welcome to Peanut')
 
 .span-24.last
+  .span-12
+    = display_flash(:all)
+    
   .span-12.mat.padding-bottom-10
     = render :partial => 'sessions/login_form'
   .span-12.last
-    = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :type => 'customer', :subdomain => current_subdomain), :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}
+    - if @signup
+      = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :type => 'customer', :subdomain => current_subdomain), :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}
