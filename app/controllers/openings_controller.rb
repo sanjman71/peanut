@@ -116,6 +116,9 @@ class OpeningsController < ApplicationController
   end
 
   def search
+    # delete the authenticity token parameter so its not passed on
+    params.delete("authenticity_token")
+    
     # url format 'when' parameters parameters
     ['when', 'time'].each do |s|
       params[s] = params[s].to_url_param if params[s]

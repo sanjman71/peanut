@@ -1,6 +1,8 @@
 - appointments_by_day.each do |day, appointments|
   .span-15.last.appointments.date{:id => "appointments_#{day.to_s(:appt_schedule_day)}", :style => 'padding-top: 5px;'}
-    %h3= day.to_s(:appt_day)
+    -# show day of week and month day in a calendar cube
+    = render(:partial => 'shared/calendar_cube', :locals => {:date => day})
+    
     -# group appointments by people
     - reset_cycle
     - appointments.group_by { |appt| appt.schedulable }.each do |schedulable, appointments|

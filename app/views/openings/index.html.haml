@@ -16,14 +16,14 @@
     .span-15.last.padding-top-10
       -# show count of available timeslots for the service and schedulable
       %h3
-        = @free_appointments.blank? ? "No Available Timeslots" : pluralize(@free_appointments.size, 'Available Timeslot')
-        == -
         = highlight("#{@service.name} with #{@schedulable.name}", [@service.name, @schedulable.name])
-        
-    .span-14.last
-      - unless @free_appointments.blank?
-        %h3== Pick a #{Duration.to_words(@duration).singularize} window below
-        
+      %h4{:style => 'color: #666666;'}
+        - if @free_appointments.blank?
+          == We found no available timeslots matching your search criteria.
+        - else
+          == We found #{pluralize(@free_appointments.size, 'available timeslot')} matching your search criteria.
+          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below.", Duration.to_words(@duration).singularize)
+          
     .span-14.last
       -# show daterange name
       %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
@@ -34,10 +34,13 @@
       .span-14.last.appointments#free_appointments
         = render(:partial => 'appointments/free_appointments', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
 
-    .span-14.last
+    .span-15.last
       -# show waitlist link if the @show_waitlist flag is set
       - if @show_waitlist
-        %h2= link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
+        %h2
+          = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
+          %span{:style => 'font-size: 0.7em;'}== or
+        %h3{:style => 'font-size: 1.3em; color: #666666;'}== Use the search bar to the right to change your search parameters and try again.
     
 .last{:class => @daterange ? "span-7" : "span-24"}
   .span-7.mat
