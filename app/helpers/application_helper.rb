@@ -173,7 +173,7 @@ module ApplicationHelper
   
   def build_admin_tab_links
     if has_privilege?('create companies')
-      link = link_to 'Admin Console', companies_path(:subdomain => nil)
+      link = link_to 'Admin Console', root_path(:subdomain => 'www')
       yield link
     end
   end
