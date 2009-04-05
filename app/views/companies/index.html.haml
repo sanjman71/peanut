@@ -8,9 +8,11 @@
   
   .span-15.prepend-1
     %h3{:style => 'color: #FF6600;'}
-      = pluralize(@companies.size, "Company")
-      == and
-      = pluralize(@billing_errors.size, "Billing Error")
+      .span-3== Companies:
+      = @companies.size
+      %hr.space{:style => 'margin-bottom: 7px;'}
+      .span-3== Billing Errors:
+      = @billing_errors.size
       
   .span-15.prepend-1.append-1.last
     .highlight#flash
