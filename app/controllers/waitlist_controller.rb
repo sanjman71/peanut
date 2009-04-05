@@ -26,8 +26,8 @@ class WaitlistController < ApplicationController
       @anyone       = false
     end
     
-    # group appointments by schedulable
-    @appointments_by_schedulable = @appointments.group_by { |appt| appt.schedulable || User.anyone }
+    # group appointments by schedulable, map an empty schedulable to the special 'anyone' user
+    @appointments_by_schedulable = @appointments.group_by{ |appt| appt.schedulable }.map{ |schedulable, appts| [schedulable || User.anyone, appts] }
     
     logger.debug("*** #{@appointments.size} waitlist appointments")
 
