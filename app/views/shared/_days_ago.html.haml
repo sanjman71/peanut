@@ -1,4 +1,4 @@
 %span.calendar.days.ago
   -# find time span in hours
-  - hours = (Time.now - date) / 3600
+  - hours = (Time.now.utc - date.beginning_of_day.utc) / 3600
   = hours < 24 ? "Today" : "#{(hours/24).to_i} days ago"
