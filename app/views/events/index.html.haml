@@ -1,5 +1,5 @@
 - title("Events")
-/ - stylesheet('events')
+- stylesheet('calendar')
 / - javascript('events')
 
 .span-24
@@ -14,12 +14,13 @@
 %hr.space
 
 - if has_privilege?('create events', current_company)
-  .span-23.prepend-1.mat
-    %h3 Add an Event
+  .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
+    %h3==Add an Event
     - form_for(Event.new, :url => events_url(:subdomain => current_subdomain), :method => :post) do |f|
       = hidden_field_tag :event_company_id, current_company.id
       = hidden_field_tag :event_user_id, current_user.id
       = f.select :etype, [["Urgent", 1], ["Approval", 2], ["Informational", 3]], {:selected => nil}
+      == &nbsp;
       = f.label :message, "Message: "
       = f.text_field :message
       = f.submit
@@ -28,14 +29,32 @@
 
 #events
   - unless @urgent.empty?
-    .urgent.span-22.prepend-1.append-1.last
-      %h3==Urgent
-      = render(:partial => 'events', :object => @urgent)
+    .urgent.last
+      %h3.prepend-1
+        %span{:style => 'background-color: #FFCC00;'}==Urgent
+      - @urgent_by_day.each do |date, events|
+        .prepend-1
+          -# show event day of week and month day 
+          = render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+        - reset_cycle
+        = render(:partial => 'events', :object => events)
+        %hr.space
+      
   - unless @approval.empty?
-    .approval.span-22.prepend-1.append-1.last
-      %h3==Approval
+    .approval.last
+      %h3.prepend-1==Approval
+      - reset_cycle
       = render(:partial => 'events', :object => @approval)
+      %hr.space
+      
   - unless @informational.empty?
-    .informational.span-22.prepend-1.append-1.last
-      %h3==Informational
-      = render(:partial => 'events', :object => @informational)
+    .informational.last
+      %h3.prepend-1
+        %span{:style => 'background-color: #FFCC00;'}==Informational
+      - @informational_by_day.each do |date, events|
+        .prepend-1
+          -# show event day of week and month day 
+          = render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+        - reset_cycle
+        = render(:partial => 'events', :object => events)
+        %hr.space

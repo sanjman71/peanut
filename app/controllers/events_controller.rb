@@ -7,23 +7,25 @@ class EventsController < ApplicationController
   privilege_required  'delete events', :only => [:delete]
 
   def index
-    
     if params[:seen].blank? || params[:seen] != "true"
       @seen = false
       @urgent = current_company.events.urgent.unseen
       @approval = current_company.events.approval.unseen
-      @informational = current_company.events.informational.unseen
+      @informational = current_company.events.informational.unseen.order_recent
     else
       @seen = true
       @urgent = current_company.events.urgent.seen
       @approval = current_company.events.approval.seen
-      @informational = current_company.events.informational.seen
+      @informational = current_company.events.informational.seen.order_recent
     end
+
+    # group events by day
+    @urgent_by_day          = @urgent.group_by { |e| e.updated_at.beginning_of_day }
+    @informational_by_day   = @informational.group_by { |e| e.updated_at.beginning_of_day }
     
     respond_to do |format|
       format.html
     end
-    
   end
   
   def mark_as_seen

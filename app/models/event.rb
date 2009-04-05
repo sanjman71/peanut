@@ -17,6 +17,9 @@ class Event < ActiveRecord::Base
   named_scope             :seen, :conditions => {:seen => true}
   named_scope             :unseen, :conditions => ['seen = ? or seen is null', false]
   
+  # order by start_at, most recent first
+  named_scope             :order_recent, {:order => 'updated_at DESC'}
+  
   def seen?
     self.seen == true
   end
