@@ -4,10 +4,10 @@ class EventsController < ApplicationController
   privilege_required  'read events', :only => [:index]
   privilege_required  'update events', :only => [:mark_as_seen]
   privilege_required  'create events', :only => [:create]
-  privilege_required  'delete events', :only => [:delete]
+  privilege_required  'delete events', :only => [:destroy]
 
   def index
-    if params[:seen].blank? || params[:seen] != "true"
+    if params[:state].blank? || params[:state] == 'unseen'
       @seen = false
       @urgent = current_company.events.urgent.unseen
       @approval = current_company.events.approval.unseen
@@ -19,7 +19,7 @@ class EventsController < ApplicationController
       @informational = current_company.events.informational.seen.order_recent
     end
 
-    # group events by day
+    # group events by updated_at timestamp
     @urgent_by_day          = @urgent.group_by { |e| e.updated_at.beginning_of_day }
     @informational_by_day   = @informational.group_by { |e| e.updated_at.beginning_of_day }
     
@@ -39,8 +39,7 @@ class EventsController < ApplicationController
       flash[:error] = "Couldn't mark event as seen"
     end
     
-    redirect_to dashboard_path(:subdomain => current_subdomain) and return
-    
+    redirect_to events_path(:subdomain => current_subdomain) and return
   end
   
   def create
@@ -53,8 +52,7 @@ class EventsController < ApplicationController
       flash[:error] = "Problem creating event"
     end
     
-    redirect_to dashboard_path(:subdomain => current_subdomain) and return
-    
+    redirect_to events_path(:subdomain => current_subdomain) and return
   end
   
   def destroy
@@ -68,11 +66,11 @@ class EventsController < ApplicationController
     @urgent = current_company.events.urgent
     @approval = current_company.events.approval
     @informational = current_company.events.informational
+    
     respond_to do |format|
-      format.html { redirect_to dashboard_path(:subdomain => current_subdomain)}
+      format.html { redirect_to events_path(:subdomain => current_subdomain)}
       format.js
     end
-    
   end
   
 end

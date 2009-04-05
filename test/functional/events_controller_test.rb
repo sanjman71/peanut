@@ -3,6 +3,11 @@ require 'test/factories'
 
 class EventsControllerTest < ActionController::TestCase
 
+  # show events index, optionally scoped by state
+  should_route :get, '/events', :controller => 'events', :action => 'index'
+  should_route :get, '/events/seen', :controller => 'events', :action => 'index', :state => 'seen'
+  should_route :get, '/events/unseen', :controller => 'events', :action => 'index', :state => 'unseen'
+
   def setup
     @owner        = Factory(:user, :name => "Owner")
     @customer     = Factory(:user, :name => "Customer")

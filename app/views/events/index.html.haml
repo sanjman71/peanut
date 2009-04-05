@@ -7,9 +7,9 @@
     .span-15
       %h2== Events
       - if (@seen == true)
-        %h3== #{link_to "Unseen", events_url(:subdomain => current_subdomain)} | Seen
+        %h3== #{link_to "Unseen", url_for(:subdomain => current_subdomain, :state => nil)} | Seen
       - else
-        %h3== Unseen | #{link_to "Seen", events_url(:subdomain => current_subdomain, :seen => true)}
+        %h3== Unseen | #{link_to "Seen", url_for(:subdomain => current_subdomain, :state => 'seen')}
       
 %hr.space
 
@@ -42,7 +42,8 @@
       
   - unless @approval.empty?
     .approval.last
-      %h3.prepend-1==Approval
+      %h3.prepend-1
+        %span{:style => 'background-color: #FFCC00;'}==Approval
       - reset_cycle
       = render(:partial => 'events', :object => @approval)
       %hr.space

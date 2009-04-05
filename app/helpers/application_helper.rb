@@ -156,14 +156,14 @@ module ApplicationHelper
       # 'Dashboard' tab
       name = 'Dashboard'
       if current_controller.controller_name == 'events' and ['index'].include?(current_controller.action_name)
-        link = link_to(name, dashboard_path, :class => 'current')
+        link = link_to(name, events_path, :class => 'current')
       else
         if current_company.events.urgent.unseen.size > 0
-          link = link_to(name, dashboard_path, :class => 'urgent')
+          link = link_to(name, events_path, :class => 'urgent')
         elsif current_company.events.approval.unseen.size > 0
-          link = link_to(name, dashboard_path, :class => 'approval')
+          link = link_to(name, events_path, :class => 'approval')
         else
-          link = link_to(name, dashboard_path)
+          link = link_to(name, events_path)
         end
       end
 
