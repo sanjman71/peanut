@@ -35,7 +35,8 @@
       - @urgent_by_day.each do |date, events|
         .prepend-1
           -# show event day of week and month day 
-          = render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+          .span-2= render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+          .span-2.last= render(:partial => 'shared/days_ago', :locals => {:date => date})
         - reset_cycle
         = render(:partial => 'events', :object => events)
         %hr.space
@@ -55,7 +56,8 @@
       - @informational_by_day.each do |date, events|
         .prepend-1
           -# show event day of week and month day 
-          = render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+          .span-2= render(:partial => 'shared/calendar_cube', :locals => {:date => date})
+          .span-2.last= render(:partial => 'shared/days_ago', :locals => {:date => date})
         - reset_cycle
         = render(:partial => 'events', :object => events)
         %hr.space

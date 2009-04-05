@@ -34,6 +34,9 @@ table.calendar td.mark                            { background: #5500BB none rep
 .calendar.cube.month_day                          { background: #FFFFFF none repeat scroll 0 0; color: #111111; display: block; font-size: 2em; 
                                                     font-weight: bold; line-height: 1.25em; }
 
+.calendar.days.ago                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; display: block; 
+                                                    width: 75px; text-align: center; }
+
 /* calendar time range slider styles */
 
 .slider .time                                     { color: #333333; }
