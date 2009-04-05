@@ -56,6 +56,7 @@ class Appointment < ActiveRecord::Base
   MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
   
   named_scope :free_work,   { :conditions => ["mark_as = ? OR mark_as = ?", FREE, WORK]}
+  named_scope :wait_work,   { :conditions => ["mark_as = ? OR mark_as = ?", WAIT, WORK]}
   
   # find appointments by state is part of the AASM plugin
   # add special named scopes for special state queries

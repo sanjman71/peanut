@@ -1,9 +1,13 @@
 .sidebar.instructions
-  %ul
-    - case state
-    - when 'upcoming'
-      %li== Upcoming appointments are appointments that have been scheduled and not marked as completed.
-    - when 'completed'
+  - case state
+  - when 'upcoming'
+    == What are upcoming appointments?
+    %ul
+      %li== They are appointments that have been scheduled and not marked as completed.
+      %li== They can be appointments scheduled for a service, or they can be waitlisted.
+  - when 'completed'
+    %ul
       %li== Completed appointments have finished and been marked as completed.
-    - when 'canceled'
+  - when 'canceled'
+    %ul
       %li== Canceled appointments have been scheduled and canceled before they occurred.

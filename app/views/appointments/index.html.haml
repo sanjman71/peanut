@@ -2,7 +2,7 @@
 - stylesheet('appointments')
 - javascript('appointments')
 
-.span-24
+.span-16
   .span-15.prepend-1.mat.padding-top-10.padding-bottom-10
     .span-10
       -# appointment schedulables
@@ -20,16 +20,32 @@
     .span-15.last
       %h3{:style => 'font-size: 1.3em;'}== Today is #{Time.now.to_s(:appt_day)}
     
-  -# appointment help
-  .span-7.prepend-1.last
-    = render(:partial => 'appointment_help', :locals => {:state => @state})
+  %hr.space
+  
+  .span-15.prepend-1.last
+    - if @appointments.blank?
+      %h2.bottom{:style => 'color: #5500BB;'}== No #{@state} appointments
+    - else
+      %h3.bottom{:style => 'color: #5500BB;'}== #{pluralize(@appointments.size, "#{@state} appointment")}
+  
+  %hr.space
+  
+  - @appointments_by_customer.each do |customer, appointments|
+    -# show customer name if showing more than 1 customer's appointments
+    .span-8.prepend-1.last
+      - if @anyone
+        .customer.group[customer]
+          == Customer:
+          = customer.name
+    
+    -# customer appointments
+    - reset_cycle
+    = render(:partial => 'customer_appointments', :locals => {:customer => customer, :appointments => appointments})
 
-%hr.space
-  
-.span-23.prepend-1
-  - if @appointments.blank?
-    %h2{:style => 'color: #5500BB;'}== No #{@state} appointments
-  - else
-    %h3{:style => 'color: #5500BB;'}== #{pluralize(@appointments.size, "#{@state} appointment")}
-  
-= render(:partial => 'customer_appointments', :locals => {:appointments => @appointments})
+    -# add space between customer appointment groups
+    %hr.space
+    
+-# appointment help
+.span-7.prepend-1.last
+  = render(:partial => 'appointment_help', :locals => {:state => @state})
+

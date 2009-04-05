@@ -370,14 +370,19 @@ class AppointmentsController < ApplicationController
 
     case @customer.id
     when 0
-      # find appointments for anyone with the specified state
-      @appointments = current_company.appointments.work.order_start_at.send(@state)
+      # find work, wait appointments for anyone with the specified state
+      @appointments = current_company.appointments.wait_work.order_start_at.send(@state)
+      @anyone       = true
     else
-      # find customer appointments with the specified state
-      @appointments = current_company.appointments.work.customer(@customer).order_start_at.send(@state)
+      # find customer work, wait appointments with the specified state
+      @appointments = current_company.appointments.wait_work.customer(@customer).order_start_at.send(@state)
+      @anyone       = false
     end
 
-    # find set of customers based on user role
+    # group appointments by customer
+    @appointments_by_customer = @appointments.group_by { |appt| appt.customer }
+
+    # company managers can see all customers; othwerwise the user can only see their own appointments
     if company_manager?
       @customers  = [User.anyone] + current_company.authorized_users.with_role(Company.customer_role).order_by_name
     else

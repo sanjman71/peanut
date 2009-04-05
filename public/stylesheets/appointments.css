@@ -3,10 +3,6 @@
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 
 div.appointment.review                            { font-size: 1.8em; font-weight: normal; }
-/*
-div.schedule_form span.field                      { margin: 3px 0 3px; padding-right: 7px; }
-div.schedule_form input.submit                    { font-size: 12px; }
-*/
 div.appointment.review .label                     { color: #999999; }
 div.appointment.review .data                      { color: #007700; }
 
@@ -31,3 +27,8 @@ a:visited.notify.waitlist                         { color: #008800; font-weight:
 div.appointment_header                            { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
                                                     color: #666666; font-size: 11px; font-weight: bold; padding: 5px 10px 5px 15px; }
 
+.customer.group                                   { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
+                                                    font-size: 1.0em; font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }
+
+.schedulable.group                                { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
+                                                    font-size: 1.0em;  font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }

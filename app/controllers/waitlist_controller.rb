@@ -18,11 +18,16 @@ class WaitlistController < ApplicationController
     
     if @schedulable.anyone?
       # find waitlist appointments for anyone by state
-      @appointments = @current_company.appointments.wait.no_schedulable.send(@state)
+      @appointments = @current_company.appointments.wait.send(@state)
+      @anyone       = true
     else
       # find waitlist appointments for a schedulable by state
       @appointments = @current_company.appointments.wait.schedulable(@schedulable).send(@state)
+      @anyone       = false
     end
+    
+    # group appointments by schedulable
+    @appointments_by_schedulable = @appointments.group_by { |appt| appt.schedulable || User.anyone }
     
     logger.debug("*** #{@appointments.size} waitlist appointments")
 

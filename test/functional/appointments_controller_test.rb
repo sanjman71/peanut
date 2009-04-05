@@ -365,35 +365,36 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_redirected_to "/appointments/#{assigns(:appointment).id}"
       end
     end
+    
+    context "for a service with any service provider" do
+      setup do
+        # get 'anyone' user
+        @anyone = User.anyone
+
+        # stub current user
+        @controller.stubs(:current_user).returns(@customer)
+
+        # create waitlist appointment
+        post :create,
+             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @anyone.tableize, :schedulable_id => @anyone.id,
+              :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
+      end
+
+      should_change "Appointment.count", :by => 1
+
+      should_assign_to :service, :equals => "@haircut"
+      should_not_assign_to :duration
+      should_not_assign_to :schedulable # schedulable should be empty
+      should_assign_to :customer, :equals => "@customer"
+      should_assign_to :mark_as, :equals => '"wait"'
+      should_assign_to :appointment
+
+      should_respond_with :redirect
+      should "redirect to appointment path" do
+        # assert_redirected_to "http://test.host/appointments/#{assigns(:appointment).id}"
+        assert_redirected_to "/appointments/#{assigns(:appointment).id}"
+      end
+    end
   end
   
-  context "for a service with any service provider" do
-    setup do
-      # get 'anyone' user
-      @anyone = User.anyone
-      
-      # stub current user
-      @controller.stubs(:current_user).returns(@customer)
-    
-      # create waitlist appointment
-      post :create,
-           {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @anyone.tableize, :schedulable_id => @anyone.id,
-            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
-    end
-
-    should_change "Appointment.count", :by => 1
-    
-    should_assign_to :service, :equals => "@haircut"
-    should_not_assign_to :duration
-    should_not_assign_to :schedulable # schedulable should be empty
-    should_assign_to :customer, :equals => "@customer"
-    should_assign_to :mark_as, :equals => '"wait"'
-    should_assign_to :appointment
-
-    should_respond_with :redirect
-    should "redirect to appointment path" do
-      # assert_redirected_to "http://test.host/appointments/#{assigns(:appointment).id}"
-      assert_redirected_to "/appointments/#{assigns(:appointment).id}"
-    end
-  end
 end

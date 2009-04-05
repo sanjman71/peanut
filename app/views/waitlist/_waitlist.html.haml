@@ -1,14 +1,11 @@
 - appointments.each do |appointment|
-  .span-24.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]
-    .span-4.prepend-1.name
-      %h3{:style => "margin-bottom: 2px;"}= (appointment.schedulable || User.anyone).name
-      = appointment.service.name
-    .span-4.when
-      %h3{:style => "margin-bottom: 2px;"}= appointment.when.titleize
+  .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]
+    .span-5.prepend-1.name
+      %h3{:style => "margin-bottom: 2px;"}= appointment.customer.name
+      %span{:style => 'font-size: 1.3em;'}= appointment.service.name
+    .span-5.when
       = appointment.start_at.to_s(:appt_short_month_day_year)
       == -
       = appointment.end_at.to_s(:appt_short_month_day_year)
-    .span-7.customer
-      %h4= appointment.customer.name
-    .span-8.last.action
+    .span-3.prepend-2.last.action
       = link_to('Details', appointment_path(appointment, :subdomain => current_subdomain), :class => 'admin')
