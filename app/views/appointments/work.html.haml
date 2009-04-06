@@ -44,8 +44,8 @@
 
 .span-23.prepend-1.text
   - # allow owners and managers add invoices
-  - if (@owner or @manager) and !@appointment.canceled?
-    %h3== Add Invoice
+  -#- if (@owner or @manager) and !@appointment.canceled?
+    -#%h3== Add Invoice
     
 .span-15.prepend-1  
   -# notes flash message
@@ -54,7 +54,7 @@
   -# add note
   .new_note#new_note_container
     %p
-    %h4{:style => 'color: #ff6600;'}== Add a note about this appointment
+    %h4== Add a note about this appointment
     = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @appointment, :subdomain => current_subdomain})
   %p
   -# appointment notes

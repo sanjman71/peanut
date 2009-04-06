@@ -96,19 +96,19 @@ module ApplicationHelper
 
     end
   
-    if has_privilege?('read invoices', current_company)
-
-      # 'Invoices' tab
-      name = 'Invoices'
-      if current_controller.controller_name == 'invoices' and ['index', 'show'].include?(current_controller.action_name)
-        link = link_to(name, invoices_path, :class => 'current')
-      else
-        link = link_to(name, invoices_path)
-      end
-
-      yield link
-
-    end
+    # if has_privilege?('read invoices', current_company)
+    # 
+    #   # 'Invoices' tab
+    #   name = 'Invoices'
+    #   if current_controller.controller_name == 'invoices' and ['index', 'show'].include?(current_controller.action_name)
+    #     link = link_to(name, invoices_path, :class => 'current')
+    #   else
+    #     link = link_to(name, invoices_path)
+    #   end
+    # 
+    #   yield link
+    # 
+    # end
     
     if has_privilege?('read services', current_company)
 
@@ -124,19 +124,19 @@ module ApplicationHelper
 
     end
 
-    if has_privilege?('read products', current_company)
-
-      # 'Products' tab
-      name = 'Products'
-      if current_controller.controller_name == 'products' and ['index', 'show'].include?(current_controller.action_name)
-        link = link_to(name, products_path, :class => 'current')
-      else
-        link = link_to(name, products_path)
-      end
-
-      yield link
-      
-    end
+    # if has_privilege?('read products', current_company)
+    # 
+    #   # 'Products' tab
+    #   name = 'Products'
+    #   if current_controller.controller_name == 'products' and ['index', 'show'].include?(current_controller.action_name)
+    #     link = link_to(name, products_path, :class => 'current')
+    #   else
+    #     link = link_to(name, products_path)
+    #   end
+    # 
+    #   yield link
+    #   
+    # end
     
     if has_privilege?('read users', current_company)
     
