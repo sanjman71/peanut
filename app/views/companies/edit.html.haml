@@ -38,8 +38,8 @@
     = f.error_messages
 
     .span-20.last
-      .span-3
-        %h3== Timezone:
+      .span-2
+        %h3{:style => 'padding-top: 7px;'}== Timezone:
       .span-5.last
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
     .span-20.last.padding-bottom-10
@@ -53,8 +53,9 @@
       .span-20.last.description
         = f.text_area :description, :class => "tiny-mce-editor span-20 last"
     .span-20.last.padding-top-10
-      .span-5
-        = f.submit 'Update Company Information', :class => 'button big'
+      = f.submit 'Update Company Information', :class => 'button big'
+      == or
+      = link_to 'Cancel', openings_path
 
 %hr.space
 
@@ -62,8 +63,3 @@
   %h2
     == Company Locations
   = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
-
-%hr.space
-
-.span-21.prepend-1.last
-  = link_to 'Go back to company site', root_path(:subdomain => current_subdomain), :style => 'font-size: 12px;'

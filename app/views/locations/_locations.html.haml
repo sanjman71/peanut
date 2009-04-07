@@ -15,7 +15,7 @@
 
 #locations
   .addressbox#addressbox
-    - unless locations.nil?
+    - unless locations.blank?
       .toppage
         = location_page_info locations
         = will_paginate locations, :param_name => page_param_name
