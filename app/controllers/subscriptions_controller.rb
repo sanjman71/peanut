@@ -25,12 +25,18 @@ class SubscriptionsController < ApplicationController
     else
       flash[:error] = "You are not eligible for the #{@plan.name} plan."
     end
-    
-    redirect_to edit_company_root_path(:subdomain => current_company.subdomain) and return
+
+    respond_to do |format|
+      format.html { redirect_to edit_company_root_path and return }
+    end
   end
   
   def edit_cc
     @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
+
+    respond_to do |format|
+      format.html
+    end
   end
   
   def update_cc
