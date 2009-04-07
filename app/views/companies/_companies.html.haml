@@ -6,7 +6,7 @@
       %h4.bottom= company.time_zone
       
     -# company plan and subscription
-    .span-3
+    .span-5
       .company_plan.bottom
         == Plan:
         = company.plan.name
@@ -17,7 +17,17 @@
         %br
         == Next Billing Date: #{company.subscription.next_billing_at ? company.subscription.next_billing_at.to_date : ''}
         
+    -# company objects and limits
+    .span-5
+      == Services: #{company.work_services_count}
+      %br
+      == Service Providers: #{company.schedulables_count}
+      == (#{company.plan.max_resources} allowed)
+      %br
+      == Locations: #{company.locations_count}
+      == (#{company.plan.max_locations} allowed)
+      
     -# link to company site
-    .span-2.prepend-3.last.action
+    .span-2.last.action
       - if has_privilege?("read companies")
         = link_to "Site", root_path(:subdomain => company.subdomain), :class => 'admin'
