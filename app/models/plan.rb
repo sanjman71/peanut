@@ -6,7 +6,7 @@ class Plan < ActiveRecord::Base
   
   named_scope             :order_by_cost, { :order => :cost }
   
-  def is_eligible(company)
+  def is_eligible?(company)
     (
       (self.max_locations.blank? || (company.locations.size <= self.max_locations)) &&
       (self.max_resources.blank? || (company.schedulables.size <= self.max_resources))

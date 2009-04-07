@@ -2,14 +2,14 @@ class SignupController < ApplicationController
   layout 'home'
   # ssl_required :new
   
-  # /signup/:plan
+  # /signup/:id
   def new
     if request.post? or request.put?
       return create
     else
       @company      = Company.new
       @user         = logged_in? ? current_user : User.new
-      @plan         = Plan.find(params[:plan_id])
+      @plan         = Plan.find(params[:id])
       @subscription = Subscription.new
     end
   end
@@ -60,11 +60,11 @@ class SignupController < ApplicationController
   end
   
   def index
-    plans     = Plan.order_by_cost
-    @free     = plans[0]
-    @basic    = plans[1]
-    @premium  = plans[2]
-    @max      = plans[3]
+    @plans    = Plan.order_by_cost
+    @free     = @plans[0]
+    @basic    = @plans[1]
+    @premium  = @plans[2]
+    @max      = @plans[3]
   end
 
 end

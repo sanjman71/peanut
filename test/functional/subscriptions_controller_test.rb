@@ -4,6 +4,7 @@ class SubscriptionsControllerTest < ActionController::TestCase
   
   # index route
   should_route :get, '/subscriptions',  :controller => 'subscriptions', :action => 'index'
-  should_route :get, '/subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
   
+  # update subscription route
+  should_route :get, '/subscriptions/1/plan/3', :controller => 'subscriptions', :action => 'update', :id => 1, :plan_id => 3
 end

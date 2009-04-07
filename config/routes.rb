@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup        '/signup',          :controller => 'signup', :action => 'index'
-  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
+  map.signup_plan   '/signup/:id',      :controller => 'signup', :action => 'new'
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
@@ -115,10 +115,8 @@ ActionController::Routing::Routes.draw do |map|
 
   # Plans and subscriptions
   map.resources :plans
-  map.connect   'subscriptions/errors', :controller => 'subscriptions', :action => 'index', :filter => 'errors'
   map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
-  map.change_subscription   '/change_subscription', :controller => 'subscriptions', :action => 'edit'
-  map.update_subscription   '/update_subscription/:plan_id', :controller => 'subscriptions', :action => 'update'
+  map.update_subscription '/subscriptions/:id/plan/:plan_id', :controller => 'subscriptions', :action => 'update', :conditions => {:method => :get}
 
   # Messages controller
   map.connect   '/messages/deliver/:type', :controller => 'messages', :action => 'deliver', :conditions => {:method => :post}

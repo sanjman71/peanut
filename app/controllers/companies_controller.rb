@@ -16,7 +16,6 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       # use home layout when listing all companies
       format.html { render :action => :index, :layout => 'home' }
-      format.xml  { render :xml => @companies }
     end
   end
   
@@ -61,10 +60,8 @@ class CompaniesController < ApplicationController
         flash[:notice] = 'Company was successfully updated.'
         # redirect to edit company page, since company show doesn't really show anything
         format.html { redirect_to(edit_company_root_path(:subdomain => @subdomain)) }
-        format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @company.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -76,7 +73,6 @@ class CompaniesController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to(companies_url) }
-      format.xml  { head :ok }
     end
   end
   

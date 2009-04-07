@@ -149,7 +149,4 @@ $(document).ready(function() {
   $(document).init_complete_appointment();
   $(document).init_send_message();
   $(document).init_reschedule_appointment();
-  
-  // rounded corners
-  $('.rounded').corners();
 })

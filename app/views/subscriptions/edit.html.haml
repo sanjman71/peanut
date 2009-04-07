@@ -6,25 +6,8 @@
 
   .span-22.prepend-1.append-1.last
     %h2 Choose a new plan
-    = "Your company is currently using the <strong>#{current_company.plan.name}</strong> plan and has #{pluralize current_company.locations.size, "location"} and #{pluralize current_company.schedulables.size, "resource"}."
-    %br
-    = "Depending on the number of locations and resources you have, you may not be eligible for all plans below."
+    %h4= "Your company is currently using the <strong>#{@current_plan.name}</strong> plan and has #{pluralize current_company.locations.size, "location"} and #{pluralize current_company.schedulables.size, "resource"}."
+    %h4= "Based on the number of locations and resources you have, you may change your subscription to one of the following plans:"
 
-  .plans.span-24
-    .span-5
-      .plan-basic
-        = render :partial => 'plans/choose_plan', :object => @basic
-    .span-5.prepend-1
-      .plan-premium
-        = render :partial => 'plans/choose_plan', :object => @premium
-    .span-5.prepend-1
-      .plan-max
-        = render :partial => 'plans/choose_plan', :object => @max
-    .span-5.prepend-1.last
-      .plan-free
-        = render :partial => 'plans/choose_plan', :object => @free
-
-%hr.space
-
-.span-20.prepend-1
-  %h3= link_to 'Company Openings', openings_path(:subdomain => current_subdomain)
+  .prepend-1
+    = render(:partial => 'plans/plans', :locals => {:plans => @plans})

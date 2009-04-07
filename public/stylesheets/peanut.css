@@ -149,13 +149,15 @@ span.example                                      { color: #666666; font-style: 
 
 /* plan styles */
 
-div.plan-basic, div.plan-premium, div.plan-max    { background-color: lightblue; }
-div.plan-free                                     { background-color: lightgrey; }
-div.plan-ineligable                               { background-color: red;}
-div.plans                                         { text-align: center; }
-div.plans.a                                       { background-color: red;}
-div.plan-heading                                  { text-align: center;}
-div.plan                                          { height: 200px;}
+div.plans.title                                   { text-align: center;}
+div.plans.header                                  { text-align: left; font-size: 1.3em; }
+div.plan.details                                  { text-align: left; font-size: 1.5em; line-height: 1.5em; margin-bottom: 10px; 
+                                                    padding-bottom: 5px; border-bottom: 2px solid #EFEFEF; }
+                                                    
+div.plan.name                                     { font-weight: bold; }
+div.plan.signup                                   { padding-left: 5px; }
+
+/* miscellaneous */
 
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}
 

@@ -325,6 +325,8 @@ $(document).ready(function() {
   $(document).init_ujs_links();
   // initialize change location select link
   $(document).init_change_location();
+  // initialize rounded corners
+  $('.rounded').corners();
 })
 
 $(document).ajaxComplete(function(request, settings) {
