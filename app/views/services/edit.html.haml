@@ -1,3 +1,4 @@
+- title('Edit Service')
 - stylesheet('services')
 - javascript('services')
 
@@ -50,7 +51,7 @@
   %hr.space
   .span-20.prepend-1.last
     %h3
-      == People who provide this service
+      %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}== People who provide this service
   #service_providers
     = render(:partial => 'service_providers/service_providers.html.haml', :locals => {:service_providers => @service_providers, :non_providers => @non_providers})
   %hr.space

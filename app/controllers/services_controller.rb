@@ -31,19 +31,15 @@ class ServicesController < ApplicationController
 
   # GET /services/1/edit
   def edit
-    @service        = current_company.services.find(params[:id])
-    @service_providers   = @service.service_providers
-    @non_providers  = current_company.schedulables.all - @service.schedulables
+    @service              = current_company.services.find(params[:id])
+    @service_providers    = @service.service_providers
+    @non_providers        = current_company.schedulables.all - @service.schedulables
+
+    respond_to do |format|
+      format.html
+    end
   end
 
-  # COMPONENT - GET /services/1/providers
-  # show all service providers
-  def providers
-    @service        = current_company.services.find(params[:id])
-    @service_providers = @service.service_providers
-    @non_providers  = current_company.schedulables.all - @service.schedulables
-  end
-  
   # POST /services
   # POST /services.xml
   def create

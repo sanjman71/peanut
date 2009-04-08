@@ -28,8 +28,13 @@ class ProvidersController < ApplicationController
       @user.grant_role('manager', current_company)
     end
 
-    render_component(:controller => 'providers',  :action => 'index', :layout => false, 
-                     :params => {:authenticity_token => params[:authenticity_token] })
+    # redirect to providers index
+    @redirect_path = providers_path
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) }
+      format.js { render(:update) {|page| page.redirect_to(@redirect_path) } }
+    end
   end
   
 end
