@@ -1,14 +1,14 @@
 - title('Invite a User')
 
 - form_for(@invitation, :url => invitations_path, :method => :post, :html => {:class => 'new_invitation'}) do |f|
-  .span-20.box
+  .span-23.prepend-1.mat.padding-top-10
     .span-20.last
-      %h2== Invite a user
+      %h2== Invite a provider
     .span-18.last
       %hr
     .span-18.last
-      %h3
-        == Enter the email address for the person you want to invite.
+      %h3{:style => 'line-height: 1.5em;'}
+        == Enter the email address for the provider you want to invite.
         == They will get an email with a special link that will allow them to create an account and log in.
     -# show any invitation errors
     - unless @invitation.errors.blank?
@@ -17,7 +17,7 @@
     .span-20.last.padding-bottom-10
       = f.text_field :recipient_email, :id => 'invitation_recipient_email', :class => 'title big', :style => 'width: 350px; margin: 0px;'
     .span-20
-      = submit_tag "Invite User", :name => nil, :class => 'button big'
+      = submit_tag "Invite Provider", :name => nil, :class => 'button big'
       == &nbsp;or&nbsp;
       = link_to 'Cancel', request.referer || providers_path, :style => 'font-size: 12px;'
     
