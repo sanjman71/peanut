@@ -10,7 +10,7 @@
       %h4{:style => 'padding-top: 5px; font-size: 1.3em;'}
         = link_to 'Add a provider', url_for(:controller => 'users', :action => 'new', :type => 'provider', :subdomain => current_subdomain)
         == &nbsp;|&nbsp;
-        = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
+        = link_to 'Invite a provider', new_invitation_path(:subdomain => current_subdomain)
       
   %hr.space
 
