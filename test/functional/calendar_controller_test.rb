@@ -97,8 +97,8 @@ class CalendarControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'calendar/show.html.haml'
       
-      should "show add free time form" do
-        assert_select "form#add_free_time_form", 1
+      should "show add single free time form" do
+        assert_select "form#add_single_free_time_form", 1
       end
       
       should_assign_to :schedulable, :equals => '@johnny'
@@ -145,8 +145,8 @@ class CalendarControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'calendar/show.html.haml'
 
-      should "not show add free time form" do
-        assert_select "form#add_free_time_form", 0
+      should "not show add single free time form" do
+        assert_select "form#add_single_free_time_form", 0
       end
 
       should_assign_to :schedulable, :equals => '@johnny'

@@ -131,7 +131,6 @@ $.fn.init_reschedule_appointment = function() {
 }
 
 $(document).ready(function() {
-  $(document).init_add_free_time(); // don't need to rebind after an ajax call
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
   $('#appointment_code').focus();
   $('#appointment_time_range_start_at').focus();

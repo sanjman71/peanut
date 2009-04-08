@@ -39,7 +39,6 @@ $.fn.init_add_free_time = function () {
 $(document).ready(function() {
   // initialize all datepicker objects
   $(document).init_datepicker();
-  $(document).init_add_free_time();
   
   $("#add_more_dates").click(function() {
     var $free_time      = $(".free_time")

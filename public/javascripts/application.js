@@ -77,34 +77,6 @@ $.fn.init_new_object = function(form_id) {
   })
 }
 
-// Add free time for a schedulable on a specific day
-$.fn.init_add_free_time = function() {
-  // validate the form by binding a callback to the submit function
-  $("#add_free_time_form").validate({
-    // handle form errors
-    showErrors: function(errorMap, errorList) {
-      // highlight blank fields, and set focus on first blank field
-      $(".required:blank").addClass('highlighted');
-      $(".required:blank:first").focus();
-    },
-    // don't validate until the form is submitted and we call valid
-    onfocusout: false,
-    onkeyup: false,
-    onsubmit: false
-  });
-  
-  $("#add_free_time_form").submit(function () {
-    // reset any previous form errors beforing validating
-    $(".required").removeClass('highlighted');
-    if ($(this).valid()) {
-      $.post(this.action, $(this).serialize(), null, "script");
-      $(this).find("#submit").hide();
-      $(this).find("#progress").show();
-    }
-    return false;
-  })
-}
-
 // Search for an appointment by its confirmation code
 $.fn.init_search_appointments_by_confirmation_code = function () {
   // validate the form by binding a callback to the submit function

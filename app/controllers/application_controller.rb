@@ -98,7 +98,7 @@ class ApplicationController < ActionController::Base
     user      = user || current_user
     customer  = appointment.customer == user ? true : false
     provider  = appointment.schedulable == user ? true : false
-    manager   = company_manager?
+    manager   = manager?
     [customer, provider, manager]
   end
   

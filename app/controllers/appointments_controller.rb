@@ -383,7 +383,7 @@ class AppointmentsController < ApplicationController
     @appointments_by_customer = @appointments.group_by { |appt| appt.customer }
 
     # company managers can see all customers; othwerwise the user can only see their own appointments
-    if company_manager?
+    if manager?
       @customers  = [User.anyone] + current_company.authorized_users.with_role(Company.customer_role).order_by_name
     else
       @customers  = Array(current_user)
