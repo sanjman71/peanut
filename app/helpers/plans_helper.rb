@@ -12,12 +12,12 @@ module PlansHelper
     end
   end
   
-  # type => ['resources', 'locations']
+  # type => ['providers', 'locations']
   def plan_limit_text(plan, type)
-    if plan.send("max_#{type.to_s}")
-      "Up to #{pluralize(plan.send("max_#{type.to_s}"), type.to_s.singularize)}"
+    if plan.send("max_#{type.to_s.pluralize}")
+      "Up to #{pluralize(plan.send("max_#{type.to_s.pluralize}"), type.to_s.singularize)}"
     else
-      "Unlimited #{type.to_s}"
+      "Unlimited #{type.to_s.pluralize}"
     end
   end
   

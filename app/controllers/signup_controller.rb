@@ -49,9 +49,19 @@ class SignupController < ApplicationController
       @user.grant_role('provider', @company)
       @user.grant_role('manager', @company)
 
+      # add user as company schedulable
+      @company.schedulables.push(@user)
+      
       # signup completed, redirect to login page
       flash[:notice] = "Signup complete! Please sign in to continue."
-      redirect_to(login_path(:subdomain => @company.subdomain)) and return
+      
+      if !logged_in?
+        # redirect to the new company's login path
+        redirect_to(login_path(:subdomain => @company.subdomain)) and return
+      else
+        # redirect to the new company's openings path
+        redirect_to(openings_path(:subdomain => @company.subdomain)) and return
+      end
     end
     
     respond_to do |format|

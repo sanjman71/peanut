@@ -6,6 +6,10 @@ a.customer.name                                   { color: #111111; font-weight:
 a:hover.customer.name                             { color: #111111; background-color: #FF6600; text-decoration: none; }
 a:visited.customer.name                           { color: #111111; }
 
+a.customer.add                                    { color: #008800; font-weight: bold; }
+a:hover.customer.add                              { color: #008800; background-color: #FF6600; }
+a:visited.customer.add                            { color: #008800; font-weight: bold; }
+
 .customer.email                                   { color: #111111; }
 .customer.sms                                     { color: #5500BB; }
 .customer.nosms                                   { color: #666666; }
