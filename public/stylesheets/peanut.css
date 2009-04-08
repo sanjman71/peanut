@@ -157,6 +157,7 @@ div.plan.details                                  { text-align: left; font-size:
 div.plan.name                                     { font-weight: bold; }
 div.plan.signup                                   { padding-left: 5px; }
 
+hr.plan.divider                                   { background: #008800 none repeat scroll 0 0; height: 0.2em; margin-top: 10px; }
 /* miscellaneous */
 
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}

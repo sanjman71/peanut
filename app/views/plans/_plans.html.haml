@@ -2,12 +2,10 @@
 - if current_company
   - context     = 'Select'
   - url_params  = {:controller => 'subscriptions', :action => 'update', :id => @subscription.id, :subdomain => current_subdomain}
-  - id_sym      = :plan_id
   - features    = false
 - else
   - context     = 'Signup'
   - url_params  = {:controller => 'signup', :action => 'new'}
-  - id_sym      = :id
   - features    = true
  
 .span-17.plans
@@ -25,7 +23,7 @@
       .span-5.plan.locations= plan.max_locations ? "Up to #{pluralize(plan.max_locations, "location")}" : 'Unlimited'
       .span-5.plan.providers= plan.max_providers ? "Up to #{pluralize(plan.max_providers, "provider")}" : 'Unlimited'
       .span-1.plan.cost= plan.cost > 0 ? number_to_currency(plan.cost/100, :precision => 0) : 'Free'
-      .span-2.plan.signup= link_to context, url_for(url_params.update(id_sym => plan.id)), :class => 'rounded button', :style => 'padding: 0px 7px;'
+      .span-2.plan.signup= link_to context, url_for(url_params.update(:plan_id => plan.id)), :class => 'rounded button', :style => 'padding: 0px 7px;'
 
 - if features
   .span-5.prepend-1

@@ -3,15 +3,38 @@ require 'test/factories'
 
 class SignupControllerTest < ActionController::TestCase
 
-  should_route :get,  '/signup/1', :controller => 'signup', :action => 'new', :id => '1'
+  should_route :get,  '/signup/1', :controller => 'signup', :action => 'new', :plan_id => '1'
   
   def setup
     @controller   = SignupController.new
     # create free plan
     @free_plan    = Factory(:free_plan)
   end
+
+  context "signup page" do
+    setup do
+      get :index
+    end
+
+    should_respond_with :success
+    should_render_template 'signup/index.html.haml'
+  end
   
-  context "signup" do
+  context "signup new" do
+    context "for the free plan" do
+      setup do
+        get :new, :plan_id => @free_plan.id
+      end
+
+      should_respond_with :success
+      should_render_template 'signup/new.html.haml'
+
+      should_assign_to :company, :user, :subscription
+      should_assign_to :plan, :equals => @free_plan
+    end
+  end
+  
+  context "signup create" do
     context "for the free plan" do
       setup do
         post :create, 
@@ -24,8 +47,7 @@ class SignupControllerTest < ActionController::TestCase
       should_change "User.count"
       should_change "Company.count"
       
-      should_assign_to :company
-      should_assign_to :user
+      should_assign_to :company, :user
       should_assign_to :plan, :equals => @free_plan
       
       should "create user with roles 'manager' and 'provider'" do

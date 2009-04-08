@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup        '/signup',          :controller => 'signup', :action => 'index'
-  map.signup_plan   '/signup/:id',      :controller => 'signup', :action => 'new'
+  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }

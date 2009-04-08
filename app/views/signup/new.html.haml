@@ -2,41 +2,45 @@
 
 - form_for(@company, :url => signup_plan_path(:plan_id => @plan.id), :method => :post, :html => {:class => 'new_company'}) do |f|
   = hidden_field_tag "plan_id", @plan.id
-  .span-20.box
+  .span-23.prepend-1.mat.shaded.padding-top-10.padding-bottom-20
     %h2 Please sign up using the fields below.
 
-    .span-20.last
-      %hr
+  %hr.space
+  %hr.space
 
+  .span-23.prepend-1.mat
+    -# user info
     .span-20.last
       %h2== User information
     - if logged_in?
-      .span-18.prepend-1.last
-        == This account is being created for #{current_user.name}
+      .span-18.last
+        %h4== This account is being created for #{current_user.name}
     - else
       - fields_for("user", @user) do |user_form|
         .span-18.prepend-1.last
-          Create your user account
-          (if you already have a user account you want to use, please log in and then sign up).
-        .span-18.last
-          %hr.space
+          %h4
+            == Create your user account
+            == (if you already have a user account you want to use, please log in and then sign up).
+            
         -# show any user errors
         - unless @user.errors.blank?
           .span-18.notice
             = error_messages_for('user', :header_message => nil)
+            
+        -# user fields    
         .span-20.last.padding-bottom-10
           .span-4
-            %h3.text-align-right{:style => "padding-top: 10px;"}== Your name:
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Name:
           .span-16.last
             = user_form.text_field :name, :class => 'title big', :style => 'width: 300px; margin: 0px;'
         .span-20.last.padding-bottom-10
           .span-4
-            %h3.text-align-right{:style => "padding-top: 10px;"}== Your email:
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
           .span-16.last
             = user_form.text_field :email, :class => 'title big', :style => 'width: 300px; margin: 0px;'
         .span-20.last.padding-bottom-10
           .span-4
-            %h3.text-align-right{:style => "padding-top: 10px;"}== Your password:
+            %h3.text-align-right{:style => "padding-top: 10px;"}== Password:
           .span-16.last
             = user_form.password_field :password, :class => 'title big', :style => 'width: 300px; margin: 0px;'
         .span-20.last.padding-bottom-10
@@ -46,52 +50,50 @@
             = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 300px; margin: 0px;'
             .span-20.last.padding-bottom-10
         
+    -# end of user information
     .span-20.last
-      %hr
+      %hr.plan.divider
 
+    -# company info
     .span-20.last
-      %h2== Company information
-    .span-18.prepend-1.last
-      Tell us about your company.
-    .span-18.last
-      %hr.space
+      %h2
+        == Company information - 
+        %span{:style => 'font-size: 0.7em;'}== Tell us about your company.
+        
     -# show any company errors
     - unless @company.errors.blank?
       .span-18.notice
         = error_messages_for('company', :header_message => nil)
     .span-20.last.padding-bottom-10
       .span-4
-        %h3.text-align-right== Company name:
+        %h3.text-align-right.padding-top-10== Company name:
       .span-16.last
         = f.text_field :name, :id => 'company_name', :class => 'title big', :style => 'width: 200px; margin: 0px;'
       .span-16.prepend-4.last.directions
         == This is the name of your company as it will be shown to your customers on your company pages.
       .span-4
-        %h3.text-align-right== Subdomain:
+        %h3.text-align-right.padding-top-10== Subdomain:
       .span-16.last
         = f.text_field :subdomain, :class => 'title', :style => 'width: 200px; margin: 0px;'
         %span{:style => 'font-size: 12px; font-weight: bold;'}=DOMAIN
     .span-16.prepend-4.last.directions
       == This is the address your customers will use to view and schedule appointments (e.g. http://peanut#{DOMAIN}). You will use this address to login and manage your appointments. It should only have letters, numbers or dash.
     
-    .span-18.last
-      %hr.space
-  
     .span-20.last
       .span-4
-        %h3.text-align-right== Timezone:
+        %h3.text-align-right{:style => 'padding-top: 3px;'}== Timezone:
       .span-16.last
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {:include_blank => true}, {:style => 'margin: 0px;', :class => 'select big'}
       .span-16.prepend-4.last.directions
         == This is the timezone for your business.  Users will be shown available times and schedule appointments in this timezone. 
         
+      -# end of company information 
     .span-20.last
-      %hr
+      %hr.plan.divider
       
+    -# billing info
     .span-20.last
       %h2== Billing Information
-    .span-18.last
-      %hr.space
         
     -# show any subscription errors
     - unless @subscription and @subscription.errors.blank?
@@ -99,13 +101,13 @@
         = error_messages_for('subscription', :header_message => nil)
     
     - if @plan.cost == 0
-      .span-18.prepend-1.last
-        You have chosen a free plan so you do not have to provide billing information now.
+      .span-18.last
+        %h4== You have chosen a free plan so you do not have to provide billing information now.
     - else
       .span-20#credit_card
         .span-20.last
-          .span-18.prepend-1.last
-            Please provide your credit card billing details.
+          .span-18.last
+            %h4== Please provide your credit card billing details.
           .span-7#first_name
             = label_tag 'cc_first_name', 'First Name'
             %br
@@ -133,38 +135,36 @@
           .span-4.last#cvv
             = label_tag 'cc_verification_value', 'CVV'
             %br
-            = text_field_tag 'cc[verification_value]', '', :id => 'cc_verification_value', :class => 'title', :style => 'width: 25px; height: 12px; font-size: 11px;'
-            
+            = text_field_tag 'cc[verification_value]', '', :id => 'cc_verification_value', :class => 'title', :style => 'width: 30px; height: 15px; font-size: 14px;'
+           
+    -# end of billing information 
     .span-20.last
-      %hr
+      %hr.plan.divider
 
+    -# review plan
     .span-20.last
       %h2== Review your plan and signup
-    .span-18.last
-      %hr.space
-
+      
     .span-18.prepend-1.last
       = render :partial => 'plans/plan', :object => @plan
       
+    .span-18.prepend-1.last
+      %h4
+        == All plans are monthly. There are no cancellation fees or long-term contracts.
+        == To choose another plan go #{link_to "back to the signup page", signup_path }
+
     -# show terms errors
     - if @terms_error
       .span-18.notice
         = @terms_error
-    .span-18.prepend-1.last
-      == All plans are monthly. There are no cancellation fees or long-term contracts.
-      == To choose another plan go #{link_to "back to the signup page", signup_path }
-
-    .span-20.last
-      %hr
+        
+    -# terms and conditions
     .span-20.last
       %h3
         = check_box_tag "company[terms]"
         = label_tag 'company_terms', 'I agree to the terms and conditions'
       
-    .span-18.last
-      %hr.space
-
-    .span-20.prepend-1
+    .span-20.last.padding-top-10
       = submit_tag "Create My Account", :name => nil, :class => 'button big'
       == &nbsp;or&nbsp;
       = link_to 'Cancel', root_path, :style => 'font-size: 12px;'
