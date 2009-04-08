@@ -47,7 +47,7 @@ class SignupController < ApplicationController
 
       # set user roles on the specific company
       @user.grant_role('provider', @company)
-      @user.grant_role('company manager', @company)
+      @user.grant_role('manager', @company)
 
       # signup completed, redirect to login page
       flash[:notice] = "Signup complete! Please sign in to continue."

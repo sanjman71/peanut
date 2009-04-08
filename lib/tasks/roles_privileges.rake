@@ -10,7 +10,7 @@ namespace :rp do
   task :companies do
     
     puts "adding company roles & privileges"
-    cm = Badges::Role.create(:name=>"company manager")
+    m = Badges::Role.create(:name=>"manager")
     p = Badges::Role.create(:name=>"provider")
     c = Badges::Role.create(:name=>"customer")
 
@@ -19,9 +19,9 @@ namespace :rp do
     uc = Badges::Privilege.create(:name=>"update companies")
     dc = Badges::Privilege.create(:name=>"delete companies")
 
-    # Company manager can read & update company
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rc)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uc)
+    # Managers can read & update company
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rc)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>uc)
 
     # Providers can read company
     Badges::RolePrivilege.create(:role=>p,:privilege=>rc)
@@ -40,7 +40,6 @@ namespace :rp do
     Badges::Privilege.create(:name=>'read roles privileges')
     Badges::Privilege.create(:name=>'update roles privileges')
     Badges::Privilege.create(:name=>'delete roles privileges')
-
   end
   
   desc "Initialize appointments roles and privileges"
@@ -48,7 +47,7 @@ namespace :rp do
     
     puts "adding appointments roles & privileges"
 
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     # Appointments are broken into free, work and wait appointments
@@ -63,20 +62,20 @@ namespace :rp do
     uw2a = Badges::Privilege.create(:name=>"update wait appointments")
     dw2a = Badges::Privilege.create(:name=>"delete wait appointments")
 
-    # Company manager can fully manage schedules
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cwa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rwa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uwa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>dwa)
+    # Managers can fully manage schedules
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cwa)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rwa)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>uwa)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>dwa)
 
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cw2a)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rw2a)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uw2a)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>dw2a)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cw2a)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rw2a)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>uw2a)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>dw2a)
 
     # Providers can read schedules
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cwa)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cw2a)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cwa)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cw2a)
     Badges::RolePrivilege.create(:role=>p,:privilege=>rwa)
     Badges::RolePrivilege.create(:role=>p,:privilege=>rw2a)
     
@@ -91,16 +90,16 @@ namespace :rp do
   
     puts "adding calendars roles & privileges"
 
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     # Calendars
     rc = Badges::Privilege.create(:name=>"read calendars")
     uc = Badges::Privilege.create(:name=>"update calendars")
 
-    # Company manager can fully manage calendars
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rc)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uc)
+    # Managers can fully manage calendars
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rc)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>uc)
 
     # Providers can read calendars
     Badges::RolePrivilege.create(:role=>p,:privilege=>rc)
@@ -111,7 +110,7 @@ namespace :rp do
 
     puts "adding user management roles & privileges"
     
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
     
     cu = Badges::Privilege.create(:name=>"create users")
@@ -119,10 +118,10 @@ namespace :rp do
     uu = Badges::Privilege.create(:name=>"update users")
     du = Badges::Privilege.create(:name=>"delete users")
 
-    # Company manager can manage a company's users
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ru)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>uu)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>du)
+    # Managers can manage a company's users
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ru)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>uu)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>du)
 
     # Providers can view users
     Badges::RolePrivilege.create(:role=>p,:privilege=>ru)
@@ -133,7 +132,7 @@ namespace :rp do
     
     puts "adding invoices roles & privileges"
 
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     im = Badges::Role.create(:name => "invoice manager")
@@ -144,11 +143,11 @@ namespace :rp do
     ui = Badges::Privilege.create(:name=>"update invoices")
     di = Badges::Privilege.create(:name=>"delete invoices")
 
-    # Company manager can manage invoices
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ci)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ri)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ui)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>di)
+    # Managers can manage invoices
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ci)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ri)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ui)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>di)
 
     # Invoice manager can manage invoices
     Badges::RolePrivilege.create(:role=>im,:privilege=>ci)
@@ -162,7 +161,7 @@ namespace :rp do
 
     puts "adding services roles & privileges"
 
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     # Services
@@ -171,11 +170,11 @@ namespace :rp do
     us = Badges::Privilege.create(:name=>"update services")
     ds = Badges::Privilege.create(:name=>"delete services")
 
-    # Company manager can manage services
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>cs)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rs)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>us)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>ds)
+    # Managers can manage services
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cs)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rs)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>us)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ds)
 
     # Providers can view services
     Badges::RolePrivilege.create(:role=>p,:privilege=>rs)
@@ -186,19 +185,16 @@ namespace :rp do
     
     puts "adding customer management roles & privileges"
     
-    cm = Badges::Role.find_by_name('company manager')
-    ce = Badges::Role.find_by_name('provider')
+    m = Badges::Role.find_by_name('manager')
+    p = Badges::Role.find_by_name('provider')
 
     cc = Badges::Privilege.create(:name=>"create customers")
     rc = Badges::Privilege.create(:name=>"read customers")
     uc = Badges::Privilege.create(:name=>"update customers")
     dc = Badges::Privilege.create(:name=>"delete customers")
 
-    # Company manager can manage a company's customers
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>rc)
-    
-    # TODO - add more privileges and roles here as appropriate
-
+    # Managers can manage a company's customers
+    Badges::RolePrivilege.create(:role=>m,:privilege=>rc)
   end
 
   desc "Initialize products management roles & privileges"
@@ -206,7 +202,7 @@ namespace :rp do
     
     puts "adding products management roles & privileges"
     
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     c = Badges::Privilege.create(:name=>"create products")
@@ -214,11 +210,11 @@ namespace :rp do
     u = Badges::Privilege.create(:name=>"update products")
     d = Badges::Privilege.create(:name=>"delete products")
 
-    # Company manager can manage products
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>c)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>d)
+    # Managers can manage products
+    Badges::RolePrivilege.create(:role=>m,:privilege=>c)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>r)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>u)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>d)
 
     # Provider can view products
     Badges::RolePrivilege.create(:role=>p,:privilege=>r)
@@ -229,7 +225,7 @@ namespace :rp do
     
     puts "adding events management roles & privileges"
     
-    cm = Badges::Role.find_by_name('company manager')
+    m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
     c = Badges::Privilege.create(:name=>"create events")
@@ -237,9 +233,9 @@ namespace :rp do
     u = Badges::Privilege.create(:name=>"update events")
     d = Badges::Privilege.create(:name=>"delete events")
 
-    # Company manager can manage events
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>r)
-    Badges::RolePrivilege.create(:role=>cm,:privilege=>u)
+    # Managers can manage events
+    Badges::RolePrivilege.create(:role=>m,:privilege=>r)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>u)
 
     # Providers can view events
     Badges::RolePrivilege.create(:role=>p,:privilege=>r)

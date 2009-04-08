@@ -5,8 +5,8 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   
   # Make the following methods available to all helpers
-  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, :company_manager?,
-                :has_role?, :show_location?, :global_flash?
+  helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, 
+                :manager?, :provider?, :customer?, :has_role?, :show_location?, :global_flash?
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -73,8 +73,8 @@ class ApplicationController < ActionController::Base
   end
   
   # return true if the current user is a manager of the company
-  def company_manager?
-    has_role?('company manager', current_company) || has_role?('admin')
+  def manager?
+    has_role?('manager', current_company) || has_role?('admin')
   end
 
   # return true if the current user is a provider of the company
@@ -84,7 +84,7 @@ class ApplicationController < ActionController::Base
   
   # returns true if the current user is a customer of the company
   def customer?
-    has_role?(Company.customer_role_name, current_company)
+    has_role?('customer', current_company)
   end
   
   # returns true if there is more than 1 company location
@@ -93,13 +93,13 @@ class ApplicationController < ActionController::Base
   end
   
   # return the relationship(s) between the appointment and the user
-  # returns a tuple with true/false values for: ['customer', 'owner', 'manager']
+  # returns a tuple with true/false values for: ['customer', 'provider', 'manager']
   def appointment_roles(appointment, user=nil)
     user      = user || current_user
     customer  = appointment.customer == user ? true : false
-    owner     = appointment.schedulable == user ? true : false
+    provider  = appointment.schedulable == user ? true : false
     manager   = company_manager?
-    [customer, owner, manager]
+    [customer, provider, manager]
   end
   
   # controls whether the flash may be displayed in the header, defaults to true

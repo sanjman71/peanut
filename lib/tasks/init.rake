@@ -43,7 +43,7 @@ namespace :init do
                     :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
     a.register!
     a.activate!
-    a.grant_role('company manager', company1)
+    a.grant_role('manager', company1)
     a.grant_role('provider', company1)
 
     puts "adding user: mary@peanut.com, password: peanut as company manager for #{company1.name}"
@@ -58,7 +58,7 @@ namespace :init do
                     :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
     a.register!
     a.activate!
-    a.grant_role('company manager', noelrose)
+    a.grant_role('manager', noelrose)
     a.grant_role('provider', noelrose)
 
     puts "#{Time.now}: completed"

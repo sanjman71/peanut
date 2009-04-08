@@ -13,7 +13,7 @@ class UsersControllerTest < ActionController::TestCase
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
-    @owner.grant_role('company manager', @company)
+    @owner.grant_role('manager', @company)
     @owner.grant_role('provider', @company)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)

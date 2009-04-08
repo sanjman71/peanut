@@ -19,7 +19,7 @@ class EventsControllerTest < ActionController::TestCase
     @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @provider, :service => @service)
     @event        = Factory(:event, :company => @company, :user => @owner, :customer => @customer, :eventable => @appointment, :etype => Event::INFORMATIONAL)
     # make owner the company manager
-    @owner.grant_role('company manager', @company)
+    @owner.grant_role('manager', @company)
     @owner.grant_role('provider', @company)
     @provider.grant_role('provider', @company)
     # stub current company methods

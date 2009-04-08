@@ -81,7 +81,7 @@ class CustomersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@owner)
         ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
         # stub company manager method
-        ActionView::Base.any_instance.stubs(:company_manager?).returns(false)
+        ActionView::Base.any_instance.stubs(:manager?).returns(false)
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
     

@@ -45,12 +45,8 @@ class Company < ActiveRecord::Base
   # find all subscriptions with billing errors
   named_scope               :billing_errors, { :include => :subscription, :conditions => ["subscriptions.billing_errors_count > 0"] }
 
-  def self.customer_role_name
-    'customer'
-  end
-  
   def self.customer_role
-    Badges::Role.find_by_name(customer_role_name)
+    Badges::Role.find_by_name('customer')
   end
 
   def self.provider_role
@@ -58,7 +54,7 @@ class Company < ActiveRecord::Base
   end
 
   def self.manager_role
-    Badges::Role.find_by_name("company manager")
+    Badges::Role.find_by_name("manager")
   end
 
   def validate

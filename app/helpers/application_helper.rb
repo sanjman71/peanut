@@ -68,7 +68,7 @@ module ApplicationHelper
 
     end
 
-    if has_role?(Company.customer_role_name, current_company)
+    if has_role?('customer', current_company)
 
       # 'Appointments' tab for customer work appointments
       name = 'Appointments'

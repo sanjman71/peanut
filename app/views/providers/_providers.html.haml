@@ -7,12 +7,12 @@
       
       -# allow company managers to toggle manager role
     .span-5.provider.manager
-      - if company_manager?
+      - if manager?
         - if current_user == user
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
         - else
-          = check_box_tag 'Company Manager', 'yes', user.has_role?('company manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => user.id, :subdomain => current_subdomain)
+          = check_box_tag 'Company Manager', 'yes', user.has_role?('manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => user.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
           
@@ -25,5 +25,5 @@
         -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
     .span-2.prepend-2.action.last
       -# allow company managers or edit all users, and user to edit himself
-      - if company_manager? or user == current_user
+      - if manager? or user == current_user
         = link_to "Edit", url_for(:controller => 'providers', :action => 'edit', :id => user.id, :subdomain => current_subdomain), :class => 'admin'

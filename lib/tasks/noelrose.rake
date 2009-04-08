@@ -24,9 +24,8 @@ namespace :noelrose do
     @noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
     # add user roles
-    @erika.grant_role('company manager', @noelrose)
+    @erika.grant_role('manager', @noelrose)
     @erika.grant_role('provider', @noelrose)
-    
   end
   
   task :services do

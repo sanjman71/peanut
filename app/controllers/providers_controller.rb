@@ -20,12 +20,12 @@ class ProvidersController < ApplicationController
   def toggle_manager
     @user = User.find(params[:id])
     
-    if @user.has_role?('company manager', current_company)
+    if @user.has_role?('manager', current_company)
       # revoke manager role, but a user may not revoke this role on himself
-      @user.revoke_role('company manager', current_company) unless (@user == current_user)
+      @user.revoke_role('manager', current_company) unless (@user == current_user)
     else
       # grant manager role
-      @user.grant_role('company manager', current_company)
+      @user.grant_role('manager', current_company)
     end
 
     render_component(:controller => 'providers',  :action => 'index', :layout => false, 
