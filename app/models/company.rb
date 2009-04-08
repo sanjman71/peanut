@@ -89,8 +89,8 @@ class Company < ActiveRecord::Base
     self.plan.may_add_location?(self)
   end
   
-  def may_add_resource?
-    self.plan.may_add_resource?(self)
+  def may_add_provider?
+    self.plan.may_add_provider?(self)
   end  
   
   protected

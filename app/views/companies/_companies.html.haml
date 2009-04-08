@@ -21,11 +21,11 @@
     .span-5
       == Services: #{company.work_services_count}
       %br
-      == Service Providers: #{company.schedulables_count}
-      == (#{company.plan.max_resources} allowed)
+      == Providers: #{company.schedulables_count}
+      == (#{plan_limit_text(company.plan, 'providers')})
       %br
       == Locations: #{company.locations_count}
-      == (#{company.plan.max_locations} allowed)
+      == (#{plan_limit_text(company.plan, 'locations')})
       
     -# link to company site
     .span-2.last.action

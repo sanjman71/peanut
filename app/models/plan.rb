@@ -9,7 +9,7 @@ class Plan < ActiveRecord::Base
   def is_eligible?(company)
     (
       (self.max_locations.blank? || (company.locations.size <= self.max_locations)) &&
-      (self.max_resources.blank? || (company.schedulables.size <= self.max_resources))
+      (self.max_providers.blank? || (company.schedulables.size <= self.max_providers))
     )
   end
   
@@ -17,8 +17,8 @@ class Plan < ActiveRecord::Base
     (self.max_locations.blank? || (company.locations.size < self.max_locations))
   end
   
-  def may_add_resource?(company)
-    (self.max_resources.blank? || (company.schedulables.size < self.max_resources))
+  def may_add_provider?(company)
+    (self.max_providers.blank? || (company.schedulables.size < self.max_providers))
   end
   
   # return true if the plan cost > 0

@@ -14,7 +14,7 @@
   .span-17.last.plans.header.rounded.button.color
     .span-3== Plan
     .span-5== Locations
-    .span-5== Resources
+    .span-5== Providers
     .span-3== Monthly Cost
     
   %hr.space
@@ -23,7 +23,7 @@
     .span-17.last.plan.details{:class => cycle("", "")}
       .span-3.plan.name= plan.name
       .span-5.plan.locations= plan.max_locations ? "Up to #{pluralize(plan.max_locations, "location")}" : 'Unlimited'
-      .span-5.plan.resources= plan.max_resources ? "Up to #{pluralize(plan.max_resources, "resource")}" : 'Unlimited'
+      .span-5.plan.providers= plan.max_providers ? "Up to #{pluralize(plan.max_providers, "provider")}" : 'Unlimited'
       .span-1.plan.cost= plan.cost > 0 ? number_to_currency(plan.cost/100, :precision => 0) : 'Free'
       .span-2.plan.signup= link_to context, url_for(url_params.update(id_sym => plan.id)), :class => 'rounded button', :style => 'padding: 0px 7px;'
 

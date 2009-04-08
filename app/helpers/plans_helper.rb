@@ -12,4 +12,13 @@ module PlansHelper
     end
   end
   
+  # type => ['resources', 'locations']
+  def plan_limit_text(plan, type)
+    if plan.send("max_#{type.to_s}")
+      "Up to #{pluralize(plan.send("max_#{type.to_s}"), type.to_s.singularize)}"
+    else
+      "Unlimited #{type.to_s}"
+    end
+  end
+  
 end

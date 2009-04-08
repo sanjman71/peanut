@@ -4,10 +4,19 @@
   .span-15.prepend-1.append-1.last
     .highlight#flash
 
+  .span-23.prepend-1.last.mat.padding-top-10
+    %h2== Choose a new plan
+
+  %hr.space
+  
+  - locations = pluralize(current_company.locations_count, "location")
+  - providers = pluralize(current_company.schedulables_count, "provider")
+
   .span-22.prepend-1.append-1.last
-    %h2 Choose a new plan
-    %h4= "Your company is currently using the <strong>#{@current_plan.name}</strong> plan and has #{pluralize current_company.locations.size, "location"} and #{pluralize current_company.schedulables.size, "resource"}."
-    %h4= "Based on the number of locations and resources you have, you may change your subscription to one of the following plans:"
+    %h3
+      = highlight("Your company is currently using the #{@current_plan.name} plan, with #{locations} and #{providers}.", [@current_plan.name, locations, providers])
+      %hr.space
+      == You may upgrade/downgrade to one of the following plans:
 
   .prepend-1
     = render(:partial => 'plans/plans', :locals => {:plans => @plans})

@@ -6,15 +6,9 @@
       = "Free!!"
   %ul
     %li.max_locations
-      - if plan.max_locations
-        = "Up to #{pluralize plan.max_locations, "location"}"
-      - else
-        Unlimited locations!
-    %li.max_resources
-      - if plan.max_resources
-        = "Up to #{pluralize plan.max_resources, "resource"}"
-      - else
-        Unlimited resources!
+      = plan_limit_text(plan, 'locations')
+    %li.max_providers
+      = plan_limit_text(plan, 'providers')
     %li.billing_info
       - if plan.start_billing_in_time_amount && plan.between_billing_time_amount
         = "Billing starts after #{pluralize(plan.start_billing_in_time_amount, plan.start_billing_in_time_unit)} and is billed #{plan_billing_regularity(plan)}"

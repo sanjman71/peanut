@@ -14,7 +14,7 @@ namespace :plans do
       :enabled => true,
       :cost => 0,
       :cost_currency => "USD",
-      :max_resources => 1,
+      :max_providers => 1,
       :max_locations => 1
     )
   end
@@ -28,7 +28,7 @@ namespace :plans do
       :enabled => true,
       :cost => 1000,
       :cost_currency => "USD",
-      :max_resources => 5,
+      :max_providers => 5,
       :max_locations => 1,
       :start_billing_in_time_amount => 1,
       :start_billing_in_time_unit => "months",
@@ -46,7 +46,7 @@ namespace :plans do
       :enabled => true,
       :cost => 3000,
       :cost_currency => "USD",
-      :max_resources => 20,
+      :max_providers => 20,
       :max_locations => 3,
       :start_billing_in_time_amount => 1,
       :start_billing_in_time_unit => "months",
