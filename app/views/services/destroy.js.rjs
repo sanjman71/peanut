@@ -1,6 +1,0 @@
-# add flash notice
-page["#flash"].addClass('notice')
-page["#flash"].html(@notice_text)
-
-# update services
-page["#services"].html(render(:partial => 'services.html.haml', :locals => {:services => @services}))

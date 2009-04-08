@@ -51,10 +51,15 @@ class ServicesController < ApplicationController
       return
     end
     
+    # create and add service to company
     @service.save
+    current_company.services.push(@service)
+    
+    # redirect to edit page
+    @redirect_path = edit_service_path(@service)
     
     respond_to do |format|
-      format.js # redirect to edit page
+      format.js { render(:update) {|page| page.redirect_to(@redirect_path) } }
     end
   end
 
@@ -80,9 +85,11 @@ class ServicesController < ApplicationController
     @service = current_company.services.find(params[:id])
     @service.destroy
 
-    @notice_text = "Removed service #{@service.name}"
-
-    # build services collection
-    @services = current_company.services.work
+    flash[:notice] = "Removed service #{@service.name}"
+    
+    # redirect to services index
+    respond_to do |format|
+      format.js { render(:update) {|page| page.redirect_to(services_path) } }
+    end
   end
 end
