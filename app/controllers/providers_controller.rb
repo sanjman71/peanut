@@ -1,13 +1,13 @@
-class EmployeesController < ApplicationController
+class ProvidersController < ApplicationController
   before_filter :disable_global_flash, :only => [:index]
   
   privilege_required 'read users', :only => [:index], :on => :current_company
   privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
   
-  # GET /employees
+  # GET /providers
   def index
-    # find all company employees
-    @users  = current_company.authorized_users.with_role(Company.employee_role).order_by_name.uniq
+    # find all company providers
+    @users  = current_company.authorized_users.with_role(Company.provider_role).order_by_name.uniq
     
     respond_to do |format|
       format.html
@@ -16,7 +16,7 @@ class EmployeesController < ApplicationController
     end
   end
   
-  # POST /employees/:id/toggle_manager
+  # POST /providers/:id/toggle_manager
   def toggle_manager
     @user = User.find(params[:id])
     
@@ -28,7 +28,7 @@ class EmployeesController < ApplicationController
       @user.grant_role('company manager', current_company)
     end
 
-    render_component(:controller => 'employees',  :action => 'index', :layout => false, 
+    render_component(:controller => 'providers',  :action => 'index', :layout => false, 
                      :params => {:authenticity_token => params[:authenticity_token] })
   end
   

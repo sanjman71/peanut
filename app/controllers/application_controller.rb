@@ -72,17 +72,17 @@ class ApplicationController < ActionController::Base
     @current_privileges ||= []
   end
   
-  # return true if the current user is a company manager
+  # return true if the current user is a manager of the company
   def company_manager?
     has_role?('company manager', current_company) || has_role?('admin')
   end
 
-  # return true if the current user is a company employee
-  def company_employee?
-    has_role?('company employee', current_company)
+  # return true if the current user is a provider of the company
+  def provider?
+    has_role?('provider', current_company)
   end
   
-  # returns true if the current user is a customer
+  # returns true if the current user is a customer of the company
   def customer?
     has_role?(Company.customer_role_name, current_company)
   end

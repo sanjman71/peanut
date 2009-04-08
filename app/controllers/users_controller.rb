@@ -26,8 +26,8 @@ class UsersController < ApplicationController
       when 'customer'
         # anyone can signup as a customer
         return true
-      when 'employee'
-        # employees must be invited or user must have 'create users' privilege
+      when 'provider'
+        # providers must be invited or user must have 'create users' privilege
         return true if @invitation or current_privileges.include?(p)
         return false
       else
@@ -50,8 +50,8 @@ class UsersController < ApplicationController
     end
   end
   
-  # GET /employees/new
-  # GET /employees/new?invitation_token=xyz
+  # GET /providers/new
+  # GET /providers/new?invitation_token=xyz
   # GET /customers/new
   def new
     # @type (always) and @invitation (if it exists) have been initialized at this point
@@ -68,7 +68,7 @@ class UsersController < ApplicationController
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
         # add the user to the company
-        @user.grant_role('company employee', @invitation.company)
+        @user.grant_role('provider', @invitation.company)
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
         redirect_back_or_default('/login') and return
@@ -79,12 +79,12 @@ class UsersController < ApplicationController
     @user       = User.new
     @user.email = @invitation.recipient_email if @invitation
     
-    # initialize back path to either the caller or the resource index page (e.g. /customers, /employees), but only if there is a current user
+    # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
     @back_path  = current_user ? (request.referer || "/#{@type.pluralize}") : nil
   end
  
   # POST /customers/create
-  # POST /employees/create
+  # POST /providers/create
   def create
     # @type (always) and @invitation (if it exists) have been initialized at this point
     
@@ -110,9 +110,9 @@ class UsersController < ApplicationController
       @company = @invitation ? @invitation.company : current_company
       
       case @type
-      when 'employee'
-        # grant the user basic access to the company as a 'company employee'
-        @user.grant_role('company employee', @company)
+      when 'provider'
+        # grant the user basic access to the company as a 'provider'
+        @user.grant_role('provider', @company)
         # add the user as a company schedulable
         @company.schedulables.push(@user)
       when 'customer'
@@ -276,7 +276,7 @@ class UsersController < ApplicationController
     if @type.blank?
       # figure out type based on user
       return @type if @user.blank?
-      @type = @user.has_role?('company employee', current_company) ? 'employee' : 'customer'
+      @type = @user.has_role?('provider', current_company) ? 'provider' : 'customer'
     end
     
     @type

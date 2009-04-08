@@ -1,14 +1,14 @@
-- title("Employees")
+- title("Providers")
 - stylesheet('users')
 - javascript('users')
 
 .span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
     .span-9
-      %h2== Employees
+      %h2== Providers
     .span-6.last
       %h4{:style => 'padding-top: 5px; font-size: 1.3em;'}
-        = link_to 'Add an employee', url_for(:controller => 'users', :action => 'new', :type => 'employee', :subdomain => current_subdomain)
+        = link_to 'Add a provider', url_for(:controller => 'users', :action => 'new', :type => 'provider', :subdomain => current_subdomain)
         == &nbsp;|&nbsp;
         = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
       
@@ -20,11 +20,11 @@
   .span-14.prepend-1.append-1.last
     .highlight#flash
   
-  #employees
-    = render(:partial => 'employees', :locals => {:users => @users})
+  #providers
+    = render(:partial => 'providers', :locals => {:users => @users})
 
 .span-8.last
-  -# employee help
+  -# provider help
   .span-7.prepend-1.last
-    = render(:partial => 'employee_help')
+    = render(:partial => 'provider_help')
 

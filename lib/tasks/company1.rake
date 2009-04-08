@@ -28,8 +28,8 @@ namespace :company1 do
 
     # add user roles
     @johnny.grant_role('company manager', @company1)
-    @johnny.grant_role('company employee', @company1)
-    @mary.grant_role('company employee', @company1)
+    @johnny.grant_role('provider', @company1)
+    @mary.grant_role('provider', @company1)
     
   end
   

@@ -25,7 +25,7 @@ namespace :noelrose do
 
     # add user roles
     @erika.grant_role('company manager', @noelrose)
-    @erika.grant_role('company employee', @noelrose)
+    @erika.grant_role('provider', @noelrose)
     
   end
   

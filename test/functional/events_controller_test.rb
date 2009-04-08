@@ -14,14 +14,14 @@ class EventsControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    @employee     = Factory(:user, :name => "Employee", :companies => [@company])
+    @provider     = Factory(:user, :name => "Provider", :companies => [@company])
     @service      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
-    @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @employee, :service => @service)
+    @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @provider, :service => @service)
     @event        = Factory(:event, :company => @company, :user => @owner, :customer => @customer, :eventable => @appointment, :etype => Event::INFORMATIONAL)
     # make owner the company manager
     @owner.grant_role('company manager', @company)
-    @owner.grant_role('company employee', @company)
-    @employee.grant_role('company employee', @company)
+    @owner.grant_role('provider', @company)
+    @provider.grant_role('provider', @company)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -43,12 +43,12 @@ class EventsControllerTest < ActionController::TestCase
 
   end
   
-  context "Logged in as employee" do
+  context "Logged in as provider" do
     setup do
       @controller.stubs(:current_privileges).returns(['read events'])
       ActionView::Base.any_instance.stubs(:current_privileges).returns(['read events'])
-      @controller.stubs(:current_user).returns(@employee)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@employee)
+      @controller.stubs(:current_user).returns(@provider)
+      ActionView::Base.any_instance.stubs(:current_user).returns(@provider)
     end
     
     context "get events index" do

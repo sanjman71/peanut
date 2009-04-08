@@ -140,12 +140,12 @@ module ApplicationHelper
     
     if has_privilege?('read users', current_company)
     
-      # 'Employees' tab
-      name = 'Employees'
-      if current_controller.controller_name == 'employees' and ['index', 'show', 'edit'].include?(current_controller.action_name)
-        link = link_to(name, employees_path, :class => 'current')
+      # 'Providers' tab
+      name = 'Providers'
+      if current_controller.controller_name == 'providers' and ['index', 'show', 'edit'].include?(current_controller.action_name)
+        link = link_to(name, providers_path, :class => 'current')
       else
-        link = link_to(name, employees_path)
+        link = link_to(name, providers_path)
       end
 
       yield link

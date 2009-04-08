@@ -53,8 +53,8 @@ class Company < ActiveRecord::Base
     Badges::Role.find_by_name(customer_role_name)
   end
 
-  def self.employee_role
-    Badges::Role.find_by_name("company employee")
+  def self.provider_role
+    Badges::Role.find_by_name("provider")
   end
 
   def self.manager_role

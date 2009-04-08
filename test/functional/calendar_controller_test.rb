@@ -73,12 +73,12 @@ class CalendarControllerTest < ActionController::TestCase
   
   context "add company schedulables" do
     setup do
-      # add johnny as a company employee
+      # add johnny as a company provider
       @johnny = Factory(:user, :name => "Johnny", :companies => [@company])
-      @johnny.grant_role("company employee", @company)
-      # add mary as a company employee
-      @mary = Factory(:user, :name => "Johnny", :companies => [@company])
-      @mary.grant_role("company employee", @company)
+      @johnny.grant_role("provider", @company)
+      # add mary as a company provider
+      @mary = Factory(:user, :name => "Mary", :companies => [@company])
+      @mary.grant_role("provider", @company)
       @company.reload
     end
     
@@ -87,7 +87,7 @@ class CalendarControllerTest < ActionController::TestCase
         # stub current user
         @controller.stubs(:current_user).returns(@johnny)
         ActionView::Base.any_instance.stubs(:current_user).returns(@johnny)
-        # stub user privileges, johnny should have 'read calendars' privilege as 'company employee'
+        # stub user privileges, johnny should have 'read calendars' privilege as 'provider'
         @controller.stubs(:current_privileges).returns(["read calendars"])
         # stub calendar markings
         @controller.stubs(:build_calendar_markings).returns(Hash.new)
@@ -135,7 +135,7 @@ class CalendarControllerTest < ActionController::TestCase
         # stub current user
         @controller.stubs(:current_user).returns(@mary)
         ActionView::Base.any_instance.stubs(:current_user).returns(@mary)
-        # stub user privileges, mary should have 'read calendars' privilege as 'company employee'
+        # stub user privileges, mary should have 'read calendars' privilege as 'provider'
         @controller.stubs(:current_privileges).returns(['read calendars'])
         # stub calendar markings
         @controller.stubs(:build_calendar_markings).returns(Hash.new)

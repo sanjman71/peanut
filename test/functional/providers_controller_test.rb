@@ -1,19 +1,19 @@
 require 'test/test_helper'
 require 'test/factories'
 
-class EmployeesControllerTest < ActionController::TestCase
+class ProvidersControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/employees/new', :controller => 'users', :action => 'new', :type => 'employee'
-  should_route :post, '/employees/create', :controller => 'users', :action => 'create', :type => 'employee'
-  should_route :get,  '/employees/1/edit', :controller => 'users', :action => 'edit', :id => '1', :type => 'employee'
-  should_route :put,  '/employees/1', :controller => 'users', :action => 'update', :id => '1', :type => 'employee'
+  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :type => 'provider'
+  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :type => 'provider'
+  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :type => 'provider'
+  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :type => 'provider'
 
-  # employees controller routes
-  should_route :get,  '/employees/1', :controller => 'employees', :action => 'show', :id => '1'
+  # providers controller routes
+  should_route :get,  '/providers/1', :controller => 'providers', :action => 'show', :id => '1'
   
   def setup
-    @controller   = EmployeesController.new
+    @controller   = ProvidersController.new
     # create a valid company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -21,7 +21,7 @@ class EmployeesControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('company manager', @company)
-    @owner.grant_role('company employee', @company)
+    @owner.grant_role('provider', @company)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -55,7 +55,7 @@ class EmployeesControllerTest < ActionController::TestCase
     end
   
     should_respond_with :success
-    should_render_template 'employees/index.html.haml'
+    should_render_template 'providers/index.html.haml'
     should_assign_to :users, :class => Array
   
     should "not be able to change manager role" do
@@ -70,17 +70,17 @@ class EmployeesControllerTest < ActionController::TestCase
       # stub current user methods
       @controller.stubs(:current_user).returns(@owner)
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-      # add a company employee
-      @employee = Factory(:user)
-      @employee.grant_role('company employee', @company)
+      # add a company provider
+      @provider = Factory(:user)
+      @provider.grant_role('provider', @company)
       get :index
     end
   
     should_respond_with :success
-    should_render_template 'employees/index.html.haml'
+    should_render_template 'providers/index.html.haml'
     should_assign_to :users, :class => Array
     
-    should "be able to change manager role for 1 employee" do
+    should "be able to change manager role for 1 provider" do
       assert_select "input.checkbox.manager", 1
     end
   end

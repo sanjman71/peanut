@@ -35,9 +35,9 @@ namespace :meatheads do
 
     # add user roles
     @meathead.grant_role('company manager', @meatheads)
-    @meathead.grant_role('company employee', @meatheads)
-    @wimpy.grant_role('company employee', @meatheads)
-    @skinny.grant_role('company employee', @meatheads)
+    @meathead.grant_role('provider', @meatheads)
+    @wimpy.grant_role('provider', @meatheads)
+    @skinny.grant_role('provider', @meatheads)
     
   end
   
