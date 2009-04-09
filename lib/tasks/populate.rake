@@ -25,28 +25,27 @@ namespace :populate do
     
   end
   
-  desc "Populate people for the first company in the database"
-  task :people, :count do |t, args|
-    count   = args.count.to_i 
-    count   = @@count_default if count == 0 # default value
+  desc "Populate providers for the specified company"
+  task :providers, :company_id, :count do |t, args|
+    # find specified company
+    company   = Company.find_by_id(args.company_id.to_i) || Company.first
     
-    # find first company
-    company = Company.first
+    count     = args.count.to_i 
+    count     = @@count_default if count == 0 # default value
     
-    puts "#{Time.now}: populating #{count} people for company #{company.name}"
     
-    # save people ids in collection so they can be added to company after populate is done
-    people_ids = []
-    Person.populate count do |person|
-      person.name = Faker::Name.name
-      people_ids.push(person.id)
+    puts "#{Time.now}: populating #{count} providers for company #{company.name}"
+    
+    count.times do |i|
+      # create random provider
+      provider = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
+      
+      # add provider to company
+      company.schedulables.push(provider)
+      provider.grant_role('provider', company)
     end
 
-    # associate each person to a company
-    people_ids.each do |id|
-      person = Person.find_by_id(id)
-      company.resources.push(person)
-    end
+    puts "#{Time.now}: completed, added #{count} providers"
   end
 
   desc "Populate free time for the specified company"
