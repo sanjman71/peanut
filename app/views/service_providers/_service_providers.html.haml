@@ -1,7 +1,7 @@
-- service_providers.sort_by{ |sp| sp.schedulable.name }.each do |sp|
+- service_providers.sort_by{ |sp| sp.provider.name }.each do |sp|
   .span-15.prepend-1.last.service_provider{:class => cycle("shaded", "")}
-    .span-4.person
-      %h3= sp.schedulable.name
+    .span-4.provider
+      %h3= sp.provider.name
     .span-1.last.action
       = link_to("Remove", service_provider_path(sp, :subdomain => current_subdomain), :class => 'admin ujs delete')
 - unless non_providers.blank?

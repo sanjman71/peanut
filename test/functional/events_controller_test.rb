@@ -16,7 +16,7 @@ class EventsControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     @provider     = Factory(:user, :name => "Provider", :companies => [@company])
     @service      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
-    @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @provider, :service => @service)
+    @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @provider, :service => @service)
     @event        = Factory(:event, :company => @company, :user => @owner, :customer => @customer, :eventable => @appointment, :etype => Event::INFORMATIONAL)
     # make owner the company manager
     @owner.grant_role('manager', @company)

@@ -36,9 +36,9 @@ namespace :company1 do
   
     puts "#{Time.now}: adding company1 services ..."
   
-    # assign schedulables
-    @company1.schedulables.push(@johnny)
-    @company1.schedulables.push(@mary)
+    # assign providers
+    @company1.providers.push(@johnny)
+    @company1.providers.push(@mary)
   
     # create services
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00, :allow_custom_duration => false)
@@ -47,8 +47,8 @@ namespace :company1 do
     puts "#{Time.now}: adding company1 service providers ..."
 
     # add service providers
-    @mens_haircut.schedulables.push(@johnny)
-    @womens_haircut.schedulables.push(@mary)
+    @mens_haircut.providers.push(@johnny)
+    @womens_haircut.providers.push(@mary)
 
     puts "#{Time.now}: completed"
   end

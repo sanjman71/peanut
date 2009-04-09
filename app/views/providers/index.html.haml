@@ -16,9 +16,9 @@
     .span-15
       -# show current plan usage
       - if current_company.may_add_provider?
-        %span{:style => 'font-size: 1.1em; color: #777777;'}== The company has #{pluralize(current_company.schedulables_count, 'provider')}.  Your plan allows #{plan_limit_text(current_company.plan, 'provider').downcase}.
+        %span{:style => 'font-size: 1.1em; color: #777777;'}== The company has #{pluralize(current_company.providers_count, 'provider')}.  Your plan allows #{plan_limit_text(current_company.plan, 'provider').downcase}.
       - else current_company.may_add_provider?
-        %span.highlight{:style => 'font-size: 1.3em;'}== You are at your plan limit of #{pluralize(current_company.schedulables_count, 'provider')}.  You can use the following #{link_to('link', edit_subscription_path(current_company.subscription))} to upgrade your account.
+        %span.highlight{:style => 'font-size: 1.3em;'}== You are at your plan limit of #{pluralize(current_company.providers_count, 'provider')}.  You can use the following #{link_to('link', edit_subscription_path(current_company.subscription))} to upgrade your account.
     
   %hr.space
 

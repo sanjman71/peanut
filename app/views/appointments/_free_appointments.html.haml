@@ -5,12 +5,12 @@
     
     -# group appointments by people
     - reset_cycle
-    - appointments.group_by { |appt| appt.schedulable }.each do |schedulable, appointments|
+    - appointments.group_by { |appt| appt.provider }.each do |provider, appointments|
       - appointments.each do |appointment|
         .span-15.last.free.appointment[appointment]{:class => cycle("", "shaded")}
           .span-15.last
-            .span-5.schedulable
-              %h4{:style => 'margin-left: 5px;'}= schedulable.name
+            .span-5.provider
+              %h4{:style => 'margin-left: 5px;'}= provider.name
             .span-4.time
               == #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
             .span-6.last.location
@@ -21,4 +21,4 @@
             .span-13.last.slider.hide
               = render(:partial => 'calendar/time_range_slider', :locals => free_appointment_possible_start_times(appointment, service.duration))
           .span-15.last.book_it.hide{:style => 'margin-left: 5px;'}
-            = link_to('Book It', "javascript:void(0)", :url => schedule_path(:subdomain => current_subdomain, :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :service_id => service.id, :duration => service.duration, :start_at => appointment.start_at.to_s(:appt_schedule)), :class => 'bookit')
+            = link_to('Book It', "javascript:void(0)", :url => schedule_path(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id, :service_id => service.id, :duration => service.duration, :start_at => appointment.start_at.to_s(:appt_schedule)), :class => 'bookit')

@@ -59,7 +59,7 @@ class AppointmentsController < ApplicationController
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
     # note: the send method can generate an exception
-    @schedulable  = current_company.send(params[:schedulable_type]).find_by_id(params[:schedulable_id])
+    @provider  = current_company.send(params[:provider_type]).find_by_id(params[:provider_id])
     @customer     = current_user
     
     case (@mark_as = params[:mark_as])
@@ -70,7 +70,7 @@ class AppointmentsController < ApplicationController
       @options              = {:start_at => @start_at}
 
       # build the work appointment without committing the changes
-      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => false)
+      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @options, :commit => false)
     
       # set appointment date, start_at and end_at times in local time
       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
@@ -85,10 +85,10 @@ class AppointmentsController < ApplicationController
       @options              = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
       
       # build the waitlist appointment without committing the changes
-      @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => false)
+      @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @provider, @service, @customer, @options, :commit => false)
       
-      # default schedulable is 'anyone' for display purposes
-      @schedulable          = User.anyone if @schedulable.blank?
+      # default provider is 'anyone' for display purposes
+      @provider          = User.anyone if @provider.blank?
       
       # set appointment date to daterange name, set start_at and end_at times in schedule format
       @appt_date            = @daterange.name
@@ -107,12 +107,12 @@ class AppointmentsController < ApplicationController
   def create
     # get appointment parameters
     @service      = current_company.services.find_by_id(params[:service_id])
-    klass, id     = [params[:schedulable_type], params[:schedulable_id]]
+    klass, id     = [params[:provider_type], params[:provider_id]]
     @customer     = User.find_by_id(params[:customer_id])
         
     begin
-      # find the schedulable, but beware that the send method can generate an exception
-      @schedulable = current_company.send(klass).find_by_id(id)
+      # find the provider, but beware that the send method can generate an exception
+      @provider = current_company.send(klass).find_by_id(id)
     rescue Exception => e
       logger.debug("xxx create appointment error: #{e.message}")
       flash[:error] = "Error creating appointment"
@@ -142,7 +142,7 @@ class AppointmentsController < ApplicationController
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           @options        = {:time_range => @time_range}
           # create work appointment
-          @appointment    = AppointmentScheduler.create_work_appointment(current_company, @schedulable, @service, @duration, @customer, @options, :commit => true)
+          @appointment    = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
           # set flash message
@@ -171,7 +171,7 @@ class AppointmentsController < ApplicationController
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           @options        = {:time_range => @time_range}
           # create free appointment
-          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @schedulable, @service, @options)
+          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @service, @options)
           # set redirect path
           @redirect_path  = request.referer
           flash[:notice]  = "Created available time"
@@ -180,7 +180,7 @@ class AppointmentsController < ApplicationController
           @daterange      = DateRange.parse_range(@start_at, @end_at, :inclusive => true)
           @options        = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
           # create waitlist appointment
-          @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @schedulable, @service, @customer, @options, :commit => true)
+          @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @provider, @service, @customer, @options, :commit => true)
           # set redirect path
           @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
           flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
@@ -205,9 +205,9 @@ class AppointmentsController < ApplicationController
     if @errors.keys.size > 0
       # set the flash
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
-      @redirect_path  = build_create_redirect_path(@schedulable, request.referer)
+      @redirect_path  = build_create_redirect_path(@provider, request.referer)
     else
-      @redirect_path  = @redirect_path || build_create_redirect_path(@schedulable, request.referer)
+      @redirect_path  = @redirect_path || build_create_redirect_path(@provider, request.referer)
     end
     
     respond_to do |format|
@@ -286,7 +286,7 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1/cancel
   def cancel
     @appointment  = current_company.appointments.find(params[:id])
-    @schedulable  = @appointment.schedulable
+    @provider  = @appointment.provider
     
     case @appointment.mark_as
     when  Appointment::WORK
@@ -328,9 +328,9 @@ class AppointmentsController < ApplicationController
       # redirect to waitlist index
       @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
     else
-      # redirect to schedulable appointment path
-      @schedulable    = @appointment.schedulable
-      @redirect_path  = url_for(:action => 'index', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+      # redirect to provider appointment path
+      @provider    = @appointment.provider
+      @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
     end
   end
   
@@ -422,9 +422,9 @@ class AppointmentsController < ApplicationController
     "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
   end
   
-  def build_create_redirect_path(schedulable, referer)
-    # default to the schedulable's calendar show
-    default_path  = url_for(:controller => 'calendar', :action => 'show', :schedulable_type => schedulable.tableize, :schedulable_id => schedulable.id, :subdomain => current_subdomain)
+  def build_create_redirect_path(provider, referer)
+    # default to the provider's calendar show
+    default_path  = url_for(:controller => 'calendar', :action => 'show', :provider_type => provider.tableize, :provider_id => provider.id, :subdomain => current_subdomain)
     
     return default_path if referer.blank?
 

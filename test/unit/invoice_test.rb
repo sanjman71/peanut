@@ -24,7 +24,7 @@ class InvoiceTest < ActiveSupport::TestCase
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
-                                     :schedulable => @johnny,
+                                     :provider => @johnny,
                                      :customer => @user,
                                      :start_at_string => "today 2 pm",
                                      :duration => @haircut.duration)

@@ -16,14 +16,7 @@
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
           
-    -#.span-4.calendar
-      -# allow company managers to toggle user calendar
-      -#- if company_manager?
-        -#= check_box_tag 'Show Calendar', 'yes', user.has_calendar?(current_company), :class => 'checkbox calendar', :url => url_for(:controller => :company_schedulables, :action => :toggle, :schedulable_type => user.tableize, :schedulable_id => user.id, :subdomain => current_subdomain)
-        -#- text = (current_user == user) ? "Show My Calendar" : "Show Calendar"
-        -#= label_tag '', text, :class => 'checkbox label'
-        -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+    -# allow company managers or edit all users, and user to edit himself
     .span-2.prepend-2.action.last
-      -# allow company managers or edit all users, and user to edit himself
       - if manager? or user == current_user
         = link_to "Edit", url_for(:controller => 'providers', :action => 'edit', :id => user.id, :subdomain => current_subdomain), :class => 'admin'

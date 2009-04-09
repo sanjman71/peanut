@@ -5,8 +5,8 @@ class AppointmentTest < ActiveSupport::TestCase
   
   should_require_attributes :company_id
   should_require_attributes :service_id
-  should_require_attributes :schedulable_id
-  should_require_attributes :schedulable_type
+  should_require_attributes :provider_id
+  should_require_attributes :provider_type
   should_require_attributes :start_at
   should_require_attributes :end_at
   should_require_attributes :duration
@@ -14,7 +14,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
   should_belong_to          :company
   should_belong_to          :service
-  should_belong_to          :schedulable
+  should_belong_to          :provider
   should_belong_to          :customer
   should_have_one           :invoice
   
@@ -207,7 +207,7 @@ class AppointmentTest < ActiveSupport::TestCase
       # create appointment at 2 pm
       @appt     = Appointment.create(:company => @company,
                                      :service => @haircut,
-                                     :schedulable => @johnny,
+                                     :provider => @johnny,
                                      :customer => @user,
                                      :start_at => @start_at_local,
                                      :duration => @haircut.duration)

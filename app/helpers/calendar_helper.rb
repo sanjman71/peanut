@@ -1,12 +1,12 @@
 module CalendarHelper
 
-  def build_calendar_when_links(schedulable, when_collection, current, options={})
+  def build_calendar_when_links(provider, when_collection, current, options={})
     default = options[:default]
     
     when_collection.each do |s|
       # add css 'current' class for the current link
       klass       = (s == current) ? 'current' : ''
-      url_params  = {:controller => 'calendar', :action => 'show', :schedulable_id => schedulable.id, :schedulable_type => schedulable.tableize, :subdomain => @subdomain}
+      url_params  = {:controller => 'calendar', :action => 'show', :provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain}
       
       if s == default
         # no when parameter for the default value (explicitly clear start/end date used for range values)

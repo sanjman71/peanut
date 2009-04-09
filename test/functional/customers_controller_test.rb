@@ -66,7 +66,7 @@ class CustomersControllerTest < ActionController::TestCase
       @customer     = Factory(:user, :name => 'Booty Licious')
       @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
       @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
-      @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :schedulable => @johnny, :service => @haircut)
+      @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @johnny, :service => @haircut)
       assert @appointment.valid?
     end
 

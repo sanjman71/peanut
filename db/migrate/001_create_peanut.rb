@@ -9,7 +9,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :locations_count, :default => 0       # counter cache
       t.integer :services_count, :default => 0        # counter cache
       t.integer :work_services_count, :default => 0   # counter cache
-      t.integer :schedulables_count, :default => 0    # counter cache
+      t.integer :providers_count, :default => 0       # counter cache
       t.timestamps
     end
     
@@ -20,7 +20,7 @@ class CreatePeanut < ActiveRecord::Migration
       t.integer :duration
       t.string  :mark_as
       t.integer :price_in_cents
-      t.integer :schedulables_count, :default => 0          # counter cache
+      t.integer :providers_count, :default => 0             # counter cache
       t.boolean :allow_custom_duration, :default => false   # by default no custom duration
       
       t.timestamps
@@ -51,24 +51,24 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :products, [:company_id]
     add_index :products, [:company_id, :name]
 
-    # Map polymorphic schedulablesd (e.g. users) to companies
-    create_table :company_schedulables do |t|
+    # Map polymorphic providers (e.g. users) to companies
+    create_table :company_providers do |t|
       t.references  :company
-      t.references  :schedulable, :polymorphic => true
+      t.references  :provider, :polymorphic => true
       t.timestamps
     end
     
-    add_index :company_schedulables, [:schedulable_id, :schedulable_type], :name => 'index_on_schedulables'
-    add_index :company_schedulables, [:company_id, :schedulable_id, :schedulable_type], :name => 'index_on_companies_and_schedulables'
+    add_index :company_providers, [:provider_id, :provider_type], :name => 'index_on_providers'
+    add_index :company_providers, [:company_id, :provider_id, :provider_type], :name => 'index_on_companies_and_providers'
 
-    # Polymorphic relationship mapping services to schedulables (e.g. users)
+    # Polymorphic relationship mapping services to provider (e.g. users)
     create_table :service_providers do |t|
       t.references  :service
-      t.references  :schedulable, :polymorphic => true
+      t.references  :provider, :polymorphic => true
       t.timestamps
     end
 
-    add_index :service_providers, [:service_id, :schedulable_id, :schedulable_type], :name => 'index_on_services_and_schedulable'
+    add_index :service_providers, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
     
     create_table :mobile_carriers do |t|
       t.string :name
@@ -88,7 +88,7 @@ class CreatePeanut < ActiveRecord::Migration
     create_table :appointments do |t|
       t.integer     :company_id
       t.integer     :service_id
-      t.references  :schedulable, :polymorphic => true    # e.g. users
+      t.references  :provider, :polymorphic => true    # e.g. users
       t.integer     :customer_id       # user who booked the appointment
       t.string      :when
       t.datetime    :start_at

@@ -5,7 +5,7 @@ class Service < ActiveRecord::Base
   has_many                    :company_services
   has_many                    :companies, :through => :company_services
   has_many                    :appointments
-  has_many_polymorphs         :schedulables, :from => [:users], :through => :service_providers
+  has_many_polymorphs         :providers, :from => [:users], :through => :service_providers
   before_validation           :init_duration
   before_save                 :titleize_name
   
@@ -17,7 +17,7 @@ class Service < ActiveRecord::Base
   Appointment::MARK_AS_TYPES.each { |s| named_scope s, :conditions => {:mark_as => s} }
   
   # find services with at least 1 service provider
-  named_scope :with_providers,  { :conditions => ["schedulables_count > 0"] }
+  named_scope :with_providers,  { :conditions => ["providers_count > 0"] }
   
   # default duration value
   @@default_duration          = 30
@@ -42,8 +42,8 @@ class Service < ActiveRecord::Base
   
   # return true if the service is provided by the specfied provider
   def provided_by?(o)
-    # can't use schedulables.include?(o) here, not sure why but possibly because of polymorphic
-    schedulables.any? { |schedulable| schedulable == o }
+    # can't use providers.include?(o) here, not sure why but possibly because of polymorphic
+    providers.any? { |provider| provider == o }
   end
   
   def free?

@@ -2,37 +2,37 @@ class WaitlistController < ApplicationController
   privilege_required 'read wait appointments', :only => [:index], :on => :current_company
 
   def index
-    if params[:schedulable_id].to_s == "0"
+    if params[:provider_id].to_s == "0"
       # /users/0/waitlist is canonicalized to /waitlist; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable_id => nil, :schedulable_type => nil)))
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :provider_id => nil, :provider_type => nil)))
     end
     
-    # initialize schedulable
-    @schedulable  = find_schedulable_from_params || User.anyone
+    # initialize provider
+    @provider  = find_provider_from_params || User.anyone
 
-    # build schedulables collection, including 'anyone'
-    @schedulables = [User.anyone] + current_company.schedulables.all
+    # build providers collection, including 'anyone'
+    @providers = [User.anyone] + current_company.providers.all
     
     # find state (default to 'upcoming')
     @state        = params[:state] ? params[:state].to_s : 'upcoming'
     
-    if @schedulable.anyone?
+    if @provider.anyone?
       # find waitlist appointments for anyone by state
       @appointments = @current_company.appointments.wait.send(@state)
       @anyone       = true
     else
-      # find waitlist appointments for a schedulable by state
-      @appointments = @current_company.appointments.wait.schedulable(@schedulable).send(@state)
+      # find waitlist appointments for a provider by state
+      @appointments = @current_company.appointments.wait.provider(@provider).send(@state)
       @anyone       = false
     end
     
-    # group appointments by schedulable, map an empty schedulable to the special 'anyone' user
-    @appointments_by_schedulable = @appointments.group_by{ |appt| appt.schedulable }.map{ |schedulable, appts| [schedulable || User.anyone, appts] }
+    # group appointments by provider, map an empty provider to the special 'anyone' user
+    @appointments_by_provider = @appointments.group_by{ |appt| appt.provider }.map{ |provider, appts| [provider || User.anyone, appts] }
     
     logger.debug("*** #{@appointments.size} waitlist appointments")
 
-    # set title based on schedulable
-    @title = "Waitlist for #{@schedulable.name}"
+    # set title based on provider
+    @title = "Waitlist for #{@provider.name}"
     
     respond_to do |format|
       format.html
@@ -42,8 +42,8 @@ class WaitlistController < ApplicationController
   protected
   
   # find scheduable from the params hash
-  def find_schedulable_from_params
-    current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
+  def find_provider_from_params
+    current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
   end
   
 end

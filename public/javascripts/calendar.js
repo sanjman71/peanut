@@ -1,4 +1,4 @@
-// add free time for a schedulable on a specific day
+// add free time for a provider on a specific day
 $.fn.init_add_single_free_time = function() {
   // validate the form by binding a callback to the submit function
   $("#add_single_free_time_form").validate({
@@ -39,18 +39,18 @@ $.fn.init_show_appointment_on_hover = function () {
   )
 } 
 
-// show calendar for the selected schedulable
-$.fn.init_select_calendar_show_schedulable = function () {
-  $("#show_schedulable").change(function () {
+// show calendar for the selected provider
+$.fn.init_select_calendar_show_provider = function () {
+  $("#show_provider").change(function () {
     var href = '/' + this.value + '/calendar';
     window.location = href;
     return false;
   })
 }
 
-// edit calendar for the selected schedulable
-$.fn.init_select_calendar_edit_schedulable = function () {
-  $("#edit_schedulable").change(function () {
+// edit calendar for the selected provider
+$.fn.init_select_calendar_edit_provider = function () {
+  $("#edit_provider").change(function () {
     var href = '/' + this.value + '/calendar/edit';
     window.location = href;
     return false;
@@ -60,8 +60,8 @@ $.fn.init_select_calendar_edit_schedulable = function () {
 $(document).ready(function() {
 
   $(document).init_add_single_free_time();
-  $(document).init_select_calendar_show_schedulable();
-  $(document).init_select_calendar_edit_schedulable();
+  $(document).init_select_calendar_show_provider();
+  $(document).init_select_calendar_edit_provider();
   $(document).init_show_appointment_on_hover();
   
   // set hover states to show selected date, ignore past dates
@@ -167,5 +167,5 @@ $(document).ready(function() {
 
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
-  $(document).init_select_calendar_show_schedulable();
+  $(document).init_select_calendar_show_provider();
 })

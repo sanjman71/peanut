@@ -97,7 +97,7 @@ class ApplicationController < ActionController::Base
   def appointment_roles(appointment, user=nil)
     user      = user || current_user
     customer  = appointment.customer == user ? true : false
-    provider  = appointment.schedulable == user ? true : false
+    provider  = appointment.provider == user ? true : false
     manager   = manager?
     [customer, provider, manager]
   end

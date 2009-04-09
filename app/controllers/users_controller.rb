@@ -117,8 +117,8 @@ class UsersController < ApplicationController
       when 'provider'
         # grant the user basic access to the company as a 'provider'
         @user.grant_role('provider', @company)
-        # add the user as a company schedulable
-        @company.schedulables.push(@user)
+        # add the user as a company provider
+        @company.providers.push(@user)
       when 'customer'
         # grant the user the 'customer' role
         @user.grant_role('customer', @company)

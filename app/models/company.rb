@@ -22,8 +22,8 @@ class Company < ActiveRecord::Base
   before_validation         :init_subdomain, :downcase_subdomain, :titleize_name
 
   validates_presence_of     :time_zone
-  has_many                  :company_schedulables
-  has_many_polymorphs       :schedulables, :from => [:users], :through => :company_schedulables
+  has_many                  :company_providers
+  has_many_polymorphs       :providers, :from => [:users], :through => :company_providers
   has_many                  :company_services
   has_many                  :services, :through => :company_services, :after_add => :added_service, :after_remove => :removed_service
   has_many                  :products
@@ -63,10 +63,10 @@ class Company < ActiveRecord::Base
     end
   end
 
-  # return true if the company contains the specified schedulable
-  def has_schedulable?(object)
-    # can't use schedulables.include?(object) here, not sure why but possibly because its polymorphic
-    schedulables.any? { |o| o == object }
+  # return true if the company contains the specified provider
+  def has_provider?(object)
+    # can't use providers.include?(object) here, not sure why but possibly because its polymorphic
+    providers.any? { |o| o == object }
   end
   
   # return the company free service
@@ -74,9 +74,9 @@ class Company < ActiveRecord::Base
     services.free.first
   end
   
-  # returns true if the company has at least 1 schedulable and 1 work service
+  # returns true if the company has at least 1 provider and 1 work service
   def setup?
-    return false if schedulables_count == 0 or work_services_count == 0
+    return false if providers_count == 0 or work_services_count == 0
     true
   end
   

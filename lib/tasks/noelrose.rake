@@ -32,8 +32,8 @@ namespace :noelrose do
   
     puts "#{Time.now}: adding noelrose services ..."
 
-    # assign schedulables
-    @noelrose.schedulables.push(@erika)
+    # assign providers
+    @noelrose.providers.push(@erika)
     
     # create noelrose services, products
     @mens_haircut     = @noelrose.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)

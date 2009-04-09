@@ -4,8 +4,8 @@
 
 - form_for(ServiceProvider.new, :url => service_providers_path(:subdomain => current_subdomain), :method => :post, :html => {:id => 'new_service_provider'}) do |f|
   = hidden_field_tag "service_provider[service_id]", @service.id, :id => 'service_provider_service_id'
-  = hidden_field_tag "service_provider[schedulable_type]", '', :id => 'service_provider_schedulable_type'
-  = hidden_field_tag "service_provider[schedulable_id]", '', :id => 'service_provider_schedulable_id'
+  = hidden_field_tag "service_provider[provider_type]", '', :id => 'service_provider_provider_type'
+  = hidden_field_tag "service_provider[provider_id]", '', :id => 'service_provider_provider_id'
     
 - form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
 

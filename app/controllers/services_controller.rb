@@ -33,7 +33,7 @@ class ServicesController < ApplicationController
   def edit
     @service              = current_company.services.find(params[:id])
     @service_providers    = @service.service_providers
-    @non_providers        = current_company.schedulables.all - @service.schedulables
+    @non_providers        = current_company.providers.all - @service.providers
 
     respond_to do |format|
       format.html

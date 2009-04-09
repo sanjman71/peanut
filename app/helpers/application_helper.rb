@@ -178,10 +178,10 @@ module ApplicationHelper
     end
   end
   
-  # build schedulable display name based on context of the current user
-  def schedulable_display_name(schedulable, current_user)
-    return "" if schedulable.blank?
-    (schedulable == current_user) ? "Me" : schedulable.name
+  # build provider display name based on context of the current user
+  def provider_display_name(provider, current_user)
+    return "" if provider.blank?
+    (provider == current_user) ? "Me" : provider.name
   end
   
   # build customer display name based on context of the current user

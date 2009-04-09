@@ -32,8 +32,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     
     context "then add a service provider and search for free appointments again" do
       setup do
-        # add schedulable
-        @haircut.schedulables.push(@johnny)
+        # add provider
+        @haircut.providers.push(@johnny)
         # search for free appointments
         @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
@@ -147,7 +147,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
         assert_equal @free_service, @free2_appointment.service
-        assert_equal @johnny, @free2_appointment.schedulable
+        assert_equal @johnny, @free2_appointment.provider
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end
@@ -208,7 +208,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
         assert_equal @free_service, @free2_appointment.service
-        assert_equal @johnny, @free2_appointment.schedulable
+        assert_equal @johnny, @free2_appointment.provider
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end
@@ -270,7 +270,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
         assert_equal @free_service, @free2_appointment.service
-        assert_equal @johnny, @free2_appointment.schedulable
+        assert_equal @johnny, @free2_appointment.provider
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end
@@ -331,7 +331,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
         assert_equal @free_appointment.end_at, @free2_appointment.end_at
         assert_equal @free_service, @free2_appointment.service
-        assert_equal @johnny, @free2_appointment.schedulable
+        assert_equal @johnny, @free2_appointment.provider
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end

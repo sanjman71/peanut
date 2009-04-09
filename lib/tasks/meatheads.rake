@@ -44,10 +44,10 @@ namespace :meatheads do
   
     puts "#{Time.now}: adding meathead services ..."
   
-    # assign schedulables
-    @meatheads.schedulables.push(@meathead)
-    @meatheads.schedulables.push(@wimpy)
-    @meatheads.schedulables.push(@skinny)
+    # assign providers
+    @meatheads.providers.push(@meathead)
+    @meatheads.providers.push(@wimpy)
+    @meatheads.providers.push(@skinny)
 
     # create services
     @training         = @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
@@ -55,8 +55,8 @@ namespace :meatheads do
     puts "#{Time.now}: adding meatheads service providers ..."
 
     # add service providers
-    @training.schedulables.push(@wimpy)
-    @training.schedulables.push(@skinny)
+    @training.providers.push(@wimpy)
+    @training.providers.push(@skinny)
 
     puts "#{Time.now}: completed"
   end

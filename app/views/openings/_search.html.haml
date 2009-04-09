@@ -1,7 +1,7 @@
 %h2.prepend-1
   = title
-= hidden_field_tag 'initial_schedulable_id', schedulable.id
-= hidden_field_tag 'initial_schedulable_type', schedulable.tableize
+= hidden_field_tag 'initial_provider_id', provider.id
+= hidden_field_tag 'initial_provider_type', provider.tableize
 - form_for(Appointment.new, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
   .last{:class => size == :wide ? "span-24" : "span-7"}
     .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
@@ -22,7 +22,7 @@
     .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
       == With?
     .span-5.last.field#who
-      = select_tag('schedulable', options_for_select(schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{schedulable.tableize}/#{schedulable.id}"), :style => "width: 125px; align: top;")
+      = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :style => "width: 125px; align: top;")
   .last{:class => size == :wide ? "span-24" : "span-7"}
     .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
       == Time of Day?

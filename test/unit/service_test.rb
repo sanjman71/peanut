@@ -37,13 +37,13 @@ class ServiceTest < ActiveSupport::TestCase
       setup do
         @user1 = Factory(:user, :name => "Sanjay")
         assert_valid @user1
-        @service.schedulables.push(@user1)
+        @service.providers.push(@user1)
         @service.reload
         @user1.reload
       end
       
-      should "have service schedulables collection == [@user]" do
-        assert_equal [@user1], @service.schedulables
+      should "have service providers collection == [@user]" do
+        assert_equal [@user1], @service.providers
         assert_equal [@user1], @service.users
       end
       

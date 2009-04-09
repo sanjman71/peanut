@@ -2,10 +2,10 @@
 - javascript('service_providers', 'openings', 'time_range_slider')
 - stylesheet('appointments', 'calendar', 'datePicker')
 
--# service providers mapping services to schedulables
+-# service providers mapping services to providers
 .span-16.service_providers.hide
   - @sps.each do |sp|
-    .service_provider{:service_id => sp[0], :schedulable_id => sp[1], :schedulable_name => sp[2], :schedulable_type => sp[3]}
+    .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
 
 .span-16.services.hide
   - @sps.each do |sp|
@@ -14,9 +14,9 @@
 - unless @daterange.blank?
   .span-15.prepend-1.append-1
     .span-15.last.padding-top-10
-      -# show count of available timeslots for the service and schedulable
+      -# show count of available timeslots for the service and provider
       %h3
-        = highlight("#{@service.name} with #{@schedulable.name}", [@service.name, @schedulable.name])
+        = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name])
       %h4{:style => 'color: #666666;'}
         - if @free_appointments.blank?
           == We found no available timeslots matching your search criteria.
@@ -38,13 +38,13 @@
       -# show waitlist link if the @show_waitlist flag is set
       - if @show_waitlist
         %h2
-          = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
+          = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
           %span{:style => 'font-size: 0.7em;'}== or
         %h3{:style => 'font-size: 1.3em; color: #666666;'}== Use the search bar to the right to change your search parameters and try again.
     
 .last{:class => @daterange ? "span-7" : "span-24"}
   .span-7.mat
-    = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :schedulables => @schedulables, :schedulable => @schedulable, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
+    = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :providers => @providers, :provider => @provider, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
   - if @daterange.blank? && !current_company.description.blank?
     .span-15.prepend-1.last
       = Sanitize.clean(current_company.description, Sanitize::Config::RELAXED)

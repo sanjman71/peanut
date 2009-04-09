@@ -47,7 +47,7 @@ namespace :populate do
       provider = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
       
       # add provider to company
-      company.schedulables.push(provider)
+      company.has_providers.push(provider)
       provider.grant_role('provider', company)
       
       added += 1
@@ -67,7 +67,7 @@ namespace :populate do
     puts "#{Time.now}: populating free time for company #{company.name}"
     
     # find all providers
-    providers = company.schedulables
+    providers = company.providers
     day_range = Range.new(0, count)
     scheduled = 0
     
@@ -110,9 +110,9 @@ namespace :populate do
     
     while scheduled < count and (!(free_appts = company.appointments.free).blank?)
       free_appts.each do |appt|
-        provider = appt.schedulable
+        provider = appt.provider
       
-        # find a provider's service
+        # find a random service performed by the provider
         service = provider.services[rand(provider.services.count)]
       
         if service.blank?

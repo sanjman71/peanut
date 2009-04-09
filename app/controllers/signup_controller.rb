@@ -57,8 +57,8 @@ class SignupController < ApplicationController
       @user.grant_role('provider', @company)
       @user.grant_role('manager', @company)
 
-      # add user as company schedulable
-      @company.schedulables.push(@user)
+      # add user as company provider
+      @company.providers.push(@user)
       
       # signup completed, redirect to login page
       flash[:notice] = "Signup complete! Please sign in to continue."

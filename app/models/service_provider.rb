@@ -1,11 +1,11 @@
 class ServiceProvider < ActiveRecord::Base
-  belongs_to                :service, :counter_cache => :schedulables_count
-  belongs_to                :schedulable, :polymorphic => true, :counter_cache => :services_count
-  validates_presence_of     :service_id, :schedulable_id, :schedulable_type
+  belongs_to                :service, :counter_cache => :providers_count
+  belongs_to                :provider, :polymorphic => true, :counter_cache => :services_count
+  validates_presence_of     :service_id, :provider_id, :provider_type
   
   def validate
-    if self.schedulable.blank?
-      errors.add_to_base("schedulable is invalid")
+    if self.provider.blank?
+      errors.add_to_base("provider is invalid")
     end
     
     if self.service.blank?

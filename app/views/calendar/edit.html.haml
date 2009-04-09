@@ -4,9 +4,9 @@
 
 .span-24.last#what
   .span-15.box
-    .span-15.last.schedulable
-      = label_tag "edit_schedulable", "Schedule available time for", :class => 'big'
-      = select_tag('edit_schedulable', options_for_select(@schedulables.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@schedulable.tableize}/#{@schedulable.id}"), :class => 'text')
+    .span-15.last.provider
+      = label_tag "edit_provider", "Schedule available time for", :class => 'big'
+      = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br
@@ -23,8 +23,8 @@
         %li== Its the default, since the system has no way of knowing when a person is available to work.
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
-  = hidden_field_tag :schedulable_type, @schedulable.tableize
-  = hidden_field_tag :schedulable_id, @schedulable.id
+  = hidden_field_tag :provider_type, @provider.tableize
+  = hidden_field_tag :provider_id, @provider.id
   = hidden_field_tag :service_id, @free_service.id
   = hidden_field_tag :mark_as, Appointment::FREE
   
@@ -84,6 +84,6 @@
       = f.submit "Schedule Available Time", :class => 'big button'
       %span{:style => 'font-size: 11px;'}
         == or
-        = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :schedulable_type => @schedulable.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)
+        = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
     %h2.hide#progress= image_tag 'barbershop.gif'
   
