@@ -36,16 +36,24 @@ namespace :populate do
     
     puts "#{Time.now}: populating #{count} providers for company #{company.name}"
     
+    added = 0
     count.times do |i|
+      if !company.may_add_provider?
+        puts "#{Time.now}: xxx reached company provider limit"
+        break
+      end
+      
       # create random provider
       provider = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
       
       # add provider to company
       company.schedulables.push(provider)
       provider.grant_role('provider', company)
+      
+      added += 1
     end
 
-    puts "#{Time.now}: completed, added #{count} providers"
+    puts "#{Time.now}: completed, added #{added} providers"
   end
 
   desc "Populate free time for the specified company"
