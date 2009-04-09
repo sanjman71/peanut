@@ -3,6 +3,8 @@ class CustomersController < ApplicationController
 
   privilege_required 'read users', :only => [:index], :on => :current_company
 
+  @@per_page  = 10
+  
   # GET /customers
   def index
     @search = params[:search]
@@ -11,9 +13,10 @@ class CustomersController < ApplicationController
     if !@search.blank?
       @customers    = current_company.authorized_users.with_role(@role).search_by_name(@search).order_by_name
       @search_text  = "Customers matching '#{@search}'"
+      @paginate     = false
     else
-      @customers    = current_company.authorized_users.with_role(@role).order_by_name
-      @search_text  = @customers.blank? ? "No Customers" : "All Customers"
+      @customers    = current_company.authorized_users.with_role(@role).order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
+      @paginate     = true
     end
     
     respond_to do |format|

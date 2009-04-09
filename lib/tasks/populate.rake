@@ -117,7 +117,7 @@ namespace :populate do
             
         Appointment.transaction do
           # create a random customer
-          customer = User.create(:name => Faker::Name.name, :email => Faker::Internet.email, :password => 'secret', :password_confirmation => 'secret')
+          customer = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
 
           begin
             # schedule the work appointment

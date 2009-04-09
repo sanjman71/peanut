@@ -50,15 +50,12 @@ class CustomersControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'customers/index.html.haml'
       should_not_set_the_flash
-      should_assign_to :customers, :search_text
-      should_not_assign_to :search
-    
+      should_assign_to :customers
+      should_assign_to :paginate, :equals => 'true'
+      should_not_assign_to :search, :search_text
+      
       should "find no customers" do
         assert_equal [], assigns(:customers)
-      end
-    
-      should "have search text 'No Customers'" do
-        assert_equal "No Customers", assigns(:search_text)
       end
     end
   end
@@ -90,7 +87,8 @@ class CustomersControllerTest < ActionController::TestCase
       should_respond_with_content_type "text/javascript"
       should_not_set_the_flash
       should_assign_to :customers, :search, :search_text
-
+      should_not_assign_to :paginate
+      
       should "find customer" do
         assert_equal [@customer], assigns(:customers)
         # assert_equal "", @response.body

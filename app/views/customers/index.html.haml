@@ -20,8 +20,8 @@
   = display_flash(:all)
   
 .span-24.last
-  .span-23.prepend-1.append-bottom.customers.header#customer_search_text
-    = @search_text
+  #customers_pagination
+    = render(:partial => 'customers_pagination', :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate})
   #customers
     = render(:partial => 'customers', :locals => {:customers => @customers})
     
