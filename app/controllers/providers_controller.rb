@@ -9,13 +9,13 @@ class ProvidersController < ApplicationController
   # GET /providers
   def index
     # find all company providers
-    @users    = current_company.authorized_users.with_role(Company.provider_role).order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
-    @paginate = true
+    @providers  = current_company.authorized_users.with_role(Company.provider_role).order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
+    @paginate   = true
     
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @users.to_json(:only => ['id', 'name', 'email'])) }
+      format.json { render(:json => @providers.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
   

@@ -56,7 +56,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :users, :class => Array
+    should_assign_to :providers, :class => Array
   
     should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0
@@ -78,7 +78,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :users, :class => Array
+    should_assign_to :providers, :class => Array
     
     should "be able to change manager role for 1 provider" do
       assert_select "input.checkbox.manager", 1

@@ -1,22 +1,22 @@
-- users.each do |user|
-  .span-16.last.letterbox.user{:class => cycle("shaded", "")}[user]
+- providers.each do |provider|
+  .span-16.last.letterbox.provider{:class => cycle("shaded", "")}[provider]
     -# provider name and email
     .span-6.prepend-1.name
-      %h2.provider.name.bottom= user.name
-      %h4=user.email
+      %h2.provider.name.bottom= provider.name
+      %h4=provider.email
       
       -# allow company managers to toggle manager role
     .span-5.provider.manager
       - if manager?
-        - if current_user == user
+        - if current_user == provider
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
         - else
-          = check_box_tag 'Company Manager', 'yes', user.has_role?('manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => user.id, :subdomain => current_subdomain)
+          = check_box_tag 'Company Manager', 'yes', provider.has_role?('manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
           
-    -# allow company managers or edit all users, and user to edit himself
+    -# allow company managers or edit all providers, and provider to edit himself
     .span-2.prepend-2.action.last
-      - if manager? or user == current_user
-        = link_to "Edit", url_for(:controller => 'providers', :action => 'edit', :id => user.id, :subdomain => current_subdomain), :class => 'admin'
+      - if manager? or provider == current_user
+        = link_to "Edit", url_for(:controller => 'providers', :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin'

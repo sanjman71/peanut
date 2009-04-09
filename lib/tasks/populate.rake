@@ -6,25 +6,6 @@ namespace :populate do
   
   @@count_default = 20
   
-  desc "Populate products for the first company in the database"
-  task :products, :count do |t, args|
-    count   = args.count.to_i 
-    count   = @@count_default if count == 0 # default value
-    
-    # find first company
-    company = Company.first
-    
-    puts "#{Time.now}: populating #{count} products for company #{company.name}"
-    
-    Product.populate count do |product|
-      product.company_id      = company.id
-      product.name            = Populator.words(1..3).titleize
-      product.price_in_cents  = [500, 1000, 1500, 2000, 2500]
-      product.inventory       = 5..50
-    end
-    
-  end
-  
   desc "Populate providers for the specified company"
   task :providers, :company_id, :count do |t, args|
     # find specified company
@@ -47,7 +28,7 @@ namespace :populate do
       provider = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
       
       # add provider to company
-      company.has_providers.push(provider)
+      company.providers.push(provider)
       provider.grant_role('provider', company)
       
       added += 1
@@ -143,6 +124,26 @@ namespace :populate do
     end # while
   
     puts "#{Time.now}: completed, scheduled #{scheduled} work appointments"
+  end
+  
+  desc "Populate products for the specified company"
+  task :products, :company_id, :count do |t, args|
+    # find specified company
+    company   = Company.find_by_id(args.company_id.to_i) || Company.first
+    
+    count     = args.count.to_i 
+    count     = @@count_default if count == 0 # default value
+    
+    puts "#{Time.now}: populating #{count} products for company #{company.name}"
+    
+    Product.populate count do |product|
+      product.company_id      = company.id
+      product.name            = Populator.words(1..3).titleize
+      product.price_in_cents  = [500, 1000, 1500, 2000, 2500]
+      product.inventory       = 5..50
+    end
+    
+    puts "#{Time.now}: completed, added #{count} products"
   end
   
   desc "Populate invoices for the first company in the database"

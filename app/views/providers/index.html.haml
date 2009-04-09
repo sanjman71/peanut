@@ -30,9 +30,9 @@
 
   .span-16.last
     #providers_pagination
-      = render(:partial => 'providers_pagination', :locals => {:providers => @users, :search_text => @search_text, :paginate => @paginate})
+      = render(:partial => 'providers_pagination', :locals => {:providers => @providers, :search_text => @search_text, :paginate => @paginate})
     #providers
-      = render(:partial => 'providers', :locals => {:users => @users})
+      = render(:partial => 'providers', :locals => {:providers => @providers})
 
 .span-8.last
   -# provider help
