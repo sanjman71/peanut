@@ -3,8 +3,18 @@ require 'test/factories'
 
 class UsersControllerTest < ActionController::TestCase
 
+  # user notify route
   should_route :get,  '/users/1/notify/create', :controller => 'users', :action => 'notify', :id => '1', :type => 'create'
 
+  context 'invite url with subdomain' do
+    setup do
+      SubdomainFu.stubs(:subdomain_from).with(anything).returns('peanut')
+    end
+  
+    # user invite route
+    should_route :get,  '/invite/12345', :controller => 'users', :action => 'new', :invitation_token => '12345'
+  end
+  
   def setup
     @controller   = UsersController.new
     # create a valid company

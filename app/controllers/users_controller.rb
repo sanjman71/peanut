@@ -81,6 +81,10 @@ class UsersController < ApplicationController
     
     # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
     @back_path  = current_user ? (request.referer || "/#{@type.pluralize}") : nil
+
+    respond_to do |format|
+      format.html
+    end
   end
  
   # POST /customers/create
