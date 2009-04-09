@@ -15,8 +15,13 @@
   .span-22.prepend-1.append-1.last
     %h3
       = highlight("Your company is currently using the #{@current_plan.name} plan, with #{locations} and #{providers}.", [@current_plan.name, locations, providers])
-      %hr.space
-      == You may upgrade/downgrade to one of the following plans:
-
+      
+  %hr.space
+  
   .prepend-1
-    = render(:partial => 'plans/plans', :locals => {:plans => @plans})
+    -# check if there are any plans to upgrade/downgrade
+    - if @plans.blank?
+      %h3== There are no upgrade/downgrade options at this time.
+    - else
+      %h3== You may upgrade/downgrade to one of the following plans:
+      = render(:partial => 'plans/plans', :locals => {:plans => @plans})
