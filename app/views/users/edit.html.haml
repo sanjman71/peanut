@@ -1,5 +1,6 @@
 - title('Edit User')
-- stylesheet('users')
+- stylesheet('users', 'notes')
+- javascript('notes')
 
 - form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :type => @type, :subdomain => current_subdomain), :method => :post) do |f|
   
@@ -47,4 +48,21 @@
     = submit_tag "Save Changes"
     == or
     = link_to "Cancel", @index_path, :class => 'admin'
+
+%hr.space
+  
+.span-15.prepend-1
+  -# notes flash message
+  #note_flash
+
+  -# add new note
+  .new_note#new_note_container
+    %p
+      %h4.bottom== Add a note:
+      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @user})
+  %hr.space
+  -# customer notes
+  #notes_collection
+    = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+
 

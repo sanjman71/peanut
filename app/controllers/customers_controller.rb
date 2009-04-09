@@ -27,16 +27,16 @@ class CustomersController < ApplicationController
   end
 
   # GET /customers/1
-  def show
-    @customer = User.find(params[:id])
-    @note     = Note.new
-    
-    # build notes collection, most recent first
-    @notes    = @customer.notes.sort_recent
-
-    respond_to do |format|
-      format.html
-    end
-  end
+  # def show
+  #   @customer = User.find(params[:id])
+  #   @note     = Note.new
+  #   
+  #   # build notes collection, most recent first
+  #   @notes    = @customer.notes.sort_recent
+  # 
+  #   respond_to do |format|
+  #     format.html
+  #   end
+  # end
 
 end

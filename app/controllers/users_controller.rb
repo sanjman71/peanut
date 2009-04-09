@@ -173,6 +173,10 @@ class UsersController < ApplicationController
   def edit
     # @type and @user are initialized here
     
+    # build notes collection, most recent first
+    @note     = Note.new
+    @notes    = @user.notes.sort_recent
+    
     # build the index path based on the user type
     @index_path = "/#{@type.pluralize}"
     

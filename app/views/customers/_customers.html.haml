@@ -1,15 +1,21 @@
 - customers.each do |customer|
-  .span-24.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
-    .span-6.prepend-1
-      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, customer_path(customer, :subdomain => current_subdomain), :class => 'customer name'
+  .span-16.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
+    .span-7.prepend-1
+      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, url_for(:controller =>'users', :action => 'edit', :id => customer.id, :type => 'customer', :subdomain => current_subdomain), :class => 'customer name'
       %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email
-    .span-3
-      %h3.customer.phone= number_to_phone(customer.phone)
-    .span-5
-      %h4{:class => customer.sms? ? 'customer sms' : 'customer nosms'}= customer.sms? ? "Text messaging enabled" : "No text messaging"
-    .span-3
-      %h4= link_to "Appointments", customer_appointments_path(customer), :class => 'admin'
-    .span-6.last
+      %br
+      %span.customer.phone{:style => 'font-size: 1.3em;'}
+        - if customer.phone
+          = number_to_phone(customer.phone)
+          - if customer.sms?
+            %span{:style => 'color: #008800; font-size: 0.8em;'}== * text messaging
+        - else
+          == &nbsp;
+          
+    .span-4
+      %h4= link_to "Show Appointments", customer_appointments_path(customer), :class => 'admin'
+      
+    .span-3.last
       -# allow company managers to edit all users, or the user to edit himself
       - if manager? or customer == current_user
         = link_to "Edit", url_for(:controller =>'users', :action => 'edit', :id => customer.id, :type => 'customer', :subdomain => current_subdomain), :class => 'admin'
