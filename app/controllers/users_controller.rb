@@ -67,8 +67,8 @@ class UsersController < ApplicationController
       if @user = User.find_by_email(@invitation.recipient_email)
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
-        # add the user to the company
-        @user.grant_role('provider', @invitation.company)
+        # add the user as a company provider
+        @invitation.company.providers.push(@user) unless @invitation.company.blank?
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
         redirect_back_or_default('/login') and return
@@ -115,8 +115,6 @@ class UsersController < ApplicationController
       
       case @type
       when 'provider'
-        # grant the user basic access to the company as a 'provider'
-        @user.grant_role('provider', @company)
         # add the user as a company provider
         @company.providers.push(@user)
       when 'customer'

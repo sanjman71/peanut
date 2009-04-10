@@ -9,7 +9,7 @@ class ProvidersController < ApplicationController
   # GET /providers
   def index
     # find all company providers
-    @providers  = current_company.authorized_users.with_role(Company.provider_role).order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
+    @providers  = current_company.providers.order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
     @paginate   = true
     
     respond_to do |format|

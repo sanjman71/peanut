@@ -61,7 +61,7 @@ class CreatePeanut < ActiveRecord::Migration
     add_index :company_providers, [:provider_id, :provider_type], :name => 'index_on_providers'
     add_index :company_providers, [:company_id, :provider_id, :provider_type], :name => 'index_on_companies_and_providers'
 
-    # Polymorphic relationship mapping services to provider (e.g. users)
+    # Polymorphic relationship mapping services to provider (e.g. users, things)
     create_table :service_providers do |t|
       t.references  :service
       t.references  :provider, :polymorphic => true
@@ -69,6 +69,13 @@ class CreatePeanut < ActiveRecord::Migration
     end
 
     add_index :service_providers, [:service_id, :provider_id, :provider_type], :name => 'index_on_services_and_providers'
+    
+    create_table :resources do |t|
+      t.string  :name
+      t.string  :description
+    end
+    
+    add_index :resources, [:name]
     
     create_table :mobile_carriers do |t|
       t.string :name

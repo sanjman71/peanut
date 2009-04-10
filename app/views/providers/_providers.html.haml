@@ -3,7 +3,7 @@
     -# provider name and email
     .span-6.prepend-1.name
       %h2.provider.name.bottom= provider.name
-      %h4=provider.email
+      %h4=provider.email if provider.respond_to?(:email)
       
       -# allow company managers to toggle manager role
     .span-5.provider.manager
@@ -11,10 +11,13 @@
         - if current_user == provider
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
-        - else
+        - elsif provider.respond_to?(:has_role?)
           = check_box_tag 'Company Manager', 'yes', provider.has_role?('manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+        - else
+          -# provider is a resource, which does not have roles
+          == &nbsp;
           
     -# allow company managers or edit all providers, and provider to edit himself
     .span-2.prepend-2.action.last

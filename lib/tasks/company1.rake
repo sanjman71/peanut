@@ -26,10 +26,8 @@ namespace :company1 do
     # create test companies
     @company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
-    # add user roles
+    # add manager role
     @johnny.grant_role('manager', @company1)
-    @johnny.grant_role('provider', @company1)
-    @mary.grant_role('provider', @company1)
   end
   
   task :services do    

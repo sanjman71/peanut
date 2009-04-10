@@ -24,7 +24,8 @@ class UsersControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    @owner.grant_role('provider', @company)
+    # add provider
+    @company.providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)

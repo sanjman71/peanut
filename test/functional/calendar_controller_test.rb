@@ -75,10 +75,10 @@ class CalendarControllerTest < ActionController::TestCase
     setup do
       # add johnny as a company provider
       @johnny = Factory(:user, :name => "Johnny", :companies => [@company])
-      @johnny.grant_role("provider", @company)
+      @company.providers.push(@johnny)
       # add mary as a company provider
       @mary = Factory(:user, :name => "Mary", :companies => [@company])
-      @mary.grant_role("provider", @company)
+      @company.providers.push(@mary)
       @company.reload
     end
     

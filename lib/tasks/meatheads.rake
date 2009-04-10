@@ -33,11 +33,8 @@ namespace :meatheads do
     # create test companies
     @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
-    # add user roles
+    # add manager roles
     @meathead.grant_role('manager', @meatheads)
-    @meathead.grant_role('provider', @meatheads)
-    @wimpy.grant_role('provider', @meatheads)
-    @skinny.grant_role('provider', @meatheads)
   end
   
   task :services do

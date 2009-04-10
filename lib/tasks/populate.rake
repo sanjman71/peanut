@@ -29,7 +29,6 @@ namespace :populate do
       
       # add provider to company
       company.providers.push(provider)
-      provider.grant_role('provider', company)
       
       added += 1
     end

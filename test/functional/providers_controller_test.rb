@@ -21,7 +21,8 @@ class ProvidersControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    @owner.grant_role('provider', @company)
+    # add provider
+    @company.providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -72,7 +73,7 @@ class ProvidersControllerTest < ActionController::TestCase
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
       # add a company provider
       @provider = Factory(:user)
-      @provider.grant_role('provider', @company)
+      @company.providers.push(@provider)
       get :index
     end
   

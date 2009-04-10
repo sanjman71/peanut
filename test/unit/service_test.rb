@@ -50,10 +50,6 @@ class ServiceTest < ActiveSupport::TestCase
       should "have service provided_by? return true" do
         assert @service.provided_by?(@user1)
       end
-      
-      should "have user services count == 1" do
-        assert_equal 1, @user1.services_count
-      end
     end
   end
   

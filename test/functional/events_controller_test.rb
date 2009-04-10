@@ -20,8 +20,9 @@ class EventsControllerTest < ActionController::TestCase
     @event        = Factory(:event, :company => @company, :user => @owner, :customer => @customer, :eventable => @appointment, :etype => Event::INFORMATIONAL)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    @owner.grant_role('provider', @company)
-    @provider.grant_role('provider', @company)
+    # add providers
+    @company.providers.push(@owner)
+    @company.providers.push(@provider)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)

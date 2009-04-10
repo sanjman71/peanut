@@ -5,7 +5,7 @@ class Service < ActiveRecord::Base
   has_many                    :company_services
   has_many                    :companies, :through => :company_services
   has_many                    :appointments
-  has_many_polymorphs         :providers, :from => [:users], :through => :service_providers
+  has_many_polymorphs         :providers, :from => [:users, :resources], :through => :service_providers
   before_validation           :init_duration
   before_save                 :titleize_name
   

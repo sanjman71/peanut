@@ -23,7 +23,7 @@ class Company < ActiveRecord::Base
 
   validates_presence_of     :time_zone
   has_many                  :company_providers
-  has_many_polymorphs       :providers, :from => [:users], :through => :company_providers
+  has_many_polymorphs       :providers, :from => [:users, :resources], :through => :company_providers
   has_many                  :company_services
   has_many                  :services, :through => :company_services, :after_add => :added_service, :after_remove => :removed_service
   has_many                  :products
