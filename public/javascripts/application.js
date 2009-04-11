@@ -50,6 +50,7 @@ $.fn.init_add_company_resource = function() {
 }
 
 // Add a new object (e.g. person, service, product)
+/*
 $.fn.init_new_object = function(form_id) {
   // validate the form by binding a callback to the submit function
   $(form_id).validate({
@@ -76,6 +77,7 @@ $.fn.init_new_object = function(form_id) {
     return false;
   })
 }
+*/
 
 // Search for an appointment by its confirmation code
 $.fn.init_search_appointments_by_confirmation_code = function () {

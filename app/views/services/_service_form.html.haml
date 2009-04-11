@@ -1,0 +1,46 @@
+- @service = service
+- form_for(@service, :url => submit_url, :method => :post) do |f|
+  = hidden_field_tag "service[mark_as]", 'work'
+  
+  .span-23.prepend-1.last.mat.padding-bottom-20.padding-top-10
+    %h3{:style => 'font-size: 2.0em;'}= title
+  
+  %hr.space
+  
+  .span-15.prepend-1.last
+    = display_flash(:all)
+
+  - unless @service.errors.blank?
+    .span-15.prepend-1.last
+      .notice= error_messages_for('service', :header_message => nil)
+
+  -# name
+  .span-20.last
+    .span-3.prepend-1.padding-top-10.text-align-right
+      %h2= label_tag "service_name", "Name"
+    .span-16.last
+      = f.text_field :name, :class => 'text title big', :style => "width: 200px;"
+    
+  -# price
+  .span-20.last
+    .span-3.prepend-1.text-align-right
+      %h2= label_tag "service_price", "Price"
+    .span-16.last
+      = f.text_field :price, :class => 'text', :style => "width: 100px;"
+      
+  -# duration
+  .span-20.last
+    .span-3.prepend-1.text-align-right
+      %h2= label_tag "service_duration", "Duration"
+    .span-16.last
+      = f.text_field :duration, :class => 'text blue muted', :style => "width: 100px;"
+      %b{:style => 'font-size: 12px;'}== &nbsp;Minutes
+  .span-15.prepend-4.last
+    %em== An accurate duration allows appointments to be scheduled efficiently.
+    
+  %hr.space
+  
+  .span-20.prepend-1.last.submit
+    = submit_tag(action)
+    == or
+    = link_to "Cancel", services_path(:subdomain => current_subdomain), :class => 'admin'

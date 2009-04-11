@@ -1,1 +1,5 @@
 div.service                                       { border-bottom: 2px solid #EFEFEF; }
+
+a.service.add                                     { color: #008800; font-weight: bold; }
+a:hover.service.add                               { color: #008800; background-color: #FF6600; }
+a:visited.service.add                             { color: #008800; font-weight: bold; }

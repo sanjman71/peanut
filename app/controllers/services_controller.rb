@@ -1,5 +1,5 @@
 class ServicesController < ApplicationController
-  before_filter :disable_global_flash, :only => [:index]
+  before_filter :disable_global_flash, :only => [:index, :new, :create, :edit]
   
   privilege_required 'create services', :only => [:new, :create], :on => :current_company
   privilege_required 'read services', :only => [:index, :show], :on => :current_company
@@ -8,25 +8,32 @@ class ServicesController < ApplicationController
 
   
   # GET /services
-  # GET /services.xml
   def index
+    # only show work services
     @services = current_company.services.work
+
+    respond_to do |format|
+      format.html
+    end
   end
 
   # GET /services/1
   # GET /services/1.xml
   def show
-    @service = Service.find(params[:id])
+    @service = current_company.services.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html
     end
   end
 
   # GET /services/new
-  # GET /services/new.xml
   def new
     @service = Service.new
+
+    respond_to do |format|
+      format.html
+    end
   end
 
   # GET /services/1/edit
@@ -46,9 +53,7 @@ class ServicesController < ApplicationController
     @service = current_company.services.new(params[:service])
     
     if !@service.valid?
-      @error      = true
-      @error_text = "Could not create service"
-      return
+      render(:action => 'new') and return
     end
     
     # create service and add as a company service
@@ -57,8 +62,11 @@ class ServicesController < ApplicationController
     
     # redirect to edit page
     @redirect_path = edit_service_path(@service)
+
+    flash[:notice] = "Created service #{@service.name}"
     
     respond_to do |format|
+      format.html { redirect_to(@redirect_path) }
       format.js { render(:update) {|page| page.redirect_to(@redirect_path) } }
     end
   end
@@ -70,7 +78,7 @@ class ServicesController < ApplicationController
     @status   = @service.update_attributes(params[:service])
     
     if !@status
-      flash[:error] = @service.errors.full_messages
+      flash[:error] = @service.errors.full_messages.split("\n")
       redirect_to(edit_service_path(@service, :subdomain => @subdomain)) and return
     else
       flash[:notice] = "Updated service #{@service.name}"

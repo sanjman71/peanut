@@ -113,7 +113,7 @@ class Company < ActiveRecord::Base
   # initialize company's basic services
   def init_basic_services
     # add company free service
-    services.push(Service.find_or_create_by_name(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00))
+    services.push(Service.find_or_create_by_name(:name => Service::AVAILABLE, :mark_as => "free", :price => 0.00))
   end
   
   # manage both the services count and work service count

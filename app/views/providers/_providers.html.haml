@@ -5,7 +5,7 @@
       %h2.provider.name.bottom= provider.name
       %h4=provider.email if provider.respond_to?(:email)
       
-      -# allow company managers to toggle manager role
+    -# allow company managers to toggle manager role
     .span-5.provider.manager
       - if manager?
         - if current_user == provider

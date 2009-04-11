@@ -1,10 +1,10 @@
 - service_providers.sort_by{ |sp| sp.provider.name }.each do |sp|
-  .span-15.prepend-1.last.service_provider{:class => cycle("shaded", "")}
+  .span-15.prepend-1.last.padding-top-10.service_provider{:class => cycle("shaded", "")}
     .span-4.provider
       %h3= sp.provider.name
-    .span-1.last.action
+    .span-6.last.action
       = link_to("Remove", service_provider_path(sp, :subdomain => current_subdomain), :class => 'admin ujs delete')
 - unless non_providers.blank?
-  .span-15.prepend-1.last.add_provider
+  .span-15.prepend-1.last.padding-top-10.add_provider
     = select_tag('provider', options_for_select([['Add a service provider', 0]] + non_providers.sort_by{ |o| o.name }.collect{ |o| [o.name, "#{o.class}/#{o.id}"]}, 0))
     
