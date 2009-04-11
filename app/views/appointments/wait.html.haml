@@ -18,7 +18,7 @@
     -# allow owners and managers to change appointment state
     - if (@owner or @manager) and @appointment.upcoming?
       %h4
-        = link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
+        = link_to 'Cancel appointment', cancel_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin', :id => 'cancel_appointment'
       
 %hr.space
 
