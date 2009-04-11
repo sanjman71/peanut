@@ -51,7 +51,7 @@ class ServicesController < ApplicationController
       return
     end
     
-    # create and add service to company
+    # create service and add as a company service
     @service.save
     current_company.services.push(@service)
     

@@ -55,6 +55,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
+  map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]

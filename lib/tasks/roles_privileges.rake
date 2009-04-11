@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :products, :events]
+  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :resources, :products, :events]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -197,6 +197,24 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>m,:privilege=>rc)
   end
 
+  desc "Initialize resources management roles & privileges"
+  task :resources do
+    puts "adding resources management roles & privileges"
+    
+    m = Badges::Role.find_by_name('manager')
+    p = Badges::Role.find_by_name('provider')
+
+    cr = Badges::Privilege.create(:name=>"create resources")
+    rr = Badges::Privilege.create(:name=>"read resources")
+    ur = Badges::Privilege.create(:name=>"update resources")
+    dr = Badges::Privilege.create(:name=>"delete resources")
+
+    # Managers can manage resources
+    Badges::RolePrivilege.create(:role=>m,:privilege=>cr)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>ur)
+    Badges::RolePrivilege.create(:role=>m,:privilege=>dr)
+  end
+  
   desc "Initialize products management roles & privileges"
   task :products do
     

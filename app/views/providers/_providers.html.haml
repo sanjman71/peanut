@@ -22,4 +22,4 @@
     -# allow company managers or edit all providers, and provider to edit himself
     .span-2.prepend-2.action.last
       - if manager? or provider == current_user
-        = link_to "Edit", url_for(:controller => 'providers', :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin'
+        = link_to "Edit", url_for(:controller => provider.tableize, :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin'
