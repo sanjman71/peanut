@@ -1,0 +1,25 @@
+textarea {
+  height: 40px;
+  width: 590px;
+  padding: 5px;
+}
+
+#add_event_form {
+  display: none;
+}
+
+.urgent h3 {
+  background-color: #f00;
+}
+
+.approval h3 {
+  background-color: #fc0;
+}
+
+.informational h3 {
+  background-color: grey;
+}
+
+.message_body_text {
+  display: none;
+}

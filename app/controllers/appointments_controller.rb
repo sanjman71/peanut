@@ -165,7 +165,8 @@ class AppointmentsController < ApplicationController
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
           # create event
           current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                        :message => "#{@appointment.service.name} confirmed with #{@appointment.customer.name}.", :customer => @appointment.customer)
+                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:appointment_confirmation],
+                                        :customer => @appointment.customer)
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
@@ -188,7 +189,8 @@ class AppointmentsController < ApplicationController
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
           # create event
           current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                        :message => "#{@appointment.customer.name} added to waitlist.", :customer => @appointment.customer)
+                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:added_to_waitlist],
+                                        :customer => @appointment.customer)
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")
@@ -292,11 +294,11 @@ class AppointmentsController < ApplicationController
     when  Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
-      message = "#{@appointment.service.name} cancelled with #{@appointment.customer.name}."
+      message_id = EventsHelper::EVENT_MESSAGE_IDS[:appointment_canceled]
     when Appointment::WAIT
       # cancel the wait appointment
       AppointmentScheduler.cancel_wait_appointment(@appointment)
-      message = "Waitlist appointment cancelled with #{@appointment.customer.name}."
+      message_id = EventsHelper::EVENT_MESSAGE_IDS[:waitlist_canceled]
     end
 
     # redirect to the appointment page
@@ -304,7 +306,7 @@ class AppointmentsController < ApplicationController
     
     # create event
     current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                  :message => message, :customer => @appointment.customer)
+                                  :message_id => message_id, :customer => @appointment.customer)
 
     # set flash
     flash[:notice] = "Canceled appointment"

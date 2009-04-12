@@ -9,20 +9,16 @@ class EventsController < ApplicationController
   def index
     if params[:state].blank? || params[:state] == 'unseen'
       @seen = false
-      @urgent = current_company.events.urgent.unseen
-      @approval = current_company.events.approval.unseen
-      @informational = current_company.events.informational.unseen.order_recent
+      @urgent_by_day = current_company.events.urgent.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @approval_by_day = current_company.events.approval.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @informational_by_day = current_company.events.informational.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
     else
       @seen = true
-      @urgent = current_company.events.urgent.seen
-      @approval = current_company.events.approval.seen
-      @informational = current_company.events.informational.seen.order_recent
+      @urgent_by_day = current_company.events.urgent.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @approval_by_day = current_company.events.approval.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @informational_by_day = current_company.events.informational.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
     end
 
-    # group events by updated_at timestamp
-    @urgent_by_day          = @urgent.group_by { |e| e.updated_at.beginning_of_day }
-    @informational_by_day   = @informational.group_by { |e| e.updated_at.beginning_of_day }
-    
     respond_to do |format|
       format.html
     end
@@ -31,15 +27,36 @@ class EventsController < ApplicationController
   def mark_as_seen
     @event = Event.find(params[:id])
     if @event
-      @event.seen = true
+      if (params[:seen].blank? || params[:seen] == true)
+        @event.mark_as_seen!
+        state = :unseen
+      else
+        @event.mark_as_unseen!
+        state = :seen
+      end
     end
     if @event.save
-      flash[:notice] = "Event marked as seen"
+      flash[:notice] = "Changed event"  
     else
-      flash[:error] = "Couldn't mark event as seen"
+      flash[:error] = "Couldn't change event"
     end
     
-    redirect_to events_path(:subdomain => current_subdomain) and return
+    respond_to do |format|
+      format.html { 
+        redirect_to url_for(:subdomain => current_subdomain, :action => 'index', :state => state.to_s) and return }
+      format.js {
+        if state == :seen
+          @urgent_by_day = current_company.events.urgent.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+          @approval_by_day = current_company.events.approval.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+          @informational_by_day = current_company.events.informational.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+        else
+          @urgent_by_day = current_company.events.urgent.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+          @approval_by_day = current_company.events.approval.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+          @informational_by_day = current_company.events.informational.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+        end
+      }
+    end
+    
   end
   
   def create

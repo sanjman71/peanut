@@ -11,9 +11,9 @@
     .span-13.last
       - if @appointment.state == 'upcoming'
         -# upcoming appointments can be canceled and checked-out
-        = link_to('Cancel', cancel_appointment_path(@appointment), :class => 'admin ujs confirm', :question => "Are you sure you want to cancel this appointment?")
+        = link_to('Cancel', cancel_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin ujs confirm', :question => "Are you sure you want to cancel this appointment?")
         == &nbsp;|
-        = link_to('Checkout', checkout_appointment_path(@appointment), :class => 'admin')
+        = link_to('Checkout', checkout_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin')
   .span-24.last
     = render(:partial => 'appointment_header', :locals => {:appointment => @appointment})
 
