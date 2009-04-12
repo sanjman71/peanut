@@ -6,9 +6,10 @@ class CreateEvents < ActiveRecord::Migration
       t.references  :location                           # company location this is relevant to, if any
       t.references  :customer                           # customer this is relevant to, if any
       t.references  :user                               # user who created the event
-      t.string      :message                            # event message
+      t.text        :message_body                       # event message body
+      t.integer     :message_id                         # one of the standard message IDs
       t.integer     :etype                              # informational, approval, urgent
-      t.boolean     :seen                               # event marked as seen
+      t.string      :state
       t.timestamps
     end
   end
