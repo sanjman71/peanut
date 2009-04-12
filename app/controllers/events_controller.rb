@@ -29,10 +29,10 @@ class EventsController < ApplicationController
     if @event
       if (params[:seen].blank? || params[:seen] == true)
         @event.mark_as_seen!
-        state = 'unseen'
+        state = :unseen
       else
         @event.mark_as_unseen!
-        state = 'seen'
+        state = :seen
       end
     end
     if @event.save
@@ -42,9 +42,10 @@ class EventsController < ApplicationController
     end
     
     respond_to do |format|
-      format.html { redirect_to url_for(:subdomain => current_subdomain, :action => 'index', :state => state) and return }
+      format.html { 
+        redirect_to url_for(:subdomain => current_subdomain, :action => 'index', :state => state.to_s) and return }
       format.js {
-        if state == 'seen'
+        if state == :seen
           @urgent_by_day = current_company.events.urgent.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
           @approval_by_day = current_company.events.approval.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
           @informational_by_day = current_company.events.informational.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
