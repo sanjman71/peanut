@@ -292,6 +292,15 @@ $.fn.init_ujs_links = function () {
   })
 }
 
+$.fn.init_events = function () {
+  $("a#show_add_event_form").click(function(){
+    $('#add_event_form').toggle();
+  })
+  $("a.show_message_body").click(function(){
+    $(this).parent().next('.message_body_text').toggle();
+  })
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();
