@@ -1,5 +1,4 @@
 class CalendarController < ApplicationController
-  before_filter :disable_global_flash
   
   privilege_required 'read calendars', :only => [:index, :show, :search], :on => :current_company
   privilege_required 'update calendars', :only => [:edit], :on => :current_company

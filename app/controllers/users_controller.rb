@@ -1,5 +1,4 @@
 class UsersController < ApplicationController
-  before_filter :disable_global_flash, :only => [:new, :create]
   
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]

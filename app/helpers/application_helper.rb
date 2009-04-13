@@ -15,20 +15,13 @@ module ApplicationHelper
     
   FLASH_TYPES = [:error, :warning, :success, :message, :notice]
 
-  def display_flash(type = nil)
-    if type.nil? or type == :all
-      html = FLASH_TYPES.collect { |name| display_flash(name) }
-      return html
-    else
-      return flash[type].blank? ? "" : "<div class=\"#{type}\">#{flash[type]}</div>"
+  def display_flash(force = false)
+    if force || @flash_displayed.nil? || @flash_displayed == false
+      @flash_displayed = true
+      render :partial => "shared/flash.html.haml", :object => (flash.nil? ? {} : flash)
     end
   end
   
-  def display_message(msg, type = :notice)
-    return "" if msg.blank?
-    "<div class=\"#{type.to_s}\">#{msg}</div>"
-  end
-    
   def build_tab_links(current_controller)
     # 'Openings' tab
     name = 'Openings'

@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   
   # Make the following methods available to all helpers
   helper_method :current_subdomain, :current_company, :current_locations, :current_location, :current_privileges, 
-                :manager?, :provider?, :customer?, :has_role?, :show_location?, :global_flash?
+                :manager?, :provider?, :customer?, :has_role?, :show_location?
 
   # AuthenticatedSystem is used by restful_authentication
   include AuthenticatedSystem
@@ -100,16 +100,6 @@ class ApplicationController < ActionController::Base
     provider  = appointment.schedulable == user ? true : false
     manager   = manager?
     [customer, provider, manager]
-  end
-  
-  # controls whether the flash may be displayed in the header, defaults to true
-  def global_flash?
-    @global_flash = true if @global_flash.nil?
-    return @global_flash
-  end
-  
-  def disable_global_flash
-    @global_flash = false
   end
   
   # build hash mapping days to appointment attributes that are used as css tags in calendar views

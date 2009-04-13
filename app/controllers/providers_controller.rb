@@ -1,5 +1,4 @@
 class ProvidersController < ApplicationController
-  before_filter :disable_global_flash, :only => [:index]
   
   privilege_required 'read users', :only => [:index], :on => :current_company
   privilege_required 'update users', :only => [:toggle_manager], :on => :current_company

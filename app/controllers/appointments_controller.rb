@@ -1,5 +1,4 @@
 class AppointmentsController < ApplicationController
-  before_filter :disable_global_flash, :only => [:show, :work, :wait]
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
     

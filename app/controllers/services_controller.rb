@@ -1,5 +1,4 @@
 class ServicesController < ApplicationController
-  before_filter :disable_global_flash, :only => [:index]
   
   privilege_required 'create services', :only => [:new, :create], :on => :current_company
   privilege_required 'read services', :only => [:index, :show], :on => :current_company
@@ -47,7 +46,7 @@ class ServicesController < ApplicationController
     
     if !@service.valid?
       @error      = true
-      @error_text = "Could not create service"
+      flash[:error] = "Could not create service"
       return
     end
     
