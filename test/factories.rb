@@ -72,7 +72,8 @@ Factory.define :appointment_today, :class => Appointment do |a|
 end
 
 Factory.define :event do |e|
-  e.message                       "Test event"
+  e.message_id                    EventsHelper::EVENT_MESSAGE_IDS[:appointment_confirmation]
+  e.message_body                  "This is a test appointment confirmation event"
 end
 
 Factory.sequence :user_name do |n|

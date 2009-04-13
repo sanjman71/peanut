@@ -60,9 +60,9 @@ class EventsControllerTest < ActionController::TestCase
       
       should_respond_with :success
       should_render_template "events/index.html.haml"
-      should_assign_to :urgent
-      should_assign_to :approval
-      should_assign_to :informational
+      should_assign_to :urgent_by_day
+      should_assign_to :approval_by_day
+      should_assign_to :informational_by_day
     end
     
     context "mark event as seen" do
@@ -94,9 +94,9 @@ class EventsControllerTest < ActionController::TestCase
       
       should_respond_with :success
       should_render_template "events/index.html.haml"
-      should_assign_to :urgent
-      should_assign_to :approval
-      should_assign_to :informational
+      should_assign_to :urgent_by_day
+      should_assign_to :approval_by_day
+      should_assign_to :informational_by_day
     end
     
     context "mark event as seen" do
