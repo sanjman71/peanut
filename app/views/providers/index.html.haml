@@ -22,12 +22,9 @@
     
   %hr.space
 
-  .span-14.prepend-1.append-1.last
-    = display_flash(:notice)
+  .span-14.prepend-1.last
+    = display_flash
 
-  .span-14.prepend-1.append-1.last
-    .highlight#flash
-  
   #providers
     = render(:partial => 'providers', :locals => {:users => @users})
 
