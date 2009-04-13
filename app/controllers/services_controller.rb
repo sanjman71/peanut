@@ -60,7 +60,7 @@ class ServicesController < ApplicationController
     current_company.services.push(@service)
     
     # redirect to edit page
-    @redirect_path = edit_service_path(@service)
+    @redirect_path = edit_service_path(@service, :subdomain => current_subdomain)
 
     flash[:notice] = "Created service #{@service.name}"
     
