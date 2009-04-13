@@ -1,21 +1,21 @@
 #event_groups
   - unless urgent_by_day.empty?
     .urgent.last
-      %h3.span-4.prepend-1==Urgent
+      %h3.span-6.prepend-1==Urgent messages
       - reset_cycle
       = render(:partial => 'events', :locals => {:events_by_day => urgent_by_day})
       %hr.space
     
   - unless approval_by_day.empty?
     .approval.last
-      %h3.span-4.prepend-1==Approval
+      %h3.span-6.prepend-1==Approval required
       - reset_cycle
       = render(:partial => 'events', :locals => {:events_by_day => approval_by_day})
       %hr.space
     
   - unless informational_by_day.empty?
     .informational.last
-      %h3.span-4.prepend-1==Informational
+      %h3.span-6.prepend-1==Informational messages
       - reset_cycle
       = render(:partial => 'events', :locals => {:events_by_day => informational_by_day})
       %hr.space
