@@ -32,7 +32,7 @@ namespace :init do
     puts "#{Time.now}: completed"
   end
   
-  task :companies => ["company1:init", "noelrose:init", "meatheads:init"]
+  task :companies => ["company1:init", "noelrose:init", "meatheads:init", "mctrucks:init"]
 
 end # init namespace
   

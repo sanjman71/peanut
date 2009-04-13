@@ -1,0 +1,5 @@
+- title("Add Resource")
+- javascript('resources')
+
+= render(:partial => 'resource_form', :locals => {:resource => @resource, :action => 'Create', :title => 'Add a Resource', :submit_url => resources_path(:subdomain => current_subdomain)})
+  

@@ -30,5 +30,5 @@ div.appointment_header                            { background: #E1E0E0 none rep
 .customer.group                                   { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
                                                     font-size: 1.0em; font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }
 
-.schedulable.group                                { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
+.provider.group                                { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
                                                     font-size: 1.0em;  font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }

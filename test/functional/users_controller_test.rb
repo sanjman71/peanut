@@ -3,8 +3,18 @@ require 'test/factories'
 
 class UsersControllerTest < ActionController::TestCase
 
+  # user notify route
   should_route :get,  '/users/1/notify/create', :controller => 'users', :action => 'notify', :id => '1', :type => 'create'
 
+  context 'invite url with subdomain' do
+    setup do
+      SubdomainFu.stubs(:subdomain_from).with(anything).returns('peanut')
+    end
+  
+    # user invite route
+    should_route :get,  '/invite/12345', :controller => 'users', :action => 'new', :invitation_token => '12345'
+  end
+  
   def setup
     @controller   = UsersController.new
     # create a valid company
@@ -14,7 +24,8 @@ class UsersControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    @owner.grant_role('provider', @company)
+    # add provider
+    @company.providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -151,7 +162,7 @@ class UsersControllerTest < ActionController::TestCase
           assert assigns(:user).valid?
         end
 
-        should "have user as a company provider and as a company schedulable" do
+        should "have user as a company provider and as a company provider" do
           assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
           assert_equal [@company], assigns(:user).companies
         end
@@ -195,7 +206,7 @@ class UsersControllerTest < ActionController::TestCase
           assert assigns(:user).valid?
         end
 
-        should "have user as a company provider and as a company schedulable" do
+        should "have user as a company provider and as a company provider" do
           assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
           assert_equal [@company], assigns(:user).companies
         end
@@ -232,7 +243,7 @@ class UsersControllerTest < ActionController::TestCase
           assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
         end
         
-        should "have be a company schedulable" do
+        should "have be a company provider" do
           assert_equal [@company], assigns(:user).companies
         end
 
@@ -273,7 +284,7 @@ class UsersControllerTest < ActionController::TestCase
         assert_equal ['customer'], assigns(:user).roles.collect(&:name).sort
       end
 
-      should "have not have user as a company schedulable" do
+      should "have not have user as a company provider" do
         assert_equal [], assigns(:user).companies
       end
 
@@ -311,7 +322,7 @@ class UsersControllerTest < ActionController::TestCase
         assert_equal ['customer'], assigns(:user).roles.collect(&:name).sort
       end
 
-      should "have not have user as a company schedulable" do
+      should "have not have user as a company provider" do
         assert_equal [], assigns(:user).companies
       end
 

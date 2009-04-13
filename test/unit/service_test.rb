@@ -21,7 +21,7 @@ class ServiceTest < ActiveSupport::TestCase
   
   context "create service" do
     setup do
-      @service = @company.services.create(:name => "boring job", :duration => 0, :mark_as => "work", :price => 1.00)
+      @service = @company.services.create(:name => "boring job", :duration => 30, :mark_as => "work", :price => 1.00)
       assert_valid @service
     end
     
@@ -29,7 +29,7 @@ class ServiceTest < ActiveSupport::TestCase
       assert_equal "Boring Job", @service.name
     end
     
-    should "have default duration of 30 minutes" do
+    should "have duration of 30 minutes" do
       assert_equal 30, @service.duration
     end
     
@@ -37,22 +37,18 @@ class ServiceTest < ActiveSupport::TestCase
       setup do
         @user1 = Factory(:user, :name => "Sanjay")
         assert_valid @user1
-        @service.schedulables.push(@user1)
+        @service.providers.push(@user1)
         @service.reload
         @user1.reload
       end
       
-      should "have service schedulables collection == [@user]" do
-        assert_equal [@user1], @service.schedulables
+      should "have service providers collection == [@user]" do
+        assert_equal [@user1], @service.providers
         assert_equal [@user1], @service.users
       end
       
       should "have service provided_by? return true" do
         assert @service.provided_by?(@user1)
-      end
-      
-      should "have user services count == 1" do
-        assert_equal 1, @user1.services_count
       end
     end
   end

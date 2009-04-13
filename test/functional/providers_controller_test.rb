@@ -21,7 +21,8 @@ class ProvidersControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    @owner.grant_role('provider', @company)
+    # add provider
+    @company.providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -56,7 +57,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :users, :class => Array
+    should_assign_to :providers, :class => Array
   
     should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0
@@ -72,13 +73,13 @@ class ProvidersControllerTest < ActionController::TestCase
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
       # add a company provider
       @provider = Factory(:user)
-      @provider.grant_role('provider', @company)
+      @company.providers.push(@provider)
       get :index
     end
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :users, :class => Array
+    should_assign_to :providers, :class => Array
     
     should "be able to change manager role for 1 provider" do
       assert_select "input.checkbox.manager", 1

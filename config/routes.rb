@@ -55,55 +55,56 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get}
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
+  map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
   
-  # search openings for a specified service and duration, and an optional schedulable
-  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
+  # search openings for a specified service and duration, and an optional provider
+  map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
                 :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.connect   ':schedulable_type/:schedulable_id/services/:service_id/:duration/openings/:when/:time',
+  map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
                  :controller => 'openings', :action => 'index'
   map.connect   'services/:service_id/:duration/openings/:start_date..:end_date/:time', 
                  :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
   map.connect   'services/:service_id/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
 
-  # show/edit calendars scoped by schedulable (and optional format)
-  map.connect   ':schedulable_type/:schedulable_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar.:format', :controller => 'calendar', :action => 'show'
-  map.connect   ':schedulable_type/:schedulable_id/calendar/edit', :controller => 'calendar', :action => 'edit'
+  # show/edit calendars scoped by provider (and optional format)
+  map.connect   ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar/edit', :controller => 'calendar', :action => 'edit'
   
-  # search calendars scoped by schedulable
-  map.connect   ':schedulable_type/:schedulable_id/calendar/search', :controller => 'calendar', :action => 'search'
+  # search calendars scoped by provider
+  map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
 
-  # search waitlist scoped by schedulable
-  map.connect   ':schedulable_type/:schedulable_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
-  map.connect   ':schedulable_type/:schedulable_id/waitlist', :controller => 'waitlist', :action => 'index'
+  # search waitlist scoped by provider
+  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
+  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlist', :action => 'index'
 
-  # schedule a work appointment with a schedulable for a specified service and duration
-  map.schedule  'book/work/:schedulable_type/:schedulable_id/services/:service_id/:duration/:start_at', 
+  # schedule a work appointment with a provider for a specified service and duration
+  map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule  'book/work/:schedulable_type/:schedulable_id/services/:service_id/:duration/:start_at', 
+  map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
                 :controller => 'appointments', :action => 'create', :mark_as => 'work', :conditions => {:method => :post}
 
-  # schedule a waitlist appointment with a schedulable for a specific service and date range
-  map.waitlist  'book/wait/:schedulable_type/:schedulable_id/services/:service_id/:start_date..:end_date',
+  # schedule a waitlist appointment with a provider for a specific service and date range
+  map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
                 :controller => 'appointments', :action => 'new', :mark_as => 'wait', 
                 :conditions => {:method => :get, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.waitlist  'book/wait/:schedulable_type/:schedulable_id/services/:service_id/:start_date..:end_date',
+  map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
                 :controller => 'appointments', :action => 'create', :mark_as => 'wait', 
                 :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
     
-  # toggle a schedulable's calendar
-  map.connect   ':schedulable_type/:schedulable_id/calendar/toggle',
-                :controller => 'company_schedulables', :action => 'toggle', :conditions => {:method => :post}
+  # toggle a provider's calendar
+  map.connect   ':provider_type/:provider_id/calendar/toggle',
+                :controller => 'company_providers', :action => 'toggle', :conditions => {:method => :post}
    
   # services, products
   map.resources :services

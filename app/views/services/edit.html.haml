@@ -2,59 +2,25 @@
 - stylesheet('services')
 - javascript('services')
 
+= render(:partial => 'service_form', :locals => {:service => @service, :action => 'Save Changes', :title => 'Edit Service', :submit_url => service_path(@service, :subdomain => current_subdomain)})
+
+
 - form_for(ServiceProvider.new, :url => service_providers_path(:subdomain => current_subdomain), :method => :post, :html => {:id => 'new_service_provider'}) do |f|
   = hidden_field_tag "service_provider[service_id]", @service.id, :id => 'service_provider_service_id'
-  = hidden_field_tag "service_provider[schedulable_type]", '', :id => 'service_provider_schedulable_type'
-  = hidden_field_tag "service_provider[schedulable_id]", '', :id => 'service_provider_schedulable_id'
-    
-- form_for(@service, :url => service_path(@service, :subdomain => current_subdomain), :method => :post) do |f|
-
-  .span-23.prepend-1.last.mat.padding-bottom-20.padding-top-10
-    %h3{:style => 'font-size: 2.0em;'}== Edit Service
-  
-  %hr.space
-  
-  .span-14.prepend-1.last
-    = display_flash
-
-  -# name
-  .span-20.last
-    .span-3.prepend-1
-      %h2= label_tag "service_name", "Name"
-    .span-16.last
-      = text_field_tag "service[name]", @service.name, :class => 'text', :style => "width: 200px;"
-    
-  -# price
-  .span-20.last
-    .span-3.prepend-1
-      %h2= label_tag "service_price", "Price"
-    .span-16.last
-      = text_field_tag "service[price]", @service.price, :class => 'text', :style => "width: 100px;"
+  = hidden_field_tag "service_provider[provider_type]", '', :id => 'service_provider_provider_type'
+  = hidden_field_tag "service_provider[provider_id]", '', :id => 'service_provider_provider_id'
       
-  -# duration
-  .span-20.last
-    .span-3.prepend-1
-      %h2= label_tag "service_duration", "Duration"
-    .span-16.last
-      = text_field_tag "service[duration]", @service.duration, :class => 'text blue muted', :style => "width: 100px;"
-      %b{:style => 'font-size: 12px;'}== &nbsp;Minutes
-  .span-20.prepend-4.last
-    %em== An accurate duration will allow you to more efficiently schedule appointments
-    
   %hr.space
   
-  .span-20.prepend-1.last.submit
-    = submit_tag "Save Changes"
-    == or
-    = link_to "Cancel", services_path(:subdomain => current_subdomain), :class => 'admin'
-    
-  %hr.space
-  .span-20.prepend-1.last
+  .span-23.prepend-1.last
     %h3
       %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}== People who provide this service
   #service_providers
     = render(:partial => 'service_providers/service_providers.html.haml', :locals => {:service_providers => @service_providers, :non_providers => @non_providers})
+    
   %hr.space
+  
   .span-20.prepend-1.last
-    = button_to "Done", :url => services_path(:subdomain => current_subdomain)
+    = link_to 'Done', services_path(:subdomain => current_subdomain), :class => 'rounded button color', :style => 'padding: 3px 7px;'
+  -#= button_to "Done", :url => services_path(:subdomain => current_subdomain)
               

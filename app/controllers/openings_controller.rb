@@ -7,9 +7,9 @@ class OpeningsController < ApplicationController
   # GET /users/1/services/3/openings/this-week/morning
   # GET /services/1/openings/this-week/anytime
   def index
-    if (params[:schedulable_type] == "0") or (params[:schedulable_id] == "0")
-      # /:schedulable/0/openings is canonicalized to /openings; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :schedulable_type => nil, :schedulable_id => nil)))
+    if (params[:provider_type] == "0") or (params[:provider_id] == "0")
+      # /:provider/0/openings is canonicalized to /openings; preserve subdomain on redirect
+      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :provider_type => nil, :provider_id => nil)))
     elsif params[:service_id].to_s == "0"
       # /services/0/openings is canonicalized to /openings; preserve subdomain on redirect
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
@@ -28,9 +28,9 @@ class OpeningsController < ApplicationController
       redirect_to(setup_company_path(current_company)) and return
     end
     
-    # initialize schedulable, default to anyone
-    @schedulable  = current_company.schedulables.find_by_schedulable_id_and_schedulable_type(params[:schedulable_id], params[:schedulable_type].to_s.classify)
-    @schedulable  = User.anyone if @schedulable.blank?
+    # initialize provider, default to anyone
+    @provider  = current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
+    @provider  = User.anyone if @provider.blank?
     
     if params[:start_date] and params[:end_date]
       # build daterange using range values
@@ -72,13 +72,13 @@ class OpeningsController < ApplicationController
       redirect_to(url_for(params.update(:duration => @service.duration, :subdomain => current_subdomain))) and return
     end
     
-    # build schedulables collection, which are restricted by the services they perform
-    @schedulables = @service.schedulables
+    # build providers collection, which are restricted by the services they perform
+    @providers = @service.providers
     
-    # build service providers collection mapping services to schedulables
+    # build service providers collection mapping services to providers
     @sps          = @services.inject([]) do |array, service|
-      service.schedulables.each do |schedulable|
-        array << [service.id, schedulable.id, schedulable.name, schedulable.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
+      service.providers.each do |provider|
+        array << [service.id, provider.id, provider.name, provider.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
       end
       array
     end
@@ -96,7 +96,7 @@ class OpeningsController < ApplicationController
 
     # find free appointments, group by day (use appt utc time)
     @free_appointments        = AppointmentScheduler.find_free_appointments(current_company, current_location, 
-                                                                            @schedulable, @service, @duration, @daterange, :time => @time)
+                                                                            @provider, @service, @duration, @daterange, :time => @time)
     @free_appointments_by_day = @free_appointments.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
     logger.debug("*** found #{@free_appointments.size} free appointments over #{@daterange.days} days")
@@ -129,11 +129,11 @@ class OpeningsController < ApplicationController
       params[s] = sprintf("%s", params[s].split('/').reverse.swap!(1,2).join) if params[s]
     end
     
-    # get schedulable object
-    schedulable_type, schedulable_id = params.delete(:schedulable).split('/')
+    # get provider object
+    provider_type, provider_id = params.delete(:provider).split('/')
     
     # build redirect path
-    @redirect_path = url_for(params.update(:subdomain => current_subdomain, :action => 'index', :schedulable_type => schedulable_type, :schedulable_id => schedulable_id))
+    @redirect_path = url_for(params.update(:subdomain => current_subdomain, :action => 'index', :provider_type => provider_type, :provider_id => provider_id))
 
     respond_to do |format|
       format.html  { redirect_to(@redirect_path) }

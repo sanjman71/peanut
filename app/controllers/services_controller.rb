@@ -7,32 +7,39 @@ class ServicesController < ApplicationController
 
   
   # GET /services
-  # GET /services.xml
   def index
+    # only show work services
     @services = current_company.services.work
+
+    respond_to do |format|
+      format.html
+    end
   end
 
   # GET /services/1
   # GET /services/1.xml
   def show
-    @service = Service.find(params[:id])
+    @service = current_company.services.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html
     end
   end
 
   # GET /services/new
-  # GET /services/new.xml
   def new
     @service = Service.new
+
+    respond_to do |format|
+      format.html
+    end
   end
 
   # GET /services/1/edit
   def edit
     @service              = current_company.services.find(params[:id])
     @service_providers    = @service.service_providers
-    @non_providers        = current_company.schedulables.all - @service.schedulables
+    @non_providers        = current_company.providers.all - @service.providers
 
     respond_to do |format|
       format.html
@@ -45,19 +52,20 @@ class ServicesController < ApplicationController
     @service = current_company.services.new(params[:service])
     
     if !@service.valid?
-      @error      = true
-      flash[:error] = "Could not create service"
-      return
+      render(:action => 'new') and return
     end
     
-    # create and add service to company
+    # create service and add as a company service
     @service.save
     current_company.services.push(@service)
     
     # redirect to edit page
     @redirect_path = edit_service_path(@service)
+
+    flash[:notice] = "Created service #{@service.name}"
     
     respond_to do |format|
+      format.html { redirect_to(@redirect_path) }
       format.js { render(:update) {|page| page.redirect_to(@redirect_path) } }
     end
   end
@@ -69,7 +77,7 @@ class ServicesController < ApplicationController
     @status   = @service.update_attributes(params[:service])
     
     if !@status
-      flash[:error] = @service.errors.full_messages
+      flash[:error] = @service.errors.full_messages.split("\n")
       redirect_to(edit_service_path(@service, :subdomain => @subdomain)) and return
     else
       flash[:notice] = "Updated service #{@service.name}"

@@ -19,7 +19,7 @@ class ServicesControllerTest < ActionController::TestCase
     context "without privilege ['create services']" do
       setup do
         @controller.stubs(:current_privileges).returns([])
-        xhr :post, :create, :service => {:name => "New service"}
+        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60}
       end
       
       should_redirect_to "unauthorized_path"
@@ -28,11 +28,14 @@ class ServicesControllerTest < ActionController::TestCase
     context "with privilege ['create services']" do
       setup do
         @controller.stubs(:current_privileges).returns(["create services"])
-        xhr :post, :create, :service => {:name => "New service"}
+        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60}
       end
       
-      should_respond_with :success
-      should_render_template 'services/create.js.rjs'
+      should_assign_to :service, :redirect_path
+      should_change "Service.count", :by => 1
+      
+      should_respond_with :redirect
+      should_redirect_to 'edit_service_path(assigns(:service))'
     end
   end
   
@@ -66,10 +69,7 @@ class ServicesControllerTest < ActionController::TestCase
       end
   
       should_respond_with :success
-    
-      should "show add service form" do
-        assert_select "form#new_service_form", 1
-      end
+      should_render_template 'services/index.html.haml'
     end
   end
   

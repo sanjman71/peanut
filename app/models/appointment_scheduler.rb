@@ -1,10 +1,10 @@
 class AppointmentScheduler
   
   # find free appointments in the 
-  def self.find_free_appointments(company, location, schedulable, service, duration, daterange, date_time_options={}, options={})
+  def self.find_free_appointments(company, location, provider, service, duration, daterange, date_time_options={}, options={})
     raise ArgumentError, "company is required" if company.blank?
     raise ArgumentError, "location is required" if location.blank?
-    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "provider is required" if provider.blank?
     raise ArgumentError, "service is required" if service.blank?
     raise ArgumentError, "duration is required" if duration.blank?
     raise ArgumentError, "daterange is required" if daterange.blank?
@@ -17,22 +17,22 @@ class AppointmentScheduler
     time        = date_time_options.has_key?(:time) ? date_time_options[:time] : 'anytime'
     time_range  = Appointment.time_range(time)
     
-    if schedulable.anyone?
-      # find free appointments for any schedulable, order by start times
+    if provider.anyone?
+      # find free appointments for any provider, order by start times
       appointments = company.appointments.overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     else
-      # find free appointments for a specific schedulable, order by start times
-      appointments = company.appointments.schedulable(schedulable).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
+      # find free appointments for a specific provider, order by start times
+      appointments = company.appointments.provider(provider).overlap(start_at, end_at).time_overlap(time_range).duration_gt(duration).free.general_location(location.id).order_start_at
     end
     
-    # remove appointments that have ended (when compared to Time.now) or appointment schedulables that do not provide the requested service
-    appointments.select { |appt| appt.end_at.utc > Time.now.utc and service.provided_by?(appt.schedulable) }
+    # remove appointments that have ended (when compared to Time.now) or appointment providers that do not provide the requested service
+    appointments.select { |appt| appt.end_at.utc > Time.now.utc and service.provided_by?(appt.provider) }
   end
   
   # create a free appointment in the specified timeslot
-  def self.create_free_appointment(company, schedulable, service, date_time_options)
+  def self.create_free_appointment(company, provider, service, date_time_options)
     raise ArgumentError, "company is required" if company.blank?
-    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "provider is required" if provider.blank?
     raise ArgumentError, "service is required" if service.blank?
     
     # find company free service
@@ -41,7 +41,7 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Could not find 'free' service" if service.blank?
     
     # create a new appointment object
-    free_hash         = {:company => company, :service => service, :schedulable => schedulable}.merge(date_time_options)
+    free_hash         = {:company => company, :service => service, :provider => provider}.merge(date_time_options)
     free_appointment  = Appointment.new(free_hash)
                       
     # free appointments should not have conflicts
@@ -60,19 +60,19 @@ class AppointmentScheduler
   # create a work appointment by scheduling the specified appointment in a free timeslot
   # options:
   #  - commit => if true, commit the work and free appointment changes; otherwise, create the objects but don't save them; default is true
-  def self.create_work_appointment(company, schedulable, service, duration, customer, date_time_options, options={})
+  def self.create_work_appointment(company, provider, service, duration, customer, date_time_options, options={})
     raise ArgumentError, "company is required" if company.blank?
-    raise ArgumentError, "schedulable is required" if schedulable.blank?
+    raise ArgumentError, "provider is required" if provider.blank?
     raise ArgumentError, "service is required" if service.blank?
     raise ArgumentError, "customer is required" if customer.blank?
     
     # should be a work service
     raise AppointmentInvalid if service.mark_as != Appointment::WORK
     
-    # should be a service provided by the schedulable
-    raise AppointmentInvalid if !service.provided_by?(schedulable)
+    # should be a service provided by the provider
+    raise AppointmentInvalid if !service.provided_by?(provider)
     
-    work_hash         = {:company => company, :schedulable => schedulable, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
+    work_hash         = {:company => company, :provider => provider, :service => service, :duration => duration, :customer => customer}.merge(date_time_options)
     work_appointment  = Appointment.new(work_hash)
     
     raise AppointmentInvalid if !work_appointment.valid?
@@ -94,12 +94,12 @@ class AppointmentScheduler
   # create a waitlist appointment
   # options:
   #  - commit => if true, commit the waitlist appointment; otherwise, create the object but don't save it; default is true
-  def self.create_waitlist_appointment(company, schedulable, service, customer, date_time_options, options={})
+  def self.create_waitlist_appointment(company, provider, service, customer, date_time_options, options={})
     # should be a service that is not marked as work
     raise AppointmentInvalid if service.mark_as != Appointment::WORK
     
     wait_commit       = options.has_key?(:commit) ? options[:commit] : true
-    wait_hash         = {:company => company, :service => service, :schedulable => schedulable, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
+    wait_hash         = {:company => company, :service => service, :provider => provider, :customer => customer, :mark_as => Appointment::WAIT}.merge(date_time_options)
     wait_appointment  = Appointment.new(wait_hash)
 
     raise AppointmentInvalid if !wait_appointment.valid?
@@ -134,7 +134,7 @@ class AppointmentScheduler
     
     # build new appointment
     new_appt              = Appointment.new
-    new_appt.schedulable  = appointment.schedulable
+    new_appt.provider     = appointment.provider
     new_appt.company      = appointment.company
     new_appt.service      = service
     new_appt.start_at     = service_start_at
@@ -196,7 +196,7 @@ class AppointmentScheduler
     raise AppointmentInvalid, "Too many free times that overlap" if free_time_after.size > 1
     
     # combine the work appointment and any free times before/after into a single free appointment
-    schedulable       = appointment.schedulable
+    provider          = appointment.provider
     free_start_at     = appointment.start_at
     free_start_at     = free_time_before.first.start_at unless free_time_before.blank?
     free_end_at       = appointment.end_at
@@ -219,7 +219,7 @@ class AppointmentScheduler
       end
       
       # add the new free appointment
-      free_appointment = create_free_appointment(company, schedulable, company.free_service, :start_at => free_start_at, :end_at => free_end_at)
+      free_appointment = create_free_appointment(company, provider, company.free_service, :start_at => free_start_at, :end_at => free_end_at)
       if !free_appointment.valid?
         raise ActiveRecord::Rollback
       end
@@ -235,15 +235,15 @@ class AppointmentScheduler
   end
   
   # build collection of all free and work appointments that have not been canceled over the specified date range
-  def self.find_free_work_appointments(company, location, schedulable, daterange, appointments=nil)
-    company.appointments.schedulable(schedulable).free_work.upcoming_completed.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
+  def self.find_free_work_appointments(company, location, provider, daterange, appointments=nil)
+    company.appointments.provider(provider).free_work.upcoming_completed.overlap(daterange.start_at, daterange.end_at).general_location(location.id).order_start_at
   end
   
   # build collection of all unscheduled appointments over the specified date range
   # returns a hash mapping dates to a appointment collection
-  def self.find_unscheduled_time(company, location, schedulable, daterange, appointments=nil)
+  def self.find_unscheduled_time(company, location, provider, daterange, appointments=nil)
     # find all appointments over the specified daterange, order by start_at
-    appointments = appointments || company.appointments.schedulable(schedulable).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
+    appointments = appointments || company.appointments.provider(provider).free_work.overlap(daterange.start_at, daterange.end_at).order_start_at
     
     # group appointments by day; note that we use the appt start_at utc value to build the day
     appointments_by_day = appointments.group_by { |appt| appt.start_at.utc.to_s(:appt_schedule_day) }

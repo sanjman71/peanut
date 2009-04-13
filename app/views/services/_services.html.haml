@@ -7,12 +7,12 @@
         
 - services.each do |service|
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
-    .span-6.prepend-1.name{:class => service.schedulables_count? ? '' : 'noproviders'}
+    .span-6.prepend-1.name{:class => service.providers_count? ? '' : 'noproviders'}
       %h2.margin-bottom-0= service.name
-      - if service.schedulables_count > 0
+      - if service.providers_count > 0
         -# show all service providers
         == Service providers: 
-        - providers = service.schedulables.collect { |r| r.name }.sort
+        - providers = service.providers.collect { |r| r.name }.sort
         = providers.join(", ")
       - else
         %span{:style => 'color: #FF3333;'}

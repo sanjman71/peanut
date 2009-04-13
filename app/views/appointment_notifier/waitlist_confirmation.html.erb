@@ -1,5 +1,5 @@
 You are confirmed on the waitlist:
 
 What: <%= @appointment.service.name %>
-With: <%= (@appointment.schedulable || User.anyone).name %>
+With: <%= (@appointment.provider || User.anyone).name %>
 When: <%= @appointment.time.titleize %>, <%= @appointment.when.titleize %>

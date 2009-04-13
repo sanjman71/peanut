@@ -7,14 +7,14 @@ class OpeningsControllerTest < ActionController::TestCase
   should_route :get, '/openings', :controller => 'openings', :action => 'index'
   should_route :get, '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule'
   
-  # search appointments for a specified schedulable, duration and service, with a when range
+  # search appointments for a specified provider, duration and service, with a when range
   should_route :post, 'users/1/services/3/45/openings/this-week/anytime',
-               :controller => 'openings', :action => 'index', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 3, 
+               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
                :duration => 45, :when => 'this-week', :time => 'anytime'
 
-  # search appointments for a specified schedulable, duration and service, with a date range
+  # search appointments for a specified provider, duration and service, with a date range
   should_route :post, 'users/1/services/3/45/openings/20090101..20090201/anytime',
-               :controller => 'openings', :action => 'index', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 3, 
+               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
                :duration => 45, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   # search appointments for anyone providing a specified service with a specified service duration, with a when range
@@ -29,7 +29,7 @@ class OpeningsControllerTest < ActionController::TestCase
 
   def setup
     @controller   = OpeningsController.new
-    # create a valid company, with 1 schedulable and 1 work service
+    # create a valid company, with 1 provider and 1 work service
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)

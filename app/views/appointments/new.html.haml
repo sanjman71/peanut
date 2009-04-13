@@ -12,8 +12,8 @@
 %hr.space
 
 - form_for(@appointment, :url => url_for(:action => 'create', :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
-  = hidden_field_tag :schedulable_type, @schedulable.tableize
-  = hidden_field_tag :schedulable_id, @schedulable.id
+  = hidden_field_tag :provider_type, @provider.tableize
+  = hidden_field_tag :provider_id, @provider.id
   = hidden_field_tag :service_id, @service.id
   = hidden_field_tag :customer_id, @customer.id
   = hidden_field_tag :dates, @appt_date

@@ -1,8 +1,8 @@
 .span-6.prepend-1.last.mat
   = label_tag 'add_single_free_time_form', "Schedule Available Time", :class => 'big'
   - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_single_free_time_form'}) do |f|
-    = hidden_field_tag :schedulable_type, schedulable.tableize
-    = hidden_field_tag :schedulable_id, schedulable.id
+    = hidden_field_tag :provider_type, provider.tableize
+    = hidden_field_tag :provider_id, provider.id
     = hidden_field_tag :service_id, service.id
     = hidden_field_tag :mark_as, Appointment::FREE
     

@@ -25,15 +25,15 @@ Function.prototype.sleep = function (millisecond_delay) {
 }
 */
 
-// Add a service provider mapping a service to a schedulable
+// Add a service provider mapping a service to a provider
 $.fn.init_add_service_provider = function() {
   $("#provider").change(function () {
     // split selected provider value into provider type and id
-    var tuple             = $("#provider option:selected").attr("value").split("/");
-    var schedulable_type  = tuple[0];
-    var schedulable_id    = tuple[1];
-    $("#service_provider_schedulable_id").attr("value", schedulable_id);
-    $("#service_provider_schedulable_type").attr("value", schedulable_type);
+    var tuple           = $("#provider option:selected").attr("value").split("/");
+    var provider_type   = tuple[0];
+    var provider_id     = tuple[1];
+    $("#service_provider_provider_id").attr("value", provider_id);
+    $("#service_provider_provider_type").attr("value", provider_type);
     $.post($("#new_service_provider").attr("action"), $("#new_service_provider").serialize(), null, "script");
     return false;
   })
@@ -50,6 +50,7 @@ $.fn.init_add_company_resource = function() {
 }
 
 // Add a new object (e.g. person, service, product)
+/*
 $.fn.init_new_object = function(form_id) {
   // validate the form by binding a callback to the submit function
   $(form_id).validate({
@@ -76,6 +77,7 @@ $.fn.init_new_object = function(form_id) {
     return false;
   })
 }
+*/
 
 // Search for an appointment by its confirmation code
 $.fn.init_search_appointments_by_confirmation_code = function () {

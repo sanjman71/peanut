@@ -10,7 +10,7 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many            :products
   should_have_many            :appointments
   should_have_many            :invitations
-  should_have_many            :company_schedulables
+  should_have_many            :company_providers
   
   context "create company without a subscription" do
     setup do
@@ -112,28 +112,51 @@ class CompanyTest < ActiveSupport::TestCase
         end
       end
     end
-    context "and add a user schedulable" do
+    context "and add a user provider" do
       setup do 
-        @user1 = Factory(:user, :name => "User Resource")
+        @user1 = Factory(:user, :name => "User Provider")
         assert_valid @user1
-        @company.schedulables.push(@user1)
+        @company.providers.push(@user1)
         @company.reload
       end
       
-      should "have company schedulables == [@user1]" do
-        assert_equal [@user1], @company.schedulables
+      should "have company providers == [@user1]" do
+        assert_equal [@user1], @company.providers
       end
       
-      should "have company.has_schedulable?(user) return true" do
-        assert @company.has_schedulable?(@user1)
+      should "have providers count == 1" do
+        assert_equal 1, @company.providers_count
+      end
+
+      should "have company.has_provider?(user) return true" do
+        assert @company.has_provider?(@user1)
+      end
+
+      should "assign role 'provider' to user" do
+        assert_equal ['provider'], @user1.roles.collect(&:name)
       end
       
-      should "have schedulables count == 1" do
-        assert_equal 1, @company.schedulables_count
-      end
-      
-      should "have user1.has_calendar?(company) return true" do
-        assert @user1.has_calendar?(@company)
+      context "and then remove the user provider" do
+        setup do
+          @company.providers.delete(@user1)
+          @company.reload
+        end
+
+        should "have company providers == []" do
+          assert_equal [], @company.providers
+        end
+
+        should "have providers count == 0" do
+          assert_equal 0, @company.providers_count
+        end
+
+        should "have company.has_provider?(user) return false" do
+          assert !@company.has_provider?(@user1)
+        end
+
+        should "remove role 'provider' from user" do
+          assert_equal [], @user1.roles.collect(&:name)
+        end
       end
     end
   end

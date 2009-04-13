@@ -3,20 +3,20 @@ require 'test/factories'
 
 class AppointmentsControllerTest < ActionController::TestCase
 
-  # schedule a waitlist appointment for a specific schedulable, with a date range
+  # schedule a waitlist appointment for a specific provider, with a date range
   should_route :get, 'book/wait/users/1/services/5/20090101..20090201',
-               :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
+               :controller => 'appointments', :action => 'new', :provider_type => 'users', :provider_id => 1, :service_id => 5, 
                :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
   should_route :post, 'book/wait/users/1/services/5/20090101..20090201',
-               :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 1, :service_id => 5, 
+               :controller => 'appointments', :action => 'create', :provider_type => 'users', :provider_id => 1, :service_id => 5, 
                :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
   
-  # schedule a work apppointment for a specific schedulable, service and duration
+  # schedule a work apppointment for a specific provider, service and duration
   should_route :get, 'book/work/users/3/services/3/60/20090303T113000',
-               :controller => 'appointments', :action => 'new', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
+               :controller => 'appointments', :action => 'new', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
   should_route :post, 'book/work/users/3/services/3/60/20090303T113000',
-               :controller => 'appointments', :action => 'create', :schedulable_type => 'users', :schedulable_id => 3, :service_id => 3, 
+               :controller => 'appointments', :action => 'create', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
 
   # show an appointment
@@ -61,7 +61,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       # book a haircut with johnny during his free time
       get :new, 
-          :schedulable_type => 'users', :schedulable_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+          :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
           :duration => @haircut.duration, :mark_as => 'work'
     end
     
@@ -84,7 +84,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # book a haircut with johnny during his free time
       get :new, 
-          :schedulable_type => 'users', :schedulable_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+          :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
           :duration => @haircut.duration, :mark_as => 'work'
     end
 
@@ -94,7 +94,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to :appointment, :class => Appointment
     should_assign_to :service, :equals => '@haircut'
     should_assign_to :duration, :equals => '30'
-    should_assign_to :schedulable, :equals => '@johnny'
+    should_assign_to :provider, :equals => '@johnny'
     should_assign_to :customer, :equals => '@customer'
     should_assign_to :appt_date, :equals => '@time_range.start_at.to_s(:appt_schedule_day)'
     should_assign_to :appt_time_start_at, :equals => '"0900"'
@@ -104,7 +104,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create free appointment without privilege ['update calendars']" do
     setup do
       post :create,
-           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @free_service.id, :mark_as => 'free'}
     end
     
@@ -118,14 +118,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       # allow user to update calendar
       @controller.stubs(:current_privileges).returns(["update calendars"])
       post :create,
-           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @free_service.id, :mark_as => 'free'}
     end
     
     should_change "Appointment.count", :by => 2
     
     should_assign_to :service, :equals => "@free_service"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
     should_assign_to :end_at, :equals => '"1100"'
     should_assign_to :mark_as, :equals => '"free"'
@@ -141,14 +141,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       # allow user to create free appointments
       @controller.stubs(:current_privileges).returns(["update calendars"])
       post :create,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}", 
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
             :service_id => @free_service.id, :mark_as => 'free'}
     end
   
     should_change "Appointment.count", :by => 1
     
     should_assign_to :service, :equals => "@free_service"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
     should_assign_to :end_at, :equals => '"1100"'
     should_assign_to :mark_as, :equals => '"free"'
@@ -162,14 +162,14 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create work appointment for a single date that has no free time" do
     setup do
       post :create,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
     end
   
     should_not_change "Appointment.count"
   
     should_assign_to :service, :equals => "@haircut"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :start_at, :equals => '"0900"'
     should_assign_to :end_at, :equals => '"1100"'
     should_assign_to :mark_as, :equals => '"work"'
@@ -192,7 +192,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # create work appointment, today from 9 am to 11 am
       post :create,
-           {:dates => @today, :start_at => "0900", :end_at => "1100", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => @today, :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
     end
 
@@ -200,7 +200,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 1
 
     should_assign_to :service, :equals => "@haircut"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :start_at, :equals => '"0900"'
     should_assign_to :end_at, :equals => '"1100"'
@@ -233,7 +233,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # create work appointment, today from 10 am to 10:30 am local time
       post :create,
-           {:dates => @today, :start_at => "1000", :end_at => "1030", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => @today, :start_at => "1000", :end_at => "1030", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
     end
     
@@ -241,7 +241,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 3
   
     should_assign_to :service, :equals => "@haircut"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :start_at, :equals => '"1000"'
     should_assign_to :end_at, :equals => '"1030"'
@@ -274,7 +274,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # create work appointment, today from 10 am to 12 pm local time
       post :create,
-           {:dates => @today, :start_at => "1000", :end_at => "1200", :schedulable_type => "users", :schedulable_id => "#{@johnny.id}",
+           {:dates => @today, :start_at => "1000", :end_at => "1200", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
     end
 
@@ -282,7 +282,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change "Appointment.count", :by => 3
 
     should_assign_to :service, :equals => "@haircut"
-    should_assign_to :schedulable, :equals => "@johnny"
+    should_assign_to :provider, :equals => "@johnny"
     should_assign_to :customer, :equals => "@customer"
     should_assign_to :start_at, :equals => '"1000"'
     should_assign_to :end_at, :equals => '"1200"'
@@ -317,7 +317,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
       # request a waitlist appointment
       get :new,
-          {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
+          {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :provider_type => @johnny.tableize, :provider_id => @johnny.id,
            :service_id => @haircut.id, :mark_as => 'wait'}
     end
 
@@ -347,7 +347,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       
         # create waitlist appointment
         post :create,
-             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @johnny.tableize, :schedulable_id => @johnny.id,
+             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @johnny.tableize, :provider_id => @johnny.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
 
@@ -355,7 +355,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     
       should_assign_to :service, :equals => "@haircut"
       should_not_assign_to :duration
-      should_assign_to :schedulable, :equals => "@johnny"
+      should_assign_to :provider, :equals => "@johnny"
       should_assign_to :customer, :equals => "@customer"
       should_assign_to :mark_as, :equals => '"wait"'
       should_assign_to :appointment
@@ -376,7 +376,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         # create waitlist appointment
         post :create,
-             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :schedulable_type => @anyone.tableize, :schedulable_id => @anyone.id,
+             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @anyone.tableize, :provider_id => @anyone.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
 
@@ -384,7 +384,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_assign_to :service, :equals => "@haircut"
       should_not_assign_to :duration
-      should_not_assign_to :schedulable # schedulable should be empty
+      should_not_assign_to :provider # provider should be empty
       should_assign_to :customer, :equals => "@customer"
       should_assign_to :mark_as, :equals => '"wait"'
       should_assign_to :appointment

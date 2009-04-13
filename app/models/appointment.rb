@@ -6,11 +6,11 @@ class TimeslotNotEmpty < Exception; end
 class Appointment < ActiveRecord::Base
   belongs_to              :company
   belongs_to              :service
-  belongs_to              :schedulable, :polymorphic => true
+  belongs_to              :provider, :polymorphic => true
   belongs_to              :customer, :class_name => 'User'
   validates_presence_of   :company_id, :service_id, :start_at, :end_at, :duration
-  validates_presence_of   :schedulable_id, :if => :schedulable_required?
-  validates_presence_of   :schedulable_type, :if => :schedulable_required?
+  validates_presence_of   :provider_id, :if => :provider_required?
+  validates_presence_of   :provider_type, :if => :provider_required?
   validates_presence_of   :customer_id, :if => :customer_required?
   validates_inclusion_of  :mark_as, :in => %w(free work wait)
   has_one                 :invoice, :dependent => :destroy, :as => :invoiceable
@@ -30,8 +30,8 @@ class Appointment < ActiveRecord::Base
   CONFIRMATION_CODE_ZERO  = '00000'
   
   named_scope :service,       lambda { |o| { :conditions => {:service_id => o.is_a?(Integer) ? o : o.id} }}
-  named_scope :schedulable,   lambda { |schedulable| { :conditions => {:schedulable_id => schedulable.id, :schedulable_type => schedulable.class.to_s} }}
-  named_scope :no_schedulable, { :conditions => {:schedulable_id => nil, :schedulable_type => nil} }
+  named_scope :provider,      lambda { |provider| { :conditions => {:provider_id => provider.id, :provider_type => provider.class.to_s} }}
+  named_scope :no_provider,   { :conditions => {:provider_id => nil, :provider_type => nil} }
   named_scope :customer,      lambda { |o| { :conditions => {:customer_id => o.is_a?(Integer) ? o : o.id} }}
   named_scope :duration_gt,   lambda { |t|  { :conditions => ["duration >= ?", t] }}
 
@@ -221,10 +221,10 @@ class Appointment < ActiveRecord::Base
       end
     end
     
-    if self.schedulable and self.company
-      # schedulable must belong to this same company
-      if !self.company.has_schedulable?(self.schedulable)
-        errors.add_to_base("Schedulable is not associated to this company")
+    if self.provider and self.company
+      # provider must belong to this same company
+      if !self.company.has_provider?(self.provider)
+        errors.add_to_base("Provider is not associated to this company")
       end
     end
     
@@ -347,12 +347,12 @@ class Appointment < ActiveRecord::Base
   
   # returns all appointment conflicts
   # conflict rules:
-  #  - schedulable must be the same
+  #  - provider must be the same
   #  - start, end times must overlap
   #  - must be marked as 'free' or 'work'
   #  - state must not be 'upcoming' or 'completed'
   def conflicts
-    @conflicts ||= self.company.appointments.free_work.upcoming_completed.schedulable(schedulable).overlap(start_at, end_at)
+    @conflicts ||= self.company.appointments.free_work.upcoming_completed.provider(provider).overlap(start_at, end_at)
   end
   
   # returns true if this appointment conflicts with any other
@@ -434,8 +434,8 @@ class Appointment < ActiveRecord::Base
 
   protected
   
-  # schedulables are required for all appointments except waitlist appointments
-  def schedulable_required?
+  # providers are required for all appointments except waitlist appointments
+  def provider_required?
     return false if wait?
     true
   end

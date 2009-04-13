@@ -10,7 +10,7 @@
   .span-3.label.text-align-right
     == With:
   .span-12.last.data
-    ~ "<#{tag}>#{(appointment.schedulable || User.anyone).name}</#{tag}>"
+    ~ "<#{tag}>#{(appointment.provider || User.anyone).name}</#{tag}>"
 
 
   -# when is different for a work appointment vs. a waitlist apointment

@@ -54,8 +54,8 @@ class SignupControllerTest < ActionController::TestCase
         assert_equal ['manager', 'provider'], assigns(:user).roles.collect(&:name).sort
       end
       
-      should "create company with user as a schedulable" do
-        assert_equal [assigns(:user)], assigns(:company).schedulables
+      should "create company with user as a provider" do
+        assert_equal [assigns(:user)], assigns(:company).providers
       end
       
       should_respond_with :redirect

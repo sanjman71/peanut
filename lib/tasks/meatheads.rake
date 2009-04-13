@@ -33,21 +33,18 @@ namespace :meatheads do
     # create test companies
     @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
-    # add user roles
+    # add manager roles
     @meathead.grant_role('manager', @meatheads)
-    @meathead.grant_role('provider', @meatheads)
-    @wimpy.grant_role('provider', @meatheads)
-    @skinny.grant_role('provider', @meatheads)
   end
   
   task :services do
   
     puts "#{Time.now}: adding meathead services ..."
   
-    # assign schedulables
-    @meatheads.schedulables.push(@meathead)
-    @meatheads.schedulables.push(@wimpy)
-    @meatheads.schedulables.push(@skinny)
+    # assign providers
+    @meatheads.providers.push(@meathead)
+    @meatheads.providers.push(@wimpy)
+    @meatheads.providers.push(@skinny)
 
     # create services
     @training         = @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
@@ -55,8 +52,8 @@ namespace :meatheads do
     puts "#{Time.now}: adding meatheads service providers ..."
 
     # add service providers
-    @training.schedulables.push(@wimpy)
-    @training.schedulables.push(@skinny)
+    @training.providers.push(@wimpy)
+    @training.providers.push(@skinny)
 
     puts "#{Time.now}: completed"
   end

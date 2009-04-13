@@ -2,8 +2,8 @@
 - stylesheet('users')
 - javascript('customers')
 
-.span-16.last.mat.padding-top-10.padding-bottom-20
-  .span-15.prepend-1
+.span-16
+  .span-15.prepend-1.mat.padding-top-10.padding-bottom-20
     = label_tag "live_search_for_customers", "Find a customer by typing their name", :class => 'big'
     -# must have 'create users' privilege to add a customer
     - if has_privilege?('create users', current_company)
@@ -14,14 +14,18 @@
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
     
 
-%hr.space
+  %hr.space
 
 .span-14.prepend-1.last
   = display_flash
   
-.span-16.last
-  #customers_pagination
-    = render(:partial => 'customers_pagination', :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate})
-  #customers
-    = render(:partial => 'customers', :locals => {:customers => @customers})
+  .span-16.last
+    #customers_pagination
+      = render(:partial => 'customers_pagination', :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate})
+    #customers
+      = render(:partial => 'customers', :locals => {:customers => @customers})
     
+.span-8.last
+  -# customer help
+  .span-7.prepend-1.last
+    = render(:partial => 'customer_help')

@@ -1,6 +1,6 @@
 - title("Providers")
 - stylesheet('users')
-- javascript('users')
+- javascript('users', 'providers')
 
 .span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
@@ -10,26 +10,33 @@
       -# show add provider links if the company plan allows it
       - if current_company.may_add_provider?
         %h4{:style => 'padding-top: 5px; font-size: 1.3em;'}
-          = link_to 'Add a provider', url_for(:controller => 'users', :action => 'new', :type => 'provider', :subdomain => current_subdomain)
+          = select_tag('add_provider', options_for_select([['Add provider', 0], ['Add user', '/providers/new'], ['Add resource', '/resources/new']], 0), :class => 'text')
+          / = link_to 'Add a provider', url_for(:controller => 'users', :action => 'new', :type => 'provider', :subdomain => current_subdomain)
           == &nbsp;|&nbsp;
-          = link_to 'Invite a provider', new_invitation_path(:subdomain => current_subdomain)
+          = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
     .span-15
       -# show current plan usage
       - if current_company.may_add_provider?
-        %span{:style => 'font-size: 1.1em; color: #777777;'}== The company has #{pluralize(current_company.schedulables_count, 'provider')}.  Your plan allows #{plan_limit_text(current_company.plan, 'provider').downcase}.
+        %span{:style => 'font-size: 1.1em; color: #777777;'}== The company has #{pluralize(current_company.providers_count, 'provider')}.  Your plan allows #{plan_limit_text(current_company.plan, 'provider').downcase}.
       - else current_company.may_add_provider?
-        %span.highlight{:style => 'font-size: 1.3em;'}== You are at your plan limit of #{pluralize(current_company.schedulables_count, 'provider')}.  You can use the following #{link_to('link', edit_subscription_path(current_company.subscription))} to upgrade your account.
+        %span.highlight{:style => 'font-size: 1.3em;'}== You are at your plan limit of #{pluralize(current_company.providers_count, 'provider')}.  You can use the following #{link_to('link', edit_subscription_path(current_company.subscription))} to upgrade your account.
     
   %hr.space
 
   .span-14.prepend-1.last
     = display_flash
 
-  #providers
-    = render(:partial => 'providers', :locals => {:users => @users})
+  .span-14.prepend-1.append-1.last
+    .highlight#flash
+
+  .span-16.last
+    #providers_pagination
+      = render(:partial => 'providers_pagination', :locals => {:providers => @providers, :search_text => @search_text, :paginate => @paginate})
+    #providers
+      = render(:partial => 'providers', :locals => {:providers => @providers})
 
 .span-8.last
   -# provider help
   .span-7.prepend-1.last
-    = render(:partial => 'provider_help')
+    = render(:partial => 'providers_help')
 

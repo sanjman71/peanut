@@ -1,4 +1,3 @@
-
 namespace :noelrose do
 
   desc "Initialize noelrose test data"
@@ -17,23 +16,22 @@ namespace :noelrose do
     @erika.activate!
   
     # create subscriptions
-    @subscription  = Subscription.create(:user => @erika, :plan => @max_plan)
+    @subscription = Subscription.create(:user => @erika, :plan => @max_plan)
   
     puts "#{Time.now}: creating noelrose company"
     # create test companies
-    @noelrose        = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
+    @noelrose     = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
-    # add user roles
+    # add manager roles
     @erika.grant_role('manager', @noelrose)
-    @erika.grant_role('provider', @noelrose)
   end
   
   task :services do
   
     puts "#{Time.now}: adding noelrose services ..."
 
-    # assign schedulables
-    @noelrose.schedulables.push(@erika)
+    # assign providers
+    @noelrose.providers.push(@erika)
     
     # create noelrose services, products
     @mens_haircut     = @noelrose.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00)

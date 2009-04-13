@@ -8,7 +8,7 @@
     .span-3.padding-bottom-5.text-align-right
       == With:
     .span-12.padding-bottom-5.last
-      = (appointment.schedulable || User.anyone).name
+      = (appointment.provider || User.anyone).name
     
   -# when is different for a work appointment vs. a waitlist apointment
   .when

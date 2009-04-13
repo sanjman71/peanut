@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
     !mobile_carrier.blank?
   end
 
-  # the special user person
+  # the special user 'anyone'
   def self.anyone
     r = User.new do |o|
       o.name = "Anyone"
@@ -76,11 +76,6 @@ class User < ActiveRecord::Base
 
   def tableize
     self.class.to_s.tableize
-  end
-  
-  # returns true if the user has a calendar for the specified company
-  def has_calendar?(company)
-    companies.include?(company)
   end
   
   protected

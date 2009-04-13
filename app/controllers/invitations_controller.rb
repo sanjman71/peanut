@@ -9,12 +9,18 @@ class InvitationsController < ApplicationController
   def create
     @invitation         = Invitation.new(params[:invitation])
     @invitation.sender  = current_user
-    @invitation.company = @current_company
+    @invitation.company = current_company
     
     if @invitation.save
-      MailWorker.async_send_invitation(:id => @invitation.id, :url => invite_url(@invitation.token))
-      flash[:notice] = "Your invitation has been sent"
-      redirect_to(users_path)
+      begin
+        MailWorker.async_send_invitation(:id => @invitation.id, :url => invite_url(@invitation.token))
+        flash[:notice] = "Your invitation has been sent"
+      rescue Exception => e
+        logger.debug("*** invitation error: #{e.message}")
+        flash[:error]  = "There was a problem sending your invitation"
+      end
+      
+      redirect_to(providers_path)
     else
       render :action => 'new'
     end

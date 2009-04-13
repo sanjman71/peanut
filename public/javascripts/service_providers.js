@@ -5,13 +5,13 @@ $.fn.init_service_providers = function () {
   // build service_providers array
   $(".service_providers.hide .service_provider").each(function(index, service_provider)
   {
-    var service_id        = $(service_provider).attr("service_id");
-    var schedulable_id    = $(service_provider).attr("schedulable_id");
-    var schedulable_name  = $(service_provider).attr("schedulable_name");
-    var schedulable_type  = $(service_provider).attr("schedulable_type");
+    var service_id     = $(service_provider).attr("service_id");
+    var provider_id    = $(service_provider).attr("provider_id");
+    var provider_name  = $(service_provider).attr("provider_name");
+    var provider_type  = $(service_provider).attr("provider_type");
     
-    // populate array with the service id, schedulable id and name
-    service_providers.push([service_id, schedulable_id, schedulable_name, schedulable_type]);
+    // populate array with the service id, provider id and name
+    service_providers.push([service_id, provider_id, provider_name, provider_type]);
   });
 }
 
@@ -28,25 +28,25 @@ $.fn.init_services = function() {
   });
 }
 
-$.fn.init_schedulables = function () {
+$.fn.init_providers = function () {
   // find the selected service
   var service_id = $('#service_id').val();
   
-  // remove all schedulables
-  $('#schedulable').removeOption(/./);
+  // remove all providers
+  $('#provider').removeOption(/./);
   
-  // find the schedulable initially selected
-  var initial_schedulable_id = $('#initial_schedulable_id').attr("value");
-  var initial_schedulable_type = $('#initial_schedulable_type').attr("value");
+  // find the provider initially selected
+  var initial_provider_id = $('#initial_provider_id').attr("value");
+  var initial_provider_type = $('#initial_provider_type').attr("value");
   
-  // add schedulables who provide the selected service
+  // add providers who provide the selected service
   var num_providers = 0;
   
   $.each(service_providers, function (index, service_provider) {
     if (service_provider[0] == service_id)
     {
-      // add the schedulable type and id (e.g. users/3) as the type, and the schedulable name as the value 
-      $('#schedulable').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_schedulable_id) && (service_provider[3] == initial_schedulable_type));
+      // add the provider type and id (e.g. users/3) as the type, and the provider name as the value 
+      $('#provider').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_provider_id) && (service_provider[3] == initial_provider_type));
       num_providers += 1;
     }
   })
@@ -68,9 +68,9 @@ $.fn.init_schedulables = function () {
     }
   })
   
-  // add the special 'Anyone' schedulable iff a service has been selected and the service has 0 or > 1 providers
+  // add the special 'Anyone' provider iff a service has been selected and the service has 0 or > 1 providers
   if (service_id != 0 && (num_providers == 0 || num_providers > 1)) {
-    $('#schedulable').addOption(0, "Anyone", 0 == initial_schedulable_id);
+    $('#provider').addOption(0, "Anyone", 0 == initial_provider_id);
   }
   
   // check if the selected service allows a custom duration
@@ -96,11 +96,11 @@ $.fn.init_default_duration = function() {
 $(document).ready(function() {
   $(document).init_service_providers();
   $(document).init_services();
-  $(document).init_schedulables();
+  $(document).init_providers();
     
-  // when a service is selected, rebuild the schedulable service provider select list
+  // when a service is selected, rebuild the provider service provider select list
   $("#service_id").change(function () {
-    $(document).init_schedulables();
+    $(document).init_providers();
     $(document).init_default_duration();
     return false;
   })
