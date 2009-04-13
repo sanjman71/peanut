@@ -73,7 +73,7 @@ class PeopleController < ApplicationController
 
     if !@person.valid?
       @error      = true
-      @error_text = "Could not create person"
+      flash[:error] = "Could not create person"
       return
     end
     
