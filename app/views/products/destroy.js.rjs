@@ -1,5 +1,5 @@
 # update the flash
-page["#flash"].html(display_flash)
+page["#flash"].html(display_flash(true))
 flash.discard
 
 # update services

@@ -1,4 +1,4 @@
-page["#flash"].html(display_flash)
+page["#flash"].html(display_flash(true))
 flash.discard
 if @error
   # highlight note comment field

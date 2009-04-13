@@ -1,6 +1,6 @@
 if @error
   # update the flash
-  page["#flash"].html(display_flash)
+  page["#flash"].html(display_flash(true))
   flash.discard
 
   page["#new_product_name"].addClass('highlighted')
