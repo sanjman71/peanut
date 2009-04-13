@@ -22,16 +22,15 @@
       %ul{:style => 'font-size: 11px;'}
         %li== Its the default, since the system has no way of knowing when a person is available to work.
 
+.span-14.prepend-1.last
+  = display_flash
+
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
   = hidden_field_tag :schedulable_type, @schedulable.tableize
   = hidden_field_tag :schedulable_id, @schedulable.id
   = hidden_field_tag :service_id, @free_service.id
   = hidden_field_tag :mark_as, Appointment::FREE
   
-  .span-14.prepend-1.append-9.last
-    = display_flash(:notice)
-    = display_flash(:error)
-
   %em.span-14.prepend-1.append-9.last#date_count
     == No dates selected
   

@@ -23,10 +23,7 @@
         = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :schedulable_type => @schedulable.class.to_s.tableize, :schedulable_id => @schedulable.id, :subdomain => current_subdomain)})
       
   .span-14.prepend-1.last
-    #appointment_flash
-
-  .span-14.prepend-1.last
-    = display_flash(:notice)
+    = display_flash
     
   %hr.space
   
