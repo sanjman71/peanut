@@ -1,4 +1,4 @@
-module RescheduleLib
+module AppointmentRescheduleHelper
   protected
 
   def set_reschedule_id(appointment)

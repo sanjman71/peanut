@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base 
 
-  include RescheduleLib
+  include AppointmentRescheduleHelper
   
   # These before filters are not necessary, but are used to mirror the real app
   before_filter :init_current_company
@@ -23,17 +23,6 @@ class ApplicationController < ActionController::Base
   # return true if the current user is a manager of the company
   def manager?
     has_role?('manager', current_company) || has_role?('admin')
-  end
-
-  # these flash methods are needed for the functional tests
-  
-  def global_flash?
-    @global_flash = true if @global_flash.nil?
-    return @global_flash
-  end
-  
-  def disable_global_flash
-    @global_flash = false
   end
 
   private

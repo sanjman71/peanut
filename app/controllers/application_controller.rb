@@ -27,7 +27,7 @@ class ApplicationController < ActionController::Base
   include ExceptionNotifiable
   
   # Library for re-scheduling appointments
-  include RescheduleLib
+  include AppointmentRescheduleHelper
   
   # Initialize current company and subdomain
   before_filter :init_current_company

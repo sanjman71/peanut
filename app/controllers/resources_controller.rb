@@ -1,5 +1,4 @@
 class ResourcesController < ApplicationController
-  before_filter :disable_global_flash, :only => [:new, :create]
   privilege_required 'create resources', :only => [:new, :create], :on => :current_company
   
   # GET /resources/new
