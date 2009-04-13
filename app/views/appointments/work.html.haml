@@ -27,8 +27,8 @@
             
 %hr.space
 
-.span-15.prepend-1
-  = display_flash(:all)
+.span-14.prepend-1.last
+  = display_flash
   
 .span-23.prepend-1
   = render(:partial => 'appointment', :locals => {:appointment => @appointment})
@@ -46,10 +46,6 @@
   - # allow owners and managers add invoices
   -#- if (@owner or @manager) and !@appointment.canceled?
     -#%h3== Add Invoice
-    
-.span-15.prepend-1  
-  -# notes flash message
-  #note_flash
 
   -# add note
   .new_note#new_note_container

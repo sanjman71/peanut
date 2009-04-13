@@ -22,15 +22,11 @@
       
 %hr.space
 
-.span-15.prepend-1
-  = display_flash(:all)
+.span-14.prepend-1.last
+  = display_flash
 
-.span-23.prepend-1
+.span-23.prepend-1.last
   = render :partial => 'appointment', :locals => {:appointment => @appointment}
-
-.span-15.prepend-1  
-  -# notes flash message
-  #note_flash
 
   -# add note
   .new_note#new_note_container
