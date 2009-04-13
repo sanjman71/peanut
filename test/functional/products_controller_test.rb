@@ -33,13 +33,10 @@ class ProductsControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
-      should_assign_to :product, :error_text
+      should_assign_to :product
+      should_set_the_flash_to "Could not create product"
       should_assign_to :error, :equals => "true"
       should_not_change "Product.count"
-            
-      should "return error text" do
-        assert_equal "Could not create product", assigns(:error_text)
-      end
     end
     
     context "with a valid name" do
@@ -52,7 +49,7 @@ class ProductsControllerTest < ActionController::TestCase
       should_render_template 'products/create.js.rjs'
       should_respond_with_content_type "text/javascript"
       should_assign_to :product
-      should_not_assign_to :error, :error_text
+      should_not_assign_to :error
       should_not_set_the_flash
       should_change "Product.count", :by => 1
       
