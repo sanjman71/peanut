@@ -10,10 +10,8 @@
     %hr.space
     
     -# show flash messages
-    .span-14.prepend-1.append-1.last
-      .highlight#flash
-    .span-14.prepend-1.append-1.last
-      = display_flash(:all)
+    .span-14.prepend-1.last
+      = display_flash
       
     #services
       = render(:partial => 'services', :locals => {:services => @services})
