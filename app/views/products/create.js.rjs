@@ -1,4 +1,8 @@
 if @error
+  # update the flash
+  page["#flash"].html(display_flash)
+  flash.discard
+
   page["#new_product_name"].addClass('highlighted')
   page["#progress"].hide();  # hide progress bar
   page["#submit"].show();    # show submit button 
