@@ -17,9 +17,8 @@
   .span-24.last
     = render(:partial => 'appointment_header', :locals => {:appointment => @appointment})
 
-.span-14.prepend-1
-  %br
-  = display_flash(:all)
+.span-14.prepend-1.last
+  = display_flash
   
 .span-15.prepend-1.last
   - if @appointment.state == 'completed'
@@ -27,10 +26,6 @@
     #invoice
       = render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => @mode})
 
-.span-15.prepend-1  
-  -# notes flash message
-  #note_flash
-  
   -# add note
   .new_note#new_note_container
     %p

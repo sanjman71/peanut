@@ -17,7 +17,7 @@ class ProductsController < ApplicationController
     
     if !@product.valid?
       @error      = true
-      @error_text = "Could not create product"
+      flash[:error] = "Could not create product"
       return
     end
     
@@ -56,7 +56,7 @@ class ProductsController < ApplicationController
     @product = current_company.products.find(params[:id])
     @product.destroy
 
-    @notice_text = "Removed product #{@product.name}"
+    flash[:notice] = "Removed product #{@product.name}"
 
     # build products collection
     @products = current_company.products

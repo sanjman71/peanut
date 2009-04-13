@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  before_filter :disable_global_flash
+
   layout 'home'
   
   def index

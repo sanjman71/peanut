@@ -1,9 +1,10 @@
 - title('Welcome to Peanut')
 
+.span-14.prepend-1.last
+  = display_flash
+
 .span-24.last
-  .span-12
-    = display_flash(:all)
-    
+      
   .span-12.mat.padding-bottom-10
     = render :partial => 'sessions/login_form'
   .span-12.last

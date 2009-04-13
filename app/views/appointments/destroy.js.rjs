@@ -2,8 +2,8 @@ if @redirect_path
   page.redirect_to(@redirect_path)
 else
   # update flash message
-  page["#appointment_flash"].add_class('notice')
-  page["#appointment_flash"].html(@notice_text)
+  page["#flash"].html(display_flash(true))
+  flash.discard
 
   # update calendar
   page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', 

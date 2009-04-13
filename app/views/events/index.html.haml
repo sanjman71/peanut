@@ -10,6 +10,11 @@
         %h3== #{link_to "Unseen", url_for(:subdomain => current_subdomain, :state => nil)} | Seen
       - else
         %h3== Unseen | #{link_to "Seen", url_for(:subdomain => current_subdomain, :state => 'seen')}
+
+%hr.space
+
+.span-14.prepend-1.last
+  = display_flash
       
 %hr.space
 

@@ -1,18 +1,12 @@
-if @errors
+page["#flash"].html(display_flash(true))
+flash.discard
+if @error
   # highlight note comment field
   page["#note_comment"].add_class('highlighted')
   
   # set focus
   page["#note_comment"].focus()
-  
-  # clear notice text
-  page["#note_flash"].html('')
-  page["#note_flash"].remove_class('notice')
 else
-  # highlight notice text
-  page["#note_flash"].html(@notice_text)
-  page["#note_flash"].add_class('notice')
-  
   # clear note comment field
   page["#note_comment"].remove_class('highlighted')
   page["#note_comment"].value = ''

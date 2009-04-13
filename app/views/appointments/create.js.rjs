@@ -1,40 +1,37 @@
 if @redirect_path
   page.redirect_to(@redirect_path)
-elsif @error
-  # clear any errors
-  page["#appointment_time_range_start_at"].add_class('highlighted')
-  page["#appointment_time_range_end_at"].add_class('highlighted')
-  page["#appointment_time_range_start_at"].focus()
-  # clear any notice messages, add error message
-  page["#appointment_flash"].remove_class('notice')
-  page["#appointment_flash"].add_class('error')
-  page["#appointment_flash"].html(@error_text)
 else
-  # clear any errors 
-  page["#appointment_time_range_start_at"].remove_class('highlighted')
-  page["#appointment_time_range_end_at"].remove_class('highlighted')
-  page["#appointment_time_range_start_at"].focus()
-  # clear any error messages, add notice message
-  page["#appointment_flash"].remove_class('error')
-  page["#appointment_flash"].add_class('notice')
-  page["#appointment_flash"].html(@notice_text)
-
-  # reset form
-  page << "document.forms['add_free_time_form'].reset();"
-
-  # update calendar
-  page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', 
-                                     :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}))
-
-  # update appointment count
-  page["#appointments_count"].html(render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size}))
+  # update the flash
+  page["#flash"].html(display_flash(true))
+  flash.discard
   
-  # update appointments
-  page["#free_schedule"].html(render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day}))
+  if @error
+    # clear any errors
+    page["#appointment_time_range_start_at"].add_class('highlighted')
+    page["#appointment_time_range_end_at"].add_class('highlighted')
+    page["#appointment_time_range_start_at"].focus()
+  else
+    # clear any errors 
+    page["#appointment_time_range_start_at"].remove_class('highlighted')
+    page["#appointment_time_range_end_at"].remove_class('highlighted')
+    page["#appointment_time_range_start_at"].focus()
 
-  # reset submit button and progress bar
-  page["#submit"].show();
-  page["#progress"].hide();
-end 
+    # reset form
+    page << "document.forms['add_free_time_form'].reset();"
 
+    # update calendar
+    page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', 
+                                       :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}))
+
+    # update appointment count
+    page["#appointments_count"].html(render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size}))
+  
+    # update appointments
+    page["#free_schedule"].html(render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day}))
+
+    # reset submit button and progress bar
+    page["#submit"].show();
+    page["#progress"].hide();
+  end 
+end
 

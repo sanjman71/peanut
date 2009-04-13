@@ -59,6 +59,6 @@
               %li= tab
             
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
-      .flash.prepend-1.span-14
-        = display_flash(:all) if global_flash?
+      .span-14.prepend-1.last
+        = display_flash
       = yield

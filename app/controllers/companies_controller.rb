@@ -1,5 +1,4 @@
 class CompaniesController < ApplicationController
-  before_filter :disable_global_flash, :only => [:edit]
   layout "company"
 
   privilege_required 'read companies', :only => [:index]

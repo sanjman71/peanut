@@ -1,5 +1,4 @@
 class ServicesController < ApplicationController
-  before_filter :disable_global_flash, :only => [:index, :new, :create, :edit]
   
   privilege_required 'create services', :only => [:new, :create], :on => :current_company
   privilege_required 'read services', :only => [:index, :show], :on => :current_company
@@ -61,7 +60,7 @@ class ServicesController < ApplicationController
     current_company.services.push(@service)
     
     # redirect to edit page
-    @redirect_path = edit_service_path(@service)
+    @redirect_path = edit_service_path(@service, :subdomain => current_subdomain)
 
     flash[:notice] = "Created service #{@service.name}"
     
