@@ -6,15 +6,21 @@ class NotesController < ApplicationController
     @note = Note.create(params[:note])
     
     if !@note.valid?
-      @errors = true
-      return
+      @error = true
+      flash[:error] = "Problem creating note"
+      @notes = []
+    else
+      # set notice text
+      flash[:notice]  = "Created note"
+
+      # build notes collection, most recent first 
+      @notes        =  @note.subject.notes.sort_recent
     end
     
-    # set notice text
-    @notice_text  = "Created note"
+    respond_to do |format|
+      format.js
+    end
     
-    # build notes collection, most recent first 
-    @notes        =  @note.subject.notes.sort_recent
   end
 
 end
