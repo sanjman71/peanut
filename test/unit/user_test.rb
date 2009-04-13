@@ -7,18 +7,11 @@ class UserTest < ActiveSupport::TestCase
   should_belong_to    :invitation
   should_have_many    :subscriptions
   should_have_many    :plans, :through => :subscriptions
-  
-  def setup
-    @owner        = Factory(:user, :name => "Owner")
-    @monthly_plan = Factory(:monthly_plan)
-    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
-    @company      = Factory(:company, :subscription => @subscription)
-    assert_valid @company
-  end
+  should_have_many    :appointments
   
   context "create user with extra phone characters" do
     setup do
-      @user = User.create(:company => @company, :name => "User 1", :email => "user1@jarna.com", 
+      @user = User.create(:name => "User 1", :email => "user1@jarna.com", 
                           :password => "secret", :password_confirmation => "secret", :phone => "(650) 387-6818")
     end
     
@@ -37,7 +30,7 @@ class UserTest < ActiveSupport::TestCase
   
   context "create user without an invitation" do
     setup do
-      @user1 = User.create(:company => @company, :name => "User 1", :email => "user1@jarna.com", 
+      @user1 = User.create(:name => "User 1", :email => "user1@jarna.com", 
                            :password => "secret", :password_confirmation => "secret")
     end
     
@@ -45,7 +38,7 @@ class UserTest < ActiveSupport::TestCase
     
     context "create another user without an invitation" do
       setup do
-        @user2 = User.create(:company => @company, :name => "User 2", :email => "user2@jarna.com", 
+        @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", 
                              :password => "secret", :password_confirmation => "secret")
       end
       
@@ -58,7 +51,7 @@ class UserTest < ActiveSupport::TestCase
       @recipient_email  = Factory.next(:user_email)
       @invitation       = Invitation.create(:sender => @owner, :recipient_email => @recipient_email, :company => @company)
       assert_valid @invitation
-      @user             = User.create(:company => @company, :name => "User 3", :email => "user3@jarna.com", 
+      @user             = User.create(:name => "User 3", :email => "user3@jarna.com", 
                                       :password => "secret", :password_confirmation => "secret",
                                       :invitation_id => @invitation.id)
       @user.reload

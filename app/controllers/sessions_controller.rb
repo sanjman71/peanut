@@ -18,9 +18,9 @@ class SessionsController < ApplicationController
 
   def create
     logout_keeping_session!
-    # authenticate user within a company domain; admins login with a company id of 0
-    company_id  = current_company.blank? ? 0 : current_company.id
-    user        = User.authenticate(params[:email], params[:password], :company_id => company_id)
+    
+    # authenticate user
+    user = User.authenticate(params[:email], params[:password])
     
     if user
       # Protects against session fixation attacks, causes request forgery

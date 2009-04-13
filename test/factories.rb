@@ -13,10 +13,6 @@ Factory.define :location do |l|
   l.zip         "12345"
 end
 
-Factory.define :person do |p|
-  p.name "Person 1"
-end
-
 Factory.define :work_service, :class => Service do |s|
   s.name                    "Work"
   s.mark_as                 "work"

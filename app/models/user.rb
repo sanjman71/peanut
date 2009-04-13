@@ -9,11 +9,6 @@ class User < ActiveRecord::Base
   # Badges for authorization
   badges_authorized_user
 
-  # Accounting and plans
-  has_many                  :subscriptions
-  has_many                  :plans, :through => :subscriptions
-  has_many                  :owned_companies, :through => :subscriptions, :source => :company
-
   validates_format_of       :name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
   validates_length_of       :name,     :maximum => 100
   validates_presence_of     :name
@@ -25,11 +20,6 @@ class User < ActiveRecord::Base
 
   before_validation         :format_phone
 
-  has_many                  :sent_invitations, :class_name => 'Invitation'
-  has_many                  :received_invitations, :class_name => 'Invitation'
-  belongs_to                :invitation
-  
-  has_many                  :appointments, :class_name => 'User'
   belongs_to                :mobile_carrier
   
   # HACK HACK HACK -- how to do attr_accessible from here?
@@ -40,6 +30,11 @@ class User < ActiveRecord::Base
   named_scope               :search_by_name, lambda { |s| { :conditions => ["LOWER(users.name) REGEXP '%s'", s.downcase] }}
   named_scope               :order_by_name, { :order => 'users.name' }
 
+  # include other required user modules
+  include UserSubscription
+  include UserAppointment
+  include UserInvitation
+  
   # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
   #
   # uff.  this is really an authorization, not authentication routine.  
