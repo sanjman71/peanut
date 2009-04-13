@@ -7,11 +7,11 @@
   
   %hr.space
   
-  .span-15.prepend-1.last
+  .span-14.prepend-1.last
     = display_flash(:all)
 
   - unless @service.errors.blank?
-    .span-15.prepend-1.last
+    .span-14.prepend-1.last
       .notice= error_messages_for('service', :header_message => nil)
 
   -# name
