@@ -3,19 +3,23 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :plans do
   
   desc "Initialize plans"
-  task :init  => [:free, :basic, :premium, :max]
+  task :init  => [:indy, :basic, :premium, :max]
 
-  desc "Initialize free plan"
-  task :free do
+  desc "Initialize indy plan"
+  task :indy do
     
-    puts "creating free plan"
+    puts "creating indy plan"
     p = Plan.create(
-      :name => "Free",
+      :name => "Indy",
       :enabled => true,
-      :cost => 0,
+      :cost => 500,
       :cost_currency => "USD",
       :max_providers => 1,
-      :max_locations => 1
+      :max_locations => 1,
+      :start_billing_in_time_amount => 1,
+      :start_billing_in_time_unit => "months",
+      :between_billing_time_amount => 1,
+      :between_billing_time_unit => "months"
     )
   end
   

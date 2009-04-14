@@ -1,4 +1,4 @@
-- title('Peanut Signup')
+- title('Sign Up')
 
 - form_for(@company, :url => signup_plan_path(:plan_id => @plan.id), :method => :post, :html => {:class => 'new_company'}) do |f|
   = hidden_field_tag "plan_id", @plan.id
@@ -6,9 +6,8 @@
     %h2 Please sign up using the fields below.
 
   %hr.space
-  %hr.space
 
-  .span-23.prepend-1.mat
+  .span-23.prepend-1.mat.padding-top-10
     -# user info
     .span-20.last
       %h2== User information
@@ -77,7 +76,7 @@
         = f.text_field :subdomain, :class => 'title', :style => 'width: 200px; margin: 0px;'
         %span{:style => 'font-size: 12px; font-weight: bold;'}=DOMAIN
     .span-16.prepend-4.last.directions
-      == This is the address your customers will use to view and schedule appointments (e.g. http://peanut#{DOMAIN}). You will use this address to login and manage your appointments. It should only have letters, numbers or dash.
+      == This is the address your customers will use to view and schedule appointments (e.g. http://widgets#{DOMAIN}). You will use this address to login and manage your appointments. It should only have letters, numbers or dash.
     
     .span-20.last
       .span-4

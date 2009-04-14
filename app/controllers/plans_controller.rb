@@ -1,5 +1,4 @@
 class PlansController < ApplicationController
-
   layout 'home'
   
   privilege_required 'create plans', :only => [:new, :create]
@@ -12,10 +11,6 @@ class PlansController < ApplicationController
   end
   
   def create
-  end
-  
-  def index
-    @plans = Plan.order_by_cost
   end
   
   def show

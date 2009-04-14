@@ -24,4 +24,4 @@
       %h3== There are no upgrade/downgrade options at this time.
     - else
       %h3== You may upgrade/downgrade to one of the following plans:
-      = render(:partial => 'plans/plans', :locals => {:plans => @plans})
+      = render(:partial => 'plans/plans', :locals => {:plans => @plans, :trial => false})

@@ -96,7 +96,7 @@ ExceptionNotifier.sender_address        = %("peanut error" <app.error@peanut.com
 ExceptionNotifier.email_prefix          = "[app] "
 
 # 
-DOMAIN = '.peanutcalendar.com'
+DOMAIN = '.walnutcalendar.com'
 
 # Define all gem requirements
 require "will_paginate"

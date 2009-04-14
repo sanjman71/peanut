@@ -8,28 +8,24 @@
   - url_params  = {:controller => 'signup', :action => 'new'}
   - features    = true
  
-.span-17.plans
-  .span-17.last.plans.header.rounded.button.color
+.span-24.last.plans
+  .span-21.last.plans.header.rounded.button.color
     .span-3== Plan
     .span-5== Locations
     .span-5== Providers
+    - if trial
+      .span-4== 30 Day Free Trial
     .span-3== Monthly Cost
     
   %hr.space
   
   - plans.each do |plan|
-    .span-17.last.plan.details{:class => cycle("", "")}
+    .span-21.last.plan.details{:class => cycle("", "")}
       .span-3.plan.name= plan.name
       .span-5.plan.locations= plan.max_locations ? "Up to #{pluralize(plan.max_locations, "location")}" : 'Unlimited'
       .span-5.plan.providers= plan.max_providers ? "Up to #{pluralize(plan.max_providers, "provider")}" : 'Unlimited'
+      - if trial
+        .span-4.plan.trial== Yes
       .span-1.plan.cost= plan.cost > 0 ? number_to_currency(plan.cost/100, :precision => 0) : 'Free'
       .span-2.plan.signup= link_to context, url_for(url_params.update(:plan_id => plan.id)), :class => 'rounded button', :style => 'padding: 0px 7px;'
-
-- if features
-  .span-5.prepend-1
-    %h2.span-4.plans.features{:style => 'color: #5500BB; font-weight: bold;'}== Features:
-    %h4
-      %ul
-        %li.padding-bottom-10== Online scheduling
-        %li.padding-bottom-10== Email, SMS notifications
   
