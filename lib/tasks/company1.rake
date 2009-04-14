@@ -28,15 +28,14 @@ namespace :company1 do
 
     # add manager role
     @johnny.grant_role('manager', @company1)
+
+    # add providers
+    @company1.providers.push(@johnny)
+    @company1.providers.push(@mary)
   end
   
   task :services do    
-  
     puts "#{Time.now}: adding company1 services ..."
-  
-    # assign providers
-    @company1.providers.push(@johnny)
-    @company1.providers.push(@mary)
   
     # create services
     @mens_haircut    = @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00, :allow_custom_duration => false)

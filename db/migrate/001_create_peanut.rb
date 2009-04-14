@@ -139,15 +139,33 @@ class CreatePeanut < ActiveRecord::Migration
       t.references  :subject, :polymorphic => true
     end
     
+    create_table :invitations do |t|
+      t.integer   :sender_id
+      t.integer   :recipient_id
+      t.string    :recipient_email
+      t.string    :token
+      t.string    :role
+      t.datetime  :sent_at
+      t.integer   :company_id
+      
+      t.timestamps
+    end
+    
+    add_index :invitations, :token
   end
 
   def self.down
     drop_table :companies
     drop_table :appointments
-    drop_table :people
     drop_table :services
-    drop_table :calendars
+    drop_table :company_services
+    drop_table :products
+    drop_table :company_providers
     drop_table :service_providers
+    drop_table :resources
+    drop_table :mobile_carriers
     drop_table :notes
+    drop_table :notes_subjects
+    drop_table :invitations
   end
 end
