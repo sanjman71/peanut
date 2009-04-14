@@ -28,10 +28,10 @@ table.calendar td.mark                            { background: #5500BB none rep
 .calendar.date_range_name                         { color: #5500BB; font-weight: bold; font-size: 1.5em; }
 .calendar.date_range_summary                      { color: #5500BB; font-weight: bold; font-size: 1.5em; }
 
-.calendar.cube                                    { text-align: center; width: 70px; }
-.calendar.cube.week_day                           { background: #008800 none repeat scroll 0 0; color: #FFFFFF; display: block; 
+.calendar.cube                                    { text-align: center; width: 40px; border: 1px solid #007700; padding-bottom: 0; }
+.calendar.cube.week_day                           { background: #008800 none repeat scroll 0 0; color: #FFFFFF; display: block; font-size: 0.8em; 
                                                     letter-spacing: 1px; margin: 0; padding: 0; text-transform: uppercase; }
-.calendar.cube.month_day                          { background: #FFFFFF none repeat scroll 0 0; color: #111111; display: block; font-size: 2em; 
+.calendar.cube.month_day                          { background: #FFFFFF none repeat scroll 0 0; color: #111111; display: block; font-size: 1.5em; 
                                                     font-weight: bold; line-height: 1.25em; }
 
 .calendar.days.ago                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; display: block; 
