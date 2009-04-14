@@ -13,13 +13,20 @@
         
     -# show any invitation errors
     - unless @invitation.errors.blank?
-      .span-12.notice
+      .span-9.notice
         = error_messages_for('invitation', :header_message => nil)
         
-    .span-20.last.padding-bottom-10
-      = hidden_field_tag "invitation[role]", 'provider'
-      = f.text_field :recipient_email, :id => 'invitation_recipient_email', :class => 'title big', :style => 'width: 350px; margin: 0px;'
-    .span-20
+    -# default invitation role is 'provider'
+    .span-20.last.padding-bottom-20{:style => 'line-height: 2.0em;'}
+      .span-10
+        = f.text_field :recipient_email, :id => 'invitation_recipient_email', :class => 'title big', :style => 'width: 350px; margin: 0px; height: 1.4em;'
+      .span-10.last
+        = f.radio_button :role, "provider", :checked => 'checked', :id => 'provider'
+        = label_tag 'provider', 'Invite user as a provider', :class => 'checkbox label'
+        %br
+        = f.radio_button :role, "customer", :id => 'customer'
+        = label_tag 'customer', 'Invite user as a customer', :class => 'checkbox label'
+    .span-20.last
       = submit_tag "Invite User", :name => nil, :class => 'button big'
       == &nbsp;or&nbsp;
       = link_to 'Cancel', request.referer || providers_path, :style => 'font-size: 12px;'

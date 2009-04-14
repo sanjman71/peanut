@@ -10,10 +10,9 @@
       -# show add provider links if the company plan allows it
       - if current_company.may_add_provider?
         %h4{:style => 'padding-top: 5px; font-size: 1.2em;'}
-          / = select_tag('add_provider', options_for_select([['Add provider', 0], ['Add user', '/providers/new'], ['Add resource', '/resources/new']], 0), :class => 'text')
-          = link_to 'Add a user', '/providers/new', :class => 'add provider'
+          = link_to 'Add a user', new_provider_path, :class => 'add provider'
           == &nbsp;|&nbsp;
-          = link_to 'Add a resource', '/resources/new', :class => 'add provider'
+          = link_to 'Add a resource', new_resource_path, :class => 'add provider'
           == &nbsp;|&nbsp;
           = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain), :class => 'add provider'
     .span-15
