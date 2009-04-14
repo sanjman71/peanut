@@ -2,6 +2,7 @@ require 'factory_girl'
 
 Factory.define :company do |c|
   c.name        "Company 1"
+  c.subdomain   "company1"
   c.time_zone   "Central Time (US & Canada)"
 end
 

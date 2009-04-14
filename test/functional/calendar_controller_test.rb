@@ -28,6 +28,9 @@ class CalendarControllerTest < ActionController::TestCase
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
     # stub current localation to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
+    
+    # Set the request hostname
+    @request.host = "www.peanut.com"
   end
   
   context "search company calendars as an unauthorized user" do

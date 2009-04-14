@@ -48,6 +48,9 @@ class OpeningsControllerTest < ActionController::TestCase
     
     # stub helper method (not sure why this generates an error?)
     ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
+    
+    # Set the request hostname
+    @request.host = "www.peanut.com"
   end
   
   context "search company openings with no service specified" do

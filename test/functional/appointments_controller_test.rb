@@ -47,8 +47,12 @@ class AppointmentsControllerTest < ActionController::TestCase
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
+    ActionView::Base.any_instance.stubs(:current_subdomain).returns(@company.subdomain)
     # stub user privileges, all users should be able to create work and wait appointments
     @controller.stubs(:current_privileges).returns(["create work appointments", "create wait appointments"])
+
+    # Set the request hostname
+    @request.host = "www.peanut.com"
   end
 
   context "build work appointment for a single date with free time, without being logged in" do
