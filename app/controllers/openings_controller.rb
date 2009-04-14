@@ -104,9 +104,9 @@ class OpeningsController < ApplicationController
     # build hash of calendar markings
     @calendar_markings  = build_calendar_markings(@free_appointments)
 
-    # flag to show waitlist link
-    @show_waitlist      = @free_appointments.blank?
-    
+    # build waitlist path
+    @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, 
+                                        :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date))
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
     

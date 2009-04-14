@@ -56,6 +56,7 @@ class OpeningsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :success
+    should_render_template 'openings/index.html.haml'
     should_not_assign_to :daterange
     should_assign_to :duration, :equals => '0'
     

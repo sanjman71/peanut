@@ -17,12 +17,15 @@
       -# show count of available timeslots for the service and provider
       %h3
         = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name])
-      %h4{:style => 'color: #666666;'}
+      %h4{:style => 'color: #666666; line-height: 1.5em;'}
         - if @free_appointments.blank?
           == We found no available timeslots matching your search criteria.
         - else
           == We found #{pluralize(@free_appointments.size, 'available timeslot')} matching your search criteria.
-          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below.", Duration.to_words(@duration).singularize)
+          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below or", Duration.to_words(@duration).singularize)
+          %br
+          = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
+          == if you can't find a suitable timeslot.
           
     .span-14.last
       -# show daterange name
@@ -35,10 +38,10 @@
         = render(:partial => 'appointments/free_appointments', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
 
     .span-15.last
-      -# show waitlist link if the @show_waitlist flag is set
-      - if @show_waitlist
+      -# show waitlist text here if there are no available timeslots
+      - if @free_appointments.blank?
         %h2
-          = link_to "Notify me if there is an opening", waitlist_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date)), :class => 'notify waitlist'
+          = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
           %span{:style => 'font-size: 0.7em;'}== or
         %h3{:style => 'font-size: 1.3em; color: #666666;'}== Use the search bar to the right to change your search parameters and try again.
     
