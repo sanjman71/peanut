@@ -3,7 +3,7 @@ class UsersController < ApplicationController
   # Protect these actions behind an admin login
   # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
   before_filter :find_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :notify]
-  before_filter :find_type, :only => [:edit, :update]
+  before_filter :find_role, :only => [:edit, :update]
   
   privilege_required 'create users', :only => [:new, :create], :on => :current_company
   privilege_required 'update users', :only => [:edit, :update, :notify], :on => :current_company
@@ -13,15 +13,17 @@ class UsersController < ApplicationController
     when 'create users'
       authorizable  = args[0]
       user          = args[1]
-      @type         = find_type
+      @role         = find_role
       
       begin
+        # if we have an invitation, use invitation role
         @invitation = params[:invitation_token] ? Invitation.find_by_token!(params[:invitation_token]) : nil
+        @role       = @invitation.role if @invitation
       rescue ActiveRecord::RecordNotFound => e
         return false
       end
       
-      case @type
+      case @role
       when 'customer'
         # anyone can signup as a customer
         return true
@@ -38,7 +40,7 @@ class UsersController < ApplicationController
     when 'update users'
       authorizable  = args[0]
       user          = args[1] || find_user
-      @type         = find_type
+      @role         = find_role
 
       # user can always update themselves
       return true if user and user == current_user
@@ -50,10 +52,10 @@ class UsersController < ApplicationController
   end
   
   # GET /providers/new
-  # GET /providers/new?invitation_token=xyz
   # GET /customers/new
+  # GET /invite/dc8a032b9ae52f5c7710f53a945efbc11bb7ce51
   def new
-    # @type (always) and @invitation (if it exists) have been initialized at this point
+    # @role (always) and @invitation (if it exists) have been initialized at this point
 
     if @invitation
       # if the invitation has already been used, give an error
@@ -66,8 +68,14 @@ class UsersController < ApplicationController
       if @user = User.find_by_email(@invitation.recipient_email)
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
-        # add the user as a company provider
-        @invitation.company.providers.push(@user) unless @invitation.company.blank?
+        case @invitation.role
+        when 'provider'
+          # add the user as a company provider
+          @invitation.company.providers.push(@user) unless @invitation.company.blank?
+        when 'customer'
+          # grant user customer role
+          @user.grant_role('customer', @invitation.company) unless @invitation.company.blank?
+        end 
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
         redirect_back_or_default('/login') and return
@@ -79,23 +87,19 @@ class UsersController < ApplicationController
     @user.email = @invitation.recipient_email if @invitation
     
     # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
-    @back_path  = current_user ? (request.referer || "/#{@type.pluralize}") : nil
-
-    respond_to do |format|
-      format.html
-    end
+    @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
   end
  
   # POST /customers/create
   # POST /providers/create
   def create
-    # @type (always) and @invitation (if it exists) have been initialized at this point
+    # @role (always) and @invitation (if it exists) have been initialized at this point
     
     # xxx - temporarily disable this
     # logout_keeping_session!
 
     @user = User.new(params[:user])
-    @user.invitation = @invitation if @invitation
+    # @user.invitation = @invitation if @invitation
     
     # initialize creator, default to anonymous
     @creator = params[:creator] ? params[:creator] : 'anonymous'
@@ -112,7 +116,7 @@ class UsersController < ApplicationController
       # if there was an invitation, then use the invitation company; otherwise use the current company
       @company = @invitation ? @invitation.company : current_company
       
-      case @type
+      case @role
       when 'provider'
         # add the user as a company provider
         @company.providers.push(@user)
@@ -131,11 +135,11 @@ class UsersController < ApplicationController
       @user.activate!
       
       # set flash based on who created the user
-      # set redirect path based on creator and type
+      # set redirect path based on creator and role
       case @creator
       when 'user'
-        @redirect_path  = "/#{@type.pluralize}"
-        flash[:notice]  = "#{@type.titleize} #{@user.name} was successfully created."
+        @redirect_path  = "/#{@role.pluralize}"
+        flash[:notice]  = "#{@role.titleize} #{@user.name} was successfully created."
         
         begin
           # send account created notification
@@ -158,7 +162,6 @@ class UsersController < ApplicationController
     else
       @error    = true
       template  ='users/new'
-      flash.now[:error] = "We could not set up that account, sorry.  Please try again, or contact an admin (link is above)."
     end
     
     respond_to do |format|
@@ -172,14 +175,14 @@ class UsersController < ApplicationController
 
   # /users/1/edit
   def edit
-    # @type and @user are initialized here
+    # @role and @user are initialized here
     
     # build notes collection, most recent first
     @note     = Note.new
     @notes    = @user.notes.sort_recent
     
     # build the index path based on the user type
-    @index_path = "/#{@type.pluralize}"
+    @index_path = "/#{@role.pluralize}"
     
     respond_to do |format|
       format.html
@@ -187,14 +190,14 @@ class UsersController < ApplicationController
   end
   
   def update
-    # @type and @user are initialized here
+    # @role and @user are initialized here
 
     # build the index path based on the user type
-    @index_path = "/#{@type.pluralize}"
+    @index_path = "/#{@role.pluralize}"
     
     respond_to do |format|
       if @user.update_attributes(params[:user])
-        flash[:notice] = "#{@type.titleize} #{@user.name} was successfully updated"
+        flash[:notice] = "#{@role.titleize} #{@user.name} was successfully updated"
         format.html { redirect_to(@index_path) }
       else
         format.html { render(:action => 'edit') }
@@ -275,16 +278,16 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
   end
   
-  def find_type
-    @type = params[:type]
+  def find_role
+    @role = params[:role]
     
-    if @type.blank?
+    if @role.blank?
       # figure out type based on user
-      return @type if @user.blank?
-      @type = @user.has_role?('provider', current_company) ? 'provider' : 'customer'
+      return @role if @user.blank?
+      @role = @user.has_role?('provider', current_company) ? 'provider' : 'customer'
     end
     
-    @type
+    @role
   end
   
   def random_password

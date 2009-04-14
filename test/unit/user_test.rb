@@ -4,7 +4,6 @@ require 'test/factories'
 class UserTest < ActiveSupport::TestCase
 
   should_belong_to    :mobile_carrier
-  should_belong_to    :invitation
   should_have_many    :subscriptions
   should_have_many    :plans, :through => :subscriptions
   should_have_many    :appointments
@@ -28,40 +27,19 @@ class UserTest < ActiveSupport::TestCase
     end
   end
   
-  context "create user without an invitation" do
+  context "create user" do
     setup do
-      @user1 = User.create(:name => "User 1", :email => "user1@jarna.com", 
-                           :password => "secret", :password_confirmation => "secret")
+      @user1 = User.create(:name => "User 1", :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
     end
     
     should_change "User.count", :by => 1
     
-    context "create another user without an invitation" do
+    context "create another user" do
       setup do
-        @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", 
-                             :password => "secret", :password_confirmation => "secret")
+        @user2 = User.create(:name => "User 2", :email => "user2@jarna.com", :password => "secret", :password_confirmation => "secret")
       end
       
       should_change "User.count", :by => 1
     end
-  end
-  
-  context "create user with a valid invitation" do
-    setup do
-      @recipient_email  = Factory.next(:user_email)
-      @invitation       = Invitation.create(:sender => @owner, :recipient_email => @recipient_email, :company => @company)
-      assert_valid @invitation
-      @user             = User.create(:name => "User 3", :email => "user3@jarna.com", 
-                                      :password => "secret", :password_confirmation => "secret",
-                                      :invitation_id => @invitation.id)
-      @user.reload
-    end
-    
-    should_change "User.count", :by => 1
-    
-    should "have an invitation" do
-      assert_equal @invitation, @user.invitation
-    end
-  end
-  
+  end  
 end

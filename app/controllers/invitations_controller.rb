@@ -20,9 +20,9 @@ class InvitationsController < ApplicationController
         flash[:error]  = "There was a problem sending your invitation"
       end
       
-      redirect_to(providers_path)
+      redirect_to(providers_path) and return
     else
-      render :action => 'new'
+      render(:action => 'new') and return
     end
   end
 

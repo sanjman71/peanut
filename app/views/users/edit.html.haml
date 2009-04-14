@@ -2,10 +2,10 @@
 - stylesheet('users', 'notes')
 - javascript('notes')
 
-- form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :type => @type, :subdomain => current_subdomain), :method => :post) do |f|
+- form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :role => @role, :subdomain => current_subdomain), :method => :post) do |f|
   
   .span-23.prepend-1.last.mat.padding-bottom-20
-    %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit #{@type.titleize}
+    %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit #{@role.titleize}
   
   %hr.space
   

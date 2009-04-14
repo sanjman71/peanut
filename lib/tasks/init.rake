@@ -13,7 +13,7 @@ namespace :init do
     # Create admin users
     puts "adding admin user: admin@killianmurphy.com, password: peanut"
     a = User.create(:name => "Admin Killian", :email => "admin@killianmurphy.com", :phone => "6504502628",
-                    :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                    :password => "peanut", :password_confirmation => "peanut")
     a.register!
     a.activate!
     a.grant_role('admin')
@@ -22,7 +22,7 @@ namespace :init do
 
     puts "adding admin user: sanjay@jarna.com, password: peanut"
     a = User.create(:name => "Admin Sanjay", :email => "sanjay@jarna.com", :phone => "6503876818",
-                    :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                    :password => "peanut", :password_confirmation => "peanut")
     a.register!
     a.activate!
     a.grant_role('admin')

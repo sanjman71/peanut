@@ -10,12 +10,12 @@ namespace :company1 do
   
     # create users
     @johnny         = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @johnny.register!
     @johnny.activate!
                                 
     @mary           = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @mary.register!
     @mary.activate!
   

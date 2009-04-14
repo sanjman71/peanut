@@ -39,7 +39,7 @@ class UsersControllerTest < ActionController::TestCase
       
       context "and with no invitation" do
         setup do
-          get :new, :type => 'provider'
+          get :new, :role => 'provider'
         end
 
         should_respond_with :redirect
@@ -48,23 +48,23 @@ class UsersControllerTest < ActionController::TestCase
       
       context "and with an invalid invitation" do
         setup do
-          get :new, :type => 'provider', :invitation_token => "0"
+          get :new, :role => 'provider', :invitation_token => "0"
         end
 
         should_respond_with :redirect
         should_redirect_to 'unauthorized_path'
       end
 
-      context "and with a valid invitation" do
+      context "and with a valid provider invitation" do
         setup do
           @sender           = Factory(:user)
           @recipient_email  = Factory.next(:user_email)
-          @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
+          @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company, :role => 'provider')
           assert @invitation.valid?
           # stub current user as nobody logged in
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)
-          get :new, :invitation_token => @invitation.token, :type => 'provider'
+          get :new, :invitation_token => @invitation.token, :role => 'provider'
         end
         
         should_respond_with :success
@@ -74,7 +74,7 @@ class UsersControllerTest < ActionController::TestCase
         should_not_assign_to :error_message
         should_assign_to :user
         should_assign_to :invitation
-        should_assign_to :type, :equals => '"provider"'
+        should_assign_to :role, :equals => '"provider"'
         
         should "build new user, but should not create the new user" do
           assert_equal @recipient_email, assigns(:user).email
@@ -92,19 +92,19 @@ class UsersControllerTest < ActionController::TestCase
           # stub current user as nobody
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)
-          get :new, :type => 'provider'
+          get :new, :role => 'provider'
         end
 
         should_respond_with :success
         should_render_template 'users/new.html.haml'
         should_not_change "User.count"
         should_not_assign_to :error_message
-        should_assign_to :type, :equals => '"provider"'
+        should_assign_to :role, :equals => '"provider"'
       end
       
       context "and with an invalid invitation" do
         setup do
-          get :new, :type => 'provider', :invitation_token => "0"
+          get :new, :role => 'provider', :invitation_token => "0"
         end
 
         should_respond_with :redirect
@@ -121,7 +121,7 @@ class UsersControllerTest < ActionController::TestCase
       
       context "and with no invitation" do
         setup do
-          post :create, {:type => 'provider'}
+          post :create, {:role => 'provider'}
         end
 
         should_respond_with :redirect
@@ -130,25 +130,27 @@ class UsersControllerTest < ActionController::TestCase
       
       context "and with an invalid invitation" do
         setup do
-          post :create, {:type => 'provider', :invitation_token => "0"}
+          post :create, {:role => 'provider', :invitation_token => "0"}
         end
 
         should_respond_with :redirect
         should_redirect_to 'unauthorized_path'
       end
       
-      context "and with a valid invitation and valid user properties as an anonymous user" do
+      context "and with a valid provider invitation and valid user properties as an anonymous user" do
         setup do
           @sender           = Factory(:user, :email => "sender@peanut.com")
           @recipient_email  = Factory.next(:user_email)
-          @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company)
+          @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company, :role => 'provider')
           assert @invitation.valid?
           # stub current user as nobody
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)
-          post :create, {:invitation_token => @invitation.token, :type => 'provider',
+          post :create, {:invitation_token => @invitation.token, :role => 'provider',
                          :user => {:email => @recipient_email, :name => "Invited User", :password => 'secret', :password_confirmation => 'secret'}}
+          # reload objects
           @invitation.reload
+          @company.reload
         end
 
         # +1 for the sender user and +1 for the new user
@@ -156,23 +158,57 @@ class UsersControllerTest < ActionController::TestCase
         
         should_assign_to :invitation, :equals => '@invitation'
         should_assign_to :user
-        should_assign_to :type, :equals => '"provider"'
+        should_assign_to :role, :equals => '"provider"'
 
         should "have a valid user" do
           assert assigns(:user).valid?
         end
 
-        should "have user as a company provider and as a company provider" do
+        should "be a company provider" do
+          assert @company.has_provider?(assigns(:user))
+        end
+
+        should "have provider role" do
           assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
-          assert_equal [@company], assigns(:user).companies
         end
 
         should "have updated invitation's recipient to the new user" do
           assert_equal assigns(:user), @invitation.recipient
         end
 
-        should "have user with the invitation" do
-          assert_equal @invitation, assigns(:user).invitation
+        should_respond_with :redirect
+        should_redirect_to '"http://test.host/"'
+      end
+      
+      context "and with a valid customer invitation and valid user properties as an anonymous user" do
+        setup do
+          @sender           = Factory(:user, :email => "sender@peanut.com")
+          @recipient_email  = Factory.next(:user_email)
+          @invitation       = Invitation.create(:sender => @sender, :recipient_email => @recipient_email, :company => @company, :role => 'customer')
+          assert @invitation.valid?
+          # stub current user as nobody
+          @controller.stubs(:current_user).returns(nil)
+          ActionView::Base.any_instance.stubs(:current_user).returns(nil)
+          post :create, {:invitation_token => @invitation.token, :role => 'provider',
+                         :user => {:email => @recipient_email, :name => "Invited User", :password => 'secret', :password_confirmation => 'secret'}}
+          # reload objects
+          @invitation.reload
+          @company.reload
+        end
+
+        # +1 for the sender user and +1 for the new user
+        should_change "User.count", :by => 2
+        
+        should_assign_to :invitation, :equals => '@invitation'
+        should_assign_to :user
+        should_assign_to :role, :equals => '"customer"'
+      
+        should "have customer role" do
+          assert_equal ['customer'], assigns(:user).roles.collect(&:name).sort
+        end
+
+        should "have updated invitation's recipient to the new user" do
+          assert_equal assigns(:user), @invitation.recipient
         end
 
         should_respond_with :redirect
@@ -191,7 +227,7 @@ class UsersControllerTest < ActionController::TestCase
           @controller.stubs(:current_user).returns(nil)
           ActionView::Base.any_instance.stubs(:current_user).returns(nil)
           # create user requires a password
-          post :create, {:type => 'provider', :creator => 'anonymous',
+          post :create, {:role => 'provider', :creator => 'anonymous',
                          :user => {:email => "sanjay@jarna.com", :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
         end
         
@@ -199,20 +235,19 @@ class UsersControllerTest < ActionController::TestCase
         
         should_assign_to :creator, :equals => '"anonymous"'
         should_assign_to :user
-        should_assign_to :type, :equals => '"provider"'
+        should_assign_to :role, :equals => '"provider"'
         should_not_assign_to :invitation
         
         should "have a valid user" do
           assert assigns(:user).valid?
         end
 
-        should "have user as a company provider and as a company provider" do
-          assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
-          assert_equal [@company], assigns(:user).companies
+        should "be a company provider" do
+          assert @company.has_provider?(assigns(:user))
         end
 
-        should "have no invitation" do
-          assert_equal nil, assigns(:user).invitation
+        should "have provider role" do
+          assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
         end
 
         should_respond_with :redirect
@@ -225,30 +260,26 @@ class UsersControllerTest < ActionController::TestCase
           @controller.stubs(:current_user).returns(@owner)
           ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
           # create user should generate a password
-          post :create, {:type => 'provider', :creator => 'user', :user => {:email => "sanjay@jarna.com", :name => "Sanjay Kapoor"}}
+          post :create, {:role => 'provider', :creator => 'user', :user => {:email => "sanjay@jarna.com", :name => "Sanjay Kapoor"}}
         end
         
         should_change "User.count", :by => 1
         
         should_assign_to :creator, :equals => '"user"'
         should_assign_to :user
-        should_assign_to :type, :equals => '"provider"'
+        should_assign_to :role, :equals => '"provider"'
         should_not_assign_to :invitation
 
         should "have a valid user" do
           assert assigns(:user).valid?
         end
 
-        should "have provider role" do
-          assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
-        end
-        
-        should "have be a company provider" do
-          assert_equal [@company], assigns(:user).companies
+        should "be a company provider" do
+          assert @company.has_provider?(assigns(:user))
         end
 
-        should "have no invitation" do
-          assert_equal nil, assigns(:user).invitation
+        should "have provider role" do
+          assert_equal ['provider'], assigns(:user).roles.collect(&:name).sort
         end
 
         should_set_the_flash_to /Provider Sanjay Kapoor was successfully created/i
@@ -265,7 +296,7 @@ class UsersControllerTest < ActionController::TestCase
         # stub current user as nobody
         @controller.stubs(:current_user).returns(nil)
         ActionView::Base.any_instance.stubs(:current_user).returns(nil)
-        post :create, {:type => 'customer', :creator => 'anonymous',
+        post :create, {:role => 'customer', :creator => 'anonymous',
                       :user => {:email => "sanjay@jarna.com", :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
       end
 
@@ -273,7 +304,7 @@ class UsersControllerTest < ActionController::TestCase
       
       should_assign_to :creator, :equals => '"anonymous"'
       should_assign_to :user
-      should_assign_to :type, :equals => '"customer"'
+      should_assign_to :role, :equals => '"customer"'
       should_not_assign_to :invitation
       
       should "have a valid user" do
@@ -288,9 +319,9 @@ class UsersControllerTest < ActionController::TestCase
         assert_equal [], assigns(:user).companies
       end
 
-      should "have no invitation" do
-        assert_equal nil, assigns(:user).invitation
-      end
+      # should "have no invitation" do
+      #   assert_equal nil, assigns(:user).invitation
+      # end
 
       should_set_the_flash_to /Your account was successfully created/i
 
@@ -304,14 +335,14 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@owner)
         ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
         # create user should generate a password
-        post :create, {:type => 'customer', :creator => 'user', :user => {:email => "joe@jarna.com", :name => "Joe Bloggs"}}
+        post :create, {:role => 'customer', :creator => 'user', :user => {:email => "joe@jarna.com", :name => "Joe Bloggs"}}
       end
 
       should_change "User.count", :by => 1
     
       should_assign_to :creator, :equals => '"user"'
       should_assign_to :user
-      should_assign_to :type, :equals => '"customer"'
+      should_assign_to :role, :equals => '"customer"'
       should_not_assign_to :invitation
       
       should "have a valid user" do
@@ -326,9 +357,9 @@ class UsersControllerTest < ActionController::TestCase
         assert_equal [], assigns(:user).companies
       end
 
-      should "have no invitation" do
-        assert_equal nil, assigns(:user).invitation
-      end
+      # should "have no invitation" do
+      #   assert_equal nil, assigns(:user).invitation
+      # end
 
       should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
 
@@ -342,7 +373,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         @controller.stubs(:current_user).returns(nil)
         @controller.stubs(:current_privileges).returns([])
-        get :edit, :id => @owner.id, :type => 'provider'
+        get :edit, :id => @owner.id, :role => 'provider'
       end
       
       should_respond_with :redirect
@@ -354,7 +385,7 @@ class UsersControllerTest < ActionController::TestCase
         @provider = Factory(:user, :name => "Provider")
         @controller.stubs(:current_user).returns(@owner)
         @controller.stubs(:current_privileges).returns([])
-        get :edit, :id => @provider.id, :type => 'provider'
+        get :edit, :id => @provider.id, :role => 'provider'
       end
       
       should_respond_with :redirect
@@ -365,7 +396,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         @controller.stubs(:current_user).returns(@owner)
         @controller.stubs(:current_privileges).returns([])
-        get :edit, :id => @owner.id, :type => 'provider'
+        get :edit, :id => @owner.id, :role => 'provider'
       end
       
       should_respond_with :success
@@ -378,7 +409,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         @controller.stubs(:current_user).returns(@owner)
         @controller.stubs(:current_privileges).returns(['update users'])
-        get :edit, :id => @owner.id, :type => 'provider'
+        get :edit, :id => @owner.id, :role => 'provider'
       end
 
       should_respond_with :success

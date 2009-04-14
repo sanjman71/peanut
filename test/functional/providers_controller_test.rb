@@ -4,10 +4,10 @@ require 'test/factories'
 class ProvidersControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :type => 'provider'
-  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :type => 'provider'
-  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :type => 'provider'
-  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :type => 'provider'
+  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :role => 'provider'
+  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :role => 'provider'
+  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'provider'
+  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'provider'
 
   # providers controller routes
   should_route :get,  '/providers/1', :controller => 'providers', :action => 'show', :id => '1'

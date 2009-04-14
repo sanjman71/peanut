@@ -9,4 +9,4 @@
     = render :partial => 'sessions/login_form'
   .span-12.last
     - if @signup
-      = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :type => 'customer', :subdomain => current_subdomain), :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}
+      = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :role => 'customer', :subdomain => current_subdomain), :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}

@@ -1,7 +1,7 @@
 - customers.each do |customer|
   .span-16.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
     .span-7.prepend-1
-      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, url_for(:controller =>'users', :action => 'edit', :id => customer.id, :type => 'customer', :subdomain => current_subdomain), :class => 'customer name'
+      %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, url_for(:controller =>'users', :action => 'edit', :id => customer.id, :role => 'customer', :subdomain => current_subdomain), :class => 'customer name'
       %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email
       %br
       %span.customer.phone{:style => 'font-size: 1.3em;'}
@@ -18,6 +18,6 @@
     .span-3.last
       -# allow company managers to edit all users, or the user to edit himself
       - if manager? or customer == current_user
-        = link_to "Edit", url_for(:controller =>'users', :action => 'edit', :id => customer.id, :type => 'customer', :subdomain => current_subdomain), :class => 'admin'
+        = link_to "Edit", url_for(:controller =>'users', :action => 'edit', :id => customer.id, :role => 'customer', :subdomain => current_subdomain), :class => 'admin'
         == &nbsp;
         = link_to 'Reset Password', url_for(:controller => 'users', :id => customer.id, :action => 'notify', :type => 'reset', :subdomain => current_subdomain), :class => 'admin'

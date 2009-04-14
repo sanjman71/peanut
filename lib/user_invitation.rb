@@ -6,7 +6,6 @@ module UserInvitation
       
       has_many      :sent_invitations, :class_name => 'Invitation'
       has_many      :received_invitations, :class_name => 'Invitation'
-      belongs_to    :invitation
     end
   end
 

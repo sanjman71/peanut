@@ -11,7 +11,7 @@ namespace :noelrose do
   
     # create users  
     @erika          = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @erika.register!
     @erika.activate!
   

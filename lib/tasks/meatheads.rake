@@ -12,17 +12,17 @@ namespace :meatheads do
     # create users
   
     @meathead       = User.create(:name => "Meathead Manager", :email => "meathead@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @meathead.register!
     @meathead.activate!
 
     @wimpy          = User.create(:name => "Wimpy Arms", :email => "wimpy@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @wimpy.register!
     @wimpy.activate!
 
     @skinny         = User.create(:name => "Skinny Legs", :email => "skinny@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @skinny.register!
     @skinny.activate!
   

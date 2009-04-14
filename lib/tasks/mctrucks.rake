@@ -10,7 +10,7 @@ namespace :mctrucks do
   
     # create users  
     @owner          = User.create(:name => "Mr Trucks", :email => "mrtrucks@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut", :invitation_id => 0)
+                                  :password => "peanut", :password_confirmation => "peanut")
     @owner.register!
     @owner.activate!
   

@@ -4,16 +4,18 @@
 
 .span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
-    .span-9
+    .span-7
       %h2== Providers
-    .span-6.last
+    .span-8.last
       -# show add provider links if the company plan allows it
       - if current_company.may_add_provider?
-        %h4{:style => 'padding-top: 5px; font-size: 1.3em;'}
-          = select_tag('add_provider', options_for_select([['Add provider', 0], ['Add user', '/providers/new'], ['Add resource', '/resources/new']], 0), :class => 'text')
-          / = link_to 'Add a provider', url_for(:controller => 'users', :action => 'new', :type => 'provider', :subdomain => current_subdomain)
+        %h4{:style => 'padding-top: 5px; font-size: 1.2em;'}
+          / = select_tag('add_provider', options_for_select([['Add provider', 0], ['Add user', '/providers/new'], ['Add resource', '/resources/new']], 0), :class => 'text')
+          = link_to 'Add a user', '/providers/new', :class => 'add provider'
           == &nbsp;|&nbsp;
-          = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain)
+          = link_to 'Add a resource', '/resources/new', :class => 'add provider'
+          == &nbsp;|&nbsp;
+          = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain), :class => 'add provider'
     .span-15
       -# show current plan usage
       - if current_company.may_add_provider?

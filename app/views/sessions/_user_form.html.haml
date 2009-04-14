@@ -1,6 +1,8 @@
 -# if there is a user logged in, this user is being created by somebody else as their proxy
-- creator = current_user ? "user" : "anonymous"
-  
+- creator     = current_user ? "user" : "anonymous"
+-# check for an invitation
+- invitation  = nil unless local_assigns[:invitation]
+
 .span-12.last.mat
   -# form title
   .span-11.prepend-1.last
@@ -14,6 +16,8 @@
 
   - form_for("user", @user, :url => submit_url) do |user_form|
     = hidden_field_tag 'creator', creator
+    - if invitation
+      = hidden_field_tag 'invitation_token', invitation.token
     
     -# name field
     .span-12.last.padding-bottom-10

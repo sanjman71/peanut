@@ -1,4 +1,5 @@
 // add a provider, e.g. a user or resource
+/*
 $.fn.init_add_provider = function() {
   $("#add_provider").change(function() {
     // redirect to selected url
@@ -7,7 +8,8 @@ $.fn.init_add_provider = function() {
     return false;
   })
 }
+*/
 
 $(document).ready(function() {
-  $(document).init_add_provider();
+  //$(document).init_add_provider();
 })
