@@ -114,8 +114,7 @@ ActionController::Routing::Routes.draw do |map|
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
   map.resources :locations,         :member => {:select => :get}
 
-  # Plans and subscriptions
-  map.resources :plans
+  # Subscriptions
   map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
   map.update_subscription '/subscriptions/:id/plan/:plan_id', :controller => 'subscriptions', :action => 'update', :conditions => {:method => :get}
 
