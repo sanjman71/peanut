@@ -76,11 +76,12 @@ class CalendarController < ApplicationController
         
     respond_to do |format|
       format.html
-      format.pdf do
-        # create pdf and stream it to the caller
-        pdf = Reports::CalendarController.render_pdf(:appointments => @appointments, :title => "Calendar Title")
-        send_data pdf, :type => "application/pdf"
-      end
+      format.pdf
+      # format.pdf do
+      #   # create pdf and stream it to the caller
+      #   pdf = Reports::CalendarController.render_pdf(:appointments => @appointments, :title => "Calendar Title")
+      #   send_data pdf, :type => "application/pdf"
+      # end
     end
   end
   

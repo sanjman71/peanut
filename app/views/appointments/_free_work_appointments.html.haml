@@ -1,7 +1,8 @@
 - appointments_by_day.each do |day, appointments|
   .span-15.last
-    -# show day of week and month day in a calendar cube
-    = render(:partial => 'shared/calendar_cube', :locals => {:date => day})
+    .cube{:style => 'margin-bottom: 5px;'}
+      -# show day of week and month day in a calendar cube
+      = render(:partial => 'shared/calendar_cube', :locals => {:date => day})
   - reset_cycle
   - appointments.each do |appointment|
     .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")], :id => 'appointment_'+appointment.id.to_s}
