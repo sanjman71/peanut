@@ -21,6 +21,11 @@ class Event < ActiveRecord::Base
   # order by start_at, most recent first
   named_scope             :order_recent, {:order => 'updated_at DESC'}
   
+  # Will paginate paging info
+  def self.per_page
+     10
+  end
+  
   # BEGIN acts_as_state_machine
   include AASM
   
