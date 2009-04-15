@@ -4,7 +4,8 @@ class Event < ActiveRecord::Base
   belongs_to              :user
   belongs_to              :customer, :class_name => 'User'
   
-  validates_presence_of   :etype, :company_id, :user_id
+  # Events must be associated with a company. We usually capture the user who created the event, but not necessarily.
+  validates_presence_of   :etype, :company_id
 
   # Event types
   URGENT                  = 1               # urgent messages

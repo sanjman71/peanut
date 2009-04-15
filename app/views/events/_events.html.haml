@@ -45,4 +45,5 @@
               .span-6.prepend-3.last
                 %a.show_message_body{id="show_message_body_#{event.id}"}==Show / hide message body
               .span-20.prepend-3.message_body_text{id="show_message_body_#{event.id}"}
-                = event.message_body
+                = event.message_body.gsub(/\n/, '<br />')
+                
