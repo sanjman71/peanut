@@ -74,3 +74,7 @@ class ActionView::Base
   include ApplicationHelper
   include AuthenticatedSystem
 end
+
+Webrat.configure do |config|
+  config.mode = :rails
+end

@@ -40,6 +40,7 @@ Factory.define :user do |u|
   u.password              "secret"
   u.password_confirmation "secret"
   u.phone                 "9999999999"
+  u.state                 "active"    # always create users in active state
 end
 
 Factory.define :monthly_plan, :class => Plan do |o|
