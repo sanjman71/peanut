@@ -106,7 +106,8 @@ class OpeningsController < ApplicationController
 
     # build waitlist path
     @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, 
-                                        :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date))
+                                        :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date),
+                                        :subdomain => current_subdomain)
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
     

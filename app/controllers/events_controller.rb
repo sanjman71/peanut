@@ -9,14 +9,14 @@ class EventsController < ApplicationController
   def index
     if params[:state].blank? || params[:state] == 'unseen'
       @seen = false
-      @urgent_by_day = current_company.events.urgent.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
-      @approval_by_day = current_company.events.approval.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
-      @informational_by_day = current_company.events.informational.unseen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @urgent = current_company.events.urgent.unseen.order_recent.paginate(:page => params[:urgent_page])
+      @approval = current_company.events.approval.unseen.order_recent.paginate(:page => params[:approval_page])
+      @informational = current_company.events.informational.unseen.order_recent.paginate(:page => params[:info_page])
     else
       @seen = true
-      @urgent_by_day = current_company.events.urgent.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
-      @approval_by_day = current_company.events.approval.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
-      @informational_by_day = current_company.events.informational.seen.order_recent.group_by { |e| e.updated_at.beginning_of_day }
+      @urgent = current_company.events.urgent.seen.order_recent.paginate(:page => params[:urgent_page])
+      @approval = current_company.events.approval.seen.order_recent.paginate(:page => params[:approval_page])
+      @informational = current_company.events.informational.seen.order_recent.paginate(:page => params[:info_page])
     end
 
     respond_to do |format|

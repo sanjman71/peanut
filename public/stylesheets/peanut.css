@@ -120,7 +120,7 @@ div.instructions ul                               { font-size: 12px; }
 
 .pagination a                                     { background: #008800; color: #FFFFFF; }
 
-.pagination span, .pagination a                   { display: block; width: 50px; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
+.pagination span, .pagination a                   { display: block; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
                                                     text-decoration: none; }
 
 .pagination span.disabled                         { background: #FFFFFF; color: #999999; }

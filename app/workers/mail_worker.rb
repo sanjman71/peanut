@@ -23,9 +23,29 @@ class MailWorker < Workling::Base
     
     case appointment.mark_as
     when Appointment::WORK
+
+      # Create the email text for logging as an event
+      email_content = AppointmentNotifier.create_work_confirmation(appointment)
+
+      # Create an event with the mail body saying we sent the email
+      appointment.company.events.create(:etype => Event::INFORMATIONAL, :eventable => appointment,
+                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:sent_appointment_confirmation_email],
+                                        :message_body => email_content.to_s,
+                                        :customer => appointment.customer)
+      
       AppointmentNotifier.deliver_work_confirmation(appointment)
       logger.debug("*** mail worker: sent work appointment confirmation for appointment #{appointment.id}")
     when Appointment::WAIT
+
+      # Create the email text for logging as an event
+      email_content = AppointmentNotifier.create_waitlist_confirmation(appointment)
+
+      # Create an event with the mail body saying we sent the email
+      appointment.company.events.create(:etype => Event::INFORMATIONAL, :eventable => appointment,
+                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:sent_waitlist_confirmation_email],
+                                        :message_body => email_content.to_s,
+                                        :customer => appointment.customer)
+
       AppointmentNotifier.deliver_waitlist_confirmation(appointment)
       logger.debug("*** mail worker: sent waitlist appointment confirmation for appointment #{appointment.id}")
     end    
