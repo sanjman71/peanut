@@ -6,7 +6,7 @@ set :application, "peanut"
 # Git repository
 set :scm,           :git
 set :repository,    'git@github.com:sanjman71/peanut.git'
-set :branch,        "master"
+set :branch,        "ec2onrails"
 set :deploy_via,    :remote_cache
 
 # NOTE: for some reason Capistrano requires you to have both the public and
