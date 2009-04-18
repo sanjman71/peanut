@@ -20,3 +20,12 @@ test:
   database: peanut_test
   username: rails
   password: rails
+
+production:
+  encoding: utf8
+  adapter: mysql
+  host: db_primary
+  port: 3306
+  database: peanut_production
+  username: rails
+  password: rails

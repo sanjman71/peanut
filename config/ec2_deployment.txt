@@ -1,0 +1,41 @@
+Step 1:
+Using EC2 on Rails, deploy private keys to app and admin users for use with github:
+scp -i ~/AWS/id-kdefault .ssh/id* admin@ec2-174-129-118-110.compute-1.amazonaws.com:~/.ssh/
+scp -i ~/AWS/id-kdefault .ssh/id* app@ec2-174-129-118-110.compute-1.amazonaws.com:~/.ssh/
+
+Once this is done, on the server get the fingerprint set up so that there isn't a problem first time:
+ssh git@github.com
+
+Step 2:
+Install Rails 2.3.2 on the server
+ssh -i ~/AWS/id-kdefault admin@ec2-174-129-118-110.compute-1.amazonaws.com
+
+on the EC2 server:
+sudo gem install -v=2.3.2 --no-rdoc --no-ri rails
+
+Then:
+cap ec2onrails:setup
+cap ec2onrails:db:create
+cap deploy:cold
+
+Must install all the gems. Problem with starling - no g++ executable.
+sudo gem install --no-ri --no-rdoc mbleigh-subdomain-fu
+sudo gem install --no-ri --no-rdoc chronic
+sudo gem install --no-ri --no-rdoc starling
+  ** Fails with: 
+  make
+  g++ -I. -I. -I/usr/lib/ruby/1.8/i486-linux -I. -DBUILD_FOR_RUBY -DHAVE_RB_TRAP_IMMEDIATE -DHAVE_RBTRAP -DOS_UNIX -DHAVE_SYS_EPOLL_H -DHAVE_EPOLL -DHAVE_OPENSSL_SSL_H -DHAVE_OPENSSL_ERR_H -DWITH_SSL -I/include/include  -fPIC -fno-strict-aliasing -g -g -O2  -fPIC   -c em.cpp
+  make: g++: Command not found
+  make: *** [em.o] Error 127
+
+
+  To fix:
+  sudo aptitude update && sudo aptitude install g++
+  
+
+sudo gem install --no-ri --no-rdoc rubyist-aasm
+sudo gem install --no-ri --no-rdoc mislav-will_paginate
+sudo gem install --no-ri --no-rdoc -v1.0.6 sanitize
+sudo gem install --no-ri --no-rdoc populator
+sudo gem install --no-ri --no-rdoc faker
+sudo gem install --no-ri --no-rdoc thoughtbot-factory_girl

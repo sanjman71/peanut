@@ -1,0 +1,9 @@
+staging:
+  aws_access_key: AKIAILQU54NBMD44OAJQ
+  aws_secret_access_key:  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
+  bucket_base_name: killianm_peanut
+
+production:
+  aws_access_key: AKIAILQU54NBMD44OAJQ
+  aws_secret_access_key:  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
+  bucket_base_name: killianm_peanut
