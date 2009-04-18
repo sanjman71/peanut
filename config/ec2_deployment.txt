@@ -27,5 +27,8 @@ sudo gem install --no-ri --no-rdoc thoughtbot-factory_girl
 
 Then:
 cap ec2onrails:setup
-cap ec2onrails:db:create
+cap ec2onrails:db:create (warning - doesn't seem to indicate if there are problems)
 cap deploy:cold
+
+On the server, ran:
+rake init:dev_data RAILS_ENV=production
