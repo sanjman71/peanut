@@ -24,6 +24,7 @@ sudo gem install --no-ri --no-rdoc -v1.0.6 sanitize
 sudo gem install --no-ri --no-rdoc populator
 sudo gem install --no-ri --no-rdoc faker
 sudo gem install --no-ri --no-rdoc thoughtbot-factory_girl
+sudo gem install --no-ri --no-rdoc has_many_polymorphs
 
 Then:
 cap ec2onrails:setup
