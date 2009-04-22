@@ -1,6 +1,12 @@
+# Add our local deployment scripts directory
+load_paths << "config/deploy"
+
 # Be explicit about our different environments
 set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
+
+# Load data for provisioning resources
+load "provisioning"
 
 # Set application name
 set :application,   "peanut"
@@ -21,8 +27,5 @@ set :user,          'peanut'  # log into servers as
 set :group,         'peanut'
 
 # Load external recipe files
-load_paths << "config/mongrel"
-load_paths << "config/database"
-load "mongrel_tasks"
 load "database_tasks"
 
