@@ -1,12 +1,13 @@
 # Add our local deployment scripts directory
 load_paths << "config/deploy"
+# File.expand_path(File.dirname(__FILE__) + "config/deploy")
+
+# Assuming you have just one ec2 server, set it's public DNS name here:
+set :server_name, "ec2-174-129-117-111.compute-1.amazonaws.com"
 
 # Be explicit about our different environments
-set :stages, %w(staging production)
-require 'capistrano/ext/multistage'
-
-# Load data for provisioning resources
-load "provisioning"
+# set :stages, %w(staging production)
+# require 'capistrano/ext/multistage'
 
 # Set application name
 set :application,   "peanut"
@@ -27,5 +28,10 @@ set :user,          'peanut'  # log into servers as
 set :group,         'peanut'
 
 # Load external recipe files
-load "database_tasks"
+# load "database_tasks"
 
+# use the ubuntu machine gem
+load 'capistrano/ext/ubuntu-machine'
+
+# Load data for provisioning resources
+load "provisioning"

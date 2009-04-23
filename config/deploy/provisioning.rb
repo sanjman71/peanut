@@ -1,6 +1,3 @@
-# use the ubuntu machine gem
-require 'capistrano/ext/ubuntu-machine'
-
 
 # #######################################
 # HOSTING PROVIDER CONFIGURATION
@@ -8,14 +5,14 @@ require 'capistrano/ext/ubuntu-machine'
 # and sometimes tasks are specific to those providers
 set :hosting_provider, "ec2" # currently supported : ovh-rps, ovh-dedie, slicehost
 
-
 # #######################################
 # SERVER CONFIGURATION
-set :server_name, "YOUR_SERVER_NAME_HERE"
-set :root_user, 'admin'
-set :user, 'peanut'
+# set :server_name, "YOUR_SERVER_NAME_HERE"
+set :root_user, 'root'
+# set :user, 'peanut'
 set :setup_ssh, false # makes admin user not able to use ssh
 ssh_options[:port] = 22
+set :setup_iptables, false # We get this from ec2
 
 # #######################################
 # LOCAL CONFIGURATION
@@ -39,7 +36,7 @@ set :install_php, false
 set :install_sphinx, true
 set :configure_apparmor, true # necessary to allow MySQL to bulk import from /u/apps/
 set :install_imagemagick, true
-#set :install_god, true
+set :install_god, true
 
 # version numbers
 # NOTE: The latest version of Ruby Enterprise Edition is used unless you specify a version below.
