@@ -9,18 +9,23 @@ set :repository,    'git@github.com:sanjman71/peanut.git'
 set :branch,        "ec2onrails"
 set :deploy_via,    :remote_cache
 
+single_instance = "ec2-67-202-8-93.compute-1.amazonaws.com"
+
 # NOTE: for some reason Capistrano requires you to have both the public and
 # the private key in the same folder, the public key should have the 
 # extension ".pub".
-ssh_options[:keys] = ["#{ENV['HOME']}/AWS/id-kdefault"]
+ssh_options[:keys] = ["#{ENV['HOME']}/.ec2/id_rsa-kdefault"]
 
 # Your EC2 instances. Use the ec2-xxx....amazonaws.com hostname, not
 # any other name (in case you have your own DNS alias) or it won't
 # be able to resolve to the internal IP address.
-role :web,      "ec2-174-129-118-110.compute-1.amazonaws.com"
-role :app,      "ec2-174-129-118-110.compute-1.amazonaws.com"
-role :db,       "ec2-174-129-118-110.compute-1.amazonaws.com", :primary => true
-role :memcache, "ec2-174-129-118-110.compute-1.amazonaws.com"
+role :web,      single_instance
+role :app,      single_instance
+role :memcache, single_instance
+role :db,       single_instance, :primary => true, :ebs_vol_id => 'vol-a832d1c1'
+# role :db,       "ec2-56-xx-xx-xx.z-1.compute-1.amazonaws.com", :primary => true, :ebs_vol_id => 'vol-12345abc'
+# optinally, you can specify Amazon's EBS volume ID if the database is persisted 
+# via Amazon's EBS.  See the main README for more information.
 
 # Whatever you set here will be taken set as the default RAILS_ENV value
 # on the server. Your app and your hourly/daily/weekly/monthly scripts
@@ -31,15 +36,17 @@ set :rails_env, "production"
 # NOTE: Some of these should be omitted if not needed.
 set :ec2onrails_config, {
   # S3 bucket and "subdir" used by the ec2onrails:db:restore task
-  :restore_from_bucket => "killianm_peanut",
-  :restore_from_bucket_subdir => "database",
+  # NOTE: this only applies if you are not using EBS
+  # :restore_from_bucket => "killianm_peanut_restore",
+  # :restore_from_bucket_subdir => "database",
   
   # S3 bucket and "subdir" used by the ec2onrails:db:archive task
   # This does not affect the automatic backup of your MySQL db to S3, it's
   # just for manually archiving a db snapshot to a different bucket if 
   # desired.
-  :archive_to_bucket => "killianm_peanut",
-  :archive_to_bucket_subdir => "db-archive/#{Time.new.strftime('%Y-%m-%d--%H-%M-%S')}",
+  # NOTE: this only applies if you are not using EBS
+  # :archive_to_bucket => "killianm_peanut_archive",
+  # :archive_to_bucket_subdir => "db-archive/#{Time.new.strftime('%Y-%m-%d--%H-%M-%S')}",
   
   # Set a root password for MySQL. Run "cap ec2onrails:db:set_root_password"
   # to enable this. This is optional, and after doing this the
@@ -47,16 +54,30 @@ set :ec2onrails_config, {
   # connections on the public network interface (you should block the MySQL
   # port with the firewall anyway). 
   # If you don't care about setting the mysql root password then remove this.
-  #:mysql_root_password => "your-mysql-root-password",
+  :mysql_root_password => "rails",
   
   # Any extra Ubuntu packages to install if desired
   # If you don't want to install extra packages then remove this.
-  #:packages => ["logwatch", "imagemagick"],
+  # :packages => ["sphinx"],
   
   # Any extra RubyGems to install if desired: can be "gemname" or if a 
   # particular version is desired "gemname -v 1.0.1"
   # If you don't want to install extra rubygems then remove this
-  #:rubygems => ["rmagick", "rfacebook -v 0.9.7"],
+  # NOTE: if you are using rails 2.1, ec2onrails calls 'sudo rake gem:install',
+  # which will install gems defined in your rails configuration
+  :rubygems => ["rails -v=2.3.2"],
+  
+  # extra security measures are taken if this is true, BUT it makes initial
+  # experimentation and setup a bit tricky.  For example, if you do not
+  # have your ssh keys setup correctly, you will be locked out of your
+  # server after 3 attempts for upto 3 months.  
+  :harden_server => false,
+  
+  #if you want to harden the server, or setup email signing, you will need to set the domain
+  #if you use Capistrano's multistage extension (recommended!), you can add a line like this to your
+  #environment specific file:
+  #      ec2onrails_config[:service_domain] = 'staging.mydomain.com'
+  :service_domain => nil,
   
   # Set the server timezone. run "cap -e ec2onrails:server:set_timezone" for 
   # details
@@ -69,7 +90,7 @@ set :ec2onrails_config, {
   # server's filesystem. 
   # If you don't need to deploy customized config files to the server then
   # remove this.
-  #:server_config_files_root => "../server_config",
+  #:server_config_files_root => "../server_configs",
   
   # If config files are deployed, some services might need to be restarted.
   # If you don't need to deploy customized config files to the server then

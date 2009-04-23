@@ -1,0 +1,20 @@
+To configure for an instance name, do:
+:g/ec2-174-129-147-161.compute-1.amazonaws.com/s//hostname/g
+
+Copy keys to new instance:
+scp -i ~/.ec2/id_rsa-kdefault ~/.ec2/{cert,pk}-*.pem root@ec2-174-129-147-161.compute-1.amazonaws.com:/mnt/
+
+scp -rp -i ~/.ec2/id_rsa-kdefault ~/development/ec2onrails/. root@ec2-174-129-147-161.compute-1.amazonaws.com:/mnt/ec2onrails
+
+Login to instance:
+ssh -i .ec2/id_rsa-kdefault root@ec2-174-129-147-161.compute-1.amazonaws.com
+
+Build the Ubuntu machine, and at the end call the EC2onRails script:
+/mnt/ec2onrails/server/build \
+  --bucket killian_ec2onrails \
+  --prefix ec2onrails-custom \
+  --user 8342-9993-3197 \
+  --access-key AKIAILQU54NBMD44OAJQ \
+  --secret-key  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 \
+  --private-key /mnt/pk-7OIHBDUMJ5QHTOLLP3FK5BCK3FEGU7BV.pem \
+  --cert /mnt/cert-7OIHBDUMJ5QHTOLLP3FK5BCK3FEGU7BV.pem
