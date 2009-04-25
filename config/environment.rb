@@ -26,13 +26,13 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
-  config.gem "chronic", :version => '0.2.3'
-  config.gem "haml", :version => '2.0.6'
-  config.gem "starling", :version => '0.9.8'
+  config.gem "chronic", :version => '~> 0.2.3'
+  config.gem "haml", :version => '~> 2.0.9', :source => "git://github.com/nex3/haml.git"
+  config.gem "starling", :version => '~> 0.9.8'
   config.gem 'rubyist-aasm', :version => '~> 2.0.2', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'sanitize', :version => '1.0.6', :source => "http://gems.github.com"
-  config.gem 'prawn', :version => '0.4.1'
+  config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
+  config.gem 'prawn', :version => '~> 0.4.1'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
