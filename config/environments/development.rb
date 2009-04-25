@@ -43,4 +43,4 @@ end
 # Blueprint grid toggle switch
 $BlueprintGrid = false
 
-require 'ruby-debug'
+#require 'ruby-debug'
