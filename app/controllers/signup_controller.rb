@@ -59,8 +59,8 @@ class SignupController < ApplicationController
       # add user as company manager
       @user.grant_role('manager', @company)
       
-      # signup completed, redirect to login page
-      flash[:notice] = "Signup complete! Please sign in to continue."
+      # signup completed, redirect to login page and instruct user to login
+      flash[:notice] = "Signup complete! Please login to continue."
       
       if !logged_in?
         # redirect to the new company's login path
