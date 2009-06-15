@@ -12,7 +12,8 @@ class Location < ActiveRecord::Base
   has_many_polymorphs :locatables, :from => [:companies, :appointments], :through => :locatables_locations
 
   # Make sure only accessible attributes are written to from forms etc.
-	attr_accessible :name, :street_address, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
+  # attr_accessible :name, :street_address, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
+	attr_accessible :name, :street_address, :city, :city_id, :state, :state_id, :zip, :zip_id, :country, :country_id, :lat, :lng, :phone, :email, :notes
 	
   COUNTRIES = [
     ['USA', 'us'],

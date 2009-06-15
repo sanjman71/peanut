@@ -4,7 +4,7 @@ module LocationsHelper
     if location.nil?
       return ''
     elsif location.name.blank?
-      h(location.street_address + ', ' + location.city + ' ' + location.state + ' ' + location.zip)
+      h(location.street_address + ', ' + location.city.name + ' ' + location.state.code + ' ' + location.zip.name)
     else
       h(location.name)
     end
@@ -27,16 +27,14 @@ module LocationsHelper
     if location.nil?
       return ''
     end
-    country_pair = Location::COUNTRIES.detect {|country_pair| country_pair[1] == location.country}
-    country_name = country_pair ? country_pair[0] : location.country
     line_break = horizontal ? '' : '<br />'
     result = ''
     result += h(location.street_address) + ', <br />' unless location.street_address.blank?
-    result += h(location.city) + ', ' + line_break unless location.city.blank?
-    result += h(location.state) unless location.state.blank?
-    result += ' ' + location.zip unless location.zip.blank?
-    result += ', ' + line_break unless ((render_country == false) || (country_name.blank) || (location.zip.blank? && location.state.blank?) )
-    result += h(country_name) unless (render_country == false || country_name.blank?)
+    result += h(location.city.name) + ', ' + line_break unless location.city.blank?
+    result += h(location.state.code) unless location.state.blank?
+    result += ' ' + location.zip.name unless location.zip.blank?
+    result += ', ' + line_break unless ((render_country == false) || (location.country.blank) || (location.zip.blank? && location.state.blank?) )
+    result += h(location.country.name) unless (render_country == false || location.country.blank?)
     result.gsub(/([^\\])\'/, '\1\\\\\'' )
   end
 

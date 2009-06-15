@@ -7,15 +7,14 @@
 - render_phone = false if local_assigns[:render_phone].nil?
 - render_email = false if local_assigns[:render_email].nil?
 - render_notes = false if local_assigns[:render_notes].nil?
-- country_name = location_country_name(location_address)
 - line_break = horizontal ? '' : '<br />'
 
 .address
   = "#{h(location_address.street_address)},#{line_break}" unless location_address.street_address.blank?
-  = "#{h(location_address.city)},#{line_break}" unless location_address.city.blank?
-  = "#{h(location_address.state)}" unless location_address.state.blank?
-  = (location_address.zip.blank? ? "" : " #{h(location_address.zip)}") + (((render_country == false) || (country_name.blank?) || (location_address.zip.blank? && location_address.state.blank?) ) ? "#{line_break}" : ",#{line_break}" )
-  = "#{h(country_name)} #{line_break}" unless (render_country == false || country_name.blank?)
+  = "#{h(location_address.city.name)},#{line_break}" unless location_address.city.blank?
+  = "#{h(location_address.state.code)}" unless location_address.state.blank?
+  = (location_address.zip.blank? ? "" : " #{h(location_address.zip.name)}") + (((render_country == false) || (country_name.blank?) || (location_address.zip.blank? && location_address.state.blank?) ) ? "#{line_break}" : ",#{line_break}" )
+  = "#{h(location_address.country.name)} #{line_break}" unless (render_country == false || location_address.country.blank?)
   - if render_phone
     %span
       %span.label Phone:
