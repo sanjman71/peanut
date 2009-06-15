@@ -15,13 +15,6 @@ class Location < ActiveRecord::Base
   # attr_accessible :name, :street_address, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
 	attr_accessible :name, :street_address, :city, :city_id, :state, :state_id, :zip, :zip_id, :country, :country_id, :lat, :lng, :phone, :email, :notes
 	
-  COUNTRIES = [
-    ['USA', 'us'],
-    ['Canada', 'ca'], 
-    ['Ireland', 'ie'], 
-    ['UK', 'uk']
-    ]
-
 	LIMIT_BY_DISTANCE_OPTIONS = [
 	  ['No Limit', '0'], 
 	  ['2 miles', '2'],
@@ -73,14 +66,12 @@ class Location < ActiveRecord::Base
   end
     
   def geocodable_address
-    country_name = COUNTRIES.detect {|country_pair| country_pair[1] == country}
-    country_name = country_name ? country_name[0] : country
     result = ""
     result += street_address + ', ' unless street_address.blank?
-    result += city + ', ' unless city.blank?
-    result += state + ' ' unless state.blank?
-    result += zip + ', ' unless zip.blank?
-    result += country_name unless country_name.blank?
+    result += city.name + ', ' unless city.blank?
+    result += state.code + ' ' unless state.blank?
+    result += zip.name + ', ' unless zip.blank?
+    result += country.name unless country.blank?
     result
   end
   

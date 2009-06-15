@@ -14,15 +14,6 @@ module LocationsHelper
     ''
   end
   
-  def location_country_name(location)
-    if location.nil?
-      ''
-    else
-      country_pair = Location::COUNTRIES.detect {|country_pair| country_pair[1] == location.country}
-      country_pair ? country_pair[0] : location.country
-    end
-  end
-  
   def location_address_renderer(location, horizontal = false, render_country = false)
     if location.nil?
       return ''
