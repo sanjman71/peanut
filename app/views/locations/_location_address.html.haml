@@ -11,7 +11,7 @@
 - line_break = horizontal ? '' : '<br />'
 
 .address
-  = "#{h(location_address.street_addr)},#{line_break}" unless location_address.street_addr.blank?
+  = "#{h(location_address.street_address)},#{line_break}" unless location_address.street_address.blank?
   = "#{h(location_address.city)},#{line_break}" unless location_address.city.blank?
   = "#{h(location_address.state)}" unless location_address.state.blank?
   = (location_address.zip.blank? ? "" : " #{h(location_address.zip)}") + (((render_country == false) || (country_name.blank?) || (location_address.zip.blank? && location_address.state.blank?) ) ? "#{line_break}" : ",#{line_break}" )

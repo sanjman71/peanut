@@ -12,7 +12,7 @@ class Location < ActiveRecord::Base
   has_many_polymorphs :locatables, :from => [:companies, :appointments], :through => :locatables_locations
 
   # Make sure only accessible attributes are written to from forms etc.
-	attr_accessible :name, :street_addr, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
+	attr_accessible :name, :street_address, :city, :state, :zip, :country, :lat, :lng, :phone, :email, :notes
 	
   COUNTRIES = [
     ['USA', 'us'],
@@ -75,7 +75,7 @@ class Location < ActiveRecord::Base
     country_name = COUNTRIES.detect {|country_pair| country_pair[1] == country}
     country_name = country_name ? country_name[0] : country
     result = ""
-    result += street_addr + ', ' unless street_addr.blank?
+    result += street_address + ', ' unless street_address.blank?
     result += city + ', ' unless city.blank?
     result += state + ' ' unless state.blank?
     result += zip + ', ' unless zip.blank?
@@ -84,7 +84,7 @@ class Location < ActiveRecord::Base
   end
   
   def addr_is_blank?
-    (street_addr.nil? || (street_addr && street_addr.blank?)) && 
+    (street_address.nil? || (street_address && street_address.blank?)) && 
     (city.nil? || (city && city.blank?)) && 
     (state.nil? || (state && state.blank?)) && 
     (zip.nil? || (zip && zip.blank?))

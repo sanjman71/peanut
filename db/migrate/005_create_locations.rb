@@ -6,7 +6,7 @@ class CreateLocations < ActiveRecord::Migration
       t.string :name, :default => nil
 
       # This location's address
-    	t.string :street_addr, :string
+    	t.string :street_address, :string
     	t.string :city, :string
     	t.string :state, :string
     	t.string :zip, :string

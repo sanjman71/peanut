@@ -4,7 +4,7 @@ module LocationsHelper
     if location.nil?
       return ''
     elsif location.name.blank?
-      h(location.street_addr + ', ' + location.city + ' ' + location.state + ' ' + location.zip)
+      h(location.street_address + ', ' + location.city + ' ' + location.state + ' ' + location.zip)
     else
       h(location.name)
     end
@@ -31,7 +31,7 @@ module LocationsHelper
     country_name = country_pair ? country_pair[0] : location.country
     line_break = horizontal ? '' : '<br />'
     result = ''
-    result += h(location.street_addr) + ', <br />' unless location.street_addr.blank?
+    result += h(location.street_address) + ', <br />' unless location.street_address.blank?
     result += h(location.city) + ', ' + line_break unless location.city.blank?
     result += h(location.state) unless location.state.blank?
     result += ' ' + location.zip unless location.zip.blank?
