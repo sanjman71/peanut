@@ -6,12 +6,39 @@ Factory.define :company do |c|
   c.time_zone   "Central Time (US & Canada)"
 end
 
-Factory.define :location do |l|
-  l.name        "Location 1"
-  l.street_address "123 Broadway"
-  l.city        "New York"
-  l.state       "CA"
-  l.zip         "12345"
+Factory.define :us, :class => Country do |o|
+  o.name        "United States"
+  o.code        "US"
+end
+
+Factory.define :il, :class => State do |i|
+  i.name        "Illinois"
+  i.code        "IL"
+  i.country     { |i| i.association :us }
+end
+
+Factory.define :chicago, :class => City do |o|
+  o.name        "Chicago"
+  o.state       { |c| c.association :il }
+end
+
+Factory.define :zip, :class => Zip do |o|
+  o.name        "60654"
+  o.state       { |z| z.association :il }
+end
+
+Factory.define :neighborhood, :class => Neighborhood do |o|
+  o.name        "River North"
+  o.city        { |o| o.association :chicago }
+end
+
+Factory.define :location, :class => Location do |l|
+  l.name            "Broadway location"
+  l.street_address  "123 Broadway"
+  l.city            { |l| l.association :chicago }
+  l.state           { |l| l.association :il }
+  l.zip             { |l| l.association :zip }
+  l.country         { |l| l.association :us }
 end
 
 Factory.define :work_service, :class => Service do |s|
@@ -73,9 +100,9 @@ Factory.define :appointment_today, :class => Appointment do |a|
   a.end_at          { |o| o.start_at + o.service.duration_to_seconds }  # add duration to start_at
 end
 
-Factory.define :event do |e|
-  e.message_id                    EventsHelper::EVENT_MESSAGE_IDS[:appointment_confirmation]
-  e.message_body                  "This is a test appointment confirmation event"
+Factory.define :log_entry do |e|
+  e.message_id                    LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_confirmation]
+  e.message_body                  "This is a test appointment confirmation log_entry"
 end
 
 Factory.sequence :user_name do |n|

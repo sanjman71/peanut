@@ -1,12 +1,12 @@
 require 'test/test_helper'
 require 'test/factories'
 
-class EventsControllerTest < ActionController::TestCase
+class LogEntriesControllerTest < ActionController::TestCase
 
-  # show events index, optionally scoped by state
-  should_route :get, '/events', :controller => 'events', :action => 'index'
-  should_route :get, '/events/seen', :controller => 'events', :action => 'index', :state => 'seen'
-  should_route :get, '/events/unseen', :controller => 'events', :action => 'index', :state => 'unseen'
+  # show log_entries index, optionally scoped by state
+  should_route :get, '/log_entries', :controller => 'log_entries', :action => 'index'
+  should_route :get, '/log_entries/seen', :controller => 'log_entries', :action => 'index', :state => 'seen'
+  should_route :get, '/log_entries/unseen', :controller => 'log_entries', :action => 'index', :state => 'unseen'
 
   def setup
     @owner        = Factory(:user, :name => "Owner")
@@ -17,7 +17,7 @@ class EventsControllerTest < ActionController::TestCase
     @provider     = Factory(:user, :name => "Provider", :companies => [@company])
     @service      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
     @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @provider, :service => @service)
-    @event        = Factory(:event, :company => @company, :user => @owner, :customer => @customer, :eventable => @appointment, :etype => Event::INFORMATIONAL)
+    @log_entry        = Factory(:log_entry, :company => @company, :user => @owner, :customer => @customer, :loggable => @appointment, :etype => LogEntry::INFORMATIONAL)
     # make owner the company manager
     @owner.grant_role('manager', @company)
     # add providers
@@ -46,29 +46,29 @@ class EventsControllerTest < ActionController::TestCase
   
   context "Logged in as provider" do
     setup do
-      @controller.stubs(:current_privileges).returns(['read events'])
-      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read events'])
+      @controller.stubs(:current_privileges).returns(['read log_entries'])
+      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries'])
       @controller.stubs(:current_user).returns(@provider)
       ActionView::Base.any_instance.stubs(:current_user).returns(@provider)
     end
     
-    context "get events index" do
+    context "get log_entries index" do
 
       setup do
         get :index
       end
       
       should_respond_with :success
-      should_render_template "events/index.html.haml"
-      should_assign_to :urgent_by_day
-      should_assign_to :approval_by_day
-      should_assign_to :informational_by_day
+      should_render_template "log_entries/index.html.haml"
+      should_assign_to :urgent
+      should_assign_to :approval
+      should_assign_to :informational
     end
     
-    context "mark event as seen" do
+    context "mark log_entry as seen" do
       
       setup do
-        post :mark_as_seen, :id => @event.id        
+        post :mark_as_seen, :id => @log_entry.id        
       end
       
       should_respond_with :redirect
@@ -80,29 +80,29 @@ class EventsControllerTest < ActionController::TestCase
   
   context "Logged in as manager" do
     setup do
-      @controller.stubs(:current_privileges).returns(['read events', 'update events'])
-      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read events', 'update events'])
+      @controller.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
+      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
       @controller.stubs(:current_user).returns(@owner)
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
     end
     
-    context "get events index" do
+    context "get log_entries index" do
 
       setup do
         get :index
       end
       
       should_respond_with :success
-      should_render_template "events/index.html.haml"
-      should_assign_to :urgent_by_day
-      should_assign_to :approval_by_day
-      should_assign_to :informational_by_day
+      should_render_template "log_entries/index.html.haml"
+      should_assign_to :urgent
+      should_assign_to :approval
+      should_assign_to :informational
     end
     
-    context "mark event as seen" do
+    context "mark log_entry as seen" do
       
       setup do
-        post :mark_as_seen, :id => @event.id        
+        post :mark_as_seen, :id => @log_entry.id        
       end
       
       should_respond_with :redirect
