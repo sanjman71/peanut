@@ -3,7 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :rp do
   
   desc "Initialize roles and privileges"
-  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :resources, :products, :events]
+  task :init  => [:companies, :roles_privs, :appointments, :calendars, :users, :invoices, :services, :customers, :resources, :products, :log_entries]
 
   desc "Initialize company roles and privileges"
   # Avoid name clash with company data initialization by postfixing rp
@@ -238,24 +238,24 @@ namespace :rp do
     Badges::RolePrivilege.create(:role=>p,:privilege=>r)
   end
     
-  desc "Initialize events management roles & privileges"
-  task :events do
+  desc "Initialize log_entries management roles & privileges"
+  task :log_entries do
     
-    puts "adding events management roles & privileges"
+    puts "adding log_entries management roles & privileges"
     
     m = Badges::Role.find_by_name('manager')
     p = Badges::Role.find_by_name('provider')
 
-    c = Badges::Privilege.create(:name=>"create events")
-    r = Badges::Privilege.create(:name=>"read events")
-    u = Badges::Privilege.create(:name=>"update events")
-    d = Badges::Privilege.create(:name=>"delete events")
+    c = Badges::Privilege.create(:name=>"create log_entries")
+    r = Badges::Privilege.create(:name=>"read log_entries")
+    u = Badges::Privilege.create(:name=>"update log_entries")
+    d = Badges::Privilege.create(:name=>"delete log_entries")
 
-    # Managers can manage events
+    # Managers can manage log_entries
     Badges::RolePrivilege.create(:role=>m,:privilege=>r)
     Badges::RolePrivilege.create(:role=>m,:privilege=>u)
 
-    # Providers can view events
+    # Providers can view log_entries
     Badges::RolePrivilege.create(:role=>p,:privilege=>r)
   end
 

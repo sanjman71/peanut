@@ -294,7 +294,7 @@ $.fn.init_ujs_links = function () {
   })
 }
 
-$.fn.init_events = function () {
+$.fn.init_log_entries = function () {
   $("a#show_add_event_form").click(function(){
     $('#add_event_form').toggle();
   })

@@ -124,8 +124,8 @@ ActionController::Routing::Routes.draw do |map|
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
   
-  map.resources :events, :member => {:mark_as_seen => :post}, :only => [:index, :create, :destroy]
-  map.connect   '/events/:state', :controller => 'events', :action => 'index', :state => /seen|unseen/
+  map.resources :log_entries, :member => {:mark_as_seen => :post}, :only => [:index, :create, :destroy]
+  map.connect   '/log_entries/:state', :controller => 'log_entries', :action => 'index', :state => /seen|unseen/
 
   # map the root to the home controller, and let the home controller figure out the subdomain
   map.root :controller => 'home', :action => 'index'

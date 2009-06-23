@@ -1,13 +1,13 @@
-class Event < ActiveRecord::Base
-  belongs_to              :eventable, :polymorphic => true
+class LogEntry < ActiveRecord::Base
+  belongs_to              :loggable, :polymorphic => true
   belongs_to              :company
   belongs_to              :user
   belongs_to              :customer, :class_name => 'User'
   
-  # Events must be associated with a company. We usually capture the user who created the event, but not necessarily.
+  # LogEntries must be associated with a company. We usually capture the user who created the event, but not necessarily.
   validates_presence_of   :etype, :company_id
 
-  # Event types
+  # LogEntry types
   URGENT                  = 1               # urgent messages
   APPROVAL                = 2               # messages indicating that approval is required
   INFORMATIONAL           = 3               # informational messages

@@ -1,3 +1,0 @@
-page["#flash"].html(display_flash(true))
-flash.discard
-page['#event_groups'].html(render :partial => 'events/event_groups.html.haml', :locals => {:urgent_by_day => @urgent_by_day, :approval_by_day => @approval_by_day, :informational_by_day => @informational_by_day})

@@ -162,9 +162,9 @@ class AppointmentsController < ApplicationController
           
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          # create event
-          current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:appointment_confirmation],
+          # create log_entry
+          current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
+                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_confirmation],
                                         :customer => @appointment.customer)
         when Appointment::FREE
           # build time range
@@ -186,9 +186,9 @@ class AppointmentsController < ApplicationController
           flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
           # send confirmation
           AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          # create event
-          current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
-                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:added_to_waitlist],
+          # create log_entry
+          current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
+                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:added_to_waitlist],
                                         :customer => @appointment.customer)
         end
         
@@ -293,18 +293,18 @@ class AppointmentsController < ApplicationController
     when  Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
-      message_id = EventsHelper::EVENT_MESSAGE_IDS[:appointment_canceled]
+      message_id = LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_canceled]
     when Appointment::WAIT
       # cancel the wait appointment
       AppointmentScheduler.cancel_wait_appointment(@appointment)
-      message_id = EventsHelper::EVENT_MESSAGE_IDS[:waitlist_canceled]
+      message_id = LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:waitlist_canceled]
     end
 
     # redirect to the appointment page
     @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
     
-    # create event
-    current_company.events.create(:user_id => current_user.id, :etype => Event::INFORMATIONAL, :eventable => @appointment,
+    # create log_entry
+    current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
                                   :message_id => message_id, :customer => @appointment.customer)
 
     # set flash

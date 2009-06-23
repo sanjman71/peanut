@@ -1,0 +1,45 @@
+.log_entries.span-24.last
+  - reset_cycle
+  %hr.space
+  = will_paginate(log_entries, :param_name => paginate_param, :params => {:controller => 'log_entries', :search => nil, :authenticity_token => nil, :_ => nil, :subdomain => current_subdomain})
+  - if log_entries.blank?
+    No log_entries
+  - else
+    - log_entries.each do |log_entry|
+      .span-23.prepend-1.last.letterbox.log_entry{:class => cycle("shaded #{log_entry.etype_to_s}", " #{log_entry.etype_to_s}")}[log_entry]
+        .span-2
+          == #{log_entry.updated_at.strftime('%I:%M%p')}
+        - if has_privilege?('update log_entries', current_company) && (log_entry.etype == LogEntry::APPROVAL)
+          .span-12
+            - if !log_entry.message_id.blank?
+              == #{eval('"' + LogEntriesHelper::LOG_ENTRY_MESSAGES[log_entry.message_id] + '"')}
+            - else
+              == #{log_entry.message_body.blank? ? "No message" : "See message body"}
+          .span-2.approve
+            == Approve
+          .span-2.reject
+            == Reject
+        - else
+          .span-16
+            - if !log_entry.message_id.blank?
+              == #{eval('"' + LogEntriesHelper::LOG_ENTRY_MESSAGES[log_entry.message_id] + '"')}
+            - else
+            == #{log_entry.message_body.blank? ? "No message" : "See message body"}
+        .span-3.seen
+          - if has_privilege?('update log_entries', current_company)
+            - if log_entry.seen?
+              = link_to('Mark as unseen', url_for(:subdomain => current_subdomain, :controller => 'log_entries', :action => 'mark_as_seen', :id => log_entry.id, :seen => 'false'), :class => 'ujs')
+            - else
+              = link_to('Mark as seen', url_for(:subdomain => current_subdomain, :controller => 'log_entries', :action => 'mark_as_seen', :id => log_entry.id), :class => 'ujs')
+        
+        .span-1.delete.last
+          - if has_privilege?('delete log_entries', current_company)
+            = link_to('Del', url_for(:subdomain => current_subdomain, :controller => 'log_entries', :action => 'destroy', :id => log_entry.id), :method => 'delete')
+      - if !log_entry.message_body.blank?
+        .message_body
+          .span-6.prepend-3.last
+            %a.show_message_body{id="show_message_body_#{log_entry.id}"}==Show / hide message body
+          .span-20.prepend-3.message_body_text{id="show_message_body_#{log_entry.id}"}
+            = log_entry.message_body.gsub(/\n/, '<br />')
+  %hr.space
+  = will_paginate(log_entries, :param_name => paginate_param, :params => {:controller => 'log_entries', :search => nil, :authenticity_token => nil, :_ => nil, :subdomain => current_subdomain})

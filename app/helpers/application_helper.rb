@@ -144,19 +144,19 @@ module ApplicationHelper
       yield link
     end
     
-    if has_privilege?('read events', current_company)
+    if has_privilege?('read log_entries', current_company)
 
       # 'Dashboard' tab
       name = 'Dashboard'
-      if current_controller.controller_name == 'events' and ['index'].include?(current_controller.action_name)
-        link = link_to(name, events_path, :class => 'current')
+      if current_controller.controller_name == 'log_entries' and ['index'].include?(current_controller.action_name)
+        link = link_to(name, log_entries_path, :class => 'current')
       else
-        if current_company.events.urgent.unseen.size > 0
-          link = link_to(name, events_path, :class => 'urgent')
-        elsif current_company.events.approval.unseen.size > 0
-          link = link_to(name, events_path, :class => 'approval')
+        if current_company.log_entries.urgent.unseen.size > 0
+          link = link_to(name, log_entries_path, :class => 'urgent')
+        elsif current_company.log_entries.approval.unseen.size > 0
+          link = link_to(name, log_entries_path, :class => 'approval')
         else
-          link = link_to(name, events_path)
+          link = link_to(name, log_entries_path)
         end
       end
 

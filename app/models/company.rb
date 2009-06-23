@@ -36,8 +36,8 @@ class Company < ActiveRecord::Base
   has_one                   :owner, :through => :subscription, :source => :user
   has_one                   :plan, :through => :subscription
 
-  # Event log
-  has_many                  :events
+  # LogEntry log
+  has_many                  :log_entries
   
   # Locations
   has_many                  :locatables_locations, :as => :locatable

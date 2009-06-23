@@ -1,11 +1,11 @@
 class CreateLogEntries < ActiveRecord::Migration
   def self.up
-    create_table :logentries do |t|
+    create_table :log_entries do |t|
       t.references  :loggable, :polymorphic => true  # e.g. appointment
       t.references  :company, :null => false            # company this is relevant to
       t.references  :location                           # company location this is relevant to, if any
       t.references  :customer                           # customer this is relevant to, if any
-      t.references  :user                               # user who created the event
+      t.references  :user                               # user who created the log_entry
       t.text        :message_body                       # message body
       t.integer     :message_id                         # one of the standard message IDs
       t.integer     :etype                              # informational, approval, urgent
@@ -15,6 +15,6 @@ class CreateLogEntries < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :logentries
+    drop_table :log_entries
   end
 end

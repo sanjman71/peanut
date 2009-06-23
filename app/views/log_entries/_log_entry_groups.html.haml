@@ -1,21 +1,21 @@
-#event_groups
+#log_entry_groups
   - unless urgent.empty?
     .urgent.last
       %h3.span-6.prepend-1==Urgent messages
       - reset_cycle
-      = render(:partial => 'events', :object => urgent, :locals => {:paginate_param => 'urgent_page'})
+      = render(:partial => 'log_entries', :object => urgent, :locals => {:paginate_param => 'urgent_page'})
       %hr.space
     
   - unless approval.empty?
     .approval.last
       %h3.span-6.prepend-1==Approval required
       - reset_cycle
-      = render(:partial => 'events', :object => approval, :locals => {:paginate_param => 'approval_page'})
+      = render(:partial => 'log_entries', :object => approval, :locals => {:paginate_param => 'approval_page'})
       %hr.space
     
   - unless informational.empty?
     .informational.last
       %h3.span-6.prepend-1==Informational messages
       - reset_cycle
-      = render(:partial => 'events', :object => informational, :locals => {:paginate_param => 'info_page'})
+      = render(:partial => 'log_entries', :object => informational, :locals => {:paginate_param => 'info_page'})
       %hr.space

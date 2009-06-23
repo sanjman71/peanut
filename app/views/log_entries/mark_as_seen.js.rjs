@@ -1,0 +1,3 @@
+page["#flash"].html(display_flash(true))
+flash.discard
+page['#log_entry_groups'].html(render :partial => 'log_entries/log_entry_groups.html.haml', :locals => {:urgent_by_day => @urgent_by_day, :approval_by_day => @approval_by_day, :informational_by_day => @informational_by_day})

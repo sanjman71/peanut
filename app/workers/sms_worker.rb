@@ -14,9 +14,9 @@ class SmsWorker < Workling::Base
       customer  = appointment.customer
       message   = "#{appointment.service.name} confirmation"
 
-      # Create an event with the SMS message saying we sent the SMS
-      appointment.company.events.create(:etype => Event::INFORMATIONAL, :eventable => appointment,
-                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:sent_appointment_confirmation_sms],
+      # Create an log_entry with the SMS message saying we sent the SMS
+      appointment.company.log_entries.create(:etype => LogEntry::INFORMATIONAL, :loggable => appointment,
+                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:sent_appointment_confirmation_sms],
                                         :message_body => message,
                                         :customer => appointment.customer)
       
@@ -25,9 +25,9 @@ class SmsWorker < Workling::Base
       customer  = appointment.customer
       message   = "Your are waitlisted for a #{appointment.service.name}"
 
-      # Create an event with the SMS message saying we sent the SMS
-      appointment.company.events.create(:etype => Event::INFORMATIONAL, :eventable => appointment,
-                                        :message_id => EventsHelper::EVENT_MESSAGE_IDS[:sent_waitlist_confirmation_sms],
+      # Create an log_entry with the SMS message saying we sent the SMS
+      appointment.company.log_entries.create(:etype => LogEntry::INFORMATIONAL, :loggable => appointment,
+                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:sent_waitlist_confirmation_sms],
                                         :message_body => message,
                                         :customer => appointment.customer)
 
