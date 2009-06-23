@@ -38,6 +38,10 @@ class Company < ActiveRecord::Base
 
   # Event log
   has_many                  :events
+  
+  # Locations
+  has_many                  :locatables_locations, :as => :locatable
+  has_many                  :locations, :through => :locatables_locations
 
   # after create filter to initialize basic services that are provided by all companies
   after_create              :init_basic_services

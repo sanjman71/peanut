@@ -17,6 +17,10 @@ class Appointment < ActiveRecord::Base
   before_save             :make_confirmation_code
   after_create            :add_customer_role
   
+  # Locations
+  has_one                 :locatable_location, :as => :locatable
+  has_one                 :location, :through => :locatable_location
+  
   # appointment mark_as constants
   FREE                    = 'free'      # free appointments show up as free/available time and can be scheduled
   WORK                    = 'work'      # work appointments can be scheduled in free timeslots
