@@ -1,9 +1,8 @@
 - if location
   %div[location]
-    .span-5.location_text
-      - if show_location_title
+    .span-8.location_text
+      - if show_location_title && !location.name.blank?
         %h3= location_title_renderer(location)
-    .span-3.location_text
       - if short_locations
         = render :partial => 'locations/short_location', :object => location
       - else

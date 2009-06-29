@@ -1,6 +1,16 @@
-%h2.prepend-1
-  == New location
+- title('Add a location')
+- stylesheet('locations')
 
-= error_messages_for :location
+.span-16
+  .span-13.prepend-1.append-1.mat
+    %h2== Add a location
 
-= render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Add location', :submit_url => locations_path(:subdomain => current_subdomain)}
+    = error_messages_for :location
+
+    = render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Add location', :submit_url => locations_path(:subdomain => current_subdomain)}
+
+.span-7.prepend-1.sidebar.instructions
+  %h3== Adding a location
+  %ul
+    %li== Please fill in the address for this location. Fields marked * are required.
+    %li== You can give this location a name (such as "Downtown" or "Williamsburg") if you wish.

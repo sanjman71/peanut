@@ -3,7 +3,7 @@
 / First, turn on TinyMCE for use with the description field
 - use_tiny_mce
 
-.span-23.prepend-1.mat.shaded.padding-top-10
+.span-23.prepend-1.last.mat.shaded.padding-top-10
   %h2
     == Editing
     = @company.name
@@ -13,7 +13,7 @@
 .span-14.prepend-1.last
   = display_flash
 
-.span-23.prepend-1.mat.padding-top-10
+.span-23.prepend-1.last.mat.padding-top-10
   %h2 Billing Plan
   .span-10
     = "You are currently subscribed to the <strong>#{@company.plan.name}</strong> plan."
@@ -32,15 +32,15 @@
 
 %hr.space
 
-.span-23.prepend-1.mat.padding-top-10.padding-bottom-20
+.span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
   %h2 Company Information
   - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
-    = f.error_messages
+    = error_messages_for :company
 
     .span-20.last
-      .span-2
+      .span-3
         %h3{:style => 'padding-top: 7px;'}== Timezone:
-      .span-5.last
+      .span-16.prepend-1.last
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {}, {:style => 'margin-top: 5px;', :class => 'select big'}
     .span-20.last.padding-bottom-10
       .span-20.last
@@ -59,7 +59,14 @@
 
 %hr.space
 
-.span-23.prepend-1.mat.padding-top-10.padding-bottom-10
-  %h2
-    == Company Locations
-  = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
+.span-22.prepend-1.append-1.last.mat.padding-top-10.padding-bottom-10
+  .span-6
+    %h2== Company Locations
+  .span-12.last
+    - if current_company.may_add_location?
+      - if has_privilege?("update companies", current_company)
+        = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+    - else
+      = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(:subdomain => current_subdomain, :id => current_company.subscription)}"
+  .span-22
+    = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}

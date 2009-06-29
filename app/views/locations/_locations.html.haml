@@ -5,7 +5,7 @@
 -# home_location - show a home location, e.g. for a location-based search
 -# page_param_name - the page parameter name for will_paginate
  
-- short_locations = true if local_assigns[:short_locations].nil?
+- short_locations = false if local_assigns[:short_locations].nil?
 - show_location_title = true if local_assigns[:show_location_title].nil?
 - big_map = false if local_assigns[:big_map].nil?
 - home_location ||= nil
@@ -13,21 +13,15 @@
 - with_distance = false if local_assigns[:with_distance].nil?
 - locatable = '' if local_assigns[:locatable].nil?
 
-#locations
-  .addressbox#addressbox
+#locations.span-10.last
+  .addressbox#addressbox.last
     - unless locations.blank?
-      .toppage
+      .toppage.last
         = location_page_info locations
         = will_paginate locations, :param_name => page_param_name
-      .locations
+      .locations.last
         - locations.each_with_index do |location, i|
-          .span-20.last
+          .span-10.last
             = render :partial => 'locations/location', :object => location, :locals => {:with_distance => false, :i => i,:geodist => nil, :show_location_title => show_location_title, :short_locations => short_locations, :locatable => locatable}
-    .bottompage
+    .bottompage.last
       = will_paginate locations, :param_name => page_param_name
-    .bottompage
-      - if current_company.may_add_location?
-        - if has_privilege?("update companies", current_company)
-          = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
-      - else
-        = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(:subdomain => current_subdomain, :id => current_company.subscription)}"

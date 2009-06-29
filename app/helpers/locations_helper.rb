@@ -71,4 +71,12 @@ module LocationsHelper
     o
   end
   
+  def states_for_select(country)
+    s = State.in_country(country).order_by_code.collect { |c| [c.name, c.code] }
+  end
+  
+  def countries_for_select()
+    c = Country.all.collect { |c| ["#{c.name}", c.code]}
+  end
+  
 end
