@@ -70,16 +70,30 @@ class Location < ActiveRecord::Base
   end
   
   def validate
-    # We assume that an address has been put in the string temporary fields, which we'll convert to a geocoded set of references.
+    
+    # We allow for an address to be put in the string temporary fields, which we'll convert to a geocoded set of references.
+    # If the address isn't in these strings, then the database references should be assigned
     if (self.street_address.blank?)
       errors.add(:street_address, "You must enter a street address.")
     elsif (self.city_str.blank?)
-      errors.add(:city, "You must enter a city.")
-    elsif (self.state_str.blank?)
-      errors.add(:state, "You must enter a state.")
-    elsif (self.country_str.blank?)
-      # Assume the country is the US if none entered
-      self.country_str = "US"
+      if (self.city.blank?)
+        errors.add(:city, "You must enter a city.")
+      else
+        self.city_str = self.city.name
+      end
+    elsif (self.state_str.blank? && self.state.blank?)
+      if (self.city.blank?)
+        errors.add(:state, "You must enter a state.")
+      else
+        self.state_str = self.state.name
+      end
+    elsif (self.country_str.blank? && self.country.blank?)
+      if (self.city.blank?)
+        # Assume the country is the US if none entered
+        self.country_str = "US"
+      else
+        self.country_str = self.country.name
+      end
     end
 
     # Geocode the address. We pull out unit #'s etc from the street address
