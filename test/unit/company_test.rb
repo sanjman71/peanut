@@ -63,15 +63,19 @@ class CompanyTest < ActiveSupport::TestCase
     
     context "add a location" do
       setup do
-        @chicago = Location.new(:name => 'Chicago')
-        @company.locations.push(@chicago)
+        @us = Country.create(:name => "United States", :code => "US")
+        @il = State.create(:name => "Illinois", :code => "IL", :country => @us)
+        @chicago = City.create(:name => "Chicago", :state => @il)
+        @zip = Zip.create(:name => "60654", :state => @il)
+        @wi_east = Location.new(:name => 'Walnut Industries East', :street_address => "20 W. Grand Ave #2103", :city => @chicago, :state => @il, :zip => @zip, :country => @us)
+        @company.locations << @wi_east
         @company.reload
       end
       
       should_change "Location.count", :by => 1
       
       should "have company location" do
-        assert_equal [@chicago], @company.locations
+        assert_equal [@wi_east], @company.locations
       end
       
       should "increment locations count" do
