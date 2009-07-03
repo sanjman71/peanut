@@ -26,6 +26,7 @@ Rails::Initializer.run do |config|
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
+  config.gem "mbleigh-acts-as-taggable-on", :source => "http://gems.github.com", :lib => "acts-as-taggable-on"
   config.gem "chronic", :version => '~> 0.2.3'
   config.gem "haml", :version => '~> 2.0.6'
   config.gem "starling", :version => '~> 0.9.8'
@@ -42,6 +43,7 @@ Rails::Initializer.run do |config|
 
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
+  config.load_paths += %W( #{RAILS_ROOT}/walnut_shared_models #{RAILS_ROOT}/walnut_shared_models/event_stream )
 
   # Prevent the lib directory from being reloaded
   # Avoid the problem: A copy of AuthenticatedSystem has been removed from the module tree but is still active!
