@@ -78,8 +78,6 @@ class LocationsController < ApplicationController
   # POST /locations.xml
   def create
     
-    breakpoint
-    
     if !current_company
       flash[:error] = "To add a location you must be working with a specific company."
       redirect_to root_path and return
