@@ -3,10 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => ["rp:init", "plans:init", :admin_users, :companies]
+  task :dev_data  => [:free_service, "rp:init", "plans:init", :admin_users, :companies]
 
   desc "Initialize production data"
-  task :prod_data  => ["rp:init", "plans:init", :admin_users]
+  task :prod_data  => [:free_service, "rp:init", "plans:init", :admin_users]
   
   desc "Initialize admin users"
   task :admin_users do 
@@ -41,6 +41,11 @@ namespace :init do
   end
   
   task :companies => ["company1:init", "noelrose:init", "meatheads:init", "mctrucks:init"]
+  
+  task :free_service do 
+    # create free service used by all companies
+    Peanut::Service.create(:name => Peanut::Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+  end
 
 end # init namespace
   
