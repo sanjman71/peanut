@@ -9,15 +9,23 @@ namespace :company1 do
     @max_plan       = Plan.find_by_name("Max") || Plan.first
   
     # create users
-    @johnny         = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut")
-    @johnny.register!
-    @johnny.activate!
+    if (@johnny = User.find_by_email("johnny@peanut.com") )
+      puts "user: johnny@peanut.com already in db"
+    else
+      @johnny         = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
+                                    :password => "peanut", :password_confirmation => "peanut")
+      @johnny.register!
+      @johnny.activate!
+    end
                                 
-    @mary           = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut")
-    @mary.register!
-    @mary.activate!
+    if (@mary = User.find_by_email("mary@peanut.com") )
+      puts "user: mary@peanut.com already in db"
+    else
+      @mary           = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
+                                    :password => "peanut", :password_confirmation => "peanut")
+      @mary.register!
+      @mary.activate!
+    end
   
     # create subscriptions
     @subscription  = Subscription.create(:user => @johnny, :plan => @max_plan)

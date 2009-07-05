@@ -9,10 +9,14 @@ namespace :mctrucks do
     @max_plan       = Plan.find_by_name("Max") || Plan.first
   
     # create users  
-    @owner          = User.create(:name => "Mr Trucks", :email => "mrtrucks@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut")
-    @owner.register!
-    @owner.activate!
+    if (@owner = User.find_by_email("mrtrucks@peanut.com") )
+      puts "user: mrtrucks@peanut.com already in db"
+    else
+      @owner          = User.create(:name => "Mr Trucks", :email => "mrtrucks@peanut.com", 
+                                    :password => "peanut", :password_confirmation => "peanut")
+      @owner.register!
+      @owner.activate!
+    end
   
     # create subscriptions
     @subscription = Subscription.create(:user => @owner, :plan => @max_plan)

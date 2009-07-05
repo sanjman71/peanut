@@ -10,10 +10,14 @@ namespace :noelrose do
     @max_plan       = Plan.find_by_name("Max") || Plan.first
   
     # create users  
-    @erika          = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
-                                  :password => "peanut", :password_confirmation => "peanut")
-    @erika.register!
-    @erika.activate!
+    if (@erika = User.find_by_email("erika@peanut.com") )
+      puts "user: erika@peanut.com already in db"
+    else
+      @erika          = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
+                                    :password => "peanut", :password_confirmation => "peanut")
+      @erika.register!
+      @erika.activate!
+    end
   
     # create subscriptions
     @subscription = Subscription.create(:user => @erika, :plan => @max_plan)

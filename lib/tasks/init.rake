@@ -44,7 +44,8 @@ namespace :init do
   
   task :free_service do 
     # create free service used by all companies
-    Peanut::Service.create(:name => Peanut::Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+    puts "adding free service, used by all companies"
+    Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
   end
 
 end # init namespace
