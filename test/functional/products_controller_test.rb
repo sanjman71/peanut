@@ -63,25 +63,30 @@ class ProductsControllerTest < ActionController::TestCase
   end
 
   context "edit a new product" do
+    setup do 
+      # create product first, as it would be from the create form
+      @shampoo = Factory(:product, :name => 'Shampoo', :inventory => 0, :price => 0, :company => @company)
+    end
+    
+    context "with privilege ['update products']" do
+      setup do
+        @controller.stubs(:current_privileges).returns(["update products"])
+        get :edit, :id => @shampoo
+      end
+
+      should_respond_with :success
+      should_render_template 'products/edit.html.haml'
+      should_respond_with_content_type "text/html"
+    end
+  
     context "without privilege ['update products']" do
       setup do
         @controller.stubs(:current_privileges).returns([])
-        get :edit, :id => 1
+        get :edit, :id => @shampoo
       end
       
       should_redirect_to "unauthorized_path"  
     end
-    
-    setup do 
-      @controller.stubs(:current_privileges).returns(["update products"])
-      # create product first, as it would be from the create form
-      @shampoo = Factory(:product, :name => 'Shampoo', :inventory => 0, :price => 0, :company => @company)
-      get :edit, :id => @shampoo
-    end
-  
-    should_respond_with :success
-    should_render_template 'products/edit.html.haml'
-    should_respond_with_content_type "text/html"
   end
   
   context "show all products" do
