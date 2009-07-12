@@ -129,7 +129,8 @@ class DateRangeTest < ActiveSupport::TestCase
       @daterange = DateRange.parse_when('next 2 weeks', :end_on => 0)
       assert_valid @daterange
       # calculate days to add based on current day and end on day
-      @days_to_add = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1][Time.now.utc.wday]
+      # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night - so, ends on day 0
+      @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.now.utc.wday]
     end
     
     should 'have start at == beginning of today in utc format' do
@@ -195,6 +196,7 @@ class DateRangeTest < ActiveSupport::TestCase
     setup do
       @daterange = DateRange.parse_when('past month')
       assert_valid @daterange
+      @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.now.month]
     end
   
     should 'have end at == end of today in utc format' do
@@ -205,8 +207,8 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal Time.now.utc.beginning_of_day - 1.month + 1.day, @daterange.start_at
     end
 
-    should 'have date range of 31 days' do
-      assert_equal 31, @daterange.days
+    should "have date range of #{@expected_days_in_range} days" do
+      assert_equal @expected_days_in_range, @daterange.days
     end
   end
   
