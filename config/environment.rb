@@ -33,6 +33,7 @@ Rails::Initializer.run do |config|
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   config.gem 'prawn', :version => '~> 0.4.1'
+  config.gem "geokit" 
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
