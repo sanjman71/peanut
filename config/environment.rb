@@ -54,6 +54,8 @@ Rails::Initializer.run do |config|
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   config.gem 'prawn', :version => '~> 0.4.1'
   config.gem "geokit" 
+  config.gem 'unicode', :version => '~> 0.1'
+  config.gem 'ri_cal'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

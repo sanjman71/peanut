@@ -137,9 +137,12 @@ ActionController::Routing::Routes.draw do |map|
   # map the company root edit action to the companies controller
   map.edit_company_root  'edit', :controller => 'companies', :action => 'edit'
 
+  # map the company caldav
+  map.connect 'caldav/*path_info', :controller => 'cal_dav', :action => 'webdav'  
+
   # debug controller
-  map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}
-  
+  map.connect   'debug/grid', :controller => 'debug', :action => 'toggle_blueprint_grid', :conditions => {:method => :put}  
+
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:
