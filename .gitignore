@@ -1,3 +1,4 @@
+app/walnut_shared_models
 log/*
 tmp/*
 db/schema.rb
