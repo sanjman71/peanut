@@ -23,19 +23,17 @@ class CalDavController < ApplicationController
   act_as_railsdav
   
   protected
-
-  # URL format is http://<subdomain>.walnutcalendar.com/caldav([/provider/<provider_id>]|[/location/<location_id>])[/<caldav_token>]
+  
+  # URL format is http://<subdomain>.walnutcalendar.com/caldav([/provider/<provider_id>]|[/location/<location_id>])[/<cal_dav_token>]
   # We're read only, so we only support reading data from a calendar right now
   def get_resource_for_path(path)
-
-    debugger
-
+    
     # Get the different arguments in the caldav path
     args = path.split('/')
-    caldav_token = provider_id = location_id = nil
+    cal_dav_token = provider_id = location_id = nil
     while args.size > 0
       if args.size == 1
-        caldav_token = args[0]
+        cal_dav_token = args[0]
         args = []
       elsif (args[0] == "provider")
         provider_id = args[1] || nil
@@ -46,35 +44,34 @@ class CalDavController < ApplicationController
       end
     end
     
-    if (caldav_token.nil?)
+    if (cal_dav_token.nil?)
       # Public URL. Calendar of public events
       # Raise an exception for now
       raise WebDavErrors::ForbiddenError
     else
       # Private URLs - user id specified
       # Check that the user_id works and the token matches the user
-      # @caldav_user = caldav_token.nil? ? nil : User.find_by_caldav_token(caldav_token)
-      @caldav_user = caldav_token.nil? ? nil : User.find_by_email(caldav_token)
-
-      if @caldav_user.nil?
+      @cal_dav_user = cal_dav_token.nil? ? nil : User.find_by_cal_dav_token(cal_dav_token)
+      
+      if @cal_dav_user.nil?
         # The token is invalid      
         raise WebDavErrors::ForbiddenError
       end
       
       @provider = provider_id.nil? ? nil : User.find_by_id(provider_id)
-      if (@provider && !@caldav_user.has_privilege?('read calendar', @provider))
-        raise WebDavErrors::ForbiddenError
-      end
-
-      @location = location_id.nil? ? nil : Location.find_by_id(location_id)
-      if (@location && !@caldav_user.has_privilege?('read calendar', @location))
+      if (@provider && !@cal_dav_user.has_privilege?('read calendar', @provider))
         raise WebDavErrors::ForbiddenError
       end
       
-      if (@location.nil? && @provider.nil? && !@caldav_user.has_privilege?('read calendar', current_company))
+      @location = location_id.nil? ? nil : Location.find_by_id(location_id)
+      if (@location && !@cal_dav_user.has_privilege?('read calendar', @location))
         raise WebDavErrors::ForbiddenError
       end
-
+      
+      if (@location.nil? && @provider.nil? && !@cal_dav_user.has_privilege?('read calendar', current_company))
+        raise WebDavErrors::ForbiddenError
+      end
+      
     end
 
     # initialize daterange
@@ -91,4 +88,3 @@ class CalDavController < ApplicationController
   end
 
 end
-
