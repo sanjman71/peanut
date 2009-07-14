@@ -5,6 +5,10 @@ ActionController::Routing::Routes.draw do |map|
   map.login     '/login',         :controller => 'sessions', :action => 'create', :conditions => {:method => :post}
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
 
+  # rpx routes
+  map.rpx_customer  '/rpx/customer',  :controller => 'rpx', :action => 'customer'
+  # map.rpx_provider  '/rpx/provider',  :controller => 'rpx', :action => 'provider'
+
   # user activation
   map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 

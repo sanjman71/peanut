@@ -1,4 +1,4 @@
-.span-12.mat
+.span-12.mat.padding-bottom-10
   .span-11.prepend-1.last
     %h2== Log In
     %hr
@@ -21,3 +21,10 @@
     -# Uncomment this if you want this functionality
     -#= label_tag 'remember_me', 'Remember me'
     -#= check_box_tag 'remember_me', '1', @remember_me
+    
+
+%hr.space
+
+.span-11.prepend-1
+  = RPXNow.embed_code('walnut', rpx_customer_url)
+

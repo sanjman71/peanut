@@ -25,8 +25,11 @@ class ApplicationController < ActionController::Base
 
   # Exception notifier to send emails when we have exceptions
   include ExceptionNotifiable
-  
-  # Library for re-scheduling appointments
+
+  # Helper for initializing a new user
+  include UserInitializeHelper
+
+  # Helper for re-scheduling appointments
   include AppointmentRescheduleHelper
   
   # Initialize current company and subdomain

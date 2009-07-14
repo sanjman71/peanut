@@ -55,54 +55,56 @@ class AppointmentsControllerTest < ActionController::TestCase
     @request.host = "www.peanut.com"
   end
 
-  context "build work appointment for a single date with free time, without being logged in" do
-    setup do
-      # create free time from 9 am to 11 am local time
-      @today          = Time.now.utc.to_s(:appt_schedule_day)
-      @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-      @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
-
-      # book a haircut with johnny during his free time
-      get :new, 
-          :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-          :duration => @haircut.duration, :mark_as => 'work'
-    end
-    
-    should_respond_with :redirect
-    should_redirect_to "login_path"
-  end
-
   context "build work appointment for a single date with free time" do
-    setup do
-      # create free time from 9 am to 11 am local time
-      @today          = Time.now.utc.to_s(:appt_schedule_day)
-      @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-      @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
-      
-      # stub current user
-      @controller.stubs(:logged_in?).returns(true)
-      @controller.stubs(:current_user).returns(@customer)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-      
-      # book a haircut with johnny during his free time
-      get :new, 
-          :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-          :duration => @haircut.duration, :mark_as => 'work'
+    context "without being logged in" do
+      setup do
+        # create free time from 9 am to 11 am local time
+        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
+        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
+
+        # book a haircut with johnny during his free time
+        get :new, 
+            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+            :duration => @haircut.duration, :mark_as => 'work'
+      end
+    
+      should_respond_with :redirect
+      should_redirect_to "login_path"
     end
 
-    should_respond_with :success
-    should_render_template 'appointments/new.html.haml'
+    context "being logged in as a customer" do
+      setup do
+        # create free time from 9 am to 11 am local time
+        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
+        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
+      
+        # stub current user
+        @controller.stubs(:logged_in?).returns(true)
+        @controller.stubs(:current_user).returns(@customer)
+        ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
+      
+        # book a haircut with johnny during his free time
+        get :new, 
+            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+            :duration => @haircut.duration, :mark_as => 'work'
+      end
+
+      should_respond_with :success
+      should_render_template 'appointments/new.html.haml'
     
-    should_assign_to :appointment, :class => Appointment
-    should_assign_to :service, :equals => '@haircut'
-    should_assign_to :duration, :equals => '30'
-    should_assign_to :provider, :equals => '@johnny'
-    should_assign_to :customer, :equals => '@customer'
-    should_assign_to :appt_date, :equals => '@time_range.start_at.to_s(:appt_schedule_day)'
-    should_assign_to :appt_time_start_at, :equals => '"0900"'
-    should_assign_to :appt_time_end_at, :equals => '"0930"'
+      should_assign_to :appointment, :class => Appointment
+      should_assign_to :service, :equals => '@haircut'
+      should_assign_to :duration, :equals => '30'
+      should_assign_to :provider, :equals => '@johnny'
+      should_assign_to :customer, :equals => '@customer'
+      should_assign_to :appt_date, :equals => '@time_range.start_at.to_s(:appt_schedule_day)'
+      should_assign_to :appt_time_start_at, :equals => '"0900"'
+      should_assign_to :appt_time_end_at, :equals => '"0930"'
+    end
   end
   
   context "create free appointment without privilege ['update calendars']" do
