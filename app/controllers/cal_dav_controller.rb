@@ -27,7 +27,7 @@ class CalDavController < ApplicationController
   # URL format is http://<subdomain>.walnutcalendar.com/caldav([/provider/<provider_id>]|[/location/<location_id>])[/<cal_dav_token>]
   # We're read only, so we only support reading data from a calendar right now
   def get_resource_for_path(path)
-    
+
     # Get the different arguments in the caldav path
     args = path.split('/')
     cal_dav_token = provider_id = location_id = nil
@@ -59,16 +59,16 @@ class CalDavController < ApplicationController
       end
       
       @provider = provider_id.nil? ? nil : User.find_by_id(provider_id)
-      if (@provider && !@cal_dav_user.has_privilege?('read calendar', @provider))
+      if (@provider && !@cal_dav_user.has_privilege?('read calendars', current_company))
         raise WebDavErrors::ForbiddenError
       end
       
       @location = location_id.nil? ? nil : Location.find_by_id(location_id)
-      if (@location && !@cal_dav_user.has_privilege?('read calendar', @location))
+      if (@location && !@cal_dav_user.has_privilege?('read calendars', current_company))
         raise WebDavErrors::ForbiddenError
       end
       
-      if (@location.nil? && @provider.nil? && !@cal_dav_user.has_privilege?('read calendar', current_company))
+      if (@location.nil? && @provider.nil? && !@cal_dav_user.has_privilege?('read calendars', current_company))
         raise WebDavErrors::ForbiddenError
       end
       
