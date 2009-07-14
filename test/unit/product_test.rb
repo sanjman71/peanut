@@ -3,12 +3,12 @@ require 'test/factories'
 
 class ProductTest < ActiveSupport::TestCase
 
-  should_require_attributes :company_id
-  should_require_attributes :name
-  should_require_attributes :inventory
-  should_require_attributes :price_in_cents
+  should_validate_presence_of   :company_id
+  should_validate_presence_of   :name
+  should_validate_presence_of   :inventory
+  should_validate_presence_of   :price_in_cents
   
-  should_belong_to          :company
+  should_belong_to              :company
   
   def setup
     @owner        = Factory(:user)

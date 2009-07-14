@@ -3,9 +3,9 @@ require 'test/factories'
 
 class ServiceProviderTest < ActiveSupport::TestCase
   
-  should_require_attributes :service_id
-  should_require_attributes :provider_id
-  should_require_attributes :provider_type
+  should_validate_presence_of   :service_id
+  should_validate_presence_of   :provider_id
+  should_validate_presence_of   :provider_type
 
   def setup
     @user         = Factory(:user, :name => "Sanjay")

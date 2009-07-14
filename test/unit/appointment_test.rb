@@ -3,20 +3,20 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  should_require_attributes :company_id
-  should_require_attributes :service_id
-  should_require_attributes :provider_id
-  should_require_attributes :provider_type
-  should_require_attributes :start_at
-  should_require_attributes :end_at
-  should_require_attributes :duration
-  should_allow_values_for   :mark_as, "free", "work", "wait"
+  should_validate_presence_of   :company_id
+  should_validate_presence_of   :service_id
+  should_validate_presence_of   :provider_id
+  should_validate_presence_of   :provider_type
+  should_validate_presence_of   :start_at
+  should_validate_presence_of   :end_at
+  should_validate_presence_of   :duration
+  should_allow_values_for       :mark_as, "free", "work", "wait"
 
-  should_belong_to          :company
-  should_belong_to          :service
-  should_belong_to          :provider
-  should_belong_to          :customer
-  should_have_one           :invoice
+  should_belong_to              :company
+  should_belong_to              :service
+  should_belong_to              :provider
+  should_belong_to              :customer
+  should_have_one               :invoice
   
   def setup
     @owner          = Factory(:user, :name => "Owner")

@@ -2,15 +2,15 @@ require 'test/test_helper'
 
 class CompanyTest < ActiveSupport::TestCase
 
-  should_require_attributes   :name
-  should_require_attributes   :subdomain
-  should_require_attributes   :time_zone
-  should_have_one             :subscription
-  should_have_many            :services
-  should_have_many            :products
-  should_have_many            :appointments
-  should_have_many            :invitations
-  should_have_many            :company_providers
+  should_validate_presence_of   :name
+  should_validate_presence_of   :subdomain
+  should_validate_presence_of   :time_zone
+  should_have_one               :subscription
+  should_have_many              :services
+  should_have_many              :products
+  should_have_many              :appointments
+  should_have_many              :invitations
+  should_have_many              :company_providers
   
   context "create company without a subscription" do
     setup do

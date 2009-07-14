@@ -1,10 +1,10 @@
 require 'test/test_helper'
 
 class PlanTest < ActiveSupport::TestCase
-  should_require_attributes   :name, :cost
-  should_have_many            :companies
-  should_have_many            :users
-  should_have_many            :subscriptions
+  should_validate_presence_of   :name, :cost
+  should_have_many              :companies
+  should_have_many              :users
+  should_have_many              :subscriptions
   
   context "create monthly plan" do
     setup do

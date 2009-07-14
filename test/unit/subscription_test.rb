@@ -2,8 +2,8 @@ require 'test/test_helper'
 require 'test/factories'
 
 class SubscriptionTest < ActiveSupport::TestCase
-  should_require_attributes :company_id, :user_id, :plan_id, :paid_count, :billing_errors_count
-  should_have_many          :payments
+  should_validate_presence_of   :company_id, :user_id, :plan_id, :paid_count, :billing_errors_count
+  should_have_many              :payments
   
   def setup
     @user = Factory(:user)

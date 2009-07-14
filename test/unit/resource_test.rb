@@ -3,7 +3,7 @@ require 'test/factories'
 
 class ResourceTest < ActiveSupport::TestCase
 
-  should_require_attributes :name
+  should_validate_presence_of :name
   
   def setup
     # create a valid company

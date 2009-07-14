@@ -3,10 +3,9 @@ require 'test/factories'
 
 class InvoiceTest < ActiveSupport::TestCase
   
-  # shoulda
-  should_require_attributes :invoiceable_id
-  should_require_attributes :invoiceable_type
-  should_have_many          :invoice_line_items
+  should_validate_presence_of   :invoiceable_id
+  should_validate_presence_of   :invoiceable_type
+  should_have_many              :invoice_line_items
   
   def setup
     @owner        = Factory(:user, :name => "Owner")

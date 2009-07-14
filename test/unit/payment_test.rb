@@ -2,7 +2,7 @@ require 'test/test_helper'
 require 'test/factories'
 
 class PaymentTest < ActiveSupport::TestCase
-  should_require_attributes     :description
+  should_validate_presence_of   :description
   should_belong_to              :subscription
   
   context "successful payment authorization" do
