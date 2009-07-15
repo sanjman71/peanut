@@ -50,7 +50,7 @@ class OpeningsControllerTest < ActionController::TestCase
     ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
     
     # Set the request hostname
-    @request.host = "www.peanut.com"
+    # @request.host = "www.peanut.com"
   end
   
   context "search company openings with no service specified" do
@@ -61,7 +61,7 @@ class OpeningsControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'openings/index.html.haml'
     should_not_assign_to :daterange
-    should_assign_to :duration, :equals => '0'
+    should_assign_to(:duration) { 0 }
     
     should "have 'nothing' service" do
       assert assigns(:service).nothing?
@@ -74,7 +74,7 @@ class OpeningsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should_redirect_to "openings_path"
+    should_redirect_to("openings_path") { openings_path }
   end
 
   context "search company openings with a valid service, but invalid duration" do
@@ -84,8 +84,8 @@ class OpeningsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to openings services path with default duration value" do
-      assert_redirected_to("/services/#{@haircut.id}/30/openings/this-week/anytime")
+    should_redirect_to "openings services path with default duration value" do
+      "/services/#{@haircut.id}/30/openings/this-week/anytime"
     end
   end
 end
