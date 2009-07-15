@@ -15,7 +15,8 @@ class OpeningsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
     end
     
-    if !current_company.setup?
+    # check that the company has at least 1 provider and 1 work service
+    if current_company.providers_count == 0 or current_company.work_services_count == 0
       redirect_to(setup_company_path(current_company)) and return
     end
     

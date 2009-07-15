@@ -24,7 +24,7 @@ if !File.exists?(path)
   File.symlink(source, path)
 else
   if File.symlink?(path)
-    puts "Looks like you have the models symbolic link set up."
+    # puts "Looks like you have the models symbolic link set up."
   else
     puts "Can't overwrite the existing file at #{path} with the symlink for shared models. No action being taken."
   end

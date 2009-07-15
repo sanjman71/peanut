@@ -35,7 +35,7 @@ class CustomersControllerTest < ActionController::TestCase
       end
       
       should_respond_with :redirect
-      should_redirect_to 'unauthorized_path'
+      should_redirect_to('unauthorized_path') { unauthorized_path }
     end
     
     context "and with 'read users' privilege" do
@@ -51,7 +51,7 @@ class CustomersControllerTest < ActionController::TestCase
       should_render_template 'customers/index.html.haml'
       should_not_set_the_flash
       should_assign_to :customers
-      should_assign_to :paginate, :equals => 'true'
+      should_assign_to(:paginate) { true }
       should_not_assign_to :search, :search_text
       
       should "find no customers" do
@@ -87,7 +87,7 @@ class CustomersControllerTest < ActionController::TestCase
       should_respond_with_content_type "text/javascript"
       should_not_set_the_flash
       should_assign_to :customers, :search, :search_text
-      should_not_assign_to :paginate
+      should_assign_to(:paginate) { false }
       
       should "find customer" do
         assert_equal [@customer], assigns(:customers)

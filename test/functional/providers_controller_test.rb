@@ -14,7 +14,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
   def setup
     @controller   = ProvidersController.new
-    # create a valid company
+    # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
@@ -41,7 +41,7 @@ class ProvidersControllerTest < ActionController::TestCase
     end
   
     should_respond_with :redirect
-    should_redirect_to 'unauthorized_path'
+    should_redirect_to('unauthorized_path') { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
   
@@ -57,7 +57,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :providers, :class => Array
+    should_assign_to(:providers, :class => Array)
   
     should "not be able to change manager role" do
       assert_select "input.checkbox.manager", 0
@@ -79,7 +79,7 @@ class ProvidersControllerTest < ActionController::TestCase
   
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to :providers, :class => Array
+    should_assign_to(:providers, :class => Array)
     
     should "be able to change manager role for 1 provider" do
       assert_select "input.checkbox.manager", 1
