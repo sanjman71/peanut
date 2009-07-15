@@ -21,7 +21,7 @@ class ProductsControllerTest < ActionController::TestCase
         xhr :post, :create, :product => {:name => "", :price => "0", :inventory => "0"}
       end
       
-      should_redirect_to "unauthorized_path"
+      should_redirect_to("unauthorized_path") { unauthorized_path }
     end
     
     context "with a blank name" do
@@ -35,7 +35,7 @@ class ProductsControllerTest < ActionController::TestCase
       should_respond_with_content_type "text/javascript"
       should_assign_to :product
       should_set_the_flash_to "Could not create product"
-      should_assign_to :error, :equals => "true"
+      should_assign_to(:error) { true }
       should_not_change "Product.count"
     end
     
@@ -85,7 +85,7 @@ class ProductsControllerTest < ActionController::TestCase
         get :edit, :id => @shampoo
       end
       
-      should_redirect_to "unauthorized_path"  
+      should_redirect_to("unauthorized_path") { unauthorized_path }
     end
   end
   
@@ -96,7 +96,7 @@ class ProductsControllerTest < ActionController::TestCase
         get :index
       end
       
-      should_redirect_to "unauthorized_path"  
+      should_redirect_to("unauthorized_path") { unauthorized_path }
     end
     
     context "with privilege ['read products'], but not ['create products']" do
