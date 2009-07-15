@@ -1,5 +1,7 @@
 class RpxController < ApplicationController
 
+  include UserSessionHelper
+
   def customer
     raise Exception unless @data = RPXNow.user_data(params[:token])
     
@@ -8,20 +10,25 @@ class RpxController < ApplicationController
     if @user.blank?
       # create user using rpx identifier
       @user = User.create(:name => @data[:name], :email => @data[:email], :identifier => @data[:identifier])
-    
-      @user.register! if @user && @user.valid?
-      success = @user && @user.valid?
-    
-      if success && @user.errors.empty?
-        @redirect_path  = "/"
+
+      if @user.valid?
+        @user.register!
+
+        # create user session
+        redirect_path = session_initialize(@user)
+      end
+
+      if @user.valid?
+        redirect_back_or_default(redirect_path) and return
       else
-        raise Exception, "error"
+        flash[:error] = @user.errors.full_messages.join("<br/>")
+        render(:template => "sessions/new") and return
       end
     else
-      # create new user session
+      # create user session
+      redirect_path = session_initialize(@user)
+      redirect_back_or_default(redirect_path) and return
     end
-    
-    redirect_back_or_default(@redirect_path)
   end
 
 end

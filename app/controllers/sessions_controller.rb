@@ -1,6 +1,8 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
 
+  include UserSessionHelper
+
   def new
     # We show a signup form also, which requires a @user object
     @user = User.new
@@ -26,14 +28,8 @@ class SessionsController < ApplicationController
       # protection if user resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
       
-      # cache the return to value (if it exists) before we reset the ression
-      return_to         = session[:return_to]
-      reset_session
-      self.current_user = user
-      new_cookie_flag   = (params[:remember_me] == "1")
-      handle_remember_cookie! new_cookie_flag
-      flash[:notice]    = "Logged in successfully"
-      redirect_back_or_default(return_to || '/') and return
+      redirect_path = session_initialize(@user)
+      redirect_back_or_default(redirect_path) and return
     else
       note_failed_signin
       @user        = User.new
