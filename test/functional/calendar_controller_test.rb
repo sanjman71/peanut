@@ -40,7 +40,7 @@ class CalendarControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should_redirect_to "unauthorized_path"
+    should_redirect_to("unauthorized_path") { unauthorized_path } 
     should_set_the_flash_to /You are not authorized/
   end
 
@@ -52,9 +52,7 @@ class CalendarControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to company root path" do
-      assert_redirected_to("/")
-    end
+    should_redirect_to("company root path") { '/' }
   end
 
   context "search company calendars for a company that has 1 provider" do
@@ -69,9 +67,7 @@ class CalendarControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to johnny's calendar" do
-      assert_redirected_to("/#{@johnny.tableize}/#{@johnny.id}/calendar")
-    end
+    should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
   end
   
   context "add company providers" do
@@ -104,11 +100,11 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "form#add_single_free_time_form", 1
       end
       
-      should_assign_to :provider, :equals => '@johnny'
+      should_assign_to(:provider) { @johnny }
       should_assign_to :providers, :class => Array
       should_assign_to :appointments, :class => Array
       should_assign_to :calendar_markings, :class => Hash
-      should_assign_to :when, :equals => '"this week"'
+      should_assign_to(:when) { "this week" }
       should_assign_to :daterange, :class => DateRange
     end
     
@@ -127,7 +123,7 @@ class CalendarControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'calendar/edit.html.haml'
 
-      should_assign_to :provider, :equals => '@johnny'
+      should_assign_to(:provider) { @johnny }
       should_assign_to :providers, :class => Array
       should_assign_to :calendar_markings, :class => Hash
       should_assign_to :daterange, :class => DateRange
@@ -152,11 +148,11 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "form#add_single_free_time_form", 0
       end
 
-      should_assign_to :provider, :equals => '@johnny'
+      should_assign_to(:provider) { @johnny }
       should_assign_to :providers, :class => Array
       should_assign_to :appointments, :class => Array
       should_assign_to :calendar_markings, :class => Hash
-      should_assign_to :when, :equals => '"this week"'
+      should_assign_to(:when) { "this week" }
       should_assign_to :daterange, :class => DateRange
     end
 
@@ -171,7 +167,7 @@ class CalendarControllerTest < ActionController::TestCase
       end
 
       should_respond_with :redirect
-      should_redirect_to "unauthorized_path"
+      should_redirect_to("unauthorized_path") { unauthorized_path }
       should_set_the_flash_to /You are not authorized/
     end
   end
