@@ -71,7 +71,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
     
       should_respond_with :redirect
-      should_redirect_to "login_path"
+      should_redirect_to("login_path") { login_path }
     end
 
     context "being logged in as a customer" do
@@ -97,13 +97,13 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_render_template 'appointments/new.html.haml'
     
       should_assign_to :appointment, :class => Appointment
-      should_assign_to :service, :equals => '@haircut'
-      should_assign_to :duration, :equals => '30'
-      should_assign_to :provider, :equals => '@johnny'
-      should_assign_to :customer, :equals => '@customer'
-      should_assign_to :appt_date, :equals => '@time_range.start_at.to_s(:appt_schedule_day)'
-      should_assign_to :appt_time_start_at, :equals => '"0900"'
-      should_assign_to :appt_time_end_at, :equals => '"0930"'
+      should_assign_to(:service) { @haircut }
+      should_assign_to(:duration) { 30 }
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:customer) { @customer }
+      should_assign_to(:appt_date) { @time_range.start_at.to_s(:appt_schedule_day) }
+      should_assign_to(:appt_time_start_at) { "0900" }
+      should_assign_to(:appt_time_end_at) { "0930" }
     end
   end
   
@@ -116,7 +116,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     
     should_not_change "Appointment.count"
     should_respond_with :redirect
-    should_redirect_to "unauthorized_path"
+    should_redirect_to("unauthorized_path") { unauthorized_path }
   end
   
   context "create free appointment for multiple dates" do
@@ -130,16 +130,14 @@ class AppointmentsControllerTest < ActionController::TestCase
     
     should_change "Appointment.count", :by => 2
     
-    should_assign_to :service, :equals => "@free_service"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :start_at, :equals => '"0900"'
-    should_assign_to :end_at, :equals => '"1100"'
-    should_assign_to :mark_as, :equals => '"free"'
+    should_assign_to(:service) { @free_service }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:start_at) { "0900" }
+    should_assign_to(:end_at) { "1100" }
+    should_assign_to(:mark_as)  { "free" }
 
     should_respond_with :redirect
-    should "redirect to user calendar path" do
-      assert_redirected_to("/users/#{@johnny.id}/calendar")
-    end
+    should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
   
   context "create free appointment for a single date" do
@@ -153,16 +151,14 @@ class AppointmentsControllerTest < ActionController::TestCase
   
     should_change "Appointment.count", :by => 1
     
-    should_assign_to :service, :equals => "@free_service"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :start_at, :equals => '"0900"'
-    should_assign_to :end_at, :equals => '"1100"'
-    should_assign_to :mark_as, :equals => '"free"'
+    should_assign_to(:service) { @free_service }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:start_at)  { "0900" }
+    should_assign_to(:end_at) { "1100" }
+    should_assign_to(:mark_as) {"free" }
 
     should_respond_with :redirect
-    should "redirect to user calendar path" do
-      assert_redirected_to("/users/#{@johnny.id}/calendar")
-    end
+    should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
   
   context "create work appointment for a single date that has no free time" do
@@ -174,16 +170,14 @@ class AppointmentsControllerTest < ActionController::TestCase
   
     should_not_change "Appointment.count"
   
-    should_assign_to :service, :equals => "@haircut"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :start_at, :equals => '"0900"'
-    should_assign_to :end_at, :equals => '"1100"'
-    should_assign_to :mark_as, :equals => '"work"'
+    should_assign_to(:service) { @haircut }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:start_at) { "0900" }
+    should_assign_to(:end_at) { "1100" }
+    should_assign_to(:mark_as) { "work" }
 
     should_respond_with :redirect
-    should "redirect to user calendar path" do
-      assert_redirected_to("/users/#{@johnny.id}/calendar")
-    end
+    should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
 
   context "create work appointment for a single date with free time, replacing free time" do
@@ -205,13 +199,13 @@ class AppointmentsControllerTest < ActionController::TestCase
     # free appointment should be replaced with work appointment
     should_change "Appointment.count", :by => 1
 
-    should_assign_to :service, :equals => "@haircut"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :customer, :equals => "@customer"
-    should_assign_to :start_at, :equals => '"0900"'
-    should_assign_to :end_at, :equals => '"1100"'
-    should_assign_to :duration, :equals => '120'
-    should_assign_to :mark_as, :equals => '"work"'
+    should_assign_to(:service) { @haircut }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:customer) { @customer }
+    should_assign_to(:start_at)  { "0900" }
+    should_assign_to(:end_at)  { "1100" }
+    should_assign_to(:duration) { 120 }
+    should_assign_to(:mark_as) { "work" }
 
     should "have appointment duration of 120 minutes" do
       assert_equal 120, assigns(:appointment).duration
@@ -222,9 +216,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment path" do
-      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
-    end
+    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
   end
 
   context "create work appointment for a single date with free time, splitting free time" do
@@ -246,13 +238,13 @@ class AppointmentsControllerTest < ActionController::TestCase
     # free appointment should be split into work appointment and 2 free appointments, so we should have 3 appointments total
     should_change "Appointment.count", :by => 3
   
-    should_assign_to :service, :equals => "@haircut"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :customer, :equals => "@customer"
-    should_assign_to :start_at, :equals => '"1000"'
-    should_assign_to :end_at, :equals => '"1030"'
-    should_assign_to :duration, :equals => '30'
-    should_assign_to :mark_as, :equals => '"work"'
+    should_assign_to(:service) { @haircut }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:customer) { @customer }
+    should_assign_to(:start_at)  { "1000" }
+    should_assign_to(:end_at) { "1030" }
+    should_assign_to(:duration) { 30 }
+    should_assign_to(:mark_as) { "work" }
     
     should "have appointment duration of 30 minutes" do
       assert_equal 30, assigns(:appointment).duration
@@ -263,9 +255,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment path" do
-      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
-    end
+    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
   end
 
   context "create work appointment for a single date with free time, using a custom duration" do
@@ -287,13 +277,13 @@ class AppointmentsControllerTest < ActionController::TestCase
     # free appointment should be replaced with 1 work and 2 free appointments
     should_change "Appointment.count", :by => 3
 
-    should_assign_to :service, :equals => "@haircut"
-    should_assign_to :provider, :equals => "@johnny"
-    should_assign_to :customer, :equals => "@customer"
-    should_assign_to :start_at, :equals => '"1000"'
-    should_assign_to :end_at, :equals => '"1200"'
-    should_assign_to :duration, :equals => '120'
-    should_assign_to :mark_as, :equals => '"work"'
+    should_assign_to(:service) { @haircut }
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:customer) { @customer }
+    should_assign_to(:start_at) { "1000" }
+    should_assign_to(:end_at)  { "1200" }
+    should_assign_to(:duration)  { 120 }
+    should_assign_to(:mark_as) { "work" }
     should_assign_to :appointment
 
     should "have appointment duration of 120 minutes" do
@@ -305,9 +295,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should "redirect to appointment path" do
-      assert_redirected_to("/appointments/#{assigns(:appointment).id}")
-    end
+    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
   end
   
   context "request a waitlist appointment for a date range" do
@@ -359,17 +347,15 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_change "Appointment.count", :by => 1
     
-      should_assign_to :service, :equals => "@haircut"
-      should_not_assign_to :duration
-      should_assign_to :provider, :equals => "@johnny"
-      should_assign_to :customer, :equals => "@customer"
-      should_assign_to :mark_as, :equals => '"wait"'
-      should_assign_to :appointment
+      should_assign_to(:service) { @haircut }
+      should_not_assign_to(:duration)
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:customer) { @customer }
+      should_assign_to(:mark_as) { "wait" }
+      should_assign_to(:appointment)
     
       should_respond_with :redirect
-      should "redirect to appointment path" do
-        assert_redirected_to "/appointments/#{assigns(:appointment).id}"
-      end
+      should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
     end
     
     context "for a service with any service provider" do
@@ -388,18 +374,15 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_change "Appointment.count", :by => 1
 
-      should_assign_to :service, :equals => "@haircut"
-      should_not_assign_to :duration
-      should_not_assign_to :provider # provider should be empty
-      should_assign_to :customer, :equals => "@customer"
-      should_assign_to :mark_as, :equals => '"wait"'
-      should_assign_to :appointment
+      should_assign_to(:service) { @haircut }
+      should_not_assign_to(:duration)
+      should_not_assign_to(:provider) # provider should be empty
+      should_assign_to(:customer) { @customer }
+      should_assign_to(:mark_as) { "wait" }
+      should_assign_to(:appointment)
 
       should_respond_with :redirect
-      should "redirect to appointment path" do
-        # assert_redirected_to "http://test.host/appointments/#{assigns(:appointment).id}"
-        assert_redirected_to "/appointments/#{assigns(:appointment).id}"
-      end
+      should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
     end
   end
   
