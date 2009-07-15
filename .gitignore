@@ -3,5 +3,6 @@ log/*
 tmp/*
 db/schema.rb
 config/god/*
+config/database.yml
 public/system/*
 .DS_Store
