@@ -10,6 +10,7 @@ class RecurrenceTest < ActiveSupport::TestCase
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
   should_validate_presence_of   :duration
+  # should_validate_presence_of   :uid        # The UID is made before validation if it's missing. So, this test always fails
   should_allow_values_for       :mark_as, "free", "work", "wait"
 
   should_belong_to              :company
@@ -31,12 +32,12 @@ class RecurrenceTest < ActiveSupport::TestCase
   context "create one recurring free appointment" do
     setup do
       @free_service   = @company.free_service
-      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
-      @start_at_utc   = Time.now.utc.beginning_of_day
+      @provider       = Factory(:user, :name => "Provider", :companies => [@company])
+      @start_at_utc   = Time.parse("20090712").utc.beginning_of_day # Begin on a Sunday
       @end_at_utc     = @start_at_utc + 2.hours
       @end_recurrence = @start_at_utc + 8.weeks
       @rrule          = "FREQ=WEEKLY;BYDAY=TU,TH"
-      @recurrence     = Recurrence.create(:company => @company, :provider => @johnny, :service => @free_service,
+      @recurrence     = Recurrence.create(:company => @company, :provider => @provider, :service => @free_service,
                                           :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => "free",
                                           :rrule => @rrule, :description => "This is the recurrence description")
     end
@@ -132,6 +133,43 @@ class RecurrenceTest < ActiveSupport::TestCase
           assert_equal 0, a.start_at.utc.hour
           assert_equal 3, a.end_at.utc.hour
         end
+      end
+      
+    end
+
+    context "then create a second recurrence" do
+      setup do
+        @customer       = Factory(:user, :name => "Customer", :companies => [@company])
+        @start_at_utc   = Time.parse("20090712").utc.beginning_of_day # Begin on a Sunday
+        @end_at_utc     = @start_at_utc + 30.minutes
+        @end_recurrence = @start_at_utc + 8.weeks
+        @rrule          = "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,FR"
+        @recurrence2    = Recurrence.create(:company => @company, :provider => @provider, :service => @free_service,
+                                            :customer => @customer,
+                                            :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => "free",
+                                            :rrule => @rrule, :description => "This is the recurrence description")
+      end
+
+      should_change "Appointment.count", :by => 4
+
+      should "have duration of 30 minutes" do
+        @recurrence2.appointments.each do |a|
+          assert_equal 30, a.duration
+          assert_equal 0, a.start_at.utc.hour
+          assert_equal 0, a.end_at.utc.hour
+          assert_equal 30, a.end_at.min
+        end
+      end
+      
+    end
+    
+    context "delete the second recurrence" do
+      setup do
+        setup do
+          @recurrence2.destroy
+        end
+
+        should_change "Appointment.count", :by => 4
       end
       
     end

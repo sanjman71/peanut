@@ -10,7 +10,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
   should_validate_presence_of   :duration
-  should_validate_presence_of   :uid
+  # should_validate_presence_of   :uid        # The UID is made before validation if it's missing. So, this test always fails
   should_allow_values_for       :mark_as, "free", "work", "wait"
 
   should_belong_to              :company
