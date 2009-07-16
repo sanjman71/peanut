@@ -1,35 +1,41 @@
 -# total_days => number of days to show
--# start_day => start calendar with start_day
+-# start_day => day to start calendar with
 -# today => day to show as 'Today'
 -# markings => hash mapping days to markings for that day
+-# show_weeks => if true, show weeks, otherwise, just show the day names; defaults to true
 
 -# split days into weeks, use first week to show calendar header fields
 - weeks = Array(0..total_days-1).in_groups_of(7)
 - week0 = weeks.first.compact
+
+-# always show weeks unless explicitly asked not to
+- show_weeks = true if local_assigns[:show_weeks].nil?
 
 %table.calendar
   %tbody
     %tr.colborder
       - week0.each do |day_i|
         -# show Mon-Sun header fields
-        %th= (start_day + day_i.days).strftime("%a")
-      -# show appointments for each day
-      - weeks.each do |week|
-        %tr
-          - week.compact.each do |day_i|
-            -# compute the day we're on
-            - day     = start_day + day_i.days
-            -# check for markings (used as css tags) on this day
-            - key     = day.to_s(:appt_schedule_day)
-            - klasses = Array(markings[key])
-            -# add weekday or weekend class
-            - klasses += [0, 6].include?(day.wday) ? ['weekend'] : ['weekday']
-            -# add past, today classes based on day of the year
-            - klasses += ['past'] if day.yday < today.yday
-            - klasses += ['today'] if day.yday == today.yday
-            -# set id as date [year,month,day]
-            - id = "#{day.year}#{sprintf("%02d", day.month)}#{sprintf("%02d", day.mday)}"
-            %td{:class => klasses.join(" "), :id => id}
-              -# special case for 'Today'
-              %span= (day.yday == today.yday) ? 'Today' : day.strftime("%b %d")
+        - day_string = (start_day + day_i.days).strftime("%a")
+        %th{:class => 'dayname', :id => day_string.downcase, :byday => day_string.downcase.slice(0,2)}= day_string
+      - if show_weeks
+        -# show appointments for each day
+        - weeks.each do |week|
+          %tr
+            - week.compact.each do |day_i|
+              -# compute the day we're on
+              - day     = start_day + day_i.days
+              -# check for markings (used as css tags) on this day
+              - key     = day.to_s(:appt_schedule_day)
+              - klasses = Array(markings[key])
+              -# add weekday or weekend class
+              - klasses += [0, 6].include?(day.wday) ? ['weekend'] : ['weekday']
+              -# add past, today classes based on day of the year
+              - klasses += ['past'] if day.yday < today.yday
+              - klasses += ['today'] if day.yday == today.yday
+              -# set id as date [year,month,day]
+              - id = "#{day.year}#{sprintf("%02d", day.month)}#{sprintf("%02d", day.mday)}"
+              %td{:class => klasses.join(" "), :id => id}
+                -# special case for 'Today'
+                %span= (day.yday == today.yday) ? 'Today' : day.strftime("%b %d")
               

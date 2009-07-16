@@ -217,6 +217,61 @@ class AppointmentsController < ApplicationController
     end
   end
   
+  # POST /users/1/calendar/weekly/add
+  def create_weekly
+    begin
+      # find the provider, but beware that the send method can generate an exception
+      klass, id = [params[:provider_type], params[:provider_id]]
+      @provider = current_company.send(klass).find_by_id(id)
+    rescue Exception => e
+      logger.debug("xxx create appointment error: #{e.message}")
+      flash[:error] = "Error creating appointment"
+      # set redirect path
+      @redirect_path = request.referer
+      return
+    end
+
+    @free_service = current_company.free_service
+
+    # get recurrence parameters
+    @freq         = params[:freq].to_s.upcase
+    @byday        = params[:byday].to_s.upcase
+    @dstart       = params[:dstart].to_s
+    @tstart       = params[:tstart].to_s
+    @tend         = params[:tend].to_s
+    @until        = params[:until].to_s
+
+    # build recurrence rule from rule components
+    tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
+
+    unless @until.blank?
+      tokens.push("UNTIL=#{@until}T000000Z")
+    end
+
+    @rrule        = tokens.join(";")
+
+    # build dtstart from dstart and tstart, and dtend from dstart and tend
+    @dtstart      = "#{@dstart}T#{@tstart}"
+    @dtend        = "#{@dstart}T#{@tend}"
+
+    # build start_at and end_at times
+    @start_at_utc = Time.parse(@dtstart).utc
+    @end_at_utc   = Time.parse(@dtend).utc
+
+    # create recurrence
+    @recurrence   = Recurrence.create(:company => current_company, :provider => @provider, :service => @free_service,
+                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => "free",
+                                      :rrule => @rrule)
+
+    # build redirect path
+    @redirect_path  = build_create_redirect_path(@provider, request.referer)
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
+      format.js
+    end
+  end
+
   # GET /appointments/1/reschedule
   def reschedule
     @appointment  = current_company.appointments.find(params[:id])

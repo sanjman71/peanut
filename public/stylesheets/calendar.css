@@ -19,9 +19,9 @@ table.calendar span                               { margin: 3px 0 0; padding: 0;
 /* change text color for today */
 table.calendar td.today                           { color: #5500BB; font-weight: bold; }
 
-table.calendar td.hover                           { background: #FFCC00 none repeat scroll 0 0; color: #000000; }  /* yellowish */
+table.calendar td.hover, table.calendar th.hover  { background: #FFCC00 none repeat scroll 0 0; color: #000000; }  /* yellowish */
 
-table.calendar td.mark                            { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
+table.calendar td.mark, table.calendar th.mark    { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
 
 /* calendar attribute styles */
 

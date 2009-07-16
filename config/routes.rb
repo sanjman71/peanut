@@ -83,6 +83,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
   map.connect   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
   map.connect   ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.connect   ':provider_type/:provider_id/calendar/weekly/edit', :controller => 'calendar', :action => 'edit_weekly'
   map.connect   ':provider_type/:provider_id/calendar/edit', :controller => 'calendar', :action => 'edit'
   
   # search calendars scoped by provider
@@ -106,6 +107,10 @@ ActionController::Routing::Routes.draw do |map|
                 :controller => 'appointments', :action => 'create', :mark_as => 'wait', 
                 :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
     
+  # schedule free time for a provider by adding a weekly recurring set of appointmetns  
+  map.connect   ':provider_type/:provider_id/calendar/weekly/add', 
+                :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}
+
   # toggle a provider's calendar
   map.connect   ':provider_type/:provider_id/calendar/toggle',
                 :controller => 'company_providers', :action => 'toggle', :conditions => {:method => :post}

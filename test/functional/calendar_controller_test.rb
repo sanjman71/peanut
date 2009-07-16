@@ -15,6 +15,10 @@ class CalendarControllerTest < ActionController::TestCase
   # edit calendar for a specific provider
   should_route :get, 'users/1/calendar/edit', 
                :controller => "calendar", :action => 'edit', :provider_type => "users", :provider_id => "1"
+
+  should_route :get, 'users/1/calendar/weekly/edit',
+               :controller => "calendar", :action => 'edit_weekly', :provider_type => "users", :provider_id => "1"
+
   
   def setup
     @controller   = CalendarController.new

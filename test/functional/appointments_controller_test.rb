@@ -19,6 +19,10 @@ class AppointmentsControllerTest < ActionController::TestCase
                :controller => 'appointments', :action => 'create', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60, :start_at => '20090303T113000', :mark_as => 'work'
 
+  # create free time
+  should_route  :post, '/users/3/calendar/weekly/add', 
+                :controller => 'appointments', :action => 'create_weekly', :provider_type => 'users', :provider_id => 3
+  
   # show an appointment
   should_route :get, '/appointments/1', :controller => 'appointments', :action => 'show', :id => 1
   
@@ -161,6 +165,58 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
   
+  context "create weekly schedule" do
+    context "with no end date" do
+      setup do
+        # allow user to create free appointments
+        @controller.stubs(:current_privileges).returns(["update calendars"])
+        post :create_weekly,
+             {:freq => 'weekly', :byday => 'mo,tu', :dstart => "20090201", :tstart => "090000", :tend => "110000", :until => '',
+              :provider_type => "users", :provider_id => "#{@johnny.id}"}
+      end
+    
+      should_change "Recurrence.count", :by => 1
+      # should expand 4 weeks, at 2 appts a week
+      should_change "Appointment.count", :by => 8
+    
+      should_assign_to(:freq) { "WEEKLY" }
+      should_assign_to(:byday) { "MO,TU" }
+      should_assign_to(:dtstart) { "20090201T090000" }
+      should_assign_to(:dtend) { "20090201T110000" }
+      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:free_service) { @free_service }
+
+      should_respond_with :redirect
+      should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+    end
+    
+    context "with an end date" do
+      setup do
+        # allow user to create free appointments
+        @controller.stubs(:current_privileges).returns(["update calendars"])
+        post :create_weekly,
+             {:freq => 'weekly', :byday => 'mo,tu', :dstart => "20090201", :tstart => "090000", :tend => "110000", :until => '20090515',
+              :provider_type => "users", :provider_id => "#{@johnny.id}"}
+      end
+
+      should_change "Recurrence.count", :by => 1
+      # should expand 4 weeks, at 2 appts a week
+      should_change "Appointment.count", :by => 8
+
+      should_assign_to(:freq) { "WEEKLY" }
+      should_assign_to(:byday) { "MO,TU" }
+      should_assign_to(:dtstart) { "20090201T090000" }
+      should_assign_to(:dtend) { "20090201T110000" }
+      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20090515T000000Z" }
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:free_service) { @free_service }
+
+      should_respond_with :redirect
+      should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+    end
+  end
+
   context "create work appointment for a single date that has no free time" do
     setup do
       post :create,

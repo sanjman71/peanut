@@ -17,7 +17,7 @@ class CalendarController < ApplicationController
       super
     end
   end
-  
+
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
@@ -113,7 +113,7 @@ class CalendarController < ApplicationController
     @providers = current_company.providers.all
     
     # initialize daterange, start calendar on sunday, end calendar on sunday
-    @daterange    = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
+    @daterange = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
         
     # find free work appointments
     @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
@@ -132,6 +132,39 @@ class CalendarController < ApplicationController
     
     @free_service = current_company.free_service
     
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  # GET /users/1/calendar/weekly/edit
+  def edit_weekly
+    if params[:provider_type].blank? or params[:provider_id].blank?
+      # no provider was specified, redirect to the company's first provider
+      provider = current_company.providers.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+    end
+
+    # initialize provider, default to anyone
+    @provider  = find_provider_from_params || User.anyone
+
+    # build list of providers to allow the scheduled to be adjusted by resource
+    @providers = current_company.providers.all
+
+    # initialize daterange, start calendar on sunday, end calendar on sunday, dont really care about 'when'
+    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
+
+    # initialize calendar markings to empty
+    @calendar_markings  = Hash.new
+
+    # build time of day collection
+    # TODO xxx - need a better way of mapping these times to start, end hours
+    @tod        = ['morning', 'afternoon']
+    @tod_start  = 'morning'
+    @tod_end    = 'afternoon'
+
+    @free_service = current_company.free_service
+
     respond_to do |format|
       format.html
     end
