@@ -52,6 +52,11 @@ class RecurrenceTest < ActiveSupport::TestCase
       end
     end
 
+    should "have a valid uid" do
+      assert !(@recurrence.uid.blank?)
+      assert_match Regexp.new("[0-9]*-r-[0-9]*@walnutindustries.com"), @recurrence.uid
+    end
+
     context "then delete the recurrence" do
        setup do
          @recurrence.destroy

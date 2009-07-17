@@ -5,12 +5,11 @@ class AppointmentTest < ActiveSupport::TestCase
   
   should_validate_presence_of   :company_id
   should_validate_presence_of   :service_id
-  should_validate_presence_of   :provider_id
-  should_validate_presence_of   :provider_type
+  # should_validate_presence_of   :provider_id
+  # should_validate_presence_of   :provider_type
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
   should_validate_presence_of   :duration
-  # should_validate_presence_of   :uid        # The UID is made before validation if it's missing. So, this test always fails
   should_allow_values_for       :mark_as, "free", "work", "wait"
 
   should_belong_to              :company
@@ -45,6 +44,11 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 120, @appt.duration
       assert_equal 0, @appt.start_at.utc.hour
       assert_equal 2, @appt.end_at.utc.hour
+    end
+    
+    should "have a valid uid" do
+      assert !(@appt.uid.blank?)
+      assert_match Regexp.new("[0-9]*-[ar]-[0-9]*@walnutindustries.com"), @appt.uid
     end
   end
   
