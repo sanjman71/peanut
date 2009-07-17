@@ -4,7 +4,7 @@ require 'test/factories'
 class AppointmentTest < ActiveSupport::TestCase
   
   should_validate_presence_of   :company_id
-  should_validate_presence_of   :service_id
+  # should_validate_presence_of   :service_id
   # should_validate_presence_of   :provider_id
   # should_validate_presence_of   :provider_type
   should_validate_presence_of   :start_at
