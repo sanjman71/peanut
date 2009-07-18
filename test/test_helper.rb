@@ -69,6 +69,23 @@ class ActiveSupport::TestCase
       :zip      => '90210' 
     }.update(options) 
   end
+
+  def assert_true(x)
+    assert(x)
+  end
+  
+  def assert_false(x)
+    assert(!x)
+  end
+  
+  def assert_not_valid(x)
+    assert !x.valid?
+  end  
+
+  def assert_nil(x)
+    assert_equal nil, x
+  end
+
 end
 
 class ActionView::Base
