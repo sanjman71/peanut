@@ -29,7 +29,7 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
                                           :description => "Benchmarking", :public => true)
     end
   
-    should_change "Appointment.count", :by => 4
+    should_change "Recurrence.count", :by => 1
   
   end
 
