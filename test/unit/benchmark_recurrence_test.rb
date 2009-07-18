@@ -19,7 +19,7 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
 
   context "Benchmark run" do
     setup do
-      @start_at_utc   = Time.now.utc.beginning_of_day
+      @start_at_utc   = (Time.now - 6.months).utc.beginning_of_day
       @end_at_utc     = @start_at_utc + 2.hours
       @end_recurrence = @start_at_utc + 4.weeks
       @recur_days     = "#{DAYS_OF_WEEK[(Time.now + 2.days).wday]}"
