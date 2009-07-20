@@ -2,9 +2,7 @@ require 'test/test_helper'
 require 'test/factories'
 
 class BenchmarkRecurrenceTest < ActiveSupport::TestCase
-    
-  DAYS_OF_WEEK = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
-  
+      
   def setup
     @owner          = Factory(:user, :name => "Owner")
     @monthly_plan   = Factory(:monthly_plan)
@@ -32,7 +30,7 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
       @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks, 3)
     end
   
-    should_change "Recurrence.count", :by => 1
+    should_change "Appointment.recurring.count", :by => 1
   
   end
 
