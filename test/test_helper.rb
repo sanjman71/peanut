@@ -86,6 +86,15 @@ class ActiveSupport::TestCase
     assert_equal nil, x
   end
 
+  DAYS_OF_WEEK = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
+  
+  def ical_days(days)
+    a = []
+    days.each do |day|
+      a << DAYS_OF_WEEK[day.wday - 1]
+    end
+    a.join(',')
+  end
 end
 
 class ActionView::Base

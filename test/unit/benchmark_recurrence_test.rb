@@ -19,14 +19,17 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
 
   context "Benchmark run" do
     setup do
-      @start_at_utc   = (Time.now - 6.months).utc.beginning_of_day
-      @end_at_utc     = @start_at_utc + 2.hours
-      @end_recurrence = @start_at_utc + 4.weeks
-      @recur_days     = "#{DAYS_OF_WEEK[(Time.now + 2.days).wday]}"
-      @rrule          = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-      @recurrence     = Recurrence.create(:company => @company, :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => "free",
-                                          :rrule => @rrule, :name => "Benchmarking", 
+      @now            = Time.now
+      @start_at       = (@now - 6.months).beginning_of_day
+      @end_at         = @start_at + 2.hours
+      @end_recurrence = @start_at + 4.weeks
+      @recur_days     = "#{ical_days([(@start_at + 2.days)])}"
+      @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
+      @recurrence     = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
+                                          :recur_rule => @recur_rule, :name => "Benchmarking", 
                                           :description => "Benchmarking", :public => true)
+      assert_valid @recurrence
+      @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks, 3)
     end
   
     should_change "Recurrence.count", :by => 1
