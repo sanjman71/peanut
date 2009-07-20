@@ -1,23 +1,9 @@
 class CalendarController < ApplicationController
+  before_filter :init_provider, :only => [:edit, :edit_weekly]
   
   privilege_required 'read calendars', :only => [:index, :show, :search], :on => :current_company
-  privilege_required 'update calendars', :only => [:edit], :on => :current_company
+  privilege_required 'update calendars', :only => [:edit, :edit_weekly], :on => @provider
   
-  def has_privilege?(p, *args)
-    case p
-    when 'update calendars'
-      # users may update their own calendar
-      authorizable  = args[0]
-      user          = args[1] || current_user
-      provider   = find_provider_from_params
-      return true if user == provider
-      # delegate to base class
-      super
-    else
-      super
-    end
-  end
-
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
@@ -43,7 +29,7 @@ class CalendarController < ApplicationController
     @free_service = current_company.free_service
 
     # initialize provider
-    @provider  = find_provider_from_params
+    @provider  = init_provider
     @providers = current_company.providers.all
 
     if params[:start_date] and params[:end_date]
@@ -71,9 +57,6 @@ class CalendarController < ApplicationController
     # partition into work and free appointments
     @work_appointments, @free_appointments = @appointments.partition { |appt| appt.mark_as == Appointment::WORK }
      
-    # check if current user is a calendar manager for the specified calendar
-    @calendar_manager     = current_user.has_privilege?('update calendars', current_company) || current_user == @provider
-        
     respond_to do |format|
       format.html
       format.pdf
@@ -99,15 +82,16 @@ class CalendarController < ApplicationController
   
   # GET /users/1/calendar/edit
   def edit
-    if params[:provider_type].blank? or params[:provider_id].blank?
-      # no provider was specified, redirect to the company's first provider
-      provider = current_company.providers.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
-    end
+    # @provider initialized in before_filter
+    
+    # if params[:provider_type].blank? or params[:provider_id].blank?
+    #   # no provider was specified, redirect to the company's first provider
+    #   provider = current_company.providers.first
+    #   redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+    # end
         
     # initialize provider, default to anyone
-    @provider  = find_provider_from_params
-    @provider  = User.anyone if @provider.blank?
+    # @provider  = User.anyone if @provider.blank?
     
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers.all
@@ -139,14 +123,13 @@ class CalendarController < ApplicationController
   
   # GET /users/1/calendar/weekly/edit
   def edit_weekly
+    # @provider initialize in before_filter
+    
     if params[:provider_type].blank? or params[:provider_id].blank?
       # no provider was specified, redirect to the company's first provider
       provider = current_company.providers.first
       redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
     end
-
-    # initialize provider, default to anyone
-    @provider  = find_provider_from_params || User.anyone
 
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers.all
@@ -173,7 +156,7 @@ class CalendarController < ApplicationController
   protected
   
   # find scheduable from the params hash
-  def find_provider_from_params
-    current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
+  def init_provider
+    @provider = current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
   end
 end

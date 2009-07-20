@@ -1,10 +1,11 @@
 class AppointmentsController < ApplicationController
+  before_filter :init_provider, :only => [:create, :create_weekly]
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
     
   privilege_required 'read work appointments', :only => [:index], :on => :current_company
   privilege_required 'read %s appointments', :only => [:show], :on => :current_company
-  privilege_required 'update calendars', :only =>[:create], :on => :current_company
+  privilege_required 'update calendars', :only =>[:create, :create_weekly], :on => @provider
   privilege_required 'update work appointments', :only => [:complete], :on => :current_company
   
   def has_privilege?(p, *args)
@@ -104,21 +105,22 @@ class AppointmentsController < ApplicationController
   end
     
   def create
+    # @provider initialized in before filter
+    
     # get appointment parameters
-    @service      = current_company.services.find_by_id(params[:service_id])
-    klass, id     = [params[:provider_type], params[:provider_id]]
-    @customer     = User.find_by_id(params[:customer_id])
+    @service  = current_company.services.find_by_id(params[:service_id])
+    @customer = User.find_by_id(params[:customer_id])
         
-    begin
-      # find the provider, but beware that the send method can generate an exception
-      @provider = current_company.send(klass).find_by_id(id)
-    rescue Exception => e
-      logger.debug("xxx create appointment error: #{e.message}")
-      flash[:error] = "Error creating appointment"
-      # set redirect path
-      @redirect_path = request.referer
-      return
-    end
+    # begin
+    #   # find the provider, but beware that the send method can generate an exception
+    #   @provider = current_company.send(klass).find_by_id(id)
+    # rescue Exception => e
+    #   logger.debug("xxx create appointment error: #{e.message}")
+    #   flash[:error] = "Error creating appointment"
+    #   # set redirect path
+    #   @redirect_path = request.referer
+    #   return
+    # end
     
     @mark_as        = params[:mark_as]
     @duration       = params[:duration].to_i if params[:duration]
@@ -219,18 +221,8 @@ class AppointmentsController < ApplicationController
   
   # POST /users/1/calendar/weekly/add
   def create_weekly
-    begin
-      # find the provider, but beware that the send method can generate an exception
-      klass, id = [params[:provider_type], params[:provider_id]]
-      @provider = current_company.send(klass).find_by_id(id)
-    rescue Exception => e
-      logger.debug("xxx create appointment error: #{e.message}")
-      flash[:error] = "Error creating appointment"
-      # set redirect path
-      @redirect_path = request.referer
-      return
-    end
-
+    # @provider initialized in before filter
+    
     @free_service = current_company.free_service
 
     # get recurrence parameters
@@ -248,9 +240,9 @@ class AppointmentsController < ApplicationController
       tokens.push("UNTIL=#{@until}T000000Z")
     end
 
-    @rrule        = tokens.join(";")
+    @recur_rule   = tokens.join(";")
 
-    # build dtstart from dstart and tstart, and dtend from dstart and tend
+    # build dtstart and dtend
     @dtstart      = "#{@dstart}T#{@tstart}"
     @dtend        = "#{@dstart}T#{@tend}"
 
@@ -258,10 +250,10 @@ class AppointmentsController < ApplicationController
     @start_at_utc = Time.parse(@dtstart).utc
     @end_at_utc   = Time.parse(@dtend).utc
 
-    # create recurrence
-    @recurrence   = Recurrence.create(:company => current_company, :provider => @provider, :service => @free_service,
-                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => "free",
-                                      :rrule => @rrule)
+    # create appointment with recurrence rule
+    @appointment  = current_company.appointments.create(:company => current_company, :provider => @provider, :service => @free_service,
+                                                        :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => Appointment::FREE,
+                                                        :recur_rule => @recur_rule)
 
     # build redirect path
     @redirect_path  = build_create_redirect_path(@provider, request.referer)
@@ -455,6 +447,17 @@ class AppointmentsController < ApplicationController
   
   protected
   
+  def init_provider
+    begin
+      # find the provider; note that the send method can generate an exception
+      klass, id = [params[:provider_type], params[:provider_id]]
+      @provider = current_company.send(klass).find_by_id(id)
+    rescue Exception => e
+      logger.debug("xxx could not provider #{params[:provider_type]}:#{params[:provider_id]}")
+      redirect_to(unauthorized_path) and return
+    end
+  end
+
   # find appointment from the params hash
   def find_appointment_from_params
     current_company.appointments.find(params[:id])

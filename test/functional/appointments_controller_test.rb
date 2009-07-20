@@ -175,15 +175,14 @@ class AppointmentsControllerTest < ActionController::TestCase
               :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
     
-      should_change "Recurrence.count", :by => 1
-      # should expand 4 weeks, at 2 appts a week
-      should_change "Appointment.count", :by => 8
+      should_change "Appointment.recurring.count", :by => 1
+      should_change "Appointment.count", :by => 1
     
       should_assign_to(:freq) { "WEEKLY" }
       should_assign_to(:byday) { "MO,TU" }
       should_assign_to(:dtstart) { "20090201T090000" }
       should_assign_to(:dtend) { "20090201T110000" }
-      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
+      should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:free_service) { @free_service }
 
@@ -200,15 +199,14 @@ class AppointmentsControllerTest < ActionController::TestCase
               :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
 
-      should_change "Recurrence.count", :by => 1
-      # should expand 4 weeks, at 2 appts a week
-      should_change "Appointment.count", :by => 8
+      should_change "Appointment.recurring.count", :by => 1
+      should_change "Appointment.count", :by => 1
 
       should_assign_to(:freq) { "WEEKLY" }
       should_assign_to(:byday) { "MO,TU" }
       should_assign_to(:dtstart) { "20090201T090000" }
       should_assign_to(:dtend) { "20090201T110000" }
-      should_assign_to(:rrule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20090515T000000Z" }
+      should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20090515T000000Z" }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:free_service) { @free_service }
 

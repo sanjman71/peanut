@@ -45,6 +45,6 @@
     .span-15.last#free_work_appointments
       = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
 
--# show add free time form if the user is a calendar manager for this calendar
-- if @calendar_manager
+-# show add free time form if the user can update the providers calendar
+- if current_user.has_privilege?('update calendars', @provider)
   = render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})

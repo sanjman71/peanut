@@ -85,13 +85,14 @@ class CalendarControllerTest < ActionController::TestCase
       @company.reload
     end
     
-    context "and have johnny view johnny's calendar for this week" do
+    context "and have johnny view his calendar for this week" do
       setup do
         # stub current user
         @controller.stubs(:current_user).returns(@johnny)
         ActionView::Base.any_instance.stubs(:current_user).returns(@johnny)
-        # stub user privileges, johnny should have 'read calendars' privilege as 'provider'
-        @controller.stubs(:current_privileges).returns(["read calendars"])
+        # stub user privileges, johnny should have 'read calendars' and 'update calendars' privilege as 'provider'
+        @controller.stubs(:current_privileges).returns(["read calendars", "update calendars"])
+        @johnny.stubs(:has_privilege?).returns(true)
         # stub calendar markings
         @controller.stubs(:build_calendar_markings).returns(Hash.new)
         get :show, :provider_type => 'users', :provider_id => @johnny.id
@@ -112,13 +113,13 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to :daterange, :class => DateRange
     end
     
-    context "and have johnny edit johnny's calendar" do
+    context "and have johnny edit his calendar" do
       setup do
         # stub current user
         @controller.stubs(:current_user).returns(@johnny)
         ActionView::Base.any_instance.stubs(:current_user).returns(@johnny)
         # stub user privileges
-        @controller.stubs(:current_privileges).returns(["read calendars"])
+        @controller.stubs(:current_privileges).returns(["update calendars"])
         # stub calendar markings
         @controller.stubs(:build_calendar_markings).returns(Hash.new)
         get :edit, :provider_type => 'users', :provider_id => @johnny.id

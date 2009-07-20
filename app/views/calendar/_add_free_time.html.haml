@@ -26,4 +26,6 @@
         .hide#progress= image_tag 'barbershop.gif'
         
   %h4== or
-  %h4= link_to "Schedule blocks of available time", url_for(:controller => 'calendar', :action => 'edit', :subdomain => current_subdomain), :class => 'rounded button'
+  %h4= link_to "Add blocks of available time", url_for(:controller => 'calendar', :action => 'edit', :subdomain => current_subdomain), :class => 'rounded button'
+  %h4== or
+  %h4= link_to "Add a weekly schedule", url_for(:controller => 'calendar', :action => 'edit_weekly', :subdomain => current_subdomain), :class => 'rounded button'
