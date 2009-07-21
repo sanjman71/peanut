@@ -702,7 +702,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create one invalid recurring free appointment (private, no service)" do
     setup do
-      @start_at       = Time.now.beginning_of_day
+      @start_at       = Time.now.utc.beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 8.weeks
       # Recur 2 and 4 days from now
@@ -722,7 +722,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
   context "create one invalid recurring free appointment (private, no provider)" do
     setup do
-      @start_at       = Time.now.beginning_of_day
+      @start_at       = Time.now.utc.beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 8.weeks
       # Recur 2 and 4 days from now
@@ -741,16 +741,16 @@ class AppointmentTest < ActiveSupport::TestCase
     
   context "create one valid recurring free private appointment" do
     setup do
-      @start_at       = Time.now.beginning_of_day
+      @start_at       = Time.now.utc.beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 8.weeks
-      @recur_days     = "#{ical_days([(@start_at), (@start_at + 4.days)])}"
+      @recur_days     = "#{ical_days([@start_at.utc, (@start_at + 4.days).utc])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
       @recurrence     = Appointment.create(:company => @company, :customer => @customer, :provider => @provider,
                                           :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
                                           :recur_rule => @recur_rule, :description => "This is the recurrence description")
       assert_valid @recurrence
-      @recurrence.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
+      @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks - 1.hour)
     end
 
     should_change "Appointment.count", :by => 8
@@ -760,8 +760,8 @@ class AppointmentTest < ActiveSupport::TestCase
     should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
       @recurrence.recur_instances.each do |a|
         assert_equal 120, a.duration
-        assert_equal 0, a.start_at.hour
-        assert_equal 2, a.end_at.hour
+        assert_equal 0, a.start_at.utc.hour
+        assert_equal 2, a.end_at.utc.hour
       end
     end
     
@@ -829,8 +829,8 @@ class AppointmentTest < ActiveSupport::TestCase
       should "change appointments' end time and duration" do
         @recurrence.recur_instances.each do |a|
           assert_equal 180, a.duration
-          assert_equal 0, a.start_at.hour
-          assert_equal 3, a.end_at.hour
+          assert_equal 0, a.start_at.utc.hour
+          assert_equal 3, a.end_at.utc.hour
         end
       end
       
@@ -850,8 +850,8 @@ class AppointmentTest < ActiveSupport::TestCase
       should "not change appointments' end time and duration" do
         @recurrence.recur_instances.each do |a|
           assert_equal 120, a.duration
-          assert_equal 0, a.start_at.hour
-          assert_equal 2, a.end_at.hour
+          assert_equal 0, a.start_at.utc.hour
+          assert_equal 2, a.end_at.utc.hour
         end
       end
       
@@ -872,8 +872,8 @@ class AppointmentTest < ActiveSupport::TestCase
       should "change appointments' end time and duration" do
         @recurrence.recur_instances.each do |a|
           assert_equal 180, a.duration
-          assert_equal 0, a.start_at.hour
-          assert_equal 3, a.end_at.hour
+          assert_equal 0, a.start_at.utc.hour
+          assert_equal 3, a.end_at.utc.hour
         end
       end
       
@@ -881,7 +881,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
     context "then create a second recurrence" do
       setup do
-        @start_at       = Time.now.beginning_of_day
+        @start_at       = Time.now.utc.beginning_of_day
         @end_at         = @start_at + 30.minutes
         @end_recurrence = @start_at + 8.weeks
         @recur_days     = "#{ical_days([(@start_at + 1.day), (@start_at + 5.days)])}"
@@ -898,8 +898,8 @@ class AppointmentTest < ActiveSupport::TestCase
       should "have duration of 30 minutes" do
         @recurrence2.recur_instances.each do |a|
           assert_equal 30, a.duration
-          assert_equal 0, a.start_at.hour
-          assert_equal 0, a.end_at.hour
+          assert_equal 0, a.start_at.utc.hour
+          assert_equal 0, a.end_at.utc.hour
           assert_equal 30, a.end_at.min
         end
       end
@@ -939,7 +939,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create a recurring free public appointment ending in 13 days" do
     setup do
-      @start_at       = Time.now.beginning_of_day
+      @start_at       = Time.now.utc.beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 13.days
       @recur_days     = "#{ical_days([(@start_at)])}"
@@ -947,9 +947,8 @@ class AppointmentTest < ActiveSupport::TestCase
       @recurrence     = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
                                           :recur_rule => @recur_rule, :name => "Happy Hour!", 
                                           :description => "$2 beers, $3 well drinks", :public => true)
-puts @recurrence.errors.full_messages
       assert_valid @recurrence
-      @recurrence.expand_recurrence(@start_at, @start_at + 4.weeks)
+      @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks)
     end
     
     should_change "Appointment.count", :by => 2
@@ -960,7 +959,7 @@ puts @recurrence.errors.full_messages
   
   context "create a recurring free public appointment with no end instantiating 3 instances" do
     setup do
-      @start_at   = Time.now.beginning_of_day
+      @start_at   = Time.now.utc.beginning_of_day
       @end_at     = @start_at + 2.hours
       @recur_days = "#{ical_days([(@start_at + 3.days)])}"
       @recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
@@ -979,12 +978,12 @@ puts @recurrence.errors.full_messages
       assert_equal  3, @appointments.size
     end
 
-  end  
+  end
   
   context "create a recurring free public appointment which ends in the past" do
     setup do
-      @now            = Time.now
-      @start_at       = (@now - 6.months).beginning_of_day
+      @now            = Time.now.utc.beginning_of_day
+      @start_at       = @now - 6.months
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 4.weeks
       @recur_days     = "#{ical_days([(@start_at + 2.days)])}"
