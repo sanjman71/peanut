@@ -12,12 +12,20 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal 1, @daterange.days
     end
     
-    should 'have start at == beginning of today in utc format' do
-      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
+    # should 'have start at == beginning of today in utc format' do
+    #   assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
+    # end
+    # 
+    # should 'have end at == end of today in utc format' do
+    #   assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
+    # end
+    
+    should 'have start at == beginning of today in local time, expressed in UTC' do
+      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
     end
 
-    should 'have end at == end of today in utc format' do
-      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+    should 'have end at == end of today in local time, expressed in UTC' do
+      assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
     end
     
     should 'be named Today' do
@@ -25,7 +33,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have url param for today' do
-      @today = Time.now.utc.to_s(:appt_schedule_day)
+      @today = Time.zone.now.utc.to_s(:appt_schedule_day)
       assert_equal "#{@today}..#{@today}", @daterange.to_url_param
       assert_equal @today, @daterange.to_url_param(:for => :start_date)
       assert_equal @today, @daterange.to_url_param(:for => :end_date)
@@ -43,11 +51,11 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have start at == beginning of tomorrow in utc format' do
-      assert_equal Time.now.utc.beginning_of_day + 1.day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc + 1.day, @daterange.start_at
     end
 
     should 'have end at == end of tomorrow in utc format' do
-      assert_equal Time.now.utc.end_of_day + 1.day, @daterange.end_at
+      assert_equal Time.zone.now.end_of_day.utc + 1.day, @daterange.end_at
     end
 
     should 'be named Tomorrow' do
@@ -55,7 +63,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have url param for tomorrow' do
-      @tomorrow = (Time.now.utc + 1.day).to_s(:appt_schedule_day)
+      @tomorrow = (Time.zone.now.utc + 1.day).to_s(:appt_schedule_day)
       assert_equal "#{@tomorrow}..#{@tomorrow}", @daterange.to_url_param
       assert_equal @tomorrow, @daterange.to_url_param(:for => :start_date)
       assert_equal @tomorrow, @daterange.to_url_param(:for => :end_date)
@@ -70,15 +78,15 @@ class DateRangeTest < ActiveSupport::TestCase
       @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
       
       # check if including today adds an extra day
-      @add_today_day     = Time.now.utc.yday > Time.now.yday ? 1 : 0
+      @add_today_day     = Time.zone.now.utc.yday > Time.zone.now.yday ? 1 : 0
     end
 
     should 'have days count based on current utc time and day of week' do
-      assert_equal @days_left_in_week[Time.now.utc.wday] + @add_today_day, @daterange.days
+      assert_equal @days_left_in_week[Time.zone.now.utc.wday] + @add_today_day, @daterange.days
     end
 
     should 'have start day == beginning of today (adjusting for today) in utc format' do
-      assert_equal Time.now.utc.beginning_of_day - @add_today_day.day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc - @add_today_day.day, @daterange.start_at
     end
 
     should 'be named This Week' do
@@ -116,7 +124,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have start at == beginning of today in utc format' do
-      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
     end
 
     should 'be named Next 2 Weeks' do
@@ -130,15 +138,15 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_valid @daterange
       # calculate days to add based on current day and end on day
       # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night - so, ends on day 0
-      @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.now.utc.wday]
+      @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.zone.now.utc.wday]
     end
     
     should 'have start at == beginning of today in utc format' do
-      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
     end
     
     should "have last day a sunday" do
-      assert_equal 0, @daterange.end_at.wday
+      assert_equal 0, @daterange.end_at.in_time_zone.wday
     end
     
     should 'have the days count adjusted to end day' do
@@ -161,7 +169,7 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have start day == beginning of today in utc format' do
-      assert_equal Time.now.utc.beginning_of_day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
     end
     
     should 'be named Next 6 Weeks' do
@@ -176,11 +184,11 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have end at == end of today in utc format' do
-      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+      assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
     end
 
     should 'have start at == 1 week ago in utc format' do
-      assert_equal Time.now.utc.beginning_of_day - 6.days, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc - 6.days, @daterange.start_at
     end
 
     should 'have date range of 7 days' do
@@ -196,15 +204,15 @@ class DateRangeTest < ActiveSupport::TestCase
     setup do
       @daterange = DateRange.parse_when('past month')
       assert_valid @daterange
-      @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.now.month]
+      @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.zone.now.month]
     end
   
     should 'have end at == end of today in utc format' do
-      assert_equal Time.now.utc.end_of_day, @daterange.end_at
+      assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
     end
 
     should 'have start at == 1 month ago in utc format' do
-      assert_equal Time.now.utc.beginning_of_day - 1.month + 1.day, @daterange.start_at
+      assert_equal Time.zone.now.beginning_of_day.utc - 1.month + 1.day, @daterange.start_at
     end
 
     should "have date range of #{@expected_days_in_range} days" do
