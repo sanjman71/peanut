@@ -234,4 +234,29 @@ class TimeRangeTest < ActiveSupport::TestCase
     
   end
   
+  context "time range across two days starting today 2300 ending tomorrow 0100 (testing time_start_at_utc)" do
+    setup do
+      @today      = Time.now.to_s(:appt_schedule_day)
+      @tomorrow   = (Time.now + 1.day).to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range = TimeRange.new(:day => @today, :end_day => @tomorrow, :start_at => "2300", :end_at => "0100")
+    end
+  
+    should "have duration of 2 hours = 2 * 60 = 120 minutes" do
+      assert_equal (2 * 60), @time_range.duration
+    end
+
+    should "have time_start_at and time_end_at in local time" do
+      # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day in local time
+        assert_equal (@time_range.start_at.in_time_zone.hour * 60 * 60) + (@time_range.start_at.in_time_zone.min * 60), @time_range.time_start_at
+      assert_equal (@time_range.end_at.in_time_zone.hour * 60 * 60) + (@time_range.end_at.in_time_zone.min * 60) + (24 * 3600), @time_range.time_end_at
+    end
+
+    should "have time_start_at_utc and time_end_at_utc in UTC time" do
+      # Note that we do not add 24 hours to the calculation of time_end_at_utc, as both the end_day and the start_day are one day away in UTC.
+      # Both are therefore normalized back to today
+      assert_equal (@time_range.start_at.utc.hour * 60 * 60) + (@time_range.start_at.utc.min * 60), @time_range.time_start_at_utc 
+      assert_equal (@time_range.end_at.utc.hour * 60 * 60) + (@time_range.end_at.utc.min * 60), @time_range.time_end_at_utc 
+    end
+    
+  end
 end
