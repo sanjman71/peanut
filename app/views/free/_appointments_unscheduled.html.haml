@@ -10,7 +10,7 @@
       - else
         - unscheduled_appts[key].each do |time_range|
           == Unscheduled: &nbsp; 
-          = time_range.start_at.to_s(:appt_time)
+          = time_range.start_at.in_time_zone.to_s(:appt_time)
           == -
-          = time_range.end_at.to_s(:appt_time)
+          = time_range.end_at.in_time_zone.to_s(:appt_time)
           %br
