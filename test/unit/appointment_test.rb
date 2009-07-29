@@ -15,6 +15,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_belong_to              :customer
   should_have_one               :invoice
   should_belong_to              :location
+  should_have_many              :capacity_slots
   
   should_belong_to              :recur_parent
   should_have_many              :recur_instances
