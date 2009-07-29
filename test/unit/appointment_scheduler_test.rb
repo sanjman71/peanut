@@ -22,12 +22,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
   
       # search for free appointments
-      @daterange          = DateRange.parse_range("20100101000000", "20100301000000")
-      @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+      @daterange  = DateRange.parse_range("20100101000000", "20100301000000")
+      @free_slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
     end
     
-    should "find no free appointments" do
-      assert_equal [], @free_appointments
+    should "find no free capacity slots" do
+      assert_equal [], @free_slots
     end
     
     context "then add a service provider and search for free appointments again" do
@@ -35,11 +35,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         # add provider
         @haircut.providers.push(@johnny)
         # search for free appointments
-        @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+        @free_slots  = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
   
-      should "find 1 free appointment" do
-        assert_equal [@free_appointment], @free_appointments
+      should "find 1 free capacity slot corresponding to the free appointment" do
+        assert_equal 1, @free_slots.size
+        assert_equal [@free_appointment], @free_slots.map(&:free_appointment)
       end
     end
   end
@@ -59,12 +60,13 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     context "and search for free appointments" do
       setup do
         # search for free appointments using a wider date range (in utc format)
-        @daterange          = DateRange.parse_range((Time.now - 3.days).utc.to_s(:appt_schedule), (Time.now + 3.days).utc.to_s(:appt_schedule))
-        @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+        @daterange  = DateRange.parse_range((Time.now - 3.days).utc.to_s(:appt_schedule), (Time.now + 3.days).utc.to_s(:appt_schedule))
+        @free_slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
       
-      should "find 1 free appointment1" do
-        assert_equal [@free_appointment], @free_appointments
+      should "find 1 free capacity slot" do
+        assert_equal 1, @free_slots.size
+        assert_equal [@free_appointment], @free_slots.map(&:free_appointment)
       end
     end
   end
@@ -89,29 +91,40 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     context "and search for free appointments" do
       setup do
         # search for free appointments using a wider date range (in utc format)
-        @daterange          = DateRange.parse_range((Time.now - 30.days).to_s(:appt_schedule), (Time.now + 30.days).to_s(:appt_schedule))
-        @free_appointments  = AppointmentScheduler.find_free_appointments(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+        @daterange  = DateRange.parse_range((Time.now - 30.days).to_s(:appt_schedule), (Time.now + 30.days).to_s(:appt_schedule))
+        @free_slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
       
       should "find 1 free appointment" do
-        assert_equal [@free_appointment], @free_appointments
+        assert_equal 1, @free_slots.size
+        assert_equal [@free_appointment], @free_slots.map(&:free_appointment)
       end
     end
   end
   
   context "schedule work appointment at the start of a free appointment" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
-      @customer  = Factory(:user)
   
+      @johnny           = Factory(:user, :name => "Johnny", :companies => [@company])
+      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @customer         = Factory(:user)
+  
+      beginning_of_day  = Time.now.utc.beginning_of_day
+      @start_at         = (beginning_of_day).to_s(:appt_schedule)
+      @end_at           = (beginning_of_day + 1.day).to_s(:appt_schedule)
+
       # create free appointment (all day)
-      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => "20080801000000", :end_at => "20080802000000")
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801000000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => @start_at)
+      @end_appt         = (beginning_of_day + @haircut.duration.minutes).to_s(:appt_schedule)
       assert_valid @work_appointment
+
+      @daterange        = DateRange.parse_range((beginning_of_day - 30.days).to_s(:appt_schedule), (beginning_of_day + 30.days).to_s(:appt_schedule))
+      @free_slots       = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+      
     end
     
     # should have 1 free and 1 work appointment
@@ -127,17 +140,24 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
     
     should "have work appointment with correct start and end times" do
-      assert_equal "20080801T000000", @work_appointment.start_at.to_s(:appt_schedule)
-      assert_equal "20080801T003000", @work_appointment.end_at.to_s(:appt_schedule)
+      assert_equal @start_at, @work_appointment.start_at.to_s(:appt_schedule)
+      assert_equal @end_appt, @work_appointment.end_at.to_s(:appt_schedule)
     end
     
     should "have work appointment with a different confirmation code" do
       assert_not_equal @work_appointment.confirmation_code, @free_appointment.confirmation_code
     end
     
+    should "have 1 capacity slot which refers to the free appointment" do
+      assert_equal 1, @free_slots.size
+      assert_equal [@free_appointment], @free_slots.map(&:free_appointment)
+    end
+
     context "and then cancel the work appointment" do
       setup do
         @free2_appointment = AppointmentScheduler.cancel_work_appointment(@work_appointment)
+
+        @free_slots2 = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
   
       # should have 1 free appointment and 1 work appointment in a 'canceled' state
@@ -156,6 +176,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         @work_appointment.reload
         assert_equal "canceled", @work_appointment.state
       end
+
+      should "have 1 capacity slot which refers to the free appointment" do
+        assert_equal 1, @free_slots2.size
+        assert_equal [@free_appointment], @free_slots2.map(&:free_appointment)
+      end
     end
   end
   
@@ -170,13 +195,13 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
                                                                         :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
       
-      # schedule the work appointment, with a custom duration, the free appointment should be split into free/work time
+      # schedule the work appointment, with a custom duration
       @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 60, @customer, :start_at => "20080801100000")
       assert_valid @work_appointment
     end
   
-    # should have 2 free and 1 work appointment
-    should_change "Appointment.count", :by => 3
+    # should have 1 free and 1 work appointment
+    should_change "Appointment.count", :by => 2
   
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -202,7 +227,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment, and 1 work appointment in a 'canceled' state
-      should_change "Appointment.count", :by => -1
+      should_not_change "Appointment.count"
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -212,7 +237,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end
-
+  
       should "have work appointment in a canceled state" do
         @work_appointment.reload
         assert_equal "canceled", @work_appointment.state
@@ -274,7 +299,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         # customer id should be nil for a free appointment
         assert_equal nil, @free2_appointment.customer_id
       end
-
+  
       should "have work appointment in a canceled state" do
         @work_appointment.reload
         assert_equal "canceled", @work_appointment.state
@@ -298,8 +323,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @work_appointment
     end
   
-    # should have 1 work appointment
-    should_change "Appointment.count", :by => 1
+    # should have 1 work appointment and 1 free appointment
+    should_change "Appointment.count", :by => 2
     
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -325,7 +350,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment + 1 work appointment in a canceled state
-      should_change "Appointment.count", :by => 1
+      should_not_change "Appointment.count"
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
