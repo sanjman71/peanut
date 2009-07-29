@@ -66,7 +66,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @today          = Time.now.utc.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
+        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
 
         # book a haircut with johnny during his free time
         get :new, 
@@ -84,7 +84,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @today          = Time.now.utc.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
+        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
       
         # stub current user
         @controller.stubs(:logged_in?).returns(true)
@@ -105,7 +105,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:duration) { 30 }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:customer) { @customer }
-      should_assign_to(:appt_date) { @time_range.start_at.to_s(:appt_schedule_day) }
+      should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
       should_assign_to(:appt_time_start_at) { "0900" }
       should_assign_to(:appt_time_end_at) { "0930" }
     end
