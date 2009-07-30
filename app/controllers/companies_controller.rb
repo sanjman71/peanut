@@ -8,7 +8,8 @@ class CompaniesController < ApplicationController
   # GET /companies
   # GET /companies.xml
   def index
-    @companies = Company.all
+    # companies with subscriptions indicate they are peanut customers
+    @companies = Company.with_subscriptions
     
     # find all companies w/ billing errors
     @billing_errors = Company.billing_errors
