@@ -259,4 +259,19 @@ class TimeRangeTest < ActiveSupport::TestCase
     end
     
   end
+
+  context "create a time range with the parameter anytime" do
+    
+    setup do
+      @time_range = TimeRange.new("anytime")
+    end
+    
+    should "have no start_at, end_at or duration" do
+      assert_nil  @time_range.start_at
+      assert_nil  @time_range.end_at
+      assert_nil  @time_range.duration
+    end
+    
+  end
+
 end

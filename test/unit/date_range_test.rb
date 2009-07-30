@@ -284,5 +284,15 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_equal "20090107", @daterange.to_url_param(:for => :end_date)
     end
   end
+
+  context "create a date range for today" do
+    
+    setup
+      @date_range = DateRange.today
+    end
+
+    assert_valid @date_range
+  
+  end
   
 end
