@@ -18,10 +18,10 @@
       %h3
         = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name])
       %h4{:style => 'color: #666666; line-height: 1.5em;'}
-        - if @free_appointments.blank?
+        - if @free_capacity_slots.blank?
           == We found no available timeslots matching your search criteria.
         - else
-          == We found #{pluralize(@free_appointments.size, 'available timeslot')} matching your search criteria.
+          == We found #{pluralize(@free_capacity_slots.size, 'available timeslot')} matching your search criteria.
           = highlight("Pick a #{Duration.to_words(@duration).singularize} window below or", Duration.to_words(@duration).singularize)
           %br
           = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
@@ -34,12 +34,12 @@
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
       .span-15.last#free_calendar
         = render(:partial => 'shared/calendar', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
-      .span-14.last.appointments#free_appointments
-        = render(:partial => 'appointments/free_appointments', :locals => {:appointments_by_day => @free_appointments_by_day, :service => @service})
+      .span-14.last.appointments#free_capacity_slots
+        = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
     .span-15.last
       -# show waitlist text here if there are no available timeslots
-      - if @free_appointments.blank?
+      - if @free_capacity_slots.blank?
         %h2
           = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
           %span{:style => 'font-size: 0.7em;'}== or
