@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
       # protection if user resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
       
-      redirect_path = session_initialize(@user)
+      redirect_path = session_initialize(user)
       redirect_back_or_default(redirect_path) and return
     else
       note_failed_signin
