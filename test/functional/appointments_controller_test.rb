@@ -248,6 +248,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       post :create,
            {:dates => @today, :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
+      @free_appt.reload
     end
 
     # free appointment and work appointment coexist
@@ -292,6 +293,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       post :create,
            {:dates => @today, :start_at => "1000", :end_at => "1030", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
+      @free_appt.reload
     end
     
     # free appointment and work appointment coexist
@@ -336,14 +338,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       post :create,
            {:dates => @today, :start_at => "1000", :end_at => "1200", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
+      @free_appt.reload
     end
 
-    # free appointment should coexist with 1 work appointments
-    should_change "Appointment.count", :by => 3
+    # free appointment should coexist with 1 work appointment
+    should_change "Appointment.count", :by => 2
     
-    should "have one capacity slots" do
-
-      
+    should "have two capacity slots" do
+      assert_equal 2, @free_appt.capacity_slots.size
     end
 
     should_assign_to(:service) { @haircut }
