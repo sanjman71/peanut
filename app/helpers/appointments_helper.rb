@@ -23,15 +23,15 @@ module AppointmentsHelper
   end
   
   # return hash of possible start time values
-  def free_appointment_possible_start_times(appointment, duration_in_minutes, options={})
+  def free_slot_possible_start_times(slot, duration_in_minutes, options={})
     # initialize hash with apointment start_at hour and minute
-    hash = {:start_hour => appointment.start_at.hour, :start_minute => appointment.start_at.min}
+    hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min}
             
-    # adjust appointment end_at based on duration
+    # adjust slot end_at based on duration
     begin
-      end_at = appointment.end_at - eval("#{duration_in_minutes}.minutes")
+      end_at = slot.end_at - eval("#{duration_in_minutes}.minutes")
     rescue
-      end_at = appointment.end_at
+      end_at = slot.end_at
     end
     
     # update hash with end_at hour and minute

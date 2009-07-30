@@ -43,9 +43,10 @@ class OpeningsController < ApplicationController
       @when       = params[:when].from_url_param 
       @daterange  = DateRange.parse_when(@when)
     end
-    
+
     # initialize time
     @time         = params[:time].from_url_param if params[:time]
+    @time_range   = params[:time].blank? ? nil : TimeRange.new(params[:time].from_url_param)
 
     # initialize location & locations
     if params[:location_id]
@@ -96,21 +97,21 @@ class OpeningsController < ApplicationController
     end
 
     # find free appointments, group by day (use appt utc time)
-    @free_appointments        = AppointmentScheduler.find_free_appointments(current_company, current_location, 
-                                                                            @provider, @service, @duration, @daterange, :time => @time)
-    @free_appointments_by_day = @free_appointments.group_by { |appt| appt.start_at.utc.beginning_of_day}
+    @free_capacity_slots        = AppointmentScheduler.find_free_appointments(current_company, current_location, 
+                                                                            @provider, @service, @duration, @daterange, :time_range => @time_range)
+    @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
-    logger.debug("*** found #{@free_appointments.size} free appointments over #{@daterange.days} days")
+    logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings  = build_calendar_markings(@free_appointments)
+    @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
 
     # build waitlist path
     @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, 
                                         :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date),
                                         :subdomain => current_subdomain)
     # build openings cache key
-    @openings_cache_key = "openings:" + CacheKey.schedule(@daterange, @free_appointments, @time)
+    @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
     
     respond_to do |format|
       format.html # index.html.erb
