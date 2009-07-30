@@ -250,8 +250,13 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
     end
 
-    # free appointment should be replaced with work appointment
-    should_change "Appointment.count", :by => 1
+    # free appointment and work appointment coexist
+    should_change "Appointment.count", :by => 2
+    
+    # There should be no available capacity slots
+    should "have no capacity slots" do
+      assert_equal 0, @free_appt.capacity_slots.size
+    end
 
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
@@ -289,8 +294,13 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
     end
     
-    # free appointment should be split into work appointment and 2 free appointments, so we should have 3 appointments total
-    should_change "Appointment.count", :by => 3
+    # free appointment and work appointment coexist
+    should_change "Appointment.count", :by => 2
+
+    # There should be two available capacity slots
+      should "have two capacity slots" do
+      assert_equal 2, @free_appt.capacity_slots.size
+    end
   
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
@@ -328,8 +338,13 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
     end
 
-    # free appointment should be replaced with 1 work and 2 free appointments
+    # free appointment should coexist with 1 work appointments
     should_change "Appointment.count", :by => 3
+    
+    should "have one capacity slots" do
+
+      
+    end
 
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
