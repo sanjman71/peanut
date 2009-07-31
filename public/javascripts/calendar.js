@@ -57,8 +57,43 @@ $.fn.init_select_calendar_edit_provider = function () {
   })
 }
 
+// search provider calendar with a date range
+$.fn.init_search_calendar_with_date_range = function () {
+  $(".datepicker").datepicker({minDate: +0, maxDate: '+3m'});
+
+  // check date fields before submit
+  $("#search_calendar_with_date_range_submit").click(function() {
+    var start_date = $('#start_date').attr("value");
+    var end_date   = $('#end_date').attr("value");
+
+    if (!start_date) {
+      $('#start_date').addClass('highlighted');
+      alert("Please enter a start date");
+      return false;
+    } else {
+      $('#start_date').removeClass('highlighted');
+    }
+
+    if (!end_date) {
+      $('#end_date').addClass('highlighted');
+      alert("Please enter an end date");
+      return false;
+    } else {
+      $('#end_date').removeClass('highlighted');
+    }
+
+    if (end_date <= start_date) {
+      $('#start_date').addClass('highlighted');
+      $('#end_date').addClass('highlighted');
+      alert("The start date must be before the end date");
+      return false;
+    }
+  })
+}
+
 $(document).ready(function() {
 
+  $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
   $(document).init_select_calendar_show_provider();
   $(document).init_select_calendar_edit_provider();

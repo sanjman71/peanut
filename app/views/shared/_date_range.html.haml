@@ -2,12 +2,12 @@
   .span-3
     == Start:
     %br
-    = text_field_tag 'start_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
+    = text_field_tag 'start_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'datepicker'
   .span-3.last
     == End:
     %br
-    = text_field_tag 'end_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'date-pick'
+    = text_field_tag 'end_date', '', :style => 'width: 90px; font-size: 12px;', :class => 'datepicker'
   .span-6.last{:style => 'padding-top: 7px;'}
-    = f.submit 'Search', :name => nil, :class => 'button'
+    = f.submit 'Search', :name => nil, :class => 'button', :id => submit_id
     == or
     = link_to "Cancel", '', :id => 'show_links'

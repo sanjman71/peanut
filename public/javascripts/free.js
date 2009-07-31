@@ -73,7 +73,8 @@ $(document).ready(function() {
     $("#free_time_list").append($new_free_time);
     
     // add datepickers for unbound objects
-    $(document).init_datepicker();
+    //$(document).init_datepicker();
+    $(document).init_datepicker({minDate: +0, maxDate: '+3m'});  
 
     // initialize free time remove links
     $(document).init_remove_links();

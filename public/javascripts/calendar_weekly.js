@@ -24,17 +24,7 @@ $.fn.set_weekly_schedule = function () {
     if (tend) { s += " and ending at " + tend; }
   }
 
-  // find slider start time
-/*  if ($("#slider_start").find(".time.mark:first").length) {
-    var tstart = $("#slider_start").find(".time.mark:first").attr('id');
-    s += " starting at " + tstart;
-
-    // find slider end time
-    var tend = $("#slider_end").find(".time.mark:first").attr('id');
-    if (tend) { s += " and ending at " + tend; }
-  }
-*/  
-  $("#weekly_schedule").text(s);
+  $("#weekly_schedule").text("Schedule: " + s);
 }
 
 $.fn.set_recurrence = function () {

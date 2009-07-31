@@ -19,6 +19,20 @@ $.fn.init_search_openings = function() {
     if (!$("#when_date_range_start").is(":visible")) {
       $("#when_date_range_start").remove();
       $("#when_date_range_end").remove();
+    } else {
+      // check that we have both a start and end date, and the start date is before the end date
+      start_date = $("#start_date").attr('value');
+      end_date   = $("#end_date").attr('value');
+      
+      if (!(start_date) || !(end_date)) {
+        alert("Please select a start date and end date");
+        return false;
+      }
+      
+      if (end_date <= start_date) {
+        alert("The start date must be before the end date");
+        return false;
+      }
     }
 
     // remove when select list if its not visible
@@ -63,11 +77,7 @@ $.fn.init_search_when_toggle = function() {
 }
 
 $(document).ready(function() {
-  Date.firstDayOfWeek = 7;
-  Date.format = 'mm/dd/yyyy';
-  
-  $(document).init_datepicker({start_date : (new Date()).addDays(0).asString(), end_date : (new Date()).addMonths(1).asString(), max_days:6});
-  
+  $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});  
   $(document).init_search_openings();
   $(document).init_search_when_toggle();
   

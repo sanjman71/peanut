@@ -1,6 +1,6 @@
 - title("Manage Schedules")
-- stylesheet('calendar', 'ui.core', 'ui.theme', 'jquery.timepickr', 'ui.datepicker')
-- javascript('calendar_weekly', 'ui.timepickr', 'jquery.timepickr', 'ui.datepicker')
+- stylesheet('calendar', 'jquery.timepickr')
+- javascript('calendar_weekly', 'ui.timepickr', 'jquery.timepickr')
 
 .span-24.last#what
   .span-15.box
@@ -39,37 +39,33 @@
 %hr.space
 
 .span-14.prepend-1.last
-  .span-2{:style => 'padding-top: 5px;'}
-    %h3= label_tag "starts_at", "Starts at:"
+  .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
+    %h5= label_tag "starts_at", "Starts at:"
   .span-12.last.padding-top-5
-    = text_field_tag 'starts_at', '', :class => 'timepicker', :style => "width: 100px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
-
-%hr.space
+    = text_field_tag 'starts_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
 
 .span-14.prepend-1.last
-  .span-2{:style => 'padding-top: 5px;'}
-    %h3= label_tag "ends_at", "Ends at:"
+  .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
+    %h5= label_tag "ends_at", "Ends at:"
   .span-12.last.padding-top-5
-    = text_field_tag 'ends_at', '', :class => 'timepicker', :style => "width: 100px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
-
-%hr.space
+    = text_field_tag 'ends_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
 
 .span-14.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 7px;'}
   .span-2
     %h5== Start Date:
   .span-12.last.padding-bottom-10
-    = text_field_tag 'schedule_start_date', '', :class => 'datepicker', :style => 'width: 100px; font-size: 1.1em;'
+    = text_field_tag 'schedule_start_date', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; background: #EDF3FE;'
     %em{:style => 'padding-left: 7px;'}== i.e. the first day of this schedule
     
-.span-14.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 7px;'}
+.span-14.prepend-1.last{:style => 'font-size: 1.3em;'}
   .span-2
     %h5== End Date:
   .span-11.last
     = radio_button_tag "ends", "Never", true, :id => 'schedule_end_never'
-    = label_tag "schedule_end_never", "Never", :class => 'small'
+    = label_tag "schedule_end_never", "Never", :class => 'big'
     = radio_button_tag "ends", "Until", false, :id => 'schedule_end_until'
-    = label_tag "schedule_end_until", "Until", :class => 'small'
-    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide', :style => 'width: 90px; font-size: 12px;'
+    = label_tag "schedule_end_until", "Until", :class => 'big', :style => 'padding-right: 5px;'
+    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide', :style => 'width: 90px; font-size: 1.0em; background: #EDF3FE;'
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
   = hidden_field_tag :freq, 'weekly'
