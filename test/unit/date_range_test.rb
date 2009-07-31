@@ -205,7 +205,11 @@ class DateRangeTest < ActiveSupport::TestCase
     setup do
       @daterange = DateRange.parse_when('past month')
       assert_valid @daterange
-      @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.zone.now.month]
+      # This test doesn't necessarily work on the last day of the month (or more, in the case of March)
+      # e.g. on 28th, 29th, 30th and 31st March, 1 month ago is 28th Feb. The days delta changes on each of these days in March.
+      # So, instead of the following array, we calculate our expectation by hand.
+      # @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.zone.now.month]
+      @expected_days_in_range = (Time.zone.now.end_of_day - (Time.zone.now.beginning_of_day - 1.month + 1.day) + 1.second) / (60*60*24)
     end
   
     should 'have end at == end of today in utc format' do
@@ -285,13 +289,19 @@ class DateRangeTest < ActiveSupport::TestCase
     end
   end
 
-  context "create a date range for today" do
+  context "create a Date for today" do
     
-    setup
-      @date_range = DateRange.today
+    setup do
+      @now = Time.zone.now
+      @today = DateRange.today
+      assert_not_nil @today
     end
 
-    assert_valid @date_range
+    should 'have correct string representation, and be convertible to Time' do
+      @today_time = Time.zone.now.to_s(:appt_schedule_day)
+      assert_equal @today.to_time.to_s(:appt_schedule_day), @today_time.to_s
+      assert_match /([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9])/, @today.to_s
+    end
   
   end
   
