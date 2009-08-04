@@ -79,7 +79,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @johnny    = Factory(:user, :name => "Johnny")
       @company.providers.push(@johnny)
       @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-  
+      @company.services.push(@haircut)
       @haircut.reload
       @johnny.reload
       
@@ -108,9 +108,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "schedule work appointment at the start of a free appointment" do
     setup do
-  
-      @johnny           = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny           = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer         = Factory(:user)
   
       beginning_of_day  = Time.now.utc.beginning_of_day

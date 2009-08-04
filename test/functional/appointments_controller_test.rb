@@ -57,9 +57,8 @@ class AppointmentsControllerTest < ActionController::TestCase
     @free_service = @company.free_service
     # create a customer
     @customer     = Factory(:user, :name => "Customer")
-    # stub current company methods
+    # stub current company
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
     # set the request hostname
     @request.host = "www.peanut.com"
     # initialize roles and privileges
@@ -193,18 +192,16 @@ class AppointmentsControllerTest < ActionController::TestCase
     context "logged in as a customer" do
       setup do
         # create free time from 9 am to 11 am local time
-        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @today          = Time.zone.now.utc.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
-      
+        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
+
         # stub current user
-        @controller.stubs(:logged_in?).returns(true)
         @controller.stubs(:current_user).returns(@customer)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-      
+
         # book a haircut with johnny during his free time
-        get :new, 
+        get :new,
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
             :duration => @haircut.duration, :mark_as => 'work'
       end

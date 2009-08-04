@@ -36,7 +36,8 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create free appointment with mismatched duration and end_at values" do
     setup do
-      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @johnny         = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
@@ -61,7 +62,8 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create free appointment and test unscheduled time" do
     setup do
-      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @johnny         = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
@@ -89,7 +91,8 @@ class AppointmentTest < ActiveSupport::TestCase
   context "create free time" do
     setup do
       # create free time from 10 am to 12 pm
-      @johnny         = Factory(:user, :name => "Johnny", :companies => [@company])
+      @johnny         = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
@@ -136,8 +139,12 @@ class AppointmentTest < ActiveSupport::TestCase
         @customer.reload
       end
   
-      should "have customer with customer role" do
-        assert_equal ['company customer'], @customer.roles.collect(&:name)
+      should "add 'user manager' role on user to customer" do
+        assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
+      end
+
+      should "add 'company customer' role on company to customer" do
+        assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
       end
     end
     
@@ -186,12 +193,16 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 0, @wait_appt.time_start_at
       assert_equal 86400, @wait_appt.time_end_at
     end
-    
-    should "add 'customer' role to customer" do
-      assert_equal ['company customer'], @customer.roles.collect(&:name)
+
+    should "add 'user manager' role on user to customer" do
+      assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
+    end
+
+    should "add 'company customer' role on company to customer" do
+      assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
     end
   end
-  
+
   context "create waitlist appointment with any service provider" do
     setup do
       @johnny       = Factory(:user, :name => "Johnny")

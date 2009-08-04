@@ -25,9 +25,11 @@ class CapacitySlotTest < ActiveSupport::TestCase
     assert_equal @company, @location.company
 
     @anywhere       = Location.anywhere
-    @customer       = Factory(:user, :name => "Customer", :companies => [@company])
-    @provider       = Factory(:user, :name => "Provider", :companies => [@company])
-    @work_service   = Factory(:work_service, :name => "Work service", :companies => [@company], :price => 1.00, :duration => 60, :allow_custom_duration => true)
+    @customer       = Factory(:user, :name => "Customer")
+    @provider       = Factory(:user, :name => "Provider")
+    @company.providers.push(@provider)
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :duration => 60, :allow_custom_duration => true)
+    @company.services.push(@work_service)
     @free_service   = @company.free_service
 
     assert_valid @customer
@@ -188,23 +190,22 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @tomorrow, :end_day => @day_after, :start_at => "2100", :end_at => "0500"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
     end
-    
+
     should_change "Appointment.count", :by => 1
-    
     should_change "CapacitySlot.count", :by => 1
-    
+
     should "have one capacity slot from 2100 to 0500 duration 8 hours" do
       assert_equal 8 * 60, CapacitySlot.first.duration
     end
-    
+
     context "THEN find free time from 0000 to 0300" do
-      
+
       setup do
         @time_range     = TimeRange.new({:day => @day_after, :end_day => @day_after, :start_at => "0000", :end_at => "0300"})
         @date_range     = DateRange.parse_when("tomorrow")
         @capacity_slots = AppointmentScheduler.find_free_capacity_slots(@company, @anywhere, @provider, @work_service, @time_range.duration, @date_range, {:time_range => @time_range})
       end
-      
+
       should "have one capacity slot of duration 8 hours" do
         assert_equal 1, @capacity_slots.size
         assert_equal 8 * 60, @capacity_slots.first.duration
