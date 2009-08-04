@@ -22,7 +22,7 @@
           == We found no available timeslots matching your search criteria.
         - else
           == We found #{pluralize(@free_capacity_slots.size, 'available timeslot')} matching your search criteria.
-          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below or", Duration.to_words(@duration).singularize)
+          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below or", Duration.to_words(@duration).singularize, :highlighter => '<strong class="shaded">\1</strong>')
           %br
           = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
           == if you can't find a suitable timeslot.
