@@ -1,19 +1,15 @@
 class UsersController < ApplicationController
+  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :notify]
+  before_filter :init_role, :only => [:edit, :update]
+  before_filter :init_user_privileges, :only => [:edit, :update]
   
-  # Protect these actions behind an admin login
-  # before_filter :admin_required, :only => [:suspend, :unsuspend, :destroy, :purge]
-  before_filter :find_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :notify]
-  before_filter :find_role, :only => [:edit, :update]
+  privilege_required      'create users', :only => [:new, :create], :on => :current_company
+  privilege_required_any  'update users', :only => [:edit, :update, :notify], :on => [:user, :current_company]
   
-  privilege_required 'create users', :only => [:new, :create], :on => :current_company
-  privilege_required 'update users', :only => [:edit, :update, :notify], :on => :current_user
-  
-  def has_privilege?(p, *args)
+  def has_privilege?(p, authorizable=nil, user=nil)
     case p
     when 'create users'
-      authorizable  = args[0]
-      user          = args[1]
-      @role         = find_role
+      @role = init_role
       
       begin
         # if we have an invitation, use invitation role
@@ -28,16 +24,17 @@ class UsersController < ApplicationController
         # anyone can signup as a customer
         return true
       when 'provider'
-        # providers must be invited or user must have 'create users' privilege
-        return true if @invitation or current_privileges.include?(p)
-        return false
+        # providers must be invited or user must have 'create users' privilege on the company
+        return true if @invitation
+        super
       else
-        # not allowed
+        # any other role is not allowed
         return false
       end
       # delegate to base class
       super
     else
+      # delegate to base class
       super
     end
   end
@@ -65,7 +62,7 @@ class UsersController < ApplicationController
           @invitation.company.providers.push(@user) unless @invitation.company.blank?
         when 'customer'
           # grant user customer role
-          @user.grant_role('customer', @invitation.company) unless @invitation.company.blank?
+          @user.grant_role('company customer', @invitation.company) unless @invitation.company.blank?
         end 
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
@@ -84,7 +81,7 @@ class UsersController < ApplicationController
   # POST /customers/create
   # POST /providers/create
   def create
-    # @role (always) and @invitation (if it exists) have been initialized at this point
+    # @role (always) and @invitation (if it exists) are initialized in a before filter
     
     # xxx - temporarily disable this
     # logout_keeping_session!
@@ -223,11 +220,11 @@ class UsersController < ApplicationController
 
   protected
   
-  def find_user
+  def init_user
     @user = User.find(params[:id])
   end
   
-  def find_role
+  def init_role
     @role = params[:role]
     
     if @role.blank?
@@ -237,6 +234,12 @@ class UsersController < ApplicationController
     end
     
     @role
+  end
+  
+  def init_user_privileges
+    if current_user and @user
+      @current_privileges[@user] = current_user.privileges(@user).collect(&:name)
+    end
   end
   
   def random_password

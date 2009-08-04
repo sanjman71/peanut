@@ -11,11 +11,11 @@
     <!--[if IE]>
     = stylesheet_link_tag 'blueprint/ie', :media =>"screen, projection"
     <![endif]-->
-    = stylesheet_link_tag 'peanut', 'errors', 'green'
+    = stylesheet_link_tag 'peanut', 'errors', 'green', 'jquery.ui'
     = stylesheet_link_tag 'peanut_print', :media => "print"
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'jquery.datePicker', 'application'
+    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application'
     = yield :javascript
     
     / Pull in the TinyMCE support if required

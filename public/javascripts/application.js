@@ -238,6 +238,25 @@ $.fn.init_log_entries = function () {
   })
 }
 
+// convert '03:00 pm' time format to 'hhmmss' 24 hour time format
+$.fn.convert_time_ampm_to_string = function(s) {
+  re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
+  match   = s.match(re);
+
+  // convert hour to integer, leave minute as string
+  hour    = parseInt(match[1], 10); 
+  minute  = match[2];
+
+  if (match[3] == 'pm') {
+    // add 12 for pm
+    hour += 12;
+  }
+
+  value = hour < 10 ? "0" + hour.toString() : hour.toString()
+  value += minute + "00";
+  return value
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();

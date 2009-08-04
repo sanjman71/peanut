@@ -1,9 +1,11 @@
 class CalendarController < ApplicationController
-  before_filter :init_provider, :only => [:edit, :edit_weekly]
+  before_filter :init_provider, :only => [:show, :edit_block, :edit_weekly]
+  before_filter :init_provider_privileges, :only => [:show, :edit_block, :edit_weekly]
   
-  privilege_required 'read calendars', :only => [:index, :show, :search], :on => :current_company
-  privilege_required 'update calendars', :only => [:edit, :edit_weekly], :on => @provider
-  
+  privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
+  privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company]
+  privilege_required_any  'update calendars', :only => [:edit_block, :edit_weekly], :on => [:provider, :current_company]
+
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
   
@@ -21,16 +23,15 @@ class CalendarController < ApplicationController
   # GET /users/1/calendar/when/next-week
   # GET /users/1/calendar/range/20090101..20090201
   def show
-    if current_company.providers_count == 0
-      # redirect to company home page
-      redirect_to root_path(:subdomain => current_subdomain) and return
-    end
+    # @provider initialized in before_filter
+    
+    # if current_company.providers_count == 0
+    #   # redirect to company home page
+    #   redirect_to root_path(:subdomain => current_subdomain) and return
+    # end
     
     @free_service = current_company.free_service
-
-    # initialize provider
-    @provider  = init_provider
-    @providers = current_company.providers.all
+    @providers    = current_company.providers.all
 
     if params[:start_date] and params[:end_date]
       # build daterange using range values
@@ -60,17 +61,12 @@ class CalendarController < ApplicationController
     respond_to do |format|
       format.html
       format.pdf
-      # format.pdf do
-      #   # create pdf and stream it to the caller
-      #   pdf = Reports::CalendarController.render_pdf(:appointments => @appointments, :title => "Calendar Title")
-      #   send_data pdf, :type => "application/pdf"
-      # end
     end
   end
   
   # GET  /calendar/search
   # POST /calendar/search
-  #  - search for a provider's calendar by date range => params[:start_date], params[:end_date]
+  #  - search a provider's calendar by date range => params[:start_date], params[:end_date]
   def search
     if request.post?
       # reformat start_date, end_date strings, and redirect to index action
@@ -80,8 +76,8 @@ class CalendarController < ApplicationController
     end
   end
   
-  # GET /users/1/calendar/edit
-  def edit
+  # GET /users/1/calendar/block/edit
+  def edit_block
     # @provider initialized in before_filter
     
     # if params[:provider_type].blank? or params[:provider_id].blank?
@@ -134,19 +130,11 @@ class CalendarController < ApplicationController
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers.all
 
-    # initialize daterange, start calendar on sunday, end calendar on sunday, dont really care about 'when'
+    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
     @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
 
     # initialize calendar markings to empty
     @calendar_markings  = Hash.new
-
-    # build time of day collection
-    # TODO xxx - need a better way of mapping these times to start, end hours
-    @tod        = ['morning', 'afternoon']
-    @tod_start  = 'morning'
-    @tod_end    = 'afternoon'
-
-    @free_service = current_company.free_service
 
     respond_to do |format|
       format.html
@@ -158,5 +146,9 @@ class CalendarController < ApplicationController
   # find scheduable from the params hash
   def init_provider
     @provider = current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
+  end
+  
+  def init_provider_privileges
+    @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)
   end
 end

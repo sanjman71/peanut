@@ -158,6 +158,15 @@ $.fn.init_schedule_form = function () {
   })
 }
 
+// edit calendar for the selected provider
+$.fn.init_select_calendar_edit_weekly_provider = function () {
+  $("#edit_provider").change(function () {
+    var href = '/' + this.value + '/calendar/weekly/edit';
+    window.location = href;
+    return false;
+  })
+}
+
 // convert mm/dd/yyyy date to yyyymmdd string
 $.fn.convert_date_to_string = function(s) {
   re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
@@ -170,25 +179,6 @@ $.fn.convert_date_to_string = function(s) {
   return s
 }
 
-// convert '03:00 pm' time format to 'hhmmss' 24 hour time format
-$.fn.convert_time_ampm_to_string = function(s) {
-  re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
-  match   = s.match(re);
-
-  // convert hour to integer, leave minute as string
-  hour    = parseInt(match[1], 10); 
-  minute  = match[2];
-
-  if (match[3] == 'pm') {
-    // add 12 for pm
-    hour += 12;
-  }
-
-  value = hour < 10 ? "0" + hour.toString() : hour.toString()
-  value += minute + "00";
-  return value
-}
-
 $(document).ready(function() {
 
   $(document).init_daynames();
@@ -196,7 +186,8 @@ $(document).ready(function() {
   $(document).init_datepicker();
   $(document).init_timepicker();
   $(document).init_schedule_form();
-
+  $(document).init_select_calendar_edit_weekly_provider();
+  
   // initialize weekly schedule
   $(document).set_weekly_schedule();
 })

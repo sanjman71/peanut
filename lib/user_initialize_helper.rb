@@ -3,16 +3,13 @@ module UserInitializeHelper
   protected
   
   def user_initialize(company, user, role, creator, invitation = nil)
-    # grant user 'user manager' role on themself
-    user.grant_role('user manager', user)
-    
     case role
     when 'provider'
       # add the user as a company provider
       company.providers.push(user)
     when 'customer'
       # grant user the 'customer' role on the company
-      user.grant_role('customer', company)
+      user.grant_role('company customer', company)
     end
 
     if invitation

@@ -6,10 +6,10 @@
       = yield :title
       == | Walnut Calendar
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
-    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'orange'
+    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'orange', 'jquery.ui'
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag 'jquery', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'jquery.datePicker', 'application'
+    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application'
     = yield :javascript
     
   %body

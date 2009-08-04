@@ -14,40 +14,41 @@ class LogEntriesControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    @provider     = Factory(:user, :name => "Provider", :companies => [@company])
-    @service      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+    @provider     = Factory(:user, :name => "Provider")
+    @company.providers.push(@provider)
+    @service      = Factory(:work_service, :name => "Haircut", :price => 1.00)
+    @company.services.push(@service)
     @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @provider, :service => @service)
     @log_entry        = Factory(:log_entry, :company => @company, :user => @owner, :customer => @customer, :loggable => @appointment, :etype => LogEntry::INFORMATIONAL)
     # make owner the company manager
     @owner.grant_role('manager', @company)
-    # add providers
+    # add providers and services
     @company.providers.push(@owner)
     @company.providers.push(@provider)
+    @company.services.push(@service)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    
   end
   
   context "Not logged in" do
     setup do
-      @controller.stubs(:current_privileges).returns([])
-      ActionView::Base.any_instance.stubs(:current_privileges).returns([])
+      # @controller.stubs(:current_privileges).returns([])
+      # ActionView::Base.any_instance.stubs(:current_privileges).returns([])
       @controller.stubs(:current_user).returns(nil)
       ActionView::Base.any_instance.stubs(:current_user).returns(nil)
       get :index
     end
-    
+
     should_respond_with :redirect
     should_redirect_to 'unauthorized_path'
     should_set_the_flash_to /You are not authorized/
-
   end
   
   context "Logged in as provider" do
     setup do
-      @controller.stubs(:current_privileges).returns(['read log_entries'])
-      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries'])
+      # @controller.stubs(:current_privileges).returns(['read log_entries'])
+      # ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries'])
       @controller.stubs(:current_user).returns(@provider)
       ActionView::Base.any_instance.stubs(:current_user).returns(@provider)
     end
@@ -80,8 +81,8 @@ class LogEntriesControllerTest < ActionController::TestCase
   
   context "Logged in as manager" do
     setup do
-      @controller.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
-      ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
+      # @controller.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
+      # ActionView::Base.any_instance.stubs(:current_privileges).returns(['read log_entries', 'update log_entries'])
       @controller.stubs(:current_user).returns(@owner)
       ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
     end

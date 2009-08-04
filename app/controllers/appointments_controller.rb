@@ -1,40 +1,37 @@
 class AppointmentsController < ApplicationController
-  before_filter :init_provider, :only => [:create, :create_weekly]
+  before_filter :init_provider, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
+  before_filter :init_provider_privileges, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
     
-  privilege_required 'read work appointments', :only => [:index], :on => :current_company
-  privilege_required 'read %s appointments', :only => [:show], :on => :current_company
-  privilege_required 'update calendars', :only =>[:create, :create_weekly], :on => @provider
-  privilege_required 'update work appointments', :only => [:complete], :on => :current_company
-  
-  def has_privilege?(p, *args)
+  privilege_required      'read work appointments', :only => [:index], :on => :current_company
+  privilege_required      'read %s appointments', :only => [:show], :on => :current_company
+  privilege_required_any  'update calendars', :only =>[:create_free, :create_block, :create_weekly], :on => [:provider, :current_company]
+  privilege_required      'update work appointments', :only => [:complete], :on => :current_company
+
+  def has_privilege?(p, authorizable=nil, user=nil)
     case p
-    when 'update calendars'
-      case params[:mark_as]
-      when Appointment::WORK, Appointment::WAIT
-        # anyone can create work, wait appointments
-        return true
-      when Appointment::FREE
-        # delegate to base class
-        super
-      else
-        # delegate to base class
-        super
-      end
+    # when 'update calendars'
+    #   case params[:mark_as]
+    #   when Appointment::WORK, Appointment::WAIT
+    #     # anyone can create work, wait appointments
+    #     return true
+    #   when Appointment::FREE
+    #     # delegate to base class
+    #     super
+    #   else
+    #     # delegate to base class
+    #     super
+    #   end
     when 'read work appointments'
       # users may read their work appointments
-      authorizable  = args[0]
-      user          = args[1] || current_user
-      @customer     = find_customer_from_params
+      @customer = find_customer_from_params
       
       return true if @customer == user
       # delegate to base class
       super
     when 'read %s appointments'
       # users may read their work/wait appointments
-      authorizable  = args[0]
-      user          = args[1] || current_user
       @appointment  = find_appointment_from_params
       
       return false if @appointment.blank?
@@ -107,6 +104,11 @@ class AppointmentsController < ApplicationController
   def create
     # @provider initialized in before filter
     
+    if params[:action] == 'create'
+      # not allowed to directly call 'create'
+      redirect_to unauthorized_path and return
+    end
+
     # get appointment parameters
     @service  = current_company.services.find_by_id(params[:service_id])
     @customer = User.find_by_id(params[:customer_id])
@@ -202,7 +204,7 @@ class AppointmentsController < ApplicationController
       end
     end
     
-    logger.debug("*** errors: #{@errors}")
+    logger.debug("*** errors: #{@errors}") unless @errors.empty?
     logger.debug("*** created: #{@created}")
     
     if @errors.keys.size > 0
@@ -215,10 +217,20 @@ class AppointmentsController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
-      format.js
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
   
+  # POST /users/1/calendar/free/add
+  def create_free
+    create
+  end
+  
+  # POST /users/1/calendar/block/add
+  def create_block
+    create
+  end
+
   # POST /users/1/calendar/weekly/add
   def create_weekly
     # @provider initialized in before filter
@@ -262,6 +274,16 @@ class AppointmentsController < ApplicationController
       format.html { redirect_to(@redirect_path) and return }
       format.js
     end
+  end
+
+  # anyone can create work appointments
+  def create_work
+    create
+  end
+
+  # anyone can create wait appointments
+  def create_wait
+    create
   end
 
   # GET /appointments/1/reschedule
@@ -455,6 +477,12 @@ class AppointmentsController < ApplicationController
     rescue Exception => e
       logger.debug("xxx could not provider #{params[:provider_type]}:#{params[:provider_id]}")
       redirect_to(unauthorized_path) and return
+    end
+  end
+
+  def init_provider_privileges
+    if current_user
+      @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)
     end
   end
 

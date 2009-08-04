@@ -1,5 +1,4 @@
-require File.dirname(__FILE__) + '/../test_helper'
-require 'test/factories'
+require 'test/test_helper'
 
 class ActionView::Base
   include PlansHelper
@@ -13,84 +12,69 @@ class CompaniesControllerTest < ActionController::TestCase
   should_route :get, '/edit', :controller => 'companies', :action => 'edit'
 
   def setup
-    # create a valid company
+    # create company
     @owner        = Factory(:user, :name => "Owner")
     @user         = Factory(:user, :name => "Joe Soap")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-
+    # owner is company manager
+    @owner.grant_role('company manager', @company)
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
+    # create admin user
+    @admin        = Factory(:user, :name => "Admin")
+    @admin.grant_role('admin')
+    # create regular user
+    @user         = Factory(:user, :name => "User")
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
   end
   
-  context "do not show companies index without privileges" do
-    setup do
-      @controller.stubs(:current_privileges).returns([])
-      get :index
+  context "show companies" do
+    context "without 'read companies' privilege" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('unauthorized_path') { unauthorized_path }
     end
 
-    should_respond_with :redirect
-    should_redirect_to 'unauthorized_path'
-  end
-  
-  context "show companies index with privileges" do
-    
-    setup do
-      ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-      ActionView::Base.any_instance.stubs(:global_flash?).returns(true)
-      @controller.stubs(:current_privileges).returns(['read companies'])
-      get :index
-    end
-  
-    should_respond_with :success
-    should_render_template 'companies/index.html.haml'
-    should_not_set_the_flash
-    should_assign_to :companies
-  end
-  
-  context "working with a single company" do
+    context "with 'read companies' privileges" do
+      setup do
+        @controller.stubs(:current_user).returns(@admin)
+        get :index
+      end
 
-    setup do
-      # stub current company method
-      ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-      ActionView::Base.any_instance.stubs(:global_flash?).returns(true)
+      should_respond_with :success
+      should_render_template 'companies/index.html.haml'
+      should_not_set_the_flash
+      should_assign_to :companies
+    end
+  end
+
+  context "edit company" do
+    context "as the company owner" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :edit, :id => @company.id
+      end
+
+      should_respond_with :success
+      should_render_template 'companies/edit.html.haml'
     end
 
     context "as a regular user" do
       setup do
-        ActionView::Base.any_instance.stubs(:current_user).returns(@user)
-        @controller.stubs(:current_privileges).returns([])      
-      end
-      
-      context "edit company" do
-        setup do
-          get :edit, :id => @company.id
-        end
-        
-        should_respond_with :redirect
-        should_redirect_to 'unauthorized_path'
-      end
-    end
-    
-    context "as the company owner" do
-      setup do
         @controller.stubs(:current_user).returns(@user)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@user)
-        @controller.stubs(:current_privileges).returns(['update companies'])   
-        ActionView::Base.any_instance.stubs(:has_role?).returns(true)
+        get :edit, :id => @company.id
       end
-      
-      context "edit company" do
-        setup do
-          get :edit, :id => @company.id
-        end
-        
-        should_respond_with :success
-        should_render_template 'companies/edit.html.haml'
-      end
-    end
-    
-  end
 
+      should_respond_with :redirect
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+  end
+  
 end

@@ -26,9 +26,11 @@ class AppointmentTest < ActiveSupport::TestCase
     @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company        = Factory(:company, :subscription => @subscription)
     @anywhere       = Location.anywhere
-    @customer       = Factory(:user, :name => "Customer", :companies => [@company])
-    @provider       = Factory(:user, :name => "Provider", :companies => [@company])
-    @work_service   = Factory(:work_service, :name => "Work service", :companies => [@company], :price => 1.00)
+    @provider       = Factory(:user, :name => "Provider")
+    @company.providers.push(@provider)
+    @company.reload
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00)
+    @company.services.push(@work_service)
     @free_service   = @company.free_service
   end
   
@@ -109,7 +111,8 @@ class AppointmentTest < ActiveSupport::TestCase
     
     context "and schedule work appointment to test confirmation code" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+        @company.services.push(@haircut)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
@@ -124,7 +127,8 @@ class AppointmentTest < ActiveSupport::TestCase
   
     context "and schedule work appointment to test customer role" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+        @company.services.push(@haircut)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
@@ -133,13 +137,14 @@ class AppointmentTest < ActiveSupport::TestCase
       end
   
       should "have customer with customer role" do
-        assert_equal ['customer'], @customer.roles.collect(&:name)
+        assert_equal ['company customer'], @customer.roles.collect(&:name)
       end
     end
     
     context "and schedule work appointment with a custom service duration" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+        @company.services.push(@haircut)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 120, @customer, @options)
@@ -157,8 +162,10 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create waitlist appointment with a specific service provider" do
     setup do
-      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny       = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer     = Factory(:user)
       # build start, end date ranges in utc time
       @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
@@ -181,14 +188,16 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     should "add 'customer' role to customer" do
-      assert_equal ['customer'], @customer.roles.collect(&:name)
+      assert_equal ['company customer'], @customer.roles.collect(&:name)
     end
   end
   
   context "create waitlist appointment with any service provider" do
     setup do
-      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny       = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer     = Factory(:user)
       # build start, end date ranges in utc time
       @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
@@ -204,8 +213,10 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create an afternoon appointment to test time overlap searching" do
     setup do
-      @johnny   = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut  = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+      @johnny       = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @user     = Factory(:user)
   
       # start at 2 pm, local time

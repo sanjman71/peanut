@@ -14,23 +14,23 @@ class CustomersControllerTest < ActionController::TestCase
 
   def setup
     @controller   = CustomersController.new
-    # create a valid company
+    # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    # create customer role
-    @role         = Badges::Role.create(:name=>"customer")
+    @owner.grant_role('company manager', @company)
+    # create user
+    @user         = Factory(:user, :name => "User")
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
+    BadgesInit.roles_privileges
   end
   
   context "search an empty customers database with an empty search" do
     context "and without 'read users' privilege" do
       setup do
-        # stub privileges
-        @controller.stubs(:current_privileges).returns([])
+        @controller.stubs(:current_user).returns(@user)
         get :index
       end
       
@@ -40,9 +40,6 @@ class CustomersControllerTest < ActionController::TestCase
     
     context "and with 'read users' privilege" do
       setup do
-        # stub privileges
-        @controller.stubs(:current_privileges).returns(['read users'])
-        # stub current_user method
         @controller.stubs(:current_user).returns(@owner)
         get :index
       end
@@ -64,21 +61,18 @@ class CustomersControllerTest < ActionController::TestCase
     setup do
       # create customer with a valid appointment
       @customer     = Factory(:user, :name => 'Booty Licious')
-      @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut      = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+      @johnny       = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00)
+      @company.services.push(@haircut)
       @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @johnny, :service => @haircut)
       assert @appointment.valid?
     end
 
     context "with an ajax search for 'boo' with 'read users' privilege" do
       setup do
-        # stub privileges
-        @controller.stubs(:current_privileges).returns(['read users'])
         # stub current_user method
         @controller.stubs(:current_user).returns(@owner)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-        # stub company manager method
-        ActionView::Base.any_instance.stubs(:manager?).returns(false)
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
     

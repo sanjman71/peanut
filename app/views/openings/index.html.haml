@@ -16,7 +16,7 @@
     .span-15.last.padding-top-10
       -# show count of available timeslots for the service and provider
       %h3
-        = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name])
+        = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name], :highlighter => '<strong class="shaded">\1</strong>')
       %h4{:style => 'color: #666666; line-height: 1.5em;'}
         - if @free_capacity_slots.blank?
           == We found no available timeslots matching your search criteria.

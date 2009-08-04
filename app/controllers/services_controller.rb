@@ -5,7 +5,6 @@ class ServicesController < ApplicationController
   privilege_required 'update services', :only => [:edit, :update], :on => :current_company
   privilege_required 'delete services', :only => [:destroy], :on => :current_company
 
-  
   # GET /services
   def index
     # only show work services

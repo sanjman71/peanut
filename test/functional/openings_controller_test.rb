@@ -34,7 +34,8 @@ class OpeningsControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    @johnny       = Factory(:user, :name => "Johnny", :companies => [@company])
+    @johnny       = Factory(:user, :name => "Johnny")
+    @company.providers.push(@johnny)
     @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 10.00, :duration => 30)
     # add haircut as a company service
     @company.services.push(@haircut)
@@ -51,6 +52,7 @@ class OpeningsControllerTest < ActionController::TestCase
     
     # Set the request hostname
     # @request.host = "www.peanut.com"
+
   end
   
   context "search company openings with no service specified" do

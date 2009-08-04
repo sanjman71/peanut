@@ -9,8 +9,9 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
     @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company        = Factory(:company, :subscription => @subscription)
     @anywhere       = Location.anywhere
-    @customer       = Factory(:user, :name => "Customer", :companies => [@company])
-    @provider       = Factory(:user, :name => "Provider", :companies => [@company])
+    @customer       = Factory(:user, :name => "Customer")
+    @provider       = Factory(:user, :name => "Provider")
+    @company.providers.push(@provider)
     @work_service   = Factory(:work_service, :name => "Work service", :companies => [@company], :price => 1.00)
     @free_service   = @company.free_service
   end

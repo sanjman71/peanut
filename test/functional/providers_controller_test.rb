@@ -19,70 +19,76 @@ class ProvidersControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    # make owner the company manager
-    @owner.grant_role('manager', @company)
-    # add provider
-    @company.providers.push(@owner)
+    # owner is the company manager
+    @owner.grant_role('company manager', @company)
+    @owner.grant_role('user manager', @owner)
+    # add providers
+    @provider1    = Factory(:user, :name => "Provider 1")
+    @company.providers.push(@provider1)
+    @provider1.grant_role('company provider', @company)
+    @provider1.grant_role('user manager', @provider1)
+    @provider2    = Factory(:user, :name => "Provider 2")
+    @company.providers.push(@provider2)
+    @provider2.grant_role('company provider', @company)
+    @provider2.grant_role('user manager', @provider2)
+    # create user
+    @user         = Factory(:user, :name => "User")
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
   end
 
-  context "list all users without ['read users'] privilege" do
+  context "list users without 'read users' privilege" do
     setup do
-      # stub privileges
-      @controller.stubs(:current_privileges).returns([])
-      # stub current user methods
-      @controller.stubs(:current_user).returns(@owner)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-      # stub has_role? method
-      @owner.stubs(:has_role?).returns(false)
+      # list users as regular user
+      @controller.stubs(:current_user).returns(@user)
       get :index
     end
-  
+
     should_respond_with :redirect
     should_redirect_to('unauthorized_path') { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
   
-  context "list all users with ['read users'] privileges" do
+  context "list users with 'read users' privileges" do
     setup do
-      # stub privileges
-      @controller.stubs(:current_privileges).returns(['read users'])
-      # stub current user methods
-      @controller.stubs(:current_user).returns(@owner)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
+      # list users as company provider
+      @controller.stubs(:current_user).returns(@provider1)
       get :index
     end
-  
+
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to(:providers, :class => Array)
-  
-    should "not be able to change manager role" do
+    should_assign_to(:providers, :class => Array) { [@provider1, @provider2] }
+
+    should "not be able to change manager role on providers" do
       assert_select "input.checkbox.manager", 0
+    end
+
+    should "be able to edit themself" do
+      assert_select "a.admin.edit.user", 1
     end
   end
 
-  context "list all users with ['read users', 'update users'] privileges" do
+  context "list users with 'update users' privileges" do
     setup do
-      # stub privileges
-      @controller.stubs(:current_privileges).returns(['read users', 'update users'])
-      # stub current user methods
+      # list users as company manager
       @controller.stubs(:current_user).returns(@owner)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@owner)
-      # add a company provider
-      @provider = Factory(:user)
-      @company.providers.push(@provider)
       get :index
     end
-  
+
     should_respond_with :success
     should_render_template 'providers/index.html.haml'
-    should_assign_to(:providers, :class => Array)
-    
-    should "be able to change manager role for 1 provider" do
-      assert_select "input.checkbox.manager", 1
+    should_assign_to(:providers, :class => Array) { [@provider1, @provider2] }
+
+    should "be able to change manager role on providers" do
+      assert_select "input.checkbox.manager", 2
+    end
+
+    should "be able to edit users" do
+      assert_select "a.admin.edit.user", 2
     end
   end
   

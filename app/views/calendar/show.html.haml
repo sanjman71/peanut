@@ -1,6 +1,6 @@
 - title("Schedules")
-- javascript('appointments', 'calendar')
-- stylesheet('appointments', 'calendar')
+- stylesheet('appointments', 'calendar', 'jquery.timepickr')
+- javascript('appointments', 'calendar', 'ui.timepickr', 'jquery.timepickr')
 
 .span-16.append-1
   .span-15.prepend-1.last.mat.padding-top-10
@@ -22,7 +22,7 @@
       #dates.hide
         = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :provider_type => @provider.class.to_s.tableize, :provider_id => @provider.id, :subdomain => current_subdomain), :submit_id => 'search_calendar_with_date_range_submit'})
       
-  .span-14.prepend-1.last
+  .span-14.prepend-1.last.padding-top-10
     = display_flash
     
   %hr.space

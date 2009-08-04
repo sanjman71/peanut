@@ -7,6 +7,12 @@
       
   .span-12.padding-bottom-10
     = render :partial => 'sessions/login_form'
+    
+  .span-11.prepend-1.last
+    = RPXNow.embed_code('walnut', rpx_customer_url)
+
+.span-24.last
+    
   .span-12.last
     - if @signup
       = render :partial => 'sessions/user_form', :locals => {:submit_url => url_for(:controller => 'users', :action => 'create', :role => 'customer', :subdomain => current_subdomain), :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}

@@ -128,6 +128,7 @@ div.instructions ul                               { font-size: 12px; }
 /* highlight styles */
 
 .shaded                                           { background: #EDF3FE; none repeat scroll 0 0; }
+.shaded.grey                                      { background: #EEEEEE; none repeat scroll 0 0; }
 
 .highlighted, .highlighted.shaded, .highlight     { background: #FFCC00; none repeat scroll 0 0; }
 

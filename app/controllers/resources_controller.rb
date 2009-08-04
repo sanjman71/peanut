@@ -1,5 +1,6 @@
 class ResourcesController < ApplicationController
   privilege_required 'create resources', :only => [:new, :create], :on => :current_company
+  privilege_required 'update resources', :only => [:edit, :update], :on => :current_company
   
   # GET /resources/new
   def new

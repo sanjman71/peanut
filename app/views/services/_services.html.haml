@@ -6,7 +6,7 @@
     = render(:partial => 'services_newbie')
         
 - services.each do |service|
-  .span-16.last.letterbox.service{:class => cycle("shaded", "")}
+  .span-16.last.letterbox.service{:class => cycle("shaded", "shaded grey")}
     .span-6.prepend-1.name{:class => service.providers_count? ? '' : 'noproviders'}
       %h2.margin-bottom-0= service.name
       - if service.providers_count > 0

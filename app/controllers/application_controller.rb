@@ -31,7 +31,10 @@ class ApplicationController < ActionController::Base
 
   # Helper for re-scheduling appointments
   include AppointmentRescheduleHelper
-  
+
+  # Badges extentsions module
+  include BadgesExtensions
+
   # Initialize current company and subdomain
   before_filter :init_current_company
   
@@ -40,15 +43,6 @@ class ApplicationController < ActionController::Base
   
   # Default layout
   layout "company"
-
-  # check user privileges against the pre-loaded memory collection instead of using the database
-  def has_privilege?(p, *args)
-    authorizable  = args[0]
-    user          = args[1] || current_user
-    logger.debug("*** checking privilege #{p}, on authorizable #{authorizable ? authorizable.name : ""}, for user #{user ? user.name : ""}")
-    return false if current_privileges.blank?
-    return current_privileges.include?(p)
-  end
 
   # check if current user has the specified role, on the optional authorizable object
   def has_role?(role_name, authorizable=nil)
@@ -70,11 +64,7 @@ class ApplicationController < ActionController::Base
   def current_location
     @current_location
   end
-  
-  def current_privileges
-    @current_privileges ||= []
-  end
-  
+
   # return true if the current user is a manager of the company
   def manager?
     has_role?('manager', current_company) || has_role?('admin')
@@ -169,18 +159,5 @@ class ApplicationController < ActionController::Base
       logger.debug("*** current_location: #{@current_location.name}, count: #{@current_locations.size}")
     end
   end
-    
-  def init_current_privileges
-    if logged_in?
-      if @current_company
-        # load privileges on current company (includes privileges on no authorizable object)
-        @current_privileges = current_user.privileges(@current_company).collect(&:name)
-      else
-        # load privileges without an authorizable object
-        @current_privileges = current_user.privileges.collect(&:name)
-      end
-    else
-      @current_privileges = []
-    end
-  end
+
 end

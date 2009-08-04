@@ -84,7 +84,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
   map.connect   ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
   map.connect   ':provider_type/:provider_id/calendar/weekly/edit', :controller => 'calendar', :action => 'edit_weekly'
-  map.connect   ':provider_type/:provider_id/calendar/edit', :controller => 'calendar', :action => 'edit'
+  map.connect   ':provider_type/:provider_id/calendar/block/edit', :controller => 'calendar', :action => 'edit_block'
   
   # search calendars scoped by provider
   map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
@@ -97,18 +97,22 @@ ActionController::Routing::Routes.draw do |map|
   map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
   map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
-                :controller => 'appointments', :action => 'create', :mark_as => 'work', :conditions => {:method => :post}
+                :controller => 'appointments', :action => 'create_work', :mark_as => 'work', :conditions => {:method => :post}
 
   # schedule a waitlist appointment with a provider for a specific service and date range
   map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
                 :controller => 'appointments', :action => 'new', :mark_as => 'wait', 
                 :conditions => {:method => :get, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
   map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
-                :controller => 'appointments', :action => 'create', :mark_as => 'wait', 
+                :controller => 'appointments', :action => 'create_wait', :mark_as => 'wait', 
                 :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
     
-  # schedule free time for a provider by adding a weekly recurring set of appointmetns  
-  map.connect   ':provider_type/:provider_id/calendar/weekly/add', 
+  # create provider free time, single appointment, block appointments, or weekly recurring appointments
+  map.connect   ':provider_type/:provider_id/calendar/free',
+                :controller => 'appointments', :action => 'create_free', :conditions => {:method => :post}
+  map.connect   ':provider_type/:provider_id/calendar/block',
+                :controller => 'appointments', :action => 'create_block', :conditions => {:method => :post}
+  map.connect   ':provider_type/:provider_id/calendar/weekly',
                 :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}
 
   # toggle a provider's calendar

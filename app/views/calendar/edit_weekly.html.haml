@@ -3,7 +3,7 @@
 - javascript('calendar_weekly', 'ui.timepickr', 'jquery.timepickr')
 
 .span-24.last#what
-  .span-15.box
+  .span-15.prepend-1.mat.padding-top-10
     .span-15.last.provider
       = label_tag "edit_provider", "Create weekly schedule for", :class => 'big'
       = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
@@ -14,7 +14,7 @@
       %br
       == Specify the start date and end date for the schedule.
       %br
-      == Click the 'Schedule' button to add the selected available time to your calendar.
+      == Click the 'Create Weekly Schedule' button to add the selected available time to your calendar.
   .span-7.prepend-1.last
     .sidebar.instructions.padding-5
       == What is available time?

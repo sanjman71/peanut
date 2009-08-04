@@ -1,48 +1,62 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class CalendarControllerTest < ActionController::TestCase
 
-  # show calendar for a specific provider
+  # show provider calendar
   should_route :get, 'users/1/calendar',  :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1
   should_route :get, 'users/1/calendar.pdf',  
                :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :format => 'pdf'
   
-  # search calendar for a specific provider
+  # search provider calendar
   should_route :post, 'users/1/calendar/search', 
                :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_id => 1
-
-  # edit calendar for a specific provider
-  should_route :get, 'users/1/calendar/edit', 
-               :controller => "calendar", :action => 'edit', :provider_type => "users", :provider_id => "1"
-
+  
+  # edit provider calendar
+  should_route :get, 'users/1/calendar/block/edit', 
+               :controller => "calendar", :action => 'edit_block', :provider_type => "users", :provider_id => "1"
+  
   should_route :get, 'users/1/calendar/weekly/edit',
                :controller => "calendar", :action => 'edit_weekly', :provider_type => "users", :provider_id => "1"
 
   
   def setup
     @controller   = CalendarController.new
-    # create a valid company
+    # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
+    @owner.grant_role('company manager', @company)
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    # stub current localation to be anywhere
+    # stub current location to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
-    
-    # Set the request hostname
+    # set the request hostname
     @request.host = "www.peanut.com"
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+  end
+
+  def add_mary_and_johnny_as_providers
+    # add johnny as a company provider
+    @johnny = Factory(:user, :name => "Johnny")
+    @johnny.grant_role('user manager', @johnny)
+    @company.providers.push(@johnny)
+    @johnny.reload
+    @company.reload
+    @mary = Factory(:user, :name => "Mary")
+    @mary.grant_role('user manager', @mary)
+    @company.providers.push(@mary)
+    @mary.reload
+    @company.reload
   end
   
-  context "search company calendars as an unauthorized user" do
+  context "search company calendars without 'read calendars' privilege" do
     setup do
-      @controller.stubs(:current_privileges).returns([])
       get :index
     end
-
+  
     should_respond_with :redirect
     should_redirect_to("unauthorized_path") { unauthorized_path } 
     should_set_the_flash_to /You are not authorized/
@@ -51,10 +65,9 @@ class CalendarControllerTest < ActionController::TestCase
   context "search company calendars for a company with no providers" do
     setup do
       @controller.stubs(:current_user).returns(@owner)
-      @controller.stubs(:current_privileges).returns(["read calendars"])
       get :index
     end
-
+  
     should_respond_with :redirect
     should_redirect_to("company root path") { '/' }
   end
@@ -62,118 +75,95 @@ class CalendarControllerTest < ActionController::TestCase
   context "search company calendars for a company that has 1 provider" do
     setup do
       # add company provider
-      @johnny = Factory(:user, :name => "Johnny", :companies => [@company])
-      # stub current user as owner, who is not a company provider
+      @johnny = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      # search as the company manager
       @controller.stubs(:current_user).returns(@owner)
-      # stub user privileges
-      @controller.stubs(:current_privileges).returns(["read calendars"])
       get :index
     end
-
+  
     should_respond_with :redirect
     should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
   end
   
-  context "add company providers" do
+  context "view provider calendar as the provider" do
     setup do
-      # add johnny as a company provider
-      @johnny = Factory(:user, :name => "Johnny", :companies => [@company])
-      @company.providers.push(@johnny)
-      # add mary as a company provider
-      @mary = Factory(:user, :name => "Mary", :companies => [@company])
-      @company.providers.push(@mary)
-      @company.reload
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@johnny)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :show, :provider_type => 'users', :provider_id => @johnny.id
+    end
+  
+    should_respond_with :success
+    should_render_template 'calendar/show.html.haml'
+    
+    should "show add single free time form" do
+      assert_select "form#add_single_free_time_form", 1
     end
     
-    context "and have johnny view his calendar for this week" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@johnny)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@johnny)
-        # stub user privileges, johnny should have 'read calendars' and 'update calendars' privilege as 'provider'
-        @controller.stubs(:current_privileges).returns(["read calendars", "update calendars"])
-        @johnny.stubs(:has_privilege?).returns(true)
-        # stub calendar markings
-        @controller.stubs(:build_calendar_markings).returns(Hash.new)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id
-      end
-
-      should_respond_with :success
-      should_render_template 'calendar/show.html.haml'
-      
-      should "show add single free time form" do
-        assert_select "form#add_single_free_time_form", 1
-      end
-      
-      should_assign_to(:provider) { @johnny }
-      should_assign_to :providers, :class => Array
-      should_assign_to :appointments, :class => Array
-      should_assign_to :calendar_markings, :class => Hash
-      should_assign_to(:when) { "this week" }
-      should_assign_to :daterange, :class => DateRange
-    end
-    
-    context "and have johnny edit his calendar" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@johnny)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@johnny)
-        # stub user privileges
-        @controller.stubs(:current_privileges).returns(["update calendars"])
-        # stub calendar markings
-        @controller.stubs(:build_calendar_markings).returns(Hash.new)
-        get :edit, :provider_type => 'users', :provider_id => @johnny.id
-      end
-
-      should_respond_with :success
-      should_render_template 'calendar/edit.html.haml'
-
-      should_assign_to(:provider) { @johnny }
-      should_assign_to :providers, :class => Array
-      should_assign_to :calendar_markings, :class => Hash
-      should_assign_to :daterange, :class => DateRange
-    end
-    
-    context "and have mary view johnny's calendar for this week" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@mary)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@mary)
-        # stub user privileges, mary should have 'read calendars' privilege as 'provider'
-        @controller.stubs(:current_privileges).returns(['read calendars'])
-        # stub calendar markings
-        @controller.stubs(:build_calendar_markings).returns(Hash.new)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id
-      end
-      
-      should_respond_with :success
-      should_render_template 'calendar/show.html.haml'
-
-      should "not show add single free time form" do
-        assert_select "form#add_single_free_time_form", 0
-      end
-
-      should_assign_to(:provider) { @johnny }
-      should_assign_to :providers, :class => Array
-      should_assign_to :appointments, :class => Array
-      should_assign_to :calendar_markings, :class => Hash
-      should_assign_to(:when) { "this week" }
-      should_assign_to :daterange, :class => DateRange
-    end
-
-    context "and have mary edit johnny's calendar" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@mary)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@mary)
-        # stub user privileges
-        @controller.stubs(:current_privileges).returns(["read calendars"])
-        get :edit, :provider_type => 'users', :provider_id => @johnny.id
-      end
-
-      should_respond_with :redirect
-      should_redirect_to("unauthorized_path") { unauthorized_path }
-      should_set_the_flash_to /You are not authorized/
-    end
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
+    should_assign_to :appointments, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
+    should_assign_to(:when) { "this week" }
+    should_assign_to :daterange, :class => DateRange
   end
+  
+  context "edit provider calendar as the provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@johnny)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :edit_block, :provider_type => 'users', :provider_id => @johnny.id
+    end
+    
+    should_respond_with :success
+    should_render_template 'calendar/edit_block.html.haml'
+  
+    should_assign_to(:provider) { @johnny }
+    should_assign_to :providers, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
+    should_assign_to :daterange, :class => DateRange
+  end
+    
+  context "view provider calendar as another provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@mary)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :show, :provider_type => 'users', :provider_id => @johnny.id
+    end
+  
+    should_respond_with :success
+    should_render_template 'calendar/show.html.haml'
+    
+    should "not show add single free time form" do
+      assert_select "form#add_single_free_time_form", 0
+    end
+    
+    should_assign_to(:provider) { @johnny }
+    should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
+    should_assign_to :appointments, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
+    should_assign_to(:when) { "this week" }
+    should_assign_to :daterange, :class => DateRange
+  end
+
+  context "edit provider calendar as another provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@mary)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :edit_block, :provider_type => 'users', :provider_id => @johnny.id
+    end
+  
+    should_respond_with :redirect
+    should_redirect_to("unauthorized_path") { unauthorized_path }
+    should_set_the_flash_to /You are not authorized/
+  end
+
 end

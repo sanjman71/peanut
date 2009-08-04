@@ -5,7 +5,7 @@
   = link_to('Companies', companies_path(:subdomain => current_subdomain), :class => 'signup')
   == &nbsp;|&nbsp;
 
-- if has_privilege?('create roles privileges') || has_privilege?('read roles privileges') || has_privilege?('update roles privileges') || has_privilege?('delete roles privileges')
+- if has_privilege?('manage site')
   = link_to('Privileges & Roles', badges_path, :class => 'signup')
   == &nbsp;|&nbsp;
   

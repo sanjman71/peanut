@@ -12,8 +12,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "create a free appointment and a service with no providers, and search for free appointments" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00)
+      @company.services.push(@haircut)
       @customer  = Factory(:user)
   
       # create free appointment (all day)
@@ -47,8 +49,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "create a free appointment that has already ended" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
   
       # create free appointment that ended a few minutes ago
       @end_at             = (Time.now.utc - 3.minutes).to_s(:appt_schedule)
@@ -73,8 +76,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "create a free appointment that starts in the future" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
   
       @haircut.reload
       @johnny.reload
@@ -186,8 +190,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "schedule work appointment with a custom duration in the middle of a free appointment" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer  = Factory(:user)
   
       # create free appointment (all day)
@@ -248,8 +254,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "schedule work appointment at the end of a free appointment" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer  = Factory(:user)
       
       # create free appointment (all day)
@@ -309,8 +317,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "schedule work appointment replacing a free appointment" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny", :companies => [@company])
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :companies => [@company], :users => [@johnny], :price => 1.00)
+      @johnny    = Factory(:user, :name => "Johnny")
+      @company.providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
+      @company.services.push(@haircut)
       @customer  = Factory(:user)
   
       # create free appointment (all day)

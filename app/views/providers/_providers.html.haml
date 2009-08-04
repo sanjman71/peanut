@@ -7,19 +7,19 @@
       
     -# allow company managers to toggle manager role
     .span-5.provider.manager
-      - if manager?
+      - if has_privilege?('update users', current_company)
         - if current_user == provider
           -# 'me' is a company manager
           %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
-        - elsif provider.respond_to?(:has_role?)
-          = check_box_tag 'Company Manager', 'yes', provider.has_role?('manager', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
+        - elsif provider.respond_to?(:has_privilege?)
+          = check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
           = label_tag '', 'Company Manager', :class => 'checkbox label'
           %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
         - else
           -# provider is a resource, which does not have roles
           == &nbsp;
           
-    -# allow company managers or edit all providers, and provider to edit himself
+    -# allow company managers to edit all providers, and provider to edit themself
     .span-2.prepend-2.action.last
-      - if manager? or provider == current_user
-        = link_to "Edit", url_for(:controller => provider.tableize, :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin'
+      - if has_privilege?('update users', current_company) or has_privilege?('update users', provider)
+        = link_to "Edit", url_for(:controller => provider.tableize, :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin edit user'

@@ -19,7 +19,7 @@ class SignupControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'signup/index.html.haml'
   end
-  
+
   context "signup new" do
     context "for the free plan" do
       setup do
@@ -33,7 +33,7 @@ class SignupControllerTest < ActionController::TestCase
       should_assign_to :plan, :equals => @free_plan
     end
   end
-  
+
   context "signup create" do
     context "for the free plan" do
       setup do
@@ -49,15 +49,24 @@ class SignupControllerTest < ActionController::TestCase
       
       should_assign_to :company, :user
       should_assign_to :plan, :equals => @free_plan
-      
-      should "create user with roles 'manager' and 'provider'" do
-        assert_equal ['manager', 'provider'], assigns(:user).roles.collect(&:name).sort
+
+      should "create user with roles 'user manager' on user" do
+        @user = User.find_by_email('walnut@jarna.com')
+        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
-      
+
+      should "create user with roles 'company manager', 'company provider' on company" do
+        @company = Company.find_by_name('Peanut')
+        @user    = User.find_by_email('walnut@jarna.com')
+        assert_equal ['company manager', 'company provider'], assigns(:user).roles_on(@company).collect(&:name).sort
+      end
+
       should "create company with user as a provider" do
-        assert_equal [assigns(:user)], assigns(:company).providers
+        @company = Company.find_by_name('Peanut')
+        @user    = User.find_by_email('walnut@jarna.com')
+        assert_equal [@user], @company.providers
       end
-      
+
       should_respond_with :redirect
       should_redirect_to 'login_path(:subdomain => "peanut")'
     end

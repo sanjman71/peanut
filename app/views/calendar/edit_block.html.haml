@@ -1,18 +1,18 @@
 - title("Manage Schedules")
-- stylesheet('calendar')
-- javascript('calendar', 'time_range_slider')
+- stylesheet('calendar', 'jquery.timepickr')
+- javascript('calendar_block', 'ui.timepickr', 'jquery.timepickr')
 
 .span-24.last#what
-  .span-15.box
+  .span-15.prepend-1.mat.padding-top-10
     .span-15.last.provider
       = label_tag "edit_provider", "Schedule available time for", :class => 'big'
       = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br
-      == Use the time range sliders to select the available time range.
+      == Select the start and end times.
       %br
-      == Click the 'Schedule' button to add the selected available time to your calendar.
+      == Click 'Schedule Available Time' to add the time to your calendar.
   .span-7.prepend-1.last
     .sidebar.instructions.padding-5
       == What is available time?
@@ -25,7 +25,7 @@
 .span-14.prepend-1.last
   = display_flash
 
-- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create'), :method => :post, :html => {:id => 'add_free_time_form'}) do |f|
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_block'), :method => :post, :html => {:id => 'add_block_free_time_form'}) do |f|
   = hidden_field_tag :provider_type, @provider.tableize
   = hidden_field_tag :provider_id, @provider.id
   = hidden_field_tag :service_id, @free_service.id
@@ -41,35 +41,23 @@
       = render(:partial => 'shared/calendar', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
     .span-6.last#free_work_notes
       = render(:partial => 'calendar/free_work_notes', :locals => {:free_work_appts_by_day => @free_work_appts_by_day})
-        
-  .span-14.prepend-1.last{:style => 'font-size: 13px; margin-bottom: 7px;'}
-    .span-2
-      %span== Start Time:
-    .span-12.last
-      = select_tag('start_time_of_day', options_for_select(@tod, @tod_start), :class => 'text', :style => 'margin: 0px;')
-      %span{:id => 'start_time', :style => 'font-size 13px; padding-left: 5px;'}==
-  .span-14.prepend-1.sliders#slider_start
-    .span-20.slider.hide{:id => 'morning'}
-      = render(:partial => 'calendar/time_range_slider', :locals => {:start_hour => 8, :start_minute => 0, :end_hour => 12, :end_minute => 0, :minute_interval => 15, :display => 'start_time'})
-    .span-20.slider.hide{:id => 'afternoon'}
-      = render(:partial => 'calendar/time_range_slider', :locals => {:start_hour => 12, :start_minute => 0, :end_hour => 17, :end_minute => 0, :minute_interval => 15, :display => 'start_time'})
 
   %hr.space
-
-  .span-14.prepend-1.last{:style => 'font-size: 13px; margin-bottom: 7px;'}
-    .span-2
-      == End Time:
-    .span-12.last
-      = select_tag('end_time_of_day', options_for_select(@tod, @tod_end), :class => 'text', :style => 'margin: 0px;')
-      %span{:id => 'end_time', :style => 'font-size 13px; padding-left: 5px;'}==
-  .span-14.prepend-1.sliders#slider_end
-    .span-20.slider.hide{:id => 'morning'}
-      = render(:partial => 'calendar/time_range_slider', :locals => {:start_hour => 8, :start_minute => 0, :end_hour => 12, :end_minute => 0, :minute_interval => 15, :display => 'end_time'})
-    .span-20.slider.hide{:id => 'afternoon'}
-      = render(:partial => 'calendar/time_range_slider', :locals => {:start_hour => 12, :start_minute => 0, :end_hour => 17, :end_minute => 0, :minute_interval => 15, :display => 'end_time'})
   
+  .span-14.prepend-1.last
+    .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
+      %h5= label_tag "start_time", "Start time:"
+    .span-12.last.padding-top-5
+      = text_field_tag 'start_time', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+
+  .span-14.prepend-1.last
+    .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
+      %h5= label_tag "end_time", "End time:"
+    .span-12.last.padding-top-5
+      = text_field_tag 'end_time', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+
   %hr.space
-    
+
   #dates
     = text_field_tag 'dates[]', 'date', :id => 'template', :class => 'hide'
     = text_field 'start_at', '', :name => 'start_at', :id => 'start_at', :class => 'hide'

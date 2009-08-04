@@ -53,11 +53,11 @@ class SignupController < ApplicationController
         @user.activate!
       end
 
-      # add user as company provider, which also grants user 'provider' role
+      # add user as company provider, which also grants user 'company provider' role
       @company.providers.push(@user)
 
       # add user as company manager
-      @user.grant_role('manager', @company)
+      @user.grant_role('company manager', @company)
       
       # signup completed, redirect to login page and instruct user to login
       flash[:notice] = "Signup complete! Please login to continue."
