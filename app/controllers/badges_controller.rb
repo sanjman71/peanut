@@ -1,7 +1,10 @@
 class BadgesController < ApplicationController
   layout "home"
   
-  privilege_required 'manage site'
+  privilege_required 'create roles priviliges', :only => [:create_role, :create_privilege]
+  privilege_required 'read roles privileges', :only => [:index]
+  privilege_required 'update roles privileges', :only => [:update_role_privileges]
+  privilege_required 'delete roles privilieges', :only => [:delete_role, :delete_privilege]
 
   # display the list of all roles and permissions
   def index

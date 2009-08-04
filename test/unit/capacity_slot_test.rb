@@ -190,22 +190,23 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @tomorrow, :end_day => @day_after, :start_at => "2100", :end_at => "0500"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
     end
-
+    
     should_change "Appointment.count", :by => 1
+    
     should_change "CapacitySlot.count", :by => 1
-
+    
     should "have one capacity slot from 2100 to 0500 duration 8 hours" do
       assert_equal 8 * 60, CapacitySlot.first.duration
     end
-
+    
     context "THEN find free time from 0000 to 0300" do
-
+      
       setup do
         @time_range     = TimeRange.new({:day => @day_after, :end_day => @day_after, :start_at => "0000", :end_at => "0300"})
         @date_range     = DateRange.parse_when("tomorrow")
         @capacity_slots = AppointmentScheduler.find_free_capacity_slots(@company, @anywhere, @provider, @work_service, @time_range.duration, @date_range, {:time_range => @time_range})
       end
-
+      
       should "have one capacity slot of duration 8 hours" do
         assert_equal 1, @capacity_slots.size
         assert_equal 8 * 60, @capacity_slots.first.duration
