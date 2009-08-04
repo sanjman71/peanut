@@ -51,7 +51,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
     end
-
+  
     # should_change "Appointment.count", :by => 1
     # 
     # should_change "CapacitySlot.count", :by => 1
@@ -62,42 +62,46 @@ class CapacitySlotTest < ActiveSupport::TestCase
     # 
     context "then reduce capacity of the [0, 8, 8, 4] slot: 3-6 c 1" do
       setup do
-        affected_slots = @free_appt.capacity_slots.order_capacity_desc # We just include all slots as affected - not the most efficient, but complete
-
         @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
-        affected_slots.first.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, 1, affected_slots, true)
+        @capacity = 1
+  
+        affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
+        eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+        eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
         @free_appt.reload
       end
       
-      # # Should have 3 total capacity slots
-      # should_change "CapacitySlot.count", :by => 2
-      # 
-      # should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
-      #   # Get the capacity slots, sort by the start time and then the end time (hack...)
-      #   slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-      #                                               sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-      #   assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
-      # end
-
+      # Should have 3 total capacity slots
+      should_change "CapacitySlot.count", :by => 2
+      
+      should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
+        # Get the capacity slots, sort by the start time and then the end time (hack...)
+        slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                    sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+        assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
+      end
+  
       context "then reduce capacity of [0, 8, 8, 3]: 5-7 c 2" do
         setup do
-          affected_slots = @free_appt.capacity_slots.order_capacity_desc # We just include all slots as affected - not the most efficient, but complete
-      
           @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0500", :end_at => "0700"})
-          affected_slots.find_by_duration(8*60).reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, 2, affected_slots, true)
+          @capacity = 2
+  
+          affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
+          eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+          eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
           @free_appt.reload
         end
       
-        # # Should have 7 total capacity slots
-        # should_change "CapacitySlot.count", :by => 3
-        #       
-        # should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4" do
-        #   # Get the capacity slots, sort by the start time, then the end time, then the capacity
-        #   slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-        #                                               sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-        #   assert_equal [[0, 3, 3, 4], [0, 5, 5, 3], [0, 8, 8, 1], [6, 8, 2, 2], [7, 8, 1, 3], [7, 8, 1, 4]], slots
-        # end
-
+        # Should have 7 total capacity slots
+        should_change "CapacitySlot.count", :by => 3
+              
+        should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4" do
+          # Get the capacity slots, sort by the start time, then the end time, then the capacity
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                      sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+          assert_equal [[0, 3, 3, 4], [0, 5, 5, 3], [0, 8, 8, 1], [6, 8, 2, 2], [7, 8, 1, 3], [7, 8, 1, 4]], slots
+        end
+  
         context "then defrag" do
           setup do
             CapacitySlot.defrag(@free_appt.capacity_slots, true)
@@ -126,38 +130,45 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @tomorrow           = Time.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range         = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
       @free_appt          = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+  
       @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
-      @free_appt.capacity_slots.first.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, 1, true)
-      @free_appt.reload
-      CapacitySlot.defrag_all(@free_appt.capacity_slots)
+      @capacity = 1
+
+      affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
+      eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+      eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
       @free_appt.reload
     end
-      
+    
     # Should still have 3 total capacity slots
     should_change "CapacitySlot.count", :by => 3
     
     should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
       # Get the capacity slots, sort by the start time and then the end time (hack...)
       slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                  sort{|s, t| (s[0] * 100 + s[1]) <=> (t[0] * 100 + t[1])}
+                                                  sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
     end
   
     context "then consume more capacity" do
       setup do
         @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0100", :end_at => "0200"})
-        @free_appt.capacity_slots.first.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, 3, true)
+        @capacity = 3
+
+        affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
+        eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+        eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
         @free_appt.reload
       end
   
-      # Should have 6 total capacity slots
-      should_change "CapacitySlot.count", :by => 3
+      # Should have 7 total capacity slots
+      should_change "CapacitySlot.count", :by => 4
   
-      should "have capacity slots of 0-1 c 4; 0-8 c 1; 1-2 c1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
+      should "have capacity slots of 0-1 c 3; 0-1 c 4; 0-3 c 1; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
         # Get the capacity slots, sort by the start time and then the end time (hack...)
         slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                    sort{|s, t| (s[0] * 100 + s[1]) <=> (t[0] * 100 + t[1])}
-        assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [1, 2, 1, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
+                                                    sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+        assert_equal [[0, 1, 1, 3], [0, 1, 1, 4], [0, 3, 3, 1], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
       end
   
       context "and defrag the slots" do
@@ -167,50 +178,54 @@ class CapacitySlotTest < ActiveSupport::TestCase
         end
   
         # Should have 5 total capacity slots
-        should_change "CapacitySlot.count", :by => -1
+        should_change "CapacitySlot.count", :by => -2
   
         should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
           # Get the capacity slots, sort by the start time and then the end time (hack...)
           slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                      sort{|s, t| (s[0] * 100 + s[1]) <=> (t[0] * 100 + t[1])}
+                                                      sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
           assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
         end
   
         context "then consume yet more capacity causing fragmentation" do
           setup do
             @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0500", :end_at => "0700"})
-            @free_appt.capacity_slots.first.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, 2, true)
+            @capacity = 2
+        
+            affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
+            eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+            eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
             @free_appt.reload
           end
-  
+          
           # Should have 8 total capacity slots (fragmented)
           should_change "CapacitySlot.count", :by => 3
-  
+          
           should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 2-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4; " do
             # Get the capacity slots, sort by the start time and then the end time (hack...)
             slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                        sort{|s, t| (s[0] * 100 + s[1]) <=> (t[0] * 100 + t[1])}
-            assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [5, 7, 2, 1], [6, 8, 2, 2], [7, 8, 2, 4]], slots
+                                                        sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+            assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [2, 8, 6, 1], [6, 8, 2, 2], [7, 8, 1, 3], [7, 8, 1, 4]], slots
           end
-  
+          
           context "and defrag the slots" do
             setup do
               CapacitySlot.defrag(@free_appt.capacity_slots, true)
               @free_appt.reload
             end
-  
+          
             # Should have 6 total capacity slots
             should_change "CapacitySlot.count", :by => -2
-  
+          
             should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 6-8 c 2; 7-8 c 4; " do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
               slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                          sort{|s, t| (s[0] * 100 + s[1]) <=> (t[0] * 100 + t[1])}
+                                                          sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
               assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [6, 8, 2, 2], [7, 8, 1, 4]], slots
             end
-  
+          
           end
-  
+          
         end
         
       end
