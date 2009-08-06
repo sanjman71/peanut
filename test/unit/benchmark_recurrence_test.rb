@@ -18,7 +18,7 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
 
   context "Benchmark run" do
     setup do
-      @now            = Time.now
+      @now            = Time.zone.now
       @start_at       = (@now - 6.months).beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 4.weeks
