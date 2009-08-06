@@ -47,9 +47,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
   context "create a single capacity slot" do
     setup do
       # create free time from 0 to 8 tomorrow
-      @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
-      @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
+      @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
     end
   
     should_change "Appointment.count", :by => 1
@@ -66,8 +66,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
         @capacity = 1
   
         affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
-        eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
-        eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
+        max_slot       = Appointment.max_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+        max_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, {:commit => true})
         @free_appt.reload
       end
       
@@ -87,8 +87,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
           @capacity = 2
   
           affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
-          eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
-          eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
+          max_slot       = Appointment.max_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+          max_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, {:commit => true})
           @free_appt.reload
         end
       
@@ -135,8 +135,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @capacity = 1
   
       affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
-      eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
-      eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
+      max_slot = Appointment.max_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+      max_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, {:commit => true})
       @free_appt.reload
     end
     
@@ -156,8 +156,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
         @capacity = 3
   
         affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
-        eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
-        eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
+        max_slot = Appointment.max_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+        max_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, {:commit => true})
         @free_appt.reload
       end
   
@@ -193,8 +193,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
             @capacity = 2
         
             affected_slots = Appointment.affected_capacity_slots_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @provider)
-            eligible_slot = Appointment.eligible_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
-            eligible_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, true)
+            max_slot = Appointment.max_capacity_slot_range(@company, @consume_time_range.start_at, @consume_time_range.end_at, @consume_time_range.duration, @capacity, @provider)
+            max_slot.reduce_capacity(@consume_time_range.start_at, @consume_time_range.end_at, @capacity, affected_slots, {:commit => true})
             @free_appt.reload
           end
           
@@ -664,8 +664,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
             should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4; " do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
-              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
-                                                          sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+               slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                           sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
               assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
             end
   
@@ -744,75 +744,121 @@ class CapacitySlotTest < ActiveSupport::TestCase
   # 
   context "create free time from 1500 to 2300 with capacity 4 tomorrow" do
     setup do
-      # create free time from 0000 to 0800 tomorrow
+      # create free time from 1500 to 2300 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1500", :end_at => "2300"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @free_appt.reload
     end
   
     should_change "Appointment.count", :by => 1
     
     should_change "CapacitySlot.count", :by => 1
   
+    should "have capacity slots of 15-23 c 4" do
+      # Get the capacity slots, sort by the start time and then the end time (hack...)
+      expected_result = [[15, 23, 8, 4]]
+      slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+      assert_equal expected_result, slots
+    end
+
     context "THEN find free time from 1800 to 2100 capacity 1" do
-  
+      
       setup do
         @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1800", :end_at => "2100"})
         @date_range     = DateRange.parse_when("tomorrow")
         @capacity_slots = AppointmentScheduler.find_free_capacity_slots(@company, @anywhere, @provider, @work_service, @time_range.duration, @date_range, {:time_range => @time_range})
       end
-  
-      should "have one capacity slot" do
+      
+      should "find one capacity slot" do
         assert_equal 1, @capacity_slots.size
       end
-  
+      
       context "THEN schedule work appointment from 1800 to 2100" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
-          assert_valid @work_appt
+          @work_appt1 = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          assert_valid @work_appt1
           @free_appt.reload # Reload the capacity slots list
         end
-  
-        should "have 3 capacity slots" do
-          assert_equal 3, @free_appt.capacity_slots.size
+      
+        should "have capacity slots of 15-18 c 4; 15-23 c 3; 21-23 c 4" do
+          # Get the capacity slots, sort by the start time and then the end time (hack...)
+          expected_result = [[15, 18, 3, 4], [15, 23, 8, 3], [21, 23, 2, 4]]
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                      sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+          assert_equal expected_result, slots
         end
-  
-        should "have capacity slots with specific duration" do
-          assert_equal [2*60, 3*60, 8*60], @free_appt.capacity_slots.map(&:duration).sort
-        end
-  
+    
         context "THEN find free time from 1600 to 1700 capacity 3" do
-  
+      
           setup do
             @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1600", :end_at => "1700"})
             @date_range     = DateRange.parse_when("tomorrow")
+            @capacity       = 3
             @capacity_slots = AppointmentScheduler.find_free_capacity_slots(@company, @anywhere, @provider, @work_service,
-                                                                            @time_range.duration, @date_range, {:time_range => @time_range, :capacity => 3})
+                                                                            @time_range.duration, @date_range, {:time_range => @time_range, :capacity => @capacity})
           end
-  
-          should "have two capacity slots" do
+      
+          should "find two capacity slots" do
             assert_equal 2, @capacity_slots.size
           end
-  
-          context "THEN schedule a work appointment from 1600 to 1700" do
+      
+          context "THEN schedule a work appointment from 1600 to 1700 capacity 3" do
             setup do
-              @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => 3}
-              @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
-              assert_valid @work_appt
+              @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
+              @work_appt2 = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+              assert_valid @work_appt2
               @free_appt.reload # Reload the capacity slots list
             end
-  
-            should "have 5 capacity slots" do
-              assert_equal 5, @free_appt.capacity_slots.size
+      
+            should "have capacity slots of 15-16 c 4; 15-23 c 1; 17-18 c 4; 17-23 c 3; 21-23 c 4" do
+              # Get the capacity slots, sort by the start time and then the end time (hack...)
+              expected_result = [[15, 16, 1, 4], [15, 23, 8, 1], [17, 18, 1, 4], [17, 23, 6, 3], [21, 23, 2, 4]]
+              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                          sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+              assert_equal expected_result, slots
             end
-  
+    
+            context "then cancel the work appt from 1600 to 1700 capacity 3" do
+              
+              setup do
+                AppointmentScheduler.cancel_work_appointment(@work_appt2, {:commit => true})
+                @free_appt.reload
+              end
+              
+              should "have capacity slots of 15-18 c 4; 15-23 c 3; 21-23 c 4" do
+                # Get the capacity slots, sort by the start time and then the end time (hack...)
+                expected_result = [[15, 18, 3, 4], [15, 23, 8, 3], [21, 23, 2, 4]]
+                slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+                assert_equal expected_result, slots
+              end
+    
+              context "then cancel the work appt from 1800 to 2100 capacity 1" do
+      
+                setup do
+                  AppointmentScheduler.cancel_work_appointment(@work_appt1, {:commit => true})
+                  @free_appt.reload
+                end
+      
+                should "have capacity slots of 15-23 c 4" do
+                  # Get the capacity slots, sort by the start time and then the end time (hack...)
+                  expected_result = [[15, 23, 8, 4]]
+                  slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                                                              sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+                  assert_equal expected_result, slots
+                end
+    
+              end
+      
+            end
+      
           end
-  
+      
         end
-  
+      
       end
-  
+      
     end
   
   end
