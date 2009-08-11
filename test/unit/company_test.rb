@@ -147,5 +147,40 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal 0, @company.work_services_count
     end
   end
+  
+  context "company with no preferences" do
+    setup do
+      @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
+      @company      = Company.create(:name => "mary's hair Salon", :time_zone => "UTC", :subscription => @subscription)
+    end
+    
+    should "have empty preferences" do
+      assert_equal Hash.new, @company.preferences
+    end
+
+    should "have nil preferences['foo']" do
+      assert_nil @company.preferences['foo']
+    end
+
+    context "then add preferences" do
+      setup do
+        @company.preferences["favorite fruit"] = "banana"
+        @company.preferences["private"] = true
+        @company.preferences["semi-private"] = "walnutindustries.com"
+        @company.preferences["custom hash"] = ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}]
+        @company.preferences["meaning of life"] = 42
+      end
+   
+      should "have all preferences set" do
+        assert_equal "banana", @company.preferences["favorite fruit"]
+        assert_equal true, @company.preferences["private"]
+        assert_equal "walnutindustries.com", @company.preferences["semi-private"]
+        assert_equal ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}], @company.preferences["custom hash"]
+        assert_equal 42, @company.preferences["meaning of life"]
+      end
+      
+    end
+    
+  end
 
 end
