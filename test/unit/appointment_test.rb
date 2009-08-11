@@ -743,6 +743,11 @@ class AppointmentTest < ActiveSupport::TestCase
     should "not be valid" do
       assert_false @recurrence.valid?
     end
+    
+    should "create no appointments or capacity slots" do
+      assert_equal 0, Appointment.count
+      assert_equal 0, CapacitySlot.count
+    end
   
   end
     
@@ -763,6 +768,10 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_false @recurrence.valid?
     end
   
+    should "create no appointments or capacity slots" do
+      assert_equal 0, Appointment.count
+      assert_equal 0, CapacitySlot.count
+    end
   end
     
   context "create one valid recurring free private appointment" do
@@ -776,183 +785,200 @@ class AppointmentTest < ActiveSupport::TestCase
                                           :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
                                           :recur_rule => @recur_rule, :description => "This is the recurrence description")
       assert_valid @recurrence
-      @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks - 1.hour)
     end
-  
-    should_change "Appointment.count", :by => 8
     
+    should_change "Appointment.count", :by => 1
+    should_change "CapacitySlot.count", :by => 1
+
     should_not_change "Appointment.public.count"
-  
+
     should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
-      @recurrence.recur_instances.each do |a|
-        assert_equal 120, a.duration
-        assert_equal 0, a.start_at.in_time_zone.hour
-        assert_equal 2, a.end_at.in_time_zone.hour
-      end
+      assert_equal 120, @recurrence.duration
+      assert_equal 0, @recurrence.start_at.in_time_zone.hour
+      assert_equal 2, @recurrence.end_at.in_time_zone.hour
     end
-    
-    should "have same attributes as recurrence" do
-      @recurrence.recur_instances.each do |a|
-        assert_equal @recurrence.company_id, a.company_id
-        assert_equal @recurrence.service_id, a.service_id
-        assert_equal @recurrence.location_id, a.location_id
-        assert_equal @recurrence.provider_id, a.provider_id
-        assert_equal @recurrence.customer_id, a.customer_id
-        assert_equal @recurrence.mark_as, a.mark_as
-        assert_equal @recurrence.confirmation_code, a.confirmation_code
-        assert_equal @recurrence.uid, a.uid
-        assert_equal @recurrence.description, a.description
-        assert_equal @recurrence.public, a.public
-        assert_equal @recurrence.name, a.name
-        assert_equal @recurrence.popularity, a.popularity
-        assert_equal @recurrence.url, a.url
-        assert_equal @recurrence.source_type, a.source_type
-        assert_equal @recurrence.source_id, a.source_id
-      end
-    end
-    
-  
+
     should "have a valid uid" do
       assert !(@recurrence.uid.blank?)
-      assert_match Regexp.new("[0-9]*-[0-9]*@walnutindustries.com"), @recurrence.uid
+      assert_match Regexp.new("[0-9]+-[0-9]+@walnutindustries.com"), @recurrence.uid
     end
-  
-    context "then delete the recurrence" do
-       setup do
-         @recurrence.destroy
-       end
-       
-       should_change "Appointment.count", :by => -8
-       
-    end
-    
-    context "then change the recurrence description" do
-      setup do
-        @recurrence.description = "This is a changed recurring description"
-        @recurrence.save
+
+    context "then expand the recurring appointment" do
+      setup do 
+        @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks - 1.hour)
       end
-      
-      should_not_change "Appointment.count"
-  
-      should "change appointments' description" do
-        @recurrence.recur_instances.each do |a|
-          assert_equal "This is a changed recurring description", a.description
-        end
-      end
-      
-    end
-    
-    context "then change end time and duration of the recurrence" do
-      setup do
-        @recurrence.end_at = @recurrence.start_at + 3.hours
-        @recurrence.duration = 3.hours / 60
-        @recurrence.save
-        @recurrence.reload
-      end
-      
-      should_change "Appointment.count", :by => 0
-      
-      should "change appointments' end time and duration" do
-        @recurrence.recur_instances.each do |a|
-          assert_equal 180, a.duration
-          assert_equal 0, a.start_at.in_time_zone.hour
-          assert_equal 3, a.end_at.in_time_zone.hour
-        end
-      end
-      
-    end
-    
-    context "then change the recurrence rule to 3 per week" do
-      setup do
-        @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
-        @recur_rule            = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-        @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-        @recurrence.save
-        @recurrence.reload
-      end
-      
-      should_change "Appointment.count", :by => 4
-      
-      should "not change appointments' end time and duration" do
+
+      should_change "Appointment.count", :by => 7
+      should_change "CapacitySlot.count", :by => 7
+
+      should_not_change "Appointment.public.count"
+
+      should "have instances with duration of 2 hours and start at 00:00 and finish at 02:00" do
         @recurrence.recur_instances.each do |a|
           assert_equal 120, a.duration
           assert_equal 0, a.start_at.in_time_zone.hour
           assert_equal 2, a.end_at.in_time_zone.hour
         end
       end
-      
-    end
-  
-    context "then change the recurrence rule to 3 per week and change end time" do
-      setup do
-        @recurrence.end_at     = @recurrence.start_at + 3.hours
-        @recurrence.duration   = 3.hours / 60
-        @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
-        @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-        @recurrence.save
-        @recurrence.reload
-      end
-      
-      should_change "Appointment.count", :by => 4
-      
-      should "change appointments' end time and duration" do
+
+      should "have instances with same attributes as recurrence" do
         @recurrence.recur_instances.each do |a|
-          assert_equal 180, a.duration
-          assert_equal 0, a.start_at.in_time_zone.hour
-          assert_equal 3, a.end_at.in_time_zone.hour
+          assert_equal @recurrence.company_id, a.company_id
+          assert_equal @recurrence.service_id, a.service_id
+          assert_equal @recurrence.location_id, a.location_id
+          assert_equal @recurrence.provider_id, a.provider_id
+          assert_equal @recurrence.customer_id, a.customer_id
+          assert_equal @recurrence.mark_as, a.mark_as
+          assert_equal @recurrence.confirmation_code, a.confirmation_code
+          assert_equal @recurrence.uid, a.uid
+          assert_equal @recurrence.description, a.description
+          assert_equal @recurrence.public, a.public
+          assert_equal @recurrence.name, a.name
+          assert_equal @recurrence.popularity, a.popularity
+          assert_equal @recurrence.url, a.url
+          assert_equal @recurrence.source_type, a.source_type
+          assert_equal @recurrence.source_id, a.source_id
         end
       end
-      
-    end
-  
-    context "then create a second recurrence" do
-      setup do
-        @start_at       = Time.zone.now.beginning_of_day.utc
-        @end_at         = @start_at + 30.minutes
-        @end_recurrence = @start_at + 8.weeks
-        @recur_days     = "#{ical_days([(@start_at + 1.day), (@start_at + 5.days)])}"
-        @recur_rule     = "FREQ=WEEKLY;INTERVAL=2;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-        @recurrence2    = Appointment.create(:company => @company, :customer => @customer,  :provider => @provider,
-                                            :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                            :recur_rule => @recur_rule, :description => "This is the 2nd recurrence description")
-        assert_valid @recurrence2
-        appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
+
+      context "then delete the recurrence" do
+         setup do
+           @recurrence.destroy
+         end
+
+         should_change "Appointment.count", :by => -8
+
       end
-  
-      should_change "Appointment.count", :by => 5
-  
-      should "have duration of 30 minutes" do
-        @recurrence2.recur_instances.each do |a|
-          assert_equal 30, a.duration
-          assert_equal 0, a.start_at.in_time_zone.hour
-          assert_equal 0, a.end_at.in_time_zone.hour
-          assert_equal 30, a.end_at.min
-        end
-      end
-      
-    end
-    
-    context "delete the second recurrence" do
-      setup do
+
+      context "then change the recurrence description" do
         setup do
-          @recurrence2.destroy
+          @recurrence.description = "This is a changed recurring description"
+          @recurrence.save
         end
-  
-        should_change "Appointment.count", :by => -5
+
+        should_not_change "Appointment.count"
+
+        should "change appointments' description" do
+          @recurrence.recur_instances.each do |a|
+            assert_equal "This is a changed recurring description", a.description
+          end
+        end
+
       end
-      
+
+      context "then change end time and duration of the recurrence" do
+        setup do
+          @recurrence.end_at = @recurrence.start_at + 3.hours
+          @recurrence.duration = 3.hours / 60
+          @recurrence.save
+          @recurrence.reload
+        end
+
+        should_not_change "Appointment.count"
+
+        should "change appointments' end time and duration" do
+          @recurrence.recur_instances.each do |a|
+            assert_equal 180, a.duration
+            assert_equal 0, a.start_at.in_time_zone.hour
+            assert_equal 3, a.end_at.in_time_zone.hour
+          end
+        end
+
+      end
+
+      context "then change the recurrence rule to 3 per week" do
+        setup do
+          @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
+          @recur_rule            = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
+          @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
+          @recurrence.save
+          @recurrence.reload
+        end
+
+        should_change "Appointment.count", :by => 4
+
+        should "not change appointments' end time and duration" do
+          @recurrence.recur_instances.each do |a|
+            assert_equal 120, a.duration
+            assert_equal 0, a.start_at.in_time_zone.hour
+            assert_equal 2, a.end_at.in_time_zone.hour
+          end
+        end
+
+      end
+
+      context "then change the recurrence rule to 3 per week and change end time" do
+        setup do
+          @recurrence.end_at     = @recurrence.start_at + 3.hours
+          @recurrence.duration   = 3.hours / 60
+          @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
+          @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
+          @recurrence.save
+          @recurrence.reload
+        end
+
+        should_change "Appointment.count", :by => 4
+
+        should "change appointments' end time and duration" do
+          @recurrence.recur_instances.each do |a|
+            assert_equal 180, a.duration
+            assert_equal 0, a.start_at.in_time_zone.hour
+            assert_equal 3, a.end_at.in_time_zone.hour
+          end
+        end
+
+      end
+
+      context "then create a second recurrence" do
+        setup do
+          @start_at       = Time.zone.now.beginning_of_day.utc
+          @end_at         = @start_at + 30.minutes
+          @end_recurrence = @start_at + 8.weeks
+          @recur_days     = "#{ical_days([(@start_at + 1.day), (@start_at + 5.days)])}"
+          @recur_rule     = "FREQ=WEEKLY;INTERVAL=2;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
+          @recurrence2    = Appointment.create(:company => @company, :customer => @customer,  :provider => @provider,
+                                              :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
+                                              :recur_rule => @recur_rule, :description => "This is the 2nd recurrence description")
+          assert_valid @recurrence2
+          appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
+        end
+
+        should_change "Appointment.count", :by => 5
+
+        should "have duration of 30 minutes" do
+          @recurrence2.recur_instances.each do |a|
+            assert_equal 30, a.duration
+            assert_equal 0, a.start_at.in_time_zone.hour
+            assert_equal 0, a.end_at.in_time_zone.hour
+            assert_equal 30, a.end_at.min
+          end
+        end
+
+      end
+
+      context "delete the second recurrence" do
+        setup do
+          setup do
+            @recurrence2.destroy
+          end
+
+          should_change "Appointment.count", :by => -5
+        end
+
+      end
+
+      context "then search for available time" do
+
+      end
+
+
+      context "then schedule an overlapping available appointment" do
+
+      end
+
+
     end
   
-    context "then search for available time" do
-      
-    end
-    
-    
-    context "then schedule an overlapping available appointment" do
-      
-    end
-    
-    
   end
   
   context "create an available appointment" do
