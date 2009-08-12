@@ -21,6 +21,11 @@ class CalDavControllerTest < ActionController::TestCase
                                 :phone => "415 555 1234", :state => "active")
     @provider_token = @provider.cal_dav_token
     
+    @user         = User.create(:name => "User", :email => "user@walnutindustries.com",
+                                :password => "secret", :password_confirmation => "secret",
+                                :phone => "415 555 1234", :state => "active")
+    @user_token   = @user.cal_dav_token
+
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
 
@@ -42,9 +47,8 @@ class CalDavControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
 
-    m = Badges::Role.create(:name=>"manager")
-    rc = Badges::Privilege.create(:name=>"read calendars")
-    Badges::RolePrivilege.create(:role=>m,:privilege=>rc)    
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
 
   end
   
@@ -54,7 +58,7 @@ class CalDavControllerTest < ActionController::TestCase
 
     context "get company calendar" do
       setup do
-        get :webdav, :path_info => ["#{@owner_token}"]
+        get :webdav, :path_info => ["#{@user_token}"]
       end
 
       should_respond_with :forbidden
@@ -62,7 +66,7 @@ class CalDavControllerTest < ActionController::TestCase
     
     context "get provider calendar" do
       setup do
-        get :webdav, :path_info => ["provider/#{@provider.id.to_s}/#{@owner_token}"]
+        get :webdav, :path_info => ["provider/#{@provider.id.to_s}/#{@user_token}"]
       end
       
       should_respond_with :forbidden
@@ -70,7 +74,7 @@ class CalDavControllerTest < ActionController::TestCase
 
     context "get location calendar" do
       setup do
-        get :webdav, :path_info => ["location/#{@location.id.to_s}/#{@owner_token}"]
+        get :webdav, :path_info => ["location/#{@location.id.to_s}/#{@user_token}"]
       end
       
       should_respond_with :forbidden
@@ -78,10 +82,10 @@ class CalDavControllerTest < ActionController::TestCase
 
   end
   
-  context "with company manager role (includes 'read calendar' privilege)" do
+  context "with 'company manager' role (includes 'read calendar' privilege)" do
     setup do
       # make owner the manager of company
-      @owner.grant_role('manager', @company)
+      @owner.grant_role('company manager', @company)
     end
 
     context "get company calendar" do
