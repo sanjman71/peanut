@@ -1,12 +1,18 @@
 require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
+require File.expand_path(File.dirname(__FILE__) + "/../badges_init")
 
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => [:free_service, "rp:init", "plans:init", :admin_users, :companies]
+  task :dev_data  => [:free_service, :roles_privs, "plans:init", :admin_users, :companies]
 
   desc "Initialize production data"
-  task :prod_data  => [:free_service, "rp:init", "plans:init", :admin_users]
+  task :prod_data  => [:free_service, :roles_privs, "plans:init", :admin_users]
+
+  desc "Initialize roles & privileges"
+  task :roles_privs do
+    BadgesInit.roles_privileges
+  end
   
   desc "Initialize admin users"
   task :admin_users do 

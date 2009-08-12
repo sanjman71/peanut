@@ -2,7 +2,7 @@
 namespace :meatheads do
 
   desc "Initialize meatheads test data"
-  task :init => [:users, :services]
+  task :init => [:users, :company, :services]
   
   task :users do
   
@@ -38,34 +38,40 @@ namespace :meatheads do
       @skinny.activate!
     end
   
-    # create subscriptions
-    @subscription  = Subscription.create(:user => @meathead, :plan => @max_plan)
+  end
   
-    puts "#{Time.now}: creating meatheads company"
-    # create test companies
-    @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
+  task :company do
+    @meatheads = Company.find_by_subdomain('meatheads')
+    if @meatheads.nil?
+      # create subscriptions
+      @subscription  = Subscription.create(:user => @meathead, :plan => @max_plan)
+  
+      puts "#{Time.now}: creating meatheads company"
+      # create test companies
+      @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
+    end
     # add manager roles
     @meathead.grant_role('manager', @meatheads)
+
+    # assign providers
+    @meatheads.providers.push(@meathead) unless @meatheads.providers.include?(@meathead)
+    @meatheads.providers.push(@wimpy) unless @meatheads.providers.include?(@wimpy)
+    @meatheads.providers.push(@skinny) unless @meatheads.providers.include?(@skinny)
   end
   
   task :services do
   
     puts "#{Time.now}: adding meathead services ..."
   
-    # assign providers
-    @meatheads.providers.push(@meathead)
-    @meatheads.providers.push(@wimpy)
-    @meatheads.providers.push(@skinny)
-
     # create services
-    @training         = @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
+    @training         = @meatheads.services.find_by_name("Personal Training") || @meatheads.services.create(:name => "Personal Training", :duration => 60, :mark_as => "work", :price => 20.00, :allow_custom_duration => true)
 
     puts "#{Time.now}: adding meatheads service providers ..."
 
     # add service providers
-    @training.providers.push(@wimpy)
-    @training.providers.push(@skinny)
+    @training.providers.push(@wimpy) unless @training.providers.include?(@wimpy)
+    @training.providers.push(@skinny) unless @training.providers.include?(@skinny)
 
     puts "#{Time.now}: completed"
   end
