@@ -40,7 +40,7 @@ class CompaniesController < ApplicationController
       # show customer setup for an anonymous user
       setup_type = 'customer'
     else
-      setup_type = provider? ? 'provider' : 'customer'
+      setup_type = (provider? || manager?) ? 'provider' : 'customer'
     end
     
     respond_to do |format|
