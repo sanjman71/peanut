@@ -13,10 +13,10 @@ class ActiveRecord::Base
     
     args.each do |method_name|
       method_declarations = <<END_OF_CODE
-        def #{method_name}
+        def #{attr_name}_#{method_name}
           self.#{attr_name}[:#{method_name}]
         end
-        def #{method_name}=(value)
+        def #{attr_name}_#{method_name}=(value)
           self.#{attr_name}[:#{method_name}] = value
         end
 END_OF_CODE
