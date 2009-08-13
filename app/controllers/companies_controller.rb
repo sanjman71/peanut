@@ -1,7 +1,7 @@
 class CompaniesController < ApplicationController
   layout "company"
 
-  privilege_required 'read companies', :only => [:index]
+  privilege_required 'manage site', :only => [:index]
   privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
   privilege_required 'delete companies', :only => [:destroy], :on => :current_company
 

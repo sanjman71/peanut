@@ -1,33 +1,33 @@
-- companies.each do |company|
-  .span-24.last.letterbox.service{:class => cycle("shaded", "")}
-    -# company information
-    .span-7.prepend-1.name
-      %h2= company.name
-      %h4.bottom= company.time_zone
+- if has_privilege?("manage site")
+  - companies.each do |company|
+    .span-24.last.letterbox.service{:class => cycle("shaded", "")}
+      -# company information
+      .span-7.prepend-1.name
+        %h2= company.name
+        %h4.bottom= company.time_zone
       
-    -# company plan and subscription
-    .span-5
-      .company_plan.bottom
-        == Plan:
-        = company.plan.name
-      .company_subscription
-        == Paid Billing Cycles: #{company.subscription.paid_count}
-        %br
-        == Billing Errors: #{company.subscription.billing_errors_count}
-        %br
-        == Next Billing Date: #{company.subscription.next_billing_at ? company.subscription.next_billing_at.to_date : ''}
+      -# company plan and subscription
+      .span-5
+        .company_plan.bottom
+          == Plan:
+          = company.plan.name
+        .company_subscription
+          == Paid Billing Cycles: #{company.subscription.paid_count}
+          %br
+          == Billing Errors: #{company.subscription.billing_errors_count}
+          %br
+          == Next Billing Date: #{company.subscription.next_billing_at ? company.subscription.next_billing_at.to_date : ''}
         
-    -# company objects and limits
-    .span-5
-      == Services: #{company.work_services_count}
-      %br
-      == Providers: #{company.providers_count}
-      == (#{plan_limit_text(company.plan, 'providers')})
-      %br
-      == Locations: #{company.locations_count}
-      == (#{plan_limit_text(company.plan, 'locations')})
+      -# company objects and limits
+      .span-5
+        == Services: #{company.work_services_count}
+        %br
+        == Providers: #{company.providers_count}
+        == (#{plan_limit_text(company.plan, 'providers')})
+        %br
+        == Locations: #{company.locations_count}
+        == (#{plan_limit_text(company.plan, 'locations')})
       
-    -# link to company site
-    .span-2.last.action
-      - if has_privilege?("read companies")
+      -# link to company site
+      .span-2.last.action
         = link_to "Site", root_path(:subdomain => company.subdomain), :class => 'admin'

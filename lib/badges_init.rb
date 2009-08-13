@@ -20,23 +20,28 @@ module BadgesInit
     um    = Badges::Role.find_by_name('user manager') || Badges::Role.create(:name=>"user manager")
     sm    = Badges::Role.find_by_name('site manager') || Badges::Role.create(:name=>"site manager")
 
-    site(cm)
-    companies(cm, cp, um)
+    site(sm)
+    companies(cm, cp, cc, um)
     users(cm, cp, um)
     resources(cm, cp, um)
     calendars(cm, cp, um)
     services(cm, cp, um)
   end
 
-  def self.site(cm)
+  def self.site(sm)
     # site privileges
     ms = Badges::Privilege.find_or_create_by_name(:name=>"manage site")
+    mr = Badges::Privilege.find_or_create_by_name(:name=>"manage roles privileges")
+    dr = Badges::Privilege.find_or_create_by_name(:name=>"delete roles privileges")
 
-    # site managers can manage the site  
-    Badges::RolePrivilege.create(:role=>cm, :privilege=>ms)
+    # site managers can manage the site and roles & privileges
+    Badges::RolePrivilege.create(:role=>sm, :privilege=>ms)
+    Badges::RolePrivilege.create(:role=>sm, :privilege=>mr)
+    
+    # only admins can delete roles & privileges
   end
   
-  def self.companies(cm, cp, um)
+  def self.companies(cm, cp, cc, um)
     # company privileges
     rc = Badges::Privilege.find_or_create_by_name(:name=>"read companies")
     uc = Badges::Privilege.find_or_create_by_name(:name=>"update companies")
@@ -44,9 +49,13 @@ module BadgesInit
 
     # company managers can manage the company
     Badges::RolePrivilege.create(:role=>cm, :privilege=>uc)
-    Badges::RolePrivilege.create(:role=>cm, :privilege=>dc)
     
-    # admins can read companies
+    # All roles can read companies. This is used to prevent public access of private companies
+    Badges::RolePrivilege.create(:role=>cm, :privilege=>rc)
+    Badges::RolePrivilege.create(:role=>cp, :privilege=>rc)
+    Badges::RolePrivilege.create(:role=>cc, :privilege=>rc)
+    
+    # Only admin can delete a company
   end
   
   def self.users(cm, cp, um)
