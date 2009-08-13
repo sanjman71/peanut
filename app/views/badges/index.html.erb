@@ -18,7 +18,7 @@
   <% end -%>
     </tr>
 
-  <% for privilege in @privileges.sort_by {|p| p.id} -%>
+  <% for privilege in @privileges.sort_by {|p| (p.name.split[1..10].join(' ') + p.name.split[0]) } -%>
     <tr>
       <th><%= privilege.name %> (<%=link_to 'X', {  :id=>privilege, 
                                                     :action=>'delete_privilege', 
