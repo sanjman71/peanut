@@ -1,4 +1,5 @@
 require 'test/test_helper'
+require 'test/factories'
 
 class CompanyTest < ActiveSupport::TestCase
   
@@ -19,7 +20,7 @@ class CompanyTest < ActiveSupport::TestCase
 
   context "company services" do
     setup do
-      @company = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC")
+      @company = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC")
     end
 
     should "have 0 services" do
@@ -66,7 +67,7 @@ class CompanyTest < ActiveSupport::TestCase
   
   context "company providers" do
     setup do
-      @company = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC")
+      @company = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC")
       @user1   = Factory(:user, :name => "Provider")
       assert_valid @user1
       @company.providers.push(@user1)
@@ -132,7 +133,7 @@ class CompanyTest < ActiveSupport::TestCase
   context "company subscriptions" do
     setup do
       @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
-      @company      = Company.create(:name => "mary's-hair Salon", :time_zone => "UTC", :subscription => @subscription)
+      @company      = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC", :subscription => @subscription)
     end
 
     should "have free service" do
@@ -151,7 +152,7 @@ class CompanyTest < ActiveSupport::TestCase
   context "company with no preferences" do
     setup do
       @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
-      @company      = Company.create(:name => "mary's hair Salon", :time_zone => "UTC", :subscription => @subscription)
+      @company      = Factory(:company, :name => "mary's hair Salon", :time_zone => "UTC", :subscription => @subscription)
     end
     
     should "have empty preferences" do
