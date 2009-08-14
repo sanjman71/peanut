@@ -3,13 +3,21 @@ module UserInitializeHelper
   protected
   
   def user_initialize(company, user, role, creator, invitation = nil)
+    role_string = nil
     case role
-    when 'provider'
+    when 'company provider'
       # add the user as a company provider
       company.providers.push(user)
-    when 'customer'
-      # grant user the 'customer' role on the company
+      role_string = "provider"
+    when 'company customer'
+      # grant user the 'company customer' role on the company
       user.grant_role('company customer', company)
+      role_string = "customer"
+    else
+      # Just in case we get a role we don't recognize
+      redirect_path = root_path
+      flash[:error] = "Invalid role"
+      return
     end
 
     if invitation
@@ -25,8 +33,8 @@ module UserInitializeHelper
     # set redirect path based on creator and role
     case creator
     when 'user'
-      redirect_path  = "/#{role.pluralize}"
-      flash[:notice]  = "#{role.titleize} #{user.name} was successfully created."
+      redirect_path  = "/#{role_string.pluralize}"
+      flash[:notice]  = "#{role_string.titleize} #{user.name} was successfully created."
       
       begin
         # send account created notification
