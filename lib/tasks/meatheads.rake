@@ -52,7 +52,7 @@ namespace :meatheads do
 
     end
     # add manager roles
-    @meathead.grant_role('manager', @meatheads)
+    @meathead.grant_role('company manager', @meatheads)
 
     # assign providers
     @meatheads.providers.push(@meathead) unless @meatheads.providers.include?(@meathead)

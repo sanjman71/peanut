@@ -34,7 +34,7 @@ namespace :noelrose do
     end
 
     # add manager roles
-    @erika.grant_role('manager', @noelrose)
+    @erika.grant_role('company manager', @noelrose)
 
     # assign providers
     @noelrose.providers.push(@erika) unless @noelrose.providers.include?(@erika)

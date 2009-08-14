@@ -43,7 +43,7 @@ namespace :mctrucks do
 
     end
     # add manager roles
-    @owner.grant_role('manager', @mctrucks)
+    @owner.grant_role('company manager', @mctrucks)
 
     # add as company provider
     @mctrucks.providers.push(@owner) unless @mctrucks.providers.include?(@owner)

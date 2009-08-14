@@ -43,7 +43,7 @@ namespace :company1 do
       puts "#{Time.now}: company1 already exists"
     end
     # add manager role
-    @johnny.grant_role('manager', @company1)
+    @johnny.grant_role('company manager', @company1)
 
     # add providers
     @company1.providers.push(@johnny) unless @company1.providers.include?(@johnny)
