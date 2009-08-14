@@ -6,6 +6,8 @@ div#tabs a                                        { border-color: #FF6600; backg
 
 div#tabs a:hover                                  { background-color: #FF9900; }
 
+div#header #title                                 { color: #EEEEEE; }
+
 /* whoami user info */
 
 .whoami                                           { display: block; background-color: #FF4400; color: #FFFFFF; text-align: center; 

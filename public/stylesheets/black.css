@@ -1,0 +1,22 @@
+/* color palette */
+
+div#header                                        { background-color: #1A1A1A; }
+
+div#tabs a                                        { border-color: #3A2313; background-color: #3A2313; border-bottom-color: #3A2313; }
+
+div#tabs a:hover                                  { background-color: #FF9900; }
+
+div#header #title                                 { color: #EEEEEE; }
+
+/* signup links */
+
+a.signup:link, a.signup:visited                   { font-size: 11px; font-weight: normal; color: #FFFFFF; }
+a.signup:hover                                    { color: #FFFFFF; background-color: #1A1A1A; text-decoration: none; }
+
+/* title */
+
+  
+/* whoami user info */
+
+.whoami                                           { display: block; background-color: #225522; color: #FFFFFF; text-align: center;
+                                                    margin-top: 5px; }
