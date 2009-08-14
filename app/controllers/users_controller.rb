@@ -20,10 +20,10 @@ class UsersController < ApplicationController
       end
       
       case @role
-      when 'customer'
+      when 'company customer'
         # anyone can signup as a customer
         return true
-      when 'provider'
+      when 'company provider'
         # providers must be invited or user must have 'create users' privilege on the company
         return true if @invitation
         super
@@ -57,10 +57,10 @@ class UsersController < ApplicationController
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
         case @invitation.role
-        when 'provider'
+        when 'company provider'
           # add the user as a company provider
           @invitation.company.providers.push(@user) unless @invitation.company.blank?
-        when 'customer'
+        when 'company customer'
           # grant user customer role
           @user.grant_role('company customer', @invitation.company) unless @invitation.company.blank?
         end 
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
     @notes    = @user.notes.sort_recent
     
     # build the index path based on the user type
-    @index_path = "/#{@role.pluralize}"
+    @index_path = index_path(@role)
     
     respond_to do |format|
       format.html
@@ -139,7 +139,7 @@ class UsersController < ApplicationController
     # @role and @user are initialized here
 
     # build the index path based on the user type
-    @index_path = "/#{@role.pluralize}"
+    @index_path = index_path(@role)
     
     respond_to do |format|
       if @user.update_attributes(params[:user])
@@ -230,7 +230,7 @@ class UsersController < ApplicationController
     if @role.blank?
       # figure out type based on user
       return @role if @user.blank?
-      @role = @user.has_role?('provider', current_company) ? 'provider' : 'customer'
+      @role = @user.has_role?('company provider', current_company) ? 'company provider' : 'company customer'
     end
     
     @role
@@ -246,4 +246,17 @@ class UsersController < ApplicationController
     'peanut'
     # User.make_token
   end
+  
+  def index_path(role)
+    # build the index path based on the user type
+    case role
+    when "company customer"
+      "/customers"
+    when "company provider"
+      "/providers"
+    else
+      root_path
+    end
+  end
+  
 end
