@@ -4,15 +4,18 @@ require 'test/factories'
 class ProvidersControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :role => 'provider'
-  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :role => 'provider'
-  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'provider'
-  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'provider'
+  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :role => 'company provider'
+  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :role => 'company provider'
+  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company provider'
+  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company provider'
 
   # providers controller routes
   should_route :get,  '/providers/1', :controller => 'providers', :action => 'show', :id => '1'
   
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = ProvidersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
@@ -36,8 +39,6 @@ class ProvidersControllerTest < ActionController::TestCase
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
 
   context "list users without 'read users' privilege" do

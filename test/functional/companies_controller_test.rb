@@ -12,6 +12,9 @@ class CompaniesControllerTest < ActionController::TestCase
   should_route :get, '/edit', :controller => 'companies', :action => 'edit'
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     # create company
     @owner        = Factory(:user, :name => "Owner")
     @user         = Factory(:user, :name => "Joe Soap")
@@ -27,8 +30,6 @@ class CompaniesControllerTest < ActionController::TestCase
     @admin.grant_role('admin')
     # create regular user
     @user         = Factory(:user, :name => "User")
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
   
   context "show companies" do

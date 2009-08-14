@@ -9,6 +9,9 @@ class CalDavControllerTest < ActionController::TestCase
   # should_route :get,  '/caldav', :controller => 'cal_dav', :action => 'webdav', :path_info => ""
   
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = CalDavController.new
     # create a valid company
     @owner        = User.create(:name => "Owner", :email => "owner@walnutindustries.com",
@@ -46,9 +49,6 @@ class CalDavControllerTest < ActionController::TestCase
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
 
   end
   

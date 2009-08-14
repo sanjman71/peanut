@@ -39,6 +39,9 @@ class AppointmentsControllerTest < ActionController::TestCase
                      :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work', :state => 'completed'
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = AppointmentsController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
@@ -61,8 +64,6 @@ class AppointmentsControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
     # set the request hostname
     @request.host = "www.peanut.com"
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
 
   context "build work appointment for a single date with free time" do

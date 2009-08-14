@@ -4,15 +4,18 @@ require 'test/factories'
 class CustomersControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/customers/new', :controller => 'users', :action => 'new', :role => 'customer'
-  should_route :post, '/customers/create', :controller => 'users', :action => 'create', :role => 'customer'
-  should_route :get,  '/customers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'customer'
-  should_route :put,  '/customers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'customer'
+  should_route :get,  '/customers/new', :controller => 'users', :action => 'new', :role => 'company customer'
+  should_route :post, '/customers/create', :controller => 'users', :action => 'create', :role => 'company customer'
+  should_route :get,  '/customers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company customer'
+  should_route :put,  '/customers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company customer'
 
   # customers controller routes
   should_route :get,  '/customers/1', :controller => 'customers', :action => 'show', :id => '1'
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = CustomersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
@@ -24,7 +27,6 @@ class CustomersControllerTest < ActionController::TestCase
     @user         = Factory(:user, :name => "User")
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
-    BadgesInit.roles_privileges
   end
   
   context "search an empty customers database with an empty search" do

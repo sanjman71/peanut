@@ -9,6 +9,9 @@ class LogEntriesControllerTest < ActionController::TestCase
   should_route :get, '/log_entries/unseen', :controller => 'log_entries', :action => 'index', :state => 'unseen'
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @owner        = Factory(:user, :name => "Owner")
     @customer     = Factory(:user, :name => "Customer")
     @monthly_plan = Factory(:monthly_plan)
@@ -24,8 +27,6 @@ class LogEntriesControllerTest < ActionController::TestCase
     @owner.grant_role('company manager', @company)
     # stub current company
     @controller.stubs(:current_company).returns(@company)
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
   
   context "not logged in" do

@@ -4,6 +4,9 @@ require 'test/factories'
 class ServicesControllerTest < ActionController::TestCase
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = ServicesController.new
     # create owner and company
     @owner        = Factory(:user, :name => "Owner")
@@ -20,8 +23,6 @@ class ServicesControllerTest < ActionController::TestCase
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
 
   context "create service" do

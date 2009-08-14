@@ -4,6 +4,9 @@ require 'test/factories'
 class ResourcesControllerTest < ActionController::TestCase
 
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = ResourcesController.new
     # create a valid company
     @owner        = Factory(:user, :name => "Owner")
@@ -18,8 +21,6 @@ class ResourcesControllerTest < ActionController::TestCase
     @provider.grant_role('company provider', @provider)
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
 
   context "create resource" do

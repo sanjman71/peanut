@@ -20,6 +20,9 @@ class CalendarControllerTest < ActionController::TestCase
 
   
   def setup
+    # initialize roles and privileges
+    BadgesInit.roles_privileges
+
     @controller   = CalendarController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
@@ -34,8 +37,6 @@ class CalendarControllerTest < ActionController::TestCase
     @controller.stubs(:current_location).returns(Location.anywhere)
     # set the request hostname
     @request.host = "www.peanut.com"
-    # initialize roles and privileges
-    BadgesInit.roles_privileges
   end
 
   def add_mary_and_johnny_as_providers
