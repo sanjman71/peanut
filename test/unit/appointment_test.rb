@@ -46,7 +46,7 @@ class AppointmentTest < ActiveSupport::TestCase
                                                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120)
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should "have duration of 2 hours, and end_at time adjusted" do
       assert_equal 120, @appt.duration
@@ -71,7 +71,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
     end
       
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should "should not have a customer" do
       assert_equal nil, @appt.customer
@@ -98,7 +98,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     context "and schedule work appointment without a customer" do
       setup do
@@ -182,7 +182,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should "have a start date of today and end date in 1 week" do
       assert_equal @start_date, @wait_appt.start_at.utc.to_s(:appt_schedule_day) # utc format
@@ -219,7 +219,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_valid @wait_appt
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
   end
   
   context "create an afternoon appointment to test time overlap searching" do
@@ -787,10 +787,10 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_valid @recurrence
     end
     
-    should_change "Appointment.count", :by => 1
-    should_change "CapacitySlot.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
 
-    should_not_change "Appointment.public.count"
+    should_not_change("Appointment.public.count") { Appointment.public.count }
 
     should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
       assert_equal 120, @recurrence.duration
@@ -808,10 +808,10 @@ class AppointmentTest < ActiveSupport::TestCase
         @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks - 1.hour)
       end
 
-      should_change "Appointment.count", :by => 7
-      should_change "CapacitySlot.count", :by => 7
+      should_change("Appointment.count", :by => 7) { Appointment.count }
+      should_change("CapacitySlot.count", :by => 7) { CapacitySlot.count }
 
-      should_not_change "Appointment.public.count"
+      should_not_change("Appointment.public.count") { Appointment.public.count }
 
       should "have instances with duration of 2 hours and start at 00:00 and finish at 02:00" do
         @recurrence.recur_instances.each do |a|
@@ -846,7 +846,7 @@ class AppointmentTest < ActiveSupport::TestCase
            @recurrence.destroy
          end
 
-         should_change "Appointment.count", :by => -8
+         should_change("Appointment.count", :by => -8) { Appointment.count }
 
       end
 
@@ -856,7 +856,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @recurrence.save
         end
 
-        should_not_change "Appointment.count"
+        should_not_change("Appointment.count") { Appointment.count }
 
         should "change appointments' description" do
           @recurrence.recur_instances.each do |a|
@@ -874,7 +874,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @recurrence.reload
         end
 
-        should_not_change "Appointment.count"
+        should_not_change("Appointment.count") { Appointment.count }
 
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
@@ -895,7 +895,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @recurrence.reload
         end
 
-        should_change "Appointment.count", :by => 4
+        should_change("Appointment.count", :by => 4) { Appointment.count }
 
         should "not change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
@@ -917,7 +917,7 @@ class AppointmentTest < ActiveSupport::TestCase
           @recurrence.reload
         end
 
-        should_change "Appointment.count", :by => 4
+        should_change("Appointment.count", :by => 4) { Appointment.count }
 
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
@@ -943,7 +943,7 @@ class AppointmentTest < ActiveSupport::TestCase
           appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
         end
 
-        should_change "Appointment.count", :by => 5
+        should_change("Appointment.count", :by => 5) { Appointment.count }
 
         should "have duration of 30 minutes" do
           @recurrence2.recur_instances.each do |a|
@@ -962,7 +962,7 @@ class AppointmentTest < ActiveSupport::TestCase
             @recurrence2.destroy
           end
 
-          should_change "Appointment.count", :by => -5
+          should_change("Appointment.count", :by => -5) { Appointment.count }
         end
 
       end
@@ -1003,9 +1003,9 @@ class AppointmentTest < ActiveSupport::TestCase
       @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks)
     end
     
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
-    should_change "Appointment.public.count", :by => 2
+    should_change("Appointment.public.count", :by => 2) { Appointment.public.count }
   
   end
   
@@ -1022,9 +1022,9 @@ class AppointmentTest < ActiveSupport::TestCase
       @appointments   = @recurrence.expand_recurrence(@start_at, @start_at + 4.weeks, 3)
     end
     
-    should_change "Appointment.count", :by => 4
+    should_change("Appointment.count", :by => 4) { Appointment.count }
     
-    should_change "Appointment.public.count", :by => 4
+    should_change("Appointment.public.count", :by => 4) { Appointment.public.count }
     
     should "have 3 appointments returned from expand_recurrence" do
       assert_equal  3, @appointments.size
@@ -1047,7 +1047,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks)
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
   
   end
   

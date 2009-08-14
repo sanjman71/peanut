@@ -52,9 +52,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
-    should_change "CapacitySlot.count", :by => 1
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 0 to 8 dur 8 c 4" do
       assert_equal [[0, 8, 8, 4]], @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity] }
@@ -72,7 +72,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       # Should have 3 total capacity slots
-      should_change "CapacitySlot.count", :by => 2
+      should_change("CapacitySlot.count", :by => 2) { CapacitySlot.count }
       
       should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
         # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -93,7 +93,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
         end
       
         # Should have 7 total capacity slots
-        should_change "CapacitySlot.count", :by => 3
+        should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
               
         should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4" do
           # Get the capacity slots, sort by the start time, then the end time, then the capacity
@@ -108,7 +108,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
             @free_appt.reload
           end
           
-          should_change "CapacitySlot.count", :by => -1
+          should_change("CapacitySlot.count", :by => -1) { CapacitySlot.count }
           
           should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 4" do
             # Get the capacity slots, sort by the start time, then the end time, then the capacity
@@ -141,7 +141,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
     end
     
     # Should still have 3 total capacity slots
-    should_change "CapacitySlot.count", :by => 3
+    should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
     
     should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
       # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -162,7 +162,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
   
       # Should have 7 total capacity slots
-      should_change "CapacitySlot.count", :by => 4
+      should_change("CapacitySlot.count", :by => 4) { CapacitySlot.count }
   
       should "have capacity slots of 0-1 c 3; 0-1 c 4; 0-3 c 1; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
         # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -178,7 +178,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
         end
   
         # Should have 5 total capacity slots
-        should_change "CapacitySlot.count", :by => -2
+        should_change("CapacitySlot.count", :by => -2) { CapacitySlot.count }
   
         should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
           # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -199,7 +199,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
           end
           
           # Should have 8 total capacity slots (fragmented)
-          should_change "CapacitySlot.count", :by => 3
+          should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
           
           should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 2-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4; " do
             # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -215,7 +215,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
             end
           
             # Should have 6 total capacity slots
-            should_change "CapacitySlot.count", :by => -2
+            should_change("CapacitySlot.count", :by => -2) { CapacitySlot.count }
           
             should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 6-8 c 2; 7-8 c 4; " do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
@@ -245,9 +245,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
     end
     
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
-    should_change "CapacitySlot.count", :by => 1
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 0000 to 0800 duration 8 hours" do
       assert_equal 8 * 60, CapacitySlot.first.duration
@@ -383,9 +383,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
     end
     
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
-    should_change "CapacitySlot.count", :by => 1
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 2100 to 0500 duration 8 hours" do
       assert_equal 8 * 60, CapacitySlot.first.duration
@@ -537,9 +537,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => @capacity)
     end
     
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
-    should_change "CapacitySlot.count", :by => 1
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     context "then fail to find or book time before this time range" do
       setup do
@@ -751,9 +751,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @free_appt.reload
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
-    should_change "CapacitySlot.count", :by => 1
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
   
     should "have capacity slots of 15-23 c 4" do
       # Get the capacity slots, sort by the start time and then the end time (hack...)

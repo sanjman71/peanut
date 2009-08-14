@@ -42,7 +42,7 @@ class ServicesControllerTest < ActionController::TestCase
       end
       
       should_assign_to :service, :redirect_path
-      should_change "Service.count", :by => 1
+      should_change("Service.count", :by => 1) { Service.count }
       
       should_respond_with :redirect
       should_redirect_to('edit service path') { edit_service_path(assigns(:service)) }

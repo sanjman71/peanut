@@ -73,7 +73,7 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
     end
   
-    should_change "CompanyProvider.count", :by => 1
+    should_change("CompanyProvider.count", :by => 1) { CompanyProvider.count }
     
     should "have company providers == [@user1]" do
       assert_equal [@user1], @company.providers
@@ -97,7 +97,7 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
 
-      should_not_change "CompanyProvider.count"
+      should_not_change("CompanyProvider.count") { CompanyProvider.count }
 
       should "have company providers == [@user1]" do
         assert_equal [@user1], @company.providers

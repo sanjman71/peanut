@@ -13,7 +13,7 @@ class RpxControllerTest < ActionController::TestCase
         get :customer, :token => '12345'
       end
 
-      should_change "User.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
 
       should_assign_to :data
       

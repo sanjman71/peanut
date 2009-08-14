@@ -12,7 +12,7 @@ class PaymentTest < ActiveSupport::TestCase
       @payment.authorize(@amount, @credit_card) 
     end
     
-    should_change "Payment.count", :by => 1
+    should_change("Payment.count", :by => 1) { Payment.count }
     
     should "have success flag" do
       assert @payment.success?
@@ -34,7 +34,7 @@ class PaymentTest < ActiveSupport::TestCase
       @authorization  = @payment.authorize(@amount, @credit_card, :store => true) 
     end
 
-    should_change "Payment.count", :by => 1
+    should_change("Payment.count", :by => 1) { Payment.count }
     
     should "have success flag" do
       assert @payment.success?
@@ -56,7 +56,7 @@ class PaymentTest < ActiveSupport::TestCase
       @payment.authorize(@amount, @credit_card)
     end
     
-    should_change "Payment.count", :by => 1
+    should_change("Payment.count", :by => 1) { Payment.count }
     
     should "have failed flag" do
       assert !@payment.success?
@@ -78,7 +78,7 @@ class PaymentTest < ActiveSupport::TestCase
       @payment.authorize(@amount, @credit_card) 
     end
     
-    should_change "Payment.count", :by => 1
+    should_change("Payment.count", :by => 1) { Payment.count }
     
     should "have failed authorization" do
       assert !@payment.success?
@@ -100,7 +100,7 @@ class PaymentTest < ActiveSupport::TestCase
       @payment.purchase(@amount, @credit_card) 
     end
     
-    should_change "Payment.count", :by => 1
+    should_change("Payment.count", :by => 1) { Payment.count }
     
     should "have success flag" do
       assert @payment.success?

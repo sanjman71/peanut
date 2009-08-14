@@ -13,7 +13,7 @@ class PlanTest < ActiveSupport::TestCase
                                   :between_billing_time_amount => 1, :between_billing_time_unit => "months")
     end
     
-    should_change "Plan.count", :by => 1
+    should_change("Plan.count", :by => 1) { Plan.count }
 
     should "be billable" do
       assert @monthly_plan.billable?
@@ -37,7 +37,7 @@ class PlanTest < ActiveSupport::TestCase
       @free_plan =  Plan.create(:name => "free", :cost => 0)
     end
 
-    should_change "Plan.count", :by => 1
+    should_change("Plan.count", :by => 1) { Plan.count }
 
     should "not be billable" do
       assert !@free_plan.billable?

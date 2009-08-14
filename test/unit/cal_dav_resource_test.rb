@@ -23,7 +23,7 @@ class CalDavResourceTest < ActiveSupport::TestCase
       @cal_dav_resource = CalDavResource.new(@company.appointments, @company)      
     end
 
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
 
     should "give icalendar" do
       assert_not_nil @cal_dav_resource.data

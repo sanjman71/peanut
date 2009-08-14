@@ -21,7 +21,7 @@ class ServiceProviderTest < ActiveSupport::TestCase
       assert_valid @service_provider
     end
     
-    should_change "ServiceProvider.count", :by => 1
+    should_change("ServiceProvider.count", :by => 1) { ServiceProvider.count }
   end
   
   context "service_provider with invalid provider" do
@@ -29,7 +29,7 @@ class ServiceProviderTest < ActiveSupport::TestCase
       @service_provider = ServiceProvider.create(:provider_id => -1, :provider_type => "User", :service => @haircut)
     end
     
-    should_not_change "ServiceProvider.count"
+    should_not_change("ServiceProvider.count") { ServiceProvider.count }
   end
 
   context "skil with invalid service" do
@@ -37,7 +37,7 @@ class ServiceProviderTest < ActiveSupport::TestCase
       @service_provider = ServiceProvider.create(:provider => @user, :service_id => 0)
     end
 
-    should_not_change "ServiceProvider.count"
+    should_not_change("ServiceProvider.count") { ServiceProvider.count }
   end
     
 end

@@ -31,7 +31,7 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
       @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks, 3)
     end
   
-    should_change "Appointment.recurring.count", :by => 1
+    should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
   
   end
 

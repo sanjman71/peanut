@@ -42,7 +42,7 @@ class ResourcesControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template 'resources/new.html.haml'
       should_assign_to :resource
-      should_not_change "Resource.count"
+      should_not_change("Resource.count") { Resource.count }
 
       should "have an invalid resource" do
         assert_equal false, assigns(:resource).valid?
@@ -57,7 +57,7 @@ class ResourcesControllerTest < ActionController::TestCase
 
       should_assign_to :resource
       should_set_the_flash_to /Created resource/i
-      should_change "Resource.count", :by => 1
+      should_change("Resource.count", :by => 1) { Resource.count }
 
       should_respond_with :redirect
       should_redirect_to('providers_path') { providers_path }

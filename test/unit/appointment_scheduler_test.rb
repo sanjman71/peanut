@@ -90,7 +90,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
   
     context "and search for free appointments" do
       setup do
@@ -133,7 +133,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
     
     # should have 1 free and 1 work appointment
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -166,7 +166,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment and 1 work appointment in a 'canceled' state
-      should_not_change "Appointment.count"
+      should_not_change("Appointment.count") { Appointment.count }
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -208,7 +208,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   
     # should have 1 free and 1 work appointment
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
   
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -234,7 +234,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment, and 1 work appointment in a 'canceled' state
-      should_not_change "Appointment.count"
+      should_not_change("Appointment.count") { Appointment.count }
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -272,7 +272,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   
     # should have 1 free and 1 work appointment
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -298,7 +298,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
-      should_not_change "Appointment.count"
+      should_not_change("Appointment.count") { Appointment.count }
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at
@@ -335,7 +335,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   
     # should have 1 work appointment and 1 free appointment
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have work appointment with customer" do
       assert_equal @customer, @work_appointment.customer
@@ -361,7 +361,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       end
   
       # should have 1 free appointment + 1 work appointment in a canceled state
-      should_not_change "Appointment.count"
+      should_not_change("Appointment.count") { Appointment.count }
   
       should "have new free appointment with same properties as free appointment" do
         assert_equal @free_appointment.start_at, @free2_appointment.start_at

@@ -36,7 +36,7 @@ require 'test/factories'
 #       should_assign_to :product
 #       should_set_the_flash_to "Could not create product"
 #       should_assign_to(:error) { true }
-#       should_not_change "Product.count"
+#       should_not_change("Product.count") { Product.count }
 #     end
 #     
 #     context "with a valid name" do
@@ -51,7 +51,7 @@ require 'test/factories'
 #       should_assign_to :product
 #       should_not_assign_to :error
 #       should_not_set_the_flash
-#       should_change "Product.count", :by => 1
+#       should_change("Product.count", :by => 1) { Product.count }
 #       
 #       should "be a rjs redirect to product edit" do
 #         assert_equal edit_product_path(assigns(:product)), assigns(:redirect_path)

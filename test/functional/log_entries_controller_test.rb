@@ -37,7 +37,7 @@ class LogEntriesControllerTest < ActionController::TestCase
     end
 
     should_respond_with :redirect
-    should_redirect_to 'unauthorized_path'
+    should_redirect_to('unauthorized_path') { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
   

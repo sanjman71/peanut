@@ -17,7 +17,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       assert_valid @subscription
     end
 
-    should_change "Subscription.count", :by => 1
+    should_change("Subscription.count", :by => 1) { Subscription.count }
     
     should "start with subscription in initialized state" do
       assert @subscription.initialized?
@@ -207,7 +207,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       assert_valid @subscription
     end
   
-    should_change "Subscription.count", :by => 1
+    should_change("Subscription.count", :by => 1) { Subscription.count }
     
     should "start with subscription in initialized state" do
       assert @subscription.initialized?
@@ -251,7 +251,7 @@ class SubscriptionTest < ActiveSupport::TestCase
       assert_valid @subscription
     end
   
-    should_change "Subscription.count", :by => 1
+    should_change("Subscription.count", :by => 1) { Subscription.count }
   
     should "start with subscription in initialized state" do
       assert @subscription.initialized?

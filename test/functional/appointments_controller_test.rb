@@ -126,7 +126,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @free_service.id, :mark_as => 'free'}
     end
     
-    should_not_change "Appointment.count"
+    should_not_change("Appointment.count") { Appointment.count }
     should_respond_with :redirect
     should_redirect_to("unauthorized_path") { unauthorized_path }
   end
@@ -140,7 +140,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @free_service.id, :mark_as => 'free'}
     end
   
-    should_change "Appointment.count", :by => 1
+    should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should_assign_to(:service) { @free_service }
     should_assign_to(:provider) { @johnny }
@@ -161,7 +161,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @free_service.id, :mark_as => 'free'}
     end
     
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should_assign_to(:service) { @free_service }
     should_assign_to(:provider) { @johnny }
@@ -183,8 +183,8 @@ class AppointmentsControllerTest < ActionController::TestCase
               :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
     
-      should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1
+      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
+      should_change("Appointment.count", :by => 1) { Appointment.count }
     
       should_assign_to(:freq) { "WEEKLY" }
       should_assign_to(:byday) { "MO,TU" }
@@ -207,8 +207,8 @@ class AppointmentsControllerTest < ActionController::TestCase
               :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
 
-      should_change "Appointment.recurring.count", :by => 1
-      should_change "Appointment.count", :by => 1
+      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
+      should_change("Appointment.count", :by => 1) { Appointment.count }
 
       should_assign_to(:freq) { "WEEKLY" }
       should_assign_to(:byday) { "MO,TU" }
@@ -282,7 +282,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
     end
   
-    should_not_change "Appointment.count"
+    should_not_change("Appointment.count") { Appointment.count }
   
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
@@ -312,7 +312,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     # free appointment and work appointment coexist
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     # There should be no available capacity slots
     should "have no capacity slots" do
@@ -357,7 +357,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
     
     # free appointment and work appointment coexist
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
 
     # There should be two available capacity slots
       should "have two capacity slots" do
@@ -402,7 +402,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     # free appointment should coexist with 1 work appointment
-    should_change "Appointment.count", :by => 2
+    should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have two capacity slots" do
       assert_equal 2, @free_appt.capacity_slots.size
@@ -449,7 +449,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_respond_with :success
     should_render_template 'appointments/new.html.haml'
 
-    should_not_change "Appointment.count"
+    should_not_change("Appointment.count") { Appointment.count }
 
     should_assign_to :daterange
     should_assign_to :appointment
@@ -476,7 +476,7 @@ class AppointmentsControllerTest < ActionController::TestCase
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
   
-      should_change "Appointment.count", :by => 1
+      should_change("Appointment.count", :by => 1) { Appointment.count }
   
       should_assign_to(:service) { @haircut }
       should_not_assign_to(:duration)
@@ -503,7 +503,7 @@ class AppointmentsControllerTest < ActionController::TestCase
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
   
-      should_change "Appointment.count", :by => 1
+      should_change("Appointment.count", :by => 1) { Appointment.count }
   
       should_assign_to(:service) { @haircut }
       should_not_assign_to(:duration)

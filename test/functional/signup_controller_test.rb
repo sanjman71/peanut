@@ -30,7 +30,7 @@ class SignupControllerTest < ActionController::TestCase
       should_render_template 'signup/new.html.haml'
 
       should_assign_to :company, :user, :subscription
-      should_assign_to :plan, :equals => @free_plan
+      should_assign_to(:plan) { @free_plan }
     end
   end
 
@@ -44,11 +44,11 @@ class SignupControllerTest < ActionController::TestCase
               }
       end
 
-      should_change "User.count"
-      should_change "Company.count"
+      should_change("User.count") { User.count }
+      should_change("Company.count") { Company.count }
       
       should_assign_to :company, :user
-      should_assign_to :plan, :equals => @free_plan
+      should_assign_to(:plan) { @free_plan }
 
       should "create user with roles 'user manager' on user" do
         @user = User.find_by_email('walnut@jarna.com')
@@ -68,7 +68,7 @@ class SignupControllerTest < ActionController::TestCase
       end
 
       should_respond_with :redirect
-      should_redirect_to 'login_path(:subdomain => "peanut")'
+      should_redirect_to('login_path(:subdomain => "peanut")') { login_path(:subdomain => "peanut") }
     end
   end
   

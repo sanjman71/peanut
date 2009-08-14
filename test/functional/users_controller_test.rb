@@ -81,8 +81,8 @@ class UsersControllerTest < ActionController::TestCase
         should_respond_with :success
         should_render_template 'users/new.html.haml'
         
-        should_change "User.count", :by => 1 # for the sender user object
-        should_change "Invitation.count", :by => 1
+        should_change("User.count", :by => 1) { User.count } # for the sender user object
+        should_change("Invitation.count", :by => 1) { Invitation.count }
         
         should_not_assign_to :error_message
         should_assign_to(:user)
@@ -106,7 +106,7 @@ class UsersControllerTest < ActionController::TestCase
         should_respond_with :success
         should_render_template 'users/new.html.haml'
         
-        should_not_change "User.count"
+        should_not_change("User.count") { User.count }
         
         should_not_assign_to(:error_message)
         should_assign_to(:role) {"company provider"}
@@ -163,7 +163,7 @@ class UsersControllerTest < ActionController::TestCase
         should_redirect_to('root path') {"http://test.host/"}
   
         # +1 for the sender user and +1 for the new user
-        should_change "User.count", :by => 2
+        should_change("User.count", :by => 2) { User.count }
         
         should_assign_to(:invitation) {@invitation}
         should_assign_to :user
@@ -210,7 +210,7 @@ class UsersControllerTest < ActionController::TestCase
         should_redirect_to('root path') {"http://test.host/"}
   
         # +1 for the sender user and +1 for the new user
-        should_change "User.count", :by => 2
+        should_change("User.count", :by => 2) { User.count }
         
         should_assign_to(:invitation) {@invitation}
         should_assign_to :user
@@ -247,7 +247,7 @@ class UsersControllerTest < ActionController::TestCase
       #                    :user => {:email => "sanjay@jarna.com", :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
       #   end
       #   
-      #   should_change "User.count", :by => 1
+      #   should_change("User.count", :by => 1) { User.count }
       #   
       #   should_assign_to(:creator) {"anonymous"}
       #   should_assign_to :user
@@ -290,7 +290,7 @@ class UsersControllerTest < ActionController::TestCase
         
         should_set_the_flash_to /Provider Sanjay Kapoor was successfully created/i
         
-        should_change "User.count", :by => 1
+        should_change("User.count", :by => 1) { User.count }
         
         should_assign_to(:creator) {"user"}
         should_assign_to :user
@@ -333,7 +333,7 @@ class UsersControllerTest < ActionController::TestCase
   
       should_set_the_flash_to /Your account was successfully created/i
   
-      should_change "User.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
   
       should_assign_to(:creator) {"anonymous"}
       should_assign_to :user
@@ -369,7 +369,7 @@ class UsersControllerTest < ActionController::TestCase
   
       should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
   
-      should_change "User.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
   
       should_assign_to(:creator) {"user"}
       should_assign_to :user
