@@ -21,4 +21,9 @@ div#header div.company_name                       { color: #111111; font-size: 2
 .whoami                                           { display: block; background-color: #007700; color: #000000; text-align: center; 
                                                     margin-top: 5px; }
 
+/* jquery datepicker */
+
+table.ui-datepicker-calendar thead th             { background: #333333; }
+
+
 
