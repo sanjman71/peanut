@@ -10,23 +10,41 @@ RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
-# Make sure the symlink to the shared models directory is set up
+# Make sure the symlink to the shared models directory and shared lib directory are set up
 # This is done after the boot so that RAILS_ENV and RAILS_ROOT are set up
-path=File.expand_path(File.join(RAILS_ROOT, 'app/models'))
+models_path=File.expand_path(File.join(RAILS_ROOT, 'app/models'))
 
-if !File.exists?(path)
+if !File.exists?(models_path)
   if RAILS_ENV == "production"
     source = File.join(RAILS_ROOT, '../../../walnut/current/app/models')
   else
     source = File.join(RAILS_ROOT, '../walnut/app/models')
   end
-  puts "Looks like you do not have the models symbolic link set up. Attempting to link #{path} to shared models at #{source}."
-  File.symlink(source, path)
+  puts "Looks like you do not have the models symbolic link set up. Attempting to link #{models_path} to shared models at #{source}."
+  File.symlink(source, models_path)
 else
-  if File.symlink?(path)
-    # puts "Looks like you have the models symbolic link set up."
+  if File.symlink?(models_path)
+    # puts "Looks like you have the shared lib symbolic link set up."
   else
-    puts "Can't overwrite the existing file at #{path} with the symlink for shared models. No action being taken."
+    puts "Can't overwrite the existing file at #{models_path} with the symlink for shared models. No action being taken."
+  end
+end
+
+lib_shared_path=File.expand_path(File.join(RAILS_ROOT, 'lib/shared'))
+
+if !File.exists?(lib_shared_path)
+  if RAILS_ENV == "production"
+    source = File.join(RAILS_ROOT, '../../../walnut/current/lib')
+  else
+    source = File.join(RAILS_ROOT, '../walnut/lib')
+  end
+  puts "Looks like you do not have the models symbolic link set up. Attempting to link #{lib_shared_path} to shared lib at #{source}."
+  File.symlink(source, lib_shared_path)
+else
+  if File.symlink?(lib_shared_path)
+    # puts "Looks like you have the shared lib symbolic link set up."
+  else
+    puts "Can't overwrite the existing file at #{lib_shared_path} with the symlink for shared lib. No action being taken."
   end
 end
 
@@ -63,7 +81,7 @@ Rails::Initializer.run do |config|
   # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
 
   # Add additional load paths for your own custom dirs
-  # config.load_paths += %W( #{RAILS_ROOT}/extras )
+  config.load_paths += %W( #{RAILS_ROOT}/lib/shared )
 
   # Prevent the lib directory from being reloaded
   # Avoid the problem: A copy of AuthenticatedSystem has been removed from the module tree but is still active!

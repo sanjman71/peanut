@@ -1,4 +1,5 @@
 app/models
+lib/shared
 log/*
 tmp/*
 db/schema.rb
