@@ -29,8 +29,8 @@
         .span-24
           .span-5#header-tabs
             %ul
-              %li= link_to 'Companies', companies_path, :id => 'companies'
-              %li= link_to 'Signup', signup_path, :id => 'signup'
+              %li= link_to 'Companies', companies_path, :id => 'companies', :url => companies_path
+              %li= link_to 'Signup', signup_path, :id => 'signup', :url => signup_path
 
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .span-14.prepend-1.last

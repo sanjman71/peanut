@@ -23,4 +23,9 @@ $(document).ready(function() {
   console.debug("selecting tab");
   $('#header-tabs').tabs('select', 0);
   console.debug("selected: " + $('#header-tabs').tabs('option', 'selected'));
+
+  $("#header-tabs li a").click(function() {
+    location.href = $(this).attr('url');
+    return false;
+  })
 })
