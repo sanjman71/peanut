@@ -98,7 +98,7 @@ $.fn.init_search_calendar_with_date_range = function () {
 }
 
 $.fn.init_timepicker = function() {
-  $(".timepicker").timepickr({convention:12});
+  $(".timepicker").timepickr({convention:12, left:-120});
 }
 
 $(document).ready(function() {
