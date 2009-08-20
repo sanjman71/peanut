@@ -38,11 +38,15 @@
             
         .span-24.last
           .span-19
-            .company_name_slogan.span-19.last
-              .company_name.append-1
-                = current_company.name
-              .slogan.last
-                = h current_company.slogan unless current_company.slogan.blank?
+            .company_title.span-19.last
+            / The company edit page builds a new logo, so we check for the url here also
+            - if current_company.logo && current_company.logo.id
+              .company_logo.append-1
+                = link_to image_tag(current_company.logo.image.url), root_path(:subdomain => current_subdomain)
+            .company_name.last
+              = link_to current_company.name, root_path(:subdomain => current_subdomain)
+            .slogan.last
+              %h3= h current_company.slogan unless current_company.slogan.blank?
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')

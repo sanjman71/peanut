@@ -169,3 +169,6 @@ div.description textarea                          { height: 200px;}
 div.slogan input                                  { width: 100px;}
 
 textarea.message                                  { height: 30px; width: 500px; }
+
+div.company_logo                                  { float: left; }
+div.company_name a                                { text-decoration:none; }
