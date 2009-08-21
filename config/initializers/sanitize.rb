@@ -1,5 +1,9 @@
-# The Sanitize configuration we like is RELAXED, as follows:
-
+# Walnut configuration for Sanitize
+#
+# There's a great article on what tags etc. are OK and which aren't here:
+# http://www.feedparser.org/docs/html-sanitization.html
+# The Sanitize configuration we like is based on RELAXED, which reads as follows:
+#
 # class Sanitize
 #   module Config
 #     RELAXED = {
@@ -34,8 +38,8 @@
 #     }
 #   end
 # end
-
-# We extend it with a few things:
+#
+# We extend it with a few extras, as follows:
 class Sanitize
   module Config
     WALNUT = Sanitize::Config::RELAXED.merge({ :elements => ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre', 'address'] }) { |key, old_val, new_val| old_val + new_val}
