@@ -39,7 +39,7 @@
         .span-24.last
           .span-19
             .company_title.span-19.last
-            / The company edit page builds a new logo, so we check for the url here also
+            / The company edit page builds a new logo, so we check for the id here also
             - if current_company.logo && current_company.logo.id
               .company_logo.append-1
                 = link_to image_tag(current_company.logo.image.url), root_path(:subdomain => current_subdomain)

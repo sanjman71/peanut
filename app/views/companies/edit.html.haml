@@ -13,6 +13,8 @@
 .span-14.prepend-1.last
   = display_flash
 
+  = error_messages_for :company
+
 .span-23.prepend-1.last.mat.padding-top-10
   %h2 Billing Plan
   .span-10
@@ -35,7 +37,6 @@
 .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
   %h2 Company Information
   - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
-    = error_messages_for :company
 
     .span-20.last
       .span-3
@@ -62,7 +63,7 @@
 .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
   %h2 Company Logo
   .span-20.last.padding-top-10
-    - if @company.logo
+    - if @company.logo && @company.logo.id
       Current Logo is:
       = image_tag @company.logo.image.url
       - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
