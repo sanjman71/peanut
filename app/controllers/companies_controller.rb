@@ -53,7 +53,7 @@ class CompaniesController < ApplicationController
   def update
     @company = Company.find(params[:id])
     if params[:company][:description]
-      params[:company][:description] = Sanitize.clean(params[:company][:description], Sanitize::Config::RELAXED)
+      params[:company][:description] = Sanitize.clean(params[:company][:description], Sanitize::Config::WALNUT)
     end
 
     respond_to do |format|
