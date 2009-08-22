@@ -1,16 +1,51 @@
-/* Header, Tabs */
+/* header */
 
-div#header                                        { background-color: #008800; }
+div#header                      { background-color: #008800; }
 
-div#header div.company_name                       { font-size: 2.0em; font-weight: bold; }
-div#header div.company_name a                     { color: #111111; }
+div#header div.company_name     { font-size: 2.0em; font-weight: bold; }
+div#header div.company_name a   { color: #111111; }
 
 /* whoami user info */
 
-.whoami                                           { display: block; background-color: #007700; color: #000000; text-align: center; 
+.whoami                         { display: block; background-color: #007700; color: #000000; text-align: center; 
                                                     margin-top: 5px; }
 
 /* jquery datepicker */
 
-table.ui-datepicker-calendar thead th             { background: #333333; }
+table.ui-datepicker-calendar thead th   { background: #333333; }
 
+
+/* tabs */
+
+#tabs.ui-tabs                   { padding: 0; }
+
+#tabs .ui-tabs-panel            { padding: 0; }
+
+#tabs.ui-widget-content         { padding: 0; background: none; border: none; }
+
+#tabs .ui-widget-header         { background: none; border: none; }
+
+#tabs .ui-tabs-nav              { padding: 0; }
+
+/* tab default state background color */
+#tabs li.ui-state-default       { border: 1px solid #225522; background: #225522; font-weight: normal; color: #ffffff; outline: none; 
+                                  margin-right: 7px; }
+
+/* tab active state background color */
+#tabs li.ui-state-active        { border: 1px solid #cccccc; background: #ffffff; font-weight: normal; color: #000000; outline: none; }
+
+/* tab default state text color */
+#tabs .ui-state-default a, #tabs .ui-state-default a:link, #tabs .ui-state-default a:visited
+                                { color: #FFFFFF; text-decoration: none; outline: none; font-weight: normal; }
+
+/* tab active state text color */
+#tabs .ui-state-active a, #tabs .ui-state-active a:link, #tabs .ui-state-active a:visited
+                                { color: #225522; text-decoration: none; outline: none; font-weight: bold; }
+
+/* tab hover and focus states background color */
+#tabs li.ui-state-hover, #tabs li.ui-state-focus
+                                { border: 1px solid #008800; background: #008800; font-weight: normal; color: #ffffff; outline: none; }
+
+/* tab hover and focus states text color */
+#tabs li.ui-state-hover a, #tabs li.ui-state-hover a:hover
+                                { color: #ffffff; text-decoration: none; outline: none; }

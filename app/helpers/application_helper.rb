@@ -144,6 +144,24 @@ module ApplicationHelper
     end
   end
   
+  def build_signup_links(current_controller)
+    # 'Signup' tab
+    name    = 'Signup'
+    path    = signup_beta_path
+    klasses = []
+
+    if current_controller.controller_name == 'signup'
+      klasses.push('current')
+    end
+
+    yield name, path, klasses
+
+    if has_privilege?('manage site')
+      klasses = current_controller.controller_name == 'companies' ? ['current'] : []
+      yield 'Companies', companies_path, klasses
+    end
+  end
+
   # build provider display name based on context of the current user
   def provider_display_name(provider, current_user)
     return "" if provider.blank?

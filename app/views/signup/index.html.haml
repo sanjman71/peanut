@@ -11,11 +11,12 @@
 
   %hr.space
   
-  = render(:partial => 'plans/plans', :locals => {:plans => @plans, :trial => true})
+  .span-23.prepend-1.last
+    = render(:partial => 'plans/plans', :locals => {:plans => @plans, :trial => true})
 
   %hr.space
 
-  = render(:partial => 'plans/plan_features')
-  
-  = render(:partial => 'plans/plan_terms')
+  .span-23.prepend-1.last
+    = render(:partial => 'plans/plan_features')
+    = render(:partial => 'plans/plan_terms')
 

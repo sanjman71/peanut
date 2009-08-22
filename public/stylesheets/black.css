@@ -1,22 +1,51 @@
-/* color palette */
+/* header */
 
-div#header                                        { background-color: #1A1A1A; }
-
-div#tabs a                                        { border-color: #3A2313; background-color: #3A2313; border-bottom-color: #3A2313; }
-
-div#tabs a:hover                                  { background-color: #FF9900; }
-
-div#header #title                                 { color: #EEEEEE; }
+div#header                      { background-color: #1A1A1A; }
+div#header #title               { color: #EEEEEE; }
 
 /* signup links */
 
-a.signup:link, a.signup:visited                   { font-size: 11px; font-weight: normal; color: #FFFFFF; }
-a.signup:hover                                    { color: #FFFFFF; background-color: #1A1A1A; text-decoration: none; }
-
-/* title */
+a.signup:link, a.signup:visited   { font-size: 11px; font-weight: normal; color: #FFFFFF; }
+a.signup:hover                    { color: #FFFFFF; background-color: #1A1A1A; text-decoration: none; }
 
   
 /* whoami user info */
 
-.whoami                                           { display: block; background-color: #225522; color: #FFFFFF; text-align: center;
-                                                    margin-top: 5px; }
+.whoami                         { display: block; background-color: #5500BB; color: #FFFFFF; text-align: center; margin-top: 5px; padding-bottom: 3px;}
+                                                    
+/* tabs */
+
+#tabs.ui-tabs                   { padding: 0; }
+
+#tabs .ui-tabs-panel            { padding: 0; }
+
+#tabs.ui-widget-content         { padding: 0; background: none; border: none; }
+
+#tabs .ui-widget-header         { background: none; border: none; }
+
+#tabs .ui-tabs-nav              { padding: 0; }
+
+/* tab default state background color */
+#tabs li.ui-state-default       { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #ffffff; outline: none; 
+                                  margin-right: 7px; }
+
+/* tab active state background color */
+#tabs li.ui-state-active        { border: 1px solid #cccccc; background: #ffffff; font-weight: normal; color: #000000; outline: none; }
+
+/* tab default state text color */
+#tabs .ui-state-default a, #tabs .ui-state-default a:link, #tabs .ui-state-default a:visited
+                                { color: #FFFFFF; text-decoration: none; outline: none; font-weight: normal; }
+
+/* tab active state text color */
+#tabs .ui-state-active a, #tabs .ui-state-active a:link, #tabs .ui-state-active a:visited
+                                { color: #5500BB; text-decoration: none; outline: none; font-weight: bold; }
+
+/* tab hover and focus states background color */
+#tabs li.ui-state-hover, #tabs li.ui-state-focus
+                                { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #ffffff; outline: none; }
+
+/* tab hover and focus states text color */
+#tabs li.ui-state-hover a, #tabs li.ui-state-hover a:hover
+                                { color: #ffffff; text-decoration: none; outline: none; }
+
+
