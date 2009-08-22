@@ -11,11 +11,11 @@
     <!--[if IE]>
     = stylesheet_link_tag 'blueprint/ie', :media =>"screen, projection"
     <![endif]-->
-    = stylesheet_link_tag 'peanut', 'errors', 'green', 'jquery.ui'
+    = stylesheet_link_tag 'peanut', 'errors', 'green', 'jquery.ui', 'tabs'
     = stylesheet_link_tag 'peanut_print', :media => "print"
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application'
+    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application', 'tabs'
     = yield :javascript
     
     / Pull in the TinyMCE support if required
@@ -27,8 +27,8 @@
     /   use_tiny_mce
     / at the top of the view file, and add the class tiny-mce-editor to your text_areas
     /   f.text_area :excerpt, :size => '50x5', :class => "tiny-mce-editor"
-    = yield :tiny_mce    
-    
+    = yield :tiny_mce
+
   %body
     #header
       .container
@@ -52,16 +52,15 @@
               = render(:partial => 'users/user_whoami.html.haml')
               
         .span-24#tabs
-          .span-21
-            %ul
-            - build_tab_links(controller) do |tab|
-              %li.with_space= tab
-              
-          .span-3.last.text-align-right
-            %ul
-            - build_admin_tab_links do |tab|
-              %li= tab
-            
+          %ul
+            - build_tab_links(controller) do |name, path, klasses|
+              %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
+
+            %li{:style => 'padding-left: 10px;'}== &nbsp;
+
+            - build_admin_tab_links do |name, path, klasses|
+              %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
+
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .span-14.prepend-1.last
         = display_flash

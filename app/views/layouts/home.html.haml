@@ -6,10 +6,10 @@
       = yield :title
       == | Walnut Calendar
     %meta{:name => 'robots', :content => 'nofollow, noindex'}
-    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'black', 'jquery.ui', 'home'
+    = stylesheet_link_tag 'blueprint/screen', 'peanut', 'errors', 'black', 'jquery.ui', 'tabs'
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application', 'home'
+    = javascript_include_tag 'jquery', 'jquery.ui', 'jquery.selectboxes', 'jquery.validate', 'jquery.corners', 'date', 'jquery.autocomplete', 'jquery.bgiframe', 'application', 'tabs'
     = yield :javascript
     
   %body
@@ -27,10 +27,11 @@
 
       .container
         .span-24
-          .span-5#header-tabs
+          .span-5#tabs
             %ul
-              %li= link_to 'Companies', companies_path, :id => 'companies', :url => companies_path
-              %li= link_to 'Signup', signup_path, :id => 'signup', :url => signup_path
+              %li#signup= link_to 'Signup', signup_path, :id => 'signup', :url => signup_path
+              - if has_privilege?('manage site')
+                %li#companies= link_to 'Companies', companies_path, :id => 'companies', :url => companies_path
 
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .span-14.prepend-1.last

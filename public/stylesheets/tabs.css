@@ -1,0 +1,37 @@
+#tabs.ui-tabs                    { padding: 0; }
+
+#tabs .ui-tabs-panel             { padding: 0; }
+
+#tabs.ui-widget-content          { padding: 0; background: none; border: none; }
+
+#tabs .ui-widget-header          { background: none; border: none; }
+
+#tabs .ui-tabs-nav               { padding: 0; }
+
+
+#tabs li.ui-state-default        { margin-right: 7px; }
+
+/*#tabs li.ui-tabs-selected        { background-color: #fff; color: #000; }*/
+
+#tabs li.ui-state-default        { border: 1px solid #225522; background: #225522; font-weight: normal; color: #ffffff; outline: none; }
+#tabs li.ui-state-active         { border: 1px solid #cccccc; background: #ffffff; font-weight: normal; color: #000000; outline: none; }
+
+#tabs .ui-state-default a, #tabs .ui-state-default a:link, #tabs .ui-state-default a:visited
+{ color: #FFFFFF; text-decoration: none; outline: none; font-weight: normal; }
+
+#tabs .ui-state-active a, #tabs .ui-state-active a:link, #tabs .ui-state-active a:visited
+{ color: #225522; text-decoration: none; outline: none; font-weight: bold; }
+
+/*#tabs .ui-state-hover, .ui-state-focus
+{ border: 1px solid #8bd83b; background: #4eb305 url(images/ui-bg_highlight-soft_50_4eb305_1x100.png) 50% 50% repeat-x; font-weight: normal; color: #ffffff; outline: none; }
+*/
+
+/*.ui-state-hover, .ui-widget-content .ui-state-hover, .ui-state-focus, .ui-widget-content .ui-state-focus
+{ border: 1px solid #8bd83b; background: #5500bb; font-weight: normal; color: #ffffff; outline: none; }
+*/
+#tabs li.ui-state-hover, #tabs li.ui-state-focus
+{ border: 1px solid #008800; background: #008800; font-weight: normal; color: #ffffff; outline: none; }
+
+#tabs li.ui-state-hover a, #tabs li.ui-state-hover a:hover
+{ color: #ffffff; text-decoration: none; outline: none; }
+

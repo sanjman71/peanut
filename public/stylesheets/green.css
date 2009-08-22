@@ -2,19 +2,8 @@
 
 div#header                                        { background-color: #008800; }
 
-div#tabs a                                        { border-color: #008800; background-color: #008800; border-bottom-color: #008800; }
-
-div#tabs a:visited, div#tabs a:link               { color: #FFFFFF; background-color: #006600; border-bottom-color: #006600; }
-div#tabs a.urgent                                 { background-color: #ff0000; border-bottom-color: #E5E5E5; }
-div#tabs a.approval                               { background-color: #FF8040; border-bottom-color: #E5E5E5; }
-
-div#tabs a:hover                                  { background-color: #003300; }
-
-div#tabs a.current:link, div#tabs li a.current:link, div#tabs a.current:visited, div#tabs li a.current:visited                       
-                                                  { color: #000000; border-bottom-color: #E5E5E5; }
-
-
-div#header div.company_name                       { color: #111111; font-size: 2.0em; font-weight: bold; }
+div#header div.company_name                       { font-size: 2.0em; font-weight: bold; }
+div#header div.company_name a                     { color: #111111; }
 
 /* whoami user info */
 
@@ -24,6 +13,4 @@ div#header div.company_name                       { color: #111111; font-size: 2
 /* jquery datepicker */
 
 table.ui-datepicker-calendar thead th             { background: #333333; }
-
-
 
