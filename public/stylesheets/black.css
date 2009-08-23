@@ -26,11 +26,11 @@ a.signup:hover                    { color: #FFFFFF; background-color: #1A1A1A; t
 #tabs .ui-tabs-nav              { padding: 0; }
 
 /* tab default state background color */
-#tabs li.ui-state-default       { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #ffffff; outline: none; 
+#tabs li.ui-state-default       { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #FFFFFF; outline: none; 
                                   margin-right: 7px; }
 
 /* tab active state background color */
-#tabs li.ui-state-active        { border: 1px solid #cccccc; background: #ffffff; font-weight: normal; color: #000000; outline: none; }
+#tabs li.ui-state-active        { border: 1px solid #CCCCCC; background: #FFFFFF; font-weight: normal; color: #000000; outline: none; }
 
 /* tab default state text color */
 #tabs .ui-state-default a, #tabs .ui-state-default a:link, #tabs .ui-state-default a:visited
@@ -40,12 +40,14 @@ a.signup:hover                    { color: #FFFFFF; background-color: #1A1A1A; t
 #tabs .ui-state-active a, #tabs .ui-state-active a:link, #tabs .ui-state-active a:visited
                                 { color: #5500BB; text-decoration: none; outline: none; font-weight: bold; }
 
-/* tab hover and focus states background color */
-#tabs li.ui-state-hover, #tabs li.ui-state-focus
-                                { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #ffffff; outline: none; }
+/* tab hover, active state (both states simultaneously) */
+#tabs li.ui-state-hover.ui-state-active a, #tabs li.ui-state-hover.ui-state-active a:hover
+                                { color: #5500BB; text-decoration: none; outline: none; background: #FFFFFF;
+                                  -moz-border-radius-topleft: 10px; -webkit-border-top-left-radius: 10px; -moz-border-radius-topright: 10px; -webkit-border-top-right-radius: 10px;}
 
-/* tab hover and focus states text color */
+/* tabs hover state */
 #tabs li.ui-state-hover a, #tabs li.ui-state-hover a:hover
-                                { color: #ffffff; text-decoration: none; outline: none; }
+                                { color: #FFFFFF; text-decoration: none; outline: none; background: #FF9900;
+                                  -moz-border-radius-topleft: 10px; -webkit-border-top-left-radius: 10px; -moz-border-radius-topright: 10px; -webkit-border-top-right-radius: 10px;}
 
 
