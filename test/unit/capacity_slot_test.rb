@@ -116,6 +116,22 @@ class CapacitySlotTest < ActiveSupport::TestCase
                                                         sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
             assert_equal [[0, 3, 3, 4], [0, 5, 5, 3], [0, 8, 8, 1], [6, 8, 2, 2], [7, 8, 1, 4]], slots
           end
+
+          context "then remove company" do
+            setup do
+              @company.destroy
+            end
+
+            should "have no Companies or associated models" do
+              assert_equal 0, Company.count
+              assert_equal 0, Appointment.count
+              assert_equal 0, Subscription.count
+              assert_equal 0, CompanyService.count
+              assert_equal 0, CompanyProvider.count
+              assert_equal 0, CapacitySlot.count
+            end
+          end
+
         end
       end
     end
@@ -224,14 +240,25 @@ class CapacitySlotTest < ActiveSupport::TestCase
               assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [6, 8, 2, 2], [7, 8, 1, 4]], slots
             end
           
+            context "then remove company" do
+              setup do
+                @company.destroy
+              end
+
+              should "have no Companies or associated models" do
+                assert_equal 0, Company.count
+                assert_equal 0, Appointment.count
+                assert_equal 0, Subscription.count
+                assert_equal 0, CompanyService.count
+                assert_equal 0, CompanyProvider.count
+                assert_equal 0, CapacitySlot.count
+              end
+            end
+
           end
-          
         end
-        
       end
-  
     end
-    
   end
   
   # 

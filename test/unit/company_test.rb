@@ -62,6 +62,18 @@ class CompanyTest < ActiveSupport::TestCase
           assert_equal 0, @company.work_services_count
         end
       end
+
+      context "then remove company" do
+        setup do
+          @company.destroy
+        end
+
+        should "have no Companies or CompanyServices" do
+          assert_equal 0, Company.count
+          assert_equal 0, CompanyService.count
+        end
+      end
+
     end
   end
   
@@ -128,6 +140,17 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal [], @user1.roles_on(@company).collect(&:name)
       end
     end
+    
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or CompanyProviders" do
+        assert_equal 0, Company.count
+        assert_equal 0, CompanyProvider.count
+      end
+    end
   end
 
   context "company subscriptions" do
@@ -146,6 +169,17 @@ class CompanyTest < ActiveSupport::TestCase
 
     should "have work_services_count == 0" do
       assert_equal 0, @company.work_services_count
+    end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or Subscriptions" do
+        assert_equal 0, Company.count
+        assert_equal 0, Subscription.count
+      end
     end
   end
   

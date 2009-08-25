@@ -86,6 +86,22 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 1, @unscheduled[@start_at_day].first.start_at.in_time_zone.hour
       assert_equal 0, @unscheduled[@start_at_day].first.end_at.in_time_zone.hour
     end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or associated models" do
+        assert_equal 0, Company.count
+        assert_equal 0, Appointment.count
+        assert_equal 0, Subscription.count
+        assert_equal 0, CompanyService.count
+        assert_equal 0, CompanyProvider.count
+        assert_equal 0, CapacitySlot.count
+      end
+    end
+
   end
   
   context "create free time" do
@@ -164,6 +180,22 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 10, @work_appt.start_at.hour
         assert_equal 12, @work_appt.end_at.hour
       end
+
+      context "then remove company" do
+        setup do
+          @company.destroy
+        end
+
+        should "have no Companies or associated models" do
+          assert_equal 0, Company.count
+          assert_equal 0, Appointment.count
+          assert_equal 0, Subscription.count
+          assert_equal 0, CompanyService.count
+          assert_equal 0, CompanyProvider.count
+          assert_equal 0, CapacitySlot.count
+        end
+      end
+
     end
   end
   
@@ -201,6 +233,22 @@ class AppointmentTest < ActiveSupport::TestCase
     should "add 'company customer' role on company to customer" do
       assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
     end
+
+    context "then remove company" do
+      setup do
+        @company.destroy
+      end
+
+      should "have no Companies or associated models" do
+        assert_equal 0, Company.count
+        assert_equal 0, Appointment.count
+        assert_equal 0, Subscription.count
+        assert_equal 0, CompanyService.count
+        assert_equal 0, CompanyProvider.count
+        assert_equal 0, CapacitySlot.count
+      end
+    end
+
   end
 
   context "create waitlist appointment with any service provider" do
@@ -951,6 +999,21 @@ class AppointmentTest < ActiveSupport::TestCase
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 0, a.end_at.in_time_zone.hour
             assert_equal 30, a.end_at.min
+          end
+        end
+
+        context "then remove company" do
+          setup do
+            @company.destroy
+          end
+
+          should "have no Companies or associated models" do
+            assert_equal 0, Company.count
+            assert_equal 0, Appointment.count
+            assert_equal 0, Subscription.count
+            assert_equal 0, CompanyService.count
+            assert_equal 0, CompanyProvider.count
+            assert_equal 0, CapacitySlot.count
           end
         end
 
