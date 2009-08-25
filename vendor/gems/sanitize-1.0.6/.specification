@@ -1,0 +1,69 @@
+--- !ruby/object:Gem::Specification 
+name: sanitize
+version: !ruby/object:Gem::Version 
+  version: 1.0.6
+platform: ruby
+authors: 
+- Ryan Grove
+autorequire: 
+bindir: bin
+cert_chain: []
+
+date: 2009-02-23 00:00:00 -06:00
+default_executable: 
+dependencies: 
+- !ruby/object:Gem::Dependency 
+  name: hpricot
+  type: :runtime
+  version_requirement: 
+  version_requirements: !ruby/object:Gem::Requirement 
+    requirements: 
+    - - ~>
+      - !ruby/object:Gem::Version 
+        version: "0.6"
+    version: 
+description: 
+email: ryan@wonko.com
+executables: []
+
+extensions: []
+
+extra_rdoc_files: []
+
+files: 
+- HISTORY
+- LICENSE
+- README.rdoc
+- lib/sanitize.rb
+- lib/sanitize/config.rb
+- lib/sanitize/config/basic.rb
+- lib/sanitize/config/relaxed.rb
+- lib/sanitize/config/restricted.rb
+has_rdoc: false
+homepage: http://github.com/rgrove/sanitize/
+post_install_message: 
+rdoc_options: []
+
+require_paths: 
+- lib
+required_ruby_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      version: 1.8.6
+  version: 
+required_rubygems_version: !ruby/object:Gem::Requirement 
+  requirements: 
+  - - ">="
+    - !ruby/object:Gem::Version 
+      version: "0"
+  version: 
+requirements: []
+
+rubyforge_project: 
+rubygems_version: 1.3.1
+signing_key: 
+specification_version: 2
+summary: Whitelist-based HTML sanitizer.
+test_files: []
+
