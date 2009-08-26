@@ -62,9 +62,9 @@ class SignupControllerTest < ActionController::TestCase
               }
       end
 
-      should_change "User.count", :by => 1
-      should_change "Company.count", :by => 1
-      should_change "Subscription.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
+      should_change("Company.count", :by => 1) { Company.count }
+      should_change("Subscription.count", :by => 1) { Subscription.count }
       
       should_assign_to :company, :user
       should_assign_to(:plan) { @free_plan }
@@ -99,9 +99,9 @@ class SignupControllerTest < ActionController::TestCase
               }
       end
       
-      should_change "User.count", :by => 1
-      should_change "Company.count", :by => 1
-      should_change "Subscription.count", :by => 1
+      should_change("User.count", :by => 1) { User.count }
+      should_change("Company.count", :by => 1) { Company.count }
+      should_change("Subscription.count", :by => 1) { Subscription.count }
       
       should_assign_to :company, :user, :promotion
       should_assign_to(:plan) { @monthly_plan }
