@@ -2,11 +2,13 @@ namespace :mctrucks do
 
   desc "Initialize mctrucks test data"
   task :init => [:users_resources, :company, :services]
+  task :destroy => [:company_destroy, :services_destroy, :users_resources_destroy]
 
   task :users_resources do
     puts "#{Time.now}: creating mctrucks users & resources"
   
-    @max_plan       = Plan.find_by_name("Max") || Plan.first
+    @max_plan = Plan.find_by_name("Max") || Plan.first
+    @mctrucks = Company.find_by_subdomain('mctrucks')
   
     # create users  
     if (@owner = User.find_by_email("mrtrucks@peanut.com") )
@@ -18,7 +20,7 @@ namespace :mctrucks do
       @owner.activate!
     end
         
-    if @moving_van = Resource.find_by_name("Moving Van")
+    if (@moving_van = @mctrucks.providers.find_by_name("Moving Van"))
       puts "resource: moving van already in db"
     else
       # create resources
@@ -26,6 +28,22 @@ namespace :mctrucks do
       @mctrucks.providers.push(@moving_van)
     end
 
+  end
+  
+  task :users_resources_destroy do
+    @mctrucks = Company.find_by_subdomain('mctrucks')
+    if (@owner = User.find_by_email("mrtrucks@peanut.com") )
+      puts "mctrucks: destroying user id #{@owner.id} email #{@owner.email}"
+      @owner.destroy
+    else
+      puts "mctrucks: didn't find user mrtrucks@peanut.com"
+    end
+    if @mctrucks && (@moving_van = @mctrucks.providers.find_by_name("Moving Van"))
+      puts "mctrucks: destroying resource id #{@moving_van.id} name #{@moving_van.name}"
+      @moving_van.destroy
+    else
+      puts "mctrucks: didn't find resource Moving Van"
+    end
   end
   
   task :company do
@@ -50,6 +68,16 @@ namespace :mctrucks do
 
   end
   
+  # Destroying the company will also destroy the services and providers
+  task :company_destroy do
+    if (@mctrucks = Company.find_by_subdomain('mctrucks'))
+      puts "mctrucks: destroying company id #{@mctrucks.id} name #{@mctrucks.name}"
+      @mctrucks.destroy(:all => true)
+    else
+      puts "mctrucks: didn't find mctrucks"
+    end
+  end
+  
   task :services do
     puts "#{Time.now}: adding mctrucks services ..."
 
@@ -60,6 +88,16 @@ namespace :mctrucks do
     @rental.providers.push(@moving_van) unless @rental.providers.include?(@moving_van)
   
     puts "#{Time.now}: completed"
+  end
+  
+  task :services_destroy do
+    @mctrucks = Company.find_by_subdomain('mctrucks')
+    if @mctrucks && (@rental = @mctrucks.services.find_by_name("Rental"))
+      puts "mctrucks: destroying service id #{@rental.id} name #{@rental.name}"
+      @rental.destroy
+    else
+      puts "mctrucks: didn't find service Rental"
+    end
   end
   
 end

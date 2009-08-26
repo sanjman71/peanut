@@ -2,6 +2,7 @@ namespace :company1 do
 
   desc "Initialize company1 test data"
   task :init => [:users, :company, :services]
+  task :destroy => [:company_destroy, :services_destroy, :users_destroy] # The services are destroyed when the company is destroyed
 
   task :users do
     puts "#{Time.now}: creating company1 users"
@@ -28,6 +29,21 @@ namespace :company1 do
     end
   end
   
+  task :users_destroy do
+    if (@johnny = User.find_by_email("johnny@peanut.com") )
+      puts "company1: destroying user id #{@johnny.id} email #{@johnny.email}"
+      @johnny.destroy
+    else
+      puts "company1: didn't find user johnny@peanut.com"
+    end
+    if (@mary = User.find_by_email("mary@peanut.com") )
+      puts "company1: destroying user id #{@mary.id} email #{@mary.email}"
+      @mary.destroy
+    else
+      puts "company1: didn't find user mary@peanut.com"
+    end
+  end
+  
   task :company do
     # Check to see if company 1 already exists. If so, don't continue
     @company1 = Company.find_by_subdomain('company1')
@@ -50,8 +66,20 @@ namespace :company1 do
     @company1.providers.push(@mary) unless @company1.providers.include?(@mary)
   end
   
+  # Destroying the company will also destroy the services and providers
+  task :company_destroy do
+    if (@company1 = Company.find_by_subdomain('company1'))
+      puts "company1: destroying company id #{@company1.id} name #{@company1.name}"
+      @company1.destroy(:all => true)
+    else
+      puts "company1: didn't find company1"
+    end
+  end
+  
   task :services do
     puts "#{Time.now}: adding company1 services ..."
+
+    @company1 = Company.find_by_subdomain('company1')
 
     # create services
     @mens_haircut    = @company1.services.find_by_name("Men's Haircut") || @company1.services.create(:name => "Men's Haircut", :duration => 30, :mark_as => "work", :price => 20.00, :allow_custom_duration => false)
@@ -64,5 +92,21 @@ namespace :company1 do
     @womens_haircut.providers.push(@mary) unless @womens_haircut.providers.include?(@mary)
 
     puts "#{Time.now}: completed"
+  end
+  
+  task :services_destroy do
+    @company1 = Company.find_by_subdomain('company1')
+    if @company1 && (@mens_haircut = @company1.services.find_by_name("Men's Haircut"))
+      puts "company1: destroying service id #{@mens_haircut.id} name #{@mens_haircut.name}"
+      @mens_haircut.destroy
+    else
+      puts "company1: didn't find service Men's Haircut"
+    end
+    if @company1 && (@womens_haircut = @company1.services.find_by_name("Women's Haircut"))
+      puts "company1: destroying service id #{@womens_haircut.id} name #{@womens_haircut.name}"
+      @womens_haircut.destroy
+    else
+      puts "company1: didn't find service Women's Haircut"
+    end
   end
 end

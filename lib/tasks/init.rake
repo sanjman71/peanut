@@ -5,7 +5,7 @@ namespace :init do
   
   desc "Initialize development data"
   task :dev_data  => [:free_service, :roles_privs, "plans:init", :admin_users, :companies]
-
+  
   desc "Initialize production data"
   task :prod_data  => [:free_service, :roles_privs, "plans:init", :admin_users]
 
@@ -47,6 +47,9 @@ namespace :init do
   end
   
   task :companies => ["company1:init", "noelrose:init", "meatheads:init", "mctrucks:init"]
+  
+  desc "Destroy companies"
+  task :destroy_companies => ["company1:destroy", "noelrose:destroy", "meatheads:destroy", "mctrucks:destroy"]
   
   task :free_service do 
     # create free service used by all companies

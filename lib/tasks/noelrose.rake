@@ -2,6 +2,7 @@ namespace :noelrose do
 
   desc "Initialize noelrose test data"
   task :init => [:users, :company, :services]
+  task :destroy => [:company_destroy, :services_destroy, :users_destroy] # The services are destroyed when the company is destroyed
 
   task :users do
 
@@ -19,6 +20,15 @@ namespace :noelrose do
       @erika.activate!
     end
     
+  end
+  
+  task :users_destroy do
+    if (@erika = User.find_by_email("erika@peanut.com") )
+      puts "noelrose: destroying user id #{@erika.id} email #{@erika.email}"
+      @erika.destroy
+    else
+      puts "noelrose: didn't find user erika@peanut.com"
+    end
   end
   
   task :company do
@@ -41,6 +51,16 @@ namespace :noelrose do
     
   end
   
+  # Destroying the company will also destroy the services and providers
+  task :company_destroy do
+    if (@noelrose = Company.find_by_subdomain('noelrose'))
+      puts "noelrose: destroying company id #{@noelrose.id} name #{@noelrose.name}"
+      @noelrose.destroy(:all => true)
+    else
+      puts "noelrose: didn't find noelrose"
+    end
+  end
+    
   task :services do
   
     puts "#{Time.now}: adding noelrose services ..."
@@ -58,6 +78,40 @@ namespace :noelrose do
     @pomade           = @noelrose.products.find_or_create_by_name(:name => "Pomade", :inventory => 5, :price => 12.00)
 
     puts "#{Time.now}: completed"
+  end
+
+  task :services_destroy do
+    @noelrose = Company.find_by_subdomain('noelrose')
+    if @noelrose && (@mens_haircut = @noelrose.services.find_by_name("Men's Haircut"))
+      puts "noelrose: destroying service id #{@mens_haircut.id} name #{@mens_haircut.name}"
+      @mens_haircut.destroy
+    else
+      puts "noelrose: didn't find service Men's Haircut"
+    end
+    if @noelrose && (@womens_haircut = @noelrose.services.find_by_name("Women's Haircut"))
+      puts "noelrose: destroying service id #{@womens_haircut.id} name #{@womens_haircut.name}"
+      @womens_haircut.destroy
+    else
+      puts "noelrose: didn't find service Women's Haircut"
+    end
+    if @noelrose && (@color1 = @noelrose.services.find_by_name("Single Process Color"))
+      puts "noelrose: destroying service id #{@color1.id} name #{@color1.name}"
+      @color1.destroy
+    else
+      puts "noelrose: didn't find service Single Process Color"
+    end
+    if @noelrose && (@color2 = @noelrose.services.find_by_name("Touch-Up Color"))
+      puts "noelrose: destroying service id #{@color2.id} name #{@color2.name}"
+      @color2.destroy
+    else
+      puts "noelrose: didn't find service Touch-Up Color"
+    end
+    if @noelrose && (@color3 = @noelrose.services.find_by_name("Glossing"))
+      puts "noelrose: destroying service id #{@color3.id} name #{@color3.name}"
+      @color3.destroy
+    else
+      puts "noelrose: didn't find service Single Process Color"
+    end
   end
 
 end

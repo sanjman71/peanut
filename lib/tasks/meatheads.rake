@@ -3,6 +3,7 @@ namespace :meatheads do
 
   desc "Initialize meatheads test data"
   task :init => [:users, :company, :services]
+  task :destroy => [:services_destroy, :company_destroy, :users_destroy]
   
   task :users do
   
@@ -40,6 +41,21 @@ namespace :meatheads do
   
   end
   
+  task :users_destroy do
+    if (@meathead = User.find_by_email("meathead@peanut.com") )
+      puts "meatheads: destroying user id #{@meathead.id} email #{@meathead.email}"
+      @meathead.destroy
+    end
+    if (@wimpy = User.find_by_email("wimpy@peanut.com") )
+      puts "meatheads: destroying user id #{@wimpy.id} email #{@wimpy.email}"
+      @wimpy.destroy
+    end
+    if (@skinny = User.find_by_email("skinny@peanut.com") )
+      puts "meatheads: destroying user id #{@skinny.id} email #{@skinny.email}"
+      @skinny.destroy
+    end
+  end
+  
   task :company do
     @meatheads = Company.find_by_subdomain('meatheads')
     if @meatheads.nil?
@@ -59,6 +75,16 @@ namespace :meatheads do
     @meatheads.providers.push(@wimpy) unless @meatheads.providers.include?(@wimpy)
     @meatheads.providers.push(@skinny) unless @meatheads.providers.include?(@skinny)
   end
+
+  # Destroying the company will also destroy the services and providers
+  task :company_destroy do
+    if (@meatheads = Company.find_by_subdomain('meatheads'))
+      puts "meatheads: : destroying company id #{@meatheads.id} name #{@meatheads.name}"
+      @meatheads.destroy(:all => true)
+    else
+      puts "meatheads: didn't find company meatheads"
+    end
+  end
   
   task :services do
   
@@ -74,6 +100,14 @@ namespace :meatheads do
     @training.providers.push(@skinny) unless @training.providers.include?(@skinny)
 
     puts "#{Time.now}: completed"
+  end
+  
+  task :services_destroy do
+    @meatheads = Company.find_by_subdomain('meatheads')
+    if @meatheads && (@training = @meatheads.services.find_by_name("Personal Training"))
+      puts "meatheads: destroying service id #{@training.id} name #{@training.name}"
+      @training.destroy
+    end
   end
 
 end
