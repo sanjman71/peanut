@@ -47,7 +47,7 @@ a.signup:hover                    { color: #FFFFFF; background-color: #1A1A1A; t
 
 /* tabs hover state */
 #tabs li.ui-state-hover a, #tabs li.ui-state-hover a:hover
-                                { color: #FFFFFF; text-decoration: none; outline: none; background: #FF9900;
+                                { color: #FFFFFF; text-decoration: none; outline: none; background: #FF6600;
                                   -moz-border-radius-topleft: 10px; -webkit-border-top-left-radius: 10px; -moz-border-radius-topright: 10px; -webkit-border-top-right-radius: 10px;}
 
 

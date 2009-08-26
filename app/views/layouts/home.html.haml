@@ -26,11 +26,10 @@
               = render(:partial => 'users/user_whoami.html.haml')
 
       .container
-        .span-24
-          .span-5#tabs
-            %ul
-              - build_signup_links(controller) do |name, path, klasses|
-                %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
+        .span-24#tabs
+          %ul
+            - build_signup_links(controller) do |name, path, klasses|
+              %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
 
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
       .span-14.prepend-1.last

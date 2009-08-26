@@ -1,0 +1,11 @@
+- title('Sign Up - Beta')
+
+.span-24.last
+  .span-20.prepend-1.append-1.last
+    = display_flash
+
+  .span-22.prepend-1.append-1.last{:style => 'padding-top: 20px;'}
+    - form_for('promotion', @promotion, :url => signup_check_path, :method => :post) do |f|
+      %h2
+        == Please enter your promotion code:
+        = f.text_field :code, :class => 'title text big', :value => '', :style => 'margin-left: 15px;'

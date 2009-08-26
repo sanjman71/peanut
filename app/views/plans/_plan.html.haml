@@ -1,7 +1,7 @@
 .plan-details
   %h4.bottom
     - if plan.cost > 0
-      = plan_billing_details(plan)
+      = plan_billing_details(plan, price)
     - else
       = "Free!!"
   %ul

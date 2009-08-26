@@ -1,7 +1,34 @@
 class SignupController < ApplicationController
+  before_filter :init_promotion, :only => [:new, :create]
+
   layout 'home'
   # ssl_required :new
   
+  # GET /signup/beta
+  def beta
+    @promotion = Promotion.new
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  # POST /signup/check
+  def check
+    # find promotion
+    @promotion = Promotion.find_by_code(params[:promotion][:code])
+
+    if @promotion
+      # use basic plan
+      @plan = Plan.find_by_name('Basic')
+      redirect_to(signup_plan_path(@plan, :promo => @promotion.code))
+    else
+      flash[:error] = "Promotion is no longer valid"
+      redirect_to(signup_beta_path)
+    end
+  end
+
+  # GET /signup
   def index
     @plans = Plan.order_by_cost
 
@@ -10,19 +37,37 @@ class SignupController < ApplicationController
     end
   end
   
-  # /signup/:plan_id
+  # GET /signup/:plan_id
   def new
-    if request.post? or request.put?
-      return create
+    # @promotion is initialized in before filter
+
+    @company        = Company.new
+    @user           = logged_in? ? current_user : User.new
+    @plan           = Plan.find(params[:plan_id])
+    @subscription   = Subscription.new
+
+    if @promotion
+      # apply promotion
+      @prices   = @promotion.calculate(@plan.cost.to_f / 100)
+      @price    = @prices.last
+      
+      if @price == 0
+        @message  = "Your promotion code allows you to signup without any billing information."
+      end
     else
-      @company      = Company.new
-      @user         = logged_in? ? current_user : User.new
-      @plan         = Plan.find(params[:plan_id])
-      @subscription = Subscription.new
+      # use plan cost
+      @price    = @plan.cost
+    end
+
+    respond_to do |format|
+      format.html
     end
   end
 
+  # POST /signup/:plan_id
   def create
+    # @promotion is initialized in before filter
+
     # this requires a transaction
     Company.transaction do
       # get and remove terms from params
@@ -33,17 +78,18 @@ class SignupController < ApplicationController
       @subscription = Subscription.new(:user => @user, :plan => @plan)
       @company      = Company.create(params[:company].update(:subscription => @subscription))
 
-      # check credit card details only if the plan is billable
-      if @plan.billable?
+      # check credit card details only if the plan is billable and there is no promotion
+      if @plan.billable? and @promotion.blank?
         @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
         @payment      = @subscription.authorize(@credit_card)
       end
 
       # check terms
-      @terms_error = 'The terms and conditions must be accepted' unless @terms == 1
+      unless @terms == 1
+        @terms_error = 'The terms and conditions must be accepted'
+      end
 
       # rollback unless all objects are valid
-      # raise ActiveRecord::Rollback if !@company.valid? or !@user.valid? or !@subscription.errors.empty? or @terms != 1
       raise ActiveRecord::Rollback if !@company.valid? or !@user.valid?
       raise ActiveRecord::Rollback if !@subscription.errors.empty? or @terms != 1
 
@@ -56,9 +102,11 @@ class SignupController < ApplicationController
       # add user as company provider, which also grants user 'company provider' role
       @company.providers.push(@user)
 
-      # add user as company manager
-      @user.grant_role('company manager', @company)
-      
+      unless @user.has_role?('company manager', @company)
+        # add user as company manager
+        @user.grant_role('company manager', @company)
+      end
+
       # signup completed, redirect to login page and instruct user to login
       flash[:notice] = "Signup complete! Please login to continue."
       
@@ -70,10 +118,24 @@ class SignupController < ApplicationController
         redirect_to(openings_path(:subdomain => @company.subdomain)) and return
       end
     end
-    
+
     respond_to do |format|
       format.html { render(:action => 'new') }
     end
   end
 
+  protected
+
+  def init_promotion
+    return if params[:promo].blank? and session[:promo].blank?
+    @promotion = Promotion.find_by_code(params[:promo] || session[:promo])
+    return if @promotion.blank?
+    # ensure promotion is still redeemable
+    return unless @promotion.redeemable?
+
+    # cache promotion as a session variable
+    session[:promo] = @promotion.code
+
+    true
+  end
 end

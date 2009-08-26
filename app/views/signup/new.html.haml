@@ -99,11 +99,11 @@
       .span-18.notice
         = error_messages_for('subscription', :header_message => nil)
     
-    - if @plan.cost == 0
-      .span-18.last
-        %h4== You have chosen a free plan so you do not have to provide billing information now.
+    - if @price == 0
+      .span-20.last
+        %h4= @message
     - else
-      .span-20#credit_card
+      .span-20.last#credit_card
         .span-20.last
           .span-18.last
             %h4== Please provide your credit card billing details.
@@ -145,12 +145,13 @@
       %h2== Review your plan and signup
       
     .span-18.prepend-1.last
-      = render :partial => 'plans/plan', :object => @plan
+      = render :partial => 'plans/plan', :object => @plan, :locals => {:price => @price}
       
     .span-18.prepend-1.last
-      %h4
+      %h4{:style => 'font-size: 1.5em; line-height: 1.5em;'}
         == All plans are monthly. There are no cancellation fees or long-term contracts.
-        == To choose another plan go #{link_to "back to the signup page", signup_path }
+        %br
+        == To choose another plan, go back to the #{link_to("signup page", signup_path) }.
 
     -# show terms errors
     - if @terms_error
@@ -160,7 +161,7 @@
     -# terms and conditions
     .span-20.last
       %h3
-        = check_box_tag "company[terms]"
+        = check_box_tag "company[terms]", @terms ? '1' : '0'
         = label_tag 'company_terms', 'I agree to the terms and conditions'
       
     .span-20.last.padding-top-10

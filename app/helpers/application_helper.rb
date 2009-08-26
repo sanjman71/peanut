@@ -157,6 +157,9 @@ module ApplicationHelper
     yield name, path, klasses
 
     if has_privilege?('manage site')
+      klasses = current_controller.controller_name == 'promotions' ? ['current'] : []
+      yield 'Promotions', promotions_path, klasses
+
       klasses = current_controller.controller_name == 'companies' ? ['current'] : []
       yield 'Companies', companies_path, klasses
     end

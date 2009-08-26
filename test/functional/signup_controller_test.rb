@@ -7,8 +7,11 @@ class SignupControllerTest < ActionController::TestCase
   
   def setup
     @controller   = SignupController.new
-    # create free plan
+    # create plans
     @free_plan    = Factory(:free_plan)
+    @monthly_plan = Factory(:monthly_plan)
+    # create promotion
+    @promotion    = Promotion.create(:code => "free5", :uses_allowed => 5, :discount => 10.0, :units => 'dollars')
   end
 
   context "signup page" do
@@ -26,11 +29,26 @@ class SignupControllerTest < ActionController::TestCase
         get :new, :plan_id => @free_plan.id
       end
 
-      should_respond_with :success
-      should_render_template 'signup/new.html.haml'
-
       should_assign_to :company, :user, :subscription
       should_assign_to(:plan) { @free_plan }
+      should_not_assign_to(:promotion)
+      should_assign_to(:price) { 0 }
+
+      should_respond_with :success
+      should_render_template 'signup/new.html.haml'
+    end
+    
+    context "using free promotion" do
+      setup do
+        get :new, :plan_id => @monthly_plan.id, :promo => 'free5'
+      end
+
+      should_assign_to :company, :user, :subscription, :promotion
+      should_assign_to(:plan) { @monthly_plan }
+      should_assign_to(:price) { 0 }
+ 
+      should_respond_with :success
+      should_render_template 'signup/new.html.haml'
     end
   end
 
@@ -38,14 +56,15 @@ class SignupControllerTest < ActionController::TestCase
     context "for the free plan" do
       setup do
         post :create, 
-             {:user => {:name => 'Walnut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'walnut@jarna.com'},
+             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'walnut@jarna.com'},
               :company => {:name=>"Peanut", :subdomain=>"peanut", :terms=>"1", :time_zone=>"Central Time (US & Canada)"},
               :plan_id => @free_plan.id
               }
       end
 
-      should_change("User.count") { User.count }
-      should_change("Company.count") { Company.count }
+      should_change "User.count", :by => 1
+      should_change "Company.count", :by => 1
+      should_change "Subscription.count", :by => 1
       
       should_assign_to :company, :user
       should_assign_to(:plan) { @free_plan }
@@ -68,7 +87,44 @@ class SignupControllerTest < ActionController::TestCase
       end
 
       should_respond_with :redirect
-      should_redirect_to('login_path(:subdomain => "peanut")') { login_path(:subdomain => "peanut") }
+      should_redirect_to('peanut login page') { login_path(:subdomain => "peanut") }
+    end
+
+    context "using free promotion" do
+      setup do
+        post :create, 
+             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'walnut@jarna.com'},
+              :company => {:name=>"Peanut", :subdomain=>"peanut", :terms=>"1", :time_zone=>"Central Time (US & Canada)"},
+              :plan_id => @monthly_plan.id, :promo => 'free5'
+              }
+      end
+      
+      should_change "User.count", :by => 1
+      should_change "Company.count", :by => 1
+      should_change "Subscription.count", :by => 1
+      
+      should_assign_to :company, :user, :promotion
+      should_assign_to(:plan) { @monthly_plan }
+      
+      should "create user with roles 'user manager' on user" do
+        @user = User.find_by_email('walnut@jarna.com')
+        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
+      end
+
+      should "create user with roles 'company manager', 'company provider' on company" do
+        @company = Company.find_by_name('Peanut')
+        @user    = User.find_by_email('walnut@jarna.com')
+        assert_equal ['company manager', 'company provider'], assigns(:user).roles_on(@company).collect(&:name).sort
+      end
+
+      should "create company with user as a provider" do
+        @company = Company.find_by_name('Peanut')
+        @user    = User.find_by_email('walnut@jarna.com')
+        assert_equal [@user], @company.providers
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('peanut login page') { login_path(:subdomain => "peanut") }
     end
   end
   

@@ -1,7 +1,7 @@
 module PlansHelper
 
-  def plan_billing_details(plan)
-    "#{number_to_currency(plan.cost/100)} " + plan_billing_regularity(plan)
+  def plan_billing_details(plan, price)
+    "#{number_to_currency(price)} " + plan_billing_regularity(plan)
   end
   
   def plan_billing_regularity(plan)

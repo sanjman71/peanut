@@ -1,0 +1,65 @@
+- title('New Promotion')
+- javascript('promotions')
+
+.span-23.prepend-1.mat.padding-top-10.padding-bottom-10
+  %h2== Create a Promotion
+  %h5= link_to 'Back', promotions_path
+  
+%hr.space
+
+- unless @promotion.errors.blank?
+  .span-20.prepend-1.last
+    .notice
+      = error_messages_for :promotion
+  
+%hr.space
+  
+.span-20.prepend-1
+  - form_for(@promotion, :url => promotions_path, :method => :post) do |f|
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Code:
+      .span-17.last
+        = f.text_field :code, :class => 'title big'
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== e.g. 'free5', 'BigDeal'
+
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Uses:
+      .span-17.last
+        = f.text_field :uses_allowed, :class => 'title big', :style => 'width: 100px;'
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== how many times the promotion can be used
+      
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Discount:
+      .span-17.last
+        = f.text_field :discount, :value => '', :class => 'title big', :style => 'width: 100px;'
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== promotion discount
+
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Units:
+      .span-17.last
+        = select_tag('promotion[units]', options_for_select(['dollars', 'percent']), :style => 'font-size: 1.8em;')
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== use 'dollars' for a specific dollar amount, or 'percent' for a percentage
+      
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Minimum:
+      .span-17.last
+        = f.text_field :minimum, :value => '', :class => 'title big', :style => 'width: 100px;'
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== optional; promotion minimum value in dollars, defaults to 0
+
+    .span-20.last
+      .span-3.padding-top-10.text-align-right
+        %h2== Expires:
+      .span-17.last
+        = f.text_field :expires_at, :class => 'title big datepicker', :style => 'width: 150px;'
+        %em{:style => 'padding-left: 10px; font-size: 1.3em;'}== optional; promotion expiration date
+
+    %hr.space
+
+    .span-19.prepend-1.last.padding-top-10
+      = submit_tag "Create", :name => nil, :class => 'big button'
+  

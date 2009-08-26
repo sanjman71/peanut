@@ -14,7 +14,10 @@ ActionController::Routing::Routes.draw do |map|
 
   # company signup route
   map.signup        '/signup',          :controller => 'signup', :action => 'index'
-  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new'
+  map.signup_beta   '/signup/beta',     :controller => 'signup', :action => 'beta'
+  map.signup_check  '/signup/check',    :controller => 'signup', :action => 'check', :conditions => {:method => :post}
+  map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new', :conditions => {:method => :get}
+  map.connect       '/signup/:plan_id', :controller => 'signup', :action => 'create', :conditions => {:method => :post}
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
@@ -42,13 +45,10 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :appointments,
                 :member => {:cancel => :get, :complete => :post, :reschedule => [:get, :post]},
                 :collection => { :search => [:get, :post] }
-                                        
+
   map.resources :providers, :member => { :toggle_manager => :post }
   map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
   
-  map.resources :invitations, :only => [:new, :create]
-  map.resource  :session
-
   # special invoice routes
   map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
   map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
@@ -130,6 +130,10 @@ ActionController::Routing::Routes.draw do |map|
   # Subscriptions
   map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
   map.update_subscription '/subscriptions/:id/plan/:plan_id', :controller => 'subscriptions', :action => 'update', :conditions => {:method => :get}
+
+  map.resources :promotions, :only => [:new, :create, :index]
+  map.resources :invitations, :only => [:new, :create]
+  map.resource  :session
 
   # Messages controller
   map.connect   '/messages/deliver/:type', :controller => 'messages', :action => 'deliver', :conditions => {:method => :post}
