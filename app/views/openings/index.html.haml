@@ -49,7 +49,7 @@
   .span-7.mat
     = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :providers => @providers, :provider => @provider, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
   - if @daterange.blank? && !current_company.description.blank?
-    .span-15.prepend-1.last
+    .span-15.prepend-1.last.company_description
       = Sanitize.clean(current_company.description, Sanitize::Config::WALNUT)
   - else
     .last

@@ -45,8 +45,8 @@
                 = link_to image_tag(current_company.logo.image.url), root_path(:subdomain => current_subdomain)
             .company_name.last
               = link_to current_company.name, root_path(:subdomain => current_subdomain)
-            .slogan.last
-              %h3= h current_company.slogan unless current_company.slogan.blank?
+            .company_slogan.last
+              = link_to h(current_company.slogan), root_path(:subdomain => current_subdomain) unless current_company.slogan.blank?
           .span-5.last.text-align-right
             - if logged_in?
               = render(:partial => 'users/user_whoami.html.haml')
