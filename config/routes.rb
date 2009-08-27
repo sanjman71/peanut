@@ -10,7 +10,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.rpx_provider  '/rpx/provider',  :controller => 'rpx', :action => 'provider'
 
   # user activation
-  map.activate  '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
+  map.activate      '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
   # company signup route
   map.signup        '/signup',          :controller => 'signup', :action => 'index'
@@ -56,7 +56,7 @@ ActionController::Routing::Routes.draw do |map|
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
   
-  map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get}
+  map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get, :freeze => :put, :unfreeze => :put}
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
   map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
   map.resources :resources, :only => [:new, :create, :edit, :update]

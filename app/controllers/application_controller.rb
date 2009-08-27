@@ -131,9 +131,10 @@ class ApplicationController < ActionController::Base
     # If we're on www.peanut.xxx then current_subdomain will be nil
     if current_subdomain
       # find company and all associated locations
-      @current_company = Company.find_by_subdomain(current_subdomain, :include => :locations)
-      
-      if @current_company.blank?
+      @current_company = Company.find_by_subdomain(current_subdomain, :include => [:locations, :subscription])
+
+      # check if its a valid company, and that its state is active
+      if @current_company.blank? or @current_company.state != 'active'
         flash[:error] = "Invalid company"
         return redirect_to(root_path(:subdomain => 'www'))
       end

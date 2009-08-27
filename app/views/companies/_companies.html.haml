@@ -4,7 +4,8 @@
       -# company information
       .span-7.prepend-1.name
         %h2= company.name
-        %h4.bottom= company.time_zone
+        %h4= company.time_zone
+        %h5.bottom== State: #{company.state.titleize}
       
       -# company plan and subscription
       .span-5
@@ -29,5 +30,12 @@
         == (#{plan_limit_text(company.plan, 'locations')})
       
       -# link to company site
-      .span-2.last.action
-        = link_to "Site", root_path(:subdomain => company.subdomain), :class => 'admin'
+      .span-6.last.action
+        - case company.state
+        - when 'frozen'
+          = link_to 'Activate', unfreeze_company_path(company), :method => :put, :class => 'admin'
+        - when 'active', 'initialized', 'authorized'
+          = link_to "View Site", root_path(:subdomain => company.subdomain), :class => 'admin'
+          == &nbsp;|&nbsp;
+          = link_to 'Freeze', freeze_company_path(company), :method => :put, :class => 'admin'
+

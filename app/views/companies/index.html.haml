@@ -7,6 +7,11 @@
   %hr.space
   
   .span-15.prepend-1
+    = display_flash(:all)
+  
+  %hr.space
+
+  .span-15.prepend-1
     %h3{:style => 'color: #5500BB; font-weight: bold;'}
       .span-3== Companies:
       = @companies.size

@@ -1,19 +1,18 @@
 class CompaniesController < ApplicationController
   layout "company"
 
-  privilege_required 'manage site', :only => [:index]
+  privilege_required 'manage site', :only => [:index, :freeze, :unfreeze]
   privilege_required 'update companies', :only => [:edit, :update], :on => :current_company
   privilege_required 'delete companies', :only => [:destroy], :on => :current_company
 
   # GET /companies
-  # GET /companies.xml
   def index
     # companies with subscriptions indicate they are peanut customers
-    @companies = Company.with_subscriptions
-    
+    @companies      = Company.with_subscriptions.all(:include => :subscription)
+
     # find all companies w/ billing errors
     @billing_errors = Company.billing_errors
-    
+
     respond_to do |format|
       # use home layout when listing all companies
       format.html { render :action => :index, :layout => 'home' }
@@ -49,9 +48,9 @@ class CompaniesController < ApplicationController
   end
   
   # PUT /companies/1
-  # PUT /companies/1.xml
   def update
     @company = Company.find(params[:id])
+
     if params[:company][:description]
       params[:company][:description] = Sanitize.clean(params[:company][:description], Sanitize::Config::WALNUT)
     end
@@ -67,8 +66,31 @@ class CompaniesController < ApplicationController
     end
   end
 
+  # PUT /companies/1/freeze
+  def freeze
+    @company = Company.find(params[:id])
+    @company.subscription.frozen!
+
+    flash[:notice] = "Changed company '#{@company.name}' account state to frozen"
+
+    respond_to do |format|
+      format.html { redirect_to(companies_path)}
+    end
+  end
+
+  # PUT /companies/1/unfreeze
+  def unfreeze
+    @company = Company.find(params[:id])
+    @company.subscription.active!
+
+    flash[:notice] = "Changed company '#{@company.name}' account state to active"
+
+    respond_to do |format|
+      format.html { redirect_to(companies_path)}
+    end
+  end
+
   # DELETE /companies/1
-  # DELETE /companies/1.xml
   def destroy
     @company.destroy
 

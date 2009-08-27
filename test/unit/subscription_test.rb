@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class SubscriptionTest < ActiveSupport::TestCase
   should_validate_presence_of   :company_id, :user_id, :plan_id, :paid_count, :billing_errors_count
@@ -7,6 +6,42 @@ class SubscriptionTest < ActiveSupport::TestCase
   
   def setup
     @user = Factory(:user)
+  end
+  
+  context "subscription states" do
+    setup do
+      @monthly_plan = Factory(:monthly_plan, :start_billing_in_time_amount => 0, :start_billing_in_time_unit => "days")
+      @subscription = Subscription.new(:user => @user, :plan => @monthly_plan)
+      @company      = Factory(:company, :subscription => @subscription)
+    end
+
+    should_change("Subscription.count", :by => 1) { Subscription.count }
+
+    should "start in initialized state" do
+      assert_equal "initialized", @subscription.state
+    end
+
+    context "transition to frozen state" do
+      setup do
+        @subscription.frozen!
+        @subscription.reload
+      end
+
+      should "be in frozen state" do
+        assert_equal "frozen", @subscription.state
+      end
+
+      context "then transition to active state" do
+        setup do
+          @subscription.active!
+          @subscription.reload
+        end
+
+        should "be in active state" do
+          assert_equal "active", @subscription.state
+        end
+      end
+    end
   end
   
   context "monthly subscription starting today" do
@@ -19,7 +54,8 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     should_change("Subscription.count", :by => 1) { Subscription.count }
     
-    should "start with subscription in initialized state" do
+    should "start in initialized state" do
+      assert_equal "initialized", @subscription.state
       assert @subscription.initialized?
     end
     
