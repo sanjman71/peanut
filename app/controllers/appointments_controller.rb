@@ -244,6 +244,8 @@ class AppointmentsController < ApplicationController
     @tstart       = params[:tstart].to_s
     @tend         = params[:tend].to_s
     @until        = params[:until].to_s
+    
+    @capacity     = params[:capacity].to_i
 
     # build recurrence rule from rule components
     tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
@@ -265,7 +267,7 @@ class AppointmentsController < ApplicationController
     # create appointment with recurrence rule
     @appointment  = current_company.appointments.create(:company => current_company, :provider => @provider, :service => @free_service,
                                                         :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => Appointment::FREE,
-                                                        :recur_rule => @recur_rule)
+                                                        :recur_rule => @recur_rule, :capacity => @capacity)
 
     # build redirect path
     @redirect_path  = build_create_redirect_path(@provider, request.referer)

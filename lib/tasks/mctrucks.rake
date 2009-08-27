@@ -20,12 +20,11 @@ namespace :mctrucks do
       @owner.activate!
     end
         
-    if (@moving_van = @mctrucks.providers.find_by_name("Moving Van"))
+    if @mctrucks && (@moving_van = @mctrucks.providers.find_by_name("Moving Van"))
       puts "resource: moving van already in db"
     else
       # create resources
       @moving_van = Resource.create(:name => "Moving Van")
-      @mctrucks.providers.push(@moving_van)
     end
 
   end
@@ -63,8 +62,9 @@ namespace :mctrucks do
     # add manager roles
     @owner.grant_role('company manager', @mctrucks)
 
-    # add as company provider
+    # add company providers
     @mctrucks.providers.push(@owner) unless @mctrucks.providers.include?(@owner)
+    @mctrucks.providers.push(@moving_van)
 
   end
   

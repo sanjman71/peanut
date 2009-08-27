@@ -66,6 +66,14 @@
     = radio_button_tag "ends", "Until", false, :id => 'schedule_end_until'
     = label_tag "schedule_end_until", "Until", :class => 'big', :style => 'padding-right: 5px;'
     = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide', :style => 'width: 90px; font-size: 1.0em; background: #EDF3FE;'
+    
+    
+- if @provider.class.to_s == "Resource"
+  .span-14.prepend-1.last{:style => 'font-size: 1.3em;'}
+    .span-2
+      %h5== Number available:
+    .span-11.last
+      = text_field_tag 'capacity'
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
   = hidden_field_tag :freq, 'weekly'
