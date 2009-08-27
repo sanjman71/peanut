@@ -65,14 +65,16 @@ Rails::Initializer.run do |config|
   # config.gem "aws-s3", :lib => "aws/s3"
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem "chronic", :version => '~> 0.2.3'
-  config.gem "haml"
-  config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
-  config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
-  config.gem 'prawn', :version => '~> 0.4.1'
+  config.gem "eventfulapi", :lib => false
   config.gem "geokit" 
-  config.gem 'unicode', :lib => false, :version => '~> 0.1'
+  config.gem "haml"
+  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
+  config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
+  config.gem 'prawn', :version => '~> 0.4.1'
   config.gem 'ri_cal'
+  config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
+  config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
+  config.gem 'unicode', :lib => false, :version => '~> 0.1'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -130,16 +132,11 @@ require "#{RAILS_ROOT}/lib/shared/string.rb"
 # RPX key
 RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
 
-# Initialize workling to use starling
-Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
-
 # Initialize exception notifier
-ExceptionNotifier.exception_recipients  = %w(peanut-exception@jarna.com)
-ExceptionNotifier.sender_address        = %("peanut error" <app.error@peanut.com>)
-ExceptionNotifier.email_prefix          = "[app] "
+# Initialize exception notifier
+ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com)
+ExceptionNotifier.sender_address        = %("Walnut Calendar Exception" <app@walnutindustries.com>)
+ExceptionNotifier.email_prefix          = "Walnut Calendar "
 
-# 
+# Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
-
-# Define all gem requirements
-require "will_paginate"
