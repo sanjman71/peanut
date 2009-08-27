@@ -2,10 +2,10 @@ module PromotionsHelper
 
   def promotion_discount_to_s(promotion)
     case promotion.units
-    when 'dollars'
-      s = "$#{promotion.discount}"
+    when 'cents'
+      s = "#{number_to_currency(promotion.discount/100)}"
     when 'percent'
-      s = "#{promotion.discount}%"
+      s = "#{number_to_percentage(promotion.discount, :precision => 0)}"
     else
       s = ''
     end

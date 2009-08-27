@@ -48,7 +48,7 @@ class SignupController < ApplicationController
 
     if @promotion
       # apply promotion
-      @prices   = @promotion.calculate(@plan.cost.to_f / 100)
+      @prices   = @promotion.calculate(@plan.cost)
       @price    = @prices.last
       
       if @price == 0
@@ -78,10 +78,14 @@ class SignupController < ApplicationController
       @subscription = Subscription.new(:user => @user, :plan => @plan)
       @company      = Company.create(params[:company].update(:subscription => @subscription))
 
-      # check credit card details only if the plan is billable and there is no promotion
-      if @plan.billable? and @promotion.blank?
-        @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
-        @payment      = @subscription.authorize(@credit_card)
+      # check credit card details only if the plan is billable and there is a non-zero price after any promotions
+      if @plan.billable?
+        @price = @promotion ? @promotion.calculate(@plan.cost).last : @price
+
+        if @price > 0
+          @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
+          @payment      = @subscription.authorize(@credit_card)
+        end
       end
 
       # check terms
@@ -107,9 +111,14 @@ class SignupController < ApplicationController
         @user.grant_role('company manager', @company)
       end
 
+      if @promotion
+        # create promotion redemption and link to subscription
+        @promotion.promotion_redemptions.create(:redeemer => @subscription)
+      end
+
       # signup completed, redirect to login page and instruct user to login
       flash[:notice] = "Signup complete! Please login to continue."
-      
+
       if !logged_in?
         # redirect to the new company's login path
         redirect_to(login_path(:subdomain => @company.subdomain)) and return

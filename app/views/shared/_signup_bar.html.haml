@@ -2,17 +2,9 @@
 == &nbsp;|&nbsp;
 
 - if has_privilege?('manage site')
-  = link_to('Companies', companies_path(:subdomain => current_subdomain), :class => 'signup')
-  == &nbsp;|&nbsp;
-
-- if has_privilege?('manage roles privileges')
   = link_to('Roles & Privileges', badges_path, :class => 'signup')
   == &nbsp;|&nbsp;
   
--# everyone sees the sign-up link
-= link_to('Sign Up', signup_path, :class => 'signup')
-== &nbsp;|&nbsp;
-
 - if logged_in?
   = link_to('Log-out', logout_path, :class => 'signup')
 - else

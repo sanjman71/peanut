@@ -2,8 +2,11 @@
 
 - form_for(@company, :url => signup_plan_path(:plan_id => @plan.id), :method => :post, :html => {:class => 'new_company'}) do |f|
   = hidden_field_tag "plan_id", @plan.id
-  .span-23.prepend-1.mat.shaded.padding-top-10.padding-bottom-20
-    %h2 Please sign up using the fields below.
+  .span-23.prepend-1.mat.padding-top-10.padding-bottom-20
+    %h2== Sign up
+    - if @promotion
+      == Promotion code:
+      %span{:style => 'font-weight: bold;'}= @promotion.code
 
   %hr.space
 
@@ -151,7 +154,7 @@
       %h4{:style => 'font-size: 1.5em; line-height: 1.5em;'}
         == All plans are monthly. There are no cancellation fees or long-term contracts.
         %br
-        == To choose another plan, go back to the #{link_to("signup page", signup_path) }.
+        == To choose another plan, go back to the #{link_to("signup page", signup_beta_path) }.
 
     -# show terms errors
     - if @terms_error

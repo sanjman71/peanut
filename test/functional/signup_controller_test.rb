@@ -65,9 +65,11 @@ class SignupControllerTest < ActionController::TestCase
       should_change("User.count", :by => 1) { User.count }
       should_change("Company.count", :by => 1) { Company.count }
       should_change("Subscription.count", :by => 1) { Subscription.count }
-      
+
       should_assign_to :company, :user
       should_assign_to(:plan) { @free_plan }
+      should_not_assign_to(:credit_card)
+      should_not_assign_to(:payment)
 
       should "create user with roles 'user manager' on user" do
         @user = User.find_by_email('walnut@jarna.com')
@@ -90,7 +92,7 @@ class SignupControllerTest < ActionController::TestCase
       should_redirect_to('peanut login page') { login_path(:subdomain => "peanut") }
     end
 
-    context "using free promotion" do
+    context "for a paid plan using free promotion" do
       setup do
         post :create, 
              {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'walnut@jarna.com'},
@@ -98,14 +100,16 @@ class SignupControllerTest < ActionController::TestCase
               :plan_id => @monthly_plan.id, :promo => 'free5'
               }
       end
-      
+
       should_change("User.count", :by => 1) { User.count }
       should_change("Company.count", :by => 1) { Company.count }
       should_change("Subscription.count", :by => 1) { Subscription.count }
-      
-      should_assign_to :company, :user, :promotion
+
+      should_assign_to(:company, :user, :promotion, :subscription)
       should_assign_to(:plan) { @monthly_plan }
-      
+      should_not_assign_to(:credit_card)
+      should_not_assign_to(:payment)
+
       should "create user with roles 'user manager' on user" do
         @user = User.find_by_email('walnut@jarna.com')
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
@@ -121,6 +125,15 @@ class SignupControllerTest < ActionController::TestCase
         @company = Company.find_by_name('Peanut')
         @user    = User.find_by_email('walnut@jarna.com')
         assert_equal [@user], @company.providers
+      end
+
+      should_change("promotion redemptions", :by => 1) { PromotionRedemption.count }
+
+      should "link promotion redemption to subscription" do
+        @company      = Company.find_by_name("Peanut")
+        @redemption   = @promotion.promotion_redemptions.first
+        @subscription = @company.subscription
+        assert_equal @subscription, @redemption.redeemer
       end
 
       should_respond_with :redirect
