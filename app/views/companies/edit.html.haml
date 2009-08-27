@@ -29,7 +29,7 @@
     %br
     = link_to "Update Credit Card information", edit_cc_subscription_path(current_company.subscription, :subdomain => current_subdomain)
   .span-10.prepend-1.last
-    = render :partial => 'plans/plan', :object => @company.plan
+    = render :partial => 'plans/plan', :object => @company.plan, :locals => { :price => (@company.plan.cost / 100) }
 
 
 %hr.space
