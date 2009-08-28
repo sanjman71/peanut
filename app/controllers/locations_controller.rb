@@ -82,12 +82,10 @@ class LocationsController < ApplicationController
       flash[:error] = "Your plan does not allow you to add another location."
       redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
-        
+    
     @location = initialize_location(Location.new, params[:location])
     
-    @location.update_attributes(params[:location]) unless !@location.errors.empty?
-
-    if @location.errors.empty? && current_company.locations << @location
+    if @location.errors.empty? && (current_company.locations << @location)
     
       flash[:notice] = "Location was successfully added to #{current_company.name}"
 
@@ -109,8 +107,6 @@ class LocationsController < ApplicationController
     @location = Location.find(params[:id])
 
     @location = initialize_location(@location, params[:location])
-
-    @location.update_attributes(params[:location]) unless !@location.errors.empty?
 
     if @location.errors.empty?
       respond_to do |format|
@@ -141,10 +137,6 @@ class LocationsController < ApplicationController
     end
   end
   
-  def pick_location
-    
-  end
-  
   protected
 
   def redirect_success_path
@@ -159,59 +151,47 @@ class LocationsController < ApplicationController
   #
   def initialize_location(location, params)
 
-    # Initialize the country, state, city and zip in order
-    if params[:country_id]
-      new_country = Country.find(params[:country_id].to_i) unless location.country_id == params[:country_id].to_i
-      if new_country
-        location.country = new_country
-      elsif location.country_id != params[:country_id].to_i
-        location.errors.add(:country, "is missing or invalid")
-      end
-    else
-      location.errors.add(:country, "is missing or invalid")      
-    end
+    location.name           = params[:name] unless params[:name].blank?
+    location.street_address = params[:street_address] unless params[:street_address].blank?
+    location.country        = Country.find(params[:country_id].to_i) unless params[:country_id].blank?
+    location.state          = State.find(params[:state_id].to_i) unless params[:state_id].blank?
     
-    if params[:state_id]
-      new_state = State.find(params[:state_id].to_i) unless location.state_id == params[:state_id].to_i
-      if new_state
-        location.state = new_state
-      elsif location.state_id != params[:state_id].to_i
-        location.errors.add(:state, "is missing or invalid")
-      end
+    if location.state.blank? || location.country.blank?
+      location.errors.add(:state, "cannot be blank") if state.blank?
+      location.errors.add(:country, "cannot be blank") if country.blank?
+      return
     else
-      location.errors.add(:state, "is missing or invalid")
-    end
-    
-    if !params[:city].blank? && location.state
-      location.city = location.state.cities.find_or_create_by_name(params[:city])
-    else
-      if !location.state
-        location.errors.add(:city, "can't be added without state")
-      else
-        location.errors.add(:city, "cannot be blank")
-      end
-    end
-    
-    if !params[:zip].blank? && location.state
-      location.zip = location.state.zips.find_or_create_by_name(params[:zip])
-    else
-      if !location.state
-        location.errors.add(:zip, "can't be added without state")
-      else
-        location.errors.add(:zip, "cannot be blank")
-      end
-    end
 
-    # Catch a street address error if appropriate
-    if params[:street_address].blank?
-      location.errors.add(:street_address, "can't be blank")
-    end
+      begin
+        # Initialize the country, state, city and zip in order
+        if !params[:city].blank? && location.state
+          location.city = Locality.check(location.state, "city", params[:city])
+        end
+      rescue
+        if params[:city].blank?
+          location.errors.add(:city, "cannot be blank")
+        else
+          location.errors.add(:city, "#{params[:city]} is invalid in #{location.state.name}")
+        end
+        location.city = nil
+      end
 
-    # Remove these parameters - we don't want to pass them to update_attributes or create
-    params.delete(:country_id)
-    params.delete(:state_id)
-    params.delete(:city)
-    params.delete(:zip)
+      begin
+        if !params[:zip].blank? && location.state
+          location.zip = Locality.check(location.state, "zip", params[:zip])
+        end
+      rescue
+        if params[:zip].blank?
+          location.errors.add(:zip, "cannot be blank")
+        else
+          location.errors.add(:zip, "#{params[:zip]} is invalid in #{location.state.name}")
+        end
+        location.zip = nil
+      end
+      
+    end
+    
+    location.geocode_latlng unless !location.errors.empty?
     
     location
   end
