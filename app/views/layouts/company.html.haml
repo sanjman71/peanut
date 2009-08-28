@@ -33,12 +33,8 @@
     #header
       .container
         .span-24.last
-          .span-10.prepend-14.last{:style => 'color: #DDDDDD; text-align: right;'}
-            = render :partial => 'users/user_links.html.haml'
-            
-        .span-24.last
-          .span-19
-            .company_title.span-19.last
+          .span-16
+            .company_title.span-16.last
             / The company edit page builds a new logo, so we check for the id here also
             - if current_company.logo && current_company.logo.id
               .company_logo.append-1
@@ -47,11 +43,13 @@
               = link_to current_company.name, root_path(:subdomain => current_subdomain)
             .company_slogan.last
               = link_to h(current_company.slogan), root_path(:subdomain => current_subdomain) unless current_company.slogan.blank?
-          .span-5.last.text-align-right
-            - if logged_in?
-              = render(:partial => 'users/user_whoami.html.haml')
+          .span-8.last
+            .span-8.last{:style => 'color: #DDDDDD; text-align: right;'}
+              = render :partial => 'users/user_links.html.haml'
+            .span-8.last.walnut_calendar_logo
+              = link_to image_tag('walnut_calendar.gif'), root_path(:subdomain => 'www')
               
-        .span-24#tabs
+        .span-16#tabs
           %ul
             - build_tab_links(controller) do |name, path, klasses|
               %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
@@ -61,7 +59,11 @@
             - build_admin_tab_links do |name, path, klasses|
               %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
 
+        .span-8.last.text-align-right
+          - if logged_in?
+            = render(:partial => 'users/user_whoami.html.haml')
+
     .container{:class => $BlueprintGrid ? 'showgrid' : ''}
-      .span-14.prepend-1.last
+      .span-14.prepend-1.append-1.last
         = display_flash
       = yield

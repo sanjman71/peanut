@@ -10,8 +10,9 @@
 
     = render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Update', :submit_url => location_path(@location, :subdomain => current_subdomain) }
 
-.span-7.prepend-1.sidebar.instructions.last
-  %h3== Editing a location
-  %ul
-    %li== Please fill in the address for this location. Fields marked * are required.
-    %li== You can give this location a name (e.g. "Downtown") if you wish.
+.span-7.prepend-1.last
+  .sidebar.instructions
+    %h3== Editing a location
+    %ul
+      %li== Please fill in the address for this location. Fields marked * are required.
+      %li== You can give this location a name (e.g. "Downtown") if you wish.

@@ -152,3 +152,4 @@ div.company_slogan                                { float: left; font-size: 1.5e
 div.company_slogan a, a:hover                     { text-decoration:none; color: #000000; background-color: #008800; }
 
 div.company_description                           { font-size: 1.5em;}
+div.walnut_calendar_logo a img                    { float: right; padding: 5px; height: 55px;}
