@@ -1,41 +1,43 @@
-.location.span-13.last
-  - form_for @location, :url => submit_url, :html => {:id => 'edit_location_form'} do |form|
-    = error_messages_for :location
-    .span-13.last
+.location.span-14.last
+  - form_for edit_location, :url => submit_url, :html => {:id => 'edit_location_form'} do |form|
+    -unless edit_location.errors.empty?
+      .notice
+        = error_messages_for :location
+    .span-14.last
       .span-3
         %h3= form.label :name, "Name:"
       .span-9.last
         = form.text_field :name, :size => 34
-    .span-13.last
+    .span-14.last
       .span-3
         %h3= form.label :street_address, "*Street:"
       .span-9.last
         = form.text_field :street_address, :size => 34
-    .span-13.last
+    .span-14.last
       .span-3
-        %h3= form.label :city_str, "*City:"
+        %h3= form.label :city, "*City:"
       .span-4.last
-        = form.text_field :city_str, :size => 34
-    .span-13.last
+        = form.text_field :city, :size => 34
+    .span-14.last
       .span-3.pulldown-label
-        %h3= form.label :state_str, "*State:"
+        %h3= form.label :state_id, "*State:"
       .span-4
-        = form.select :state_str, states_for_select(@location.country), :size => 20
+        = form.select :state_id, states_for_select(@location.country), :size => 20
       .span-2.pulldown-label
-        %h3= form.label :zip_str, "Zip:"
+        %h3= form.label :zip, "Zip:"
       .span-3.last.pulldown-label
-        = form.text_field :zip_str, :size => 7
-    .span-13.last
+        = form.text_field :zip, :size => 7
+    .span-14.last
       .span-3.pulldown-label
-        %h3= form.label :country_str, "*Country:"
+        %h3= form.label :country_id, "*Country:"
       .span-4
-        = form.select(:country_str, countries_for_select())
+        = form.select(:country_id, countries_for_select())
       .span-4.prepend-2.last.large
         %em== * Required
         
     %hr.space
     
-    .span-13.last.padding-top-10
+    .span-14.last.padding-top-10
       = submit_tag form_submit || 'Submit', :class => 'big button'
       == or
       = link_to 'Cancel', edit_company_root_path(:subdomain => current_subdomain)
