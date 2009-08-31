@@ -62,10 +62,6 @@ class LocationsController < ApplicationController
   # GET /locations/1/edit
   def edit
     @location = Location.find(params[:id])
-    @location.city_str = @location.city.name
-    @location.state_str = @location.state.code
-    @location.zip_str = @location.zip.name
-    @location.country_str = @location.country.code
     
     respond_to do |format|
       format.html # edit.html.haml
@@ -77,7 +73,6 @@ class LocationsController < ApplicationController
   # POST /locations
   # POST /locations.xml
   def create
-    
     if !current_company
       flash[:error] = "To add a location you must be working with a specific company."
       redirect_to root_path and return
@@ -88,9 +83,9 @@ class LocationsController < ApplicationController
       redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
     
-    @location = Location.new(params[:location])
-
-    if current_company.locations << @location 
+    @location = initialize_location(Location.new, params[:location])
+    
+    if @location.errors.empty? && (current_company.locations << @location)
     
       flash[:notice] = "Location was successfully added to #{current_company.name}"
 
@@ -111,14 +106,16 @@ class LocationsController < ApplicationController
   def update
     @location = Location.find(params[:id])
 
-    if @location.update_attributes(params[:location])
+    @location = initialize_location(@location, params[:location])
+
+    if @location.errors.empty?
       respond_to do |format|
         flash[:notice] = 'Location was successfully updated.'
         format.html { redirect_to(redirect_success_path) }
       end
     else
       respond_to do |format|
-        flash[:notice] = 'Problem updating location.'
+        flash[:error] = 'Problem updating location.'
         format.html { render :action => "edit" }
       end
     end
@@ -140,14 +137,63 @@ class LocationsController < ApplicationController
     end
   end
   
-  def pick_location
-    
-  end
-  
   protected
 
   def redirect_success_path
     edit_company_root_path(:subdomain => current_subdomain)
+  end
+  
+  #
+  # initialize_location is set up to initialize the location in the correct order
+  # This means that we want to make sure to pick the correct city id depending on the state
+  # For example, if there's a Springfield, IL and Springfield, CA, we want to pick the correct one
+  # depending on which state is chosen
+  #
+  def initialize_location(location, params)
+
+    location.name           = params[:name] unless params[:name].blank?
+    location.street_address = params[:street_address] unless params[:street_address].blank?
+    location.country        = Country.find(params[:country_id].to_i) unless params[:country_id].blank?
+    location.state          = State.find(params[:state_id].to_i) unless params[:state_id].blank?
+    
+    if location.state.blank? || location.country.blank?
+      location.errors.add(:state, "cannot be blank") if state.blank?
+      location.errors.add(:country, "cannot be blank") if country.blank?
+      return
+    else
+
+      begin
+        # Initialize the country, state, city and zip in order
+        if !params[:city].blank? && location.state
+          location.city = Locality.check(location.state, "city", params[:city])
+        end
+      rescue
+        if params[:city].blank?
+          location.errors.add(:city, "cannot be blank")
+        else
+          location.errors.add(:city, "#{params[:city]} is invalid in #{location.state.name}")
+        end
+        location.city = nil
+      end
+
+      begin
+        if !params[:zip].blank? && location.state
+          location.zip = Locality.check(location.state, "zip", params[:zip])
+        end
+      rescue
+        if params[:zip].blank?
+          location.errors.add(:zip, "cannot be blank")
+        else
+          location.errors.add(:zip, "#{params[:zip]} is invalid in #{location.state.name}")
+        end
+        location.zip = nil
+      end
+      
+    end
+    
+    location.geocode_latlng unless !location.errors.empty?
+    
+    location
   end
   
 end
