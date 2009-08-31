@@ -22,18 +22,20 @@
       = f.text_field :name, :class => 'text title', :style => "width: 300px;"
   
   -# email
-  .span-20.last
-    .span-4.text-align-right
-      %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
-    .span-16.last
-      = f.text_field :email, :class => 'text title', :style => "width: 300px;"
+  - f.fields_for :email_addresses do |email_form|
+    .span-20.last
+      .span-4.text-align-right
+        %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
+      .span-16.last
+        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email'
       
-  -# phone
-  .span-20.last
-    .span-4.text-align-right
-      %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "user_phone", "Phone:"
-    .span-16.last
-      = f.text_field :phone, :class => 'text title', :style => "width: 300px;"
+  -# phone, nested model
+  - f.fields_for :phone_numbers do |phone_form|
+    .span-20.last
+      .span-4.text-align-right
+        %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "user_phone", "Phone:"
+      .span-16.last
+        = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_phone'
 
   -# mobile carrier
   -#.span-20.last
@@ -59,7 +61,7 @@
   .new_note#new_note_container
     %p
       %h4.bottom== Add a note:
-      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note, :subject => @user})
+      = render(:partial => 'notes/add_note.html.haml', :locals => {:note => @note || Note.new, :subject => @user})
   %hr.space
   -# customer notes
   #notes_collection

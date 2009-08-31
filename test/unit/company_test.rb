@@ -153,7 +153,6 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal [], @provider.roles_on(@company).collect(&:name)
       end
     end
-    
   end
 
   context "company subscriptions" do
@@ -161,10 +160,14 @@ class CompanyTest < ActiveSupport::TestCase
       @company      = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC")
       @owner        = Factory(:user, :name => "Owner")
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
+      @free_service = @company.free_service
+      @company.reload
     end
 
+    should_change("services count", :by => 1) { Service.count }
+
     should "have free service" do
-      assert @company.free_service
+      assert_valid @free_service
     end
 
     should "have services_count == 1" do

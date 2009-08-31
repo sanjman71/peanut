@@ -122,7 +122,11 @@ class UsersController < ApplicationController
   # /users/1/edit
   def edit
     # @role and @user are initialized here
-    
+
+    # build email and phone attributes for the form
+    @user.email_addresses.build unless @user.email_addresses_count > 0
+    @user.phone_numbers.build unless @user.phone_numbers_count > 0
+
     # build notes collection, most recent first
     @note     = Note.new
     @notes    = @user.notes.sort_recent
@@ -230,7 +234,12 @@ class UsersController < ApplicationController
     if @role.blank?
       # figure out type based on user
       return @role if @user.blank?
-      @role = @user.has_role?('company provider', current_company) ? 'company provider' : 'company customer'
+      case
+      when @user.has_role?('company provider', current_company) || @user.has_role?('admin')
+        @role = 'company provider'
+      else
+        @role = 'company customer'
+      end
     end
     
     @role
