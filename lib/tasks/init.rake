@@ -5,7 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + "/../demos")
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => [:roles_privs, "plans:init", :create_companies]
+  task :dev_data  => [:roles_privs, "plans:init", :create_demos]
   
   desc "Initialize production data"
   task :prod_data  => [:roles_privs, "plans:init"]
