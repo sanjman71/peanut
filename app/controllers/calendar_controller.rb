@@ -125,7 +125,7 @@ class CalendarController < ApplicationController
     end
 
     # build list of providers to allow the scheduled to be adjusted by resource
-    @providers = current_company.providers.all
+    @providers = current_company.providers
 
     # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
     @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
