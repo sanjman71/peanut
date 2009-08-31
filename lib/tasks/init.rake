@@ -1,10 +1,11 @@
 require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 require File.expand_path(File.dirname(__FILE__) + "/../badges_init")
+require File.expand_path(File.dirname(__FILE__) + "/../demos")
 
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => [:roles_privs, "plans:init", :companies]
+  task :dev_data  => [:roles_privs, "plans:init", :create_companies]
   
   desc "Initialize production data"
   task :prod_data  => [:roles_privs, "plans:init"]
@@ -44,10 +45,21 @@ namespace :init do
   #   puts "#{Time.now}: completed"
   # end
   
-  task :companies => ["company1:init", "noelrose:init", "meatheads:init", "mctrucks:init"]
-  
+  desc "Create Companies"
+  task :create_companies do
+    m = Meatheads.new
+    m.create
+    t = Mctrucks.new
+    t.create
+  end
+
   desc "Destroy companies"
-  task :destroy_companies => ["company1:destroy", "noelrose:destroy", "meatheads:destroy", "mctrucks:destroy"]
+  task :destroy_companies do
+    m = Meatheads.new
+    m.destroy
+    t = Mctrucks.new
+    t.destroy
+  end
   
   # task :free_service do 
   #   # create free service used by all companies
