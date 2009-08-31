@@ -9,8 +9,8 @@ class WalnutDemo
   end
   
   def destroy
-    deinitialize_company # Will also destroy services, appointments, capacity slots, subscription and all join tables
     destroy_resources
+    deinitialize_company # Will also destroy services, appointments, capacity slots, subscription and all join tables
     destroy_users
   end
   
@@ -57,52 +57,64 @@ class WalnutDemo
   end
   
   def destroy_user(user_email)
+    puts "destroy_user: #{user_email}"
     if (user = User.find_by_email(user_email) )
       puts "destroy_user: destroying user id #{user.id} email #{user.email}"
       user.destroy
     else
       puts "destroy_user: didn't find user #{user_email}"
     end
+    puts "destroy_user: finished destroying #{user_email}"
   end
   
-  def create_resource(company, name)
-    puts "#{company.name}: create resource: #{name}"
+  def create_resource(subdomain, name)
+    puts "create_resource: #{name} for #{subdomain}"
+    company = Company.find_by_subdomain(subdomain)
     if company.blank?
       company
     elsif resource = company.resource_providers.find_by_name(name)
-      puts "#{company.name}: create_resource: #{name} already in db"
+      puts "create_resource: #{name} already in db"
     else
       # create resource
       resource = Resource.create(:name => name)
     end
-    puts "#{company.name}: finished creating resource: #{name}"
+    puts "finished creating resource: #{name} for #{company.name}"
     resource
   end
   
-  def destroy_resource(company, name)
-    if company && (resource = company.resource_providers.find_by_name(name))
-      puts "#{company.name}: destroying resource id #{resource.id} name #{name}"
+  def destroy_resource(subdomain, name)
+    puts "destroy_resource: #{name} for #{subdomain}"
+    company = Company.find_by_subdomain(subdomain)
+    resource = company.resource_providers.find_by_name(name) unless company.blank?
+    if resource
+      puts "destroy_resource: resource id #{resource.id} name #{name} for #{company.name}"
       resource.destroy
     else
-      puts "#{company.name}: destroy_resource: didn't find resource #{name}"
+      puts "destroy_resource: didn't find resource #{name} for #{subdomain}"
     end
+    puts "destroy_resource: finished destroying #{name} for #{subdomain}"
   end
   
-  def create_company(owner, name, subdomain, plan, timezone)
-    puts "#{name}: initializing company"
+  def create_company(owner, name, subdomain, plan = "Max", timezone = "Central Time (US & Canada)")
+    puts "create_company: #{name}"
     company = Company.find_by_subdomain(subdomain)
     if company.blank?
-      # create subscriptions
-      plan       = Plan.find_by_name(plan) || Plan.first
-      sub        = Subscription.create(:user => owner, :plan => plan)
-  
-      puts "#{Time.now}: creating company #{name}"
-      # create test companies
-      company = Company.create(:name => name, :time_zone => timezone, :subscription => sub)
+      puts "create_company: creating company #{name}"
+      company = Company.create(:name => name, :time_zone => timezone, :subdomain => subdomain)
     end
-    puts "#{name}: granting #{owner.name} company manager role"
+
+    if company.subscription.blank?
+      puts "create_company: creating subscription for #{name}"
+      # create subscription in 'active' state
+      plan = Plan.find_by_name(plan) || Plan.first
+      sub  = company.create_subscription(:user => owner, :plan => plan)
+      sub.active!
+    end
+
+    puts "create_company: granting #{owner.name} company manager role on #{name}"
     owner.grant_role('company manager', company)
-    puts "#{name}: finished initializing company"
+
+    puts "create_company: finished initializing company #{name}"
     company
   end
   
@@ -119,15 +131,17 @@ class WalnutDemo
   
   def create_service(company, svc_name, users_or_resources, duration, price)
     # create services
-    puts "#{company.name}: creating service #{svc_name}"
+    puts "create_service #{svc_name} for #{company.name}"
     svc = company.services.find_by_name(svc_name) || company.services.create(:name => svc_name, :duration => duration, :mark_as => "work", :price => price)
 
     # add service providers
     users_or_resources.each do |ur|
       if ur.class == User
+        company.user_providers.push(ur) unless company.user_providers.include?(ur)
         svc.user_providers.push(ur) unless svc.user_providers.include?(ur)
         puts "#{company.name}: Adding user provider #{ur.name}"
       elsif ur.class == Resource
+        company.resource_providers.push(ur) unless company.resource_providers.include?(ur)
         svc.resource_providers.push(ur) unless svc.providers.include?(ur)
         puts "#{company.name}: Adding resource provider #{ur.name}"
       end
