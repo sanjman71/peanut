@@ -1,0 +1,3 @@
+class RestfulBedAndBreakfast < WalnutDemo
+  
+end
