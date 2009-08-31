@@ -7,7 +7,7 @@
     /   = render(:partial => 'shared/calendar_cube', :locals => {:date => day})
   - reset_cycle
   - appointments.each do |appointment|
-    .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")], :id => 'appointment_'+appointment.id.to_s}
+    .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")].join(' '), :id => 'appointment_'+appointment.id.to_s}
       .span-4.time
         %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
       .span-3.service{:class => appointment.mark_as}
