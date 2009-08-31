@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class ResourceTest < ActiveSupport::TestCase
 
@@ -19,15 +18,34 @@ class ResourceTest < ActiveSupport::TestCase
       @resource = Resource.create(:name => "Mac Truck")
       assert @resource.valid?
     end
-  
+
     context "and add as a company provider" do
       setup do
-        @company.providers.push(@resource)
+        @company.resource_providers.push(@resource)
         @company.reload
       end
 
-      should "should have company providers == [@resource]" do
-        assert_equal [@resource], @company.providers
+      should "change company.resource_providers" do
+        assert_equal [@resource], @company.resource_providers
+      end
+
+      should "increment company.providers_count" do
+        assert_equal 1, @company.providers_count
+      end
+
+      context "then remove resource provider" do
+        setup do
+          @company.resource_providers.delete(@resource)
+          @company.reload
+        end
+
+        should "change company.resource_providers" do
+          assert_equal [], @company.resource_providers
+        end
+
+        should "decrement company.providers_count" do
+          assert_equal 0, @company.providers_count
+        end
       end
     end
   end

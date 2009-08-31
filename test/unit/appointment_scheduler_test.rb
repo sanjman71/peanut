@@ -13,16 +13,16 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "create a free appointment and a service with no providers, and search for free appointments" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00)
+      @company.user_providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
       @company.services.push(@haircut)
       @customer  = Factory(:user)
-  
+
       # create free appointment (all day)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service,
                                                                          :start_at => "20100101000000", :end_at => "20100102000000")
       assert_valid @free_appointment
-  
+
       # search for free appointments
       @daterange  = DateRange.parse_range("20100101000000", "20100301000000")
       @free_slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
@@ -35,7 +35,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     context "then add a service provider and search for free appointments again" do
       setup do
         # add provider
-        @haircut.providers.push(@johnny)
+        @haircut.user_providers.push(@johnny)
         # search for free appointments
         @free_slots  = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
       end
@@ -50,9 +50,10 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "create a free appointment that has already ended" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-  
+      @company.user_providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
+
       # create free appointment that ended a few minutes ago
       @end_at             = (Time.now.utc - 3.minutes).to_s(:appt_schedule)
       @start_at           = (Time.now.utc - 10.hours).to_s(:appt_schedule)
@@ -77,9 +78,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "create a free appointment that starts in the future" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @haircut.reload
       @johnny.reload
       
@@ -109,9 +110,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "schedule work appointment at the start of a free appointment" do
     setup do
       @johnny           = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @customer         = Factory(:user)
   
       beginning_of_day  = Time.now.utc.beginning_of_day
@@ -192,9 +193,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "schedule work appointment with a custom duration in the middle of a free appointment" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.company_providers.create(:provider => @johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.service_providers.create(:provider => @johnny)
       @customer  = Factory(:user)
   
       # create free appointment (all day)
@@ -256,21 +257,21 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "schedule work appointment at the end of a free appointment" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @customer  = Factory(:user)
-      
+
       # create free appointment (all day)
       @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
                                                                         :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
-      
+
       # schedule the work appointment, the free appointment should be split into free/work time
       @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801233000")
       assert_valid @work_appointment
     end
-  
+
     # should have 1 free and 1 work appointment
     should_change("Appointment.count", :by => 2) { Appointment.count }
     
@@ -319,9 +320,9 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   context "schedule work appointment replacing a free appointment" do
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @customer  = Factory(:user)
   
       # create free appointment (all day)

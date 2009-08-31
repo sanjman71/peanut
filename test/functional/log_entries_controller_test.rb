@@ -18,9 +18,10 @@ class LogEntriesControllerTest < ActionController::TestCase
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     @provider     = Factory(:user, :name => "Provider")
-    @company.providers.push(@provider)
-    @service      = Factory(:work_service, :name => "Haircut", :price => 1.00)
+    @company.user_providers.push(@provider)
+    @service      = Factory.build(:work_service, :name => "Haircut", :price => 1.00)
     @company.services.push(@service)
+    @service.user_providers.push(@provider)
     @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @provider, :service => @service)
     @log_entry    = Factory(:log_entry, :company => @company, :user => @owner, :customer => @customer, :loggable => @appointment, :etype => LogEntry::INFORMATIONAL)
     # make owner the company manager

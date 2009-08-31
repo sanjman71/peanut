@@ -11,7 +11,7 @@ class CalendarController < ApplicationController
   
   def index
     # redirect to a specific provider, try the current first and default to the first company provider
-    provider = current_company.users.find_by_id(current_user.id) || current_company.providers.first
+    provider = current_company.user_providers.find_by_id(current_user.id) || current_company.user_providers.first
     if provider.blank?
       redirect_to root_path(:subdomain => current_subdomain) and return
     end
@@ -31,7 +31,7 @@ class CalendarController < ApplicationController
     # end
     
     @free_service = current_company.free_service
-    @providers    = current_company.providers.all
+    @providers    = current_company.providers
 
     if params[:start_date] and params[:end_date]
       # build daterange using range values
@@ -86,11 +86,8 @@ class CalendarController < ApplicationController
     #   redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
     # end
         
-    # initialize provider, default to anyone
-    # @provider  = User.anyone if @provider.blank?
-    
     # build list of providers to allow the scheduled to be adjusted by resource
-    @providers = current_company.providers.all
+    @providers = current_company.providers
     
     # initialize daterange, start calendar on sunday, end calendar on sunday
     @daterange = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
@@ -141,14 +138,4 @@ class CalendarController < ApplicationController
     end
   end
   
-  protected
-  
-  # find scheduable from the params hash
-  def init_provider
-    @provider = current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
-  end
-  
-  def init_provider_privileges
-    @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)
-  end
 end

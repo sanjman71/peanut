@@ -25,7 +25,6 @@ class OpeningsControllerTest < ActionController::TestCase
   should_route :post, 'services/3/120/openings/20090101..20090201/anytime', 
                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120, 
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
-  
 
   def setup
     @controller   = OpeningsController.new
@@ -35,24 +34,23 @@ class OpeningsControllerTest < ActionController::TestCase
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     @johnny       = Factory(:user, :name => "Johnny")
-    @company.providers.push(@johnny)
-    @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 10.00, :duration => 30)
-    # add haircut as a company service
+    @company.user_providers.push(@johnny)
+    @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 10.00, :duration => 30)
     @company.services.push(@haircut)
+    @haircut.user_providers.push(@johnny)
     @company.reload
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    # stub current localation to be anywhere
+    # stub current location to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     @controller.stubs(:current_locations).returns([])
-    
+
     # stub helper method (not sure why this generates an error?)
     ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
-    
+
     # Set the request hostname
     # @request.host = "www.peanut.com"
-
   end
   
   context "search company openings with no service specified" do
@@ -64,7 +62,7 @@ class OpeningsControllerTest < ActionController::TestCase
     should_render_template 'openings/index.html.haml'
     should_not_assign_to :daterange
     should_assign_to(:duration) { 0 }
-    
+
     should "have 'nothing' service" do
       assert assigns(:service).nothing?
     end

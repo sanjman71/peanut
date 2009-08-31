@@ -11,8 +11,8 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
     @anywhere       = Location.anywhere
     @customer       = Factory(:user, :name => "Customer")
     @provider       = Factory(:user, :name => "Provider")
-    @company.providers.push(@provider)
-    @work_service   = Factory(:work_service, :name => "Work service", :companies => [@company], :price => 1.00)
+    @company.user_providers.push(@provider)
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :company => @company)
     @free_service   = @company.free_service
   end
 

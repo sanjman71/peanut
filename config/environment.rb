@@ -68,7 +68,10 @@ Rails::Initializer.run do |config|
   config.gem "eventfulapi", :lib => false
   config.gem "geokit" 
   config.gem "haml"
+  config.gem "httparty" # used by google weather plugin
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
+  config.gem 'json'
+  config.gem 'mime-types', :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'prawn', :version => '~> 0.4.1'
   config.gem 'ri_cal'
@@ -131,6 +134,12 @@ require "#{RAILS_ROOT}/lib/shared/string.rb"
 
 # RPX key
 RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
+
+# Admin users email collection
+ADMIN_USER_EMAILS  = %w(sanjay@walnutindustries.com killian@walnutindustries.com)
+
+# Auth token
+AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 
 # Initialize exception notifier
 # Initialize exception notifier

@@ -47,14 +47,16 @@ class AppointmentsControllerTest < ActionController::TestCase
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @johnny, :plan => @monthly_plan)
-    @company      = Factory(:company, :subscription => @subscription, :users => [@owner])
+    @company      = Factory(:company, :subscription => @subscription)
+    @owner.grant_role('company manager', @company)
     # create provider
     @johnny       = Factory(:user, :name => "Johnny")
-    @company.providers.push(@johnny)
+    @company.user_providers.push(@johnny)
     @company.reload
     # create a work service, and assign johnny as a service provider
-    @haircut      = Factory(:work_service, :duration => 30, :name => "Haircut", :users => [@johnny], :price => 1.00)
+    @haircut      = Factory.build(:work_service, :duration => 30, :name => "Haircut", :price => 1.00)
     @company.services.push(@haircut)
+    @haircut.user_providers.push(@johnny)
     @company.reload
     # get company free service
     @free_service = @company.free_service
@@ -63,7 +65,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     # stub current company
     @controller.stubs(:current_company).returns(@company)
     # set the request hostname
-    @request.host = "www.peanut.com"
+    @request.host = "www.walnutcalendar.com"
   end
 
   context "build work appointment for a single date with free time" do
@@ -77,7 +79,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         # book a haircut with johnny during his free time
         get :new, 
-            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
             :duration => @haircut.duration, :mark_as => 'work'
       end
     
@@ -493,25 +495,25 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         # get 'anyone' user
         @anyone = User.anyone
-  
+
         # stub current user
         @controller.stubs(:current_user).returns(@customer)
-  
+
         # create waitlist appointment
         post :create_wait,
              {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @anyone.tableize, :provider_id => @anyone.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
-  
+
       should_change("Appointment.count", :by => 1) { Appointment.count }
-  
+
       should_assign_to(:service) { @haircut }
       should_not_assign_to(:duration)
       should_not_assign_to(:provider) # provider should be empty
       should_assign_to(:customer) { @customer }
       should_assign_to(:mark_as) { "wait" }
       should_assign_to(:appointment)
-  
+
       should_respond_with :redirect
       should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
     end

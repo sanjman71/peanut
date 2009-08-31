@@ -7,30 +7,30 @@ class UsersControllerTest < ActionController::TestCase
 
   # Don't have the patience to test all these routes:
   # map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
-  
-  should_route :get, '/users/1/notify/reset', :controller => 'users', :action => 'notify', :id => "1", :type => "reset"
+
+  should_route :get, '/users/1/notify/reset',   :controller => 'users', :action => 'notify', :id => "1", :type => "reset"
   should_route :get, '/providers/new',          :controller => 'users', :action => 'new', :role => 'company provider'
   should_route :post, '/providers/create',      :controller => 'users', :action => 'create', :role => 'company provider'
-  should_route :get, '/providers/1/edit',     :controller => 'users', :action => 'edit', :role => 'company provider', :id => "1"
-  should_route :put, '/providers/1',          :controller => 'users', :action => 'update', :role => 'company provider', :id => "1"
+  should_route :get, '/providers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company provider', :id => "1"
+  should_route :put, '/providers/1',            :controller => 'users', :action => 'update', :role => 'company provider', :id => "1"
   should_route :get, '/customers/new',          :controller => 'users', :action => 'new', :role => 'company customer'
   should_route :post, '/customers/create',      :controller => 'users', :action => 'create', :role => 'company customer'
-  should_route :get, '/customers/1/edit',     :controller => 'users', :action => 'edit', :role => 'company customer', :id => "1"
-  should_route :put, '/customers/1',          :controller => 'users', :action => 'update', :role => 'company customer', :id => "1"
-  
+  should_route :get, '/customers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company customer', :id => "1"
+  should_route :put, '/customers/1',            :controller => 'users', :action => 'update', :role => 'company customer', :id => "1"
+
   context 'invite url with subdomain' do
     setup do
       SubdomainFu.stubs(:subdomain_from).with(anything).returns('peanut')
     end
-  
+
     # user invite route
     should_route :get,  '/invite/12345', :controller => 'users', :action => 'new', :invitation_token => '12345'
   end
-  
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-  
+
     @controller   = UsersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
@@ -41,7 +41,7 @@ class UsersControllerTest < ActionController::TestCase
     # make owner the company manager
     @owner.grant_role('company manager', @company)
     # add provider
-    @company.providers.push(@owner)
+    @company.user_providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
@@ -53,20 +53,20 @@ class UsersControllerTest < ActionController::TestCase
         setup do
           get :new, :role => 'company provider'
         end
-  
+
         should_respond_with :redirect
         should_redirect_to('unauthorized_path') { unauthorized_path }
       end
-      
+
       context "and an invalid invitation" do
         setup do
           get :new, :role => 'company provider', :invitation_token => "0"
         end
-  
+
         should_respond_with :redirect
         should_redirect_to('unauthorized_path') { unauthorized_path }
       end
-  
+
       context "and a valid provider invitation" do
         setup do
           @sender           = Factory(:user)
@@ -102,34 +102,34 @@ class UsersControllerTest < ActionController::TestCase
           @controller.stubs(:current_user).returns(@owner)
           get :new, :role => 'company provider'
         end
-  
+
         should_respond_with :success
         should_render_template 'users/new.html.haml'
-        
+
         should_not_change("User.count") { User.count }
-        
+
         should_not_assign_to(:error_message)
         should_assign_to(:role) {"company provider"}
       end
-      
+
       context "and an invalid invitation" do
         setup do
           get :new, :role => 'company provider', :invitation_token => "0"
         end
-  
+
         should_respond_with :redirect
         should_redirect_to('unauthorized_path') { unauthorized_path }
       end
     end
   end
-  
+
   context "create provider" do
     context "without 'create users' privilege" do
       context "and no invitation" do
         setup do
           post :create, {:role => 'company provider'}
         end
-  
+
         should_respond_with :redirect
         should_redirect_to('unauthorized_path') { unauthorized_path }
       end

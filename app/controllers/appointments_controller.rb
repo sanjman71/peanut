@@ -52,12 +52,17 @@ class AppointmentsController < ApplicationController
       flash[:notice] = "To finalize your appointment, please log in or sign up."
       redirect_to(login_path) and return
     end
-    
+
+    @provider = init_provider(:default => nil)
+
+    if @provider.blank?
+      logger.debug("xxx could not provider #{params[:provider_type]}:#{params[:provider_id]}")
+      redirect_to root_path(:subdomain => current_subdomain) and return
+    end
+
     # get appointment parameters
-    @service      = current_company.services.find_by_id(params[:service_id])
-    # note: the send method can generate an exception
-    @provider  = current_company.send(params[:provider_type]).find_by_id(params[:provider_id])
-    @customer     = current_user
+    @service  = current_company.services.find_by_id(params[:service_id])
+    @customer = current_user
     
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
@@ -203,10 +208,10 @@ class AppointmentsController < ApplicationController
         @errors[date] = e.message
       end
     end
-    
+
     logger.debug("*** errors: #{@errors}") unless @errors.empty?
     logger.debug("*** created: #{@created}")
-    
+
     if @errors.keys.size > 0
       # set the flash
       flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
@@ -468,25 +473,8 @@ class AppointmentsController < ApplicationController
       format.html
     end
   end
-  
-  protected
-  
-  def init_provider
-    begin
-      # find the provider; note that the send method can generate an exception
-      klass, id = [params[:provider_type], params[:provider_id]]
-      @provider = current_company.send(klass).find_by_id(id)
-    rescue Exception => e
-      logger.debug("xxx could not provider #{params[:provider_type]}:#{params[:provider_id]}")
-      redirect_to(unauthorized_path) and return
-    end
-  end
 
-  def init_provider_privileges
-    if current_user
-      @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)
-    end
-  end
+  protected
 
   # find appointment from the params hash
   def find_appointment_from_params

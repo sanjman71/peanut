@@ -27,17 +27,16 @@ class AppointmentTest < ActiveSupport::TestCase
     @company        = Factory(:company, :subscription => @subscription)
     @anywhere       = Location.anywhere
     @provider       = Factory(:user, :name => "Provider")
-    @company.providers.push(@provider)
+    @company.user_providers.push(@provider)
     @company.reload
-    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00)
-    @company.services.push(@work_service)
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :company => @company)
     @free_service   = @company.free_service
   end
   
   context "create free appointment with mismatched duration and end_at values" do
     setup do
       @johnny         = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
+      @company.user_providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
@@ -63,7 +62,7 @@ class AppointmentTest < ActiveSupport::TestCase
   context "create free appointment and test unscheduled time" do
     setup do
       @johnny         = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
+      @company.user_providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
@@ -96,7 +95,6 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 0, Company.count
         assert_equal 0, Appointment.count
         assert_equal 0, Subscription.count
-        assert_equal 0, CompanyService.count
         assert_equal 0, CompanyProvider.count
         assert_equal 0, CapacitySlot.count
       end
@@ -108,7 +106,7 @@ class AppointmentTest < ActiveSupport::TestCase
     setup do
       # create free time from 10 am to 12 pm
       @johnny         = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
+      @company.user_providers.push(@johnny)
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
@@ -118,7 +116,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     context "and schedule work appointment without a customer" do
       setup do
-        @haircut = Factory(:work_service, :name => "Haircut", :companies => [@company], :price => 1.00)
+        @haircut = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
       end
       
       should "raise exception" do
@@ -127,34 +125,34 @@ class AppointmentTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     context "and schedule work appointment to test confirmation code" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-        @company.services.push(@haircut)
+        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
         assert_valid @work_appt
       end
-      
+
       should "have confirmation code of exactly 5 characters" do
         assert_equal 5, @work_appt.confirmation_code.size
         assert_match /([A-Z]|[0-9])+/, @work_appt.confirmation_code
       end
     end
-  
+
     context "and schedule work appointment to test customer role" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-        @company.services.push(@haircut)
+        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
         assert_valid @work_appt
         @customer.reload
       end
-  
+
       should "add 'user manager' role on user to customer" do
         assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
       end
@@ -166,8 +164,8 @@ class AppointmentTest < ActiveSupport::TestCase
     
     context "and schedule work appointment with a custom service duration" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-        @company.services.push(@haircut)
+        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 120, @customer, @options)
@@ -186,11 +184,10 @@ class AppointmentTest < ActiveSupport::TestCase
           @company.destroy
         end
 
-        should "have no Companies or associated models" do
+        should "have no companies or associated models" do
           assert_equal 0, Company.count
           assert_equal 0, Appointment.count
           assert_equal 0, Subscription.count
-          assert_equal 0, CompanyService.count
           assert_equal 0, CompanyProvider.count
           assert_equal 0, CapacitySlot.count
         end
@@ -202,9 +199,9 @@ class AppointmentTest < ActiveSupport::TestCase
   context "create waitlist appointment with a specific service provider" do
     setup do
       @johnny       = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @customer     = Factory(:user)
       # build start, end date ranges in utc time
       @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
@@ -243,7 +240,6 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 0, Company.count
         assert_equal 0, Appointment.count
         assert_equal 0, Subscription.count
-        assert_equal 0, CompanyService.count
         assert_equal 0, CompanyProvider.count
         assert_equal 0, CapacitySlot.count
       end
@@ -254,9 +250,9 @@ class AppointmentTest < ActiveSupport::TestCase
   context "create waitlist appointment with any service provider" do
     setup do
       @johnny       = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @customer     = Factory(:user)
       # build start, end date ranges in utc time
       @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
@@ -272,10 +268,10 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create an afternoon appointment to test time overlap searching" do
     setup do
-      @johnny       = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :users => [@johnny], :price => 1.00)
-      @company.services.push(@haircut)
+      @johnny   = Factory(:user, :name => "Johnny")
+      @company.user_providers.push(@johnny)
+      @haircut  = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+      @haircut.user_providers.push(@johnny)
       @user     = Factory(:user)
   
       # start at 2 pm, local time
@@ -1011,12 +1007,10 @@ class AppointmentTest < ActiveSupport::TestCase
             assert_equal 0, Company.count
             assert_equal 0, Appointment.count
             assert_equal 0, Subscription.count
-            assert_equal 0, CompanyService.count
             assert_equal 0, CompanyProvider.count
             assert_equal 0, CapacitySlot.count
           end
         end
-
       end
 
       context "delete the second recurrence" do

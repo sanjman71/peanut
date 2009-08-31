@@ -7,7 +7,7 @@
   %h4
     = link_to 'Send Email', '', :class => 'rounded button color', :id => 'send_email_message', :url => "/messages/deliver/email", :appointment_id => appointment.id
     -# show text option if customer has sms enabled
-    - if appointment.customer.sms?
+    - if appointment.customer.phone_numbers_count > 0
       == &nbsp;
       = link_to 'Send Text', '', :class => 'rounded button color', :id => 'send_sms_message', :url => "/messages/deliver/sms", :appointment_id => appointment.id
     == &nbsp;

@@ -21,15 +21,14 @@ class CapacitySlotTest < ActiveSupport::TestCase
     @company        = Factory(:company, :subscription => @subscription)
     @company.locations.push(@location)
     @location.reload
-    assert_valid    @company
+    assert_valid @company
     assert_equal @company, @location.company
 
     @anywhere       = Location.anywhere
     @customer       = Factory(:user, :name => "Customer")
     @provider       = Factory(:user, :name => "Provider")
-    @company.providers.push(@provider)
-    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :duration => 60, :allow_custom_duration => true)
-    @company.services.push(@work_service)
+    @company.user_providers.push(@provider)
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :duration => 60, :allow_custom_duration => true, :company => @company)
     @free_service   = @company.free_service
 
     assert_valid @customer
@@ -37,7 +36,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
     assert_valid @work_service
     assert_valid @free_service
 
-    @work_service.providers.push(@provider)
+    @work_service.user_providers.push(@provider)
     assert_valid @work_service
   end
 
@@ -126,7 +125,6 @@ class CapacitySlotTest < ActiveSupport::TestCase
               assert_equal 0, Company.count
               assert_equal 0, Appointment.count
               assert_equal 0, Subscription.count
-              assert_equal 0, CompanyService.count
               assert_equal 0, CompanyProvider.count
               assert_equal 0, CapacitySlot.count
             end
@@ -249,7 +247,6 @@ class CapacitySlotTest < ActiveSupport::TestCase
                 assert_equal 0, Company.count
                 assert_equal 0, Appointment.count
                 assert_equal 0, Subscription.count
-                assert_equal 0, CompanyService.count
                 assert_equal 0, CompanyProvider.count
                 assert_equal 0, CapacitySlot.count
               end

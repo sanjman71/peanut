@@ -7,7 +7,7 @@ module UserInitializeHelper
     case role
     when 'company provider'
       # add the user as a company provider
-      company.providers.push(user)
+      company.user_providers.push(user)
       role_string = "provider"
     when 'company customer'
       # grant user the 'company customer' role on the company
@@ -45,8 +45,8 @@ module UserInitializeHelper
       end
     when 'anonymous'
       # cache the return to value (if it exists) before we reset the ression
-      return_to       = session[:return_to]
-      redirect_path  = return_to || "/"
+      return_to     = session[:return_to]
+      redirect_path = return_to || "/"
       # kill the existing session
       logout_killing_session!
       # login as the new user

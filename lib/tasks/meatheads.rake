@@ -15,8 +15,7 @@ namespace :meatheads do
     if (@meathead = User.find_by_email("meathead@peanut.com") )
       puts "user: meathead@peanut.com already in db"
     else
-      @meathead       = User.create(:name => "Meathead Manager", :email => "meathead@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @meathead = User.create(:name => "Meathead Manager", :email => "meathead@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @meathead.register!
       @meathead.activate!
     end
@@ -24,8 +23,7 @@ namespace :meatheads do
     if (@wimpy = User.find_by_email("wimpy@peanut.com") )
       puts "user: wimpy@peanut.com already in db"
     else
-      @wimpy          = User.create(:name => "Wimpy Arms", :email => "wimpy@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @wimpy = User.create(:name => "Wimpy Arms", :email => "wimpy@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @wimpy.register!
       @wimpy.activate!
     end
@@ -33,8 +31,7 @@ namespace :meatheads do
     if (@skinny = User.find_by_email("skinny@peanut.com") )
       puts "user: skinny@peanut.com already in db"
     else
-      @skinny         = User.create(:name => "Skinny Legs", :email => "skinny@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @skinny = User.create(:name => "Skinny Legs", :email => "skinny@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @skinny.register!
       @skinny.activate!
     end
@@ -58,22 +55,25 @@ namespace :meatheads do
   
   task :company do
     @meatheads = Company.find_by_subdomain('meatheads')
-    if @meatheads.nil?
-      # create subscriptions
-      @subscription  = Subscription.create(:user => @meathead, :plan => @max_plan)
-  
-      puts "#{Time.now}: creating meatheads company"
-      # create test companies
-      @meatheads       = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
 
+    if @meatheads.blank?
+      puts "#{Time.now}: creating meatheads company"
+      @meatheads = Company.create(:name => "Meat Heads", :time_zone => "Central Time (US & Canada)")
     end
+
+    if @meatheads.subscription.blank?
+      # create subscription in 'active' state
+      @subscription = @meatheads.create_subscription(:user => @meathead, :plan => @max_plan)
+      @subscription.active!
+    end
+
     # add manager roles
     @meathead.grant_role('company manager', @meatheads)
 
     # assign providers
-    @meatheads.providers.push(@meathead) unless @meatheads.providers.include?(@meathead)
-    @meatheads.providers.push(@wimpy) unless @meatheads.providers.include?(@wimpy)
-    @meatheads.providers.push(@skinny) unless @meatheads.providers.include?(@skinny)
+    @meatheads.user_providers.push(@meathead) unless @meatheads.user_providers.include?(@meathead)
+    @meatheads.user_providers.push(@wimpy) unless @meatheads.user_providers.include?(@wimpy)
+    @meatheads.user_providers.push(@skinny) unless @meatheads.user_providers.include?(@skinny)
   end
 
   # Destroying the company will also destroy the services and providers
@@ -96,8 +96,8 @@ namespace :meatheads do
     puts "#{Time.now}: adding meatheads service providers ..."
 
     # add service providers
-    @training.providers.push(@wimpy) unless @training.providers.include?(@wimpy)
-    @training.providers.push(@skinny) unless @training.providers.include?(@skinny)
+    @training.user_providers.push(@wimpy) unless @training.user_providers.include?(@wimpy)
+    @training.user_providers.push(@skinny) unless @training.user_providers.include?(@skinny)
 
     puts "#{Time.now}: completed"
   end

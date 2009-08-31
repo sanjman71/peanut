@@ -26,12 +26,12 @@ class ProvidersControllerTest < ActionController::TestCase
     @owner.grant_role('company manager', @company)
     @owner.grant_role('user manager', @owner)
     # add providers
-    @provider1    = Factory(:user, :name => "Provider 1")
-    @company.providers.push(@provider1)
+    @provider1    = Factory(:user, :name => "User Provider 1")
+    @company.user_providers.push(@provider1)
     @provider1.grant_role('company provider', @company)
     @provider1.grant_role('user manager', @provider1)
-    @provider2    = Factory(:user, :name => "Provider 2")
-    @company.providers.push(@provider2)
+    @provider2    = Factory(:user, :name => "User Provider 2")
+    @company.user_providers.push(@provider2)
     @provider2.grant_role('company provider', @company)
     @provider2.grant_role('user manager', @provider2)
     # create user

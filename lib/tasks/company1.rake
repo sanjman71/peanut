@@ -7,14 +7,13 @@ namespace :company1 do
   task :users do
     puts "#{Time.now}: creating company1 users"
   
-    @max_plan       = Plan.find_by_name("Max") || Plan.first
+    @max_plan = Plan.find_by_name("Max") || Plan.first
   
     # create users
     if (@johnny = User.find_by_email("johnny@peanut.com") )
       puts "user: johnny@peanut.com already in db"
     else
-      @johnny         = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @johnny = User.create(:name => "Johnny Smith", :email => "johnny@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @johnny.register!
       @johnny.activate!
     end
@@ -22,8 +21,7 @@ namespace :company1 do
     if (@mary = User.find_by_email("mary@peanut.com") )
       puts "user: mary@peanut.com already in db"
     else
-      @mary           = User.create(:name => "Mary Jones", :email => "mary@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @mary = User.create(:name => "Mary Jones", :email => "mary@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @mary.register!
       @mary.activate!
     end
@@ -47,23 +45,24 @@ namespace :company1 do
   task :company do
     # Check to see if company 1 already exists. If so, don't continue
     @company1 = Company.find_by_subdomain('company1')
-    if (@company1.nil?)
-  
-      # create subscriptions
-      @subscription  = Subscription.create(:user => @johnny, :plan => @max_plan)
-  
+
+    if @company1.blank?
       puts "#{Time.now}: creating company1 company"
-      # create test companies
-      @company1        = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
-    else
-      puts "#{Time.now}: company1 already exists"
+      @company1 = Company.create(:name => "Company 1", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
     end
+
+    if @company1.subscription.blank?
+      # create subscription in 'active' state
+      @subscription = @company1.create_subscription(:user => @johnny, :plan => @max_plan)
+      @subscription.active!
+    end
+
     # add manager role
     @johnny.grant_role('company manager', @company1)
 
     # add providers
-    @company1.providers.push(@johnny) unless @company1.providers.include?(@johnny)
-    @company1.providers.push(@mary) unless @company1.providers.include?(@mary)
+    @company1.user_providers.push(@johnny) unless @company1.user_providers.include?(@johnny)
+    @company1.user_providers.push(@mary) unless @company1.user_providers.include?(@mary)
   end
   
   # Destroying the company will also destroy the services and providers
@@ -88,8 +87,8 @@ namespace :company1 do
     puts "#{Time.now}: adding company1 service providers ..."
 
     # add service providers
-    @mens_haircut.providers.push(@johnny) unless @mens_haircut.providers.include?(@johnny)
-    @womens_haircut.providers.push(@mary) unless @womens_haircut.providers.include?(@mary)
+    @mens_haircut.user_providers.push(@johnny) unless @mens_haircut.user_providers.include?(@johnny)
+    @womens_haircut.user_providers.push(@mary) unless @womens_haircut.user_providers.include?(@mary)
 
     puts "#{Time.now}: completed"
   end

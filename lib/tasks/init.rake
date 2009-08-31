@@ -4,58 +4,56 @@ require File.expand_path(File.dirname(__FILE__) + "/../badges_init")
 namespace :init do
   
   desc "Initialize development data"
-  task :dev_data  => [:free_service, :roles_privs, "plans:init", :admin_users, :companies]
+  task :dev_data  => [:roles_privs, "plans:init", :companies]
   
   desc "Initialize production data"
-  task :prod_data  => [:free_service, :roles_privs, "plans:init", :admin_users]
+  task :prod_data  => [:roles_privs, "plans:init"]
 
   desc "Initialize roles & privileges"
   task :roles_privs do
     BadgesInit.roles_privileges
   end
   
-  desc "Initialize admin users"
-  task :admin_users do 
-    # Create admin users
-    if (User.find_by_email("admin@killianmurphy.com").nil? )
-      puts "adding admin user: admin@killianmurphy.com, password: peanut"
-      a = User.create(:name => "Admin Killian", :email => "admin@killianmurphy.com", :phone => "6504502628",
-                      :password => "peanut", :password_confirmation => "peanut")
-      a.register!
-      a.activate!
-      a.grant_role('admin')
-      a.mobile_carrier = MobileCarrier.find_by_name("AT&T/Cingular")
-      a.save
-    else
-      puts "admin user: admin@killianmurphy.com already in db"
-    end
-
-    if (User.find_by_email("sanjay@jarna.com").nil? )
-      puts "adding admin user: sanjay@jarna.com, password: peanut"
-      a = User.create(:name => "Admin Sanjay", :email => "sanjay@jarna.com", :phone => "6503876818",
-                      :password => "peanut", :password_confirmation => "peanut")
-      a.register!
-      a.activate!
-      a.grant_role('admin')
-      a.mobile_carrier = MobileCarrier.find_by_name("Verizon Wireless")
-      a.save
-    else
-      puts "admin user: sanjay@jarna.com already in db"
-    end
-    
-    puts "#{Time.now}: completed"
-  end
+  # desc "Initialize admin users"
+  # task :admin_users do 
+  #   # Create admin users
+  #   if (User.find_by_email("admin@killianmurphy.com").nil? )
+  #     puts "adding admin user: admin@killianmurphy.com, password: peanut"
+  #     a = User.create(:name => "Admin Killian", :email => "admin@killianmurphy.com", :password => "peanut", :password_confirmation => "peanut")
+  #     a.register!
+  #     a.activate!
+  #     a.grant_role('admin')
+  #     a.save
+  #     a.phone_numbers.create(:name => "Mobile", :address => "6504502628")
+  #   else
+  #     puts "admin user: admin@killianmurphy.com already in db"
+  #   end
+  # 
+  #   if (User.find_by_email("sanjay@jarna.com").nil? )
+  #     puts "adding admin user: sanjay@jarna.com, password: peanut"
+  #     a = User.create(:name => "Admin Sanjay", :email => "sanjay@jarna.com", :password => "peanut", :password_confirmation => "peanut")
+  #     a.register!
+  #     a.activate!
+  #     a.grant_role('admin')
+  #     a.save
+  #     a.phone_numbers.create(:name => "Mobile", :address => "6503876818")
+  #   else
+  #     puts "admin user: sanjay@jarna.com already in db"
+  #   end
+  #   
+  #   puts "#{Time.now}: completed"
+  # end
   
   task :companies => ["company1:init", "noelrose:init", "meatheads:init", "mctrucks:init"]
   
   desc "Destroy companies"
   task :destroy_companies => ["company1:destroy", "noelrose:destroy", "meatheads:destroy", "mctrucks:destroy"]
   
-  task :free_service do 
-    # create free service used by all companies
-    puts "adding free service, used by all companies"
-    Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
-  end
+  # task :free_service do 
+  #   # create free service used by all companies
+  #   puts "adding free service, used by all companies"
+  #   Service.create(:name => Service::AVAILABLE, :duration => 0, :mark_as => "free", :price => 0.00)
+  # end
 
 end # init namespace
   

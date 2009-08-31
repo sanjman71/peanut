@@ -16,7 +16,7 @@ class CalDavResourceTest < ActiveSupport::TestCase
       # create free time from 10 am to 12 pm
       @free_service     = @company.free_service
       @johnny           = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
+      @company.user_providers.push(@johnny)
       @today            = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range       = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @free_appt        = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
@@ -28,7 +28,7 @@ class CalDavResourceTest < ActiveSupport::TestCase
     should "give icalendar" do
       assert_not_nil @cal_dav_resource.data
     end
-    
-  end    
+
+  end
 
 end

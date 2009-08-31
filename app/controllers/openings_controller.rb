@@ -22,17 +22,16 @@ class OpeningsController < ApplicationController
     
     # find services collection for the current company; valid services must have at least 1 service provider
     # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
-    @services     = Array(current_company.services.with_providers.work)
+    @services = Array(current_company.services.with_providers.work)
     
     if @services.empty?
       # there are no services with any service providers
       redirect_to(setup_company_path(current_company)) and return
     end
-    
-    # initialize provider, default to anyone
-    @provider  = current_company.providers.find_by_provider_id_and_provider_type(params[:provider_id], params[:provider_type].to_s.classify)
-    @provider  = User.anyone if @provider.blank?
-    
+
+    # initialize provider from params
+    @provider = init_provider(:default => User.anyone)
+
     if params[:start_date] and params[:end_date]
       # build daterange using range values
       @start_date = params[:start_date]

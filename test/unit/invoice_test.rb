@@ -17,9 +17,8 @@ class InvoiceTest < ActiveSupport::TestCase
     setup do
       @company  = Factory(:company, :subscription => @subscription)
       @johnny   = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut  = Factory(:work_service, :name => "Haircut", :price_in_cents => 500)
-      @company.services.push(@haircut)
+      @company.user_providers.push(@johnny)
+      @haircut  = Factory(:work_service, :name => "Haircut", :price_in_cents => 500, :company => @company)
       @user     = Factory(:user)
 
       # create appointment at 2 pm

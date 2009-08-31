@@ -36,28 +36,28 @@ class CalendarControllerTest < ActionController::TestCase
     # stub current location to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     # set the request hostname
-    @request.host = "www.peanut.com"
+    @request.host = "www.walnutcalendar.com"
   end
 
   def add_mary_and_johnny_as_providers
     # add johnny as a company provider
     @johnny = Factory(:user, :name => "Johnny")
-    @johnny.grant_role('user manager', @johnny)
-    @company.providers.push(@johnny)
+    # @johnny.grant_role('user manager', @johnny)
+    @company.user_providers.push(@johnny)
     @johnny.reload
     @company.reload
     @mary = Factory(:user, :name => "Mary")
-    @mary.grant_role('user manager', @mary)
-    @company.providers.push(@mary)
+    # @mary.grant_role('user manager', @mary)
+    @company.user_providers.push(@mary)
     @mary.reload
     @company.reload
   end
-  
+
   context "search company calendars without 'read calendars' privilege" do
     setup do
       get :index
     end
-  
+
     should_respond_with :redirect
     should_redirect_to("unauthorized_path") { unauthorized_path } 
     should_set_the_flash_to /You are not authorized/
@@ -77,7 +77,7 @@ class CalendarControllerTest < ActionController::TestCase
     setup do
       # add company provider
       @johnny = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
+      @company.user_providers.push(@johnny)
       # search as the company manager
       @controller.stubs(:current_user).returns(@owner)
       get :index

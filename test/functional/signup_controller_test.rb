@@ -85,7 +85,7 @@ class SignupControllerTest < ActionController::TestCase
       should "create company with user as a provider" do
         @company = Company.find_by_name('Peanut')
         @user    = User.find_by_email('walnut@jarna.com')
-        assert_equal [@user], @company.providers
+        assert_equal [@user], @company.user_providers
       end
 
       should_respond_with :redirect
@@ -118,13 +118,13 @@ class SignupControllerTest < ActionController::TestCase
       should "create user with roles 'company manager', 'company provider' on company" do
         @company = Company.find_by_name('Peanut')
         @user    = User.find_by_email('walnut@jarna.com')
-        assert_equal ['company manager', 'company provider'], assigns(:user).roles_on(@company).collect(&:name).sort
+        assert_equal ['company manager', 'company provider'], @user.roles_on(@company).collect(&:name).sort
       end
 
       should "create company with user as a provider" do
         @company = Company.find_by_name('Peanut')
         @user    = User.find_by_email('walnut@jarna.com')
-        assert_equal [@user], @company.providers
+        assert_equal [@user], @company.user_providers
       end
 
       should_change("promotion redemptions", :by => 1) { PromotionRedemption.count }

@@ -28,7 +28,7 @@ namespace :populate do
       provider = User.create(:name => Faker::Name.name, :email => Faker::Internet.free_email, :password => 'secret', :password_confirmation => 'secret')
       
       # add provider to company
-      company.providers.push(provider)
+      company.user_providers.push(provider)
       
       added += 1
     end

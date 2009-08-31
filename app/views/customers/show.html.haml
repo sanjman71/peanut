@@ -24,11 +24,12 @@
     .span-13.last
       %h3= mail_to(@customer.email)
       
-  .span-20.last.prepend-1
-    .span-2.text-align-right
-      %h3== Phone:
-    .span-13.last
-      %h3= @customer.phone
+  -if @customer.phone_numbers_count > 0
+    .span-20.last.prepend-1
+      .span-2.text-align-right
+        %h3== Phone:
+      .span-13.last
+        %h3= @customer.primary_phone_number.address
 
   .span-15.prepend-1
     -# notes flash message

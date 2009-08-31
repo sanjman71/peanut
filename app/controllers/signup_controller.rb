@@ -104,7 +104,7 @@ class SignupController < ApplicationController
       end
 
       # add user as company provider, which also grants user 'company provider' role
-      @company.providers.push(@user)
+      @company.user_providers.push(@user)
 
       unless @user.has_role?('company manager', @company)
         # add user as company manager

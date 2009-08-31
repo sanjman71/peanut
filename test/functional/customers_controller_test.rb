@@ -35,11 +35,11 @@ class CustomersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@user)
         get :index
       end
-      
+
       should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
-    
+
     context "and with 'read users' privilege" do
       setup do
         @controller.stubs(:current_user).returns(@owner)
@@ -52,7 +52,7 @@ class CustomersControllerTest < ActionController::TestCase
       should_assign_to :customers
       should_assign_to(:paginate) { true }
       should_not_assign_to :search, :search_text
-      
+
       should "find no customers" do
         assert_equal [], assigns(:customers)
       end
@@ -64,9 +64,10 @@ class CustomersControllerTest < ActionController::TestCase
       # create customer with a valid appointment
       @customer     = Factory(:user, :name => 'Booty Licious')
       @johnny       = Factory(:user, :name => "Johnny")
-      @company.providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00)
+      @company.user_providers.push(@johnny)
+      @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 1.00)
       @company.services.push(@haircut)
+      @haircut.user_providers.push(@johnny)
       @appointment  = Factory(:appointment_today, :company => @company, :customer => @customer, :provider => @johnny, :service => @haircut)
       assert @appointment.valid?
     end

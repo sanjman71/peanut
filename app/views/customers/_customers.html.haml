@@ -5,10 +5,8 @@
       %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email
       %br
       %span.customer.phone{:style => 'font-size: 1.3em;'}
-        - if customer.phone
-          = number_to_phone(customer.phone)
-          - if customer.sms?
-            %span{:style => 'color: #008800; font-size: 0.8em;'}== * text messaging
+        - if customer.phone_numbers_count > 0
+          = number_to_phone(customer.primary_phone_number.address)
         - else
           == &nbsp;
           

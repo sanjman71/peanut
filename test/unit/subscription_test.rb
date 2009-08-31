@@ -8,11 +8,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     @user = Factory(:user)
   end
   
-  context "subscription states" do
+  context "subscription state machine" do
     setup do
+      @company      = Factory(:company)
       @monthly_plan = Factory(:monthly_plan, :start_billing_in_time_amount => 0, :start_billing_in_time_unit => "days")
-      @subscription = Subscription.new(:user => @user, :plan => @monthly_plan)
-      @company      = Factory(:company, :subscription => @subscription)
+      @subscription = @company.create_subscription(:user => @user, :plan => @monthly_plan)
     end
 
     should_change("Subscription.count", :by => 1) { Subscription.count }
@@ -40,6 +40,17 @@ class SubscriptionTest < ActiveSupport::TestCase
         should "be in active state" do
           assert_equal "active", @subscription.state
         end
+      end
+    end
+
+    context "transition to active state" do
+      setup do
+        @subscription.active!
+        @subscription.reload
+      end
+
+      should "be in active state" do
+        assert_equal "active", @subscription.state
       end
     end
   end

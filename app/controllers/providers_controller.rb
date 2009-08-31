@@ -2,22 +2,22 @@ class ProvidersController < ApplicationController
   
   privilege_required 'read users', :only => [:index], :on => :current_company
   privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
-  
+
   @@per_page  = 10
-  
+
   # GET /providers
   def index
     # find all company providers
-    @providers  = current_company.providers.order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
+    @providers  = current_company.providers.paginate(:page => params[:page], :per_page => @@per_page)
     @paginate   = true
-    
+
     respond_to do |format|
       format.html
       format.js
       format.json { render(:json => @providers.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
-  
+
   # POST /providers/:id/toggle_manager
   def toggle_manager
     @user = User.find(params[:id])

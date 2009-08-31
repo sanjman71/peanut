@@ -8,14 +8,13 @@ namespace :noelrose do
 
     puts "#{Time.now}: creating noelrose users"
   
-    @max_plan       = Plan.find_by_name("Max") || Plan.first
+    @max_plan = Plan.find_by_name("Max") || Plan.first
   
     # create users  
     if (@erika = User.find_by_email("erika@peanut.com") )
       puts "user: erika@peanut.com already in db"
     else
-      @erika          = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", 
-                                    :password => "peanut", :password_confirmation => "peanut")
+      @erika = User.create(:name => "Erika Maechtle", :email => "erika@peanut.com", :password => "peanut", :password_confirmation => "peanut")
       @erika.register!
       @erika.activate!
     end
@@ -32,23 +31,24 @@ namespace :noelrose do
   end
   
   task :company do
-  
     @noelrose = Company.find_by_subdomain('noelrose')
-    if (@noelrose.nil?)  
-      # create subscriptions
-      @subscription = Subscription.create(:user => @erika, :plan => @max_plan)
-  
+
+    if @noelrose.blank?  
       puts "#{Time.now}: creating noelrose company"
-      # create test companies
-      @noelrose     = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)", :subscription => @subscription)
+      @noelrose = Company.create(:name => "Noel Rose", :time_zone => "Central Time (US & Canada)")
+    end
+
+    if @noelrose.subscription.blank?
+      # create subscription in 'active' state
+      @subscription = @noelrose.create_subscription(:user => @erika, :plan => @max_plan)
+      @subscription.active!
     end
 
     # add manager roles
     @erika.grant_role('company manager', @noelrose)
 
     # assign providers
-    @noelrose.providers.push(@erika) unless @noelrose.providers.include?(@erika)
-    
+    @noelrose.user_providers.push(@erika) unless @noelrose.user_providers.include?(@erika)
   end
   
   # Destroying the company will also destroy the services and providers
