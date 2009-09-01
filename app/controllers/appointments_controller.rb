@@ -494,24 +494,14 @@ class AppointmentsController < ApplicationController
   def find_customer_from_params!
     current_company.authorized_users.with_role(Company.customer_role).find(params[:customer_id])
   end
-  
+
   def appointment_free_time_scheduled_at(appointment)
     "#{appointment.start_at.to_s(:appt_short_month_day_year)} from #{appointment.start_at.to_s(:appt_time)} to #{appointment.end_at.to_s(:appt_time)}"
   end
-  
+
   def build_create_redirect_path(provider, referer)
     # default to the provider's calendar show
-    default_path  = url_for(:controller => 'calendar', :action => 'show', :provider_type => provider.tableize, :provider_id => provider.id, :subdomain => current_subdomain)
-    
-    return default_path if referer.blank?
-
-    if referer.match(/calendar/)
-      # use referer path
-      referer
-    else
-      # use default path
-      default_path
-    end
+    calendar_show_path = url_for(:controller => 'calendar', :action => 'show', :provider_type => provider.tableize, :provider_id => provider.id, :subdomain => current_subdomain)
   end
   
 end
