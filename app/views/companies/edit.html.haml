@@ -85,21 +85,26 @@
       - if @company.logo && @company.logo.id
         .span-6.last
           .span-6.last
-            = image_tag @company.logo.image.url
+            %h3 Current Logo:
           .span-6.last
+            = image_tag @company.logo.image.url
+          .span-6.last.padding-top-10
             - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
               - f.fields_for :logo do |lf|
                 = lf.hidden_field :_delete, {:value => '1'}
                 = lf.submit 'Delete', :class => 'button big'
       - else
+        - @company.build_logo # It's important to build the logo before making it's fields_for form below, otherwise you get a nil.new_record? error. It's equally important only to do this if the logo doesn't already exist. If you do this when it does exist, you will over-write the existing logo.
         .span-6.last
           No logo uploaded yet.
     .span-16.last
-      - @company.build_logo # It's important to build the logo before making it's fields_for form below, otherwise you get a nil.new_record? error
       - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :multipart => true, :method => :put } do |f|
         .span-16.last.padding-top-10
           .span-5
-            %h3==Upload a logo:
+            - if @company.logo && @company.logo.id
+              %h3==Upload a new logo:
+            - else
+              %h3==Upload a logo:
           .span-11.last
             - f.fields_for :logo do |lf|
               = lf.file_field :image
@@ -109,13 +114,16 @@
 %hr.space
 
 .span-22.prepend-1.append-1.last.mat.padding-top-10.padding-bottom-10
-  .span-6
+  .span-6.last
     %h2== Company Locations
-  .span-12.last
+  .span-22.last
     - if current_company.may_add_location?
       - if has_privilege?("update companies", current_company)
         = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
     - else
       = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(:subdomain => current_subdomain, :id => current_company.subscription)}"
-  .span-22
-    = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
+  .span-22.last
+    - if @company.locations.empty?
+      == You do not yet have any locations
+    - else
+      = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
