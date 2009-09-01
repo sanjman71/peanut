@@ -44,15 +44,15 @@ class WalnutDemo
   # ^.*find_by_email\((["a-zA-Z@\.]*).*\n.*\n.*\n.*:name => (["a-zA-Z@\.\ ]*),.*\n.*:password => (["a-zA-Z@\.]*).*\n.*\n.*\n.*
   # create_user($1, $2, $3)
   def create_user(user_email, user_name, user_pwd)
-    puts "create user: #{user_name}"
+    puts "create_user: #{user_name}"
     if (user = User.find_by_email(user_email))
-      puts "create user: #{user_email} already in db"
+      puts "create_user: #{user_email} already in db"
     else
       user = User.create(:name => user_name, :email => user_email, :password => user_pwd, :password_confirmation => user_pwd)
       user.register!
       user.activate!
     end
-    puts "finished creating user: #{user_name}"
+    puts "create_user: finished creating user #{user_name}"
     user
   end
   
@@ -78,7 +78,7 @@ class WalnutDemo
       # create resource
       resource = Resource.create(:name => name)
     end
-    puts "finished creating resource: #{name} for #{company.name}"
+    puts "create_resource: finished creating resource: #{name} for #{company.name}"
     resource
   end
   
@@ -114,7 +114,7 @@ class WalnutDemo
     puts "create_company: granting #{owner.name} company manager role on #{name}"
     owner.grant_role('company manager', company)
 
-    puts "create_company: finished initializing company #{name}"
+    puts "create_company: finished creating company #{name}"
     company
   end
   
@@ -131,7 +131,7 @@ class WalnutDemo
   
   def create_service(company, svc_name, users_or_resources, duration, price)
     # create services
-    puts "create_service #{svc_name} for #{company.name}"
+    puts "create_service: #{svc_name} for #{company.name}"
     svc = company.services.find_by_name(svc_name) || company.services.create(:name => svc_name, :duration => duration, :mark_as => "work", :price => price)
 
     # add service providers
@@ -139,14 +139,14 @@ class WalnutDemo
       if ur.class == User
         company.user_providers.push(ur) unless company.user_providers.include?(ur)
         svc.user_providers.push(ur) unless svc.user_providers.include?(ur)
-        puts "#{company.name}: Adding user provider #{ur.name}"
+        puts "create_service: Adding user provider #{ur.name} to #{company.name} for service #{svc_name}"
       elsif ur.class == Resource
         company.resource_providers.push(ur) unless company.resource_providers.include?(ur)
         svc.resource_providers.push(ur) unless svc.providers.include?(ur)
-        puts "#{company.name}: Adding resource provider #{ur.name}"
+        puts "create_service: Adding resource provider #{ur.name} to #{company.name} for service #{svc_name}"
       end
     end
-    puts "#{company.name}: finished creating service #{svc_name}"
+    puts "create_service: finished creating service #{svc_name} for #{company.name}"
   end
   
 end
