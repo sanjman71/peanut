@@ -61,27 +61,50 @@
 %hr.space
 
 .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
+  %h2 Company Preferences
+  - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
+
+    .span-20.last
+      .span-4
+        %h3{:style => 'padding-top: 7px;'}== Time Horizon:
+      .span-16.last
+        = f.select :preferences_time_horizon, time_horizon_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-16.prepend-4.last.directions
+        == Choose how far out you want people to be able to make appointments.
+    .span-20.last.padding-top-10
+      = f.submit 'Update Company Preferences', :class => 'button big'
+      == or
+      = link_to 'Cancel', openings_path
+      
+%hr.space
+
+.span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
   %h2 Company Logo
-  .span-20.last.padding-top-10
-    - if @company.logo && @company.logo.id
-      Current Logo is:
-      = image_tag @company.logo.image.url
-      - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
-        - f.fields_for :logo do |lf|
-          = lf.hidden_field :_delete, {:value => '1'}
-          = lf.submit 'Delete', :class => 'button big'
-    - else
-      No logo uploaded yet.
+  .span-23.last.padding-top-10
+    .span-6
+      - if @company.logo && @company.logo.id
+        .span-6.last
+          .span-6.last
+            = image_tag @company.logo.image.url
+          .span-6.last
+            - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
+              - f.fields_for :logo do |lf|
+                = lf.hidden_field :_delete, {:value => '1'}
+                = lf.submit 'Delete', :class => 'button big'
+      - else
+        .span-6.last
+          No logo uploaded yet.
+    .span-16.last
       - @company.build_logo # It's important to build the logo before making it's fields_for form below, otherwise you get a nil.new_record? error
-    - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :multipart => true, :method => :put } do |f|
-      .span-20.last.padding-top-10
-        .span-5
-          %h3==Upload a logo:
-        .span-15.last
-          - f.fields_for :logo do |lf|
-            = lf.file_field :image
-      .span-20.last.padding-top-10
-        = f.submit 'Upload', :class => 'button big'
+      - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :multipart => true, :method => :put } do |f|
+        .span-16.last.padding-top-10
+          .span-5
+            %h3==Upload a logo:
+          .span-11.last
+            - f.fields_for :logo do |lf|
+              = lf.file_field :image
+        .span-16.last.padding-top-10
+          = f.submit 'Upload', :class => 'button big'
 
 %hr.space
 

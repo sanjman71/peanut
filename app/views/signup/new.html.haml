@@ -88,6 +88,13 @@
         = f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones, {:include_blank => true}, {:style => 'margin: 0px;', :class => 'select big'}
       .span-16.prepend-4.last.directions
         == This is the timezone for your business.  Users will be shown available times and schedule appointments in this timezone. 
+    .span-20.last
+      .span-4
+        %h3{:style => 'padding-top: 7px;'}== Time Horizon:
+      .span-16.last
+        = f.select :preferences_time_horizon, time_horizon_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-16.prepend-4.last.directions
+        == Choose how far out you want people to be able to make appointments.
         
       -# end of company information 
     .span-20.last
