@@ -16,21 +16,37 @@ namespace :init do
   end
   
   desc "Create Demos"
-  task :create_demos do
+  task :create_demos => [:create_meatheads, :create_mctrucks, :create_maryssalon]
+
+  desc "Destroy Demos"
+  task :destroy_demos => [:destroy_meatheads, :destroy_mctrucks, :destroy_maryssalon]
+  
+  task :create_meatheads do
     m = Meatheads.new
     m.create
+  end
+  
+  task :destroy_meatheads do
+    m = Meatheads.new
+    m.destroy
+  end
+  
+  task :create_mctrucks do
     t = Mctrucks.new
     t.create
+  end
+  
+  task :destroy_mctrucks do
+    t = Mctrucks.new
+    t.destroy
+  end
+  
+  task :create_maryssalon do
     s = MarysSalonAndSpa.new
     s.create
   end
-
-  desc "Destroy Demos"
-  task :destroy_demos do
-    m = Meatheads.new
-    m.destroy
-    t = Mctrucks.new
-    t.destroy
+  
+  task :destroy_maryssalon do
     s = MarysSalonAndSpa.new
     s.destroy
   end
