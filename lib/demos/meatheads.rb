@@ -25,6 +25,13 @@ class Meatheads < WalnutDemo
 
   def initialize_company
     @meatheads = create_company(@meathead, "Meat Heads", "meatheads", "Max", "Central Time (US & Canada)")
+
+    @meatheads.slogan = SLOGAN
+    @meatheads.description = DESCRIPTION
+    meatheads_logo = File.new(File.join(File.dirname(__FILE__), "images", "truck.png"), 'rb')
+    @meatheads.logo = Logo.new
+    @meatheads.logo.image = meatheads_logo
+    @meatheads.save
   end
   
   def deinitialize_company
@@ -41,5 +48,19 @@ class Meatheads < WalnutDemo
   def destroy_appointments
   end
   
+  SLOGAN = "Work it out with us!"
+
+  DESCRIPTION = <<-END_DESCRIPTION
+    <p>Meatheads offers very special personal training services. Our staff are extremely </p>
+
+    <ol>
+       <li>a Van,a very good choice for those odd-jobs which require some extra capacity</li>
+       <li>14 feet, useful for moving a 1-2 bedroom apartment</li>
+       <li>17 feet, used to move a house</li>
+    </ol>
+
+    <p>We have a number of each type of truck, so there should be plenty of availability.</p>
+  END_DESCRIPTION
+
 end
 
