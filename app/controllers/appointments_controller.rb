@@ -1,13 +1,16 @@
 class AppointmentsController < ApplicationController
   before_filter :init_provider, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
   before_filter :init_provider_privileges, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
+  before_filter :init_appointment, :only => [:show]
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
+
+  privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
+  privilege_required_any  'update calendars', :only =>[:create_free, :create_block, :create_weekly], :on => [:provider, :current_company]
     
   privilege_required      'read work appointments', :only => [:index], :on => :current_company
-  privilege_required      'read %s appointments', :only => [:show], :on => :current_company
-  privilege_required_any  'update calendars', :only =>[:create_free, :create_block, :create_weekly], :on => [:provider, :current_company]
   privilege_required      'update work appointments', :only => [:complete], :on => :current_company
+  # privilege_required      'read %s appointments', :only => [:show], :on => :current_company
 
   def has_privilege?(p, authorizable=nil, user=nil)
     case p
@@ -118,17 +121,6 @@ class AppointmentsController < ApplicationController
     @service  = current_company.services.find_by_id(params[:service_id])
     @customer = User.find_by_id(params[:customer_id])
         
-    # begin
-    #   # find the provider, but beware that the send method can generate an exception
-    #   @provider = current_company.send(klass).find_by_id(id)
-    # rescue Exception => e
-    #   logger.debug("xxx create appointment error: #{e.message}")
-    #   flash[:error] = "Error creating appointment"
-    #   # set redirect path
-    #   @redirect_path = request.referer
-    #   return
-    # end
-    
     @mark_as        = params[:mark_as]
     @duration       = params[:duration].to_i if params[:duration]
     @start_at       = params[:start_at]
@@ -141,14 +133,17 @@ class AppointmentsController < ApplicationController
     # set default redirect path
     @redirect_path  = request.referer
     
-    # iterate over the specified dates
-    Array(params[:dates]).each do |date|
+    # iterator over the specified dates, if provided, or use single start_at date
+    @dates          = params[:dates] ?  Array(params[:dates]) : Array[@start_at]
+    
+    @dates.each do |date|
       begin
         case @mark_as
         when Appointment::WORK
           # build time range
-          @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-          @options        = {:time_range => @time_range}
+          # @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+          # @options        = {:time_range => @time_range}
+          @options        = Hash[:start_at => @start_at]
           # create work appointment
           @appointment    = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @options, :commit => true)
           # set redirect path
@@ -169,12 +164,10 @@ class AppointmentsController < ApplicationController
           # append to the flash message
           flash[:notice] += "<br/>A confirmation email will also be sent to #{@customer.email}"
           
-          # send confirmation
-          AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          # create log_entry
-          current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_confirmation],
-                                        :customer => @appointment.customer)
+          # # create log_entry
+          # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
+          #                               :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_confirmation],
+          #                               :customer => @appointment.customer)
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
@@ -193,12 +186,10 @@ class AppointmentsController < ApplicationController
           # set redirect path
           @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
           flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
-          # send confirmation
-          AppointmentScheduler.send_confirmation(@appointment, :email => true, :sms => false)
-          # create log_entry
-          current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-                                        :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:added_to_waitlist],
-                                        :customer => @appointment.customer)
+          # # create log_entry
+          # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
+          #                               :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:added_to_waitlist],
+          #                               :customer => @appointment.customer)
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")
@@ -283,6 +274,7 @@ class AppointmentsController < ApplicationController
     end
   end
 
+  # POST /book/work/users/7/services/4/60/20090901T060000
   # anyone can create work appointments
   def create_work
     create
@@ -476,6 +468,10 @@ class AppointmentsController < ApplicationController
 
   protected
 
+  def init_appointment
+    @appointment = Appointment.find(params[:id])
+  end
+  
   # find appointment from the params hash
   def find_appointment_from_params
     current_company.appointments.find(params[:id])

@@ -12,18 +12,18 @@
 %hr.space
 
 - form_for(@appointment, :url => url_for(:action => "create_#{@appointment.mark_as}", :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
-  = hidden_field_tag :provider_type, @provider.tableize
-  = hidden_field_tag :provider_id, @provider.id
-  = hidden_field_tag :service_id, @service.id
   = hidden_field_tag :customer_id, @customer.id
-  = hidden_field_tag :dates, @appt_date
-  = hidden_field_tag :mark_as, @mark_as
-  = hidden_field_tag :start_at, @appt_time_start_at
-  = hidden_field_tag :end_at, @appt_time_end_at
-  = hidden_field_tag :duration, @duration
-  = hidden_field_tag :when, @when.to_url_param unless @when.blank?
-  = hidden_field_tag :time, @time.to_url_param unless @time.blank?
-  = hidden_field_tag :type, @type
+  -#= hidden_field_tag :provider_type, @provider.tableize
+  -#= hidden_field_tag :provider_id, @provider.id
+  -#= hidden_field_tag :service_id, @service.id
+  -#= hidden_field_tag :dates, @appt_date
+  -#= hidden_field_tag :mark_as, @mark_as
+  -#= hidden_field_tag :start_at, @appt_time_start_at
+  -#= hidden_field_tag :end_at, @appt_time_end_at
+  -#= hidden_field_tag :duration, @duration
+  -#= hidden_field_tag :when, @when.to_url_param unless @when.blank?
+  -#= hidden_field_tag :time, @time.to_url_param unless @time.blank?
+  -#= hidden_field_tag :type, @type
   
   - unless @appointment.errors.blank?
     -# show any appointment errors

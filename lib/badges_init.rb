@@ -18,6 +18,7 @@ module BadgesInit
     cp    = Badges::Role.find_by_name('company provider') || Badges::Role.create(:name=>"company provider")
     cc    = Badges::Role.find_by_name('company customer') || Badges::Role.create(:name=>"company customer")
     um    = Badges::Role.find_by_name('user manager') || Badges::Role.create(:name=>"user manager")
+    am    = Badges::Role.find_by_name('appointment manager') || Badges::Role.create(:name=>"appointment manager")
     sm    = Badges::Role.find_by_name('site manager') || Badges::Role.create(:name=>"site manager")
 
     site(sm)
@@ -26,6 +27,7 @@ module BadgesInit
     resources(cm, cp, um)
     calendars(cm, cp, um)
     services(cm, cp, um)
+    appointments(cm, am)
   end
 
   def self.site(sm)
@@ -126,5 +128,15 @@ module BadgesInit
 
     # company providers can read services
     Badges::RolePrivilege.create(:role=>cp, :privilege=>rs)
+  end
+  
+  def self.appointments(cm, am)
+    ma = Badges::Privilege.find_or_create_by_name(:name=>"manage appointments")
+    
+    # company mangers can manage all appointments
+    Badges::RolePrivilege.create(:role=>cm, :privilege=>ma)
+    
+    # appointment managers can manage their own appointments
+    Badges::RolePrivilege.create(:role=>am, :privilege=>ma)
   end
 end

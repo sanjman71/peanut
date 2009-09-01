@@ -29,8 +29,11 @@ class AppointmentTest < ActiveSupport::TestCase
     @provider       = Factory(:user, :name => "Provider")
     @company.user_providers.push(@provider)
     @company.reload
-    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :company => @company)
+    @work_service   = Factory.build(:work_service, :name => "Work service", :price => 1.00)
+    @company.services.push(@work_service)
+    @work_service.user_providers.push(@provider)
     @free_service   = @company.free_service
+    @customer       = Factory(:user)
   end
   
   context "create free appointment with mismatched duration and end_at values" do
@@ -102,7 +105,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
   end
   
-  context "create free time" do
+  context "create free appointment" do
     setup do
       # create free time from 10 am to 12 pm
       @johnny         = Factory(:user, :name => "Johnny")
@@ -266,28 +269,19 @@ class AppointmentTest < ActiveSupport::TestCase
     should_change("Appointment.count", :by => 1) { Appointment.count }
   end
   
-  context "create an afternoon appointment to test time overlap searching" do
+  context "create work appointment to check time overlap searching" do
     setup do
-      @johnny   = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
-      @haircut  = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-      @haircut.user_providers.push(@johnny)
-      @user     = Factory(:user)
-  
       # start at 2 pm, local time
       @start_at_local = Time.zone.now.beginning_of_day + 14.hours
       @start_at_utc   = @start_at_local.utc
       
-      # create appointment at 2 pm
-      @appt     = Appointment.create(:company => @company,
-                                     :service => @haircut,
-                                     :provider => @johnny,
-                                     :customer => @user,
-                                     :start_at => @start_at_local,
-                                     :duration => @haircut.duration)
+      @appt = @company.appointments.create(:service => @work_service,
+                                           :provider => @provider,
+                                           :customer => @customer,
+                                           :start_at => @start_at_local,
+                                           :duration => @work_service.duration)
   
       assert_valid @appt
-      
       @end_at_utc = @appt.end_at.utc
     end
     
@@ -306,6 +300,33 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal [], Appointment.time_overlap(Appointment.time_range("morning"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("evening"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
+    end
+  end
+  
+  context "create work appointment to check appointment roles and privileges" do
+    setup do
+      # initialize roles and privileges
+      BadgesInit.roles_privileges
+
+      # start at 2 pm, local time
+      @start_at_local = Time.zone.now.beginning_of_day + 14.hours
+
+      @appt = @company.appointments.create(:service => @work_service,
+                                           :provider => @provider,
+                                           :customer => @customer,
+                                           :start_at => @start_at_local,
+                                           :duration => @work_service.duration)
+  
+      assert_valid @appt
+      @end_at_utc = @appt.end_at.utc
+    end
+    
+    should "grant customer 'appointment manager' privilege" do
+      assert_equal ['appointment manager'], @customer.roles_on(@appt).collect(&:name).sort
+    end
+    
+    should "grant provider 'appointment manager' privilege" do
+      assert_equal ['appointment manager'], @provider.roles_on(@appt).collect(&:name).sort
     end
   end
   

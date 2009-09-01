@@ -76,7 +76,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
-
+  
         # book a haircut with johnny during his free time
         get :new, 
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
@@ -86,7 +86,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("login_path") { login_path }
     end
-
+  
     context "being logged in as a customer" do
       setup do
         # create free time from 9 am to 11 am local time
@@ -105,7 +105,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
             :duration => @haircut.duration, :mark_as => 'work'
       end
-
+  
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
     
@@ -132,7 +132,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_respond_with :redirect
     should_redirect_to("unauthorized_path") { unauthorized_path }
   end
-
+  
   context "create free appointment for a single date" do
     setup do
       # have johnny create free appointments on his calendar
@@ -149,11 +149,11 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to(:start_at)  { "0900" }
     should_assign_to(:end_at) { "1100" }
     should_assign_to(:mark_as) {"free" }
-
+  
     should_respond_with :redirect
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
-
+  
   context "create free appointment for a block of dates" do
     setup do
       # have johnny create free appointments on his calendar
@@ -170,7 +170,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to(:start_at) { "0900" }
     should_assign_to(:end_at) { "1100" }
     should_assign_to(:mark_as)  { "free" }
-
+  
     should_respond_with :redirect
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
@@ -195,7 +195,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:free_service) { @free_service }
-
+  
       should_respond_with :redirect
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
@@ -208,10 +208,10 @@ class AppointmentsControllerTest < ActionController::TestCase
              {:freq => 'weekly', :byday => 'mo,tu', :dstart => "20090201", :tstart => "090000", :tend => "110000", :until => '20090515',
               :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
-
+  
       should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
       should_change("Appointment.count", :by => 1) { Appointment.count }
-
+  
       should_assign_to(:freq) { "WEEKLY" }
       should_assign_to(:byday) { "MO,TU" }
       should_assign_to(:dtstart) { "20090201T090000" }
@@ -219,12 +219,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20090515T000000Z" }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:free_service) { @free_service }
-
+  
       should_respond_with :redirect
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
   end
-
+  
   context "build work appointment for a single date with free time" do
     context "not logged in" do
       setup do
@@ -233,7 +233,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
-
+  
         # book a haircut with johnny during his free time
         get :new, 
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
@@ -243,7 +243,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to("login_path") { login_path }
     end
-
+  
     context "logged in as a customer" do
       setup do
         # create free time from 9 am to 11 am local time
@@ -251,16 +251,16 @@ class AppointmentsControllerTest < ActionController::TestCase
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
-
+  
         # stub current user
         @controller.stubs(:current_user).returns(@customer)
-
+  
         # book a haircut with johnny during his free time
         get :new,
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
             :duration => @haircut.duration, :mark_as => 'work'
       end
-
+  
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
     
@@ -302,13 +302,16 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.now.utc.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+
+      @start_at       = "#{@today}T0900"
+      @duration       = @time_range.duration
   
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
   
       # create work appointment, today from 9 am to 11 am
       post :create_work,
-           {:dates => @today, :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
+           {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
       @free_appt.reload
     end
@@ -324,11 +327,11 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }
-    should_assign_to(:start_at)  { "0900" }
-    should_assign_to(:end_at)  { "1100" }
+    should_assign_to(:start_at)  { @start_at }
+    should_not_assign_to(:end_at)
     should_assign_to(:duration) { 120 }
     should_assign_to(:mark_as) { "work" }
-  
+      
     should "have appointment duration of 120 minutes" do
       assert_equal 120, assigns(:appointment).duration
       assert_equal 9, assigns(:appointment).start_at.hour
@@ -336,7 +339,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       assert_equal 11, assigns(:appointment).end_at.hour
       assert_equal 0, assigns(:appointment).end_at.min
     end
-  
+      
     should_respond_with :redirect
     should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
   end
@@ -347,17 +350,20 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.now.utc.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-  
+
+      @start_at       = "#{@today}T1000"
+      @duration       = @time_range.duration
+
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-      
+
       # create work appointment, today from 10 am to 10:30 am local time
       post :create_work,
-           {:dates => @today, :start_at => "1000", :end_at => "1030", :provider_type => "users", :provider_id => "#{@johnny.id}",
+           {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
       @free_appt.reload
     end
-    
+
     # free appointment and work appointment coexist
     should_change("Appointment.count", :by => 2) { Appointment.count }
 
@@ -365,12 +371,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "have two capacity slots" do
       assert_equal 2, @free_appt.capacity_slots.size
     end
-  
+
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }
-    should_assign_to(:start_at)  { "1000" }
-    should_assign_to(:end_at) { "1030" }
+    should_assign_to(:start_at)  { @start_at }
+    should_not_assign_to(:end_at)
     should_assign_to(:duration) { 30 }
     should_assign_to(:mark_as) { "work" }
     
@@ -393,28 +399,31 @@ class AppointmentsControllerTest < ActionController::TestCase
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
   
+      @start_at       = "#{@today}T1000"
+      @duration       = 120
+  
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
   
       # create work appointment, today from 10 am to 12 pm local time
       post :create_work,
-           {:dates => @today, :start_at => "1000", :end_at => "1200", :provider_type => "users", :provider_id => "#{@johnny.id}",
+           {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
       @free_appt.reload
     end
-
+  
     # free appointment should coexist with 1 work appointment
     should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have two capacity slots" do
       assert_equal 2, @free_appt.capacity_slots.size
     end
-
+  
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }
-    should_assign_to(:start_at) { "1000" }
-    should_assign_to(:end_at)  { "1200" }
+    should_assign_to(:start_at) { @start_at }
+    should_not_assign_to(:end_at)
     should_assign_to(:duration)  { 120 }
     should_assign_to(:mark_as) { "work" }
     should_assign_to :appointment
@@ -447,12 +456,12 @@ class AppointmentsControllerTest < ActionController::TestCase
           {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :provider_type => @johnny.tableize, :provider_id => @johnny.id,
            :service_id => @haircut.id, :mark_as => 'wait'}
     end
-
+  
     should_respond_with :success
     should_render_template 'appointments/new.html.haml'
-
+  
     should_not_change("Appointment.count") { Appointment.count }
-
+  
     should_assign_to :daterange
     should_assign_to :appointment
     
@@ -495,25 +504,25 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         # get 'anyone' user
         @anyone = User.anyone
-
+  
         # stub current user
         @controller.stubs(:current_user).returns(@customer)
-
+  
         # create waitlist appointment
         post :create_wait,
              {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @anyone.tableize, :provider_id => @anyone.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
       end
-
+  
       should_change("Appointment.count", :by => 1) { Appointment.count }
-
+  
       should_assign_to(:service) { @haircut }
       should_not_assign_to(:duration)
       should_not_assign_to(:provider) # provider should be empty
       should_assign_to(:customer) { @customer }
       should_assign_to(:mark_as) { "wait" }
       should_assign_to(:appointment)
-
+  
       should_respond_with :redirect
       should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
     end
