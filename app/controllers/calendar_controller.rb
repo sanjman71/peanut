@@ -11,7 +11,7 @@ class CalendarController < ApplicationController
   
   def index
     # redirect to a specific provider, try the current first and default to the first company provider
-    provider = current_company.user_providers.find_by_id(current_user.id) || current_company.user_providers.first
+    provider = current_company.user_providers.find_by_id(current_user.id) || current_company.providers.first
     if provider.blank?
       redirect_to root_path(:subdomain => current_subdomain) and return
     end
