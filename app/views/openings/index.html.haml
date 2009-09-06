@@ -10,7 +10,10 @@
 .span-16.services.hide
   - @sps.each do |sp|
     .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
-          
+  
+.span-24.last
+  = display_flash(:all)
+
 - unless @daterange.blank?
   .span-15.prepend-1.append-1
     .span-15.last.padding-top-10

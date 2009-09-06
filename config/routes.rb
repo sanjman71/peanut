@@ -9,6 +9,10 @@ ActionController::Routing::Routes.draw do |map|
   map.rpx_customer  '/rpx/customer',  :controller => 'rpx', :action => 'customer'
   # map.rpx_provider  '/rpx/provider',  :controller => 'rpx', :action => 'provider'
 
+  # password routes
+  map.password_forgot '/password/forgot', :controller => 'passwords', :action => 'forgot'
+  map.password_reset  '/password/reset', :controller => 'passwords', :action => 'reset', :conditions => {:method => :post}
+  
   # user activation
   map.activate      '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 
 
@@ -21,8 +25,11 @@ ActionController::Routing::Routes.draw do |map|
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
+
+  map.provider_assign         '/providers/:id/assign',        :controller => 'providers', :action => 'assign',:conditions => {:method => :put}
+  map.provider_assign_prompt  '/providers/:id/assign/prompt', :controller => 'providers', :action => 'assign_prompt',:conditions => {:method => :get}
   
-  map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
+  map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post }
   map.connect   '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
   map.connect   '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
   map.connect   '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
@@ -62,6 +69,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
+  map.resources :reports, :only => [:index, :show], :member => {:format => :post}
+  map.resources :history, :only => [:index]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlist, :only => [:index]
@@ -132,7 +141,7 @@ ActionController::Routing::Routes.draw do |map|
   map.update_subscription '/subscriptions/:id/plan/:plan_id', :controller => 'subscriptions', :action => 'update', :conditions => {:method => :get}
 
   map.resources :promotions, :only => [:new, :create, :index]
-  map.resources :invitations, :only => [:new, :create]
+  map.resources :invitations, :only => [:new, :create], :member => {:resend => :get}
   map.resource  :session
 
   # Messages controller

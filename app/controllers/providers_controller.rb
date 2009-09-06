@@ -2,6 +2,7 @@ class ProvidersController < ApplicationController
   
   privilege_required 'read users', :only => [:index], :on => :current_company
   privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
+  privilege_required 'create users', :only => [:assign, :assign_prompt], :on => :current_company
 
   @@per_page  = 10
 
@@ -39,4 +40,26 @@ class ProvidersController < ApplicationController
     end
   end
   
+  # GET /providers/:id/assign_prompt
+  def assign_prompt
+    @user   = User.find(params[:id])
+    @email  = @user.primary_email_address
+    @title  = "Assign user as a company provider"
+
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  # PUT /providers/:id/assign
+  def assign
+    @user = User.find(params[:id])
+    
+    unless current_company.user_providers.include?(@user)
+      # current_company.user_providers.push(@user)
+      flash[:notice] = "Added user #{@user.name} as a company provider"
+    end
+    
+    redirect_to(providers_path) and return
+  end
 end

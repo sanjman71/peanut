@@ -274,7 +274,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:appt_time_end_at) { "0930" }
     end
   end
-
+  
   context "create work appointment for a single date that has no free time" do
     setup do
       # have johnny create free appointments on his calendar
@@ -302,7 +302,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.now.utc.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-
+  
       @start_at       = "#{@today}T0900"
       @duration       = @time_range.duration
   
@@ -315,7 +315,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :duration => 120, :customer_id => @customer.id, :mark_as => 'work'}
       @free_appt.reload
     end
-
+  
     # free appointment and work appointment coexist
     should_change("Appointment.count", :by => 2) { Appointment.count }
     
@@ -323,7 +323,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should "have no capacity slots" do
       assert_equal 0, @free_appt.capacity_slots.size
     end
-
+  
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }
@@ -350,28 +350,28 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.now.utc.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-
+  
       @start_at       = "#{@today}T1000"
       @duration       = @time_range.duration
-
+  
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-
+  
       # create work appointment, today from 10 am to 10:30 am local time
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :duration => 30, :customer_id => @customer.id, :mark_as => 'work'}
       @free_appt.reload
     end
-
+  
     # free appointment and work appointment coexist
     should_change("Appointment.count", :by => 2) { Appointment.count }
-
+  
     # There should be two available capacity slots
       should "have two capacity slots" do
       assert_equal 2, @free_appt.capacity_slots.size
     end
-
+  
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }
@@ -440,6 +440,63 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
   end
   
+  context "create work appointment" do
+    context "with a new customer signup" do
+      setup do
+        # create free time from 9 am to 3 pm local time
+        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
+        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+        
+        @start_at       = "#{@today}T1000"
+        @duration       = 120
+        @anyone         = User.anyone
+
+        # create work appointment as anonymous user
+        @controller.stubs(:current_user).returns(nil)
+  
+        # create work appointment, today from 10 am to 12 pm local time
+        post :create_work,
+             {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+              :service_id => @haircut.id, :duration => 120, :customer_id => @anyone.id, :mark_as => 'work',
+              :customer => {:name => "Sanjay", :email => "sanjay@jarna.com"}}
+        @free_appt.reload
+      end
+
+      # create new customer
+      should_change("User.count", :by => 1) { User.count}
+
+      # free appointment should coexist with 1 work appointment
+      should_change("Appointment.count", :by => 2) { Appointment.count }
+
+      should "have two capacity slots" do
+        assert_equal 2, @free_appt.capacity_slots.size
+      end
+
+      should_assign_to(:service) { @haircut }
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:customer) { User.find_by_email("sanjay@jarna.com") }
+      should_assign_to(:start_at) { @start_at }
+      should_not_assign_to(:end_at)
+      should_assign_to(:duration)  { 120 }
+      should_assign_to(:mark_as) { "work" }
+      should_assign_to :appointment
+
+      should "create user in active state" do
+        user = User.find_by_email("sanjay@jarna.com")
+        assert_equal 'active', user.state
+      end
+
+      should "set the flash for the appointment and user account" do
+        assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
+        assert_match /Your user account has been created/, flash[:notice]
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("openings path") { "/openings" }
+    end
+  end
+
   context "request a waitlist appointment for a date range" do
     setup do
       # stub the current user and logged_in? state

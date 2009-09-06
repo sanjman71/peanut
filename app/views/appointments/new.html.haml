@@ -31,7 +31,7 @@
       = error_messages_for('appointment', :header_message => nil)
       
   .span-16.last
-    = render :partial => 'appointment', :locals => {:appointment => @appointment}
+    = render :partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => @customer_signup}
     
   %hr.space
   

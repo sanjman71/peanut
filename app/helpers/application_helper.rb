@@ -12,7 +12,7 @@ module ApplicationHelper
   def stylesheet(*files)
     content_for(:stylesheet) { stylesheet_link_tag(*files) }
   end
-    
+
   FLASH_TYPES = [:error, :warning, :success, :message, :notice]
 
   def display_flash(force = false)
@@ -21,7 +21,7 @@ module ApplicationHelper
       render :partial => "shared/flash.html.haml", :object => (flash.nil? ? {} : flash)
     end
   end
-  
+
   def build_tab_links(current_controller)
     # 'Openings' tab
     name    = 'Openings'
@@ -56,20 +56,6 @@ module ApplicationHelper
       klasses = []
 
       if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
-        klasses.push('current')
-      end
-
-      yield name, path, klasses
-    end
-
-    if has_role?('company customer', current_company)
-
-      # 'Appointments' tab for customer work appointments
-      name    = 'Appointments'
-      path    = customer_appointments_path(current_user)
-      klasses = []
-
-      if current_controller.controller_name == 'appointments' and ['index', 'search', 'show'].include?(current_controller.action_name)
         klasses.push('current')
       end
 
@@ -112,6 +98,35 @@ module ApplicationHelper
       klasses = []
 
       if current_controller.controller_name == 'providers' and ['index', 'show', 'edit'].include?(current_controller.action_name)
+        klasses.push('current')
+      end
+
+      yield name, path, klasses
+    end
+
+    if has_role?('company provider', current_company)
+    # if has_privilege?('read calendars', current_company) || has_privilege?('read calendars', current_user)
+
+      # 'Reports' tab
+      name    = 'Reports'
+      path    = reports_path
+      klasses = []
+
+      if current_controller.controller_name == 'reports' and ['index'].include?(current_controller.action_name)
+        klasses.push('current')
+      end
+
+      yield name, path, klasses
+    end
+
+    if has_role?('company customer', current_company)
+
+      # 'History' tab for customer appointments
+      name    = 'History'
+      path    = history_index_path
+      klasses = []
+
+      if current_controller.controller_name == 'history' and ['index', 'show'].include?(current_controller.action_name)
         klasses.push('current')
       end
 

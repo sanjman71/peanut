@@ -1,0 +1,15 @@
+- title(@title)
+
+.span-23.prepend-1.mat.padding-top-10.padding-bottom-20
+  %h2= @title
+
+%hr.space
+
+.span-23.prepend-1
+  %h4{:style => 'font-size: 1.5em;'}
+    == User #{@email.address} already exists.
+    == Would you like to add the user as a company provider?
+    
+  = link_to 'Yes, add as provider', provider_assign_path(@user.id), :method => :put, :class => 'rounded button color', :style => 'padding: 3px 7px;'
+  %span{:style => 'padding-left: 3px;'}== or
+  %span{:style => 'padding-left: 3px; font-size: 1.3em;'}= link_to 'No thanks', providers_path, :class => 'admin'

@@ -257,6 +257,14 @@ $.fn.convert_time_ampm_to_string = function(s) {
   return value
 }
 
+function validate_email_address(email_address) {
+  var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  if (email_regex.test(email_address) == false) {
+    return false;
+  }
+  return true
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();

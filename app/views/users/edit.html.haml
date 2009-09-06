@@ -1,14 +1,14 @@
 - title('Edit User')
 - stylesheet('users', 'notes')
-- javascript('notes')
+- javascript('users', 'notes')
 
 - form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :role => @role, :subdomain => current_subdomain), :method => :post) do |f|
   
   .span-23.prepend-1.last.mat.padding-bottom-20
-    %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit #{@role.titleize}
-  
+    %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
+
   %hr.space
-  
+
   -# show any user errors
   - unless @user.errors.blank?
     .span-16.notice
@@ -21,7 +21,7 @@
     .span-16.last
       = f.text_field :name, :class => 'text title', :style => "width: 300px;"
   
-  -# email
+  -# email, nested model
   - f.fields_for :email_addresses do |email_form|
     .span-20.last
       .span-4.text-align-right
@@ -33,9 +33,29 @@
   - f.fields_for :phone_numbers do |phone_form|
     .span-20.last
       .span-4.text-align-right
-        %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "user_phone", "Phone:"
+        %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
       .span-16.last
-        = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_phone'
+        = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
+    .span-20.last
+      .span-4.text-align-right
+        %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
+      .span-16.last
+        = phone_form.text_field :name, :class => 'text title', :style => "width: 300px;", :id => 'phone_name'
+        %em{:style => 'padding-left: 5px;'}== e.g. Mobile, Work, Other
+
+  -# password
+  .span-20.last
+    .span-4.text-align-right
+      %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_password", "Password:"
+    .span-16.last
+      = f.password_field :password, :class => 'text title', :style => "width: 300px;"
+
+  -# password confirmation
+  .span-20.last
+    .span-4.text-align-right
+      %h3{:style => 'font-size: 1.3em; padding-top: 20px;'}= label_tag "user_password", "Password Again:"
+    .span-16.last
+      = f.password_field :password_confirmation, :class => 'text title', :style => "width: 300px;"
 
   -# mobile carrier
   -#.span-20.last
@@ -47,7 +67,7 @@
   %hr.space
 
   .span-20.prepend-1.last.submit
-    = submit_tag "Save Changes"
+    = submit_tag "Save Changes", :id => 'user_update_submit'
     == or
     = link_to "Cancel", @index_path, :class => 'admin'
 

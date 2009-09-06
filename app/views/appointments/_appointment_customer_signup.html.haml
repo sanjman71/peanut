@@ -1,0 +1,17 @@
+.span-15.last
+  .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
+    == Name:
+  .span-12.last
+    = text_field_tag 'customer[name]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+
+.span-15.last
+  .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
+    == Email:
+  .span-12.last
+    = text_field_tag 'customer[email]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+
+.span-15.last
+  .span-3.label
+    == &nbsp;
+  .span-12.last
+    %em.hide#customer_email_validate_message== &nbsp; 

@@ -11,23 +11,23 @@ class SessionsController < ApplicationController
       @signup = false
       render(:action => 'new', :layout => 'home')
     else
-      # use default layout, signups are allowed
-      @signup = true
+      # use default layout, disable signups
+      @signup = false
       render(:action => 'new')
     end
   end
 
   def create
     logout_keeping_session!
-    
+
     # authenticate user
     user = User.authenticate(params[:email], params[:password])
-    
+
     if user
       # Protects against session fixation attacks, causes request forgery
       # protection if user resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
-      
+
       redirect_path = session_initialize(user)
       redirect_back_or_default(redirect_path) and return
     else
@@ -41,8 +41,8 @@ class SessionsController < ApplicationController
         @signup = false
         render(:action => 'new', :layout => 'home')
       else
-        # use default layout, signups are allowed
-        @signup = true
+        # use default layout, disable signup
+        @signup = false
         render :action => 'new'
       end
     end

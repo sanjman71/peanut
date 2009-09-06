@@ -2,13 +2,9 @@ require 'test/test_helper'
 
 class UsersControllerTest < ActionController::TestCase
 
-  # user notify route
-  should_route :get,  '/users/1/notify/create', :controller => 'users', :action => 'notify', :id => '1', :type => 'create'
-
   # Don't have the patience to test all these routes:
   # map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete }
 
-  should_route :get, '/users/1/notify/reset',   :controller => 'users', :action => 'notify', :id => "1", :type => "reset"
   should_route :get, '/providers/new',          :controller => 'users', :action => 'new', :role => 'company provider'
   should_route :post, '/providers/create',      :controller => 'users', :action => 'create', :role => 'company provider'
   should_route :get, '/providers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company provider', :id => "1"
@@ -34,7 +30,7 @@ class UsersControllerTest < ActionController::TestCase
     @controller   = UsersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
-    @customer     = Factory(:user, :name => "Customer")
+    @customer     = Factory(:user, :name => "Customer", :password => 'customer', :password_confirmation => 'customer', :email => 'customer@walnut.com')
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
@@ -466,8 +462,7 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(nil)
         get :edit, :id => @customer.id, :role => 'company customer'
       end
-    
-      should_respond_with :redirect
+
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
   
@@ -477,8 +472,7 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@user)
         get :edit, :id => @customer.id, :role => 'company customer'
       end
-  
-      should_respond_with :redirect
+
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
   
@@ -491,7 +485,7 @@ class UsersControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template "users/edit.html.haml"
     
-      should_assign_to(:index_path) {"/customers"}
+      should_assign_to(:index_path) { openings_path }
     end
   end
   
@@ -501,8 +495,7 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(nil)
         put :update, :id => @customer.id, :user => {:name => "Customer Chg"}, :role => 'company customer'
       end
-    
-      should_respond_with :redirect
+
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
   
@@ -513,18 +506,69 @@ class UsersControllerTest < ActionController::TestCase
         put :update, :id => @customer.id, :user => {:name => "Customer Chg"}, :role => 'company customer'
       end
   
-      should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
-  
+
     context "with 'update users' privilege" do
-      setup do
-        @controller.stubs(:current_user).returns(@owner)
-        put :update, :id => @customer.id, :user => {:name => "Customer Chg"}, :role => 'company customer'
+      context "and change name" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, :id => @customer.id, :role => 'company customer', :user => {:name => "Customer Chg", :password => '', :password_confirmation => ''}
+        end
+
+        should "change name" do
+          customer = User.find_by_email(@customer.email)
+          assert_equal "Customer Chg", customer.name
+        end
+
+        should "not change password" do
+          customer = User.find_by_email(@customer.email)
+          assert User.authenticate(customer.email, 'customer')
+        end
+
+        should_redirect_to("openings path") { openings_path }
       end
-    
-      should_respond_with :redirect
-      should_redirect_to('/customers') { "/customers" }
+
+      context "and change password" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, :id => @customer.id, :role => 'company customer', :user => {:password => "secret", :password_confirmation => "secret"}
+        end
+
+        should "change password" do
+          customer = User.find_by_email(@customer.email)
+          assert User.authenticate(customer.email, 'secret')
+        end
+
+        should_redirect_to("openings path") { openings_path }
+      end
+
+      context "and change email" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          @email = @customer.primary_email_address
+          put :update, :id => @customer.id, :role => 'company customer', :user => {:email_addresses_attributes => {"0" => {:address => "anyone@walnut.com", :id => @email.id}}}
+        end
+        
+        should "change email" do
+          @customer.reload
+          @email = @customer.primary_email_address
+          assert_equal "anyone@walnut.com", @email.address
+        end
+      end
+
+      context "and add phone number" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, :id => @customer.id, :role => 'company customer', :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
+        end
+        
+        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+        
+        should "add user phone number" do
+          assert_equal ["6501239999"], @customer.phone_numbers.collect(&:address)
+        end
+      end
     end
   end
 end

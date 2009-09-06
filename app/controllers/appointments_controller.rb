@@ -51,10 +51,10 @@ class AppointmentsController < ApplicationController
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
-    if !logged_in?
-      flash[:notice] = "To finalize your appointment, please log in or sign up."
-      redirect_to(login_path) and return
-    end
+    # if !logged_in?
+    #   flash[:notice] = "To finalize your appointment, please log in or sign up."
+    #   redirect_to(login_path) and return
+    # end
 
     @provider = init_provider(:default => nil)
 
@@ -72,16 +72,23 @@ class AppointmentsController < ApplicationController
       # build the work appointment parameters
       @duration             = params[:duration].to_i if params[:duration]
       @start_at             = params[:start_at]
-      @options              = {:start_at => @start_at}
+      @date_time_options    = Hash[:start_at => @start_at]
+      @options              = Hash[:commit => false]
+
+      # allow customer to be created during this process
+      if @customer.blank?
+        @customer             = User.anyone
+        @customer_signup      = true
+      end
 
       # build the work appointment without committing the changes
-      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @options, :commit => false)
-    
+      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
+
       # set appointment date, start_at and end_at times in local time
       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
       @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
       @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
-      
+
       # set title
       @title                = "Book Appointment"
     when Appointment::WAIT
@@ -161,8 +168,14 @@ class AppointmentsController < ApplicationController
             flash[:notice]  = "Your #{@service.name} appointment has been confirmed, and your old appointment has been canceled."
           end
           
-          # append to the flash message
-          flash[:notice] += "<br/>A confirmation email will also be sent to #{@customer.email}"
+          # tell the user their confirmation email is being sent
+          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email}"
+          
+          if !logged_in?
+            @redirect_path = openings_path(:subdomain => @subdomain)
+            # tell the user their account has been created
+            flash[:notice] += "<br/>Your user account has been created and your password will be sent to #{@customer.email}"
+          end
           
           # # create log_entry
           # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
@@ -277,6 +290,14 @@ class AppointmentsController < ApplicationController
   # POST /book/work/users/7/services/4/60/20090901T060000
   # anyone can create work appointments
   def create_work
+    # check for a customer signup
+    if params[:customer]
+      # create new user, assign a random password
+      @customer = User.create_or_reset_with_random_password(params[:customer][:email], :name => params[:customer][:name])
+      # assign the customer id
+      params[:customer_id] = @customer.id
+    end
+    
     create
   end
 

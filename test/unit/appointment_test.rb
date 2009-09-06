@@ -38,13 +38,11 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create free appointment with mismatched duration and end_at values" do
     setup do
-      @johnny         = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, 
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service,
                                                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120)
     end
   
@@ -64,13 +62,11 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create free appointment and test unscheduled time" do
     setup do
-      @johnny         = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
     end
       
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -81,7 +77,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     should "have 1 unscheduled slot today for 23 hours starting at 1 am" do
       # build mapping of unscheduled time
-      @unscheduled = AppointmentScheduler.find_unscheduled_time(@company, @anywhere, @johnny, @daterange)
+      @unscheduled = AppointmentScheduler.find_unscheduled_time(@company, @anywhere, @provider, @daterange)
       assert_equal [@start_at_day], @unscheduled.keys
       assert_equal 1, @unscheduled[@start_at_day].size
       assert_equal 23*60, @unscheduled[@start_at_day].first.duration
@@ -102,40 +98,31 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal 0, CapacitySlot.count
       end
     end
-
   end
   
   context "create free appointment" do
     setup do
       # create free time from 10 am to 12 pm
-      @johnny         = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
     
     context "and schedule work appointment without a customer" do
-      setup do
-        @haircut = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-      end
-      
       should "raise exception" do
         assert_raise ArgumentError do
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration)
         end
       end
     end
 
     context "and schedule work appointment to test confirmation code" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
         assert_valid @work_appt
       end
 
@@ -147,11 +134,9 @@ class AppointmentTest < ActiveSupport::TestCase
 
     context "and schedule work appointment to test customer role" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
         assert_valid @work_appt
         @customer.reload
       end
@@ -164,19 +149,17 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
       end
     end
-    
+
     context "and schedule work appointment with a custom service duration" do
       setup do
-        @haircut    = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-        @haircut.user_providers.push(@johnny)
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 120, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, 120, @customer, @options)
         assert_valid @work_appt
       end
-  
-      should "have haircut service with duration of 120 minutes" do
-        assert_equal @haircut, @work_appt.service
+
+      should "have work service with duration of 120 minutes" do
+        assert_equal @work_service, @work_appt.service
         assert_equal 120, @work_appt.duration
         assert_equal 10, @work_appt.start_at.hour
         assert_equal 12, @work_appt.end_at.hour
@@ -195,7 +178,6 @@ class AppointmentTest < ActiveSupport::TestCase
           assert_equal 0, CapacitySlot.count
         end
       end
-
     end
   end
   

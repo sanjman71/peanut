@@ -8,18 +8,18 @@
       %h2== Providers
     .span-8.last
       -# show add provider links if the company plan allows it
-      - if current_company.may_add_provider?
+      - if current_company.may_add_provider? and current_user.has_privilege?('create users', current_company)
         %h4{:style => 'padding-top: 5px; font-size: 1.2em;'}
           = link_to 'Add a user', new_provider_path, :class => 'add provider'
           == &nbsp;|&nbsp;
           = link_to 'Add a resource', new_resource_path, :class => 'add provider'
           == &nbsp;|&nbsp;
-          = link_to 'Invite a user', new_invitation_path(:subdomain => current_subdomain), :class => 'add provider'
+          = link_to 'Invitations', invitations_path, :class => 'add provider'
     .span-15
       -# show current plan usage
       - if current_company.may_add_provider?
         %span{:style => 'font-size: 1.1em; color: #777777;'}== The company has #{pluralize(current_company.providers_count, 'provider')}.  Your plan allows #{plan_limit_text(current_company.plan, 'provider').downcase}.
-      - else current_company.may_add_provider?
+      - else
         %span.highlight{:style => 'font-size: 1.3em;'}== You are at your plan limit of #{pluralize(current_company.providers_count, 'provider')}.  You can use the following #{link_to('link', edit_subscription_path(current_company.subscription))} to upgrade your account.
     
   %hr.space

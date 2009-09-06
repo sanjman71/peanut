@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
-  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :notify]
+  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge]
   before_filter :init_role, :only => [:edit, :update]
   before_filter :init_user_privileges, :only => [:edit, :update]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
-  privilege_required_any  'update users', :only => [:edit, :update, :notify], :on => [:user, :current_company]
+  privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
   
   def has_privilege?(p, authorizable=nil, user=nil)
     case p
@@ -59,7 +59,7 @@ class UsersController < ApplicationController
         case @invitation.role
         when 'company provider'
           # add the user as a company provider
-          @invitation.company.providers.push(@user) unless @invitation.company.blank?
+          @invitation.company.user_providers.push(@user) unless @invitation.company.blank?
         when 'company customer'
           # grant user customer role
           @user.grant_role('company customer', @invitation.company) unless @invitation.company.blank?
@@ -147,14 +147,14 @@ class UsersController < ApplicationController
     
     respond_to do |format|
       if @user.update_attributes(params[:user])
-        flash[:notice] = "#{@role.titleize} #{@user.name} was successfully updated"
+        flash[:notice] = "User '#{@user.name}' was successfully updated"
         format.html { redirect_to(@index_path) }
       else
         format.html { render(:action => 'edit') }
       end
     end
   end
-  
+
   def activate
     logout_keeping_session!
     user = User.find_by_activation_code(params[:activation_code]) unless params[:activation_code].blank?
@@ -192,32 +192,20 @@ class UsersController < ApplicationController
     redirect_to users_path
   end
   
-  # GET /users/1/notify/reset
-  def notify
-    @type = params[:type]
-    
-    case @type
-    when 'reset'
-      # reset password and send an email with the new password
-      @user.password = random_password
-      @user.save
-      
-      begin
-        # send account reset notification
-        MailWorker.async_send_account_reset(:company_id => current_company.id, :user_id => @user.id, :password => @user.password,
-                                            :login_url => login_url)
-        flash[:notice] = "The account password has been reset.  An email with the new password will be sent to #{@user.email}"
-      rescue Exception => e
-        flash[:error] = "There was an error resetting the account password"
-        logger.debug("xxx error sending account created notification: #{e.message}")
-      end
-    end
-    
+  # POST /users/exists
+  def exists
+    @email = params[:email]
+    @user  = User.new(:email => @email)
+    @user.valid?
+    @error = @user.errors.on(:email)
+    @hash  = @error.blank? ? Hash[:email => 'ok'] : Hash[:email => "email #{@error}"]
+
     respond_to do |format|
-      format.html { redirect_to(request.referer) }
+      format.js { render(:json => @hash.to_json) }
+      format.json { render(:json => @hash.to_json) }
     end
   end
-  
+    
   # There's no page here to update or destroy a user.  If you add those, be
   # smart -- make sure you check that the visitor is authorized to do so, that they
   # supply their old password along with a new one to update it, etc.
@@ -260,7 +248,7 @@ class UsersController < ApplicationController
     # build the index path based on the user type
     case role
     when "company customer"
-      "/customers"
+      openings_path
     when "company provider"
       "/providers"
     else

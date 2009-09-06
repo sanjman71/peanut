@@ -18,9 +18,9 @@
     -# allow owners and managers to change appointment state
     - if (@owner or @manager) and @appointment.upcoming?
       %h4
-        = link_to 'Mark as completed', complete_appointment_path(@appointment, :subdomain => current_subdomain), :id => 'complete_appointment', :class => 'admin'
-        %span#mark_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-        %span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
+        -#= link_to 'Mark as completed', complete_appointment_path(@appointment, :subdomain => current_subdomain), :id => 'complete_appointment', :class => 'admin'
+        -#%span#mark_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+        -#%span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
         = link_to 'Cancel appointment', cancel_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin', :id => 'cancel_appointment'
         %span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
         = link_to 'Re-schedule appointment', reschedule_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin', :id => 'reschedule_appointment'

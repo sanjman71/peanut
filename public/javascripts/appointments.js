@@ -65,15 +65,81 @@ $.fn.init_change_appointment_customer = function() {
   })
 }
 
+$.fn.validate_customer_signup = function() {
+  if ($("input#customer_name").size == 0) {
+    // no customer signup required
+    return true;
+  }
+  
+  customer_name  = $("input#customer_name").attr('value');
+  customer_email = $("input#customer_email").attr('value');
+  
+  if (customer_name == '') {
+    alert("Please enter a customer name");
+    return false;
+  }
+
+  if (customer_email == '') {
+    alert("Please enter a customer email");
+    return false;
+  }
+
+  customer_email_valid    = true;
+  customer_email_message  = 'validating email ...';
+  
+  // show email validation message
+  $("#customer_email_validate_message").addClass('grey');
+  $("#customer_email_validate_message").removeClass('red');
+  $("#customer_email_validate_message").text(customer_email_message)
+  $("#customer_email_validate_message").show();
+  
+  // check if customer email is valid
+  $.ajax({
+    url : "/users/exists",
+    data : {email:customer_email},
+    async : false,
+    type : "POST",
+    dataType : "json",
+    success: function(msg)
+    {
+      if (msg.email == 'ok') {
+        customer_email_valid = true;
+      } else {
+        // invalid email
+        customer_email_valid    = false;
+        customer_email_message  = msg.email; 
+      }
+    }
+  })
+
+  if (customer_email_valid == false) {
+    // show email error message
+    $("#customer_email_validate_message").addClass('red');
+    $("#customer_email_validate_message").removeClass('grey');
+    $("#customer_email_validate_message").text(customer_email_message)
+    $("#customer_email_validate_message").show();
+  } else {
+    // hide email validation message
+    $("#customer_email_validate_message").hide();
+  }
+
+  return customer_email_valid;
+}
+
 $.fn.init_confirm_appointment = function() {
   $("#confirm_appointment_submit").click(function() {
-    // post the search query
-    $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
+    // validate customer signup
+    var submit = $(document).validate_customer_signup();
+
+    if (submit == true) {
+      // post the search query
+      $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
     
-    // show progress bar
-    $(this).hide();
-    $("#cancel").hide();
-    $("#confirm_appointment_submit_progress").show();
+      // show progress bar
+      $(this).hide();
+      $("#cancel").hide();
+      $("#confirm_appointment_submit_progress").show();
+    }
     
     return false;
   })
@@ -132,7 +198,7 @@ $.fn.init_reschedule_appointment = function() {
 
 $(document).ready(function() {
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
-  $('#appointment_code').focus();
+  //$('#appointment_code').focus();
   $('#appointment_time_range_start_at').focus();
 
   $(document).init_toggle_dates();
