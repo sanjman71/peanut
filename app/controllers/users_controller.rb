@@ -53,7 +53,7 @@ class UsersController < ApplicationController
       
       # if the user already exists, don't try to recreate them
       # instead add them to the company and redirect to the login page 
-      if @user = User.find_by_email(@invitation.recipient_email)
+      if @user = User.with_email(@invitation.recipient_email).first
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
         case @invitation.role
@@ -70,9 +70,10 @@ class UsersController < ApplicationController
       end
     end  
 
-    # We're creating a new user. Initialize the email from the invitation. The user gets to change this, however
-    @user       = User.new
-    @user.email = @invitation.recipient_email if @invitation
+    # build a new user; initialize the email from the invitation, but allow the user to change it
+    @user = User.new
+    @user.email_addresses_attributes = [{:address => @invitation.recipient_email}] if @invitation
+    # @user.email = @invitation.recipient_email if @invitation
     
     # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
     @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
@@ -86,21 +87,23 @@ class UsersController < ApplicationController
     # xxx - temporarily disable this
     # logout_keeping_session!
 
-    @user = User.new(params[:user])
-    
     # initialize creator, default to anonymous
     @creator = params[:creator] ? params[:creator] : 'anonymous'
     
-    if @creator == 'user' and (params[:user][:password].blank? or params[:user][:password_confirmation].blank?)
+    if @creator == 'user' and (params[:user][:password].blank? and params[:user][:password_confirmation].blank?)
       # generate random password for the new user
-      @user.password = @user.password_confirmation = random_password
+      params[:user][:password] = :random
     end
+
+    # create user
+    @user = User.create_or_reset(params[:user])
     
-    @user.register! if @user && @user.valid?
-    success = @user && @user.valid?
+    # @user.register! if @user && @user.valid?
+    # success = @user && @user.valid?
     
-    if success && @user.errors.empty?
-      # if there was an invitation, then use the invitation company; otherwise use the current company
+    # if success && @user.errors.empty?
+    if @user.valid?
+      # if there was an invitation, use the invitation company; otherwise use the current company
       @company        = @invitation ? @invitation.company : current_company
       
       # initialize the new user
@@ -232,18 +235,13 @@ class UsersController < ApplicationController
     
     @role
   end
-  
+
   def init_user_privileges
     if current_user and @user
       @current_privileges[@user] = current_user.privileges(@user).collect(&:name)
     end
   end
-  
-  def random_password
-    'peanut'
-    # User.make_token
-  end
-  
+
   def index_path(role)
     # build the index path based on the user type
     case role

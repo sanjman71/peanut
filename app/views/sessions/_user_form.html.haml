@@ -26,12 +26,13 @@
       .span-8.last
         = user_form.text_field :name, :class => 'title big', :style => 'width: 275px; margin: 0px;'
         
-    -# email field
-    .span-12.last.padding-bottom-10
-      .span-4
-        %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
-      .span-8.last
-        = user_form.text_field :email, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+    -# email nested field
+    - user_form.fields_for :email_addresses do |email_form|
+      .span-12.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
+        .span-8.last
+          = email_form.text_field :address, :class => 'title big', :style => 'width: 275px; margin: 0px;'
 
     -# password fields are not shown if the creator is logged in
     .span-12.last.padding-bottom-10{:class => (creator == "user") ? 'hide' : ''}

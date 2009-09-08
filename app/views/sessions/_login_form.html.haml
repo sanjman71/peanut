@@ -15,9 +15,10 @@
       .span-9.last
         = password_field_tag 'password', nil, :class => 'title big', :style => 'width: 300px; margin: 0px;'
 
-    -# forgot password link
-    .span-9.prepend-3.last.padding-bottom-10
-      = link_to 'Forgot Password', password_forgot_path, :class => 'admin'
+    -# forgot password link, but only if there is a current company
+    - unless current_company.blank?
+      .span-9.prepend-3.last.padding-bottom-10
+        = link_to 'Forgot Password', password_forgot_path, :class => 'admin'
 
     .span-11.prepend-1.last
       = submit_tag 'Log in', :name => nil, :style => 'font-size: 15px;'

@@ -25,10 +25,7 @@ module UserInitializeHelper
       invitation.recipient = user
       invitation.save
     end
-    
-    # mark user as activated
-    user.activate!
-    
+
     # set flash based on who created the user
     # set redirect path based on creator and role
     case creator
@@ -36,13 +33,13 @@ module UserInitializeHelper
       redirect_path  = "/#{role_string.pluralize}"
       flash[:notice]  = "#{role_string.titleize} #{user.name} was successfully created."
       
-      begin
-        # send account created notification
-        MailWorker.async_send_account_created(:company_id => current_company.id, :creator_id => current_user.id, 
-                                              :user_id => user.id, :password => user.password, :login_url => login_url)
-      rescue Exception => e
-        logger.debug("xxx error sending account created notification")
-      end
+      # begin
+      #   # send account created notification
+      #   MailWorker.async_send_account_created(:company_id => current_company.id, :creator_id => current_user.id, 
+      #                                         :user_id => user.id, :password => user.password, :login_url => login_url)
+      # rescue Exception => e
+      #   logger.debug("xxx error sending account created notification")
+      # end
     when 'anonymous'
       # cache the return to value (if it exists) before we reset the ression
       return_to     = session[:return_to]

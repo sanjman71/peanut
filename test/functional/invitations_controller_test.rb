@@ -50,10 +50,11 @@ class InvitationsControllerTest < ActionController::TestCase
 
     context "for an existing user" do
       setup do
-        @user = Factory(:user, :email => "sanjay@jarna.com")
+        @user = Factory(:user)
+        @user.email_addresses.create(:address => 'sanjay@walnut.com')
         @controller.stubs(:current_user).returns(@manager)
         @controller.stubs(:current_company).returns(@company)
-        post :create, :invitation => {:role => 'company provider', :recipient_email => 'sanjay@jarna.com'}
+        post :create, :invitation => {:role => 'company provider', :recipient_email => 'sanjay@walnut.com'}
       end
 
       should_not_change("invitation count") { Invitation.count }

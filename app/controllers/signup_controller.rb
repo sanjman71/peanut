@@ -72,7 +72,7 @@ class SignupController < ApplicationController
     Company.transaction do
       # get and remove terms from params
       @terms        = params[:company].delete(:terms).to_i
-      @user         = logged_in? ? current_user : User.create(params[:user])
+      @user         = logged_in? ? current_user : User.create_or_reset(params[:user])
       @plan         = Plan.find(params[:plan_id])
       # subscription and company objects are dependent on each other
       @subscription = Subscription.new(:user => @user, :plan => @plan)
@@ -96,12 +96,6 @@ class SignupController < ApplicationController
       # rollback unless all objects are valid
       raise ActiveRecord::Rollback if !@company.valid? or !@user.valid?
       raise ActiveRecord::Rollback if !@subscription.errors.empty? or @terms != 1
-
-      # register, activate user
-      if !logged_in?
-        @user.register!
-        @user.activate!
-      end
 
       # add user as company provider, which also grants user 'company provider' role
       @company.user_providers.push(@user)

@@ -17,9 +17,10 @@ class RpxControllerTest < ActionController::TestCase
 
       should_assign_to :data
       
-      should "assign user identifier" do
-        @user = User.find_by_email("sanjman71@gmail.com")
-        assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @user.identifier
+      should "assign user's email identifier" do
+        @user = User.with_email("sanjman71@gmail.com").first
+        @email_address = @user.primary_email_address
+        assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @email_address.identifier
       end
     end
     

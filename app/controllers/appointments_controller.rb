@@ -77,8 +77,8 @@ class AppointmentsController < ApplicationController
 
       # allow customer to be created during this process
       if @customer.blank?
-        @customer             = User.anyone
-        @customer_signup      = true
+        @customer           = User.anyone
+        @customer_signup    = true
       end
 
       # build the work appointment without committing the changes
@@ -100,7 +100,7 @@ class AppointmentsController < ApplicationController
       @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @provider, @service, @customer, @options, :commit => false)
       
       # default provider is 'anyone' for display purposes
-      @provider          = User.anyone if @provider.blank?
+      @provider             = User.anyone if @provider.blank?
       
       # set appointment date to daterange name, set start_at and end_at times in schedule format
       @appt_date            = @daterange.name
@@ -125,9 +125,9 @@ class AppointmentsController < ApplicationController
     end
 
     # get appointment parameters
-    @service  = current_company.services.find_by_id(params[:service_id])
-    @customer = User.find_by_id(params[:customer_id])
-        
+    @service        = current_company.services.find_by_id(params[:service_id])
+    @customer       = User.find_by_id(params[:customer_id])
+
     @mark_as        = params[:mark_as]
     @duration       = params[:duration].to_i if params[:duration]
     @start_at       = params[:start_at]
@@ -136,7 +136,7 @@ class AppointmentsController < ApplicationController
     # track errors and appointments created
     @errors         = Hash.new
     @created        = Hash.new
-    
+
     # set default redirect path
     @redirect_path  = request.referer
     
@@ -150,13 +150,14 @@ class AppointmentsController < ApplicationController
           # build time range
           # @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           # @options        = {:time_range => @time_range}
-          @options        = Hash[:start_at => @start_at]
+          @date_time_options  = Hash[:start_at => @start_at]
+          @options            = Hash[:commit => true]
           # create work appointment
-          @appointment    = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @options, :commit => true)
+          @appointment        = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
           # set redirect path
-          @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
+          @redirect_path      = appointment_path(@appointment, :subdomain => current_subdomain)
           # set flash message
-          flash[:notice]  = "Your #{@service.name} appointment has been confirmed."
+          flash[:notice]      = "Your #{@service.name} appointment has been confirmed."
 
           # check if its an appointment reschedule
           if has_reschedule_id?
@@ -169,12 +170,14 @@ class AppointmentsController < ApplicationController
           end
           
           # tell the user their confirmation email is being sent
-          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email}"
+          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}"
           
           if !logged_in?
-            @redirect_path = openings_path(:subdomain => @subdomain)
+            @redirect_path = openings_path
             # tell the user their account has been created
-            flash[:notice] += "<br/>Your user account has been created and your password will be sent to #{@customer.email}"
+            flash[:notice] += "<br/>Your user account has been created and your password will be sent to #{@customer.email_address}"
+          else
+            @redirect_path = history_index_path
           end
           
           # # create log_entry
@@ -293,7 +296,8 @@ class AppointmentsController < ApplicationController
     # check for a customer signup
     if params[:customer]
       # create new user, assign a random password
-      @customer = User.create_or_reset_with_random_password(params[:customer][:email], :name => params[:customer][:name])
+      options   = Hash[:name => params[:customer][:name], :email => params[:customer][:email], :password => :random]
+      @customer = User.create_or_reset(options)
       # assign the customer id
       params[:customer_id] = @customer.id
     end

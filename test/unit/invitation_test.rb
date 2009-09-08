@@ -55,7 +55,8 @@ class InvitationTest < ActiveSupport::TestCase
 
     context "with user having email" do
       setup do
-        @user       = Factory(:user, :name => "Sanjay", :email => "sanjay@jarna.com")
+        @user       = Factory(:user, :name => "Sanjay")
+        @user.email_addresses.create(:address => "sanjay@jarna.com")
         @invitation = Invitation.create(:recipient_email => 'sanjay@jarna.com')
       end
 

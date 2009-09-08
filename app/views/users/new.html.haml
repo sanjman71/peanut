@@ -6,4 +6,5 @@
     %h2= @error_message
     %h4{:style => 'font-size: 1.5em;'}== Please check your invitation and try again
 - else
-  = render :partial => 'sessions/user_form', :locals => {:invitation => @invitation, :submit_url => url_for(:controller => 'users', :action => 'create', :role => @role, :subdomain => current_subdomain), :title_text => "#{@role.titleize} Signup", :submit_text => 'Create', :back_path => @back_path}
+  - submit_url = url_for(:controller => 'users', :action => 'create', :role => @role, :subdomain => current_subdomain)
+  = render :partial => 'sessions/user_form', :locals => {:invitation => @invitation, :submit_url => submit_url, :title_text => "#{@role.titleize} Signup", :submit_text => 'Create', :back_path => @back_path}

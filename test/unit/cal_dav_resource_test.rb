@@ -20,7 +20,7 @@ class CalDavResourceTest < ActiveSupport::TestCase
       @today            = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range       = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @free_appt        = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-      @cal_dav_resource = CalDavResource.new(@company.appointments, @company)      
+      @cal_dav_resource = CalDavResource.new(@company.appointments, @company)
     end
 
     should_change("Appointment.count", :by => 1) { Appointment.count }

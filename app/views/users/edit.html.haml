@@ -27,8 +27,11 @@
       .span-4.text-align-right
         %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
       .span-16.last
+        -# not allowed to edit rpx user emails
         = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email'
-      
+        - if email_form.object.verified?
+          %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
+          
   -# phone, nested model
   - f.fields_for :phone_numbers do |phone_form|
     .span-20.last
@@ -36,34 +39,30 @@
         %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
       .span-16.last
         = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
+        - if phone_form.object.verified?
+          %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
     .span-20.last
       .span-4.text-align-right
         %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
       .span-16.last
         = phone_form.text_field :name, :class => 'text title', :style => "width: 300px;", :id => 'phone_name'
-        %em{:style => 'padding-left: 5px;'}== e.g. Mobile, Work, Other
+        %em{:style => 'padding-left: 5px; font-size: 1.1em;'}== e.g. Mobile, Work, Other
 
-  -# password
-  .span-20.last
-    .span-4.text-align-right
-      %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_password", "Password:"
-    .span-16.last
-      = f.password_field :password, :class => 'text title', :style => "width: 300px;"
+  - unless @user.rpx == 1
+    -# password
+    .span-20.last
+      .span-4.text-align-right
+        %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_password", "Password:"
+      .span-16.last
+        = f.password_field :password, :class => 'text title', :style => "width: 300px;"
 
-  -# password confirmation
-  .span-20.last
-    .span-4.text-align-right
-      %h3{:style => 'font-size: 1.3em; padding-top: 20px;'}= label_tag "user_password", "Password Again:"
-    .span-16.last
-      = f.password_field :password_confirmation, :class => 'text title', :style => "width: 300px;"
+    -# password confirmation
+    .span-20.last
+      .span-4.text-align-right
+        %h3{:style => 'font-size: 1.3em; padding-top: 20px;'}= label_tag "user_password", "Password Again:"
+      .span-16.last
+        = f.password_field :password_confirmation, :class => 'text title', :style => "width: 300px;"
 
-  -# mobile carrier
-  -#.span-20.last
-    -#.span-4.text-align-right
-      -#%h3{:style => 'font-size: 1.5em; padding-top: 10px;'}= label_tag "user_mobile_carrier_id", "Wireless Provider:"
-    -#.span-16.last
-      -#= select_tag('user_mobile_carrier_id', options_for_select(mobile_carrier_select_options, @user.mobile_carrier ? @user.mobile_carrier.id : nil), :class => 'select big', :name => "user[mobile_carrier_id]")
-      
   %hr.space
 
   .span-20.prepend-1.last.submit

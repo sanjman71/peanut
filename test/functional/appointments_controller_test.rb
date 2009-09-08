@@ -277,7 +277,6 @@ class AppointmentsControllerTest < ActionController::TestCase
   
   context "create work appointment for a single date that has no free time" do
     setup do
-      # have johnny create free appointments on his calendar
       @controller.stubs(:current_user).returns(@johnny)
       post :create_work,
            {:dates => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
@@ -341,7 +340,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
       
     should_respond_with :redirect
-    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
+    should_redirect_to("history path") { "/history" }
   end
   
   context "create work appointment for a single date with free time, splitting free time" do
@@ -389,7 +388,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   
     should_respond_with :redirect
-    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
+    should_redirect_to("history path") { "/history" }
   end
   
   context "create work appointment for a single date with free time, using a custom duration" do
@@ -401,10 +400,10 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       @start_at       = "#{@today}T1000"
       @duration       = 120
-  
+
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-  
+
       # create work appointment, today from 10 am to 12 pm local time
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
@@ -437,7 +436,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   
     should_respond_with :redirect
-    should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
+    should_redirect_to("history path") { "/history" }
   end
   
   context "create work appointment" do
@@ -454,12 +453,13 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         # create work appointment as anonymous user
         @controller.stubs(:current_user).returns(nil)
+        @controller.stubs(:logged_in?).returns(false)
   
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :duration => 120, :customer_id => @anyone.id, :mark_as => 'work',
-              :customer => {:name => "Sanjay", :email => "sanjay@jarna.com"}}
+              :customer => {:name => "Sanjay", :email => "sanjay@walnut.com"}}
         @free_appt.reload
       end
 
@@ -475,7 +475,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
-      should_assign_to(:customer) { User.find_by_email("sanjay@jarna.com") }
+      should_assign_to(:customer) { User.with_email("sanjay@walnut.com").first }
       should_assign_to(:start_at) { @start_at }
       should_not_assign_to(:end_at)
       should_assign_to(:duration)  { 120 }
@@ -483,7 +483,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to :appointment
 
       should "create user in active state" do
-        user = User.find_by_email("sanjay@jarna.com")
+        user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
 
@@ -497,92 +497,93 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
 
-  context "request a waitlist appointment for a date range" do
-    setup do
-      # stub the current user and logged_in? state
-      @controller.stubs(:logged_in?).returns(true)
-      @controller.stubs(:current_user).returns(@customer)
-      ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-      
-      # build daterange start, end times in utc format
-      @start_date_utc = Time.parse("20090201").utc.to_s(:appt_schedule_day)
-      @end_date_utc   = Time.parse("20090208").utc.to_s(:appt_schedule_day)
-      
-      # request a waitlist appointment
-      get :new,
-          {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :provider_type => @johnny.tableize, :provider_id => @johnny.id,
-           :service_id => @haircut.id, :mark_as => 'wait'}
-    end
+  # context "request a waitlist appointment for a date range" do
+  #   setup do
+  #     # stub the current user and logged_in? state
+  #     @controller.stubs(:logged_in?).returns(true)
+  #     @controller.stubs(:current_user).returns(@customer)
+  #     ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
+  #     
+  #     # build daterange start, end times in utc format
+  #     @start_date_utc = Time.parse("20090201").utc.to_s(:appt_schedule_day)
+  #     @end_date_utc   = Time.parse("20090208").utc.to_s(:appt_schedule_day)
+  #     
+  #     # request a waitlist appointment
+  #     get :new,
+  #         {:start_date => @start_date_utc, :end_date => @end_date_utc, :time => 'anytime', :provider_type => @johnny.tableize, :provider_id => @johnny.id,
+  #          :service_id => @haircut.id, :mark_as => 'wait'}
+  #   end
+  # 
+  #   should_respond_with :success
+  #   should_render_template 'appointments/new.html.haml'
+  # 
+  #   should_not_change("Appointment.count") { Appointment.count }
+  # 
+  #   should_assign_to :daterange
+  #   should_assign_to :appointment
+  #   
+  #   should "be a valid appointment" do
+  #     assert assigns(:appointment).valid?
+  #   end
+  #   
+  #   should "have a waitlist start date of 20090201 and end date of 20090209 (daterange is inclusive)" do
+  #     assert_equal "20090201", assigns(:appointment).start_at.utc.to_s(:appt_schedule_day) # utc format
+  #     assert_equal "20090209", assigns(:appointment).end_at.utc.to_s(:appt_schedule_day) # utc format
+  #   end
+  # end
   
-    should_respond_with :success
-    should_render_template 'appointments/new.html.haml'
-  
-    should_not_change("Appointment.count") { Appointment.count }
-  
-    should_assign_to :daterange
-    should_assign_to :appointment
-    
-    should "be a valid appointment" do
-      assert assigns(:appointment).valid?
-    end
-    
-    should "have a waitlist start date of 20090201 and end date of 20090209 (daterange is inclusive)" do
-      assert_equal "20090201", assigns(:appointment).start_at.utc.to_s(:appt_schedule_day) # utc format
-      assert_equal "20090209", assigns(:appointment).end_at.utc.to_s(:appt_schedule_day) # utc format
-    end
-  end
-  
-  context "create waitlist appointment" do
-    context "for a service with a specific provider" do
-      setup do
-        # create waitlist appointment as customer
-        @controller.stubs(:current_user).returns(@customer)
-  
-        # create waitlist appointment
-        post :create_wait,
-             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @johnny.tableize, :provider_id => @johnny.id,
-              :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
-      end
-  
-      should_change("Appointment.count", :by => 1) { Appointment.count }
-  
-      should_assign_to(:service) { @haircut }
-      should_not_assign_to(:duration)
-      should_assign_to(:provider) { @johnny }
-      should_assign_to(:customer) { @customer }
-      should_assign_to(:mark_as) { "wait" }
-      should_assign_to(:appointment)
-    
-      should_respond_with :redirect
-      should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
-    end
-    
-    context "for a service with any service provider" do
-      setup do
-        # get 'anyone' user
-        @anyone = User.anyone
-  
-        # stub current user
-        @controller.stubs(:current_user).returns(@customer)
-  
-        # create waitlist appointment
-        post :create_wait,
-             {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @anyone.tableize, :provider_id => @anyone.id,
-              :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
-      end
-  
-      should_change("Appointment.count", :by => 1) { Appointment.count }
-  
-      should_assign_to(:service) { @haircut }
-      should_not_assign_to(:duration)
-      should_not_assign_to(:provider) # provider should be empty
-      should_assign_to(:customer) { @customer }
-      should_assign_to(:mark_as) { "wait" }
-      should_assign_to(:appointment)
-  
-      should_respond_with :redirect
-      should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
-    end
-  end
+  # context "create waitlist appointment" do
+  #   context "for a service with a specific provider" do
+  #     setup do
+  #       # create waitlist appointment as customer
+  #       @controller.stubs(:current_user).returns(@customer)
+  # 
+  #       # create waitlist appointment
+  #       post :create_wait,
+  #            {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", :provider_type => @johnny.tableize, :provider_id => @johnny.id,
+  #             :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
+  #     end
+  # 
+  #     should_change("Appointment.count", :by => 1) { Appointment.count }
+  # 
+  #     should_assign_to(:service) { @haircut }
+  #     should_not_assign_to(:duration)
+  #     should_assign_to(:provider) { @johnny }
+  #     should_assign_to(:customer) { @customer }
+  #     should_assign_to(:mark_as) { "wait" }
+  #     should_assign_to(:appointment)
+  #   
+  #     should_respond_with :redirect
+  #     should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
+  #   end
+  #   
+  #   context "for a service with any service provider" do
+  #     setup do
+  #       # get 'anyone' user
+  #       @anyone = User.anyone
+  # 
+  #       # stub current user
+  #       @controller.stubs(:current_user).returns(@customer)
+  # 
+  #       # create waitlist appointment
+  #       post :create_wait,
+  #            {:dates => 'Feb 01 2009 - Feb 08 2009', :start_at => "20090201", :end_at => "20090208", 
+  #             :provider_type => @anyone.tableize, :provider_id => @anyone.id,
+  #             :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'wait'}
+  #     end
+  # 
+  #     should_change("Appointment.count", :by => 1) { Appointment.count }
+  # 
+  #     should_assign_to(:service) { @haircut }
+  #     should_not_assign_to(:duration)
+  #     should_not_assign_to(:provider) # provider should be empty
+  #     should_assign_to(:customer) { @customer }
+  #     should_assign_to(:mark_as) { "wait" }
+  #     should_assign_to(:appointment)
+  # 
+  #     should_respond_with :redirect
+  #     should_redirect_to("appointment path") { "/appointments/#{assigns(:appointment).id}" }
+  #   end
+  # end
   
 end

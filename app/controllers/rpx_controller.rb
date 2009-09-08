@@ -5,15 +5,13 @@ class RpxController < ApplicationController
   def customer
     raise Exception unless @data = RPXNow.user_data(params[:token])
     
-    @user = User.find_by_identifier(@data[:identifier])
+    @user = User.with_identifier(@data[:identifier]).first
     
     if @user.blank?
-      # create user using rpx identifier
-      @user = User.create(:name => @data[:name], :email => @data[:email], :identifier => @data[:identifier])
+      # create user using rpx data
+      @user = User.create_rpx(@data[:name], @data[:email], @data[:identifier])
 
       if @user.valid?
-        @user.register!
-
         # create user session
         redirect_path = session_initialize(@user)
       end

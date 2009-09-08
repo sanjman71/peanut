@@ -7,13 +7,14 @@ class PasswordsControllerTest < ActionController::TestCase
   should_route :post, '/password/reset', :controller => 'passwords', :action => 'reset'
 
   def setup
-    @user = Factory(:user, :email => "sanjay@jarna.com")
+    @user  = Factory(:user)
+    @email = @user.email_addresses.create(:address => "sanjay@walnut.com")
   end
   
   context "reset" do
     context "for an invalid user" do
       setup do
-        post :reset, {:email => 'bogus@jarna.com'}
+        post :reset, {:email => 'bogus@walnut.com'}
       end
 
       should_not_assign_to(:user)
@@ -27,14 +28,14 @@ class PasswordsControllerTest < ActionController::TestCase
 
     context "for a valid user" do
       setup do
-        post :reset, {:email => 'sanjay@jarna.com'}
+        post :reset, {:email => 'sanjay@walnut.com'}
       end
 
       should_assign_to(:user)
 
       should "change user password to a random password" do
-        user = User.find_by_email("sanjay@jarna.com")
-        assert User.authenticate('sanjay@jarna.com', assigns(:user).password)
+        user = User.with_email("sanjay@walnut.com").first
+        assert User.authenticate('sanjay@walnut.com', assigns(:user).password)
       end
 
       should_redirect_to("login path") { login_path }

@@ -45,10 +45,11 @@ class WalnutDemo
   # create_user($1, $2, $3)
   def create_user(user_email, user_name, user_pwd)
     puts "create_user: #{user_name}"
-    if (user = User.find_by_email(user_email))
+    if (user = User.with_email(user_email).first)
       puts "create_user: #{user_email} already in db"
     else
-      user = User.create(:name => user_name, :email => user_email, :password => user_pwd, :password_confirmation => user_pwd)
+      user  = User.create(:name => user_name, :password => user_pwd, :password_confirmation => user_pwd)
+      email = user.email_addresses.create(:address => user_email) 
       user.register!
       user.activate!
     end
@@ -58,7 +59,7 @@ class WalnutDemo
   
   def destroy_user(user_email)
     puts "destroy_user: #{user_email}"
-    if (user = User.find_by_email(user_email) )
+    if (user = User.with_email(user_email).first)
       puts "destroy_user: destroying user id #{user.id} email #{user.email}"
       user.destroy
     else

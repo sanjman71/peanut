@@ -2,11 +2,11 @@
   .span-16.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
     .span-7.prepend-1
       %h2.name{:style => 'margin-bottom: 2px;'}= link_to customer.name, url_for(:controller =>'users', :action => 'edit', :id => customer.id, :role => 'company customer', :subdomain => current_subdomain), :class => 'customer name'
-      %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email
+      %span.customer.email{:style => 'font-size: 1.3em;'}= customer.email_address
       %br
       %span.customer.phone{:style => 'font-size: 1.3em;'}
         - if customer.phone_numbers_count > 0
-          = number_to_phone(customer.primary_phone_number.address)
+          = number_to_phone(customer.phone_number)
         - else
           == &nbsp;
           

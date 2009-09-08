@@ -14,19 +14,19 @@ class CalDavControllerTest < ActionController::TestCase
 
     @controller   = CalDavController.new
     # create a valid company
-    @owner        = User.create(:name => "Owner", :email => "owner@walnutindustries.com",
-                                :password => "secret", :password_confirmation => "secret",
-                                :phone => "415 555 1234", :state => "active")
+    @owner        = User.create(:name => "Owner", :password => "secret", :password_confirmation => "secret", :state => "active")
+    @owner.email_addresses.create(:address => "owner@walnutindustries.com")
+    @owner.phone_numbers.create(:address => "415 555 1234", :name => "Mobile")
     @owner_token  = @owner.cal_dav_token
     
-    @provider     = User.create(:name => "Provider", :email => "provider@walnutindustries.com",
-                                :password => "secret", :password_confirmation => "secret",
-                                :phone => "415 555 1234", :state => "active")
+    @provider     = User.create(:name => "Provider", :password => "secret", :password_confirmation => "secret", :state => "active")
+    @provider.email_addresses.create(:address => "provider@walnutindustries.com")
+    @provider.phone_numbers.create(:address => "415 555 1234", :name => "Mobile")
     @provider_token = @provider.cal_dav_token
-    
-    @user         = User.create(:name => "User", :email => "user@walnutindustries.com",
-                                :password => "secret", :password_confirmation => "secret",
-                                :phone => "415 555 1234", :state => "active")
+
+    @user         = User.create(:name => "User", :password => "secret", :password_confirmation => "secret", :state => "active")
+    @user.email_addresses.create(:address => "user@walnutindustries.com")
+    @user.phone_numbers.create(:address => "415 555 1234", :name => "Mobile")
     @user_token   = @user.cal_dav_token
 
     @monthly_plan = Factory(:monthly_plan)

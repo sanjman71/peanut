@@ -9,7 +9,7 @@ class UserTest < ActiveSupport::TestCase
 
   context "user with no preferences" do
     setup do
-      @user = User.create(:name => "User 1", :email => "user1@jarna.com", :password => "secret", :password_confirmation => "secret")
+      @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret")
     end
     
     should "have empty preferences" do
