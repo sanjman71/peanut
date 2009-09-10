@@ -72,7 +72,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     context "without being logged in" do
       setup do
         # create free time from 9 am to 11 am local time
-        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @today          = Time.zone.now.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
@@ -90,7 +90,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     context "being logged in as a customer" do
       setup do
         # create free time from 9 am to 11 am local time
-        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @today          = Time.zone.now.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
@@ -225,56 +225,6 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
   
-  context "build work appointment for a single date with free time" do
-    context "not logged in" do
-      setup do
-        # create free time from 9 am to 11 am local time
-        @today          = Time.now.utc.to_s(:appt_schedule_day)
-        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.to_s(:appt_schedule)
-  
-        # book a haircut with johnny during his free time
-        get :new, 
-            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-            :duration => @haircut.duration, :mark_as => 'work'
-      end
-    
-      should_respond_with :redirect
-      should_redirect_to("login_path") { login_path }
-    end
-  
-    context "logged in as a customer" do
-      setup do
-        # create free time from 9 am to 11 am local time
-        @today          = Time.zone.now.utc.to_s(:appt_schedule_day)
-        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
-  
-        # stub current user
-        @controller.stubs(:current_user).returns(@customer)
-  
-        # book a haircut with johnny during his free time
-        get :new,
-            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-            :duration => @haircut.duration, :mark_as => 'work'
-      end
-  
-      should_respond_with :success
-      should_render_template 'appointments/new.html.haml'
-    
-      should_assign_to :appointment, :class => Appointment
-      should_assign_to(:service) { @haircut }
-      should_assign_to(:duration) { 30 }
-      should_assign_to(:provider) { @johnny }
-      should_assign_to(:customer) { @customer }
-      should_assign_to(:appt_date) { @time_range.start_at.to_s(:appt_schedule_day) }
-      should_assign_to(:appt_time_start_at) { "0900" }
-      should_assign_to(:appt_time_end_at) { "0930" }
-    end
-  end
-  
   context "create work appointment for a single date that has no free time" do
     setup do
       @controller.stubs(:current_user).returns(@johnny)
@@ -298,7 +248,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create work appointment for a single date with free time, replacing free time" do
     setup do
       # create free time from 9 am to 11 am local time
-      @today          = Time.now.utc.to_s(:appt_schedule_day)
+      @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
   
@@ -346,7 +296,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create work appointment for a single date with free time, splitting free time" do
     setup do
       # create free time from 9 am to 3 pm local time
-      @today          = Time.now.utc.to_s(:appt_schedule_day)
+      @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
   
@@ -394,7 +344,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   context "create work appointment for a single date with free time, using a custom duration" do
     setup do
       # create free time from 9 am to 3 pm local time
-      @today          = Time.now.utc.to_s(:appt_schedule_day)
+      @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
   
@@ -443,7 +393,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     context "with a new customer signup" do
       setup do
         # create free time from 9 am to 3 pm local time
-        @today          = Time.now.utc.to_s(:appt_schedule_day)
+        @today          = Time.zone.now.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
         
