@@ -186,21 +186,32 @@ class CompanyTest < ActiveSupport::TestCase
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
     end
     
-    should "have empty preferences" do
-      assert_equal Hash.new, @company.preferences
+    should "have default preferences" do
+      assert_equal( ({:time_horizon => 28.days}), @company.preferences)
     end
   
-    should "have nil preferences['foo']" do
-      assert_nil @company.preferences['foo']
+    should "have nil preferences[:foo]" do
+      assert_nil @company.preferences[:foo]
+    end
+    
+    context "then override default" do
+      setup do
+        @company.preferences[:time_horizon] = 14.days
+      end
+      
+      should "have new value" do
+        assert_equal( ({:time_horizon => 14.days}), @company.preferences)
+      end
     end
   
-    context "then add preferences" do
+    context "then add new preferences" do
       setup do
         @company.preferences["favorite fruit"] = "banana"
         @company.preferences["private"] = true
         @company.preferences["semi-private"] = "walnutindustries.com"
         @company.preferences["custom hash"] = ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}]
         @company.preferences["meaning of life"] = 42
+        @company.preferences[:time_horizon] = 5.days
       end
    
       should "have all preferences set" do
@@ -209,6 +220,7 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal "walnutindustries.com", @company.preferences["semi-private"]
         assert_equal ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}], @company.preferences["custom hash"]
         assert_equal 42, @company.preferences["meaning of life"]
+        assert_equal 5.days, @company.preferences[:time_horizon]
       end
       
     end
