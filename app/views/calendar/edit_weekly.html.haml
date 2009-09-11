@@ -26,54 +26,77 @@
 
 .span-14.prepend-1.last
   = display_flash
+.span-14.prepend-1.last
+  = error_messages_for(:appointment)
 
+%hr.space
+
+.span-14.prepend-1.last.prompt
+  == When will the first appointment in this recurring series start and end?
+.span-13.prepend-2.last.hint.padding-bottom-10
+  == Usually the first appointment will start and end on the same day
+
+.span-14.prepend-1.last
+  .span-3.text_field_label
+    = label_tag "starts_at", "Starting Time:"
+  .span-4.padding-top-5
+    = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style'
+  .span-2.text_field_label
+    = label_tag "start_date", "Date:"
+  .span-4.last.padding-top-5
+    = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style'
+
+.span-14.prepend-1.last
+  .span-3.text_field_label
+    = label_tag "ends_at", "Ending Time:"
+  .span-4.padding-top-5
+    = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style'
+  .span-2.text_field_label
+    = label_tag "end_date", "Date:"
+  .span-4.last.padding-top-5
+    = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style'
+
+%hr.space
+
+.span-14.prepend-1.last.prompt
+  == Which days will the appointment recur on?
 %h4.bottom.visible.span-14.prepend-1.append-9.last#weekly_schedule
   == &nbsp;
 
 %hr.space
 
-.span-23.prepend-1.last
+.span-14.prepend-1.last
   .span-14#free_work_calendar
     = render(:partial => 'shared/calendar', :locals => {:total_days => 7, :start_day => @daterange.start_at, :today => DateRange.today, :show_weeks => false, :markings => @calendar_markings})
 
 %hr.space
 
 .span-14.prepend-1.last
-  .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
-    %h5= label_tag "starts_at", "Starts at:"
-  .span-12.last.padding-top-5
-    = text_field_tag 'starts_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
-
-.span-14.prepend-1.last
-  .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
-    %h5= label_tag "ends_at", "Ends at:"
-  .span-12.last.padding-top-5
-    = text_field_tag 'ends_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
-
-.span-14.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 7px;'}
-  .span-2
-    %h5== Start Date:
-  .span-12.last.padding-bottom-10
-    = text_field_tag 'schedule_start_date', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; background: #EDF3FE;'
-    %em{:style => 'padding-left: 7px;'}== i.e. the first day of this schedule
-    
-.span-14.prepend-1.last{:style => 'font-size: 1.3em;'}
-  .span-2
-    %h5== End Date:
-  .span-11.last
+  .span-14.last.prompt
+    == How long will this appointment recur?
+  .span-13.prepend-1.last.hint
+    == If you prefer you can leave it open ended.
+  .span-4.text_field_label
+    = label_tag "schedule_end_date", "Series Ends:"
+  .span-10.last.padding-top-5
     = radio_button_tag "ends", "Never", true, :id => 'schedule_end_never'
-    = label_tag "schedule_end_never", "Never", :class => 'big'
+    = label_tag "schedule_end_never", "Never", :class => 'std_text_field_style'
     = radio_button_tag "ends", "Until", false, :id => 'schedule_end_until'
-    = label_tag "schedule_end_until", "Until", :class => 'big', :style => 'padding-right: 5px;'
-    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide', :style => 'width: 90px; font-size: 1.0em; background: #EDF3FE;'
+    = label_tag "schedule_end_until", "Until", :class => 'std_text_field_style', :style => 'padding-right: 5px;'
+    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide std_text_field_style'
     
+%hr.space
     
 - if @provider.class.to_s == "Resource"
-  .span-14.prepend-1.last{:style => 'font-size: 1.3em;'}
-    .span-2
-      %h5== Number available:
-    .span-11.last
-      = text_field_tag 'capacity'
+  .span-14.prepend-1.last.prompt
+    == How many #{@provider.name.downcase.pluralize} will be available:
+  .span-13.prepend-2.last.hint.padding-bottom-10
+    == Often the capacity is 1, but you may have more than 1.
+  .span-14.prepend-1.last
+    .span-3.text_field_label
+      = label_tag "capacity", "Capacity:"
+    .span-4.last
+      = text_field_tag 'capacity', '1', :class => 'std_text_field_style'
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
   = hidden_field_tag :freq, 'weekly'
@@ -81,8 +104,10 @@
   = hidden_field_tag :byday, ''
   = hidden_field_tag :dstart, ''
   = hidden_field_tag :tstart, ''
+  = hidden_field_tag :dend, ''
   = hidden_field_tag :tend, ''
   = hidden_field_tag :until, ''
+  = hidden_field_tag :capacity, '1'
   
   %hr.space
   %hr.space

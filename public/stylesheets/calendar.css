@@ -43,3 +43,7 @@ table.calendar td.mark, table.calendar th.mark    { background: #5500BB none rep
 
 .slider .time.mark                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
 
+.text_field_label                                 {font-size: 1.1em; padding-top: 5px;}
+.hint                                             {font-style: italic; }
+.prompt                                           {font-size: 1.3em; font-weight: bold;}
+.std_text_field_style                             {width: 100px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px;} /* This will fit in a span-3 */

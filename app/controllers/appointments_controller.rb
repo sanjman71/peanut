@@ -246,7 +246,7 @@ class AppointmentsController < ApplicationController
   # POST /users/1/calendar/weekly/add
   def create_weekly
     # @provider initialized in before filter
-    
+
     @free_service = current_company.free_service
 
     # get recurrence parameters
@@ -254,10 +254,11 @@ class AppointmentsController < ApplicationController
     @byday        = params[:byday].to_s.upcase
     @dstart       = params[:dstart].to_s
     @tstart       = params[:tstart].to_s
+    @dend         = params[:dend].to_s
     @tend         = params[:tend].to_s
     @until        = params[:until].to_s
     
-    @capacity     = params[:capacity].to_i
+    @capacity     = params[:capacity].to_i || 1
 
     # build recurrence rule from rule components
     tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
@@ -270,11 +271,15 @@ class AppointmentsController < ApplicationController
 
     # build dtstart and dtend
     @dtstart      = "#{@dstart}T#{@tstart}"
-    @dtend        = "#{@dstart}T#{@tend}"
+    if (@dend.blank?)
+      @dtend        = "#{@dstart}T#{@tend}"
+    else
+      @dtend        = "#{@dend}T#{@tend}"
+    end
 
     # build start_at and end_at times
-    @start_at_utc = Time.parse(@dtstart).utc
-    @end_at_utc   = Time.parse(@dtend).utc
+    @start_at_utc = Time.zone.parse(@dtstart).utc
+    @end_at_utc   = Time.zone.parse(@dtend).utc
 
     # create appointment with recurrence rule
     @appointment  = current_company.appointments.create(:company => current_company, :provider => @provider, :service => @free_service,
@@ -285,9 +290,17 @@ class AppointmentsController < ApplicationController
     @redirect_path  = build_create_redirect_path(@provider, request.referer)
 
     respond_to do |format|
-      format.html { redirect_to(@redirect_path) and return }
-      format.js
+      if @appointment.valid?
+        flash[:notice] = 'Weekly appointment was made successfully.'
+        format.html { redirect_to(@redirect_path) and return }
+        format.js
+      else
+        flash[:notice] = 'Problem making weekly appointment.'
+        format.html { render :template => "calendar/edit_weekly.html" }
+        format.js
+      end
     end
+
   end
 
   # POST /book/work/users/7/services/4/60/20090901T060000
