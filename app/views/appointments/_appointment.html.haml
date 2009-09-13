@@ -32,6 +32,15 @@
     .span-12.last.data
       ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
 
+  - if appointment.recurrence?
+    .span-3.label.text-align-right
+      == Recurrence:
+    .span-12.last.data
+      - if appointment.recur_parent
+        ~ "<#{tag}>#{link_to "Parent", appointment_path(appointment.recurrence_parent)}</#{tag}>"
+      - else
+        ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment)}</#{tag}>"
+
   - if customer_signup
     .span-22.prepend-1.last{:style => 'padding-top: 20px;'}
       == Please enter your name and email below to confirm your appointment and create your account.

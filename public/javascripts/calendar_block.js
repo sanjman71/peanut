@@ -1,5 +1,5 @@
 // edit calendar for the selected provider
-$.fn.init_select_calendar_edit_block_provider = function () {
+$.fn.init_select_calendar_new_block_provider = function () {
   $("#edit_provider").change(function () {
     var href = '/' + this.value + '/calendar/block/edit';
     window.location = href;
@@ -126,7 +126,7 @@ $.fn.init_add_block_free_time_form = function () {
 
 $(document).ready(function() {
 
-  $(document).init_select_calendar_edit_block_provider();
+  $(document).init_select_calendar_new_block_provider();
   $(document).init_select_calendar_dates();
   $(document).init_timepicker();
   $(document).init_add_block_free_time_form();

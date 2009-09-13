@@ -79,4 +79,46 @@ module AppointmentsHelper
       "Its happening now"
     end
   end
+
+  FREQ = {
+    "WEEKLY" => "Weekly"
+  }
+
+  DAYS_OF_WEEK = 
+    {
+      "SU" => "Sunday",
+      "MO" => "Monday",
+      "TU" => "Tuesday",
+      "WE" => "Wednesday",
+      "TH" => "Thursday",
+      "FR" => "Friday",
+      "SA" => "Saturday"
+    }
+
+  def appointment_recur_rule_in_words(appointment)
+    appointment.recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/
+    freq = FREQ[$1]
+    days = $2.split(',').map{|d| DAYS_OF_WEEK[d]}
+    "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.to_s[:appt_time]} and running for #{appointment_duration_in_words(appointment)}"
+  end
+  
+  def appointment_duration_in_words(appointment)
+    duration = appointment.duration
+    if (duration == 0)
+      "0 minutes"
+    else
+      days = (duration / (24 * 60)).to_i
+      duration -= (days * 24 * 60)
+      hours = duration / (24 * 60)
+      duration -= (hours * 60)
+      minutes = duration / 60
+      duration -= minutes
+      res = []
+      res << "#{days} days" unless (days == 0)
+      res << "#{hours} hours" unless (hours == 0)
+      res << "#{minutes} minutes" unless (minutes == 0)
+      res.to_sentence
+    end
+  end
+  
 end

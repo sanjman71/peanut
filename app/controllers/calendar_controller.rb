@@ -1,10 +1,9 @@
 class CalendarController < ApplicationController
-  before_filter :init_provider, :only => [:show, :edit_block, :edit_weekly]
-  before_filter :init_provider_privileges, :only => [:show, :edit_block, :edit_weekly]
+  before_filter :init_provider, :only => [:show]
+  before_filter :init_provider_privileges, :only => [:show]
   
   privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
   privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company]
-  privilege_required_any  'update calendars', :only => [:edit_block, :edit_weekly], :on => [:provider, :current_company]
 
   # Default when value
   @@default_when = Appointment::WHEN_THIS_WEEK
@@ -73,68 +72,6 @@ class CalendarController < ApplicationController
       start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
       end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
       redirect_to url_for(:action => 'show', :start_date => start_date, :end_date => end_date, :subdomain => current_subdomain)
-    end
-  end
-  
-  # GET /users/1/calendar/block/edit
-  def edit_block
-    # @provider initialized in before_filter
-    
-    # if params[:provider_type].blank? or params[:provider_id].blank?
-    #   # no provider was specified, redirect to the company's first provider
-    #   provider = current_company.providers.first
-    #   redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
-    # end
-        
-    # build list of providers to allow the scheduled to be adjusted by resource
-    @providers = current_company.providers
-    
-    # initialize daterange, start calendar on sunday, end calendar on sunday
-    @daterange = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
-        
-    # find free work appointments
-    @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
-
-    # group appointments by day
-    @free_work_appts_by_day = @free_work_appts.group_by { |appt| appt.start_at.utc.beginning_of_day }
-    
-    # build calendar markings from free appointments
-    @calendar_markings  = build_calendar_markings(@free_work_appts)
-    
-    # build time of day collection
-    # TODO xxx - need a better way of mapping these times to start, end hours
-    @tod        = ['morning', 'afternoon']
-    @tod_start  = 'morning'
-    @tod_end    = 'afternoon'
-    
-    @free_service = current_company.free_service
-    
-    respond_to do |format|
-      format.html
-    end
-  end
-  
-  # GET /users/1/calendar/weekly/edit
-  def edit_weekly
-    # @provider initialize in before_filter
-    
-    if params[:provider_type].blank? or params[:provider_id].blank?
-      # no provider was specified, redirect to the company's first provider
-      provider = current_company.providers.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
-    end
-
-    # build list of providers to allow the scheduled to be adjusted by resource
-    @providers = current_company.providers
-
-    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
-    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
-
-    # initialize calendar markings to empty
-    @calendar_markings  = Hash.new
-
-    respond_to do |format|
-      format.html
     end
   end
   

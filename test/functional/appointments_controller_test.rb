@@ -38,6 +38,13 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :get, '/customers/1/appointments/completed', 
                      :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work', :state => 'completed'
 
+  # edit provider calendar
+  should_route :get, 'users/1/calendar/block/edit', 
+              :controller => "calendar", :action => 'new_block', :provider_type => "users", :provider_id => "1"
+
+  should_route :get, 'users/1/calendar/weekly/edit',
+              :controller => "calendar", :action => 'edit_weekly', :provider_type => "users", :provider_id => "1"
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
@@ -68,6 +75,9 @@ class AppointmentsControllerTest < ActionController::TestCase
     @request.host = "www.walnutcalendar.com"
   end
 
+  #
+  # Single date appointment tests
+  #
   context "build work appointment for a single date with free time" do
     context "without being logged in" do
       setup do
@@ -154,6 +164,41 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
   
+  #
+  # Appointment block tests
+  #
+  context "add new blocks to provider calendar as the provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@johnny)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+    end
+    
+    should_respond_with :success
+    should_render_template 'calendar/new_block.html.haml'
+  
+    should_assign_to(:provider) { @johnny }
+    should_assign_to :providers, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
+    should_assign_to :daterange, :class => DateRange
+  end
+    
+  context "add new blocks to provider calendar as another provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@mary)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+    end
+  
+    should_respond_with :redirect
+    should_redirect_to("unauthorized_path") { unauthorized_path }
+    should_set_the_flash_to /You are not authorized/
+  end
+
   context "create free appointment for a block of dates" do
     setup do
       # have johnny create free appointments on his calendar
@@ -175,6 +220,41 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
   end
   
+  #
+  # Recurring appointment tests
+  #
+  context "add weekly appointment to provider calendar as the provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@johnny)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+    end
+    
+    should_respond_with :success
+    should_render_template 'calendar/new_block.html.haml'
+  
+    should_assign_to(:provider) { @johnny }
+    should_assign_to :providers, :class => Array
+    should_assign_to :calendar_markings, :class => Hash
+    should_assign_to :daterange, :class => DateRange
+  end
+    
+  context "add new blocks to provider calendar as another provider" do
+    setup do
+      add_mary_and_johnny_as_providers
+      @controller.stubs(:current_user).returns(@mary)
+      # stub calendar markings
+      @controller.stubs(:build_calendar_markings).returns(Hash.new)
+      get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+    end
+  
+    should_respond_with :redirect
+    should_redirect_to("unauthorized_path") { unauthorized_path }
+    should_set_the_flash_to /You are not authorized/
+  end
+
   context "create weekly schedule" do
     context "with no end date" do
       setup do
@@ -224,6 +304,8 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
   end
+  
+  
   
   context "create work appointment for a single date that has no free time" do
     setup do

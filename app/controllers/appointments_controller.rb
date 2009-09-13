@@ -1,52 +1,53 @@
 class AppointmentsController < ApplicationController
-  before_filter :init_provider, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
-  before_filter :init_provider_privileges, :only => [:create_free, :create_block, :create_weekly, :create_work, :create_wait]
+  before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
+                                          :create_work, :create_wait]
+  before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
+                                                     :create_work, :create_wait]
   before_filter :init_appointment, :only => [:show]
   before_filter :get_reschedule_id, :only => [:new]
   after_filter  :store_location, :only => [:new]
 
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
-  privilege_required_any  'update calendars', :only =>[:create_free, :create_block, :create_weekly], :on => [:provider, :current_company]
+  privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly],
+                                              :on => [:provider, :current_company]
     
-  privilege_required      'read work appointments', :only => [:index], :on => :current_company
-  privilege_required      'update work appointments', :only => [:complete], :on => :current_company
-  # privilege_required      'read %s appointments', :only => [:show], :on => :current_company
+  privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
 
-  def has_privilege?(p, authorizable=nil, user=nil)
-    case p
-    # when 'update calendars'
-    #   case params[:mark_as]
-    #   when Appointment::WORK, Appointment::WAIT
-    #     # anyone can create work, wait appointments
-    #     return true
-    #   when Appointment::FREE
-    #     # delegate to base class
-    #     super
-    #   else
-    #     # delegate to base class
-    #     super
-    #   end
-    when 'read work appointments'
-      # users may read their work appointments
-      @customer = find_customer_from_params
-      
-      return true if @customer == user
-      # delegate to base class
-      super
-    when 'read %s appointments'
-      # users may read their work/wait appointments
-      @appointment  = find_appointment_from_params
-      
-      return false if @appointment.blank?
-      return true if @appointment.customer == user
-      
-      # set permission based on appointment type, and delegate to base class
-      p = p % @appointment.mark_as
-      super
-    else
-      super
-    end
-  end
+  # def has_privilege?(p, authorizable=nil, user=nil)
+  #   case p
+  #   # when 'update calendars'
+  #   #   case params[:mark_as]
+  #   #   when Appointment::WORK, Appointment::WAIT
+  #   #     # anyone can create work, wait appointments
+  #   #     return true
+  #   #   when Appointment::FREE
+  #   #     # delegate to base class
+  #   #     super
+  #   #   else
+  #   #     # delegate to base class
+  #   #     super
+  #   #   end
+  #   when 'read work appointments'
+  #     # users may read their work appointments
+  #     @customer = find_customer_from_params
+  #     
+  #     return true if @customer == user
+  #     # delegate to base class
+  #     super
+  #   when 'read %s appointments'
+  #     # users may read their work/wait appointments
+  #     @appointment  = find_appointment_from_params
+  #     
+  #     return false if @appointment.blank?
+  #     return true if @appointment.customer == user
+  #     
+  #     # set permission based on appointment type, and delegate to base class
+  #     p = p % @appointment.mark_as
+  #     super
+  #   else
+  #     super
+  #   end
+  # end
   
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
@@ -232,6 +233,99 @@ class AppointmentsController < ApplicationController
       format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
+
+  # GET /users/1/calendar/block/edit
+  def new_block
+    # @provider initialized in before_filter
+    
+    # if params[:provider_type].blank? or params[:provider_id].blank?
+    #   # no provider was specified, redirect to the company's first provider
+    #   provider = current_company.providers.first
+    #   redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+    # end
+        
+    # build list of providers to allow the scheduled to be adjusted by resource
+    @providers = current_company.providers
+    
+    # initialize daterange, start calendar on sunday, end calendar on sunday
+    @daterange = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
+        
+    # find free work appointments
+    @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
+
+    # group appointments by day
+    @free_work_appts_by_day = @free_work_appts.group_by { |appt| appt.start_at.utc.beginning_of_day }
+    
+    # build calendar markings from free appointments
+    @calendar_markings  = build_calendar_markings(@free_work_appts)
+    
+    # build time of day collection
+    # TODO xxx - need a better way of mapping these times to start, end hours
+    @tod        = ['morning', 'afternoon']
+    @tod_start  = 'morning'
+    @tod_end    = 'afternoon'
+    
+    @free_service = current_company.free_service
+    
+    respond_to do |format|
+      format.html
+    end
+  end
+  
+  # GET /users/1/calendar/weekly/new
+  def new_weekly
+    # @provider initialize in before_filter
+    
+    if params[:provider_type].blank? or params[:provider_id].blank?
+      # no provider was specified, redirect to the company's first provider
+      provider = current_company.providers.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+    end
+
+    # build list of providers to allow the scheduled to be adjusted by resource
+    @providers = current_company.providers
+
+    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
+    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
+
+    # initialize calendar markings to empty
+    @calendar_markings  = Hash.new
+
+    # Initialize the appointment
+    @appointment = Appointment.new
+
+    respond_to do |format|
+      format.html { render "edit_weekly.html"}
+    end
+  end
+  
+  # GET /users/1/calendar/weekly/:id/edit
+  def edit_weekly
+    # @provider initialize in before_filter
+    
+    if params[:provider_type].blank? or params[:provider_id].blank?
+      # no provider was specified, redirect to the company's first provider
+      flash[:error] = "No provider was specified"
+      provider = current_company.providers.first
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+    end
+
+    @appointment = Appointment.find(params[:id])
+    if (@appointment.blank? || @appointment.recur_rule.blank?)
+      flash[:error] = "Recurring appointment wasn't found"
+      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id)) and return
+    end
+    
+    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
+    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
+
+    # initialize calendar markings to empty
+    @calendar_markings  = Hash.new
+
+    respond_to do |format|
+      format.html
+    end
+  end
   
   # POST /users/1/calendar/free/add
   def create_free
@@ -355,6 +449,8 @@ class AppointmentsController < ApplicationController
       @title = "Appointment Details"
     when Appointment::WAIT
       @title = "Waitlist Details"
+    when Appointment::FREE
+      @title = "Free Time Details"
     end
     
     # show invoices for completed appointments
