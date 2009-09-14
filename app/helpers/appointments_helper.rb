@@ -23,13 +23,13 @@ module AppointmentsHelper
   end
   
   # return hash of possible start time values
-  def free_slot_possible_start_times(slot, duration_in_minutes, options={})
+  def free_slot_possible_start_times(slot, duration_in_seconds, options={})
     # initialize hash with apointment start_at hour and minute
     hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min}
             
     # adjust slot end_at based on duration
     begin
-      end_at = slot.end_at - eval("#{duration_in_minutes}.minutes")
+      end_at = slot.end_at - duration_in_seconds
     rescue
       end_at = slot.end_at
     end
@@ -38,8 +38,8 @@ module AppointmentsHelper
     hash.update(:end_hour => end_at.hour, :end_minute => end_at.min)
     
     # set minute interval based on duration
-    case duration_in_minutes
-    when (0..60)
+    case duration_in_seconds
+    when (0..1.hour)
       minute_interval = 30
     else
       # default value
@@ -102,23 +102,5 @@ module AppointmentsHelper
     "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.to_s[:appt_time]} and running for #{appointment_duration_in_words(appointment)}"
   end
   
-  def appointment_duration_in_words(appointment)
-    duration = appointment.duration
-    if (duration == 0)
-      "0 minutes"
-    else
-      days = (duration / (24 * 60)).to_i
-      duration -= (days * 24 * 60)
-      hours = duration / (24 * 60)
-      duration -= (hours * 60)
-      minutes = duration / 60
-      duration -= minutes
-      res = []
-      res << "#{days} days" unless (days == 0)
-      res << "#{hours} hours" unless (hours == 0)
-      res << "#{minutes} minutes" unless (minutes == 0)
-      res.to_sentence
-    end
-  end
-  
+
 end
