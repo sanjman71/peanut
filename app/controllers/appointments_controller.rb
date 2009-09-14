@@ -268,7 +268,7 @@ class AppointmentsController < ApplicationController
     @free_service = current_company.free_service
     
     respond_to do |format|
-      format.html
+      format.html { render "edit_block.html"}
     end
   end
   

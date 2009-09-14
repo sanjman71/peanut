@@ -60,7 +60,7 @@ class OpeningsController < ApplicationController
     @service  = params[:service_id] ? current_company.services.find(params[:service_id].to_i) : Service.nothing
     
     # initialize duration
-    @duration = params[:duration] ? params[:duration].to_i : @service.duration
+    @duration = params[:duration] ? ((params[:duration].to_i).minutes) : @service.duration
     
     # if the service allows a custom duration, then set the service duration; otherwise use the default service duration
     if @service.allow_custom_duration
