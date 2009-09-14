@@ -99,7 +99,7 @@ module AppointmentsHelper
     appointment.recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/
     freq = FREQ[$1]
     days = $2.split(',').map{|d| DAYS_OF_WEEK[d]}
-    "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.to_s[:appt_time]} and running for #{appointment_duration_in_words(appointment)}"
+    "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.to_s[:appt_time]} and running for #{Duration.to_words(appointment.duration)}"
   end
   
 

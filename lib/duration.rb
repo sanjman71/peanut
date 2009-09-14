@@ -15,13 +15,16 @@ class Duration
     duration_in_seconds -= hours.hours
     minutes = (duration_in_seconds / 1.minute).to_i
     duration_in_seconds -= minutes.minutes
-    phrase = options[:prepend].blank? ? [] : [options[:prepend]]
+    phrase = []
     phrase << "#{pluralize(days, 'day')}" unless (days == 0)
     phrase << "#{pluralize(hours, 'hour')}" unless (hours == 0)
     phrase << "#{pluralize(minutes, 'minute')}" unless (minutes == 0)
     phrase << "#{pluralize(duration_in_seconds, 'second')}" unless (duration_in_seconds == 0)
-    phrase.to_sentence
-
+    if options[:prepend].blank?
+      phrase.to_sentence
+    else
+      options[:prepend] + ' ' + phrase.to_sentence
+    end
   end
 
   def self.pluralize(count, singular)
