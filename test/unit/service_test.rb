@@ -22,7 +22,7 @@ class ServiceTest < ActiveSupport::TestCase
 
   context "create service" do
     setup do
-      @service = @company.services.create(:name => "boring job", :duration => 30, :mark_as => "work", :price => 1.00)
+      @service = @company.services.create(:name => "boring job", :duration => 30 * 60, :mark_as => "work", :price => 1.00)
       assert_valid @service
     end
 
@@ -31,7 +31,7 @@ class ServiceTest < ActiveSupport::TestCase
     end
 
     should "have duration of 30 minutes" do
-      assert_equal 30, @service.duration
+      assert_equal 30 * 60, @service.duration
     end
 
     context "create user and add as a service provider" do

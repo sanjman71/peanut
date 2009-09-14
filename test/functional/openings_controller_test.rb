@@ -8,22 +8,22 @@ class OpeningsControllerTest < ActionController::TestCase
   should_route :get, '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule'
   
   # search appointments for a specified provider, duration and service, with a when range
-  should_route :post, 'users/1/services/3/45/openings/this-week/anytime',
+  should_route :post, 'users/1/services/3/2700/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
-               :duration => 45, :when => 'this-week', :time => 'anytime'
+               :duration => 45.minutes, :when => 'this-week', :time => 'anytime'
 
   # search appointments for a specified provider, duration and service, with a date range
-  should_route :post, 'users/1/services/3/45/openings/20090101..20090201/anytime',
+  should_route :post, 'users/1/services/3/2700/openings/20090101..20090201/anytime',
                :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
-               :duration => 45, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
+               :duration => 45.minutes, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   # search appointments for anyone providing a specified service with a specified service duration, with a when range
-  should_route :post, 'services/3/120/openings/this-week/anytime', 
-               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120, :when => 'this-week', :time => 'anytime'
+  should_route :post, 'services/3/7200/openings/this-week/anytime', 
+               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, :when => 'this-week', :time => 'anytime'
 
   # search appointments for anyone providing a specified service with a specified service duration, with a date range
-  should_route :post, 'services/3/120/openings/20090101..20090201/anytime', 
-               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120, 
+  should_route :post, 'services/3/7200/openings/20090101..20090201/anytime', 
+               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, 
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   def setup
@@ -35,7 +35,7 @@ class OpeningsControllerTest < ActionController::TestCase
     @company      = Factory(:company, :subscription => @subscription)
     @johnny       = Factory(:user, :name => "Johnny")
     @company.user_providers.push(@johnny)
-    @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 10.00, :duration => 30)
+    @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 10.00, :duration => 30.minutes)
     @company.services.push(@haircut)
     @haircut.user_providers.push(@johnny)
     @company.reload
@@ -80,12 +80,12 @@ class OpeningsControllerTest < ActionController::TestCase
   context "search company openings with a valid service, but invalid duration" do
     setup do
       # create company service that does not allow a custom duration
-      get :index, :service_id => @haircut.id, :duration => 90, :when => 'this-week', :time => 'anytime'
+      get :index, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
     end
 
     should_respond_with :redirect
     should_redirect_to "openings services path with default duration value" do
-      "/services/#{@haircut.id}/30/openings/this-week/anytime"
+      "/services/#{@haircut.id}/1800/openings/this-week/anytime"
     end
   end
 end

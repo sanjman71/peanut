@@ -28,7 +28,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
     @customer       = Factory(:user, :name => "Customer")
     @provider       = Factory(:user, :name => "Provider")
     @company.user_providers.push(@provider)
-    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :duration => 60, :allow_custom_duration => true, :company => @company)
+    @work_service   = Factory(:work_service, :name => "Work service", :price => 1.00, :duration => 60.minutes, :allow_custom_duration => true, :company => @company)
     @free_service   = @company.free_service
 
     assert_valid @customer
@@ -56,10 +56,10 @@ class CapacitySlotTest < ActiveSupport::TestCase
     should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 0 to 8 dur 8 c 4" do
-      assert_equal [[0, 8, 8, 4]], @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity] }
+      assert_equal [[0, 8, 8.hours, 4]], @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity] }
     end
     
-    context "then reduce capacity of the [0, 8, 8, 4] slot: 3-6 c 1" do
+    context "then reduce capacity of the [0, 8, 8.hours, 4] slot: 3-6 c 1" do
       setup do
         @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
         @capacity = 1
@@ -75,12 +75,12 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
       should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
         # Get the capacity slots, sort by the start time and then the end time (hack...)
-        slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+        slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                     sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-        assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
+        assert_equal [[0, 3, 3.hours, 4], [0, 8, 8.hours, 3], [6, 8, 2.hours, 4]], slots
       end
   
-      context "then reduce capacity of [0, 8, 8, 3]: 5-7 c 2" do
+      context "then reduce capacity of [0, 8, 8.hours, 3]: 5-7 c 2" do
         setup do
           @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0500", :end_at => "0700"})
           @capacity = 2
@@ -96,9 +96,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
               
         should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4" do
           # Get the capacity slots, sort by the start time, then the end time, then the capacity
-          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                       sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-          assert_equal [[0, 3, 3, 4], [0, 5, 5, 3], [0, 8, 8, 1], [6, 8, 2, 2], [7, 8, 1, 3], [7, 8, 1, 4]], slots
+          assert_equal [[0, 3, 3.hours, 4], [0, 5, 5.hours, 3], [0, 8, 8.hours, 1], [6, 8, 2.hours, 2], [7, 8, 1.hours, 3], [7, 8, 1.hours, 4]], slots
         end
   
         context "then defrag" do
@@ -111,9 +111,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
           
           should "have capacity slots of 0-3 c 4; 0-5 c 3; 0-8 c 1; 6-8 c 2; 7-8 c 4" do
             # Get the capacity slots, sort by the start time, then the end time, then the capacity
-            slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+            slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                         sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-            assert_equal [[0, 3, 3, 4], [0, 5, 5, 3], [0, 8, 8, 1], [6, 8, 2, 2], [7, 8, 1, 4]], slots
+            assert_equal [[0, 3, 3.hours, 4], [0, 5, 5.hours, 3], [0, 8, 8.hours, 1], [6, 8, 2.hours, 2], [7, 8, 1.hours, 4]], slots
           end
 
           context "then remove company" do
@@ -159,9 +159,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
     
     should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4" do
       # Get the capacity slots, sort by the start time and then the end time (hack...)
-      slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+      slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-      assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
+      assert_equal [[0, 3, 3.hours, 4], [0, 8, 8.hours, 3], [6, 8, 2.hours, 4]], slots
     end
   
     context "then consume more capacity" do
@@ -180,9 +180,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
       should "have capacity slots of 0-1 c 3; 0-1 c 4; 0-3 c 1; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
         # Get the capacity slots, sort by the start time and then the end time (hack...)
-        slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+        slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                     sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-        assert_equal [[0, 1, 1, 3], [0, 1, 1, 4], [0, 3, 3, 1], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
+        assert_equal [[0, 1, 1.hours, 3], [0, 1, 1.hours, 4], [0, 3, 3.hours, 1], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 8, 6.hours, 3], [6, 8, 2.hours, 4]], slots
       end
   
       context "and defrag the slots" do
@@ -196,9 +196,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4" do
           # Get the capacity slots, sort by the start time and then the end time (hack...)
-          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                       sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-          assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
+          assert_equal [[0, 1, 1.hours, 4], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 8, 6.hours, 3], [6, 8, 2.hours, 4]], slots
         end
   
         context "then consume yet more capacity causing fragmentation" do
@@ -217,9 +217,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
           
           should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 2-8 c 1; 6-8 c 2; 7-8 c 3; 7-8 c 4; " do
             # Get the capacity slots, sort by the start time and then the end time (hack...)
-            slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+            slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                         sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-            assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [2, 8, 6, 1], [6, 8, 2, 2], [7, 8, 1, 3], [7, 8, 1, 4]], slots
+            assert_equal [[0, 1, 1.hours, 4], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 5, 3.hours, 3], [2, 8, 6.hours, 1], [6, 8, 2.hours, 2], [7, 8, 1.hours, 3], [7, 8, 1.hours, 4]], slots
           end
           
           context "and defrag the slots" do
@@ -233,9 +233,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
           
             should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 6-8 c 2; 7-8 c 4; " do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
-              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                           sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-              assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [6, 8, 2, 2], [7, 8, 1, 4]], slots
+              assert_equal [[0, 1, 1.hours, 4], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 5, 3.hours, 3], [6, 8, 2.hours, 2], [7, 8, 1.hours, 4]], slots
             end
           
             context "then remove company" do
@@ -274,7 +274,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
     should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 0000 to 0800 duration 8 hours" do
-      assert_equal 8 * 60, CapacitySlot.first.duration
+      assert_equal [8.hours], @free_appt.capacity_slots.map(&:duration).sort
+      assert_equal [Time.zone.parse("00:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_start_at).sort
+      assert_equal [Time.zone.parse("08:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_end_at).sort
     end
     
     context "THEN find free time from 0300 to 0600" do
@@ -285,11 +287,13 @@ class CapacitySlotTest < ActiveSupport::TestCase
         @capacity_slots = AppointmentScheduler.find_free_capacity_slots(@company, @anywhere, @provider, @work_service, @time_range.duration, @date_range, {:time_range => @time_range})
       end
       
-      should "have one capacity slot of duration 8 hours" do
+      should "have one capacity slot from 0000 to 0800 of duration 8 hours" do
         assert_equal 1, @capacity_slots.size
-        assert_equal 8 * 60, @capacity_slots.first.duration
+        assert_equal [8.hours], @capacity_slots.map(&:duration).sort
+        assert_equal [Time.zone.parse("00:00").utc.hour.hours], @capacity_slots.map(&:time_start_at).sort
+        assert_equal [Time.zone.parse("08:00").utc.hour.hours], @capacity_slots.map(&:time_end_at).sort
       end
-      
+
       context "THEN schedule work appointment from 0300 to 0600" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
@@ -299,12 +303,11 @@ class CapacitySlotTest < ActiveSupport::TestCase
         end
   
         # After scheduling the appointment, we have available capacity from 0000 - 0300 and 0600 - 0800
-        should "have 2 capacity slots" do
+        should "have 2 capacity slots with durations 3 hours and 2 hours from [0000,0300] and [0600, 0800]" do
           assert_equal 2, @free_appt.capacity_slots.size
-        end
-        
-        should "have capacity slots with durations 3 hours and 2 hours" do
-          assert_equal [2*60, 3*60], @free_appt.capacity_slots.map(&:duration).sort
+          assert_equal [2.hours, 3.hours], @free_appt.capacity_slots.map(&:duration).sort
+          assert_equal [Time.zone.parse("00:00").utc.hour.hours, Time.zone.parse("06:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_start_at).sort
+          assert_equal [Time.zone.parse("03:00").utc.hour.hours, Time.zone.parse("08:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_end_at).sort
         end
         
         context "THEN find free time from 0100 to 0200" do
@@ -317,10 +320,13 @@ class CapacitySlotTest < ActiveSupport::TestCase
           end
   
           # This should give the capacity slot from 0000 - 0300
-          should "have one capacity slot" do
+          should "have one capacity slot from 0000 to 0300" do
             assert_equal 1, @capacity_slots.size
+            assert_equal [3.hours], @capacity_slots.map(&:duration).sort
+            assert_equal [Time.zone.parse("00:00").utc.hour.hours], @capacity_slots.map(&:time_start_at).sort
+            assert_equal [Time.zone.parse("03:00").utc.hour.hours], @capacity_slots.map(&:time_end_at).sort
           end
-          
+
           context "THEN schedule a work appointment from 0100 to 0200" do
             setup do
               @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
@@ -330,12 +336,13 @@ class CapacitySlotTest < ActiveSupport::TestCase
             end
     
             # I should now have capacity from 0000- 0100, 0200 - 0300 and 0600 - 0800
-            should "have 3 capacity slots" do
+            should "have 3 capacity slots from 0000- 0100, 0200 - 0300 and 0600 - 0800" do
               assert_equal 3, @free_appt.capacity_slots.size
-            end
-            
-            should "have capacity slots with durations 1 hour, 1 hour and 2 hours" do
-              assert_equal [1*60, 1*60, 2*60], @free_appt.capacity_slots.map(&:duration).sort
+              assert_equal [1.hour, 1.hour, 2.hours], @free_appt.capacity_slots.map(&:duration).sort
+              assert_equal [Time.zone.parse("00:00").utc.hour.hours, Time.zone.parse("02:00").utc.hour.hours, Time.zone.parse("06:00").utc.hour.hours],
+                            @free_appt.capacity_slots.map(&:time_start_at).sort
+              assert_equal [Time.zone.parse("01:00").utc.hour.hours, Time.zone.parse("03:00").utc.hour.hours, Time.zone.parse("08:00").utc.hour.hours],
+                            @free_appt.capacity_slots.map(&:time_end_at).sort
             end
   
             context "THEN find free time from 0500 to 0700" do
@@ -362,9 +369,11 @@ class CapacitySlotTest < ActiveSupport::TestCase
               end
   
               # This should give one slot, from 0600- 0800
-              should "have no capacity slots" do
+              should "have one capacity slot" do
                 assert_equal 1, @capacity_slots.size
-                assert_equal (2 * 60), @capacity_slots.first.duration
+                assert_equal [2.hours], @capacity_slots.map(&:duration).sort
+                assert_equal [Time.zone.parse("06:00").utc.hour.hours], @capacity_slots.map(&:time_start_at).sort
+                assert_equal [Time.zone.parse("08:00").utc.hour.hours], @capacity_slots.map(&:time_end_at).sort
               end
   
               context "THEN schedule a work appointment from 0600 to 0800" do
@@ -372,12 +381,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
                   @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
                   @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
                   assert_valid @work_appt
+                  debugger
                   @free_appt.reload # Reload the capacity slots list
                 end
   
                 # Should now have capacity from 0000 - 0100, 0200 - 0300
                 should "have 2 capacity slots" do
                   assert_equal 2, @free_appt.capacity_slots.size
+                  assert_equal [1.hour, 1.hour], @free_appt.capacity_slots.map(&:duration).sort
+                  assert_equal [Time.zone.parse("00:00").utc.hour.hours, Time.zone.parse("02:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_start_at).sort
+                  assert_equal [Time.zone.parse("01:00").utc.hour.hours, Time.zone.parse("03:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_end_at).sort
                 end
                 
               end
@@ -412,7 +425,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
     should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
     
     should "have one capacity slot from 2100 to 0500 duration 8 hours" do
-      assert_equal 8 * 60, CapacitySlot.first.duration
+      assert_equal [8.hours], @free_appt.capacity_slots.map(&:duration).sort
     end
     
     context "THEN find free time from 0000 to 0300" do
@@ -425,7 +438,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
       should "have one capacity slot of duration 8 hours" do
         assert_equal 1, @capacity_slots.size
-        assert_equal 8 * 60, @capacity_slots.first.duration
+        assert_equal [8.hours], @capacity_slots.map(&:duration).sort
       end
       
       context "THEN schedule work appointment from 0000 to 0300" do
@@ -442,7 +455,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
         end
         
         should "have capacity slots with durations 3 hours and 2 hours" do
-          assert_equal [2*60, 3*60], @free_appt.capacity_slots.map(&:duration).sort
+          assert_equal [2.hours, 3.hours], @free_appt.capacity_slots.map(&:duration).sort
         end
         
         context "THEN find free time from 2200 to 2300" do
@@ -473,7 +486,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
             end
             
             should "have capacity slots with durations 1 hour, 1 hour and 2 hours" do
-              assert_equal [1*60, 1*60, 2*60], @free_appt.capacity_slots.map(&:duration).sort
+              assert_equal [1.hour, 1.hour, 2.hour], @free_appt.capacity_slots.map(&:duration).sort
             end
   
             context "THEN find free time from 0500 to 0700" do
@@ -516,7 +529,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
               # This should give one slot, from 0300 - 0500
               should "have one capacity slot of 2 hours" do
                 assert_equal 1, @capacity_slots.size
-                assert_equal (2 * 60), @capacity_slots.first.duration
+                assert_equal [2.hours], @capacity_slots.map(&:duration).sort
               end
   
               context "THEN schedule a work appointment from 0300 to 0500" do
@@ -655,9 +668,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
         
         should "have capacity slots of 0-3 c 4; 0-8 c 3; 6-8 c 4; " do
           # Get the capacity slots, sort by the start time and then the end time (hack...)
-          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                       sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-          assert_equal [[0, 3, 3, 4], [0, 8, 8, 3], [6, 8, 2, 4]], slots
+          assert_equal [[0, 3, 3.hours, 4], [0, 8, 8.hours, 3], [6, 8, 2.hours, 4]], slots
         end
         
         context "THEN find free time from 0100 to 0200 capacity 3" do
@@ -688,9 +701,9 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
             should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-8 c 3; 6-8 c 4; " do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
-               slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+               slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                            sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
-              assert_equal [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 8, 6, 3], [6, 8, 2, 4]], slots
+              assert_equal [[0, 1, 1.hours, 4], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 8, 6.hours, 3], [6, 8, 2.hours, 4]], slots
             end
   
             
@@ -717,8 +730,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
                 should "have capacity slots of 0-1 c 4; 0-8 c 1; 2-3 c 4; 2-5 c 3; 6-8 c 2; 7-8 c 4" do
                   # Get the capacity slots, sort by the start time and then the end time (hack...)
-                  expected_result = [[0, 1, 1, 4], [0, 8, 8, 1], [2, 3, 1, 4], [2, 5, 3, 3], [6, 8, 2, 2], [7, 8, 1, 4]]
-                  slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                  expected_result = [[0, 1, 1.hours, 4], [0, 8, 8.hours, 1], [2, 3, 1.hours, 4], [2, 5, 3.hours, 3], [6, 8, 2.hours, 2], [7, 8, 1.hours, 4]]
+                  slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                               sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
                   assert_equal expected_result.size, @free_appt.capacity_slots.size
                   assert_equal expected_result, slots
@@ -781,8 +794,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
     should "have capacity slots of 15-23 c 4" do
       # Get the capacity slots, sort by the start time and then the end time (hack...)
-      expected_result = [[15, 23, 8, 4]]
-      slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+      expected_result = [[15, 23, 8.hours, 4]]
+      slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal expected_result, slots
     end
 
@@ -808,8 +821,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
         should "have capacity slots of 15-18 c 4; 15-23 c 3; 21-23 c 4" do
           # Get the capacity slots, sort by the start time and then the end time (hack...)
-          expected_result = [[15, 18, 3, 4], [15, 23, 8, 3], [21, 23, 2, 4]]
-          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+          expected_result = [[15, 18, 3.hours, 4], [15, 23, 8.hours, 3], [21, 23, 2.hours, 4]]
+          slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                       sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
           assert_equal expected_result, slots
         end
@@ -838,8 +851,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
             should "have capacity slots of 15-16 c 4; 15-23 c 1; 17-18 c 4; 17-23 c 3; 21-23 c 4" do
               # Get the capacity slots, sort by the start time and then the end time (hack...)
-              expected_result = [[15, 16, 1, 4], [15, 23, 8, 1], [17, 18, 1, 4], [17, 23, 6, 3], [21, 23, 2, 4]]
-              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+              expected_result = [[15, 16, 1.hours, 4], [15, 23, 8.hours, 1], [17, 18, 1.hours, 4], [17, 23, 6.hours, 3], [21, 23, 2.hours, 4]]
+              slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                           sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
               assert_equal expected_result, slots
             end
@@ -853,8 +866,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
               
               should "have capacity slots of 15-18 c 4; 15-23 c 3; 21-23 c 4" do
                 # Get the capacity slots, sort by the start time and then the end time (hack...)
-                expected_result = [[15, 18, 3, 4], [15, 23, 8, 3], [21, 23, 2, 4]]
-                slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+                expected_result = [[15, 18, 3.hours, 4], [15, 23, 8.hours, 3], [21, 23, 2.hours, 4]]
+                slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
                 assert_equal expected_result, slots
               end
     
@@ -867,8 +880,8 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
                 should "have capacity slots of 15-23 c 4" do
                   # Get the capacity slots, sort by the start time and then the end time (hack...)
-                  expected_result = [[15, 23, 8, 4]]
-                  slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, (s.duration / 60), s.capacity]}.
+                  expected_result = [[15, 23, 8.hours, 4]]
+                  slots = @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                                                               sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
                   assert_equal expected_result, slots
                 end
