@@ -381,7 +381,6 @@ class CapacitySlotTest < ActiveSupport::TestCase
                   @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
                   @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
                   assert_valid @work_appt
-                  debugger
                   @free_appt.reload # Reload the capacity slots list
                 end
   
