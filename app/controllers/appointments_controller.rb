@@ -248,7 +248,7 @@ class AppointmentsController < ApplicationController
     @providers = current_company.providers
     
     # initialize daterange, start calendar today, end on saturday to make it all line up nicely
-    @daterange = DateRange.parse_when('next 4 weeks', :end_on => 6)
+    @daterange = DateRange.parse_when('next 4 weeks', :end_on => ((current_company.preferences[:start_wday].to_i - 1) % 7))
         
     # find free work appointments
     @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)

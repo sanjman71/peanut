@@ -9,8 +9,12 @@
 - end_day = daterange.end_at.in_time_zone.end_of_day
 - total_days = daterange.days
 - today = DateRange.today unless local_assigns[:today]
-- extra_days_at_start = start_day.wday
-- extra_days_at_end = 6 - end_day.wday
+- if current_company
+  - extra_days_at_start = (start_day.wday - current_company.preferences[:start_wday].to_i) % 7
+  - extra_days_at_end = (((current_company.preferences[:start_wday].to_i - 1) % 7) - end_day.wday) % 7
+- else
+  - extra_days_at_start = start_day.wday
+  - extra_days_at_end = (6 - end_day.wday)
 -# split days into weeks, use first week to show calendar header fields
 - weeks = Array(0..(total_days-1 + extra_days_at_start + extra_days_at_end)).in_groups_of(7)
 - week0 = weeks.first.compact

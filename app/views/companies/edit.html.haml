@@ -71,6 +71,13 @@
         = f.select :preferences_time_horizon, time_horizon_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-16.prepend-4.last.directions
         == Choose how far out you want people to be able to make appointments.
+    .span-20.last
+      .span-4
+        %h3{:style => 'padding-top: 7px;'}== Start Week On:
+      .span-16.last
+        = f.select :preferences_start_wday, start_wday_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-16.prepend-4.last.directions
+        == When showing calendars, what day do you want to start your week
     .span-20.last.padding-top-10
       = f.submit 'Update Company Preferences', :class => 'button big'
       == or
