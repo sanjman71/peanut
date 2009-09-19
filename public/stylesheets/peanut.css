@@ -154,3 +154,6 @@ div.company_slogan a, a:hover                     { text-decoration:none; color:
 
 div.company_description                           { font-size: 1.5em;}
 div.walnut_calendar_logo a img                    { float: right; padding: 5px; height: 55px;}
+
+.center_justify                                   { text-align: center;}
+.right_justify                                    { text-align: right;}

@@ -37,6 +37,9 @@ class CalendarController < ApplicationController
       @start_date = params[:start_date]
       @end_date   = params[:end_date]
       @daterange  = DateRange.parse_range(@start_date, @end_date)
+    elsif params[:start_date] and params[:range_type]
+      @start_date = params[:start_date]
+      @daterange = DateRange.parse_range_type(@start_date, params[:range_type])
     else
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
@@ -45,7 +48,7 @@ class CalendarController < ApplicationController
 
     # find free, work appointments for the specified provider over a daterange
     @appointments = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
-        
+    
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
     
     # build hash of calendar markings

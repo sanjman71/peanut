@@ -86,12 +86,13 @@ ActionController::Routing::Routes.draw do |map|
                  :controller => 'openings', :action => 'index'
 
   # show/edit calendars scoped by provider (and optional format)
-  map.connect   ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
-  map.connect   ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
-  map.connect   ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
-  map.connect   ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.connect   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
-  map.connect   ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', :controller => 'calendar', :action => 'show'
   
   # search calendars scoped by provider
   map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
