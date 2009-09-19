@@ -85,22 +85,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   'services/:service_id/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
 
-  # show/edit calendars scoped by provider (and optional format)
-  map.connect         ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
-  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', :controller => 'calendar', :action => 'show'
-  
-  # search calendars scoped by provider
-  map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
-
-  # search waitlist scoped by provider
-  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
-  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlist', :action => 'index'
-
   # schedule a work appointment with a provider for a specified service and duration
   map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
@@ -131,6 +115,22 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}
   map.update_weekly ':provider_type/:provider_id/calendar/:id/weekly',
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :post}
+
+  # show/edit calendars scoped by provider (and optional format)
+  map.connect         ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
+  map.connect         ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/
+
+  # search calendars scoped by provider
+  map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
+
+  # search waitlist scoped by provider
+  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
+  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlist', :action => 'index'
 
   # toggle a provider's calendar
   map.connect   ':provider_type/:provider_id/calendar/toggle',

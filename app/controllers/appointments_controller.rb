@@ -247,8 +247,8 @@ class AppointmentsController < ApplicationController
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers
     
-    # initialize daterange, start calendar on sunday, end calendar on sunday
-    @daterange = DateRange.parse_when('next 4 weeks', :start_on => 0, :end_on => 0)
+    # initialize daterange, start calendar today, end on saturday to make it all line up nicely
+    @daterange = DateRange.parse_when('next 4 weeks', :end_on => 6)
         
     # find free work appointments
     @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
@@ -285,8 +285,8 @@ class AppointmentsController < ApplicationController
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers
 
-    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
-    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
+    # initialize daterange. Just used to show days of week.
+    @daterange = DateRange.parse_when('this week')
 
     # initialize calendar markings to empty
     @calendar_markings  = Hash.new
@@ -316,8 +316,8 @@ class AppointmentsController < ApplicationController
       redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id)) and return
     end
     
-    # initialize daterange, start calendar on sunday, end calendar on sunday, dont care about 'when'
-    @daterange = DateRange.parse_when('this week', :start_on => 0, :end_on => 0)
+    # initialize daterange. Just used to show days of week.
+    @daterange = DateRange.parse_when('this week')
 
     # initialize calendar markings to empty
     @calendar_markings  = Hash.new
@@ -462,7 +462,7 @@ class AppointmentsController < ApplicationController
     # build notes collection, most recent first 
     @note         = Note.new
     @notes        = @appointment.notes.sort_recent
-
+    
     respond_to do |format|
       format.html { render(:action => @appointment.mark_as) }
     end

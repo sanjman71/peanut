@@ -70,7 +70,7 @@
 
 .span-14.prepend-1.last
   .span-14#free_work_calendar
-    = render(:partial => 'shared/calendar', :locals => {:total_days => 7, :start_day => @daterange.start_at, :today => DateRange.today, :show_weeks => false, :markings => @calendar_markings})
+    = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :show_weeks => false, :markings => @calendar_markings})
 
 %hr.space
 

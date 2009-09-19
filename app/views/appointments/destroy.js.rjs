@@ -6,8 +6,7 @@ else
   flash.discard
 
   # update calendar
-  page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', 
-                                     :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings}))
+  page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings}))
 
   # update appointment count
   page["#appointments_count"].html(render(:partial => 'appointments_count.html.haml', :locals => {:count => @appointments.size}))

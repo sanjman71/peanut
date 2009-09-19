@@ -37,8 +37,7 @@
       
     -# show free, work calendar
     .span-15.last#free_work_calendar
-      - fwcalendar_date_range = DateRange.new(:name => @daterange.name, :start_at => @daterange.start_at, :end_at => @daterange.end_at, :range_type => @daterange.range_type, :start_on => 0, :end_on => 6)
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => fwcalendar_date_range.days, :start_day => fwcalendar_date_range.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings})
       
     -# show summary of work and free appointments
     .span-15.last
