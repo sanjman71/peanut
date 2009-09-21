@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../test_helper'
+require 'test_helper'
 
 class PaypalTest < Test::Unit::TestCase
   def setup
@@ -163,5 +163,16 @@ class PaypalTest < Test::Unit::TestCase
     recipients = (1..251).collect {|i| [100, "person#{i}@example.com"]}
     response = @gateway.transfer(*recipients)
     assert_failure response
+  end
+  
+  # Makes a purchase then makes another purchase adding $1.00 using just a reference id (transaction id)
+  def test_successful_referenced_id_purchase
+    response = @gateway.purchase(@amount, @creditcard, @params)
+    assert_success response
+    id_for_reference = response.params['transaction_id']
+    
+    @params.delete(:order_id)
+    response2 = @gateway.purchase(@amount + 100, id_for_reference, @params)
+    assert_success response2
   end
 end
