@@ -1,4 +1,4 @@
-if RUBY_VERSION.to_f == 1.8
+if RUBY_VERSION.to_f == 1.8 or RUBY_VERSION.to_f == 1.9
   class BlankSlate #:nodoc:
     instance_methods.each { |m| undef_method m unless m =~ /^__|instance_eval|object_id/ }
   end
