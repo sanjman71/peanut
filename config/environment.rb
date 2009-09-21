@@ -149,3 +149,6 @@ ExceptionNotifier.email_prefix          = "Walnut Calendar "
 
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
+
+# Pull in the serialized_hash functionality
+require "#{RAILS_ROOT}/lib/shared/serialized_hash"
