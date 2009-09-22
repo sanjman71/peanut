@@ -5,7 +5,7 @@
 # ENV['RAILS_ENV'] ||= 'production'
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.2' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.3' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -60,24 +60,23 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
-  # config.gem "bj"
-  # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
-  # config.gem "aws-s3", :lib => "aws/s3"
-  config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem "chronic", :version => '~> 0.2.3'
+  config.gem "crack", :version => "0.1.4" # used by google weather plugin
   config.gem "eventfulapi", :lib => false
   config.gem "geokit" 
-  config.gem "haml"
+  config.gem "haml", :version => '2.2.4'
+  config.gem "hpricot", :version => '0.8.1' # required by sanitize, uses native components
   config.gem "httparty" # used by google weather plugin
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
-  config.gem 'json'
+  config.gem 'json' # uses native components
+  config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem 'mime-types', :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'prawn', :version => '~> 0.4.1'
   config.gem 'ri_cal'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
-  config.gem 'unicode', :lib => false, :version => '~> 0.1'
+  # config.gem 'unicode', :lib => false, :version => '~> 0.1' # not compatible with ruby 1.9
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
