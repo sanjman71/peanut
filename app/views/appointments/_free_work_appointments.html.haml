@@ -10,16 +10,34 @@
     .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")].join(' '), :id => 'appointment_'+appointment.id.to_s}
       .span-4.time
         %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-      .span-3.service{:class => appointment.mark_as}
-        %h6= appointment.service.name
-      .span-3.customer
+      .span-3
+        .span-3.last.service{:class => appointment.mark_as}
+          - if ((appointment.work? || appointment.free?) && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
+            -# work appointments can be viewed with read permissions
+            = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+          - else
+            %h6= appointment.service.name
+        - if show_location?
+          .span-3.last.location
+            %h6= appointment.location.name
+      .span-4.customer
         %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
-      .span-2.location
-        %h6= show_location? ? appointment.location.name : "&nbsp;"
-      .span-2.prepend-1.last.action.hide{:id => "hover_appointment_#{appointment.id}"}
-        - if appointment.free? and has_privilege?("update calendars", current_company)
-          -# free appointments may be deleted with 'update calendars' permission
-          = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+      .span-4.last
+        - if has_privilege?("update calendars", current_company)
+          .span-4.last.edit
+            -# free appointments may be deleted with 'update calendars' permission
+            .span-1.edit-one
+              = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+            - if appointment.recurrence?
+              .span-3.last.edit-weekly
+                = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.recurrence_parent.id), :class => "ujs edit")
+          .span-4.last.edit
+            -# free appointments may be deleted with 'update calendars' permission
+            .span-1.delete-one
+              = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+            - if appointment.recurrence?
+              .span-3.last.delete-weekly
+                = link_to('Delete series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.recurrence_parent.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this series of appointments?")
         - elsif appointment.work? and has_privilege?("read work appointments", current_company)
           -# work appointments can be viewed with read permissions
           = link_to "Details", appointment_path(appointment, :subdomain => current_subdomain)

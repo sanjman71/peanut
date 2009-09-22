@@ -1,0 +1,126 @@
+- title("Manage Schedules")
+- stylesheet('calendar', 'jquery.timepickr')
+- javascript('calendar_weekly', 'ui.timepickr', 'jquery.timepickr')
+
+.span-24.last#what
+  .span-15.prepend-1.mat.padding-top-10
+    .span-15.last.provider
+      - if @providers.blank?
+        = label_tag "edit_provider", "Create weekly schedule for #{@provider.name}", :class => 'big'
+      - else
+        = label_tag "edit_provider", "Create weekly schedule for", :class => 'big'
+        = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')      
+    %h4.span-15.last#how{:style => 'line-height: 25px;'}
+      == Use the calendar to select the days of the week.
+      %br
+      == Use the time range sliders to select the available time range.
+      %br
+      == Specify the start date and end date for the schedule.
+      %br
+      == Click the 'Create Weekly Schedule' button to add the selected available time to your calendar.
+  .span-7.prepend-1.last
+    .sidebar.instructions.padding-5
+      == What is available time?
+      %ul{:style => 'font-size: 11px;'}
+        %li== Its the time a person is available to take appointments.
+      == Why does everyone start with no available time?
+      %ul{:style => 'font-size: 11px;'}
+        %li== Its the default, since the system has no way of knowing when a person is available to work.
+
+.span-14.prepend-1.last
+  = display_flash
+.span-14.prepend-1.last
+  = error_messages_for(:appointment)
+
+%hr.space
+
+.span-14.prepend-1.last.prompt
+  == When will the first appointment in this recurring series start and end?
+.span-13.prepend-2.last.hint.padding-bottom-10
+  == Usually the first appointment will start and end on the same day
+
+.span-14.prepend-1.last
+  .span-3.text_field_label
+    = label_tag "starts_at", "Starting Time:"
+  .span-4.padding-top-5
+    = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style'
+  .span-2.text_field_label
+    = label_tag "start_date", "Date:"
+  .span-4.last.padding-top-5
+    = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style'
+
+.span-14.prepend-1.last
+  .span-3.text_field_label
+    = label_tag "ends_at", "Ending Time:"
+  .span-4.padding-top-5
+    = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style'
+  .span-2.text_field_label
+    = label_tag "end_date", "Date:"
+  .span-4.last.padding-top-5
+    = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style'
+
+%hr.space
+
+.span-14.prepend-1.last.prompt
+  == Which days will the appointment recur on?
+%h4.bottom.visible.span-14.prepend-1.append-9.last#weekly_schedule
+  == &nbsp;
+
+%hr.space
+
+.span-14.prepend-1.last
+  .span-14#free_work_calendar
+    = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :show_weeks => false, :markings => @calendar_markings})
+
+%hr.space
+
+.span-14.prepend-1.last
+  .span-14.last.prompt
+    == How long will this appointment recur?
+  .span-13.prepend-1.last.hint
+    == If you prefer you can leave it open ended.
+  .span-4.text_field_label
+    = label_tag "schedule_end_date", "Series Ends:"
+  .span-10.last.padding-top-5
+    = radio_button_tag "ends", "Never", true, :id => 'schedule_end_never'
+    = label_tag "schedule_end_never", "Never", :class => 'std_text_field_style'
+    = radio_button_tag "ends", "Until", false, :id => 'schedule_end_until'
+    = label_tag "schedule_end_until", "Until", :class => 'std_text_field_style', :style => 'padding-right: 5px;'
+    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide std_text_field_style'
+    
+%hr.space
+    
+- if @provider.class.to_s == "Resource"
+  .span-14.prepend-1.last.prompt
+    == How many #{@provider.name.downcase.pluralize} will be available:
+  .span-13.prepend-2.last.hint.padding-bottom-10
+    == Often the capacity is 1, but you may have more than 1.
+  .span-14.prepend-1.last
+    .span-3.text_field_label
+      = label_tag "capacity", "Capacity:"
+    .span-4.last
+      = text_field_tag 'capacity', '1', :class => 'std_text_field_style'
+
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
+  = hidden_field_tag :freq, 'weekly'
+  = hidden_field_tag :wkst, 'su'
+  = hidden_field_tag :byday, ''
+  = hidden_field_tag :dstart, ''
+  = hidden_field_tag :tstart, ''
+  = hidden_field_tag :dend, ''
+  = hidden_field_tag :tend, ''
+  = hidden_field_tag :until, ''
+  = hidden_field_tag :capacity, '1'
+  
+  %hr.space
+  %hr.space
+  
+  .span-16.last.prepend-1
+    %h2#submit
+      = f.submit "Create Weekly Schedule", :class => 'big button'
+      %span{:style => 'font-size: 11px;'}
+        == or
+        = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+    %h2.hide#progress= image_tag 'barbershop.gif'
+  
+  

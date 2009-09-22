@@ -44,7 +44,7 @@ end
 Factory.define :work_service, :class => Service do |s|
   s.name                    "Work"
   s.mark_as                 "work"
-  s.duration                30
+  s.duration                30.minutes
   s.allow_custom_duration   false
 end
 
@@ -98,8 +98,8 @@ end
 Factory.define :appointment_today, :class => Appointment do |a|
   a.mark_as         { |o| o.service.mark_as }
   a.start_at        { |o| Factory.next :today_hour }  # choose an hour from today
-  a.duration        { |o| o.service.duration_to_seconds }
-  a.end_at          { |o| o.start_at + o.service.duration_to_seconds }  # add duration to start_at
+  a.duration        { |o| o.service.duration }
+  a.end_at          { |o| o.start_at + o.service.duration }  # add duration to start_at
 end
 
 Factory.define :log_entry do |e|

@@ -95,6 +95,21 @@ class ActiveSupport::TestCase
     end
     a.join(',')
   end
+
+  def add_mary_and_johnny_as_providers
+    # add johnny as a company provider
+    @johnny = Factory(:user, :name => "Johnny")
+    # @johnny.grant_role('user manager', @johnny)
+    @company.user_providers.push(@johnny)
+    @johnny.reload
+    @company.reload
+    @mary = Factory(:user, :name => "Mary")
+    # @mary.grant_role('user manager', @mary)
+    @company.user_providers.push(@mary)
+    @mary.reload
+    @company.reload
+  end
+
 end
 
 class ActionView::Base

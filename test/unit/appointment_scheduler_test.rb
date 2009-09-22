@@ -14,7 +14,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @company.services.push(@haircut)
       @customer  = Factory(:user)
 
@@ -51,7 +51,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.user_providers.push(@johnny)
 
       # create free appointment that ended a few minutes ago
@@ -79,7 +79,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.user_providers.push(@johnny)
       @haircut.reload
       @johnny.reload
@@ -87,7 +87,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       # create a free appointment that starts in 1 hour
       @start_at           = (Time.now + 1.hour).to_s(:appt_schedule)
       @end_at             = (Time.now + 3.hours).to_s(:appt_schedule)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :duration => 120, :end_at => @end_at)
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :start_at => @start_at, :duration => 120.minutes, :end_at => @end_at)
       assert_valid @free_appointment
     end
   
@@ -111,7 +111,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny           = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.user_providers.push(@johnny)
       @customer         = Factory(:user)
   
@@ -125,7 +125,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       
       # schedule the work appointment, the free appointment should be split into free/work time
       @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => @start_at)
-      @end_appt         = (beginning_of_day + @haircut.duration.minutes).to_s(:appt_schedule)
+      @end_appt         = (beginning_of_day + @haircut.duration).to_s(:appt_schedule)
       assert_valid @work_appointment
 
       @daterange        = DateRange.parse_range((beginning_of_day - 30.days).to_s(:appt_schedule), (beginning_of_day + 30.days).to_s(:appt_schedule))
@@ -142,7 +142,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     
     should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
-      assert_equal 30, @work_appointment.duration
+      assert_equal 30.minutes, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do
@@ -194,7 +194,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.company_providers.create(:provider => @johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.service_providers.create(:provider => @johnny)
       @customer  = Factory(:user)
   
@@ -204,7 +204,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       assert_valid @free_appointment
       
       # schedule the work appointment, with a custom duration
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 60, @customer, :start_at => "20080801100000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 60.minutes, @customer, :start_at => "20080801100000")
       assert_valid @work_appointment
     end
   
@@ -217,7 +217,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     
     should "have work appointment with haircut service and custom duration" do
       assert_equal @haircut, @work_appointment.service
-      assert_equal 60, @work_appointment.duration
+      assert_equal 60.minutes, @work_appointment.duration
     end
   
     should "have work appointment with correct start and end times" do
@@ -258,7 +258,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.user_providers.push(@johnny)
       @customer  = Factory(:user)
 
@@ -281,7 +281,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     
     should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
-      assert_equal 30, @work_appointment.duration
+      assert_equal 30.minutes, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do
@@ -321,7 +321,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @johnny    = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30, :price => 1.00, :company => @company)
+      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @haircut.user_providers.push(@johnny)
       @customer  = Factory(:user)
   
@@ -344,7 +344,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     
     should "have work appointment with haircut service and standard duration" do
       assert_equal @haircut, @work_appointment.service
-      assert_equal 30, @work_appointment.duration
+      assert_equal 30.minutes, @work_appointment.duration
     end
     
     should "have work appointment with correct start and end times" do

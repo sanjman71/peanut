@@ -105,7 +105,7 @@ class ApplicationController < ActionController::Base
       
       if appointment.mark_as == Appointment::NONE
         # if the unscheduled time is not the entire day, it means there is at least one free/work appointment
-        if appointment.duration != 24 * 60
+        if appointment.duration != (24.hours)
           hash[key].push(Appointment::BUSY).uniq!
         end
       end

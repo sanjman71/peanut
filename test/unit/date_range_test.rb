@@ -135,9 +135,8 @@ class DateRangeTest < ActiveSupport::TestCase
       @daterange = DateRange.parse_when('next 2 weeks', :end_on => 0)
       assert_valid @daterange
       # calculate days to add based on current day and end on day
-      # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night.
-      # The days calculation considers this to be Monday morning first thing, so 6 days are added to get to Sunday.
-      @days_to_add = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1][Time.zone.now.wday]
+      # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night - no days are added
+      @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.zone.now.wday]
     end
     
     should 'have start at == beginning of today in utc format' do

@@ -29,7 +29,7 @@ class ServicesControllerTest < ActionController::TestCase
     context "without privilege 'create services'" do
       setup do
         @controller.stubs(:current_user).returns(@provider)
-        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60}
+        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60 * 60}
       end
       
       should_redirect_to("unauthorized_path") { unauthorized_path }
@@ -38,7 +38,7 @@ class ServicesControllerTest < ActionController::TestCase
     context "with privilege 'create services'" do
       setup do
         @controller.stubs(:current_user).returns(@owner)
-        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60}
+        post :create, :service => {:name => "Massage", :mark_as => 'work', :price => 1000, :duration => 60 * 60}
       end
       
       should_assign_to :service, :redirect_path

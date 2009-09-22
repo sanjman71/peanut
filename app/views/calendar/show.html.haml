@@ -1,6 +1,7 @@
 - title("Schedules")
 - stylesheet('appointments', 'calendar', 'jquery.timepickr')
 - javascript('appointments', 'calendar', 'ui.timepickr', 'jquery.timepickr')
+- today_prev_next = build_calendar_today_prev_next_links(@provider, @daterange)
 
 .span-16.append-1
   .span-15.prepend-1.last.mat.padding-top-10
@@ -11,13 +12,13 @@
       %h6{:style => 'margin-bottom: 20px; font-weight: normal;'}= link_to 'PDF Version', url_for(:format => 'pdf', :subdomain => current_subdomain)
     .span-6.prepend-1.last
       #links
-        - build_calendar_when_links(@provider, Appointment::WHEN_WEEKS, @when, :default => Appointment::WHEN_THIS_WEEK) do |link, separator|
-          = link
-          = separator
+        - build_calendar_range_type_links(@provider, DateRange::RANGE_TYPES, @daterange.range_type, @daterange.start_at) do |link|
+          = link + " | "
+        = link_to "Date Range", '', :id => 'show_dates'
         %br
         == or
         %br
-        = link_to "Use a Date Range", '', :id => 'show_dates'
+        = today_prev_next[:today_link]
       
       #dates.hide
         = render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :provider_type => @provider.class.to_s.tableize, :provider_id => @provider.id, :subdomain => current_subdomain), :submit_id => 'search_calendar_with_date_range_submit'})
@@ -26,13 +27,17 @@
     = display_flash
     
   %hr.space
-  
   .span-15.prepend-1.last
-    %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
+    .span-3
+      =today_prev_next[:prev_link]
+    .span-9.center_justify
+      %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
+    .span-3.last.right_justify
+      =today_prev_next[:next_link]
       
     -# show free, work calendar
     .span-15.last#free_work_calendar
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:total_days => @daterange.days, :start_day => @daterange.start_at, :today => DateRange.today, :markings => @calendar_markings})
+      = render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings})
       
     -# show summary of work and free appointments
     .span-15.last

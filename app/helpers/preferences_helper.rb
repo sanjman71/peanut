@@ -11,4 +11,11 @@ module PreferencesHelper
     ]
   end
   
+  def start_wday_options
+    [
+      ["Sunday", "0"],
+      ["Monday", "1"]
+    ]
+  end
+  
 end

@@ -54,12 +54,25 @@ $.fn.set_recurrence = function () {
   }
   
   // write recurrence 'dstart'
-  if ($("#schedule_start_date").attr('value')) {
-    s = $(document).convert_date_to_string($("#schedule_start_date").attr('value'));
+  if ($("#start_date").attr('value')) {
+    s = $(document).convert_date_to_string($("#start_date").attr('value'));
     $("#dstart").attr('value', s);
   } else {
     // clear out field
     $("#dstart").attr('value', '');
+  }
+
+  // write recurrence 'dend'
+  // If it's set, we use the value. If not, we use the start date
+  if ($("#end_date").attr('value')) {
+    s = $(document).convert_date_to_string($("#end_date").attr('value'));
+    $("#dend").attr('value', s);
+  } else if ($("#start_date").attr('value')) {
+    s = $(document).convert_date_to_string($("#start_date").attr('value'));
+    $("#dend").attr('value', s);
+  } else {
+    // clear out field
+    $("#dend").attr('value', '');
   }
 
   // write recurrence 'until'
@@ -70,6 +83,16 @@ $.fn.set_recurrence = function () {
     // clear out field
     $("#until").attr('value', '');
   }
+
+  // write capacity
+  if ($("#capacity").attr('value')) {
+    s = $(document).convert_date_to_string($("#capacity").attr('value'));
+    $("#capacity").attr('value', s);
+  } else {
+    // set field to default
+    $("#capacity").attr('value', '1');
+  }
+
 }
 
 $.fn.init_daynames = function () {
@@ -133,7 +156,7 @@ $.fn.init_timepicker = function() {
 $.fn.init_schedule_form = function () {
   // submit weekly schedule
   $("#add_weekly_schedule_form").submit(function () {
-    // validate presence of byday, tstart, tend, schedule_start_date
+    // validate presence of byday, tstart, tend, start_date
     if (!$("#byday").attr('value')) {
       alert("Please select 1 or more days");
       return false
@@ -149,11 +172,27 @@ $.fn.init_schedule_form = function () {
       return false
     }
 
-    if (!$("#schedule_start_date").attr('value')) {
+    if (!$("#start_date").attr('value')) {
       alert("Please specify a start date");
       return false
     }
 
+    // Make sure the end date/time is later than the start date/time
+    // With the dates and times in the right format we can use string compares
+    sd = $(document).convert_date_to_string($("#start_date").attr('value'));
+    ed = $(document).convert_date_to_string($("#end_date").attr('value'));
+    st = $(document).convert_time_ampm_to_string($("#starts_at").attr('value'));
+    et = $(document).convert_time_ampm_to_string($("#ends_at").attr('value'));    
+    
+    // If the end date is earlier than the start date
+    if (ed < sd) {
+      alert("The end date is earlier than the start date");
+      return false
+    } else if ((ed == sd) && (et < st)) {
+      // If it ends on the same date as it starts, but the end time is earlier
+      alert("The end time is earlier than the start time");
+      return false
+    }
     return true;
   })
 }

@@ -41,9 +41,9 @@ class Mctrucks < WalnutDemo
   end
   
   def create_services
-    create_service(@mctrucks, "Van rental (hourly)", [@moving_van], 60, 10.00)
-    create_service(@mctrucks, "14 foot truck rental (hourly)", [@small_truck], 60, 15.00)
-    create_service(@mctrucks, "17 foot truck rental (hourly)", [@large_truck], 60, 20.00)
+    create_service(@mctrucks, "Van rental (hourly)", [@moving_van], 60.minutes, 10.00)
+    create_service(@mctrucks, "14 foot truck rental (hourly)", [@small_truck], 60.minutes, 15.00)
+    create_service(@mctrucks, "17 foot truck rental (hourly)", [@large_truck], 60.minutes, 20.00)
   end
 
   SLOGAN = "We'll haul you away"

@@ -26,11 +26,11 @@ class MarysSalonAndSpa < WalnutDemo
     
   def create_services
     # create maryssalon services, products
-    create_service(@marys_salon, "Men's Haircut", [@johnny_shears], 30, 20.00)
-    create_service(@marys_salon, "Women's Haircut", [@mary_snips, @johnny_shears], 60, 50.00)
-    create_service(@marys_salon, "Single Process Color", [@mary_snips], 120, 65.00)
-    create_service(@marys_salon, "Touch-Up Color", [@mary_snips], 120, 45.00)
-    create_service(@marys_salon, "Glossing", [@mary_snips], 120, 25.00)
+    create_service(@marys_salon, "Men's Haircut", [@johnny_shears], 30.minutes, 20.00)
+    create_service(@marys_salon, "Women's Haircut", [@mary_snips, @johnny_shears], 60.minutes, 50.00)
+    create_service(@marys_salon, "Single Process Color", [@mary_snips], 120.minutes, 65.00)
+    create_service(@marys_salon, "Touch-Up Color", [@mary_snips], 120.minutes, 45.00)
+    create_service(@marys_salon, "Glossing", [@mary_snips], 120.minutes, 25.00)
 
     # puts "#{Time.now}: adding maryssalon products ..."
     # @shampoo          = @marys_salon.products.find_or_create_by_name(:name => "Shampoo", :inventory => 5, :price => 10.00)

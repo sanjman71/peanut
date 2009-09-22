@@ -40,12 +40,12 @@ class Meatheads < WalnutDemo
   end
   
   def create_services
-    create_service(@meatheads, "Personal Training", [@meathead, @biceps_bill, @toned_tina], 60, 60.00)
-    create_service(@meatheads, "Men's strength training", [@biceps_bill], 60, 60.00)
-    create_service(@meatheads, "Women's strength training", [@toned_tina], 60, 60.00)
-    create_service(@meatheads, "Fitness for Pregnant Women", [@toned_tina], 60, 60.00)
-    create_service(@meatheads, "Nutrition and Health Advice", [@meathead], 60, 80.00)
-    create_service(@meatheads, "Fitness assessment", [@meathead], 60, 80.00)
+    create_service(@meatheads, "Personal Training", [@meathead, @biceps_bill, @toned_tina], 60.minutes, 60.00)
+    create_service(@meatheads, "Men's strength training", [@biceps_bill], 60.minutes, 60.00)
+    create_service(@meatheads, "Women's strength training", [@toned_tina], 60.minutes, 60.00)
+    create_service(@meatheads, "Fitness for Pregnant Women", [@toned_tina], 60.minutes, 60.00)
+    create_service(@meatheads, "Nutrition and Health Advice", [@meathead], 60.minutes, 80.00)
+    create_service(@meatheads, "Fitness assessment", [@meathead], 60.minutes, 80.00)
   end
   
   def create_appointments

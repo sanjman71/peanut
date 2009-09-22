@@ -10,15 +10,7 @@ class CalendarControllerTest < ActionController::TestCase
   # search provider calendar
   should_route :post, 'users/1/calendar/search', 
                :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_id => 1
-  
-  # edit provider calendar
-  should_route :get, 'users/1/calendar/block/edit', 
-               :controller => "calendar", :action => 'edit_block', :provider_type => "users", :provider_id => "1"
-  
-  should_route :get, 'users/1/calendar/weekly/edit',
-               :controller => "calendar", :action => 'edit_weekly', :provider_type => "users", :provider_id => "1"
-
-  
+    
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
@@ -37,20 +29,6 @@ class CalendarControllerTest < ActionController::TestCase
     @controller.stubs(:current_location).returns(Location.anywhere)
     # set the request hostname
     @request.host = "www.walnutcalendar.com"
-  end
-
-  def add_mary_and_johnny_as_providers
-    # add johnny as a company provider
-    @johnny = Factory(:user, :name => "Johnny")
-    # @johnny.grant_role('user manager', @johnny)
-    @company.user_providers.push(@johnny)
-    @johnny.reload
-    @company.reload
-    @mary = Factory(:user, :name => "Mary")
-    # @mary.grant_role('user manager', @mary)
-    @company.user_providers.push(@mary)
-    @mary.reload
-    @company.reload
   end
 
   context "search company calendars without 'read calendars' privilege" do
@@ -111,24 +89,6 @@ class CalendarControllerTest < ActionController::TestCase
     should_assign_to :daterange, :class => DateRange
   end
   
-  context "edit provider calendar as the provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@johnny)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :edit_block, :provider_type => 'users', :provider_id => @johnny.id
-    end
-    
-    should_respond_with :success
-    should_render_template 'calendar/edit_block.html.haml'
-  
-    should_assign_to(:provider) { @johnny }
-    should_assign_to :providers, :class => Array
-    should_assign_to :calendar_markings, :class => Hash
-    should_assign_to :daterange, :class => DateRange
-  end
-    
   context "view provider calendar as another provider" do
     setup do
       add_mary_and_johnny_as_providers
@@ -151,20 +111,6 @@ class CalendarControllerTest < ActionController::TestCase
     should_assign_to :calendar_markings, :class => Hash
     should_assign_to(:when) { "this week" }
     should_assign_to :daterange, :class => DateRange
-  end
-
-  context "edit provider calendar as another provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@mary)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :edit_block, :provider_type => 'users', :provider_id => @johnny.id
-    end
-  
-    should_respond_with :redirect
-    should_redirect_to("unauthorized_path") { unauthorized_path }
-    should_set_the_flash_to /You are not authorized/
   end
 
 end

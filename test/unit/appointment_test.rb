@@ -43,13 +43,13 @@ class AppointmentTest < ActiveSupport::TestCase
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
       @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service,
-                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120)
+                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120 * 60)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
     
     should "have duration of 2 hours, and end_at time adjusted" do
-      assert_equal 120, @appt.duration
+      assert_equal 120 * 60, @appt.duration
       assert_equal 0, @appt.start_at.in_time_zone.hour
       assert_equal 2, @appt.end_at.in_time_zone.hour
     end
@@ -80,7 +80,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @unscheduled = AppointmentScheduler.find_unscheduled_time(@company, @anywhere, @provider, @daterange)
       assert_equal [@start_at_day], @unscheduled.keys
       assert_equal 1, @unscheduled[@start_at_day].size
-      assert_equal 23*60, @unscheduled[@start_at_day].first.duration
+      assert_equal 23.hours, @unscheduled[@start_at_day].first.duration
       assert_equal 1, @unscheduled[@start_at_day].first.start_at.in_time_zone.hour
       assert_equal 0, @unscheduled[@start_at_day].first.end_at.in_time_zone.hour
     end
@@ -154,13 +154,13 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, 120, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, 120 * 60, @customer, @options)
         assert_valid @work_appt
       end
 
       should "have work service with duration of 120 minutes" do
         assert_equal @work_service, @work_appt.service
-        assert_equal 120, @work_appt.duration
+        assert_equal 120 * 60, @work_appt.duration
         assert_equal 10, @work_appt.start_at.hour
         assert_equal 12, @work_appt.end_at.hour
       end
@@ -303,11 +303,11 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at_utc = @appt.end_at.utc
     end
     
-    should "grant customer 'appointment manager' privilege" do
+    should "grant customer 'appointment manager' role on the appointment" do
       assert_equal ['appointment manager'], @customer.roles_on(@appt).collect(&:name).sort
     end
     
-    should "grant provider 'appointment manager' privilege" do
+    should "grant provider 'appointment manager' role on the appointment" do
       assert_equal ['appointment manager'], @provider.roles_on(@appt).collect(&:name).sort
     end
   end
@@ -507,7 +507,7 @@ class AppointmentTest < ActiveSupport::TestCase
   #                               :start_at => "20080801000000",
   #                               :end_at =>   "20080801010000") # 1 hour
   #     assert appt.valid?
-  #     assert_equal 60, appt.duration
+  #     assert_equal 60 * 60, appt.duration
   #   end
   # end
   # 
@@ -725,7 +725,7 @@ class AppointmentTest < ActiveSupport::TestCase
   #   appointment.narrow_by_time_of_day!('afternoon')
   #   assert_equal nil, appointment.start_at
   #   assert_equal nil, appointment.end_at
-  #   assert_equal 0, appointment.duration
+  #   assert_equal 0 * 60, appointment.duration
   # 
   #   # build appointment from 5:30am - 11:30pm
   #   appointment = Appointment.new(:start_at => Chronic.parse("today 5:30 am"), :end_at => Chronic.parse("today 11:30 am"))
@@ -734,7 +734,7 @@ class AppointmentTest < ActiveSupport::TestCase
   #   appointment.narrow_by_time_of_day!('afternoon')
   #   assert_equal nil, appointment.start_at
   #   assert_equal nil, appointment.end_at
-  #   assert_equal 0, appointment.duration
+  #   assert_equal 0 * 60, appointment.duration
   # end
   # 
   # def test_should_narrow_by_evening_to_empty
@@ -745,7 +745,7 @@ class AppointmentTest < ActiveSupport::TestCase
   #   appointment.narrow_by_time_of_day!('evening')
   #   assert_equal nil, appointment.start_at
   #   assert_equal nil, appointment.end_at
-  #   assert_equal 0, appointment.duration
+  #   assert_equal 0 * 60, appointment.duration
   # end
   # 
   # def test_narrow_by_anytime
@@ -840,7 +840,7 @@ class AppointmentTest < ActiveSupport::TestCase
     should_not_change("Appointment.public.count") { Appointment.public.count }
 
     should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
-      assert_equal 120, @recurrence.duration
+      assert_equal 120 * 60, @recurrence.duration
       assert_equal 0, @recurrence.start_at.in_time_zone.hour
       assert_equal 2, @recurrence.end_at.in_time_zone.hour
     end
@@ -862,7 +862,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
       should "have instances with duration of 2 hours and start at 00:00 and finish at 02:00" do
         @recurrence.recur_instances.each do |a|
-          assert_equal 120, a.duration
+          assert_equal 120 * 60, a.duration
           assert_equal 0, a.start_at.in_time_zone.hour
           assert_equal 2, a.end_at.in_time_zone.hour
         end
@@ -925,7 +925,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 180, a.duration
+            assert_equal 180 * 60, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 3, a.end_at.in_time_zone.hour
           end
@@ -946,7 +946,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
         should "not change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 120, a.duration
+            assert_equal 120 * 60, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 2, a.end_at.in_time_zone.hour
           end
@@ -968,7 +968,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 180, a.duration
+            assert_equal 180 * 60, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 3, a.end_at.in_time_zone.hour
           end
@@ -994,7 +994,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
         should "have duration of 30 minutes" do
           @recurrence2.recur_instances.each do |a|
-            assert_equal 30, a.duration
+            assert_equal 30 * 60, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 0, a.end_at.in_time_zone.hour
             assert_equal 30, a.end_at.min

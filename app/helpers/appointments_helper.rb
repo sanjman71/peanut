@@ -23,13 +23,13 @@ module AppointmentsHelper
   end
   
   # return hash of possible start time values
-  def free_slot_possible_start_times(slot, duration_in_minutes, options={})
+  def free_slot_possible_start_times(slot, duration_in_seconds, options={})
     # initialize hash with apointment start_at hour and minute
     hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min}
             
     # adjust slot end_at based on duration
     begin
-      end_at = slot.end_at - eval("#{duration_in_minutes}.minutes")
+      end_at = slot.end_at - duration_in_seconds
     rescue
       end_at = slot.end_at
     end
@@ -38,8 +38,8 @@ module AppointmentsHelper
     hash.update(:end_hour => end_at.hour, :end_minute => end_at.min)
     
     # set minute interval based on duration
-    case duration_in_minutes
-    when (0..60)
+    case duration_in_seconds
+    when (0..1.hour)
       minute_interval = 30
     else
       # default value
@@ -79,4 +79,28 @@ module AppointmentsHelper
       "Its happening now"
     end
   end
+
+  FREQ = {
+    "WEEKLY" => "Weekly"
+  }
+
+  DAYS_OF_WEEK = 
+    {
+      "SU" => "Sunday",
+      "MO" => "Monday",
+      "TU" => "Tuesday",
+      "WE" => "Wednesday",
+      "TH" => "Thursday",
+      "FR" => "Friday",
+      "SA" => "Saturday"
+    }
+
+  def appointment_recur_rule_in_words(appointment)
+    appointment.recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/
+    freq = FREQ[$1]
+    days = $2.split(',').map{|d| DAYS_OF_WEEK[d]}
+    "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.to_s[:appt_time]} and running for #{Duration.to_words(appointment.duration)}"
+  end
+  
+
 end

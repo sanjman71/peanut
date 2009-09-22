@@ -33,7 +33,7 @@
     .span-3.prepend-1.text-align-right
       %h2= label_tag "service_duration", "Duration"
     .span-16.last
-      = f.text_field :duration, :class => 'text blue muted', :style => "width: 100px;"
+      = f.text_field :duration_in_minutes, :class => 'text blue muted', :style => "width: 100px;"
       %b{:style => 'font-size: 12px;'}== &nbsp;Minutes
   .span-15.prepend-4.last
     %em== An accurate duration allows appointments to be scheduled efficiently.
