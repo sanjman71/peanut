@@ -56,7 +56,8 @@ class SignupControllerTest < ActionController::TestCase
     context "for the free plan" do
       setup do
         post :create, 
-             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'manager@walnut.com'},
+             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', 
+                        :email_addresses_attributes => [{:address => 'manager@walnut.com'}]},
               :company => {:name=>"Peanut", :subdomain=>"peanut", :terms=>"1", :time_zone=>"Central Time (US & Canada)"},
               :plan_id => @free_plan.id
               }
@@ -95,7 +96,8 @@ class SignupControllerTest < ActionController::TestCase
     context "for a paid plan using free promotion" do
       setup do
         post :create, 
-             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', :email => 'manager@walnut.com'},
+             {:user => {:name => 'Peanut Manager', :password => 'foo', :password_confirmation => 'foo', 
+                        :email_addresses_attributes => [{:address => 'manager@walnut.com'}]},
               :company => {:name=>"Peanut", :subdomain=>"peanut", :terms=>"1", :time_zone=>"Central Time (US & Canada)"},
               :plan_id => @monthly_plan.id, :promo => 'free5'
               }
