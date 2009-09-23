@@ -12,50 +12,10 @@ class AppointmentsController < ApplicationController
                                               :on => [:provider, :current_company]
     
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
-
-  # def has_privilege?(p, authorizable=nil, user=nil)
-  #   case p
-  #   # when 'update calendars'
-  #   #   case params[:mark_as]
-  #   #   when Appointment::WORK, Appointment::WAIT
-  #   #     # anyone can create work, wait appointments
-  #   #     return true
-  #   #   when Appointment::FREE
-  #   #     # delegate to base class
-  #   #     super
-  #   #   else
-  #   #     # delegate to base class
-  #   #     super
-  #   #   end
-  #   when 'read work appointments'
-  #     # users may read their work appointments
-  #     @customer = find_customer_from_params
-  #     
-  #     return true if @customer == user
-  #     # delegate to base class
-  #     super
-  #   when 'read %s appointments'
-  #     # users may read their work/wait appointments
-  #     @appointment  = find_appointment_from_params
-  #     
-  #     return false if @appointment.blank?
-  #     return true if @appointment.customer == user
-  #     
-  #     # set permission based on appointment type, and delegate to base class
-  #     p = p % @appointment.mark_as
-  #     super
-  #   else
-  #     super
-  #   end
-  # end
   
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
-    # if !logged_in?
-    #   flash[:notice] = "To finalize your appointment, please log in or sign up."
-    #   redirect_to(login_path) and return
-    # end
 
     @provider = init_provider(:default => nil)
 

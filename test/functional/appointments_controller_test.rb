@@ -97,8 +97,7 @@ class AppointmentsControllerTest < ActionController::TestCase
             :duration => @haircut.duration, :mark_as => 'work'
       end
     
-      should_respond_with :redirect
-      should_redirect_to("login_path") { login_path }
+      should_respond_with :success
     end
   
     context "being logged in as a customer" do
