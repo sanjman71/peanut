@@ -80,7 +80,7 @@ class SignupController < ApplicationController
 
       # check credit card details only if the plan is billable and there is a non-zero price after any promotions
       if @plan.billable?
-        @price = @promotion ? @promotion.calculate(@plan.cost).last : @price
+        @price = @promotion ? @promotion.calculate(@plan.cost).last : @plan.cost
 
         if @price > 0
           @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])

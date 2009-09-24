@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class SignupTest < ActionController::IntegrationTest
 
@@ -10,10 +9,10 @@ class SignupTest < ActionController::IntegrationTest
   
   test "signing up as a new user for the indy plan" do
     visit signup_plan_path(:plan_id => @indy_plan.id)
-    
+
     # user info
     fill_in "user_name", :with => "Sanjay"
-    fill_in "user_email", :with => "sanjay@jarna.com"
+    # fill_in "user_email_addresses_attributes_address", :with => "sanjay@jarna.com"
     fill_in "user_password", :with => "secret"  
     fill_in "user_password_confirmation", :with => "secret"  
     
@@ -34,8 +33,10 @@ class SignupTest < ActionController::IntegrationTest
     # terms and conditions
     fill_in "company_terms", :with => "1"
     
+    # post form
     click_button "Sign Up"
-    assert_contain "Signup complete! Please login to continue."
+    assert_response :success
+    assert_not_nil Company.find_by_subdomain("widgetsrus")
   end
   
 end
