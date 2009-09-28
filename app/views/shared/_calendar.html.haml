@@ -17,7 +17,7 @@
   - extra_days_at_end = (6 - end_day.wday)
 -# split days into weeks, use first week to show calendar header fields
 - weeks = Array(0..(total_days-1 + extra_days_at_start + extra_days_at_end)).in_groups_of(7)
-- week0 = weeks.first.compact
+- week0 = weeks.first.blank? ? [] : weeks.first.compact
 
 -# always show weeks unless explicitly asked not to
 - show_weeks = true if local_assigns[:show_weeks].nil?
