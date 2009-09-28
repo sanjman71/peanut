@@ -43,9 +43,9 @@ class OpeningsController < ApplicationController
       @daterange  = DateRange.parse_when(@when, :include => :today)
     end
 
-    # initialize time
+    # initialize time objects
     @time         = params[:time].from_url_param if params[:time]
-    @time_range   = params[:time].blank? ? nil : TimeRange.new(params[:time].from_url_param)
+    @time_range   = params[:time].blank? ? nil : TimeRange.new(:when => params[:time].from_url_param)
 
     # initialize location & locations
     if params[:location_id]
