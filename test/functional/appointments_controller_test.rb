@@ -18,16 +18,16 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :post, 'book/work/users/3/services/3/3600/20090303T113000',
                :controller => 'appointments', :action => 'create_work', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60.minutes, :start_at => '20090303T113000', :mark_as => 'work'
-
+  
   # create free time
   should_route  :post, '/users/3/calendar/free', 
                 :controller => 'appointments', :action => 'create_free', :provider_type => 'users', :provider_id => 3
-
+  
   should_route  :get, 'users/1/calendar/block/new', 
                 :controller => "appointments", :action => 'new_block', :provider_type => "users", :provider_id => 1
   should_route  :post, '/users/3/calendar/block', 
                 :controller => 'appointments', :action => 'create_block', :provider_type => 'users', :provider_id => 3
-
+  
   should_route  :get, '/users/3/calendar/weekly/new',
                 :controller => 'appointments', :action => 'new_weekly', :provider_type => 'users', :provider_id => 3
   should_route  :post, '/users/3/calendar/weekly', 
@@ -47,7 +47,6 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :get, '/customers/1/appointments', :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work'
   should_route :get, '/customers/1/appointments/completed', 
                      :controller => 'appointments', :action => 'index', :customer_id => 1, :type => 'work', :state => 'completed'
-
 
   def setup
     # initialize roles and privileges
@@ -82,15 +81,26 @@ class AppointmentsControllerTest < ActionController::TestCase
   #
   # Single date appointment tests
   #
-  context "build work appointment for a single date with free time" do
-    context "without being logged in" do
+  context "with free time on a single date" do
+    setup do
+      # create free time from 9 am to 11 am local time
+      @today          = Time.zone.now.to_s(:appt_schedule_day)
+      @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
+      @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
+    end
+    
+    context "try to delete free time with no work appointments" do
       setup do
-        # create free time from 9 am to 11 am local time
-        @today          = Time.zone.now.to_s(:appt_schedule_day)
-        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
-  
+        delete :destroy, :id => @free_appt.id
+      end
+
+      should_change("Appointment.count", :by => -1) { Appointment.count }
+    end
+    
+
+    context "build work appointment without being logged in" do
+      setup do  
         # book a haircut with johnny during his free time
         get :new, 
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
@@ -98,16 +108,11 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
     
       should_respond_with :success
+      
     end
   
-    context "being logged in as a customer" do
-      setup do
-        # create free time from 9 am to 11 am local time
-        @today          = Time.zone.now.to_s(:appt_schedule_day)
-        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, @free_service, :time_range => @time_range)
-        @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
-      
+    context "build work appointment while logged in as a customer" do
+      setup do      
         # stub current user
         @controller.stubs(:logged_in?).returns(true)
         @controller.stubs(:current_user).returns(@customer)
@@ -130,7 +135,29 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
       should_assign_to(:appt_time_start_at) { "0900" }
       should_assign_to(:appt_time_end_at) { "0930" }
+      
+      context "create work appointment while logged in as a customer" do
+        setup do
+          post :create_work,
+            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+            :duration => @haircut.duration, :mark_as => 'work', :customer_id => @customer.id
+        end
+
+        should_respond_with :redirect
+        should_redirect_to ("history_index_path") { history_index_path }
+        
+        context "delete free appointment containing active work appointment" do
+          setup do
+            delete :destroy, :id => @free_appt.id
+          end
+
+          should_not_change("Appointment.count") { Appointment.count }
+        end
+
+      end
+      
     end
+
   end
   
   context "create free appointment without privilege ['update calendars']" do
@@ -201,7 +228,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("unauthorized_path") { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
-
+  
   context "create free appointment for a block of dates" do
     setup do
       # have johnny create free appointments on his calendar
@@ -257,7 +284,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_redirect_to("unauthorized_path") { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
-
+  
   context "create weekly schedule" do
     context "with no end date" do
       setup do
@@ -435,10 +462,10 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes
-
+  
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-
+  
       # create work appointment, today from 10 am to 12 pm local time
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
@@ -485,7 +512,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @start_at       = "#{@today}T1000"
         @duration       = 120.minutes
         @anyone         = User.anyone
-
+  
         # create work appointment as anonymous user
         @controller.stubs(:current_user).returns(nil)
         @controller.stubs(:logged_in?).returns(false)
@@ -497,17 +524,17 @@ class AppointmentsControllerTest < ActionController::TestCase
               :customer => {:name => "Sanjay", :email => "sanjay@walnut.com"}}
         @free_appt.reload
       end
-
+  
       # create new customer
       should_change("User.count", :by => 1) { User.count}
-
+  
       # free appointment should coexist with 1 work appointment
       should_change("Appointment.count", :by => 2) { Appointment.count }
-
+  
       should "have two capacity slots" do
         assert_equal 2, @free_appt.capacity_slots.size
       end
-
+  
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:customer) { User.with_email("sanjay@walnut.com").first }
@@ -516,22 +543,22 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:duration)  { 120.minutes }
       should_assign_to(:mark_as) { "work" }
       should_assign_to :appointment
-
+  
       should "create user in active state" do
         user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
-
+  
       should "set the flash for the appointment and user account" do
         assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
         assert_match /Your user account has been created/, flash[:notice]
       end
-
+  
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
     end
   end
-
+  
   # context "request a waitlist appointment for a date range" do
   #   setup do
   #     # stub the current user and logged_in? state

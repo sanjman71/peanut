@@ -480,19 +480,41 @@ class AppointmentsController < ApplicationController
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
-    @appointment.destroy
+    @provider    = @appointment.provider
     
-    # set flash
-    flash[:notice] = "Deleted appointment"
-    logger.debug("*** deleted appointment #{@appointment.id}")
-        
-    if @appointment.waitlist?
-      # redirect to waitlist index
-      @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
+    # If this is a free appointment, we need to ensure it doesn't have any attached work appointments before destroying it.
+    if @appointment.mark_as == Appointment::FREE
+      if @appointment.work_appointments.upcoming.count != 0
+        flash[:error] = "You cannot remove this available time until all existing appointments in it have been cancelled or removed"
+      else
+        @redirect_path = request.referrer.blank? ? calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain) : request.referrer
+        @appointment.destroy
+
+        # set flash
+        flash[:notice] = "Deleted available time"
+        logger.debug("*** deleted appointment #{@appointment.id}")
+      end
+
+      # Work and Waitlist appointments are destroyed automatically
     else
-      # redirect to provider appointment path
-      @provider    = @appointment.provider
-      @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+      @appointment.destroy
+
+      if @appointment.waitlist?
+        # set flash
+        flash[:notice] = "Deleted waitlist"
+        # redirect to waitlist index
+        @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
+      else
+        flash[:notice] = "Deleted appointment"
+        # redirect to provider appointment path
+        @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+      end
+      logger.debug("*** deleted appointment #{@appointment.id}")
+    end
+
+    respond_to do |format|
+      format.html { @redirect_path ? redirect_to(@redirect_path) : render(:action => 'index') }
+      format.js
     end
   end
   
