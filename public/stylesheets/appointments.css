@@ -1,6 +1,7 @@
 /* appointment styles */
                                                     
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
+div.appointments div.appointment.canceled         { color: #FF1100;}
 
 div.appointment.review                            { font-size: 1.8em; font-weight: normal; }
 div.appointment.review .label                     { color: #999999; }
@@ -11,6 +12,9 @@ div.appointment                                   { padding: 7px 0 7px 0; }
 div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
 div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
 div.appointment.work                              { background-color: #EDF3FE; }  /* light blue */
+
+h4.canceled                                       { color: #FF1100;}
+h4.work                                           { }
 
 div.appointment.work div.service h6               { color: #009900; }
 
