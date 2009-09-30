@@ -94,8 +94,8 @@ $.fn.init_add_block_free_time_form = function () {
     }
     
     // normalize time format, validate that start_at < end_at
-    var start_at = $(document).convert_time_ampm_to_string(start_time)
-    var end_at   = $(document).convert_time_ampm_to_string(end_time)
+    var start_at = convert_time_ampm_to_string(start_time)
+    var end_at   = convert_time_ampm_to_string(end_time)
     
     if (!(start_at <= end_at)) {
       alert("The start time must be earlier than the end time");

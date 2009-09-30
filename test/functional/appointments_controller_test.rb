@@ -137,10 +137,10 @@ class AppointmentsControllerTest < ActionController::TestCase
     setup do
       @controller.stubs(:current_user).returns(@customer)
       post :create_free,
-           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
+           {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @free_service.id, :mark_as => 'free'}
     end
-    
+
     should_not_change("Appointment.count") { Appointment.count }
     should_respond_with :redirect
     should_redirect_to("unauthorized_path") { unauthorized_path }
@@ -151,7 +151,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # have johnny create free appointments on his calendar
       @controller.stubs(:current_user).returns(@johnny)
       post :create_free,
-           {:dates => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
+           {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
             :service_id => @free_service.id, :mark_as => 'free'}
     end
   
@@ -161,7 +161,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_assign_to(:provider) { @johnny }
     should_assign_to(:start_at)  { "0900" }
     should_assign_to(:end_at) { "1100" }
-    should_assign_to(:mark_as) {"free" }
+    should_assign_to(:mark_as) { "free" }
   
     should_respond_with :redirect
     should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
@@ -307,9 +307,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
   end
-  
-  
-  
+
   context "create work appointment for a single date that has no free time" do
     setup do
       @controller.stubs(:current_user).returns(@johnny)

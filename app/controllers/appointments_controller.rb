@@ -15,11 +15,10 @@ class AppointmentsController < ApplicationController
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
-
     @provider = init_provider(:default => nil)
 
     if @provider.blank?
-      logger.debug("xxx could not provider #{params[:provider_type]}:#{params[:provider_id]}")
+      logger.debug("[error] could not provider #{params[:provider_type]}:#{params[:provider_id]}")
       redirect_to root_path(:subdomain => current_subdomain) and return
     end
 
@@ -100,8 +99,19 @@ class AppointmentsController < ApplicationController
     # set default redirect path
     @redirect_path  = request.referer
     
+    # initialize dates collection
+    case
+    when params[:dates]
+      @dates = Array(params[:dates])
+    when params[:date]
+      @dates = Array(params[:date])
+    else
+      # defaults to start_at date
+      @dates = Array[@start_at]
+    end
+
     # iterator over the specified dates, if provided, or use single start_at date
-    @dates          = params[:dates] ?  Array(params[:dates]) : Array[@start_at]
+    # @dates          = params[:dates] ? Array(params[:dates]) : Array[@start_at]
     
     @dates.each do |date|
       begin
@@ -171,7 +181,8 @@ class AppointmentsController < ApplicationController
         logger.debug("*** created #{@appointment.mark_as} appointment")
         @created[date] = "Created #{@appointment.mark_as} appointment"
       rescue Exception => e
-        logger.debug("xxx create appointment error: #{e.message}")
+        logger.debug("[error] create appointment error: #{e.message}")
+        logger.debug("[error] backtrace: #{e.backtrace}")
         @errors[date] = e.message
       end
     end

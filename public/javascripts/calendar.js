@@ -1,42 +1,55 @@
 // add free time for a provider on a specific day
 $.fn.init_add_single_free_time = function() {
   $("#add_single_free_time_form").submit(function () {
-    var start_at  = $("#start_at").attr('value');
-    var end_at    = $("#end_at").attr('value');
+    var when      = $("input#date").attr('value');
+    var start_at  = $("input#start_at").attr('value');
+    var end_at    = $("input#end_at").attr('value');
     var errors    = 0;
     
-    if (!start_at) {
-      $("#start_at").addClass('highlighted');
-      errors += 1;
+    if (!when) {
+      $("input#date").addClass('highlighted');
+      alert("Please select a date");
+      return false; 
     } else {
-      $("#start_at").removeClass('highlighted');
+      $("input#date").removeClass('highlighted');
+    }
+    
+    if (!start_at) {
+      $("input#start_at").addClass('highlighted');
+      alert("Please select a start time");
+      return false; 
+    } else {
+      $("input#start_at").removeClass('highlighted');
     }
 
     if (!end_at) {
-      $("#end_at").addClass('highlighted');
-      errors += 1;
+      $("input#end_at").addClass('highlighted');
+      alert("Please select an end time");
+      return false; 
     } else {
-      $("#end_at").removeClass('highlighted');
+      $("input#end_at").removeClass('highlighted');
     }
 
-    if (errors > 0) { return false; }
-
     // normalize time format, validate that start_at < end_at
-    var start_at = $(document).convert_time_ampm_to_string(start_at)
-    var end_at   = $(document).convert_time_ampm_to_string(end_at)
+    var start_at = convert_time_ampm_to_string(start_at)
+    var end_at   = convert_time_ampm_to_string(end_at)
 
     if (!(start_at <= end_at)) {
       alert("The start time must be earlier than the end time");
       return false;
     }
 
-    $("#start_at").attr('value', start_at);
-    $("#end_at").attr('value', end_at);
+    // normalize date format
+    var when = convert_date_to_string(when);
 
+    // replace form data with formatted versions
+    $("input#start_at").attr('value', start_at);
+    $("input#end_at").attr('value', end_at);
+    $("input#date").attr('value', when);
+
+    // post
     $.post(this.action, $(this).serialize(), null, "script");
-    $(this).find("#submit").hide();
-    $(this).find("#progress").show();
-
+    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
 }
@@ -65,8 +78,6 @@ $.fn.init_select_calendar_show_provider = function () {
 
 // search provider calendar with a date range
 $.fn.init_search_calendar_with_date_range = function () {
-  $(".datepicker").datepicker({minDate: +0, maxDate: '+3m'});
-
   // check date fields before submit
   $("#search_calendar_with_date_range_submit").click(function() {
     var start_date = $('#start_date').attr("value");
@@ -97,13 +108,18 @@ $.fn.init_search_calendar_with_date_range = function () {
   })
 }
 
+$.fn.init_datepicker = function() {
+  $(".datepicker").datepicker({minDate: +0, maxDate: '+3m'});
+}
+
 $.fn.init_timepicker = function() {
   $(".timepicker").timepickr({convention:12, left:-120});
 }
 
 $(document).ready(function() {
-  $(document).init_search_calendar_with_date_range();
+  $(document).init_datepicker();
   $(document).init_timepicker();
+  $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();

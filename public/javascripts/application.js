@@ -238,8 +238,20 @@ $.fn.init_log_entries = function () {
   })
 }
 
+// convert mm/dd/yyyy date to yyyymmdd string
+function convert_date_to_string(s) {
+  re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
+  match = s.match(re);
+  if (!match) {
+    s = ''
+  } else {
+    s = match[3] + match[1] + match[2]
+  }
+  return s
+}
+
 // convert '03:00 pm' time format to 'hhmmss' 24 hour time format
-$.fn.convert_time_ampm_to_string = function(s) {
+function convert_time_ampm_to_string(s) {
   re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
   match   = s.match(re);
 
@@ -254,7 +266,7 @@ $.fn.convert_time_ampm_to_string = function(s) {
 
   value = hour < 10 ? "0" + hour.toString() : hour.toString()
   value += minute + "00";
-  return value
+  return value;
 }
 
 function validate_email_address(email_address) {
@@ -262,7 +274,7 @@ function validate_email_address(email_address) {
   if (email_regex.test(email_address) == false) {
     return false;
   }
-  return true
+  return true;
 }
 
 $(document).ready(function() {

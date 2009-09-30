@@ -43,19 +43,19 @@ $.fn.set_recurrence = function () {
   // write recurrence 'tstart' and 'tend', append '00' for seconds
   if ($("#starts_at").attr('value')) {
     // format 'start_at' field for 'dstart'
-    s = $(document).convert_time_ampm_to_string($("#starts_at").attr('value'));
+    s = convert_time_ampm_to_string($("#starts_at").attr('value'));
     $("#tstart").attr('value', s);
   }
 
   if ($("#ends_at").attr('value')) {
     // format 'start_at' field for 'dstart'
-    s = $(document).convert_time_ampm_to_string($("#ends_at").attr('value'));
+    s = convert_time_ampm_to_string($("#ends_at").attr('value'));
     $("#tend").attr('value', s);
   }
   
   // write recurrence 'dstart'
   if ($("#start_date").attr('value')) {
-    s = $(document).convert_date_to_string($("#start_date").attr('value'));
+    s = convert_date_to_string($("#start_date").attr('value'));
     $("#dstart").attr('value', s);
   } else {
     // clear out field
@@ -65,10 +65,10 @@ $.fn.set_recurrence = function () {
   // write recurrence 'dend'
   // If it's set, we use the value. If not, we use the start date
   if ($("#end_date").attr('value')) {
-    s = $(document).convert_date_to_string($("#end_date").attr('value'));
+    s = convert_date_to_string($("#end_date").attr('value'));
     $("#dend").attr('value', s);
   } else if ($("#start_date").attr('value')) {
-    s = $(document).convert_date_to_string($("#start_date").attr('value'));
+    s = convert_date_to_string($("#start_date").attr('value'));
     $("#dend").attr('value', s);
   } else {
     // clear out field
@@ -77,7 +77,7 @@ $.fn.set_recurrence = function () {
 
   // write recurrence 'until'
   if ($("#schedule_end_date").attr('value')) {
-    s = $(document).convert_date_to_string($("#schedule_end_date").attr('value'));
+    s = convert_date_to_string($("#schedule_end_date").attr('value'));
     $("#until").attr('value', s);
   } else {
     // clear out field
@@ -86,7 +86,7 @@ $.fn.set_recurrence = function () {
 
   // write capacity
   if ($("#capacity").attr('value')) {
-    s = $(document).convert_date_to_string($("#capacity").attr('value'));
+    s = convert_date_to_string($("#capacity").attr('value'));
     $("#capacity").attr('value', s);
   } else {
     // set field to default
@@ -179,10 +179,10 @@ $.fn.init_schedule_form = function () {
 
     // Make sure the end date/time is later than the start date/time
     // With the dates and times in the right format we can use string compares
-    sd = $(document).convert_date_to_string($("#start_date").attr('value'));
-    ed = $(document).convert_date_to_string($("#end_date").attr('value'));
-    st = $(document).convert_time_ampm_to_string($("#starts_at").attr('value'));
-    et = $(document).convert_time_ampm_to_string($("#ends_at").attr('value'));    
+    sd = convert_date_to_string($("#start_date").attr('value'));
+    ed = convert_date_to_string($("#end_date").attr('value'));
+    st = convert_time_ampm_to_string($("#starts_at").attr('value'));
+    et = convert_time_ampm_to_string($("#ends_at").attr('value'));    
     
     // If the end date is earlier than the start date
     if (ed < sd) {
@@ -206,20 +206,7 @@ $.fn.init_select_calendar_edit_weekly_provider = function () {
   })
 }
 
-// convert mm/dd/yyyy date to yyyymmdd string
-$.fn.convert_date_to_string = function(s) {
-  re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
-  match = s.match(re);
-  if (!match) {
-    s = ''
-  } else {
-    s = match[3] + match[1] + match[2]
-  }
-  return s
-}
-
 $(document).ready(function() {
-
   $(document).init_daynames();
   $(document).init_schedule_range();
   $(document).init_datepicker();

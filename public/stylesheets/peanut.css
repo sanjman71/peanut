@@ -68,6 +68,8 @@ label.big                                         { font-size: 16px; }
 .select                                           { font-size: 12px; }
 .select.big                                       { font-size: 15px; }
 
+.submitting                                       { font-weight: bold; color: #5500BB; background-color: #FFCC00; padding: 5px 5px;}
+  
 /* admin styles */
 
 a.admin:link, a.admin:visited                     { font-size: 11px; font-weight: normal; color: #0000FF; }
@@ -107,17 +109,13 @@ div.instructions ul                               { font-size: 12px; }
 .shaded.grey                                      { background: #EEEEEE; none repeat scroll 0 0; }
 
 .highlighted, .highlighted.shaded, .highlight     { background: #FFCC00; none repeat scroll 0 0; }
-
 .highlight.muted                                  { background: #FFFF66; none repeat scroll 0 0; }
-
 .blue.muted                                       { background: #EDF3FE; none repeat scroll 0 0; }
   
 /* color styles */
 
 .red                                              { color: #FF0000; }
-
 .green                                            { color: #FF6600; }
-
 .grey                                             { color: #666666; }
 
 /* example styles */
@@ -135,6 +133,7 @@ div.plan.name                                     { font-weight: bold; }
 div.plan.signup                                   { padding-left: 5px; }
 
 hr.plan.divider                                   { background: #008800 none repeat scroll 0 0; height: 0.2em; margin-top: 10px; }
+
 /* miscellaneous */
 
 div.directions                                    { color: #666666; font-size: 15px; font-style: italic;}
