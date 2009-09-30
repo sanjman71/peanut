@@ -1,5 +1,6 @@
-- title(@title)
 - javascript('reports')
+
+- title(@title || 'Reports')
 
 .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
   %h2== Build Your Report
@@ -7,7 +8,7 @@
   
 %hr.space
 
-- form_for(User.new, :url => url_for(:controller => 'reports', :action => 'format', :subdomain => current_subdomain), :method => :post, :html => {:id => 'report_form'}) do |f|
+- form_for(User.new, :url => route_reports_path, :method => :post, :html => {:id => 'report_form'}) do |f|
 
   .span-15.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 7px;'}
     .span-2.padding-top-10
@@ -19,14 +20,13 @@
     .span-2
       %h5== Start Date:
     .span-12.last.padding-bottom-10
-      = text_field_tag 'report[start_date]', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;'
+      = text_field_tag 'report[start_date]', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;', :autocomplete => 'off'
 
   .span-15.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 7px;'}
     .span-2
       %h5== End Date:
     .span-12.last.padding-bottom-10
-      = text_field_tag 'report[end_date]', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;'
+      = text_field_tag 'report[end_date]', '', :class => 'datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;', :autocomplete => 'off'
 
-  .span-15.prepend-1.last
+  .span-4.prepend-1.append-11.last
     %h4= link_to 'Generate', '', :class => 'rounded button color', :id => 'report_submit'
-    %span#report_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

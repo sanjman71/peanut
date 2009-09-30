@@ -100,8 +100,6 @@ $.fn.init_search_calendar_with_date_range = function () {
     }
 
     if (end_date <= start_date) {
-      $('#start_date').addClass('highlighted');
-      $('#end_date').addClass('highlighted');
       alert("The start date must be before the end date");
       return false;
     }

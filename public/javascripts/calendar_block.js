@@ -62,7 +62,7 @@ $.fn.init_select_calendar_dates = function() {
   });
 }
 
-$.fn.init_timepicker = function() {
+$.fn.init_timepicker_block = function() {
   $(".timepicker").timepickr({
       convention:12,
       select: function() {
@@ -125,9 +125,8 @@ $.fn.init_add_block_free_time_form = function () {
 }
 
 $(document).ready(function() {
-
   $(document).init_select_calendar_new_block_provider();
   $(document).init_select_calendar_dates();
-  $(document).init_timepicker();
+  $(document).init_timepicker_block();
   $(document).init_add_block_free_time_form();
 })

@@ -57,7 +57,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
-    @subscription = Subscription.new(:user => @johnny, :plan => @monthly_plan)
+    @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     @owner.grant_role('company manager', @company)
     # create provider

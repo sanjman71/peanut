@@ -132,7 +132,7 @@ $.fn.init_schedule_range = function () {
   })
 }
 
-$.fn.init_datepicker = function () {
+$.fn.init_datepicker_weekly = function () {
   $(".datepicker").datepicker({
       minDate: +0, 
       maxDate: '+3m',
@@ -143,7 +143,7 @@ $.fn.init_datepicker = function () {
     });
 }
 
-$.fn.init_timepicker = function() {
+$.fn.init_timepicker_weekly = function() {
   $(".timepicker").timepickr({
       convention:12, 
       select: function() { 
@@ -209,8 +209,8 @@ $.fn.init_select_calendar_edit_weekly_provider = function () {
 $(document).ready(function() {
   $(document).init_daynames();
   $(document).init_schedule_range();
-  $(document).init_datepicker();
-  $(document).init_timepicker();
+  $(document).init_datepicker_weekly();
+  $(document).init_timepicker_weekly();
   $(document).init_schedule_form();
   $(document).init_select_calendar_edit_weekly_provider();
   

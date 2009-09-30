@@ -69,7 +69,6 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
-  map.resources :reports, :only => [:index, :show], :member => {:format => :post}
   map.resources :history, :only => [:index]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
@@ -139,6 +138,12 @@ ActionController::Routing::Routes.draw do |map|
   # services, products
   map.resources :services
   map.resources :products
+  
+  # reports
+  map.resources         :reports, :only => [:index, :show], :collection => {:route => :post}
+  map.report_range      '/reports/range/:start_date..:end_date', :controller => 'reports', :action => 'show'
+  map.report_providers  '/reports/range/:start_date..:end_date/providers/:provider_ids',
+                        :controller => 'reports', :action => 'show', :conditions => {:provider_ids => /\d(,\d)*/}
   
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.

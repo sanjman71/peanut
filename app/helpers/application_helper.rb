@@ -104,8 +104,8 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    if has_role?('company provider', current_company)
-    # if has_privilege?('read calendars', current_company) || has_privilege?('read calendars', current_user)
+    # if has_role?('company provider', current_company)
+    if has_privilege?('read calendars', current_company) || has_privilege?('read calendars', current_user)
 
       # 'Reports' tab
       name    = 'Reports'
