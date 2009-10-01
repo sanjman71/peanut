@@ -39,7 +39,8 @@ module CalendarHelper
 
   def build_calendar_today_prev_next_links(provider, daterange)
 
-    start_date = daterange.start_at
+    start_date         = daterange.start_at.in_time_zone
+    end_date           = daterange.end_at.in_time_zone
     current_range_type = daterange.range_type
     if current_range_type == 'none'
       if daterange.days <= 1
@@ -50,29 +51,31 @@ module CalendarHelper
         current_range_type = 'monthly'
       end
     end
+    
+    day_after_end = end_date.tomorrow.beginning_of_day
 
     case current_range_type
     when 'daily'
-      prev_date = start_date - 1.day
-      next_date = start_date + 1.day
-      range_word = "Day"
-      today_word = "Today"
+      prev_date          = start_date - 1.day
+      next_date          = start_date + 1.day
+      range_word         = "Day"
+      today_word         = "Today"
     when 'weekly'
-      prev_date = start_date - 1.week
-      next_date = start_date + 1.week
-      range_word = "Week"
-      today_word = "Week starting today"
+      prev_date          = start_date - 1.week
+      next_date          = (start_date + 1.week < day_after_end) ? (start_date + 1.week) : day_after_end
+      range_word         = "Week"
+      today_word         = "Week starting today"
     when 'monthly'
-      prev_date = start_date - 1.month
-      next_date = start_date + 1.month
-      range_word = "Month"
-      today_word = "Month starting today"
+      prev_date          = start_date - 1.month
+      next_date          = (start_date + 1.month < day_after_end) ? (start_date + 1.month) : day_after_end
+      range_word         = "Month"
+      today_word         = "Month starting today"
     else # Should never get here
-      prev_date = start_date - 1.month
-      next_date = start_date + 1.month
+      prev_date          = start_date - 1.month
+      next_date          = (start_date + 1.month < day_after_end) ? (start_date + 1.month) : day_after_end
       current_range_type = 'monthly'
-      range_word = "Month"
-      today_word = "Month starting today"
+      range_word         = "Month"
+      today_word         = "Month starting today"
     end
 
     url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain, :range_type => current_range_type}
