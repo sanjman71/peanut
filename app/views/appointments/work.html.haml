@@ -7,12 +7,12 @@
     %h2{:style => 'margin-bottom: 5px;'}
       = @title
       %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
-      
     -# appointment state
-    %h4{:style => 'margin-bottom: 5px;'}
-      - if @appointment.canceled?
+    - if @appointment.canceled?
+      %h4.canceled{:style => 'margin-bottom: 5px;'}
         == Canceled: #{@appointment.canceled_at.to_s(:appt_day_date_time)}
-      - else
+    - else
+      %h4.work{:style => 'margin-bottom: 5px;'}
         == #{@appointment.state.titleize}: #{appointment_starts_at_distance_in_words(@appointment)}
     
     -# allow owners and managers to change appointment state

@@ -1,5 +1,5 @@
 - appointments.each do |appointment|
-  .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}
+  .span-16.last.letterbox.appointment{:class => cycle("shaded", "") + " #{appointment.canceled? ? 'canceled' : ''}" }
     -# service and provider
     .span-5.prepend-1
       %h3{:style => 'padding-top: 5px; margin-bottom: 5px;'}= appointment.service.name
@@ -8,15 +8,22 @@
     -# when
     .span-7
       - if appointment.work?
-        .work.when{:style => 'padding-top: 5px;'}
-          == Scheduled:
-          = appointment.start_at.to_s(:appt_short_month_day_year)
-          == @
-          = appointment.start_at.to_s(:appt_time)
-          -# show time from now for upcoming appointments
-          - if appointment.upcoming?
-            %br
-            %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+        - if appointment.canceled?
+          .canceled.when{:style => 'padding-top: 5px;'}
+            == Canceled:
+            = appointment.start_at.to_s(:appt_short_month_day_year)
+            == @
+            = appointment.start_at.to_s(:appt_time)
+        - else
+          .work.when{:style => 'padding-top: 5px;'}
+            == Scheduled:
+            = appointment.start_at.to_s(:appt_short_month_day_year)
+            == @
+            = appointment.start_at.to_s(:appt_time)
+            -# show time from now for upcoming appointments
+            - if appointment.upcoming?
+              %br
+              %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
       - elsif appointment.wait?
         .wait.when{:style => 'padding-top: 5px;'}
           == Waitlist:

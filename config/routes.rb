@@ -120,7 +120,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect         ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.connect         ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
+  map.calendar_show   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
   map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/
 
