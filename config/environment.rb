@@ -72,7 +72,7 @@ Rails::Initializer.run do |config|
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem 'mime-types', :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'prawn', :version => '~> 0.4.1'
+  config.gem 'prawn', :version => '~> 0.5.1'
   config.gem 'ri_cal'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
