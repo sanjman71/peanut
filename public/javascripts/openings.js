@@ -43,9 +43,8 @@ $.fn.init_search_openings = function() {
     // post the search query
     $.post($("#search_openings_form").attr("action"), $("#search_openings_form").serialize(), null, "script");
 
-    // replace the search button with a progress image onsubmit
-    $("#search_submit").hide();
-    $("#search_progress").show();
+    // replace the search button with text
+    $(this).replaceWith("<h4 class ='submitting'>Searching...</h3>");
     
     return false;
   })
@@ -76,15 +75,8 @@ $.fn.init_search_when_toggle = function() {
   })
 }
 
-$(document).ready(function() {
-  $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});  
-  $(document).init_search_openings();
-  $(document).init_search_when_toggle();
-  
-  // rounded corners
-  $('#search_submit').corners("7px");
-  
-  // show sliders
+$.fn.init_openings_sliders = function() {
+  // show sliders on click
   $(".pick_time").click(function () {
     var $slider = $(this).siblings(".slider");
     
@@ -105,7 +97,7 @@ $(document).ready(function() {
     return false;
   })
   
-  // bind to the 'afterClick' event, which means the user picked a time on the slider
+  // bind to the 'afterClick' event, which indicates the user picked a time on the slider
   $(".slider .time").bind("afterClick", function() {
     var $book_it  = $(this).parents(".appointment").find(".book_it");
     var book_time = $(this).text() + " " + $(this).attr("ampm");
@@ -118,12 +110,15 @@ $(document).ready(function() {
       // show the book it link
       $book_it.show();
     }
-    
+
     // change book it url and text
     $book_it.find("a").attr("href", book_url);
     $book_it.find("a").text("Book " + book_time);
   })
-  
+}
+
+// Note: not currently used
+$.fn.init_openings_show_single_date = function() {
   // set hover states to show selected date, ignore past dates
   $(".weekday.free:not(.past),.weekend.free:not(.past)").hover(
     function() {
@@ -141,5 +136,17 @@ $(document).ready(function() {
       $(".appointments.date").show();
     }
   );
-  
+}
+
+$.fn.init_datepicker_openings = function() {
+  $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});
+}
+
+$(document).ready(function() {
+  $(document).init_search_openings();
+  $(document).init_search_when_toggle();
+  $(document).init_openings_sliders();
+  $(document).init_datepicker_openings();
+  // rounded corners
+  $('#search_submit').corners("7px");
 })

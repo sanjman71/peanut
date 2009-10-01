@@ -29,7 +29,7 @@ $.fn.init_reports_form = function() {
     // post the report query
     $.post($("form#report_form").attr("action"), $("form#report_form").serialize(), null, "script");
 
-    // replace the search button with a progress image onsubmit
+    // replace the search button with text
     $(this).replaceWith("<h3 class ='submitting'>Generating...</h3>");
     
     return false;
