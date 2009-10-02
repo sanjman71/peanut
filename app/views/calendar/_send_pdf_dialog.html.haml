@@ -1,0 +1,11 @@
+.span-24.last.hide#send_pdf_dialog{:title => "Email PDF"}
+  .last{:style => 'padding-bottom: 10px;'}
+    == Email me a PDF version of my schedule:
+  .last.once
+    = radio_button_tag "when", "Once", false, :id => 'send_pdf_once', :class => 'pdf_group'
+    = label_tag "send_pdf_once", "Once", :style => 'padding-left: 3px;'
+  .last.daily
+    = radio_button_tag "when", "Daily", false, :id => 'send_pdf_daily', :class => 'pdf_group'
+    = label_tag "send_pdf_daily", "Daily", :style => 'padding-left: 3px;'
+  .last.submit{:style => 'padding-top: 5px; font-size: 1.3em;'}
+    = link_to 'Send', '', :class => 'rounded', :id => 'send_pdf_button'

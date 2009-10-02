@@ -72,6 +72,7 @@ $.fn.init_select_calendar_show_provider = function () {
   $("#show_provider").change(function () {
     var href = '/' + this.value + '/calendar';
     window.location = href;
+    $("#schedule_container").replaceWith("<h3 class='submitting' style='text-align: center;'>Loading Schedule...</h3>");
     return false;
   })
 }
@@ -114,6 +115,28 @@ $.fn.init_timepicker = function() {
   $(".timepicker").timepickr({convention:12, left:-120});
 }
 
+$.fn.init_send_pdf = function() {
+  $("#send_pdf_dialog").dialog({ autoOpen: false });
+  
+  $("#send_pdf").click(function() {
+    // open dialog when link is clicked
+    $("#send_pdf_dialog").dialog('open');
+    return false;
+  })
+  
+  $("#send_pdf_button").click(function() {
+    // find checked radio button
+    var checked = $(".pdf_group:checked").val();
+    if (!checked) {
+      alert("Please select an option");
+      return false;
+    }
+    //$.post(this.action, $(this).serialize(), null, "script");
+    $(this).replaceWith("<h3 class ='submitting'>Sending...</h3>");
+    return false;
+  })
+}
+
 $(document).ready(function() {
   $(document).init_datepicker();
   $(document).init_timepicker();
@@ -121,6 +144,7 @@ $(document).ready(function() {
   $(document).init_add_single_free_time();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
+  $(document).init_send_pdf();
 })
 
 // Re-bind after an ajax call
