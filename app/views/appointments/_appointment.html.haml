@@ -26,14 +26,11 @@
   .span-12.last.data
     ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
 
-  - if appointment.recurrence? || appointment.recurrence_parent
+  - if appointment.recurrence_instance?
     .span-3.label.text-align-right
       == Recurrence:
     .span-12.last.data
-      - if appointment.recurrence?
-        ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment)}</#{tag}>"
-      - else
-        ~ "<#{tag}>#{link_to "Parent", appointment_path(appointment.recurrence_parent)}</#{tag}>"
+      ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment.recurrence_parent)}</#{tag}>"
 
   - if customer_signup
     = render(:partial => 'appointment_customer_signup', :locals => {:signup => customer_signup})
