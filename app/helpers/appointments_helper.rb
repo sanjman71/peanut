@@ -96,10 +96,17 @@ module AppointmentsHelper
     }
 
   def appointment_recur_rule_in_words(appointment)
+    if appointment.recur_rule.blank?
+      return ""
+    end
     appointment.recur_rule =~ /FREQ=([A-Z]*);BYDAY=([A-Z,]*)/
-    freq = FREQ[$1]
-    days = $2.split(',').map{|d| DAYS_OF_WEEK[d]}
-    "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.in_time_zone.to_s(:appt_time)} and running for #{Duration.to_words(appointment.duration)}"
+    freq = FREQ[$1] unless $1.blank?
+    days = $2.split(',').map{|d| DAYS_OF_WEEK[d]} unless $2.blank?
+    if freq.blank? || days.blank? || days.empty?
+      ""
+    else
+      "Recurs #{freq} on #{days.to_sentence} starting at #{appointment.start_at.in_time_zone.to_s(:appt_time)} and running for #{Duration.to_words(appointment.duration)}"
+    end
   end
   
 
