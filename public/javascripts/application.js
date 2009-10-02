@@ -258,9 +258,10 @@ function convert_time_ampm_to_string(s) {
   // convert hour to integer, leave minute as string
   hour    = parseInt(match[1], 10); 
   minute  = match[2];
+  ampm    = match[3]
 
-  if (match[3] == 'pm') {
-    // add 12 for pm
+  if (ampm == 'pm' && hour != 12) {
+    // add 12 for pm, unless hour == 12
     hour += 12;
   }
 

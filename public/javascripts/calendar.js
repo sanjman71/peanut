@@ -112,7 +112,7 @@ $.fn.init_datepicker = function() {
 }
 
 $.fn.init_timepicker = function() {
-  $(".timepicker").timepickr({convention:12, left:-120});
+  $(".timepicker").timepickr({convention:12, left:-180});
 }
 
 $.fn.init_send_pdf = function() {
