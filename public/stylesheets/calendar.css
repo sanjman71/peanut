@@ -40,6 +40,9 @@ table.calendar td.mark, table.calendar th.mark    { background: #5500BB none rep
 .calendar.days.ago                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF; display: block; 
                                                     width: 75px; text-align: center; }
 
+.calendar.date.wide                               { color: #111111; font-size: 1.2em; text-align: left; margin-bottom: 7px;
+                                                    border-bottom: 2px solid #CCCCCC; background: #EEEEEE; padding: 3px 0px 3px 15px;}
+
 /* calendar time range slider styles */
 
 .slider .time                                     { color: #333333; }

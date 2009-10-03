@@ -1,6 +1,6 @@
 - capacity_slots_by_day.each do |day, slots|
   .span-15.last.slots.date{:id => "slots_#{day.to_s(:appt_schedule_day)}", :style => 'padding-top: 5px;'}
-    .span-12{:style => 'color: #111111; font-size: 1.5em; text-align: left; margin-bottom: 10px; border-bottom: 2px solid #FF6600;'}
+    .span-12.calendar.date.wide
       = day.to_s(:appt_day)
     / .cube{:style => 'margin-bottom: 5px;'}
     /   -# show day of week and month day in a calendar cube
