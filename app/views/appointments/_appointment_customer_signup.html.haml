@@ -1,17 +1,39 @@
-.span-15.last
-  .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
-    == Name:
-  .span-12.last
-    = text_field_tag 'customer[name]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+.span-23.prepend-1.last#rpx_login{:style => 'padding-top: 20px;'}
+  .span-13#rpx_details
+    == Select a provider to the right and login using your existing credentials.
+    %br
+    %span{:style => 'color: #777777; font-size: 0.8em; padding: 5px 0px;'}== or
+    %br
+    == Click
+    = link_to 'here', '', :id => 'show_peanut_login'
+    == to create a new account.
+  .span-10.last
+    #rpx_login_loading{:style => 'font-size: 1.0em; font-weight: bold;'}== Login Form Loading ...
+    = RPXNow.embed_code('walnut', rpx_customer_url)
 
-.span-15.last
-  .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
-    == Email:
-  .span-12.last
-    = text_field_tag 'customer[email]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+.last#peanut_login.hide
+  .span-22.prepend-1.last{:style => 'padding-top: 20px;'}
+    == Please enter your name and email below to confirm your appointment and create your account.
+    %br
+    == Your appointment confirmation and account password will be emailed to you.
 
-.span-15.last
-  .span-3.label
-    == &nbsp;
-  .span-12.last
-    %em.hide#customer_email_validate_message== &nbsp; 
+  .span-15.last
+    .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
+      == Name:
+    .span-12.last
+      = text_field_tag 'customer[name]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+
+  .span-15.last
+    .span-3.label.text-align-right{:style => 'padding-top: 20px;'}
+      == Email:
+    .span-12.last
+      = text_field_tag 'customer[email]', '', :class => 'title', :style => 'font-size: 1.2em; width: 400px;'
+
+  .span-14.prepend-1.last
+    = link_to 'Login using an existing account', '', :id => 'show_rpx_login', :style => 'font-size: 0.8em;'
+
+  .span-15.last
+    .span-3.label
+      == &nbsp;
+    .span-12.last
+      %em.hide#customer_email_validate_message== &nbsp;

@@ -42,11 +42,7 @@
         ~ "<#{tag}>#{link_to "Parent", appointment_path(appointment.recurrence_parent)}</#{tag}>"
 
   - if customer_signup
-    .span-22.prepend-1.last{:style => 'padding-top: 20px;'}
-      == Please enter your name and email below to confirm your appointment and create your account.
-      %br
-      == Your appointment confirmation and account password will be emailed to you.
-    = render :partial => 'appointment_customer_signup'
+    = render(:partial => 'appointment_customer_signup')
   - else
     -# show customer for work and wait appointments
     - unless appointment.customer.blank?

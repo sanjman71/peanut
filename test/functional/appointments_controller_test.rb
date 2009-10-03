@@ -90,7 +90,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
     end
     
-    context "try to delete free time with no work appointments" do
+    context "delete free time with no work appointments" do
       setup do
         delete :destroy, :id => @free_appt.id
       end
@@ -98,35 +98,40 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_change("Appointment.count", :by => -1) { Appointment.count }
     end
     
-
-    context "build work appointment without being logged in" do
-      setup do  
+    context "new work appointment as guest" do
+      setup do
         # book a haircut with johnny during his free time
-        get :new, 
+        get :new,
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
             :duration => @haircut.duration, :mark_as => 'work'
       end
     
       should_respond_with :success
       
+      should "show rpx login" do
+        assert_select 'div#rpx_login', true
+      end
+
+      should "show (hidden) peanut login" do
+        assert_select 'div.hide#peanut_login', true
+      end
     end
-  
-    context "build work appointment while logged in as a customer" do
-      setup do      
+
+    context "new work appointment as customer" do
+      setup do
         # stub current user
-        @controller.stubs(:logged_in?).returns(true)
         @controller.stubs(:current_user).returns(@customer)
         ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-      
+
         # book a haircut with johnny during his free time
         get :new, 
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
             :duration => @haircut.duration, :mark_as => 'work'
       end
-  
+
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
-    
+
       should_assign_to :appointment, :class => Appointment
       should_assign_to(:service) { @haircut }
       should_assign_to(:duration) { 30.minutes }
@@ -135,154 +140,176 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
       should_assign_to(:appt_time_start_at) { "0900" }
       should_assign_to(:appt_time_end_at) { "0930" }
-      
-      context "create work appointment while logged in as a customer" do
-        setup do
-          post :create_work,
-            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-            :duration => @haircut.duration, :mark_as => 'work', :customer_id => @customer.id
-        end
+    end
 
-        should_respond_with :redirect
-        should_redirect_to ("history_index_path") { history_index_path }
-        
-        context "delete free appointment containing active work appointment" do
-          setup do
-            delete :destroy, :id => @free_appt.id
-          end
-
-          should_not_change("Appointment.count") { Appointment.count }
-        end
-
+    context "create work appointment as customer" do
+      setup do
+        # stub current user
+        @controller.stubs(:current_user).returns(@customer)
+        post :create_work,
+             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
+             :duration => @haircut.duration, :mark_as => 'work', :customer_id => @customer.id
       end
-      
-    end
 
-  end
-  
-  context "create free appointment without privilege ['update calendars']" do
-    setup do
-      @controller.stubs(:current_user).returns(@customer)
-      post :create_free,
-           {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @free_service.id, :mark_as => 'free'}
-    end
+      should_respond_with :redirect
+      should_redirect_to ("history_index_path") { history_index_path }
 
-    should_not_change("Appointment.count") { Appointment.count }
-    should_respond_with :redirect
-    should_redirect_to("unauthorized_path") { unauthorized_path }
-  end
-  
-  context "create free appointment for a single date" do
-    setup do
-      # have johnny create free appointments on his calendar
-      @controller.stubs(:current_user).returns(@johnny)
-      post :create_free,
-           {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
-            :service_id => @free_service.id, :mark_as => 'free'}
+      context "delete free appointment containing active work appointment" do
+        setup do
+          delete :destroy, :id => @free_appt.id
+        end
+
+        should_not_change("Appointment.count") { Appointment.count }
+        should "not delete free appointment" do
+          assert Appointment.find(@free_appt.id)
+        end
+      end
     end
-  
-    should_change("Appointment.count", :by => 1) { Appointment.count }
+  end
+
+  context "create free appointment" do
+    context "without privilege 'update calendars'" do
+      setup do
+        @controller.stubs(:current_user).returns(@customer)
+        post :create_free,
+             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
+              :service_id => @free_service.id, :mark_as => 'free'}
+      end
+
+      should_not_change("Appointment.count") { Appointment.count }
+      should_respond_with :redirect
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+    end
     
-    should_assign_to(:service) { @free_service }
-    should_assign_to(:provider) { @johnny }
-    should_assign_to(:start_at)  { "0900" }
-    should_assign_to(:end_at) { "1100" }
-    should_assign_to(:mark_as) { "free" }
-  
-    should_respond_with :redirect
-    should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+    context "for a single date" do
+      setup do
+        # have johnny create free appointments on his calendar
+        @controller.stubs(:current_user).returns(@johnny)
+        post :create_free,
+             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
+              :service_id => @free_service.id, :mark_as => 'free'}
+      end
+
+      should_change("Appointment.count", :by => 1) { Appointment.count }
+
+      should_assign_to(:service) { @free_service }
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:start_at)  { "0900" }
+      should_assign_to(:end_at) { "1100" }
+      should_assign_to(:mark_as) { "free" }
+
+      should_respond_with :redirect
+      should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+    end
+
+     context "for a block of dates" do
+       setup do
+         # have johnny create free appointments on his calendar
+         @controller.stubs(:current_user).returns(@johnny)
+         post :create_block,
+              {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
+               :service_id => @free_service.id, :mark_as => 'free'}
+       end
+
+       should_change("Appointment.count", :by => 2) { Appointment.count }
+
+       should_assign_to(:service) { @free_service }
+       should_assign_to(:provider) { @johnny }
+       should_assign_to(:start_at) { "0900" }
+       should_assign_to(:end_at) { "1100" }
+       should_assign_to(:mark_as)  { "free" }
+
+       should_respond_with :redirect
+       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+     end
   end
   
   #
   # Appointment block tests
   #
-  context "add new blocks to provider calendar as the provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@johnny)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+  context "get new block appointments for provider calendar" do
+    context "as another provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@mary)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+      should_set_the_flash_to /You are not authorized/
     end
     
-    should_respond_with :success
-    should_render_template 'appointments/edit_block.html.haml'
-  
-    should_assign_to(:provider) { @johnny }
-    should_assign_to :providers, :class => Array
-    should_assign_to :calendar_markings, :class => Hash
-    should_assign_to :daterange, :class => DateRange
-  end
+    context "as provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@johnny)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+      end
     
-  context "add new blocks to provider calendar as another provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@mary)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+      should_respond_with :success
+      should_render_template 'appointments/edit_block.html.haml'
+  
+      should_assign_to(:provider) { @johnny }
+      should_assign_to :providers, :class => Array
+      should_assign_to :calendar_markings, :class => Hash
+      should_assign_to :daterange, :class => DateRange
     end
-  
-    should_respond_with :redirect
-    should_redirect_to("unauthorized_path") { unauthorized_path }
-    should_set_the_flash_to /You are not authorized/
   end
   
-  context "create free appointment for a block of dates" do
-    setup do
-      # have johnny create free appointments on his calendar
-      @controller.stubs(:current_user).returns(@johnny)
-      post :create_block,
-           {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @free_service.id, :mark_as => 'free'}
-    end
-    
-    should_change("Appointment.count", :by => 2) { Appointment.count }
-    
-    should_assign_to(:service) { @free_service }
-    should_assign_to(:provider) { @johnny }
-    should_assign_to(:start_at) { "0900" }
-    should_assign_to(:end_at) { "1100" }
-    should_assign_to(:mark_as)  { "free" }
-  
-    should_respond_with :redirect
-    should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
-  end
+  # context "get new blocks for provider calendar as another provider" do
+  #   setup do
+  #     add_mary_and_johnny_as_providers
+  #     @controller.stubs(:current_user).returns(@mary)
+  #     # stub calendar markings
+  #     @controller.stubs(:build_calendar_markings).returns(Hash.new)
+  #     get :new_block, :provider_type => 'users', :provider_id => @johnny.id
+  #   end
+  # 
+  #   should_respond_with :redirect
+  #   should_redirect_to("unauthorized_path") { unauthorized_path }
+  #   should_set_the_flash_to /You are not authorized/
+  # end
   
   #
   # Recurring appointment tests
   #
-  context "add weekly appointment to provider calendar as the provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@johnny)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+  context "get new weekly appointments for provider calendar" do
+    context "as another provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@mary)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+      should_set_the_flash_to /You are not authorized/
     end
     
-    should_respond_with :success
-    should_render_template 'appointments/edit_weekly.html.haml'
-  
-    should_assign_to(:provider) { @johnny }
-    should_assign_to :providers, :class => Array
-    should_assign_to :calendar_markings, :class => Hash
-    should_assign_to :daterange, :class => DateRange
-  end
+    context "as the provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@johnny)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+      end
     
-  context "add weekly appointment to provider calendar as another provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@mary)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
-    end
+      should_respond_with :success
+      should_render_template 'appointments/edit_weekly.html.haml'
   
-    should_respond_with :redirect
-    should_redirect_to("unauthorized_path") { unauthorized_path }
-    should_set_the_flash_to /You are not authorized/
+      should_assign_to(:provider) { @johnny }
+      should_assign_to :providers, :class => Array
+      should_assign_to :calendar_markings, :class => Hash
+      should_assign_to :daterange, :class => DateRange
+    end
   end
   
   context "create weekly schedule" do

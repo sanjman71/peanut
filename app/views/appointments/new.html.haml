@@ -1,5 +1,5 @@
 - title(@title)
-- javascript('appointments')
+- javascript('appointments', 'rpx')
 - stylesheet('appointments', 'jquery.autocomplete')
 
 .span-24.mat.padding-top-10.padding-bottom-10
@@ -13,32 +13,21 @@
 
 - form_for(@appointment, :url => url_for(:action => "create_#{@appointment.mark_as}", :subdomain => current_subdomain), :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
   = hidden_field_tag :customer_id, @customer.id
-  -#= hidden_field_tag :provider_type, @provider.tableize
-  -#= hidden_field_tag :provider_id, @provider.id
-  -#= hidden_field_tag :service_id, @service.id
-  -#= hidden_field_tag :dates, @appt_date
-  -#= hidden_field_tag :mark_as, @mark_as
-  -#= hidden_field_tag :start_at, @appt_time_start_at
-  -#= hidden_field_tag :end_at, @appt_time_end_at
-  -#= hidden_field_tag :duration, @duration
-  -#= hidden_field_tag :when, @when.to_url_param unless @when.blank?
-  -#= hidden_field_tag :time, @time.to_url_param unless @time.blank?
-  -#= hidden_field_tag :type, @type
-  
+
   - unless @appointment.errors.blank?
     -# show any appointment errors
     .span-14.notice.last
       = error_messages_for('appointment', :header_message => nil)
-      
+
   .span-16.last
     = render :partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => @customer_signup}
-    
+
   %hr.space
   
   -# confirm appointment
-  .span-15.prepend-1.last
-    = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em; color: #FFFFFF; font-weight: normal;'
-    %span#cancel{:style => 'font-size: 1.0em;'}
-      == &nbsp;or&nbsp;
-      = link_to 'Cancel', request.referer || openings_path
-    %span#confirm_appointment_submit_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
+  .span-8.prepend-1.last
+    #confirm_appointment
+      = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em; color: #FFFFFF; font-weight: normal;'
+      %span#cancel{:style => 'font-size: 1.0em;'}
+        == &nbsp;or&nbsp;
+        = link_to 'Cancel', openings_path

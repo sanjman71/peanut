@@ -65,22 +65,28 @@ $.fn.init_change_appointment_customer = function() {
   })
 }
 
-$.fn.validate_customer_signup = function() {
-  if ($("input#customer_name").size == 0) {
-    // no customer signup required
+$.fn.validate_appointment_customer = function() {
+  if ($("div#peanut_login").size() == 0) {
+    // customer is already logged in
     return true;
+  }
+  
+  if (!$("div#peanut_login").is(':visible')) {
+    // using rpx; user has not logged in or user login failed
+    alert("Please login with a provider or create a new user account");
+    return false;
   }
   
   customer_name  = $("input#customer_name").attr('value');
   customer_email = $("input#customer_email").attr('value');
   
   if (customer_name == '') {
-    alert("Please enter a customer name");
+    alert("Please enter a name");
     return false;
   }
 
   if (customer_email == '') {
-    alert("Please enter a customer email");
+    alert("Please enter an email");
     return false;
   }
 
@@ -127,18 +133,27 @@ $.fn.validate_customer_signup = function() {
 }
 
 $.fn.init_confirm_appointment = function() {
+  $("#show_peanut_login").click(function() {
+    $("#rpx_login").hide();
+    $("#peanut_login").show();
+    return false;
+  })
+
+  $("#show_rpx_login").click(function() {
+    $("#peanut_login").hide();
+    $("#rpx_login").show();
+    return false;
+  })
+
   $("#confirm_appointment_submit").click(function() {
     // validate customer signup
-    var submit = $(document).validate_customer_signup();
+    var customer_ok = $(document).validate_appointment_customer();
 
-    if (submit == true) {
-      // post the search query
+    if (customer_ok == true) {
+      // post the appointment confirmation
       $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
-    
-      // show progress bar
-      $(this).hide();
-      $("#cancel").hide();
-      $("#confirm_appointment_submit_progress").show();
+      // show progress message
+      $("div#confirm_appointment").replaceWith("<h3 class='submitting' style='text-align: center;'>Confirming Appointment...</h3>");
     }
     
     return false;
@@ -198,12 +213,8 @@ $.fn.init_reschedule_appointment = function() {
 
 $(document).ready(function() {
   $(document).init_search_appointments_by_confirmation_code();  // don't need to rebind after an ajax call
-  //$('#appointment_code').focus();
-  $('#appointment_time_range_start_at').focus();
-
   $(document).init_toggle_dates();
   $(document).init_select_appointments_customer();
-  
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
   $(document).init_complete_appointment();

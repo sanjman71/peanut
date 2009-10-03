@@ -25,7 +25,7 @@ class AppointmentsController < ApplicationController
     # get appointment parameters
     @service  = current_company.services.find_by_id(params[:service_id])
     @customer = current_user
-    
+
     case (@mark_as = params[:mark_as])
     when Appointment::WORK
       # build the work appointment parameters
@@ -38,6 +38,8 @@ class AppointmentsController < ApplicationController
       if @customer.blank?
         @customer           = User.anyone
         @customer_signup    = true
+        # set return_to url in case user uses rpx to login and needs to be redirect back
+        session[:return_to] = request.url
       end
 
       # build the work appointment without committing the changes
