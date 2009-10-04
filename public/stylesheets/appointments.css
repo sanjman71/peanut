@@ -3,9 +3,11 @@
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 div.appointments div.appointment.canceled         { color: #FF1100;}
 
-div.appointment.review                            { font-size: 1.8em; font-weight: normal; }
-div.appointment.review .label                     { color: #999999; }
-div.appointment.review .data                      { color: #007700; }
+div.appointment.review, div.waitlist.review       { font-size: 1.5em; font-weight: normal; }
+div.appointment.review .label, div.waitlist.review .label                     
+                                                  { color: #999999; }
+div.appointment.review .data, div.waitlist.review .data                      
+                                                  { color: #007700; }
 
 div.appointment                                   { padding: 7px 0 7px 0; }
 
@@ -34,5 +36,5 @@ div.appointment_header                            { background: #E1E0E0 none rep
 .customer.group                                   { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
                                                     font-size: 1.0em; font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }
 
-.provider.group                                { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
+.provider.group                                   { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
                                                     font-size: 1.0em;  font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }

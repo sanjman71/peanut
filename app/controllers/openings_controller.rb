@@ -106,9 +106,7 @@ class OpeningsController < ApplicationController
     @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
 
     # build waitlist path
-    @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id, 
-                                        :start_date => @daterange.to_url_param(:for => :start_date), :end_date => @daterange.to_url_param(:for => :end_date),
-                                        :subdomain => current_subdomain)
+    @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id)
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
     

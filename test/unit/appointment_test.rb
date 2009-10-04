@@ -7,7 +7,7 @@ class AppointmentTest < ActiveSupport::TestCase
   should_validate_presence_of   :start_at
   should_validate_presence_of   :end_at
   should_validate_presence_of   :duration
-  should_allow_values_for       :mark_as, "free", "work", "wait"
+  should_allow_values_for       :mark_as, "free", "work"
   
   should_belong_to              :company
   should_belong_to              :service
@@ -181,75 +181,75 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create waitlist appointment with a specific service provider" do
-    setup do
-      @johnny       = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-      @haircut.user_providers.push(@johnny)
-      @customer     = Factory(:user)
-      # build start, end date ranges in utc time
-      @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
-      @end_date     = (Time.zone.now.utc + 7.days).to_s(:appt_schedule_day)
-      @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
-      @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
-      @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
-    end
-  
-    should_change("Appointment.count", :by => 1) { Appointment.count }
-    
-    should "have a start date of today and end date in 1 week" do
-      assert_equal @start_date, @wait_appt.start_at.utc.to_s(:appt_schedule_day) # utc format
-      assert_equal @end_date, @wait_appt.end_at.utc.to_s(:appt_schedule_day) # utc format
-    end
-    
-    should "have a time of day of 'anytime'" do
-      assert_equal 0, @wait_appt.time_start_at
-      assert_equal 86400, @wait_appt.time_end_at
-    end
+  # context "create waitlist appointment with a specific service provider" do
+  #   setup do
+  #     @johnny       = Factory(:user, :name => "Johnny")
+  #     @company.user_providers.push(@johnny)
+  #     @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+  #     @haircut.user_providers.push(@johnny)
+  #     @customer     = Factory(:user)
+  #     # build start, end date ranges in utc time
+  #     @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
+  #     @end_date     = (Time.zone.now.utc + 7.days).to_s(:appt_schedule_day)
+  #     @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
+  #     @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
+  #     @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, @johnny, @haircut, @customer, @options)
+  #   end
+  # 
+  #   should_change("Appointment.count", :by => 1) { Appointment.count }
+  #   
+  #   should "have a start date of today and end date in 1 week" do
+  #     assert_equal @start_date, @wait_appt.start_at.utc.to_s(:appt_schedule_day) # utc format
+  #     assert_equal @end_date, @wait_appt.end_at.utc.to_s(:appt_schedule_day) # utc format
+  #   end
+  #   
+  #   should "have a time of day of 'anytime'" do
+  #     assert_equal 0, @wait_appt.time_start_at
+  #     assert_equal 86400, @wait_appt.time_end_at
+  #   end
+  # 
+  #   should "add 'user manager' role on user to customer" do
+  #     assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
+  #   end
+  # 
+  #   should "add 'company customer' role on company to customer" do
+  #     assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
+  #   end
+  # 
+  #   context "then remove company" do
+  #     setup do
+  #       @company.destroy
+  #     end
+  # 
+  #     should "have no Companies or associated models" do
+  #       assert_equal 0, Company.count
+  #       assert_equal 0, Appointment.count
+  #       assert_equal 0, Subscription.count
+  #       assert_equal 0, CompanyProvider.count
+  #       assert_equal 0, CapacitySlot.count
+  #     end
+  #   end
+  # 
+  # end
 
-    should "add 'user manager' role on user to customer" do
-      assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
-    end
-
-    should "add 'company customer' role on company to customer" do
-      assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
-    end
-
-    context "then remove company" do
-      setup do
-        @company.destroy
-      end
-
-      should "have no Companies or associated models" do
-        assert_equal 0, Company.count
-        assert_equal 0, Appointment.count
-        assert_equal 0, Subscription.count
-        assert_equal 0, CompanyProvider.count
-        assert_equal 0, CapacitySlot.count
-      end
-    end
-
-  end
-
-  context "create waitlist appointment with any service provider" do
-    setup do
-      @johnny       = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
-      @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
-      @haircut.user_providers.push(@johnny)
-      @customer     = Factory(:user)
-      # build start, end date ranges in utc time
-      @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
-      @end_date     = (Time.zone.now.utc + 7.days).to_s(:appt_schedule_day)
-      @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
-      @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
-      @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, nil, @haircut, @customer, @options)
-      assert_valid @wait_appt
-    end
-  
-    should_change("Appointment.count", :by => 1) { Appointment.count }
-  end
+  # context "create waitlist appointment with any service provider" do
+  #   setup do
+  #     @johnny       = Factory(:user, :name => "Johnny")
+  #     @company.user_providers.push(@johnny)
+  #     @haircut      = Factory(:work_service, :name => "Haircut", :price => 1.00, :company => @company)
+  #     @haircut.user_providers.push(@johnny)
+  #     @customer     = Factory(:user)
+  #     # build start, end date ranges in utc time
+  #     @start_date   = Time.zone.now.utc.to_s(:appt_schedule_day)
+  #     @end_date     = (Time.zone.now.utc + 7.days).to_s(:appt_schedule_day)
+  #     @daterange    = DateRange.parse_range(@start_date, @end_date, :inclusive => false) # parsed as local time
+  #     @options      = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
+  #     @wait_appt    = AppointmentScheduler.create_waitlist_appointment(@company, nil, @haircut, @customer, @options)
+  #     assert_valid @wait_appt
+  #   end
+  # 
+  #   should_change("Appointment.count", :by => 1) { Appointment.count }
+  # end
   
   context "create work appointment to check time overlap searching" do
     setup do

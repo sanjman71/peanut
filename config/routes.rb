@@ -72,7 +72,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :history, :only => [:index]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
-  map.resources :waitlist, :only => [:index]
+  map.resources :waitlists, :only => [:index, :create]
   
   # search openings for a specified service and duration, and an optional provider
   map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
@@ -85,18 +85,22 @@ ActionController::Routing::Routes.draw do |map|
                  :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration
-  map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
+  map.schedule  '/book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule  'book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at', 
+  map.schedule  '/book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                 :controller => 'appointments', :action => 'create_work', :mark_as => 'work', :conditions => {:method => :post}
 
+  # schedule a waitlist appointment with a provider for a specific service
+  map.waitlist  '/waitlist/:provider_type/:provider_id/services/:service_id',
+                :controller => 'waitlists', :action => 'new', :conditions => {:method => :get}
+
   # schedule a waitlist appointment with a provider for a specific service and date range
-  map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
-                :controller => 'appointments', :action => 'new', :mark_as => 'wait', 
-                :conditions => {:method => :get, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
-                :controller => 'appointments', :action => 'create_wait', :mark_as => 'wait', 
-                :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+  # map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
+  #               :controller => 'appointments', :action => 'new', :mark_as => 'wait', 
+  #               :conditions => {:method => :get, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+  # map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
+  #               :controller => 'appointments', :action => 'create_wait', :mark_as => 'wait', 
+  #               :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
     
   # edit, update and create provider free time, single appointment, block appointments, or weekly recurring appointments
   map.create_free   ':provider_type/:provider_id/calendar/free',
@@ -128,8 +132,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
 
   # search waitlist scoped by provider
-  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlist', :action => 'index'
-  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlist', :action => 'index'
+  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlists', :action => 'index'
+  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlists', :action => 'index'
 
   # toggle a provider's calendar
   map.connect   ':provider_type/:provider_id/calendar/toggle',

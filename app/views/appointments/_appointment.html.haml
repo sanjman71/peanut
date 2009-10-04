@@ -1,36 +1,30 @@
-.appointment.review.span-15.last{:syle => 'font-size: 1.5em;'}
+.appointment.review.span-15.last
 
   - tag = appointment.canceled? ? 'del' : 'span'
   
-  -# what and with are common across all types of appointments
+  -# what
   .span-3.label.text-align-right
     == What:
   .span-12.last.data
     ~ "<#{tag}>#{appointment.service.name}</#{tag}>"
+  
+  -# with
   .span-3.label.text-align-right
     == With:
   .span-12.last.data
     ~ "<#{tag}>#{(appointment.provider || User.anyone).name}</#{tag}>"
 
+  -# when
+  .span-3.label.text-align-right
+    == When:
+  .span-12.last.data
+    ~ "<#{tag}>#{appointment.start_at.to_s(:appt_day_date_time)}</#{tag}>"
 
-  -# when is different for a work appointment vs. a waitlist apointment
-  - if appointment.waitlist?
-    .span-3.label.text-align-right
-      == When:
-    .span-12.last.data
-      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}</#{tag}>"
-  - else
-    .span-3.label.text-align-right
-      == When:
-    .span-12.last.data
-      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_day_date_time)}</#{tag}>"
-
-  -# waitlist appointments have no duration
-  - unless appointment.waitlist?
-    .span-3.label.text-align-right
-      == How Long:
-    .span-12.last.data
-      ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
+  -#duration
+  .span-3.label.text-align-right
+    == How Long:
+  .span-12.last.data
+    ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
 
   - if appointment.recurrence? || appointment.recurrence_parent
     .span-3.label.text-align-right
@@ -42,7 +36,7 @@
         ~ "<#{tag}>#{link_to "Parent", appointment_path(appointment.recurrence_parent)}</#{tag}>"
 
   - if customer_signup
-    = render(:partial => 'appointment_customer_signup')
+    = render(:partial => 'appointment_customer_signup', :locals => {:signup => customer_signup})
   - else
     -# show customer for work and wait appointments
     - unless appointment.customer.blank?

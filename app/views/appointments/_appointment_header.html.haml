@@ -9,23 +9,15 @@
       == With:
     .span-12.padding-bottom-5.last
       = (appointment.provider || User.anyone).name
-    
-  -# when is different for a work appointment vs. a waitlist apointment
+
   .when
-  - if appointment.waitlist?
-    .span-3.padding-bottom-5.text-align-right
-      == When:
-    .span-12.padding-bottom-5.last
-      == #{appointment.start_at.to_s(:appt_short_month_day_year)} - #{appointment.end_at.to_s(:appt_short_month_day_year)}
-  - else
     .span-3.padding-bottom-5.text-align-right
       == When:
     .span-12.padding-bottom-5.last
       = appointment.start_at.to_s(:appt_day_date_time)
 
-  -# waitlist appointments have no duration
-  - unless appointment.waitlist?
-    .span-15.last.duration
+  .duration
+    .span-15.last
       .span-3.padding-bottom-5.text-align-right
         == How Long:
       .span-12.padding-bottom-5.last

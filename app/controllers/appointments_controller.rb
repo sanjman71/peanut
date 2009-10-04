@@ -37,9 +37,11 @@ class AppointmentsController < ApplicationController
       # allow customer to be created during this process
       if @customer.blank?
         @customer           = User.anyone
-        @customer_signup    = true
-        # set return_to url in case user uses rpx to login and needs to be redirect back
+        @customer_signup    = :all
+        # set return_to url in case user uses rpx to login and needs to be redirected back
         session[:return_to] = request.url
+      else
+        @customer_signup    = nil
       end
 
       # build the work appointment without committing the changes

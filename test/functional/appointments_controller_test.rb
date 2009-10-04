@@ -1,16 +1,7 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class AppointmentsControllerTest < ActionController::TestCase
 
-  # schedule a waitlist appointment for a specific provider, with a date range
-  should_route :get, 'book/wait/users/1/services/5/20090101..20090201',
-               :controller => 'appointments', :action => 'new', :provider_type => 'users', :provider_id => 1, :service_id => 5, 
-               :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
-  should_route :post, 'book/wait/users/1/services/5/20090101..20090201',
-               :controller => 'appointments', :action => 'create_wait', :provider_type => 'users', :provider_id => 1, :service_id => 5, 
-               :start_date => '20090101', :end_date => '20090201', :mark_as => 'wait'
-  
   # schedule a work apppointment for a specific provider, service and duration
   should_route :get, 'book/work/users/3/services/3/3600/20090303T113000',
                :controller => 'appointments', :action => 'new', :provider_type => 'users', :provider_id => 3, :service_id => 3, 

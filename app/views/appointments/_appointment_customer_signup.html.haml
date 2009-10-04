@@ -2,11 +2,13 @@
   .span-13#rpx_details
     == Select a provider to the right and login using your existing credentials.
     %br
-    %span{:style => 'color: #777777; font-size: 0.8em; padding: 5px 0px;'}== or
-    %br
-    == Click
-    = link_to 'here', '', :id => 'show_peanut_login'
-    == to create a new account.
+    - if signup == :all
+      -# allow peanut logins in addition to rpx
+      %span{:style => 'color: #777777; font-size: 0.8em; padding: 5px 0px;'}== or
+      %br
+      == Click
+      = link_to 'here', '', :id => 'show_peanut_login'
+      == to create a new account.
   .span-10.last
     #rpx_login_loading{:style => 'font-size: 1.0em; font-weight: bold;'}== Login Form Loading ...
     = RPXNow.embed_code('walnut', rpx_customer_url)

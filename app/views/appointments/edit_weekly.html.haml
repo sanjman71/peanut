@@ -36,28 +36,28 @@
 
 .span-14.prepend-1.last.prompt
   == When will the first appointment in this recurring series start and end?
-.span-13.prepend-2.last.hint.padding-bottom-10
+.span-14.prepend-1.last.hint.padding-bottom-10
   == Usually the first appointment will start and end on the same day
 
 .span-14.prepend-1.last
   .span-3.text_field_label
     = label_tag "starts_at", "Starting Time:"
   .span-4.padding-top-5
-    = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style'
+    = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   .span-2.text_field_label
     = label_tag "start_date", "Date:"
   .span-4.last.padding-top-5
-    = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style'
+    = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 
 .span-14.prepend-1.last
   .span-3.text_field_label
     = label_tag "ends_at", "Ending Time:"
   .span-4.padding-top-5
-    = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style'
+    = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   .span-2.text_field_label
     = label_tag "end_date", "Date:"
   .span-4.last.padding-top-5
-    = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style'
+    = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 
 %hr.space
 
@@ -77,7 +77,7 @@
 .span-14.prepend-1.last
   .span-14.last.prompt
     == How long will this appointment recur?
-  .span-13.prepend-1.last.hint
+  .span-14.last.hint
     == If you prefer you can leave it open ended.
   .span-4.text_field_label
     = label_tag "schedule_end_date", "Series Ends:"
@@ -93,7 +93,7 @@
 - if @provider.class.to_s == "Resource"
   .span-14.prepend-1.last.prompt
     == How many #{@provider.name.downcase.pluralize} will be available:
-  .span-13.prepend-2.last.hint.padding-bottom-10
+  .span-14.prepend-1.last.hint.padding-bottom-10
     == Often the capacity is 1, but you may have more than 1.
   .span-14.prepend-1.last
     .span-3.text_field_label
