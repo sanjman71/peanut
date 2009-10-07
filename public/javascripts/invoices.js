@@ -12,7 +12,6 @@ $(document).ready(function() {
 
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
-  $(document).init_ujs_links();
 //  $(document).init_highlight_invoice_chargeables();
   $(document).reset_chargeables();
   $(document).init_add_chargeables();

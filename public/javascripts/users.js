@@ -1,5 +1,5 @@
 $.fn.init_toggle_user_calendar = function() {
-  $(".checkbox.calendar").click(function() {
+  $(".checkbox.calendar").live('click', function() {
     // hide checkbox and label
     $(this).hide();
     $(this).siblings(".checkbox.label").hide();
@@ -8,11 +8,11 @@ $.fn.init_toggle_user_calendar = function() {
     // post data
     $.post($(this).attr("url"), {}, null, "script");
     return false;
-  })
+  });
 }
 
 $.fn.init_toggle_user_company_manager = function() {
-  $(".checkbox.manager").click(function() {
+  $(".checkbox.manager").live('click', function() {
     // hide checkbox and label
     $(this).hide();
     $(this).siblings(".checkbox.label").hide();
@@ -21,7 +21,7 @@ $.fn.init_toggle_user_company_manager = function() {
     // post data
     $.post($(this).attr("url"), {}, null, "script");
     return false;
-  })
+  });
 }
 
 $.fn.init_user_create_submit = function() {
@@ -113,13 +113,8 @@ function check_user_phone_fields() {
 }
 
 $(document).ready(function() {
-  $(document).init_toggle_user_calendar();  // re-bind after an ajax call
-  $(document).init_toggle_user_company_manager();  // re-bind after an ajax call
+  $(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
+  $(document).init_toggle_user_company_manager();  // re-bind after an ajax call using jquery live()
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
-})
-
-$(document).ajaxComplete(function(request, settings) {
-  $(document).init_toggle_user_calendar();
-  $(document).init_toggle_user_company_manager();
 })
