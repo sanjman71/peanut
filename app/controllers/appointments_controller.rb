@@ -468,6 +468,12 @@ class AppointmentsController < ApplicationController
       # future recurrence children determining whether or not we can remove them all.
       if params[:series] && @appointment.recurrence?
         @conflicts = []
+        # Find all conflicting work appointments in this series of free appointments
+        # Start with the parents
+        if @appointment.recurrence_parent.work_appointments.upcoming.count
+          @conflicts << @appointment.recurrence_parent
+        end
+        # And continue with all the instances
         @appointment.recurrence_parent.recur_instances.future.each do |appointment|
           if appointment.work_appointments.upcoming.count != 0
             @conflicts << appointment
@@ -490,8 +496,17 @@ class AppointmentsController < ApplicationController
           if rp.start_at > Time.zone.now
             rp.destroy
           end
-          @redirect_path = request.referrer.blank? ? calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain) : request.referrer
           flash[:notice] = "All future members of this recurring series have been removed and no more will be created"
+
+          # Make sure we don't redirect to an appointment we just destroyed 
+          if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+            @redirect_path = request.referrer
+          elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+            @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+          else
+            @redirect_path = history_path
+          end
+
         else
           flash[:error] = "You cannot remove this recurring series as there are some conflicting work appointments"
         end
@@ -502,12 +517,22 @@ class AppointmentsController < ApplicationController
         if @appointment.work_appointments.upcoming.count != 0
           flash[:error] = "You cannot remove this available time until all existing appointments in it have been cancelled or removed"
         else
-          @redirect_path = request.referrer.blank? ? calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain) : request.referrer
+
           @appointment.destroy
 
           # set flash
           flash[:notice] = "Deleted available time"
           logger.debug("*** deleted appointment #{@appointment.id}")
+
+          # Make sure we don't redirect to an appointment we just destroyed 
+          if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+            @redirect_path = request.referrer
+          elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+            @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+          else
+            @redirect_path = history_path
+          end
+
         end
       end
 
@@ -516,12 +541,19 @@ class AppointmentsController < ApplicationController
       @appointment.destroy
 
       flash[:notice] = "Deleted appointment"
-      # redirect to provider appointment path
-      @redirect_path = request.referrer.blank? ? calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain) : request.referrer
-      logger.debug("*** deleted appointment #{@appointment.id}")
-    end
 
-    # KILLIAN - Make sure we don't redirect to the appointment we just destroyed
+      # Deleting a work appointment. There are no recurring appointments in this case, thought we'll leave the check in for the future..
+      if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+        @redirect_path = request.referrer
+      elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+      else
+        @redirect_path = history_path
+      end
+
+      logger.debug("*** deleted appointment #{@appointment.id}")
+
+    end
 
     respond_to do |format|
       format.html { @redirect_path ? redirect_to(@redirect_path) : render(:action => 'index') }
