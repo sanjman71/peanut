@@ -153,11 +153,11 @@ module ApplicationHelper
     # end
   end
 
-  def build_admin_tab_links
-    if has_privilege?('manage site')
-      yield 'Admin Console', root_path(:subdomain => 'www'), Array.new
-    end
-  end
+  # def build_admin_tab_links
+  #   if has_privilege?('manage site')
+  #     yield 'Admin Console', root_path(:subdomain => 'www'), Array.new
+  #   end
+  # end
   
   def build_signup_links(current_controller)
     # 'Signup' tab

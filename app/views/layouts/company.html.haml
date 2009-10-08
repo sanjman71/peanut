@@ -33,9 +33,9 @@
     #header
       .container
         .span-24.last
-          .span-16
-            .company_title.span-16.last
-            / The company edit page builds a new logo, so we check for the id here also
+          .span-15
+            .company_title.span-15.last
+            -# The company edit page builds a new logo, so we check for the id here also
             - if current_company.logo && current_company.logo.id
               .company_logo.append-1
                 = link_to image_tag(current_company.logo.image.url), root_path(:subdomain => current_subdomain)
@@ -43,20 +43,15 @@
               = link_to current_company.name, root_path(:subdomain => current_subdomain)
             .company_slogan.last
               = link_to h(current_company.slogan), root_path(:subdomain => current_subdomain) unless current_company.slogan.blank?
-          .span-8.last
-            .span-8.last{:style => 'color: #DDDDDD; text-align: right;'}
+          .span-9.last
+            .span-9.last{:style => 'color: #DDDDDD; text-align: right;'}
               = render :partial => 'users/user_links.html.haml'
-            .span-8.last.walnut_calendar_logo
+            .span-9.last.walnut_calendar_logo
               = link_to image_tag('walnut_calendar.gif'), root_path(:subdomain => 'www')
               
-        .span-16#tabs
+        .span-16#tabs.hide
           %ul
             - build_tab_links(controller) do |name, path, klasses|
-              %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
-
-            %li{:style => 'padding-left: 10px;'}== &nbsp;
-
-            - build_admin_tab_links do |name, path, klasses|
               %li{:id => name.downcase, :class => klasses.join(' ')}= link_to(name, path, :url => path)
 
         .span-8.last.text-align-right

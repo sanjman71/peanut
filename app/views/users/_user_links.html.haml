@@ -10,6 +10,10 @@
 - else
   = link_to('Log in or Sign up', login_path, :class => 'admin header')
   
+- if has_privilege?('manage site')
+  == &nbsp;|&nbsp;
+  = link_to('Admin Console', root_path(:subdomain => 'www'), :class => 'admin header')
+
 - if RAILS_ENV == 'development'
   == &nbsp;|&nbsp;
   = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'admin header')

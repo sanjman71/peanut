@@ -283,6 +283,8 @@ $(document).ready(function() {
   $(document).init_ujs_links();
   // initialize change location select link
   $(document).init_change_location();
+  // show tabs
+  $("div#tabs").show();
   // initialize rounded corners
   $('.rounded').corners();
 })
