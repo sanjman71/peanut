@@ -59,9 +59,9 @@
         %h4.span-12.prepend-3#when_times
           .span-2
             %span{:style => 'font-size: 1.3em; padding-right: 5px;'}== Times:
-          = time_range_form.text_field :start_time, :id => 'start_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
+          = time_range_form.text_field :start_time_hours, :id => 'start_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
           %span{:style => 'padding: 0 5px;'}== to
-          = time_range_form.text_field :end_time, :id => 'end_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
+          = time_range_form.text_field :end_time_hours, :id => 'end_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
 
   %hr.space
 

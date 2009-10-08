@@ -1,8 +1,8 @@
 class AppointmentsController < ApplicationController
   before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
-                                          :create_work, :create_wait]
+                                          :create_work]
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
-                                                     :create_work, :create_wait]
+                                                     :create_work]
   before_filter :init_appointment, :only => [:show]
   before_filter :get_reschedule_id, :only => [:new]
 
@@ -54,34 +54,16 @@ class AppointmentsController < ApplicationController
 
       # set title
       @title                = "Book Appointment"
-    when Appointment::WAIT
-      # build waitlist parameters
-      @daterange            = DateRange.parse_range(params[:start_date], params[:end_date], :inclusive => true)
-      @options              = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
-      
-      # build the waitlist appointment without committing the changes
-      @appointment          = AppointmentScheduler.create_waitlist_appointment(current_company, @provider, @service, @customer, @options, :commit => false)
-      
-      # default provider is 'anyone' for display purposes
-      @provider             = User.anyone if @provider.blank?
-      
-      # set appointment date to daterange name, set start_at and end_at times in schedule format
-      @appt_date            = @daterange.name
-      @appt_time_start_at   = @appointment.start_at.to_s(:appt_schedule_day)
-      @appt_time_end_at     = @appointment.end_at.to_s(:appt_schedule_day)
-
-      # set title
-      @title                = "Waitlist Appointment"
     end
 
     respond_to do |format|
       format.html
     end
   end
-    
+
   def create
     # @provider initialized in before filter
-    
+
     if params[:action] == 'create'
       # not allowed to directly call 'create'
       redirect_to unauthorized_path and return
@@ -167,19 +149,6 @@ class AppointmentsController < ApplicationController
           # set redirect path
           @redirect_path  = request.referer
           flash[:notice]  = "Created available time"
-        when Appointment::WAIT
-          # build date range
-          @daterange      = DateRange.parse_range(@start_at, @end_at, :inclusive => true)
-          @options        = {:start_at => @daterange.start_at, :end_at => @daterange.end_at}
-          # create waitlist appointment
-          @appointment    = AppointmentScheduler.create_waitlist_appointment(current_company, @provider, @service, @customer, @options, :commit => true)
-          # set redirect path
-          @redirect_path  = appointment_path(@appointment, :subdomain => current_subdomain)
-          flash[:notice]  = "Your are confirmed on the waitlist for a #{@service.name}.  An email will also be sent to #{@customer.email}"
-          # # create log_entry
-          # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-          #                               :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:added_to_waitlist],
-          #                               :customer => @appointment.customer)
         end
         
         logger.debug("*** created #{@appointment.mark_as} appointment")
@@ -386,11 +355,6 @@ class AppointmentsController < ApplicationController
     create
   end
 
-  # anyone can create wait appointments
-  def create_wait
-    create
-  end
-
   # GET /appointments/1/reschedule
   def reschedule
     @appointment  = current_company.appointments.find(params[:id])
@@ -421,8 +385,6 @@ class AppointmentsController < ApplicationController
     case @appointment.mark_as
     when Appointment::WORK
       @title = "Appointment Details"
-    when Appointment::WAIT
-      @title = "Waitlist Details"
     when Appointment::FREE
       @title = "Free Time Details"
     end
@@ -470,18 +432,14 @@ class AppointmentsController < ApplicationController
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
       message_id = LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_canceled]
-    when Appointment::WAIT
-      # cancel the wait appointment
-      AppointmentScheduler.cancel_wait_appointment(@appointment)
-      message_id = LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:waitlist_canceled]
     end
 
     # redirect to the appointment page
     @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
     
     # create log_entry
-    current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-                                  :message_id => message_id, :customer => @appointment.customer)
+    # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
+    #                               :message_id => message_id, :customer => @appointment.customer)
 
     # set flash
     flash[:notice] = "Canceled appointment"
@@ -514,16 +472,10 @@ class AppointmentsController < ApplicationController
     else
       @appointment.destroy
 
-      if @appointment.waitlist?
-        # set flash
-        flash[:notice] = "Deleted waitlist"
-        # redirect to waitlist index
-        @redirect_path  = waitlist_index_path(:subdomain => current_subdomain)
-      else
-        flash[:notice] = "Deleted appointment"
-        # redirect to provider appointment path
-        @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
-      end
+      flash[:notice] = "Deleted appointment"
+      # redirect to provider appointment path
+      @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+
       logger.debug("*** deleted appointment #{@appointment.id}")
     end
 
@@ -569,12 +521,12 @@ class AppointmentsController < ApplicationController
 
     case @customer.id
     when 0
-      # find work, wait appointments for anyone with the specified state
-      @appointments = current_company.appointments.wait_work.order_start_at.send(@state)
+      # find work appointments for anyone with the specified state
+      @appointments = current_company.appointments.work.order_start_at.send(@state)
       @anyone       = true
     else
-      # find customer work, wait appointments with the specified state
-      @appointments = current_company.appointments.wait_work.customer(@customer).order_start_at.send(@state)
+      # find customer work appointments with the specified state
+      @appointments = current_company.appointments.work.customer(@customer).order_start_at.send(@state)
       @anyone       = false
     end
 

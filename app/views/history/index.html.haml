@@ -5,7 +5,14 @@
   
 %hr.space
 
-.span-15.prepend-1
+#waitlists.waitlists
+  .span-15.prepend-1.last
+    %h4= pluralize(@waitlists.size, "Waitlist Appointment")
+  = render(:partial => 'waitlists/waitlist', :locals => {:customer => current_user, :waitlists => @waitlists})
+
+%hr.space
+
+.span-15.prepend-1#pagination
   .span-11
     %h4= page_entries_info @appointments unless @appointments.blank?
   .span-4.last

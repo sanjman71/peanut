@@ -45,15 +45,15 @@ class AppointmentTest < ActiveSupport::TestCase
       @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service,
                                                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120 * 60)
     end
-  
+
     should_change("Appointment.count", :by => 1) { Appointment.count }
-    
+
     should "have duration of 2 hours, and end_at time adjusted" do
       assert_equal 120 * 60, @appt.duration
       assert_equal 0, @appt.start_at.in_time_zone.hour
       assert_equal 2, @appt.end_at.in_time_zone.hour
     end
-    
+
     should "have a valid uid" do
       assert !(@appt.uid.blank?)
       assert_match Regexp.new("[0-9]*-[0-9]*@walnutindustries.com"), @appt.uid

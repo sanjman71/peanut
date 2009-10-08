@@ -78,10 +78,10 @@ class WaitlistsController < ApplicationController
     end
 
     if @waitlist.valid?
-      flash[:notice]  = "Added to waitlist"
+      flash[:notice]  = "You have been added to the waitlist"
       @redirect_path  = openings_path
     else
-      flash[:error] = "Waitlist error"
+      flash[:error] = "There was an error adding you to the waitlist"
       logger.debug("[error] #{@waitlist.errors.full_messages}")
       @redirect_path = request.referer
     end
