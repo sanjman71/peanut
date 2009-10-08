@@ -85,9 +85,9 @@ ActionController::Routing::Routes.draw do |map|
                  :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration
-  map.schedule  '/book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
+  map.schedule  '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                 :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule  '/book/work/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
+  map.schedule  '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                 :controller => 'appointments', :action => 'create_work', :mark_as => 'work', :conditions => {:method => :post}
 
   # schedule a waitlist appointment with a provider for a specific service

@@ -3,10 +3,10 @@ require 'test/test_helper'
 class AppointmentsControllerTest < ActionController::TestCase
 
   # schedule a work apppointment for a specific provider, service and duration
-  should_route :get, 'book/work/users/3/services/3/3600/20090303T113000',
+  should_route :get, '/schedule/users/3/services/3/3600/20090303T113000',
                :controller => 'appointments', :action => 'new', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60.minutes, :start_at => '20090303T113000', :mark_as => 'work'
-  should_route :post, 'book/work/users/3/services/3/3600/20090303T113000',
+  should_route :post, '/schedule/users/3/services/3/3600/20090303T113000',
                :controller => 'appointments', :action => 'create_work', :provider_type => 'users', :provider_id => 3, :service_id => 3, 
                :duration => 60.minutes, :start_at => '20090303T113000', :mark_as => 'work'
   
@@ -14,7 +14,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route  :post, '/users/3/calendar/free', 
                 :controller => 'appointments', :action => 'create_free', :provider_type => 'users', :provider_id => 3
   
-  should_route  :get, 'users/1/calendar/block/new', 
+  should_route  :get, '/users/1/calendar/block/new', 
                 :controller => "appointments", :action => 'new_block', :provider_type => "users", :provider_id => 1
   should_route  :post, '/users/3/calendar/block', 
                 :controller => 'appointments', :action => 'create_block', :provider_type => 'users', :provider_id => 3
