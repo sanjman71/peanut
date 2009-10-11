@@ -48,29 +48,26 @@
     .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
       %h5= label_tag "start_time", "Start time:"
     .span-12.last.padding-top-5
-      = text_field_tag 'start_time', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+      = text_field_tag 'start_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;", :autocomplete => 'off'
 
   .span-14.prepend-1.last
     .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
       %h5= label_tag "end_time", "End time:"
     .span-12.last.padding-top-5
-      = text_field_tag 'end_time', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;"
+      = text_field_tag 'end_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;", :autocomplete => 'off'
 
   %hr.space
 
   #dates
-    = text_field_tag 'dates[]', 'date', :id => 'template', :class => 'hide'
-    = text_field 'start_at', '', :name => 'start_at', :id => 'start_at', :class => 'hide'
-    = text_field 'end_at', '', :name => 'end_at', :id => 'end_at', :class => 'hide'
+    = text_field_tag 'dates[]', '', :id => 'date_template', :class => 'hide'
 
   %hr.space
   %hr.space
   
-  .span-16.last.prepend-1
-    %h2#submit
-      = f.submit "Schedule Available Time", :class => 'big button'
+  .span-8.last.prepend-1
+    %h2#submit_wrapper
+      = f.submit "Schedule Available Time", :class => 'big button', :id => 'calendar_block_submit'
       %span{:style => 'font-size: 11px;'}
         == or
         = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
-    %h2.hide#progress= image_tag 'barbershop.gif'
   

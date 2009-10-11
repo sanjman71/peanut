@@ -32,7 +32,7 @@ $.fn.init_select_calendar_dates = function() {
     if ($(this).hasClass('mark')) 
     {
       // clone template input field
-      var $new_date = $("input#template").clone();
+      var $new_date = $("input#date_template").clone();
 
       // set value, id attributes
       $new_date.attr("value", $(this).attr("id"));
@@ -42,13 +42,13 @@ $.fn.init_select_calendar_dates = function() {
       $new_date.addClass('date');
 
       // append date object input field to free time list
-      $("#dates").append($new_date);
+      $("div#dates").append($new_date);
     }
     else 
     {
       // remove date object input field
       remove_id = "input#" + $(this).attr("id")
-      $("#dates").find(remove_id).remove();
+      $("div#dates").find(remove_id).remove();
     }
 
     // update dates selected count
@@ -72,53 +72,48 @@ $.fn.init_timepicker_block = function() {
 }
 
 $.fn.init_add_block_free_time_form = function () {
-  $("#add_block_free_time_form").submit(function () {
+  $("form#add_block_free_time_form").submit(function () {
     // check for at least 1 date, and start and end times
     var date_count  = $(".date").length;
-    var start_time  = $("#start_time").attr('value');
-    var end_time    = $("#end_time").attr('value');
+    var start_at    = $("#start_at").attr('value');
+    var end_at      = $("#end_at").attr('value');
     
     if (date_count == 0) {
       alert("Please select at least 1 date");
       return false;
     }
     
-    if (!start_time) {
+    if (!start_at) {
       alert("Please select a start time");
       return false;
     }
 
-    if (!end_time) {
+    if (!end_at) {
       alert("Please select an end time");
       return false;
     }
     
     // normalize time format, validate that start_at < end_at
-    var start_at = convert_time_ampm_to_string(start_time)
-    var end_at   = convert_time_ampm_to_string(end_time)
+    var start_at = convert_time_ampm_to_string(start_at)
+    var end_at   = convert_time_ampm_to_string(end_at)
     
     if (!(start_at <= end_at)) {
       alert("The start time must be earlier than the end time");
       return false;
     }
     
-/*    alert("start: " + start_at + " end: " + end_at);
-    return false;
-*/    
-    // set start_at and end_at values
+    // replace start_at and end_at values
     $("#start_at").attr("value", start_at);
     $("#end_at").attr("value", end_at);
     
-    // remove template input field before submit
-    $("#start_time").remove();
-    $("#end_time").remove();
+    // remove template input fields before the submit
+    $("input#date_template").remove();
     
     // ajax post
     $.post(this.action, $(this).serialize(), null, "script");
     
-    // hide the submit button and show the progress bar
-    $(this).find("#submit").hide();
-    $(this).find("#progress").show();
+    // show progress indicator
+    $("#submit_wrapper").replaceWith("<h3 class='submitting' style='text-align: center;'>Adding ...</h3>");
     
     return false;
   });
