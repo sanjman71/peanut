@@ -46,15 +46,15 @@ class Mctrucks < WalnutDemo
     create_service(@mctrucks, "17 foot truck rental (hourly)", [@large_truck], 60.minutes, 20.00)
   end
 
-  SLOGAN = "We'll haul you away"
+  SLOGAN = "We'll haul you away!"
 
   DESCRIPTION = <<-END_DESCRIPTION
-    <p>McTrucks rents different kinds of trucks. We have 3 different types of truck</p>
+    <p>McTrucks rents vans and trucks by the hour. We have 3 different types of vehicle to choose from:</p>
 
     <ol>
-       <li>a Van,a very good choice for those odd-jobs which require some extra capacity</li>
-       <li>14 feet, useful for moving a 1-2 bedroom apartment</li>
-       <li>17 feet, used to move a house</li>
+       <li><strong>A van</strong> - a very good choice for those odd-jobs which require more capacity than your family car</li>
+       <li><strong>A 14 foot gas truck</strong> - useful for moving a 1-2 bedroom apartment full of furniture</li>
+       <li><strong>A 17 foot diesel truck</strong> - used to move a house full of furniture</li>
     </ol>
 
     <p>We have a number of each type of truck, so there should be plenty of availability.</p>

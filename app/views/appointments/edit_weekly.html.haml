@@ -6,9 +6,9 @@
   .span-15.prepend-1.mat.padding-top-10
     .span-15.last.provider
       - if @providers.blank?
-        = label_tag "edit_provider", "Create weekly schedule for #{@provider.name}", :class => 'big'
+        = label_tag "edit_provider", "Create weekly availability schedule for #{@provider.name}", :class => 'big'
       - else
-        = label_tag "edit_provider", "Create weekly schedule for", :class => 'big'
+        = label_tag "edit_provider", "Create weekly availability schedule for", :class => 'big'
         = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')      
     %h4.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the days of the week.
@@ -40,22 +40,22 @@
   == Usually the first appointment will start and end on the same day
 
 .span-14.prepend-1.last
-  .span-3.text_field_label
-    = label_tag "starts_at", "Starting Time:"
+  .span-2.text_field_label
+    = label_tag "starts_at", "Start Time:"
   .span-4.padding-top-5
     = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   .span-2.text_field_label
-    = label_tag "start_date", "Date:"
+    = label_tag "start_date", "Start Date:"
   .span-4.last.padding-top-5
     = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 
 .span-14.prepend-1.last
-  .span-3.text_field_label
-    = label_tag "ends_at", "Ending Time:"
+  .span-2.text_field_label
+    = label_tag "ends_at", "End Time:"
   .span-4.padding-top-5
     = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   .span-2.text_field_label
-    = label_tag "end_date", "Date:"
+    = label_tag "end_date", "End Date:"
   .span-4.last.padding-top-5
     = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 

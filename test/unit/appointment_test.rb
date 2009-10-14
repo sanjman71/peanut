@@ -823,7 +823,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
   context "create one valid recurring free private appointment" do
     setup do
-      @start_at       = Time.zone.now.beginning_of_day.utc
+      @start_at       = Time.zone.now.beginning_of_day
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 8.weeks
       @recur_days     = "#{ical_days([@start_at.utc, (@start_at + 4.days).utc])}"
@@ -840,7 +840,7 @@ class AppointmentTest < ActiveSupport::TestCase
     should_not_change("Appointment.public.count") { Appointment.public.count }
 
     should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
-      assert_equal 120 * 60, @recurrence.duration
+      assert_equal 2.hours, @recurrence.duration
       assert_equal 0, @recurrence.start_at.in_time_zone.hour
       assert_equal 2, @recurrence.end_at.in_time_zone.hour
     end
@@ -862,7 +862,7 @@ class AppointmentTest < ActiveSupport::TestCase
 
       should "have instances with duration of 2 hours and start at 00:00 and finish at 02:00" do
         @recurrence.recur_instances.each do |a|
-          assert_equal 120 * 60, a.duration
+          assert_equal 2.hours, a.duration
           assert_equal 0, a.start_at.in_time_zone.hour
           assert_equal 2, a.end_at.in_time_zone.hour
         end
@@ -890,10 +890,18 @@ class AppointmentTest < ActiveSupport::TestCase
 
       context "then delete the recurrence" do
          setup do
+           @recur_instances = @recurrence.recur_instances
            @recurrence.destroy
          end
 
-         should_change("Appointment.count", :by => -8) { Appointment.count }
+         should_change("Appointment.count", :by => -1) { Appointment.count }
+         
+         should "have 7 instances with no recurrence parent" do
+           assert_equal 7, @recur_instances.count
+           @recur_instances.each do |i|
+             assert_nil i.recur_parent
+           end
+         end
 
       end
 

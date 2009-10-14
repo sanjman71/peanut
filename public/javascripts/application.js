@@ -208,7 +208,7 @@ $.fn.init_toggle_dates = function() {
 
 // Replace all ujs classes with ajax post calls; ask user for confirmation if required.
 $.fn.init_ujs_links = function () {
-  $("a.ujs").click(function() {
+  $("a.ujs").live('click', function() {
     // Check if its a rails delete link
     if ($(this).attr("class").match(/delete/i))
       var params = {_method : 'delete'};
@@ -226,7 +226,7 @@ $.fn.init_ujs_links = function () {
     
     $.post($(this).attr("href"), params, null, "script");
     return false;
-  })
+  });
 }
 
 // initialize rounded corners
@@ -292,10 +292,5 @@ $(document).ready(function() {
   $(document).init_rounded_corners();
   // show tabs
   $("div#tabs").show();
-})
-
-$(document).ajaxComplete(function(request, settings) {
-  // re-initialize all ujs links and any new links
-  $(document).init_ujs_links();
 })
 

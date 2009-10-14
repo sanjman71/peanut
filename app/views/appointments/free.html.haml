@@ -6,4 +6,12 @@
   = display_flash
   
 .span-23.prepend-1
-  = render(:partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => false})
+  = render(:partial => 'appointments/appointment', :locals => {:appointment => @appointment, :customer_signup => false})
+
+- if !@instances_by_day.blank?
+  .appointment.review.span-23.prepend-1.last
+    .span-23.last.label
+      == Future availability in this recurring series:
+  .span-23.last
+    = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @instances_by_day})
+  

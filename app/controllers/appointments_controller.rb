@@ -388,6 +388,11 @@ class AppointmentsController < ApplicationController
     when Appointment::FREE
       @title = "Free Time Details"
     end
+
+    # Get list of instances if this is a recurring available appointment
+    if @appointment.mark_as == Appointment::FREE && @appointment.recurrence?
+      @instances_by_day = @appointment.recurrence_parent.recur_instances.future.group_by { |appt| appt.start_at.beginning_of_day }
+    end
     
     # show invoices for completed appointments
     # @invoice      = @appointment.invoice
@@ -453,30 +458,101 @@ class AppointmentsController < ApplicationController
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
+
     @provider    = @appointment.provider
     
     # If this is a free appointment, we need to ensure it doesn't have any attached work appointments before destroying it.
     if @appointment.mark_as == Appointment::FREE
-      if @appointment.work_appointments.upcoming.count != 0
-        flash[:error] = "You cannot remove this available time until all existing appointments in it have been cancelled or removed"
-      else
-        @redirect_path = request.referrer.blank? ? calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain) : request.referrer
-        @appointment.destroy
 
-        # set flash
-        flash[:notice] = "Deleted available time"
-        logger.debug("*** deleted appointment #{@appointment.id}")
+      # If we are being asked to remove all future free appointments in a recurrence then we need to iterate through all 
+      # future recurrence children determining whether or not we can remove them all.
+      if params[:series] && @appointment.recurrence?
+        @conflicts = []
+        # Find all conflicting work appointments in this series of free appointments
+        # Start with the parents
+        if @appointment.recurrence_parent.work_appointments.upcoming.count
+          @conflicts << @appointment.recurrence_parent
+        end
+        # And continue with all the instances
+        @appointment.recurrence_parent.recur_instances.future.each do |appointment|
+          if appointment.work_appointments.upcoming.count != 0
+            @conflicts << appointment
+          end
+        end
+        
+        if @conflicts.empty?
+          # Disable the recurrence parent. For now we remove the recurrence rule
+          # Note - important to do it like this - clearing recur_rule means that @appointment.recurrence_parent will be nil when we save if this is
+          # the recurrence_parent
+          rp = @appointment.recurrence_parent
+          rp.recur_rule = nil
+          rp.save
+
+          # Now destroy all future instances. This does not include the recurrence parent itself.
+          rp.recur_instances.future.each do |appointment|
+            appointment.destroy
+          end
+          # Finally destroy the recurrence parent if it exists in the future
+          if rp.start_at > Time.zone.now
+            rp.destroy
+          end
+          flash[:notice] = "All future members of this recurring series have been removed and no more will be created"
+
+          # Make sure we don't redirect to an appointment we just destroyed 
+          if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+            @redirect_path = request.referrer
+          elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+            @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+          else
+            @redirect_path = history_path
+          end
+
+        else
+          flash[:error] = "You cannot remove this recurring series as there are some conflicting work appointments"
+        end
+
+      else
+
+        # We're only removing this instance
+        if @appointment.work_appointments.upcoming.count != 0
+          flash[:error] = "You cannot remove this available time until all existing appointments in it have been cancelled or removed"
+        else
+
+          @appointment.destroy
+
+          # set flash
+          flash[:notice] = "Deleted available time"
+          logger.debug("*** deleted appointment #{@appointment.id}")
+
+          # Make sure we don't redirect to an appointment we just destroyed 
+          if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+            @redirect_path = request.referrer
+          elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+            @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+          else
+            @redirect_path = history_path
+          end
+
+        end
       end
 
-      # Work and Waitlist appointments are destroyed automatically
+      # Work appointments are destroyed automatically
     else
       @appointment.destroy
 
       flash[:notice] = "Deleted appointment"
-      # redirect to provider appointment path
-      @redirect_path  = url_for(:action => 'index', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+
+      # Deleting a work appointment. There are no recurring appointments in this case, thought we'll leave the check in for the future..
+      if request.referrer && !(params[:series]) && !(request.referrer =~ /#{appointment_path(params[:id])}$/)
+        @redirect_path = request.referrer
+      elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+      else
+        @redirect_path = history_path
+      end
 
       logger.debug("*** deleted appointment #{@appointment.id}")
+
     end
 
     respond_to do |format|
