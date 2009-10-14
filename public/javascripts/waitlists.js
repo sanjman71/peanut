@@ -33,7 +33,7 @@ $.fn.init_add_waitlist = function() {
       return false;
     }
 
-    if (end_date <= start_date) {
+    if (end_date < start_date) {
       alert("The start date must be before the end date");
       return false;
     }
@@ -80,7 +80,7 @@ $.fn.init_show_appointment_waitlists = function() {
 }
 
 $.fn.init_send_waitlist_message = function() {
-  $("#send_message_dialog").dialog({ autoOpen: false, modal: true, height: 250, width: 500 });
+  $("#send_message_dialog").dialog({ autoOpen: false, modal: true, height: 220, width: 500, show: 'fadeIn(slow)' });
 
   $("#send_waitlist_message").live('click', function() {
     // fill in message address
