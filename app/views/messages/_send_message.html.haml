@@ -1,0 +1,33 @@
+- recipient = nil if local_assigns[:recipient].blank?
+- hidden    = false if local_assigns[:hidden].blank?
+
+.span-10.last#send_message_dialog{:title => "Send Message", :class => hidden ? 'hide' : ''}
+  - message = Message.new
+  - message.message_recipients.build
+  - form_for(message, :url => messages_path, :method => :post, :html => {:id => 'new_message'}) do |message_form|
+    = message_form.hidden_field :sender_id, :value => sender.id
+    - message_form.fields_for :message_recipients do |recipient_form|
+      - if recipient
+        = recipient_form.hidden_field :protocol, :value => protocol
+        = recipient_form.hidden_field :messagable_type, :value => recipient.class.to_s
+        = recipient_form.hidden_field :messagable_id, :value => recipient.id
+      .span-10.last{:style => 'padding-bottom: 10px;'}
+        .span-2.text-align-right
+          = label_tag 'message_to', 'To:'
+        .span-8.last
+          - if recipient
+            = recipient.address
+          - else
+            = text_field_tag "address", '', :name => "message[address]", :class => 'message short', :id => 'message_address', :size => 30
+    .span-10.last{:style => 'padding-bottom: 10px;'}
+      .span-2.text-align-right
+        = label_tag 'message_subject', 'Subject:'
+      .span-8.last
+        = message_form.text_field :subject, :class => 'message short', :id => 'message_subject'
+    .span-10.last{:style => 'padding-bottom: 10px;'}
+      .span-2.text-align-right
+        = label_tag 'message_body', 'Message:'
+      .span-8.last
+        = message_form.text_area 'body', :class => 'message short', :id => 'message_body', :style => 'margin: 0;'
+    .span-9.prepend-1.last
+      = submit_tag "Send", :class => 'title rounded button color', :id => 'send_message_button', :style => 'font-size: 1.2em;'

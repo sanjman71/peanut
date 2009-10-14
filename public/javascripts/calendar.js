@@ -54,7 +54,6 @@ $.fn.init_add_single_free_time = function() {
   })
 }
 
-
 // show appointment data (e.g. edit/delete links) on hover
 $.fn.init_show_appointment_on_hover = function () {
   $(".appointment").hover(

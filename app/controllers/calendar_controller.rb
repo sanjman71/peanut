@@ -48,9 +48,9 @@ class CalendarController < ApplicationController
 
     # find free, work appointments for the specified provider over a daterange
     @appointments = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
-    
+
     logger.debug("*** found #{@appointments.size} appointments over #{@daterange.days} days")
-    
+
     # build hash of calendar markings
     @calendar_markings    = build_calendar_markings(@appointments)
 

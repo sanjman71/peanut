@@ -1,0 +1,20 @@
+- title("Messages")
+
+.span-23.prepend-1.mat.padding-top-10.bottom
+  %h2== Messages
+  %h4
+    = link_to 'New Message', new_message_path, :class => 'admin color'
+
+%hr.space
+
+.span-14.prepend-1
+  = display_flash(:all)
+
+%hr.space
+
+- @messages.each do |message|
+  .span-16.last.letterbox.message{:class => cycle("shaded", "")}[message]
+    .span-3.prepend-1#sender
+      = message.sender.name
+    .span-5#subject
+      = message.subject

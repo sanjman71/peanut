@@ -1,0 +1,5 @@
+- waitlists.each do |waitlist|
+  - email_address = waitlist.customer.email_address
+  .span-5.last
+    == Waitlist:
+    = link_to "#{waitlist.customer.name}", '', :id => "send_waitlist_message", :address => email_address

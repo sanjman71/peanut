@@ -94,6 +94,8 @@ ActionController::Routing::Routes.draw do |map|
   map.waitlist  '/waitlist/:provider_type/:provider_id/services/:service_id',
                 :controller => 'waitlists', :action => 'new', :conditions => {:method => :get}
 
+  map.show_appt_waitlist  '/waitlists/appointments/:appointment_id', :controller => 'appointment_waitlists', :action => 'show'
+
   # schedule a waitlist appointment with a provider for a specific service and date range
   # map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
   #               :controller => 'appointments', :action => 'new', :mark_as => 'wait', 
@@ -162,11 +164,11 @@ ActionController::Routing::Routes.draw do |map|
   map.resource  :session
 
   # Messages controller
-  map.connect   '/messages/deliver/:type', :controller => 'messages', :action => 'deliver', :conditions => {:method => :post}
-  
+  map.resources :messages, :only => [:index, :create, :new]
+
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
-  
+
   map.resources :log_entries, :member => {:mark_as_seen => :post}, :only => [:index, :create, :destroy]
   map.connect   '/log_entries/:state', :controller => 'log_entries', :action => 'index', :state => /seen|unseen/
 

@@ -229,6 +229,11 @@ $.fn.init_ujs_links = function () {
   })
 }
 
+// initialize rounded corners
+$.fn.init_rounded_corners = function () {
+  $('.rounded').corners();
+}
+
 $.fn.init_log_entries = function () {
   $("a#show_add_event_form").click(function(){
     $('#add_event_form').toggle();
@@ -283,10 +288,10 @@ $(document).ready(function() {
   $(document).init_ujs_links();
   // initialize change location select link
   $(document).init_change_location();
+  // initialize rounded corners
+  $(document).init_rounded_corners();
   // show tabs
   $("div#tabs").show();
-  // initialize rounded corners
-  $('.rounded').corners();
 })
 
 $(document).ajaxComplete(function(request, settings) {

@@ -1,0 +1,3 @@
+page[".submitting"].remove();
+#page["#waitlist_#{@appointment.id}"].html(@waitlists.collect{ |w| w.customer.name}.join(", "))
+page["#waitlist_#{@appointment.id}"].html(render(:partial => 'appointment_waitlists/waitlists', :locals => {:waitlists => @waitlists}))

@@ -1,6 +1,6 @@
 - title("Schedules")
 - stylesheet('appointments', 'calendar', 'jquery.timepickr')
-- javascript('appointments', 'calendar', 'ui.timepickr', 'jquery.timepickr')
+- javascript('appointments', 'calendar', 'waitlists', 'messages', 'ui.timepickr', 'jquery.timepickr')
 - today_prev_next = build_calendar_today_prev_next_links(@provider, @daterange)
 
 .span-16.append-1
@@ -39,21 +39,25 @@
       %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
     .span-3.last.right_justify
       =today_prev_next[:next_link]
-      
+
     -# show free, work calendar
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings})
-      
+
     -# show summary of work and free appointments
     .span-15.last
       %h3.calendar.date_range_summary
         = @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
         == and
         = @free_appointments.size > 0 ? pluralize(@free_appointments.size, 'Available Timeslot') : "No Available Timeslots"
-        
+
     -# show free and work appointments
     .span-15.last#free_work_appointments
       = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
+
+    -# add a waitlist message hidden form
+    .last#send_message
+      = render(:partial => 'messages/send_message', :locals => {:sender => current_user, :protocol => 'email', :hidden => true})
 
 -# show add free time form if the user can update the providers calendar
 - if current_user.has_privilege?('update calendars', @provider)

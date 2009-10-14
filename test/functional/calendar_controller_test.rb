@@ -1,3 +1,4 @@
+
 require 'test/test_helper'
 
 class CalendarControllerTest < ActionController::TestCase
@@ -65,7 +66,7 @@ class CalendarControllerTest < ActionController::TestCase
     should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
   end
   
-  context "view provider calendar as the provider" do
+  context "show provider calendar as the provider" do
     setup do
       add_mary_and_johnny_as_providers
       @controller.stubs(:current_user).returns(@johnny)
@@ -80,7 +81,11 @@ class CalendarControllerTest < ActionController::TestCase
     should "show add single free time form" do
       assert_select "form#add_single_free_time_form", 1
     end
-    
+
+    should "have hidden send message form" do
+      assert_select "div#send_message", 1
+    end
+
     should_assign_to(:provider) { @johnny }
     should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
     should_assign_to :appointments, :class => Array
@@ -89,7 +94,7 @@ class CalendarControllerTest < ActionController::TestCase
     should_assign_to :daterange, :class => DateRange
   end
   
-  context "view provider calendar as another provider" do
+  context "show provider calendar as another provider" do
     setup do
       add_mary_and_johnny_as_providers
       @controller.stubs(:current_user).returns(@mary)
@@ -104,7 +109,11 @@ class CalendarControllerTest < ActionController::TestCase
     should "not show add single free time form" do
       assert_select "form#add_single_free_time_form", 0
     end
-    
+
+    should "have hidden send message form" do
+      assert_select "div#send_message", 1
+    end
+
     should_assign_to(:provider) { @johnny }
     should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
     should_assign_to :appointments, :class => Array

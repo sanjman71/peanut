@@ -12,7 +12,9 @@
   
 - if has_privilege?('manage site')
   == &nbsp;|&nbsp;
-  = link_to('Admin Console', root_path(:subdomain => 'www'), :class => 'admin header')
+  = link_to('Messages', messages_path, :class => 'admin header')
+  == &nbsp;|&nbsp;
+  = link_to('Console', root_path(:subdomain => 'www'), :class => 'admin header')
 
 - if RAILS_ENV == 'development'
   == &nbsp;|&nbsp;

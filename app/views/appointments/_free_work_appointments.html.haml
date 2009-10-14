@@ -10,6 +10,10 @@
     .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")].join(' '), :id => 'appointment_'+appointment.id.to_s}
       .span-4.time
         %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+        - if appointment.appointment_waitlists_count > 0
+          -# show waitlist
+          %h5.bottom{:style => 'margin-left: 5px;'}= link_to 'Show Waitlist', '', :id => 'show_appointment_waitlist', :url => show_appt_waitlist_path(appointment), :_method => 'get'
+          %h5.waitlist{:id => "waitlist_#{appointment.id}", :style => 'margin-left: 5px;'}
       .span-3
         .span-3.last.service{:class => appointment.mark_as}
           - if ((appointment.work? || appointment.free?) && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))

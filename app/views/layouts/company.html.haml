@@ -33,7 +33,7 @@
     #header
       .container
         .span-24.last
-          .span-15
+          .span-14
             .company_title.span-15.last
             -# The company edit page builds a new logo, so we check for the id here also
             - if current_company.logo && current_company.logo.id
@@ -43,10 +43,10 @@
               = link_to current_company.name, root_path(:subdomain => current_subdomain)
             .company_slogan.last
               = link_to h(current_company.slogan), root_path(:subdomain => current_subdomain) unless current_company.slogan.blank?
-          .span-9.last
-            .span-9.last{:style => 'color: #DDDDDD; text-align: right;'}
+          .span-10.last
+            .span-10.last{:style => 'color: #DDDDDD; text-align: right;'}
               = render :partial => 'users/user_links.html.haml'
-            .span-9.last.walnut_calendar_logo
+            .span-10.last.walnut_calendar_logo
               = link_to image_tag('walnut_calendar.gif'), root_path(:subdomain => 'www')
               
         .span-16#tabs.hide

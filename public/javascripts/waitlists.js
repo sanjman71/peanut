@@ -70,6 +70,28 @@ $.fn.init_add_waitlist = function() {
   })
 }
 
+$.fn.init_show_appointment_waitlists = function() {
+  $("#show_appointment_waitlist").live('click', function() {
+    $.post($(this).attr('url'), {_method:$(this).attr('_method')}, null, "script");
+    // show progress message
+    $(this).replaceWith("<h5 class='submitting' style='text-align: center;'>Retrieving Waitlist ...</h5>");
+    return false;
+  })
+}
+
+$.fn.init_send_waitlist_message = function() {
+  $("#send_message_dialog").dialog({ autoOpen: false, modal: true, height: 250, width: 500 });
+
+  $("#send_waitlist_message").live('click', function() {
+    // fill in message address
+    var address = $(this).attr('address')
+    $("input#message_address").attr('value', address);
+    // open dialog when link is clicked
+    $("#send_message_dialog").dialog('open');
+    return false;
+  })
+}
+
 $.fn.init_datepicker = function() {
   $(".datepicker").datepicker({minDate: +0, maxDate: '+1m'});
 }
@@ -81,6 +103,8 @@ $.fn.init_timepicker = function() {
 $(document).ready(function() {
   $(document).init_select_search_waitlist_provider();
   $(document).init_add_waitlist();
+  $(document).init_show_appointment_waitlists();
+  $(document).init_send_waitlist_message();
   $(document).init_datepicker();
   $(document).init_timepicker();
 })
