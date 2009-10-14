@@ -51,11 +51,11 @@
         == and
         = @free_appointments.size > 0 ? pluralize(@free_appointments.size, 'Available Timeslot') : "No Available Timeslots"
 
-    -# show free and work appointments
-    .span-15.last#free_work_appointments
-      = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})
+    -# show free, work appointments and waitlists by day
+    .span-15.last#calendar_by_day
+      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day})
 
-    -# add a waitlist message hidden form
+    -# add a send message hidden form
     .last#send_message
       = render(:partial => 'messages/send_message', :locals => {:sender => current_user, :protocol => 'email', :hidden => true})
 

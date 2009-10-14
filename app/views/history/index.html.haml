@@ -9,7 +9,7 @@
 #waitlists.waitlists
   .span-15.prepend-1.last
     %h4= pluralize(@waitlists.size, "Waitlist Appointment")
-  = render(:partial => 'waitlists/waitlist', :locals => {:customer => current_user, :waitlists => @waitlists})
+  = render(:partial => 'waitlists/waitlists', :locals => {:customer => current_user, :waitlists => @waitlists})
 
 %hr.space
 

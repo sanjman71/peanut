@@ -9,11 +9,13 @@ div.appointment.review .label, div.waitlist.review .label
 div.appointment.review .data, div.waitlist.review .data                      
                                                   { color: #007700; }
 
-div.appointment                                   { padding: 7px 0 7px 0; }
+div.appointment                                   { padding: 7px 0 7px 0; margin-bottom: 5px; }
 
 div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
 div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
 div.appointment.work                              { background-color: #EDF3FE; }  /* light blue */
+
+div.appointment.waitlist                          { background-color: #FFFFDD; }  /* light yellow */
 
 h4.canceled                                       { color: #FF1100;}
 h4.work                                           { }

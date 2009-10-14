@@ -1,16 +1,11 @@
-- waitlists.each do |waitlist|
-  .span-16.last.letterbox.waitlist{:class => cycle("shaded", "")}[waitlist]
-    .span-5.prepend-1.name
-      -#%h3{:style => "margin-bottom: 2px;"}= waitlist.customer.name
-      %span{:style => 'font-size: 1.3em;'}
-        == Waitlisted for:
-        = waitlist.service.name
-    .span-9.last.when{:style => 'margin-top: 2px;'}
-      - waitlist.waitlist_time_ranges.each do |waitlist_time_range|
-        = waitlist_time_range.start_date.to_s(:appt_short_month_day_year)
-        == -
-        = waitlist_time_range.end_date.to_s(:appt_short_month_day_year)
-        = waitlist_time_range.start_time_hours_ampm
-        == -
-        = waitlist_time_range.end_time_hours_ampm
-        %br
+.span-15.prepend-1.last.appointment.waitlist{:class => [cycle("", "")].join(' ')}[waitlist]
+  .span-4.time
+    %h4{:style => 'margin-left: 5px;'}== #{waitlist_time_range.start_time_hours_ampm} - #{waitlist_time_range.end_time_hours_ampm}
+  .span-3
+    %h6== Waitlist
+  .span-4.customer
+    %h6= waitlist.customer.name
+  .span-3.prepend-1.last
+    - email_address = waitlist.customer.email_address
+    = link_to 'Send Message', '', :id => "send_waitlist_message", :address => email_address
+      

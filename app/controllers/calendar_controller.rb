@@ -39,7 +39,7 @@ class CalendarController < ApplicationController
       @daterange  = DateRange.parse_range(@start_date, @end_date)
     elsif params[:start_date] and params[:range_type]
       @start_date = params[:start_date]
-      @daterange = DateRange.parse_range_type(@start_date, params[:range_type])
+      @daterange  = DateRange.parse_range_type(@start_date, params[:range_type])
     else
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
@@ -59,7 +59,27 @@ class CalendarController < ApplicationController
 
     # partition into work and free appointments
     @work_appointments, @free_appointments = @appointments.partition { |appt| appt.mark_as == Appointment::WORK }
-     
+
+    # find waitlist appointments for the specified provider over a daterange
+    @waitlists = Waitlist.find_matching(current_company, current_location, @provider, @daterange).collect do |waitlist|
+      tuple = waitlist.waitlist_time_ranges.collect do |time_range|
+        [waitlist, time_range]
+      end
+      tuple.flatten
+    end
+
+    # group waitlists by day
+    @waitlists_by_day = @waitlists.group_by { |waitlist, time_range| time_range.start_date.beginning_of_day }
+
+    # group appointments and waitlists by day, appointments before waitlists for any given day
+    @day_keys     = (@appointments_by_day.keys + @waitlists_by_day.keys).uniq.sort
+    @stuff_by_day = ActiveSupport::OrderedHash[]
+    @day_keys.each do |date|
+      @stuff_by_day[date] = (@appointments_by_day[date] || []) + (@waitlists_by_day[date] || [])
+    end
+
+    logger.debug("*** found #{@waitlists.size} waitlists over #{@daterange.days} days")
+
     respond_to do |format|
       format.html
       format.pdf

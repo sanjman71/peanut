@@ -1,64 +1,50 @@
-- appointments_by_day.each do |day, appointments|
-  .span-15.last
-    .span-11.last.calendar.date.wide
-      = day.to_s(:appt_day)
-    / .cube{:style => 'margin-bottom: 5px;'}
-    /   -# show day of week and month day in a calendar cube
-    /   = render(:partial => 'shared/calendar_cube', :locals => {:date => day})
-  - reset_cycle
-  - appointments.each do |appointment|
-    .span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")].join(' '), :id => 'appointment_'+appointment.id.to_s}
-      .span-4.time
-        %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-        - if appointment.appointment_waitlists_count > 0
-          -# show waitlist
-          %h5.bottom{:style => 'margin-left: 5px;'}= link_to 'Show Waitlist', '', :id => 'show_appointment_waitlist', :url => show_appt_waitlist_path(appointment), :_method => 'get'
-          %h5.waitlist{:id => "waitlist_#{appointment.id}", :style => 'margin-left: 5px;'}
-      .span-3
-        .span-3.last.service{:class => appointment.mark_as}
-          - if ((appointment.work? || appointment.free?) && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
-            -# work appointments can be viewed with read permissions
-            = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+.span-15.prepend-1.last.appointment{:class => [appointment.mark_as, cycle("", "shaded")].join(' ')}[appointment]
+  .span-4.time
+    %h4{:style => 'margin-left: 5px;'}== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+  .span-3
+    .span-3.last.service{:class => appointment.mark_as}
+      - if ((appointment.work? || appointment.free?) && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
+        -# work appointments can be viewed with read permissions
+        = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+      - else
+        %h6= appointment.service.name
+    - if show_location?
+      .span-3.last.location
+        %h6= appointment.location.name
+  .span-4.customer
+    - if appointment.free? && appointment.recur_parent
+      %h6== (Recurring series)
+    - else
+      %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
+  .span-4.last
+    - if has_privilege?("update calendars", current_company)
+      .span-4.last.edit
+        -# free appointments may be deleted with 'update calendars' permission
+        .span-3.edit-weekly
+          - if appointment.recurrence_parent
+            = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.id, :series => 1), :class => "ujs edit")
           - else
-            %h6= appointment.service.name
-        - if show_location?
-          .span-3.last.location
-            %h6= appointment.location.name
-      .span-4.customer
-        - if appointment.free? && appointment.recur_parent
-          %h6== (Recurring series)
-        - else
-          %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
-      .span-4.last
-        - if has_privilege?("update calendars", current_company)
-          .span-4.last.edit
-            -# free appointments may be deleted with 'update calendars' permission
-            .span-3.edit-weekly
-              - if appointment.recurrence_parent
-                = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.id, :series => 1), :class => "ujs edit")
-              - else
-                == &nbsp;
-            -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
-            .span-1.last.edit-one
-              - if !appointment.recurrence_parent?
-                = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
-              - else
-                == &nbsp;
-          .span-4.last.delete
-            -# free appointments may be deleted with 'update calendars' permission
-            .span-3.delete-weekly
-              - if appointment.recurrence_parent
-                = link_to('Del series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to delete all future appointments in this series?")
-              - else
-                == &nbsp;
-            -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
-            .span-1.last.delete-one
-              - if !appointment.recurrence_parent?
-                = link_to('Del', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
-              - else
-                == &nbsp;
-        - elsif appointment.work? and has_privilege?("read work appointments", current_company)
-          -# work appointments can be viewed with read permissions
-          = link_to "Details", appointment_path(appointment, :subdomain => current_subdomain)
-  %hr.space
-            
+            == &nbsp;
+        -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+        .span-1.last.edit-one
+          - if !appointment.recurrence_parent?
+            = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+          - else
+            == &nbsp;
+      .span-4.last.delete
+        -# free appointments may be deleted with 'update calendars' permission
+        .span-3.delete-weekly
+          - if appointment.recurrence_parent
+            = link_to('Del series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to delete all future appointments in this series?")
+          - else
+            == &nbsp;
+        -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+        .span-1.last.delete-one
+          - if !appointment.recurrence_parent?
+            = link_to('Del', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+          - else
+            == &nbsp;
+    - elsif appointment.work? and has_privilege?("read work appointments", current_company)
+      -# work appointments can be viewed with read permissions
+      = link_to "Details", appointment_path(appointment, :subdomain => current_subdomain)
+          
