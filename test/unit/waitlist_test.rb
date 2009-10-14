@@ -88,13 +88,13 @@ class WaitlistTest < ActiveSupport::TestCase
       should_change("waitlist count", :by => 1) { Waitlist.count }
       should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
-      should "change start time to seconds" do
-        @time_utc = Time.parse(Time.now.to_s(:appt_schedule_day) + "0900").utc
+      should "change start time to utc seconds" do
+        @time_utc = Time.zone.parse(Time.zone.now.to_s(:appt_schedule_day) + "0900").utc
         assert_equal (@time_utc.hour * 3600 + 30 * 60), @time_range.start_time
       end
 
-      should "change end time to seconds" do
-        @time_utc = Time.parse(Time.now.to_s(:appt_schedule_day) + "1100").utc
+      should "change end time to utc seconds" do
+        @time_utc = Time.zone.parse(Time.zone.now.to_s(:appt_schedule_day) + "1100").utc
         assert_equal (@time_utc.hour * 3600), @time_range.end_time
       end
     end
