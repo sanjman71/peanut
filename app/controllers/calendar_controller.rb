@@ -61,15 +61,13 @@ class CalendarController < ApplicationController
     @work_appointments, @free_appointments = @appointments.partition { |appt| appt.mark_as == Appointment::WORK }
 
     # find waitlist appointments for the specified provider over a daterange
-    @waitlists = Waitlist.find_matching(current_company, current_location, @provider, @daterange).collect do |waitlist|
-      tuple = waitlist.waitlist_time_ranges.collect do |time_range|
-        [waitlist, time_range]
-      end
-      tuple.flatten
+    @waitlists = Waitlist.find_matching(current_company, current_location, @provider, @daterange).inject([]) do |array, waitlist|
+      tuple = waitlist.expand_days(:start_day => @daterange.start_at, :end_day => @daterange.end_at)
+      array + tuple
     end
 
     # group waitlists by day
-    @waitlists_by_day = @waitlists.group_by { |waitlist, time_range| time_range.start_date.beginning_of_day }
+    @waitlists_by_day = @waitlists.group_by { |waitlist, date, time_range| date }
 
     # group appointments and waitlists by day, appointments before waitlists for any given day
     @day_keys     = (@appointments_by_day.keys + @waitlists_by_day.keys).uniq.sort

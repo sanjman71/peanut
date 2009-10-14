@@ -5,10 +5,10 @@
   - reset_cycle
   - stuff.each do |object|
     -# check what type of stuff it is, possible options:
-    -# appointments, [waitlist, waitlist_time_range]
+    -# appointments, [waitlist, date, waitlist_time_range]
     - case
     - when object.is_a?(Appointment)
       = render(:partial => 'appointments/free_work_appointments', :locals => {:day => day, :appointment => object})
     - when object.is_a?(Array)
-      = render(:partial => 'waitlists/waitlist', :locals => {:day => day, :waitlist => object[0], :waitlist_time_range => object[1]})
+      = render(:partial => 'waitlists/waitlist', :locals => {:day => day, :waitlist => object[0], :waitlist_time_range => object[2]})
   

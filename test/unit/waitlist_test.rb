@@ -52,6 +52,22 @@ class WaitlistTest < ActiveSupport::TestCase
       should_change("waitlist count", :by => 1) { Waitlist.count }
       should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
+      should "expand waitlist to 2 days" do
+        assert_equal 2, @waitlist.expand_days.size
+      end
+
+      should "expand waitlist to 1 day with start day constraint" do
+        assert_equal 1, @waitlist.expand_days(:start_day => DateTime.parse("20091002")).size
+      end
+
+      should "expand waitlist to 1 day with end day constraint" do
+        assert_equal 1, @waitlist.expand_days(:end_day => DateTime.parse("20091001")).size
+      end
+
+      should "expand waitlist to 0 days with start and end day constraints" do
+        assert_equal 0, @waitlist.expand_days(:start_day => DateTime.parse("20091003"), :end_day => DateTime.parse("20091005")).size
+      end
+
       should "add 'company customer' role on company to customer" do
         assert_equal ['company customer'], @customer.reload.roles_on(@company).collect(&:name).sort
       end
@@ -154,8 +170,12 @@ class WaitlistTest < ActiveSupport::TestCase
 
     should_change("waitlist count", :by => 1) { Waitlist.count }
     should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
+
+    should "have waitlist in the past" do
+      assert_equal [@waitlist], Waitlist.past
+    end
     
-    should "be in the past" do
+    should "have time range in the past" do
       assert_equal @waitlist.waitlist_time_ranges, WaitlistTimeRange.past
     end
   end
@@ -172,7 +192,11 @@ class WaitlistTest < ActiveSupport::TestCase
     should_change("waitlist count", :by => 1) { Waitlist.count }
     should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
     
-    should "not be in the past" do
+    should "not have waitlist in the past" do
+      assert_equal [], Waitlist.past
+    end
+
+    should "not have time range in the past" do
       assert_equal [], WaitlistTimeRange.past
     end
   end
