@@ -11,7 +11,7 @@
     <!--[if IE]>
     = stylesheet_link_tag 'blueprint/ie', :media =>"screen, projection"
     <![endif]-->
-    = stylesheet_link_tag 'jquery.ui', 'peanut', 'errors', 'green'
+    = stylesheet_link_tag 'jquery.ui', 'peanut', 'errors', 'black'
     = stylesheet_link_tag 'peanut_print', :media => "print"
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?

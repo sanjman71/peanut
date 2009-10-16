@@ -3,6 +3,9 @@
 div#header                      { background-color: #1A1A1A; }
 div#header #title               { color: #EEEEEE; }
 
+div#header div.company_name     { font-size: 2.0em; font-weight: bold; }
+div#header div.company_name a   { color: #DDDDDD; background-color: #1A1A1A; }
+
 /* signup links */
 
 a.signup:link, a.signup:visited   { font-size: 11px; font-weight: normal; color: #FFFFFF; }
