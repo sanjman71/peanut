@@ -15,7 +15,12 @@ a.signup:hover                    { color: #FFFFFF; background-color: #1A1A1A; t
 /* whoami user info */
 
 .whoami                         { display: block; background-color: #5500BB; color: #FFFFFF; text-align: center; margin-top: 5px; padding-bottom: 3px;}
-                                                    
+
+
+/* jquery datepicker */
+
+table.ui-datepicker-calendar thead th   { background: #333333; }
+
 /* tabs */
 
 #tabs.ui-tabs                   { padding: 0; }

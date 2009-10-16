@@ -51,14 +51,14 @@
       %span.field#date_range_start
         == Start:
         %br
-        = text_field_tag 'start_date', '', :style => 'width: 90px;', :class => 'datepicker'
+        = text_field_tag 'start_date', '', :style => 'width: 90px;', :class => 'datepicker', :autocomplete => 'off'
 
   .last#when_date_range_end.hide{:class => size == :wide ? "span-24" : "span-7"}
     .span-5.prepend-2.last
       %span.field#date_range_end
         == End:
         %br
-        = text_field_tag 'end_date', '', :style => 'width: 90px;', :class => 'datepicker'
+        = text_field_tag 'end_date', '', :style => 'width: 90px;', :class => 'datepicker', :autocomplete => 'off'
   .last#when_date_range_cancel.hide{:class => size == :wide ? "span-24" : "span-7"}
     .span-5.prepend-2.last
       = link_to 'Cancel', '', :id => 'show_when_select'
