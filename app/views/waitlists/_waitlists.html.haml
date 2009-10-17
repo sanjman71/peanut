@@ -7,11 +7,12 @@
         = waitlist.service.name
     .span-9.last.when{:style => 'margin-top: 2px;'}
       - waitlist.waitlist_time_ranges.each do |waitlist_time_range|
-        = waitlist_time_range.start_date.to_s(:appt_short_month_day_year)
-        == -
-        = waitlist_time_range.end_date.to_s(:appt_short_month_day_year)
-        == from
-        = waitlist_time_range.start_time_hours_ampm
-        == -
-        = waitlist_time_range.end_time_hours_ampm
-        %br
+        %h4
+          = waitlist_time_range.start_date.to_s(:appt_short_month_day_year)
+          == -
+          = waitlist_time_range.end_date.to_s(:appt_short_month_day_year)
+          == ,
+          = waitlist_time_range.start_time_hours_ampm
+          == -
+          = waitlist_time_range.end_time_hours_ampm
+          %br

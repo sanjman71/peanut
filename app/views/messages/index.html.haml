@@ -12,9 +12,22 @@
 
 %hr.space
 
+-# column headers
+%h4.span-16.last
+  .span-3.prepend-1#sender_column
+    == From
+  .span-5#subject_column
+    == Subject
+  .span-5.last#when_column
+    == Sent
+
+%hr.space
+
 - @messages.each do |message|
   .span-16.last.letterbox.message{:class => cycle("shaded", "")}[message]
     .span-3.prepend-1#sender
       = message.sender.name
     .span-5#subject
       = message.subject
+    .span-5.last#when
+      = message.updated_at.to_s(:appt_day_date_time)
