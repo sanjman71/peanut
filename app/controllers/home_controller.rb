@@ -23,4 +23,10 @@ class HomeController < ApplicationController
     render :action => :unauthorized, :layout => layout
   end
   
+  def faq
+  end
+  
+  def demos
+  end
+  
 end
