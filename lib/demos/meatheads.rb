@@ -57,12 +57,12 @@ class Meatheads < WalnutDemo
   SLOGAN = "Work it out with us!"
 
   DESCRIPTION = <<-END_DESCRIPTION
-    <h3><strong>Meatheads</strong> offers very personal training services.</h3>
-    <p>Our staff are extremely experienced with all your personal training needs. We have special programs for heart health, women's
+    <h3><strong>Meatheads</strong> offers personal training services for everyone, no matter your level of fitness.</h3>
+    <p>Our staff are extremely experienced with all your personal training needs. We have special programs for heart healthy, women's
         and men's muscle building, fitness for pregnant women and more. Our staff include:</p>
     <ul>
-      <li><strong>Meat Head</strong>, focus on fitness, health and nutrition</li>
-      <li><strong>Biceps Bill</strong>, focus on body building</li>
+      <li><strong>Meat Head</strong>, who focuses on fitness, health and nutrition</li>
+      <li><strong>Biceps Bill</strong>, who focuses on body building</li>
       <li><strong>Toned Tina</strong> who focuses particularly on women's training </li>
     </ul>
     <p>We offer personal training sessions at your convenience. Please check our schedule for availability.</p>

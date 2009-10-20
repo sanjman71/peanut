@@ -160,25 +160,34 @@ module ApplicationHelper
   #   end
   # end
   
-  def build_signup_links(current_controller)
+  def build_signup_links(current_controller, &action)
     # 'Signup' tab
-    name    = 'Signup'
-    path    = signup_beta_path
+    build_signup_link('Signup', signup_beta_path, 'signup', nil, current_controller, &action)
+    build_signup_link('FAQ', faq_path, 'home', 'faq', current_controller, &action)
+    build_signup_link('Demos', demos_path, 'home', 'demos', current_controller, &action)
+
+    if has_privilege?('manage site')
+      build_signup_link('Promotions', promotions_path, 'promotions', nil, current_controller, &action)
+      build_signup_link('Companies', promotions_path, 'companies', nil, current_controller, &action)
+    end
+  end
+  
+  def build_signup_link(name, path, controller, action, current_controller)
     klasses = []
 
-    if current_controller.controller_name == 'signup'
-      klasses.push('current')
+    if (controller && current_controller.controller_name == controller)
+      if (action && current_controller.action_name == action)
+        # If both a controller and action were specified, and we're there, it's current
+        klasses.push('current')
+      elsif (!action)
+        # If only a controller was specified and we're there, it's current
+        klasses.push('current')
+      else
+        # If both a controller and action were specified, and we're in that controller but not that action, we're not current
+      end
     end
 
     yield name, path, klasses
-
-    if has_privilege?('manage site')
-      klasses = current_controller.controller_name == 'promotions' ? ['current'] : []
-      yield 'Promotions', promotions_path, klasses
-
-      klasses = current_controller.controller_name == 'companies' ? ['current'] : []
-      yield 'Companies', companies_path, klasses
-    end
   end
 
   # build provider display name based on context of the current user
