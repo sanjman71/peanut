@@ -6,7 +6,7 @@ class Mctrucks < WalnutDemo
 
   def create_users
     # create users
-    @mrtrucks = create_user("mrtrucks@walnutcalendar.com", "Mr Trucks", "peanut")
+    @mrtrucks = create_user("mrtrucks@walnutcalendar.com", "Mr Trucks", "mrtrucks")
   end
   
   def destroy_users
