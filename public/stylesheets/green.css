@@ -7,13 +7,11 @@ div#header div.company_name a   { color: #111111; background-color: #008800; }
 
 /* whoami user info */
 
-.whoami                         { display: block; background-color: #007700; color: #000000; text-align: center; 
-                                                    margin-top: 5px; }
+.whoami                         { display: block; background-color: #007700; color: #000000; text-align: center; margin-top: 5px; }
 
 /* jquery datepicker */
 
 table.ui-datepicker-calendar thead th   { background: #333333; }
-
 
 /* tabs */
 
