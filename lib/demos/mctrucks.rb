@@ -41,11 +41,20 @@ class Mctrucks < WalnutDemo
   end
   
   def create_services
-    create_service(@mctrucks, "Van rental (hourly)", [@moving_van], 60.minutes, 10.00)
-    create_service(@mctrucks, "14 foot truck rental (hourly)", [@small_truck], 60.minutes, 15.00)
-    create_service(@mctrucks, "17 foot truck rental (hourly)", [@large_truck], 60.minutes, 20.00)
+    @van_service         = create_service(@mctrucks, "Van rental (hourly)", [@moving_van], 60.minutes, 10.00)
+    @small_truck_service = create_service(@mctrucks, "14 foot truck rental (hourly)", [@small_truck], 60.minutes, 15.00)
+    @large_truck_service = create_service(@mctrucks, "17 foot truck rental (hourly)", [@large_truck], 60.minutes, 20.00)
   end
 
+  def create_appointments
+    # The vans are available all day every day, including weekends. We have 3 of them.
+    create_weekly_free_appt(@mctrucks, @moving_van, 8.hours, 18.hours, :days => "MO,TU,WE,TH,FR,SA,SU", :capacity => 3)
+    # The small trucks are available all day every day, including weekends. We have 4 of them.
+    create_weekly_free_appt(@mctrucks, @small_truck, 8.hours, 18.hours, :days => "MO,TU,WE,TH,FR,SA,SU", :capacity => 4)
+    # The large trucks are available all day every day, including weekends. We have 2 of them.
+    create_weekly_free_appt(@mctrucks, @large_truck, 8.hours, 18.hours, :days => "MO,TU,WE,TH,FR,SA,SU", :capacity => 2)
+  end
+  
   SLOGAN = "We'll haul you away!"
 
   DESCRIPTION = <<-END_DESCRIPTION

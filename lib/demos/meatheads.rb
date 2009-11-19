@@ -49,11 +49,14 @@ class Meatheads < WalnutDemo
   end
   
   def create_appointments
+    # Meathead is available all day every day
+    create_weekly_free_appt(@meatheads, @meathead, 9.hours, 14.hours)
+    # Biceps Bill is available all day Mon, Wed, Fri
+    create_weekly_free_appt(@meatheads, @biceps_bill, 9.hours, 14.hours, :days => "MO,WE,FR")
+    # Toned Tina is available all day Tues, Wed, Sat, Sun
+    create_weekly_free_appt(@meatheads, @toned_tina, 9.hours, 14.hours, :days => "TU,WE,SA,SU")
   end
-  
-  def destroy_appointments
-  end
-  
+    
   SLOGAN = "Work it out with us!"
 
   DESCRIPTION = <<-END_DESCRIPTION

@@ -60,7 +60,7 @@ class WalnutDemo
   def destroy_user(user_email)
     puts "destroy_user: #{user_email}"
     if (user = User.with_email(user_email).first)
-      puts "destroy_user: destroying user id #{user.id} email #{user.email}"
+      puts "destroy_user: destroying user id #{user.id} email #{user_email}"
       user.destroy
     else
       puts "destroy_user: didn't find user #{user_email}"
@@ -148,6 +148,25 @@ class WalnutDemo
       end
     end
     puts "create_service: finished creating service #{svc_name} for #{company.name}"
+    svc
   end
-  
+
+  #
+  # create_weekly_free_appt
+  #
+  # Creates weekly availability between the times specified, on the days specified.
+  # If no days are specified, assumes weekdays - Mon thru Fri
+  #
+  def create_weekly_free_appt(company, provider, start_time, end_time, options = {})
+    puts "create_weekly_free_appt: creating weekly available time for #{provider.name} at #{company.name}"
+    days       = options[:days] ||  "MO,TU,WE,TH,FR"
+    capacity   = options[:capacity] ||  1
+    recur_rule = "FREQ=WEEKLY;BYDAY=#{days}"
+    start_at   = Time.zone.now.beginning_of_day + start_time
+    end_at     = Time.zone.now.beginning_of_day + end_time
+    free_appt  = AppointmentScheduler.create_free_appointment(company, provider, :start_at => start_at, :end_at => end_at,
+                    :recur_rule => recur_rule, :description => "Available")
+    puts "create_weekly_free_appt: finished creating weekly available time for #{provider.name} at #{company.name}"
+  end
+
 end
