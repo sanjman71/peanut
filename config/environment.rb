@@ -77,6 +77,7 @@ Rails::Initializer.run do |config|
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   # config.gem 'unicode', :lib => false, :version => '~> 0.1' # not compatible with ruby 1.9
+  config.gem 'curb'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
