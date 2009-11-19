@@ -42,7 +42,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service,
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider,
                                                                      :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120 * 60)
     end
 
@@ -66,7 +66,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at_utc     = @start_at_utc + 1.hour
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :start_at => @start_at_utc, :end_at => @end_at_utc)
+      @appt           = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at_utc, :end_at => @end_at_utc)
     end
       
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -105,7 +105,7 @@ class AppointmentTest < ActiveSupport::TestCase
       # create free time from 10 am to 12 pm
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }

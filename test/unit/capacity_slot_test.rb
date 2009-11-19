@@ -48,7 +48,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0 to 8 tomorrow
       @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -143,7 +143,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0 to 8 tomorrow
       @tomorrow           = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range         = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt          = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @free_appt          = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
   
       @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
       @capacity = 1
@@ -266,7 +266,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0000 to 0800 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -416,7 +416,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @day_after      = (Time.zone.now + 2.days).to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :end_day => @day_after, :start_at => "2100", :end_at => "0500"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -570,7 +570,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
       @capacity       = 4
   
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => @capacity)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => @capacity)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -783,7 +783,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 1500 to 2300 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1500", :end_at => "2300"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
       @free_appt.reload
     end
   
@@ -904,7 +904,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0000 to 0800 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1000", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, @free_service, :time_range => @time_range, :capacity => 4)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
     end
   
     context "find free time at the start of the free appointment" do

@@ -64,7 +64,7 @@ namespace :populate do
         
         begin
           puts "*** trying to schedule free time: #{start_at} to #{end_at}" 
-          @appt = AppointmentScheduler.create_free_appointment(company, provider, company.free_service, :start_at => start_at, :end_at => end_at)
+          @appt = AppointmentScheduler.create_free_appointment(company, provider, :start_at => start_at, :end_at => end_at)
           scheduled += 1
         rescue Exception => e
           puts "xxx scheduling error: #{e.message}"

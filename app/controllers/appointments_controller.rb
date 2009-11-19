@@ -145,7 +145,7 @@ class AppointmentsController < ApplicationController
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           @options        = {:time_range => @time_range}
           # create free appointment
-          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @service, @options)
+          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
           # set redirect path
           @redirect_path  = request.referer
           flash[:notice]  = "Created available time"
