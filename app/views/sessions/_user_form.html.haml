@@ -32,7 +32,7 @@
         .span-4
           %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
         .span-8.last
-          = email_form.text_field :address, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+          = email_form.text_field :address, :class => 'title big email_address', :style => 'width: 275px; margin: 0px;'
 
     -# password fields are not shown if the creator is logged in
     .span-12.last.padding-bottom-10{:class => (creator == "user") ? 'hide' : ''}

@@ -33,7 +33,7 @@ $.fn.init_user_create_submit = function() {
       return false
     }
 
-    var user_email = $("input#user_email").attr('value');
+    var user_email = $("input.email_address").attr('value');
 
     if (user_email == '') {
       alert("Please enter a user email");

@@ -27,7 +27,7 @@ class ServiceProvidersController < ApplicationController
     # find servic providers, and all non providers
     @service            = @service
     @service_providers  = @service.service_providers
-    @non_providers      = current_company.providers.all - @service.providers
+    @non_providers      = current_company.providers - @service.providers
     
     # render partial
     respond_to do |format|

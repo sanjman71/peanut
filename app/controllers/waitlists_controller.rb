@@ -12,7 +12,7 @@ class WaitlistsController < ApplicationController
     @provider  = find_provider_from_params || User.anyone
 
     # build providers collection, including 'anyone'
-    @providers = [User.anyone] + current_company.providers.all
+    @providers = [User.anyone] + current_company.providers
     
     # find state (default to 'upcoming')
     @state        = params[:state] ? params[:state].to_s : 'upcoming'

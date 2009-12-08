@@ -72,7 +72,12 @@ class UsersController < ApplicationController
 
     # build a new user; initialize the email from the invitation, but allow the user to change it
     @user = User.new
-    @user.email_addresses_attributes = [{:address => @invitation.recipient_email}] if @invitation
+
+    if @invitation
+      @user.email_addresses_attributes = [{:address => @invitation.recipient_email}]
+    else
+      @user.email_addresses.build
+    end
     # @user.email = @invitation.recipient_email if @invitation
     
     # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
