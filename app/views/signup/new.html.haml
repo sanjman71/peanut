@@ -174,7 +174,7 @@
     -# terms and conditions
     .span-20.last
       %h3
-        = check_box_tag "company[terms]", @terms ? '1' : '0'
+        = check_box_tag "company[terms]", '1', @terms == 1 ? true : false
         = label_tag 'company_terms', 'I agree to the terms and conditions'
       
     .span-20.last.padding-top-10

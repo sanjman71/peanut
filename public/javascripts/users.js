@@ -33,7 +33,7 @@ $.fn.init_user_create_submit = function() {
       return false
     }
 
-    var user_email = $("input.email_address").attr('value');
+    var user_email = $("input#user_email").attr('value');
 
     if (user_email == '') {
       alert("Please enter a user email");
@@ -70,6 +70,12 @@ $.fn.init_user_update_submit = function() {
 }
 
 function check_user_password_fields(password_required) {
+  // check that password is visible
+  if (!$("input#user_password").is(":visible")) {
+    // password is not visible, skip validation
+    return true;
+  }
+
   var password  = $("input#user_password").attr('value');
   var password2 = $("input#user_password_confirmation").attr('value');
 

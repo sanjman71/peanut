@@ -18,7 +18,7 @@ class SignupController < ApplicationController
     # find promotion
     @promotion = Promotion.find_by_code(params[:promotion][:code])
 
-    if @promotion
+    if @promotion and @promotion.redeemable?
       # use basic plan
       @plan = Plan.find_by_name('Basic')
       redirect_to(signup_plan_path(@plan, :promo => @promotion.code))
@@ -50,13 +50,13 @@ class SignupController < ApplicationController
       # apply promotion
       @prices   = @promotion.calculate(@plan.cost)
       @price    = @prices.last
-      
+
       if @price == 0
         @message  = "Your promotion code allows you to signup without any billing information."
       end
     else
       # use plan cost
-      @price    = @plan.cost
+      @price = @plan.cost
     end
 
     respond_to do |format|
@@ -72,7 +72,6 @@ class SignupController < ApplicationController
     Company.transaction do
       # get and remove terms from params
       @terms        = params[:company].delete(:terms).to_i
-      @terms        = 1 # always accept terms
       @user         = logged_in? ? current_user : User.create_or_reset(params[:user])
       @plan         = Plan.find(params[:plan_id])
       # subscription and company objects are dependent on each other
@@ -87,6 +86,9 @@ class SignupController < ApplicationController
           @credit_card  = ActiveMerchant::Billing::CreditCard.new(params[:cc])
           @payment      = @subscription.authorize(@credit_card)
         end
+      else
+        # initialize price to 0
+        @price = 0.0
       end
 
       # check terms
@@ -109,8 +111,10 @@ class SignupController < ApplicationController
       if @promotion
         # create promotion redemption and link to subscription
         @promotion.promotion_redemptions.create(:redeemer => @subscription)
+      end
 
-        # xxx - always set subscription to active
+      if @price == 0.0
+        # set subscription to active
         @subscription.active!
       end
 
@@ -138,8 +142,10 @@ class SignupController < ApplicationController
     @promotion = Promotion.find_by_code(params[:promo] || session[:promo])
     return if @promotion.blank?
     # ensure promotion is still redeemable
-    return unless @promotion.redeemable?
-
+    if !@promotion.redeemable?
+      @promotion = nil
+      return
+    end
     # cache promotion as a session variable
     session[:promo] = @promotion.code
 

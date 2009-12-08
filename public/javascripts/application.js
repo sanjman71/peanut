@@ -276,7 +276,7 @@ function convert_time_ampm_to_string(s) {
 }
 
 function validate_email_address(email_address) {
-  var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  var email_regex = /^[a-zA-Z0-9\+._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   if (email_regex.test(email_address) == false) {
     return false;
   }
