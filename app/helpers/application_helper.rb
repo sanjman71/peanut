@@ -168,7 +168,7 @@ module ApplicationHelper
 
     if has_privilege?('manage site')
       build_signup_link('Promotions', promotions_path, 'promotions', nil, current_controller, &action)
-      build_signup_link('Companies', promotions_path, 'companies', nil, current_controller, &action)
+      build_signup_link('Companies', companies_path, 'companies', nil, current_controller, &action)
     end
   end
   
