@@ -72,6 +72,7 @@ class SignupController < ApplicationController
     Company.transaction do
       # get and remove terms from params
       @terms        = params[:company].delete(:terms).to_i
+      @terms        = 1 # always accept terms
       @user         = logged_in? ? current_user : User.create_or_reset(params[:user])
       @plan         = Plan.find(params[:plan_id])
       # subscription and company objects are dependent on each other
@@ -108,6 +109,9 @@ class SignupController < ApplicationController
       if @promotion
         # create promotion redemption and link to subscription
         @promotion.promotion_redemptions.create(:redeemer => @subscription)
+
+        # xxx - always set subscription to active
+        @subscription.active!
       end
 
       # signup completed, redirect to login page and instruct user to login
