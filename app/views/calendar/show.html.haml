@@ -59,6 +59,6 @@
     .last#send_message
       = render(:partial => 'messages/send_message', :locals => {:sender => current_user, :protocol => 'email', :hidden => true})
 
--# show add free time form if the user can update the providers calendar
-- if current_user.has_privilege?('update calendars', @provider)
+-# show add free time form if the user can update the providers calendar or update company calendars
+- if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
   = render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})
