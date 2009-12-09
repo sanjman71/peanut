@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class PasswordsControllerTest < ActionController::TestCase
 

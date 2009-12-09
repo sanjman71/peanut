@@ -69,6 +69,13 @@ $.fn.init_user_update_submit = function() {
   })
 }
 
+$.fn.init_manager_reset_password = function() {
+  $("a#manager_reset_password").click(function() {
+    $.post($(this).attr('href'), {email:$(this).attr('email')}, null, "script");
+    return false;
+  })
+}
+
 function check_user_password_fields(password_required) {
   // check that password is visible
   if (!$("input#user_password").is(":visible")) {
@@ -123,4 +130,5 @@ $(document).ready(function() {
   $(document).init_toggle_user_company_manager();  // re-bind after an ajax call using jquery live()
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
+  $(document).init_manager_reset_password();
 })
