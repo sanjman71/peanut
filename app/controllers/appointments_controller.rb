@@ -470,12 +470,12 @@ class AppointmentsController < ApplicationController
         @conflicts = []
         # Find all conflicting work appointments in this series of free appointments
         # Start with the parents
-        if @appointment.recurrence_parent.work_appointments.upcoming.count
+        if @appointment.recurrence_parent.work_appointments.upcoming.count > 0
           @conflicts << @appointment.recurrence_parent
         end
         # And continue with all the instances
         @appointment.recurrence_parent.recur_instances.future.each do |appointment|
-          if appointment.work_appointments.upcoming.count != 0
+          if appointment.work_appointments.upcoming.count > 0
             @conflicts << appointment
           end
         end
