@@ -83,16 +83,6 @@ $.fn.set_recurrence = function () {
     // clear out field
     $("#until").attr('value', '');
   }
-
-  // write capacity
-  if ($("#capacity").attr('value')) {
-    s = convert_date_to_string($("#capacity").attr('value'));
-    $("#capacity").attr('value', s);
-  } else {
-    // set field to default
-    $("#capacity").attr('value', '1');
-  }
-
 }
 
 $.fn.init_daynames = function () {
@@ -155,7 +145,7 @@ $.fn.init_timepicker_weekly = function() {
 
 $.fn.init_schedule_form = function () {
   // submit weekly schedule
-  $("#add_weekly_schedule_form").submit(function () {
+  $("form#add_weekly_schedule_form").submit(function () {
     // validate presence of byday, tstart, tend, start_date
     if (!$("#byday").attr('value')) {
       alert("Please select 1 or more days");
@@ -193,6 +183,7 @@ $.fn.init_schedule_form = function () {
       alert("The end time is earlier than the start time");
       return false
     }
+    
     return true;
   })
 }

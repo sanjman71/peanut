@@ -294,8 +294,10 @@ class AppointmentsController < ApplicationController
     @dend         = params[:dend].to_s
     @tend         = params[:tend].to_s
     @until        = params[:until].to_s
-    
+
+    # ensure capacity is at least 1
     @capacity     = params[:capacity].to_i || 1
+    @capacity     = 1 if @capacity <= 0
 
     # build recurrence rule from rule components
     tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
