@@ -13,5 +13,5 @@
     .span-23.last.label
       == Future availability in this recurring series:
   .span-23.last
-    = render(:partial => 'appointments/free_work_appointments', :locals => {:appointments_by_day => @instances_by_day})
+    = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @instances_by_day})
   
