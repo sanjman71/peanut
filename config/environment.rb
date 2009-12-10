@@ -142,10 +142,9 @@ ADMIN_USER_EMAILS  = %w(sanjay@walnutindustries.com killian@walnutindustries.com
 AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 
 # Initialize exception notifier
-# Initialize exception notifier
-ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com)
-ExceptionNotifier.sender_address        = %("Walnut Calendar Exception" <app@walnutindustries.com>)
-ExceptionNotifier.email_prefix          = "Walnut Calendar "
+# ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com sanjay@jarna.com)
+# ExceptionNotifier.sender_address        = %("Walnut Calendar Exception" <app@walnutindustries.com>)
+# ExceptionNotifier.email_prefix          = "Walnut Calendar "
 
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'

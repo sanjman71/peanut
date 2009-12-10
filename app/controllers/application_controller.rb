@@ -24,7 +24,7 @@ class ApplicationController < ActionController::Base
   # filter_parameter_logging :password
 
   # Exception notifier to send emails when we have exceptions
-  include ExceptionNotifiable
+  # include ExceptionNotifiable
 
   # Helper for initializing a new user
   include UserInitializeHelper
