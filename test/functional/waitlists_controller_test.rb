@@ -80,6 +80,26 @@ class WaitlistsControllerTest < ActionController::TestCase
         assert_select 'div#when', true
       end
     end
+
+    context "for 'anyone' provider" do
+      context "as registered user" do
+        setup do
+          # stub current user
+          @controller.stubs(:current_user).returns(@customer)
+          get :new, :service_id => @haircut.id, :provider_id => 0, :provider_type => 'users'
+        end
+
+        should_respond_with :success
+
+        should "not show rpx login" do
+          assert_select 'div#rpx_login', false
+        end
+
+        should "show date and time fields" do
+          assert_select 'div#when', true
+        end
+      end
+    end
   end
   
   context "create" do

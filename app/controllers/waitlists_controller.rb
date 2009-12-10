@@ -41,6 +41,7 @@ class WaitlistsController < ApplicationController
   end
 
   # GET /waitlist/users/1/services/3
+  # GET /waitlist/users/0/services/3  # 0 refers to the special 'anyone' user
   def new
     @title = "Waitlist Add"
 
@@ -94,11 +95,15 @@ class WaitlistsController < ApplicationController
 
   protected
   
-  # find scheduable from the params hash
+  # find provider from the params hash
   def find_provider_from_params
     case params[:provider_type]
     when 'users', 'User'
-      current_company.user_providers.find(params[:provider_id])
+      if params[:provider_id].to_i == User.anyone.id
+        User.anyone
+      else
+        current_company.user_providers.find(params[:provider_id])
+      end
     else
       nil
     end
