@@ -6,7 +6,7 @@
     %h2
       = @customer.name
       %span{:style => 'font-size: 0.5em; padding-left: 5px;'}
-        = link_to('Edit', url_for(:controller =>'users', :action => 'edit', :id => @customer.id, :role => 'company customer', :subdomain => current_subdomain), :class => 'admin')
+        = link_to('Edit', customer_edit_path(@customer), :class => 'admin')
         == &nbsp;|&nbsp;
         = link_to('Back', request.referer || customers_path, :class => 'admin')
     
@@ -22,8 +22,8 @@
     .span-2.text-align-right
       %h3== Email:
     .span-13.last
-      %h3= mail_to(@customer.email)
-      
+      %h3= mail_to(@customer.primary_email_address.address)
+
   -if @customer.phone_numbers_count > 0
     .span-20.last.prepend-1
       .span-2.text-align-right

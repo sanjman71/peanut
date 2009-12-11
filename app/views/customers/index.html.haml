@@ -8,7 +8,7 @@
     -# must have 'create users' privilege to add a customer
     - if has_privilege?('create users', current_company)
       %span{:style => 'padding-left: 5px;'}== or
-      %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', url_for(:controller => 'users', :action => 'new', :role => 'company customer', :subdomain => current_subdomain), :class => 'customer add'
+      %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', customer_new_path, :class => 'customer add'
     %br
     = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => current_subdomain))
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'

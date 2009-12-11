@@ -30,15 +30,16 @@ ActionController::Routing::Routes.draw do |map|
   map.provider_assign_prompt  '/providers/:id/assign/prompt', :controller => 'providers', :action => 'assign_prompt',:conditions => {:method => :get}
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post }
-  map.connect   '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
-  map.connect   '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
-  map.connect   '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
-  map.connect   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}
-  map.connect   '/providers/:id',       :controller => 'users', :action => 'update', :role => 'company provider', :conditions => {:method => :put}
-  map.connect   '/customers/new',       :controller => 'users', :action => 'new', :role => 'company customer', :conditions => {:method => :get}
-  map.connect   '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
-  map.connect   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company customer', :conditions => {:method => :get}
-  map.connect   '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
+  map.user_notify     '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
+  map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
+  map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
+  map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}
+  map.provider_update '/providers/:id',       :controller => 'users', :action => 'update', :role => 'company provider', :conditions => {:method => :put}
+  map.customer_new    '/customers/new',       :controller => 'users', :action => 'new', :role => 'company customer', :conditions => {:method => :get}
+  map.customer_create '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
+  map.customer_edit   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company customer', :conditions => {:method => :get}
+  map.customer_update '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
+
   map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work',
                 :conditions => {:method => :get, :state => /upcoming|completed|canceled/}
   map.connect   '/customers/:customer_id/appointments', :controller => 'appointments', :action => 'index', :type => 'work',

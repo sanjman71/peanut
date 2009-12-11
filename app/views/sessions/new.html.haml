@@ -19,5 +19,5 @@
 
   .span-12.last
     - if @signup
-      - submit_url = url_for(:controller => 'users', :action => 'create', :role => 'company customer', :subdomain => current_subdomain)
+      - submit_url = customer_create_path
       = render :partial => 'sessions/user_form', :locals => {:submit_url => submit_url, :title_text => 'Sign Up', :submit_text => 'Sign Up!', :back_path => nil}

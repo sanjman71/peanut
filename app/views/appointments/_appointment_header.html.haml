@@ -41,7 +41,7 @@
           %br
           = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
           %span{:style => 'font-size: 0.8em;'}== or
-          = link_to 'Create a New Customer', url_for(:controller => 'users', :action => 'new', :role => 'company customer', :subdomain => current_subdomain), :class => 'admin'
+          = link_to 'Create a New Customer', customer_new_path, :class => 'admin'
           = hidden_field_tag :customer_search_id, 0
           
   -# work appointments have confirmation codes only after being created
