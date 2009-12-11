@@ -62,20 +62,6 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    if has_privilege?('read customers', current_company)
-
-      # 'Customers' tab
-      name    = 'Customers'
-      path    = customers_path(:subdomain => @subdomain)
-      klasses = []
-
-      if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
-        klasses.push('current')
-      end
-
-      yield name, path, klasses
-    end
-
     if has_privilege?('read services', current_company)
     
       # 'Services' tab
@@ -119,6 +105,20 @@ module ApplicationHelper
     # 
     #   yield name, path, klasses
     # end
+
+    if has_privilege?('manage site', current_company)
+
+      # 'Customers' tab
+      name    = 'Customers'
+      path    = customers_path(:subdomain => @subdomain)
+      klasses = []
+
+      if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
+        klasses.push('current')
+      end
+
+      yield name, path, klasses
+    end
 
     if has_role?('company customer', current_company)
 
