@@ -76,6 +76,10 @@ class CalendarController < ApplicationController
       @stuff_by_day[date] = (@appointments_by_day[date] || []) + (@waitlists_by_day[date] || [])
     end
 
+    # setup pdf link info
+    @pdf_title  = "#{@daterange.name} PDF Version"
+    @pdf_link   = url_for(params.merge(:format => 'pdf', :only_path => true))
+
     logger.debug("*** found #{@waitlists.size} waitlists over #{@daterange.days} days")
 
     respond_to do |format|

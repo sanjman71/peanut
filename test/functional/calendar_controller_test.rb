@@ -1,12 +1,18 @@
-
 require 'test/test_helper'
 
 class CalendarControllerTest < ActionController::TestCase
 
   # show provider calendar
   should_route :get, 'users/1/calendar',  :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1
-  should_route :get, 'users/1/calendar.pdf',  
+  should_route :get, 'users/1/calendar.pdf',
                :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :format => 'pdf'
+  
+  should_route :get, 'users/1/calendar/daily/01012009',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'daily', :start_date => '01012009'
+  should_route :get, 'users/1/calendar/weekly/01012009',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'weekly', :start_date => '01012009'
+  should_route :get, 'users/1/calendar/monthly/01012009',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'monthly', :start_date => '01012009'
   
   # search provider calendar
   should_route :post, 'users/1/calendar/search', 
@@ -67,31 +73,75 @@ class CalendarControllerTest < ActionController::TestCase
   end
   
   context "show provider calendar as the provider" do
-    setup do
-      add_mary_and_johnny_as_providers
-      @controller.stubs(:current_user).returns(@johnny)
-      # stub calendar markings
-      @controller.stubs(:build_calendar_markings).returns(Hash.new)
-      get :show, :provider_type => 'users', :provider_id => @johnny.id
-    end
+    context "default time range, this week" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@johnny)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :show, :provider_type => 'users', :provider_id => @johnny.id
+      end
   
-    should_respond_with :success
-    should_render_template 'calendar/show.html.haml'
+      should_respond_with :success
+      should_render_template 'calendar/show.html.haml'
     
-    should "show add single free time form" do
-      assert_select "form#add_single_free_time_form", 1
-    end
+      should "show add single free time form" do
+        assert_select "form#add_single_free_time_form", 1
+      end
 
-    should "have hidden send message form" do
-      assert_select "div#send_message", 1
-    end
+      should "have hidden send message form" do
+        assert_select "div#send_message", 1
+      end
 
-    should_assign_to(:provider) { @johnny }
-    should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
-    should_assign_to :appointments, :class => Array
-    should_assign_to :calendar_markings, :class => Hash
-    should_assign_to(:when) { "this week" }
-    should_assign_to :daterange, :class => DateRange
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
+      should_assign_to :appointments, :class => Array
+      should_assign_to :calendar_markings, :class => Hash
+      should_assign_to(:when) { "this week" }
+      should_not_assign_to(:start_date)
+      should_assign_to :daterange, :class => DateRange
+      should_assign_to(:pdf_title) { "This Week PDF Version" }
+      should_assign_to(:pdf_link) { "/users/#{@johnny.id}/calendar.pdf" }
+      
+      should "have link to weekly pdf version" do
+        assert_select "a#pdf_version[href='%s']" % assigns(:pdf_link), assigns(:pdf_title)
+      end
+    end
+    
+    context "monthly, starting on a specific date" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@johnny)
+        # stub calendar markings
+        @controller.stubs(:build_calendar_markings).returns(Hash.new)
+        get :show, :provider_type => 'users', :provider_id => @johnny.id, :range_type => 'monthly', :start_date => '20090101'
+      end
+  
+      should_respond_with :success
+      should_render_template 'calendar/show.html.haml'
+    
+      should "show add single free time form" do
+        assert_select "form#add_single_free_time_form", 1
+      end
+
+      should "have hidden send message form" do
+        assert_select "div#send_message", 1
+      end
+      
+      should_assign_to(:provider) { @johnny }
+      should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
+      should_assign_to :appointments, :class => Array
+      should_assign_to :calendar_markings, :class => Hash
+      should_not_assign_to(:when)
+      should_assign_to(:start_date) { "20090101" }
+      should_assign_to :daterange, :class => DateRange
+      should_assign_to(:pdf_title) { "Monthly starting on Jan 01 2009 PDF Version" }
+      should_assign_to(:pdf_link) { "/users/#{@johnny.id}/calendar/monthly/20090101.pdf" }
+
+      should "have link to monthly pdf version" do
+        assert_select "a#pdf_version[href='%s']" % assigns(:pdf_link), assigns(:pdf_title)
+      end
+    end
   end
   
   context "show provider calendar as another provider" do

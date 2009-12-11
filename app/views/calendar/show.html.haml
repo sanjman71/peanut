@@ -10,9 +10,9 @@
         = label_tag "show_provider", "Schedule for", :class => 'big'
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
       %h6{:style => 'margin-bottom: 20px; font-weight: normal;'}
-        = link_to 'PDF Version', url_for(:format => 'pdf')
-        == &nbsp;|&nbsp;
-        = link_to 'Email PDF Schedule', '', :id => 'send_pdf'
+        = link_to @pdf_title, @pdf_link, :id => 'pdf_version'
+        -#== &nbsp;|&nbsp;
+        -#= link_to 'Email PDF Schedule', '', :id => 'send_pdf'
       = render(:partial => 'calendar/send_pdf_dialog')
     .span-6.prepend-1.last
       #links

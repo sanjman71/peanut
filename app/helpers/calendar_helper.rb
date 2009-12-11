@@ -82,7 +82,7 @@ module CalendarHelper
 
     prev_link = link_to("Previous #{range_word}", range_type_show_path(url_params.merge({:start_date => prev_date.to_s(:appt_schedule_day)})))
     next_link = link_to("Next #{range_word}", range_type_show_path(url_params.merge({:start_date => next_date.to_s(:appt_schedule_day)})))
-    today_link = link_to("#{today_word}",  range_type_show_path(url_params.merge({:start_date => Time.zone.today.to_s(:appt_schedule_day)})))
+    today_link = link_to("#{today_word}",  range_type_show_path(url_params.merge({:start_date => Time.zone.today.to_time.to_s(:appt_schedule_day)})))
 
     {:today_link => today_link, :prev_link => prev_link, :next_link => next_link}
 

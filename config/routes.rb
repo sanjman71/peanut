@@ -128,7 +128,10 @@ ActionController::Routing::Routes.draw do |map|
   map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
   map.calendar_show   ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
-  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/
+  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', 
+                       :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
+  map.connect         ':provider_type/:provider_id/calendar/:range_type/:start_date.:format', 
+                       :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
 
   # search calendars scoped by provider
   map.connect   ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
