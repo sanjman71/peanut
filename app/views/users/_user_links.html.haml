@@ -9,13 +9,15 @@
   - if has_privilege?('manage site')
     = link_to('Messages', messages_path, :class => 'admin header')
     == &nbsp;|&nbsp;
+    = link_to('Tasks', tasks_path, :class => 'admin header')
+    == &nbsp;|&nbsp;
     = link_to('Console', root_path(:subdomain => 'www'), :class => 'admin header')
     == &nbsp;|&nbsp;
-    
+
   = link_to('Log out', logout_path, :class => 'admin header')
 - else
   = link_to('Log in or Sign up', login_path, :class => 'admin header')
-  
+
 - if RAILS_ENV == 'development'
   == &nbsp;|&nbsp;
   = link_to('Toggle Grid', url_for(:controller => 'debug', :action => 'toggle_blueprint_grid'), :method => :put, :class => 'admin header')

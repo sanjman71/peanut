@@ -170,6 +170,11 @@ ActionController::Routing::Routes.draw do |map|
   # Messages controller
   map.resources :messages, :only => [:index, :create, :new]
 
+  # Tasks controller
+  map.task_appt_reminders '/tasks/appointments/reminders/:time_span', 
+                          :controller => 'tasks', :action => 'appointments_reminders', :time_span => /\d+-(days|hours)/
+  map.resources           :tasks, :only => [:index]
+
   # Administrative controllers
   map.badges 'badges/:action/:id', :controller => 'badges'
 

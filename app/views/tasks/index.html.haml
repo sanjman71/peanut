@@ -1,0 +1,15 @@
+- title("Tasks")
+
+.span-16
+  .span-15.append-2
+    .span-15.prepend-1.last.mat.padding-top-10.padding-bottom-10
+      %h2== Tasks
+
+    %hr.space
+
+    .span-16.last.letterbox#task_appointment_reminder
+      .span-5.prepend-1.name
+        %h3.margin-bottom-0== Appointment Reminders
+      .span-10.last
+        - ['24 hours', '2 days', '3 days', '7 days'].each do |ts|
+          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_reminders_path(:time_span => ts.to_url_param)
