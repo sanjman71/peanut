@@ -15,7 +15,7 @@
         - providers = service.providers.collect { |r| r.name }.sort
         = providers.join(", ")
       - else
-        %span{:style => 'color: #FF3333;'}
+        %span.field_missing
           == No service providers
           %br
           == Use the 'edit' link to add service providers

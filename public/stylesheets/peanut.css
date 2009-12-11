@@ -19,6 +19,8 @@ a.rounded, .rounded.button                        { outline: none; border: none;
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
 
+span.field_missing                                { color: #FF3333; }
+
 /* padding, border styles */
 
 .padding-5                                        { padding: 5px; }

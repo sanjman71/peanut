@@ -7,7 +7,7 @@
   .span-23.prepend-1.last.mat.padding-bottom-20
     %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
     -# allow managers to reset (non-rpx) user passwords
-    - if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user)
+    - if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user) and @user.email_addresses_count > 0
       = link_to 'Reset Password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @user.primary_email_address.address
 
   %hr.space

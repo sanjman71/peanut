@@ -79,9 +79,16 @@ class UsersController < ApplicationController
       @user.email_addresses.build
     end
     # @user.email = @invitation.recipient_email if @invitation
-    
+
+    # initialize title
+    @title      = "#{@role.split[1].titleize} Signup"
+
     # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
     @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
+
+    respond_to do |format|
+      format.html
+    end
   end
  
   # POST /customers/create

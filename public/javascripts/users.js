@@ -26,21 +26,23 @@ $.fn.init_toggle_user_company_manager = function() {
 
 $.fn.init_user_create_submit = function() {
   $("input#user_create_submit").click(function() {
-    var user_name = $("input#user_name").attr('value');
+    var user_name     = $("input#user_name").attr('value');
+    var name_required = $("input#user_name").hasClass('required');
 
-    if (user_name == '') {
+    if (name_required && user_name == '') {
       alert("Please enter a user name");
       return false
     }
 
-    var user_email = $("input#user_email").attr('value');
+    var user_email      = $("input#user_email").attr('value');
+    var email_required  = $("input#user_email").hasClass('required');
 
-    if (user_email == '') {
+    if (email_required && user_email == '') {
       alert("Please enter a user email");
-      return false
+      return false;
     }
     
-    if (validate_email_address(user_email) == false) {
+    if (email_required && validate_email_address(user_email) == false) {
       alert("Please enter a valid email address");
       return false;
     }

@@ -2,6 +2,14 @@
 - creator     = current_user ? "user" : "anonymous"
 -# check for an invitation
 - invitation  = nil unless local_assigns[:invitation]
+-# check for role
+- role        = nil unless local_assigns[:role]
+
+- if creator == 'user' and role == 'company customer'
+  -# users creating customers means that the user email is optional
+  - user_email_flag = 'optional'
+- else
+  - user_email_flag = 'required'
 
 .span-12.last.mat
   -# form title
@@ -24,7 +32,7 @@
       .span-4
         %h3.text-align-right{:style => "padding-top: 10px;"}== Name:
       .span-8.last
-        = user_form.text_field :name, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        = user_form.text_field :name, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
 
     -# email nested field
     - user_form.fields_for :email_addresses do |email_form|
@@ -32,22 +40,22 @@
         .span-4
           %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
         .span-8.last
-          = email_form.text_field :address, :class => 'title big', :style => 'width: 275px; margin: 0px;', :id => 'user_email'
+          = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'user_email'
 
     -# password fields are not shown if the creator is logged in
-    .span-12.last.padding-bottom-10{:class => (creator == "user") ? 'hide' : ''}
+    .span-12.last.padding-bottom-10{:class => (creator == "user") ? '' : ''}
       .span-4
         %h3.text-align-right{:style => "padding-top: 10px;"}== Password:
       .span-8.last
-        = user_form.password_field :password, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        = user_form.password_field :password, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
         
-    .span-12.last.padding-bottom-10{:class => (creator == "user")  ? 'hide' : ''}
+    .span-12.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
       .span-4
         %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
       .span-8.last
-        = user_form.password_field :password_confirmation, :class => 'title big', :style => 'width: 275px; margin: 0px;'
+        = user_form.password_field :password_confirmation, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
         
-    .span-10.prepend-2.last.padding-bottom-10{:class => (creator == "user")  ? '' : 'hide'}
+    .span-10.prepend-2.last.padding-bottom-10{:class => (creator == "user")  ? 'hide' : 'hide'}
       %em.span-10.last{:style => 'font-size: 1.2em;'}
         == The user's password will be automatically generated and emailed to them. 
         

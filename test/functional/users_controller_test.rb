@@ -44,6 +44,46 @@ class UsersControllerTest < ActionController::TestCase
     ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
   
+  context "new customer" do
+    context "without 'create users' privilege" do
+      setup do
+        get :new, :role => 'company provider'
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+    
+    context "with 'create users' privilege" do
+      setup do
+        # create user as owner
+        @controller.stubs(:current_user).returns(@owner)
+        get :new, :role => 'company customer'
+      end
+
+      should_assign_to(:user)
+      should_not_assign_to(:invitation)
+      should_assign_to(:role) {'company customer'}
+
+      should_respond_with :success
+      should_render_template 'users/new.html.haml'
+
+      should "have required user name text field" do
+        assert_select "input#user_name.required", 1
+      end
+
+      should "have optional user email text field," do
+        assert_select "input#user_email", 1
+        assert_select "input#user_email.required", 0
+      end
+
+      should "have required user password, and password confirmation text fields" do
+        assert_select "input#user_password.required", 1
+        assert_select "input#user_password_confirmation.required", 1
+      end
+    end
+  end
+  
   context "new provider" do
     context "without 'create users' privilege" do
       context "and no invitation" do
@@ -74,21 +114,21 @@ class UsersControllerTest < ActionController::TestCase
           @controller.stubs(:current_user).returns(nil)
           get :new, :invitation_token => @invitation.token, :role => 'company provider'
         end
-        
-        should_respond_with :success
-        should_render_template 'users/new.html.haml'
-        
+
         should_change("User.count", :by => 1) { User.count } # for the sender user object
         should_change("Invitation.count", :by => 1) { Invitation.count }
-        
+
         should_not_assign_to :error_message
         should_assign_to(:user)
         should_assign_to(:invitation)
         should_assign_to(:role) {'company provider'}
-        
+
         should "build new user, but should not create the new user" do
           assert_equal [@recipient_email], assigns(:user).email_addresses.collect(&:address)
         end
+
+        should_respond_with :success
+        should_render_template 'users/new.html.haml'
       end
     end
     
@@ -100,13 +140,13 @@ class UsersControllerTest < ActionController::TestCase
           get :new, :role => 'company provider'
         end
 
-        should_respond_with :success
-        should_render_template 'users/new.html.haml'
-
         should_not_change("User.count") { User.count }
 
         should_not_assign_to(:error_message)
         should_assign_to(:role) {"company provider"}
+
+        should_respond_with :success
+        should_render_template 'users/new.html.haml'
       end
 
       context "and an invalid invitation" do
@@ -244,36 +284,36 @@ class UsersControllerTest < ActionController::TestCase
                          :user => {:email_addresses_attributes => [{:address => "sanjay@jarna.com"}], :name => "Sanjay Kapoor"}}
         end
 
-        should_respond_with :redirect
-        should_redirect_to('providers_path') { providers_path }
-
-        should_set_the_flash_to /Provider Sanjay Kapoor was successfully created/i
-        
         should_change("User.count", :by => 1) { User.count }
         
         should_assign_to(:creator) {"user"}
         should_assign_to :user
         should_assign_to(:role) {"company provider"}
         should_not_assign_to :invitation
-  
+
         should "have a valid user" do
           assert assigns(:user).valid?
         end
-  
+
         should "add user as a company provider" do
           @user = User.with_email("sanjay@jarna.com").first
           assert @company.has_provider?(@user)
         end
-  
+
         should "add 'company provider' role on company to user" do
           @user = User.with_email("sanjay@jarna.com").first
           assert_equal ['company provider'], @user.roles_on(@company).collect(&:name).sort
         end
-  
+
         should "add 'user manager' role on user to user" do
           @user = User.with_email("sanjay@jarna.com").first
           assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
         end
+
+        should_respond_with :redirect
+        should_redirect_to('providers_path') { providers_path }
+
+        should_set_the_flash_to /Provider Sanjay Kapoor was successfully created/i
       end
     end
   end
@@ -288,11 +328,6 @@ class UsersControllerTest < ActionController::TestCase
                        :user => {:email_addresses_attributes => [{:address => 'sanjay@walnut.com'}],
                                  :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
       end
-
-      should_respond_with :redirect
-      should_redirect_to('root path') {"http://test.host/"}
-
-      should_set_the_flash_to /Your account was successfully created/i
 
       should_change("User.count", :by => 1) { User.count }
 
@@ -315,6 +350,11 @@ class UsersControllerTest < ActionController::TestCase
         @user = User.with_email("sanjay@walnut.com").first
         assert_equal [], @user.companies
       end
+
+      should_respond_with :redirect
+      should_redirect_to('root path') {"http://test.host/"}
+
+      should_set_the_flash_to /Your account was successfully created/i
     end
   
     context "as an authenticated user" do
@@ -322,36 +362,73 @@ class UsersControllerTest < ActionController::TestCase
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)
         # create user should generate a password
-        post :create, {:role => 'company customer', 
-                       :creator => 'user', 
+        post :create, {:role => 'company customer',
+                       :creator => 'user',
                        :user => {:email_addresses_attributes => [{:address => "joe@jarna.com"}], :name => "Joe Bloggs"}}
       end
-  
-      should_respond_with :redirect
-      should_redirect_to('customers_path') { customers_path }
-  
-      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
-  
+
       should_change("User.count", :by => 1) { User.count }
-  
+
       should_assign_to(:creator) {"user"}
       should_assign_to(:user)
       should_assign_to(:role) {"company customer"}
       should_not_assign_to :invitation
-      
+
       should "add 'company customer' role on company to user" do
         @user = User.with_email("joe@jarna.com").first
         assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
       end
-  
+
       should "add 'user manager' role on user to user" do
         @user = User.with_email("joe@jarna.com").first
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
-  
+
       should "not add user as a company provider" do
         assert_equal [], assigns(:user).companies
       end
+
+      should_respond_with :redirect
+      should_redirect_to('customers_path') { customers_path }
+
+      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
+    end
+    
+    context "as authenticated user, without an email address" do
+      setup do
+        # stub current user as the company owner
+        @controller.stubs(:current_user).returns(@owner)
+        # create user should generate a password
+        post :create, {:role => 'company customer',
+                       :creator => 'user',
+                       :user => {:name => "Joe Bloggs"}}
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+
+      should_assign_to(:creator) {"user"}
+      should_assign_to(:user)
+      should_assign_to(:role) {"company customer"}
+      should_not_assign_to :invitation
+
+      should "add 'company customer' role on company to user" do
+        @user = User.find_by_name("Joe Bloggs")
+        assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
+      end
+
+      should "add 'user manager' role on user to user" do
+        @user = User.find_by_name("Joe Bloggs")
+        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
+      end
+
+      should "not add user as a company provider" do
+        assert_equal [], assigns(:user).companies
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('customers_path') { customers_path }
+
+      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
     end
   end
   
