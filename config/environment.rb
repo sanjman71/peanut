@@ -60,6 +60,7 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
+  config.gem "andand", :version => '1.3.1'
   config.gem "chronic", :version => '~> 0.2.3'
   config.gem "crack", :version => "0.1.4" # used by google weather plugin
   config.gem "eventfulapi", :lib => false
