@@ -38,6 +38,7 @@ class MessagesController < ApplicationController
 
       if @message.valid? and @message.message_recipients.size == 0
         # not allowed to have a message with no recipients
+        flash[:error] = "Message has no recipients"
         raise ActiveRecord::Rollback
       end
 

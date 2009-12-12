@@ -77,22 +77,42 @@ $.fn.validate_appointment_customer = function() {
     return false;
   }
   
-  customer_name  = $("input#customer_name").attr('value');
-  customer_email = $("input#customer_email").attr('value');
-  
-  if (customer_name == '') {
+  customer_name       = $("input#customer_name").val();
+  name_required       = $("input#customer_name").hasClass('required');
+  customer_email      = $("input#customer_email").val();
+  email_required      = $("input#customer_email").hasClass('required');
+  customer_password   = $("input#customer_password").val();
+  password_required   = $("input#customer_password").hasClass('required');
+  customer_confirm    = $("input#customer_password_confirmation").val();
+
+  if (name_required && customer_name == '') {
     alert("Please enter a name");
     return false;
   }
 
-  if (customer_email == '') {
+  if (email_required && customer_email == '') {
     alert("Please enter an email");
+    return false;
+  }
+
+  if (email_required && validate_email_address(customer_email) == false) {
+    alert("Please enter a valid email address");
+    return false;
+  }
+
+  if (password_required && customer_password == '') {
+    alert("Please enter a password");
+    return false;
+  }
+
+  if (customer_password != customer_confirm) {
+    alert("Password does not match password confirmation");
     return false;
   }
 
   customer_email_valid    = true;
   customer_email_message  = 'validating email ...';
-  
+
   // show email validation message
   $("#customer_email_validate_message").addClass('grey');
   $("#customer_email_validate_message").removeClass('red');

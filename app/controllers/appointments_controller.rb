@@ -126,12 +126,14 @@ class AppointmentsController < ApplicationController
           end
           
           # tell the user their confirmation email is being sent
-          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}"
+          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
           
           if !logged_in?
             @redirect_path = openings_path
             # tell the user their account has been created
-            flash[:notice] += "<br/>Your user account has been created and your password will be sent to #{@customer.email_address}"
+            flash[:notice] += "<br/>Your user account has been created."
+            # clear session return_to to ensure the user starts clean when they login
+            session[:return_to] = nil
           else
             @redirect_path = history_index_path
           end
@@ -348,8 +350,13 @@ class AppointmentsController < ApplicationController
     # check for a customer signup
     if params[:customer]
       # create new user, assign a random password
-      options   = Hash[:name => params[:customer][:name], :email => params[:customer][:email], :password => :random]
+      options   = params[:customer]
       @customer = User.create_or_reset(options)
+      if !@customer.valid?
+        # not a valid customer
+        flash[:error] = @customer.errors.full_messages.join("\n")
+        redirect_to request.referer and return
+      end
       # assign the customer id
       params[:customer_id] = @customer.id
     end

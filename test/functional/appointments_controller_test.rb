@@ -524,33 +524,33 @@ class AppointmentsControllerTest < ActionController::TestCase
         @today          = Time.zone.now.to_s(:appt_schedule_day)
         @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
         @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
-        
+
         @start_at       = "#{@today}T1000"
         @duration       = 120.minutes
         @anyone         = User.anyone
-  
+
         # create work appointment as anonymous user
         @controller.stubs(:current_user).returns(nil)
         @controller.stubs(:logged_in?).returns(false)
-  
+
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :customer_id => @anyone.id, :mark_as => 'work',
-              :customer => {:name => "Sanjay", :email => "sanjay@walnut.com"}}
+              :customer => {:name => "Sanjay", :email => "sanjay@walnut.com", :password => 'sanjay', :password_confirmation => 'sanjay'}}
         @free_appt.reload
       end
-  
+
       # create new customer
       should_change("User.count", :by => 1) { User.count}
-  
+
       # free appointment should coexist with 1 work appointment
       should_change("Appointment.count", :by => 2) { Appointment.count }
-  
+
       should "have two capacity slots" do
         assert_equal 2, @free_appt.capacity_slots.size
       end
-  
+
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:customer) { User.with_email("sanjay@walnut.com").first }
@@ -559,17 +559,25 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:duration)  { 120.minutes }
       should_assign_to(:mark_as) { "work" }
       should_assign_to :appointment
-  
+
       should "create user in active state" do
         user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
-  
-      should "set the flash for the appointment and user account" do
+
+      should "create user with specified password" do
+        user = User.authenticate('sanjay@walnut.com', 'sanjay')
+        assert_equal assigns(:customer), user
+      end
+
+      should "set the flash for the created work appointment" do
         assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
+      end
+
+      should "set the flash for the created appointment and created user account" do
         assert_match /Your user account has been created/, flash[:notice]
       end
-  
+
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
     end
