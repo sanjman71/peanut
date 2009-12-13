@@ -60,7 +60,7 @@ Rails::Initializer.run do |config|
 
   # Specify gems that this application depends on. 
   # They can then be installed with "rake gems:install" on new installations.
-  config.gem "andand", :version => '1.3.1'
+  config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   config.gem "chronic", :version => '~> 0.2.3'
   config.gem "crack", :version => "0.1.4" # used by google weather plugin
   config.gem "eventfulapi", :lib => false
@@ -79,7 +79,6 @@ Rails::Initializer.run do |config|
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   # config.gem 'unicode', :lib => false, :version => '~> 0.1' # not compatible with ruby 1.9
   config.gem 'curb'
-  config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
