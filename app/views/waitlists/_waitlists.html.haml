@@ -4,7 +4,7 @@
       -#%h3{:style => "margin-bottom: 2px;"}= waitlist.customer.name
       %span{:style => 'font-size: 1.3em;'}
         == Waitlisted for:
-        = waitlist.service.name
+        = waitlist.service.andand.name
     .span-9.last.when{:style => 'margin-top: 2px;'}
       - waitlist.waitlist_time_ranges.each do |waitlist_time_range|
         %h4

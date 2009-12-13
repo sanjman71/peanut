@@ -79,6 +79,7 @@ Rails::Initializer.run do |config|
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   # config.gem 'unicode', :lib => false, :version => '~> 0.1' # not compatible with ruby 1.9
   config.gem 'curb'
+  config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
