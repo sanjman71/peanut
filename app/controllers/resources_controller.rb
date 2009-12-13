@@ -18,7 +18,7 @@ class ResourcesController < ApplicationController
   
   # GET /resources/1/edit
   def edit
-    @resource = current_company.resources.find(params[:id])
+    @resource = current_company.resource_providers.find(params[:id])
     
     respond_to do |format|
       format.html
@@ -36,7 +36,7 @@ class ResourcesController < ApplicationController
     
     # create resource and add as a company provider
     @resource.save
-    current_company.providers.push(@resource)
+    current_company.resource_providers.push(@resource)
     
     # redirect to providers page
     @redirect_path = providers_path
