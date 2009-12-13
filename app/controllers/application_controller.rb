@@ -49,6 +49,10 @@ class ApplicationController < ActionController::Base
     current_user.blank? ? false : current_user.has_role?(role_name, authorizable)
   end
   
+  def auth_token?
+    AuthToken.instance.token == params[:token].to_s
+  end
+
   #
   # Note: current_subdomain is already defined by the subdomain_fu plugin
   #

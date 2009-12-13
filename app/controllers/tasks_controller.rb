@@ -1,7 +1,7 @@
 class TasksController < ApplicationController
   
   # managers only for now
-  privilege_required      'manage site', :on => :current_company
+  privilege_required      'manage site', :on => :current_company, :unless => :auth_token?
 
   # GET /tasks
   def index
