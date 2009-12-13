@@ -3,12 +3,12 @@
     -# customer name and email
     .span-6.prepend-1
       %h2.customer.name.bottom= customer.name
-      %h4.customer.email
+      %h4.customer.email.bottom
         - if customer.email_addresses_count > 0
           = customer.primary_email_address.address
         - else
           %span.field_missing== No email address
-      %h4.customer.phone
+      %h4.customer.phone.bottom
         - if customer.phone_numbers_count > 0
           = number_to_phone(customer.phone_number)
         - else

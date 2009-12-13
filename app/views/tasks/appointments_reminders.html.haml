@@ -1,7 +1,28 @@
 - title("Task Appointment Reminders")
 
-.span-16
-  .span-15.append-2
-    .span-15.prepend-1.last.mat.padding-top-10.padding-bottom-10
-      %h2== Appointment Reminders
-      %h5== Found #{pluralize(@appointments.size, 'appointment')} in the next #{pluralize(@number, @units)}
+.span-24.last
+  .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-10
+    %h2== Appointment Reminders
+    %h5.bottom
+      == Found #{pluralize(@appointments.size, 'appointment')} in the next #{pluralize(@number, @units)},
+      == sent #{pluralize(@reminders, 'reminder')}
+
+  %hr.space
+
+  .span-24.last#appointments
+    - @appointments.each do |appointment|
+      .span-24.last.letterbox.provider{:class => cycle("shaded", "")}[appointment]
+        .span-5.prepend-1#customer_name
+          %h4= customer_display_name(appointment.customer, current_user)
+          - email = appointment.customer.primary_email_address.andand.address || 'No email address'
+          %h5.bottom= email
+        .span-5#provider_name
+          %h4= appointment.provider.name
+          %h5.bottom{:style => 'font-weight: normal;'}= appointment.service.name
+        .span-6#when
+          %h5{:style => 'font-size: 0.9em;'}=appointment.start_at.to_s(:appt_day_date_time)
+        .span-5#topics
+          - message_topics  = appointment.message_topics
+          - message_tags    = message_topics.collect(&:tag)
+          %h5= pluralize(message_topics.size, 'message')
+          %h5.normal.bottom{:style => 'font-weight: normal;'}= message_tags.join(',')

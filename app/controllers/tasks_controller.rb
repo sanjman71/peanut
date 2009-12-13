@@ -19,7 +19,23 @@ class TasksController < ApplicationController
     @units          = match[2]
     
     # find appointments in this upcoming tiem span
-    @appointments   = Appointment.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")])
+    @appointments   = Appointment.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
+    @reminders      = 0
+
+    @appointments.each do |appointment|
+      # check appointment messages already sent
+      message_tags = appointment.message_topics.collect(&:tag)
+      next if message_tags.include?('reminder')
+      # send appointment reminder
+      success = MessageComposeAppointment.reminder(appointment)
+      case success
+      when 0
+        # reminder was sent
+        @reminders += 1
+        # reload appointment object
+        appointment.reload
+      end
+    end
 
     respond_to do |format|
       format.html
