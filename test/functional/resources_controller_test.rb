@@ -6,8 +6,6 @@ class ResourcesControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
-    @controller   = ResourcesController.new
     # create a valid company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -23,6 +21,33 @@ class ResourcesControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
 
+  context "edit resource" do
+    setup do
+      # add company resource
+      @resource = Factory(:resource)
+      @company.resource_providers.push(@resource)
+    end
+    
+    context "without privilege 'update resources'" do
+      setup do
+        @controller.stubs(:current_user).returns(@provider)
+        get :edit, :id => @resource
+      end
+  
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+    end
+
+    context "with privilege 'update resources'" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :edit, :id => @resource
+      end
+
+      should_respond_with :success
+      should_render_template 'resources/edit.html.haml'
+    end
+  end
+  
   context "create resource" do
     context "without privilege 'create resources'" do
       setup do
@@ -39,17 +64,18 @@ class ResourcesControllerTest < ActionController::TestCase
         post :create, :resource => {:name => ""}
       end
 
-      should_respond_with :success
-      should_render_template 'resources/new.html.haml'
       should_assign_to :resource
       should_not_change("Resource.count") { Resource.count }
 
       should "have an invalid resource" do
         assert_equal false, assigns(:resource).valid?
       end
+
+      should_respond_with :success
+      should_render_template 'resources/new.html.haml'
     end
 
-    context "with a valid person" do
+    context "with a valid resource" do
       setup do
         @controller.stubs(:current_user).returns(@owner)
         post :create, :resource => {:name => "Mac Truck"}

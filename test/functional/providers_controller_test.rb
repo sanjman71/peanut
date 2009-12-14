@@ -15,8 +15,6 @@ class ProvidersControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
-    @controller   = ProvidersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -25,7 +23,7 @@ class ProvidersControllerTest < ActionController::TestCase
     # owner is the company manager
     @owner.grant_role('company manager', @company)
     @owner.grant_role('user manager', @owner)
-    # add providers
+    # add user providers
     @provider1    = Factory(:user, :name => "User Provider 1")
     @company.user_providers.push(@provider1)
     @provider1.grant_role('company provider', @company)
@@ -34,6 +32,9 @@ class ProvidersControllerTest < ActionController::TestCase
     @company.user_providers.push(@provider2)
     @provider2.grant_role('company provider', @company)
     @provider2.grant_role('user manager', @provider2)
+    # add resource providers
+    @resource1    = Factory(:resource, :name => "Resource Provider 1")
+    @company.resource_providers.push(@resource1)
     # create user
     @user         = Factory(:user, :name => "User")
     # stub current company methods
@@ -52,7 +53,7 @@ class ProvidersControllerTest < ActionController::TestCase
     should_redirect_to('unauthorized_path') { unauthorized_path }
     should_set_the_flash_to /You are not authorized/
   end
-  
+
   context "list users with 'read users' privileges" do
     setup do
       # list users as company provider
@@ -60,9 +61,7 @@ class ProvidersControllerTest < ActionController::TestCase
       get :index
     end
 
-    should_respond_with :success
-    should_render_template 'providers/index.html.haml'
-    should_assign_to(:providers, :class => Array) { [@provider1, @provider2] }
+    should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
 
     should "not be able to change manager role on providers" do
       assert_select "input.checkbox.manager", 0
@@ -71,6 +70,9 @@ class ProvidersControllerTest < ActionController::TestCase
     should "be able to edit themself" do
       assert_select "a.admin.edit.user", 1
     end
+
+    should_respond_with :success
+    should_render_template 'providers/index.html.haml'
   end
 
   context "list users with 'update users' privileges" do
@@ -80,17 +82,18 @@ class ProvidersControllerTest < ActionController::TestCase
       get :index
     end
 
-    should_respond_with :success
-    should_render_template 'providers/index.html.haml'
-    should_assign_to(:providers, :class => Array) { [@provider1, @provider2] }
+    should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
 
-    should "be able to change manager role on providers" do
+    should "be able to change manager role on user providers" do
       assert_select "input.checkbox.manager", 2
     end
 
-    should "be able to edit users" do
-      assert_select "a.admin.edit.user", 2
+    should "be able to edit user and resource providers" do
+      assert_select "a.admin.edit.user", 3
     end
+
+    should_respond_with :success
+    should_render_template 'providers/index.html.haml'
   end
   
 end

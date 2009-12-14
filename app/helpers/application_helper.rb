@@ -190,6 +190,17 @@ module ApplicationHelper
     yield name, path, klasses
   end
 
+  # build user login name based on user name, email values
+  def user_login_name(user)
+    if user.email_addresses_count > 0
+      # use primary email address
+      user.primary_email_address
+    else
+      # use name
+      user.name
+    end
+  end
+
   # build provider display name based on context of the current user
   def provider_display_name(provider, current_user)
     return "" if provider.blank?
