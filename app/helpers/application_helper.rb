@@ -194,7 +194,7 @@ module ApplicationHelper
   def user_login_name(user)
     if user.email_addresses_count > 0
       # use primary email address
-      user.primary_email_address
+      user.primary_email_address.address
     else
       # use name
       user.name
