@@ -100,7 +100,7 @@ class TimeRangeTest < ActiveSupport::TestCase
       # 1800 local is 0200 in UTC. We will add 24.hours to this.
       should "have time_start_at_utc and time_end_at_utc in UTC time" do
         assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
-        assert_equal @time_range.end_at.utc.hour.hours  + @time_range.end_at.utc.min.minutes + 24.hours, @time_range.time_end_at_utc
+        assert_equal @time_range.end_at.utc.hour.hours  + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc
       end
 
     end
@@ -158,13 +158,13 @@ class TimeRangeTest < ActiveSupport::TestCase
     should "have time_start_at and time_end_at in local time" do
       # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes, @time_range.time_start_at
-      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes + 24.hours, @time_range.time_end_at
+      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes, @time_range.time_end_at
     end
 
     should "have time_start_at_utc and time_end_at_utc in UTC time" do
       # Note that we add 24 hours to the calculation of time_end_at_utc, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
-      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes + 24.hours, @time_range.time_end_at_utc 
+      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc 
     end
   
   end
@@ -191,13 +191,13 @@ class TimeRangeTest < ActiveSupport::TestCase
     should "have time_start_at and time_end_at in local time" do
       # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes, @time_range.time_start_at
-      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes + 24.hours, @time_range.time_end_at
+      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes, @time_range.time_end_at
     end
 
     should "have time_start_at_utc and time_end_at_utc in UTC time" do
       # Note that we add 24 hours to the calculation of time_end_at_utc, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
-      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes + 24.hours, @time_range.time_end_at_utc
+      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc
     end
   
   end
@@ -224,13 +224,13 @@ class TimeRangeTest < ActiveSupport::TestCase
     should "have time_start_at and time_end_at in local time" do
       # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes, @time_range.time_start_at
-      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes + 24.hours, @time_range.time_end_at
+      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes, @time_range.time_end_at
     end
 
     should "have time_start_at_utc and time_end_at_utc in UTC time" do
       # Note that we add 24 hours to the calculation of time_end_at_utc, as the end_day is one day later than the start day
       assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
-      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes + 24.hours, @time_range.time_end_at_utc
+      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc
     end
   
   end
@@ -247,14 +247,14 @@ class TimeRangeTest < ActiveSupport::TestCase
     should "have time_start_at and time_end_at in local time" do
       # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day in local time
       assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes, @time_range.time_start_at
-      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes + 24.hours, @time_range.time_end_at
+      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes, @time_range.time_end_at
     end
 
     should "have time_start_at_utc and time_end_at_utc in UTC time" do
       # Note that we add 24 hours to the calculation of time_end_at_utc. This ensures that time ranges can be compared against one another, regardless of what
       # time they actually start (before or after midnight in UTC)
-      assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes + 24.hours, @time_range.time_start_at_utc
-      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes + 24.hours, @time_range.time_end_at_utc
+      assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
+      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc
     end
   
   end
@@ -279,8 +279,8 @@ class TimeRangeTest < ActiveSupport::TestCase
     end
   
     should "have correct time_start_at and time_end_at" do
-      assert_equal 28.hours, @time_range.time_start_at_utc
-      assert_equal 30.hours, @time_range.time_end_at_utc
+      assert_equal 4.hours, @time_range.time_start_at_utc
+      assert_equal 6.hours, @time_range.time_end_at_utc
     end
   
   end
