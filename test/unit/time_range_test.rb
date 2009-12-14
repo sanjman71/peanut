@@ -3,7 +3,7 @@ require 'test/test_helper'
 class TimeRangeTest < ActiveSupport::TestCase
   
   def setup
-    Time.zone = "Pacific Time (US & Canada)"
+    # Time.zone = "Eastern Time (US & Canada)"
     @today    = Time.now.to_s(:appt_schedule_day)
     @tomorrow = (Time.now + 1.day).to_s(:appt_schedule_day) # e.g. 20081201
   end
@@ -279,8 +279,8 @@ class TimeRangeTest < ActiveSupport::TestCase
     end
   
     should "have correct time_start_at and time_end_at" do
-      assert_equal 4.hours, @time_range.time_start_at_utc
-      assert_equal 6.hours, @time_range.time_end_at_utc
+      assert_equal (20.hours - Time.zone.utc_offset) % 24.hours, @time_range.time_start_at_utc
+      assert_equal (22.hours - Time.zone.utc_offset) % 24.hours, @time_range.time_end_at_utc
     end
   
   end
@@ -321,6 +321,22 @@ class TimeRangeTest < ActiveSupport::TestCase
     should "not have a negative duration" do
       assert_true @time_range.duration >= 0
     end
+  end
+  
+  context "test issue with DateTime types being passed in leading to zero duration" do
+    setup do
+      # These DateTime values are parsed into UTC
+      @time_range = TimeRange.new(:start_at => DateTime.parse("12/12/2009 16:00"), :end_at => DateTime.parse("12/12/2009 18:00"))
+    end
+    
+    should "have correct start_at, end_at, time_start_at, time_end_at and duration" do
+      assert_equal ((16.hours + Time.zone.utc_offset) % 24.hours) / 1.hour, @time_range.start_at.in_time_zone.hour
+      assert_equal ((18.hours + Time.zone.utc_offset) % 24.hours) / 1.hour, @time_range.end_at.in_time_zone.hour
+      assert_equal 2.hours, @time_range.duration
+      assert_equal 16.hours, @time_range.time_start_at_utc
+      assert_equal 18.hours, @time_range.time_end_at_utc
+    end
+    
   end
 
 end
