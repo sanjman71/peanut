@@ -122,7 +122,7 @@ class CompanyTest < ActiveSupport::TestCase
       end
 
       should "change company.providers" do
-        assert_equal [@resource, @provider], @company.providers
+        assert_equal [@provider, @resource], @company.providers
       end
 
       should "increment company.providers_count" do
