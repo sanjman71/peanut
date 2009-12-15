@@ -7,7 +7,7 @@
 -# display - id of element to show display time
 
 -# make sure appt_start_minute is an array
-- appt_start_minutes = Array(appt_start_minutes)
+- appt_start_minutes = appt_start_minutes.is_a?(String) ? eval(appt_start_minutes) : Array(appt_start_minutes)
 
 -# build minute increments
 - minute_increments = (0..59).step(60/(60/minute_interval)).collect { |i| i }
@@ -16,7 +16,7 @@
   - first_hour = (hour == start_hour)
   - last_hour  = (hour == end_hour)
   - minute_increments.each do |minute|
-    -# if its the first hour, check that the minute after the start minute
+    -# if its the first hour, check that the minute is after the start minute
     - next if first_hour and minute < start_minute
     -# if its the last hour, check that the minute is before the end minute
     - next if last_hour and minute > end_minute

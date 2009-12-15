@@ -22,6 +22,6 @@
             .span-2.pick_time
               = link_to "Pick a Time", ''
             .span-13.last.slider.hide
-              = render(:partial => 'calendar/time_range_slider', :locals => free_slot_possible_start_times(slot, service.duration, :appt_start_minutes => CompanyPreference.default_appt_start_minutes))
+              = render(:partial => 'calendar/time_range_slider', :locals => free_slot_possible_start_times(slot, service.duration, :appt_start_minutes => current_company.preferences[:appt_start_minutes]))
           .span-15.last.book_it.hide{:style => 'margin-left: 5px;'}
             = link_to('Book It', "javascript:void(0)", :url => schedule_path(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id, :service_id => service.id, :duration => service.duration, :start_at => slot.start_at.to_s(:appt_schedule)), :class => 'bookit')

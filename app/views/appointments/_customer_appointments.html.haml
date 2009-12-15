@@ -3,7 +3,7 @@
     -# service and provider
     .span-5.prepend-1
       %h3{:style => 'padding-top: 5px; margin-bottom: 5px;'}= appointment.service.name
-      %h3{:style => 'font-size: 1.3em;'}= (appointment.provider || User.anyone).name
+      %h4= (appointment.provider || User.anyone).name
       
     -# when
     .span-7

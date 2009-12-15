@@ -63,7 +63,6 @@
 .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
   %h2 Company Preferences
   - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
-
     .span-20.last
       .span-4
         %h3{:style => 'padding-top: 7px;'}== Time Horizon:
@@ -78,6 +77,13 @@
         = f.select :preferences_start_wday, start_wday_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-16.prepend-4.last.directions
         == When showing calendars, what day do you want to start your week
+    .span-20.last
+      .span-4
+        %h3{:style => 'padding-top: 7px;'}== Appointment Start Times:
+      .span-16.last
+        = f.select :preferences_appt_start_minutes, appt_start_minutes_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-16.prepend-4.last.directions
+        == Choose when appointments can start, e.g. on the hour, on the hour and half-hours
     .span-20.last.padding-top-10
       = f.submit 'Update Company Preferences', :class => 'button big'
       == or
