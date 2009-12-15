@@ -7,7 +7,14 @@
 
     %hr.space
 
-    .span-16.last.letterbox#task_appointment_reminder
+    .span-16.last.letterbox#task_appointment_messages
+      .span-5.prepend-1.name
+        %h3.margin-bottom-0== Appointment Messages
+      .span-10.last
+        - ['whenever'].each do |ts|
+          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_messages_path(:time_span => ts.to_url_param)
+        
+    .span-16.last.letterbox#task_appointment_reminders
       .span-5.prepend-1.name
         %h3.margin-bottom-0== Appointment Reminders
       .span-10.last

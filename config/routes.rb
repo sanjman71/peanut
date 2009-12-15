@@ -171,6 +171,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :messages, :only => [:index, :create, :new]
 
   # Tasks controller
+  map.task_appt_messages  '/tasks/appointments/messages/:time_span', 
+                          :controller => 'tasks', :action => 'appointments_messages', :time_span => /whenever/
   map.task_appt_reminders '/tasks/appointments/reminders/:time_span', 
                           :controller => 'tasks', :action => 'appointments_reminders', :time_span => /\d+-(days|hours)/
   map.resources           :tasks, :only => [:index]

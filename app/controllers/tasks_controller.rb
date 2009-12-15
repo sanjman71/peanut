@@ -10,6 +10,19 @@ class TasksController < ApplicationController
     end
   end
 
+  # GET /tasks/appointments/messages/whenever
+  def appointments_messages
+    # find appointments with messages
+    @appointments = current_company.appointments.work.all(:include => :message_topics)
+    @reminders    = 0
+
+    @title        = "Task Appointment Messages"
+
+    respond_to do |format|
+      format.html { render(:action => 'appointments_reminders')}
+    end
+  end
+
   # GET /tasks/appointments/reminders/2-days
   # GET /tasks/appointments/reminders/7-hours
   def appointments_reminders
@@ -18,8 +31,8 @@ class TasksController < ApplicationController
     @number         = match[1]
     @units          = match[2]
     
-    # find appointments in this upcoming tiem span
-    @appointments   = Appointment.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
+    # find appointments in the upcoming time span
+    @appointments   = current_company.appointments.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
     @reminders      = 0
 
     @appointments.each do |appointment|
@@ -36,6 +49,8 @@ class TasksController < ApplicationController
         appointment.reload
       end
     end
+
+    @title = "Task Appointment Reminder"
 
     respond_to do |format|
       format.html
