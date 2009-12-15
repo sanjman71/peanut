@@ -31,7 +31,7 @@
         %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
       .span-16.last
         -# not allowed to edit rpx user emails
-        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email', :disabled => @user.rpx?
+        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email', :disabled => !email_form.object.changeable?
         - if email_form.object.verified?
           %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
           
