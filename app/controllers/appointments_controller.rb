@@ -96,9 +96,6 @@ class AppointmentsController < ApplicationController
       @dates = Array[@start_at]
     end
 
-    # iterator over the specified dates, if provided, or use single start_at date
-    # @dates          = params[:dates] ? Array(params[:dates]) : Array[@start_at]
-    
     @dates.each do |date|
       begin
         case @mark_as

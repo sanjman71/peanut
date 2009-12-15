@@ -85,7 +85,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         delete :destroy, :id => @free_appt.id
       end
-
+  
       should_change("Appointment.count", :by => -1) { Appointment.count }
     end
     
@@ -102,27 +102,27 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "show rpx login" do
         assert_select 'div#rpx_login', true
       end
-
+  
       should "show (hidden) peanut login" do
         assert_select 'div.hide#peanut_login', true
       end
     end
-
+  
     context "new work appointment as customer" do
       setup do
         # stub current user
         @controller.stubs(:current_user).returns(@customer)
         ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-
+  
         # book a haircut with johnny during his free time
         get :new, 
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
             :duration => @haircut.duration, :mark_as => 'work'
       end
-
+  
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
-
+  
       should_assign_to :appointment, :class => Appointment
       should_assign_to(:service) { @haircut }
       should_assign_to(:duration) { 30.minutes }
@@ -132,7 +132,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:appt_time_start_at) { "0900" }
       should_assign_to(:appt_time_end_at) { "0930" }
     end
-
+  
     context "create work appointment as customer" do
       setup do
         # stub current user
@@ -141,15 +141,15 @@ class AppointmentsControllerTest < ActionController::TestCase
              :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
              :duration => @haircut.duration, :mark_as => 'work', :customer_id => @customer.id
       end
-
+  
       should_respond_with :redirect
       should_redirect_to ("history_index_path") { history_index_path }
-
+  
       context "delete free appointment containing active work appointment" do
         setup do
           delete :destroy, :id => @free_appt.id
         end
-
+  
         should_not_change("Appointment.count") { Appointment.count }
         should "not delete free appointment" do
           assert Appointment.find(@free_appt.id)
@@ -166,7 +166,7 @@ class AppointmentsControllerTest < ActionController::TestCase
              {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @free_service.id, :mark_as => 'free'}
       end
-
+  
       should_not_change("Appointment.count") { Appointment.count }
       should_respond_with :redirect
       should_redirect_to("unauthorized_path") { unauthorized_path }
@@ -180,19 +180,19 @@ class AppointmentsControllerTest < ActionController::TestCase
              {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
               :service_id => @free_service.id, :mark_as => 'free'}
       end
-
+  
       should_change("Appointment.count", :by => 1) { Appointment.count }
-
+  
       should_assign_to(:service) { @free_service }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at)  { "0900" }
       should_assign_to(:end_at) { "1100" }
       should_assign_to(:mark_as) { "free" }
-
+  
       should_respond_with :redirect
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
-
+  
      context "for a block of dates" do
        setup do
          # have johnny create free appointments on his calendar
@@ -201,15 +201,15 @@ class AppointmentsControllerTest < ActionController::TestCase
               {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
                :service_id => @free_service.id, :mark_as => 'free'}
        end
-
+  
        should_change("Appointment.count", :by => 2) { Appointment.count }
-
+  
        should_assign_to(:service) { @free_service }
        should_assign_to(:provider) { @johnny }
        should_assign_to(:start_at) { "0900" }
        should_assign_to(:end_at) { "1100" }
        should_assign_to(:mark_as)  { "free" }
-
+  
        should_respond_with :redirect
        should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
      end
@@ -227,7 +227,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @controller.stubs(:build_calendar_markings).returns(Hash.new)
         get :new_block, :provider_type => 'users', :provider_id => @johnny.id
       end
-
+  
       should_respond_with :redirect
       should_redirect_to("unauthorized_path") { unauthorized_path }
       should_set_the_flash_to /You are not authorized/
@@ -252,20 +252,6 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
   
-  # context "get new blocks for provider calendar as another provider" do
-  #   setup do
-  #     add_mary_and_johnny_as_providers
-  #     @controller.stubs(:current_user).returns(@mary)
-  #     # stub calendar markings
-  #     @controller.stubs(:build_calendar_markings).returns(Hash.new)
-  #     get :new_block, :provider_type => 'users', :provider_id => @johnny.id
-  #   end
-  # 
-  #   should_respond_with :redirect
-  #   should_redirect_to("unauthorized_path") { unauthorized_path }
-  #   should_set_the_flash_to /You are not authorized/
-  # end
-  
   #
   # Recurring appointment tests
   #
@@ -278,7 +264,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @controller.stubs(:build_calendar_markings).returns(Hash.new)
         get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
       end
-
+  
       should_respond_with :redirect
       should_redirect_to("unauthorized_path") { unauthorized_path }
       should_set_the_flash_to /You are not authorized/
@@ -536,7 +522,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @haircut.id, :customer_id => @anyone.id, :mark_as => 'work',
+              :service_id => @haircut.id, :mark_as => 'work',
               :customer => {:name => "Sanjay", :email => "sanjay@walnut.com", :password => 'sanjay', :password_confirmation => 'sanjay'}}
         @free_appt.reload
       end
@@ -558,25 +544,28 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_not_assign_to(:end_at)
       should_assign_to(:duration)  { 120.minutes }
       should_assign_to(:mark_as) { "work" }
-      should_assign_to :appointment
-
+      should_assign_to(:appointment)
+      
       should "create user in active state" do
         user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
-
+      
       should "create user with specified password" do
         user = User.authenticate('sanjay@walnut.com', 'sanjay')
         assert_equal assigns(:customer), user
       end
-
+      
       should "set the flash for the created work appointment" do
         assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
       end
-
+      
       should "set the flash for the created appointment and created user account" do
         assert_match /Your user account has been created/, flash[:notice]
       end
+
+      # should send appt confirmation and account created messages
+      should_change("delayed job count", :by => 2) { Delayed::Job.count }
 
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
