@@ -25,7 +25,7 @@ module AppointmentsHelper
   # return hash of possible start time values
   def free_slot_possible_start_times(slot, duration_in_seconds, options={})
     # initialize hash with apointment start_at hour and minute
-    hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min}
+    hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min, :minute_interval => 5}
             
     # adjust slot end_at based on duration
     begin
@@ -36,17 +36,11 @@ module AppointmentsHelper
     
     # update hash with end_at hour and minute
     hash.update(:end_hour => end_at.hour, :end_minute => end_at.min)
-    
-    # set minute interval based on duration
-    case duration_in_seconds
-    when (0..1.hour)
-      minute_interval = 30
-    else
-      # default value
-      minute_interval = 30
-    end
-    
-    hash.update(:minute_interval => minute_interval).update(options)
+
+    # update hash with options args
+    hash.update(options)
+
+    hash
   end
   
   def service_duration_select_options
