@@ -41,8 +41,8 @@ $.fn.init_user_create_submit = function() {
       alert("Please enter a user email");
       return false;
     }
-    
-    if (email_required && validate_email_address(user_email) == false) {
+
+    if ((user_email != '') && validate_email_address(user_email) == false) {
       alert("Please enter a valid email address");
       return false;
     }

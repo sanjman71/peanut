@@ -95,7 +95,7 @@ $.fn.validate_appointment_customer = function() {
     return false;
   }
 
-  if (email_required && validate_email_address(customer_email) == false) {
+  if ((customer_email != '') && validate_email_address(customer_email) == false) {
     alert("Please enter a valid email address");
     return false;
   }
