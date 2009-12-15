@@ -27,7 +27,6 @@ class OpeningsControllerTest < ActionController::TestCase
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   def setup
-    @controller   = OpeningsController.new
     # create a valid company, with 1 provider and 1 work service
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -45,47 +44,95 @@ class OpeningsControllerTest < ActionController::TestCase
     # stub current location to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     @controller.stubs(:current_locations).returns([])
-
     # stub helper method (not sure why this generates an error?)
     ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
-
     # Set the request hostname
     # @request.host = "www.peanut.com"
   end
   
-  context "search company openings with no service specified" do
-    setup do
-      get :index
+  context "search company openings" do
+    context "with an invalid service" do
+      setup do
+        get :index, :service_id => -1
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("openings_path") { openings_path }
     end
 
-    should_respond_with :success
-    should_render_template 'openings/index.html.haml'
-    should_not_assign_to :daterange
-    should_assign_to(:duration) { 0 }
+    context "with a valid service, but invalid duration" do
+      setup do
+        # create company service that does not allow a custom duration
+        get :index, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
+      end
 
-    should "have 'nothing' service" do
-      assert assigns(:service).nothing?
+      should_respond_with :redirect
+      should_redirect_to("openings services path with default duration value") { "/services/#{@haircut.id}/1800/openings/this-week/anytime" }
+    end
+
+    context "with specified 'anyone' provider" do
+      setup do
+        get :index, :provider_id => '0'
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("openings_path") { openings_path }
+    end
+
+    context "with specified 'any' service" do
+      setup do
+        get :index, :service_id => '0'
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("openings_path") { openings_path }
+    end
+
+    context "with no service and no provider" do
+      setup do
+        get :index
+      end
+
+      should "have 'nothing' service" do
+        assert_true assigns(:service).nothing?
+      end
+
+      should "have 'anyone' user" do
+        assert_true assigns(:provider).anyone?
+      end
+
+      should_not_assign_to :daterange
+      should_assign_to(:duration) { 0 }
+
+      should "set services collection" do
+        assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
+      end
+
+      should_respond_with :success
+      should_render_template 'openings/index.html.haml'
+    end
+
+    context "with a specific service" do
+      setup do
+        get :index, :service_id => @haircut.id, :duration => @haircut.duration, :when => 'this-week', :time => 'anytime'
+      end
+
+      should_assign_to(:service) { @haircut}
+
+      should "have 'anyone' user" do
+        assert_true assigns(:provider).anyone?
+      end
+
+      should_assign_to(:daterange)
+      should_assign_to(:duration) { 30 * 60 }
+
+      should "set services collection" do
+        assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
+      end
+      
+      should_respond_with :success
+      should_render_template 'openings/index.html.haml'
     end
   end
 
-  context "search company openings with an invalid service" do
-    setup do
-      get :index, :service_id => 157
-    end
-
-    should_respond_with :redirect
-    should_redirect_to("openings_path") { openings_path }
-  end
-
-  context "search company openings with a valid service, but invalid duration" do
-    setup do
-      # create company service that does not allow a custom duration
-      get :index, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
-    end
-
-    should_respond_with :redirect
-    should_redirect_to "openings services path with default duration value" do
-      "/services/#{@haircut.id}/1800/openings/this-week/anytime"
-    end
-  end
 end

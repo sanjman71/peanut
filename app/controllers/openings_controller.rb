@@ -45,7 +45,7 @@ class OpeningsController < ApplicationController
 
     # initialize time objects
     @time         = params[:time].from_url_param if params[:time]
-    @time_range   = params[:time].blank? ? nil : TimeRange.new(:when => params[:time].from_url_param)
+    @time_range   = params[:time].blank? ? nil : TimeRange.new(:when => params[:time].from_url_param) # xxx no when parameter?
 
     # initialize location & locations
     if params[:location_id]
@@ -77,7 +77,7 @@ class OpeningsController < ApplicationController
     @providers = @service.providers
     
     # build service providers collection mapping services to providers
-    @sps          = @services.inject([]) do |array, service|
+    @sps = @services.inject([]) do |array, service|
       service.providers.each do |provider|
         array << [service.id, provider.id, provider.name, provider.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
       end
@@ -96,8 +96,8 @@ class OpeningsController < ApplicationController
     end
 
     # find free appointments, group by day (use appt utc time)
-    @free_capacity_slots        = AppointmentScheduler.find_free_appointments(current_company, current_location,
-                                                                              @provider, @service, @duration, @daterange, :time_range => @time_range)
+    @free_capacity_slots        = AppointmentScheduler.find_free_capacity_slots(current_company, current_location,
+                                                                                @provider, @service, @duration, @daterange)
     @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day}
     
     logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
@@ -110,7 +110,7 @@ class OpeningsController < ApplicationController
 
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
-    
+
     respond_to do |format|
       format.html # index.html.erb
     end

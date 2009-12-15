@@ -22,9 +22,9 @@ h4.work                                           { }
 
 div.appointment.work div.service h6               { color: #009900; }
 
-div.appointment a                                 { color: #5500BB; font-weight: bold; }
-div.appointment a:hover                           { color: #5500BB; background-color: #FF6600; }
-div.appointment a:visited                         { color: #5500BB; font-weight: bold; }
+div.appointment a, div.slot a                     { color: #5500BB; font-weight: bold; }
+div.appointment a:hover, div.slot a:hover         { color: #5500BB; background-color: #FF6600; }
+div.appointment a:visited, div.slot a:visited     { color: #5500BB; font-weight: bold; }
 
 a.bookit                                          { background-color: #FFCC00; }
 

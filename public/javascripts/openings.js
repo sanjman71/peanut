@@ -99,21 +99,21 @@ $.fn.init_openings_sliders = function() {
   
   // bind to the 'afterClick' event, which indicates the user picked a time on the slider
   $(".slider .time").bind("afterClick", function() {
-    var $book_it  = $(this).parents(".appointment").find(".book_it");
+    var book_it   = $(this).parents("div.capacity_slot").find("div.book_it");
     var book_time = $(this).text() + " " + $(this).attr("ampm");
-    var book_url  = $book_it.find("a").attr("url").replace(/(\d+T)(\d{4,4})(\d+)/, "$1" + $(this).attr("id") + "$3");
+    var book_url  = book_it.find("a.bookit").attr("url").replace(/(\d+T)(\d{4,4})(\d+)/, "$1" + $(this).attr("id") + "$3");
     
-    if (!$book_it.is(":visible")) {
+    if (!book_it.is(":visible")) {
       // hide all other book it links
       $(".book_it").hide();
       
-      // show the book it link
-      $book_it.show();
+      // show this book it link
+      book_it.show();
     }
 
     // change book it url and text
-    $book_it.find("a").attr("href", book_url);
-    $book_it.find("a").text("Book " + book_time);
+    book_it.find("a").attr("href", book_url);
+    book_it.find("a").text("Book " + book_time);
   })
 }
 

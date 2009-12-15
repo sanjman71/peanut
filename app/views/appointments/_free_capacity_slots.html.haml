@@ -8,7 +8,7 @@
     
     -# group slots by people
     - reset_cycle
-    - slots.group_by { |appt| appt.provider }.each do |provider, slots|
+    - slots.group_by { |slot| slot.free_appointment.provider }.each do |provider, slots|
       - slots.each do |slot|
         .span-15.last.free.slot[slot]{:class => cycle("", "shaded")}
           .span-15.last
