@@ -212,8 +212,13 @@ class UsersControllerTest < ActionController::TestCase
           @user = User.with_email(@recipient_email).first
           assert @company.has_provider?(@user)
         end
+        
+        should "add company to user's provided_companies" do
+          @user = User.with_email(@recipient_email).first
+          assert_equal [@company], @user.provided_companies
+        end
   
-        should "add provider role on company to suer" do
+        should "add provider role on company to user" do
           @user = User.with_email(@recipient_email).first
           assert_equal ['company provider'], @user.roles_on(@company).collect(&:name).sort
         end
@@ -348,7 +353,7 @@ class UsersControllerTest < ActionController::TestCase
   
       should "not add user as a company provider" do
         @user = User.with_email("sanjay@walnut.com").first
-        assert_equal [], @user.companies
+        assert_equal [], @user.provided_companies
       end
 
       should_respond_with :redirect
@@ -385,7 +390,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "not add user as a company provider" do
-        assert_equal [], assigns(:user).companies
+        assert_equal [], assigns(:user).provided_companies
       end
 
       should_respond_with :redirect
@@ -422,7 +427,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "not add user as a company provider" do
-        assert_equal [], assigns(:user).companies
+        assert_equal [], assigns(:user).provided_companies
       end
 
       should_respond_with :redirect
