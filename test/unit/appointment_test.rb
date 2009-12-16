@@ -36,6 +36,49 @@ class AppointmentTest < ActiveSupport::TestCase
     @customer       = Factory(:user)
   end
   
+  context "appointment state" do
+    setup do
+      # create free time from 12 midnight to 1 am
+      @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range     = TimeRange.new({:day => @today, :start_at => "0000", :end_at => "0100"})
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+    end
+
+    should "create in confirmed state" do
+      assert_equal 'confirmed', @free_appt.reload.state
+    end
+
+    context "then mark as completed" do
+      setup do
+        @free_appt.complete!
+      end
+
+      should "change state to completed" do
+        assert_equal 'completed', @free_appt.reload.state
+      end
+    end
+
+    context "then mark as canceled" do
+      setup do
+        @free_appt.cancel!
+      end
+
+      should "change state to canceled" do
+        assert_equal 'canceled', @free_appt.reload.state
+      end
+    end
+
+    context "then mark as noshow" do
+      setup do
+        @free_appt.noshow!
+      end
+
+      should "change state to noshow" do
+        assert_equal 'noshow', @free_appt.reload.state
+      end
+    end
+  end
+
   context "create free appointment with mismatched duration and end_at values" do
     setup do
       @start_at_utc   = Time.zone.now.beginning_of_day.utc

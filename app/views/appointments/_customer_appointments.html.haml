@@ -20,10 +20,8 @@
             = appointment.start_at.to_s(:appt_short_month_day_year)
             == @
             = appointment.start_at.to_s(:appt_time)
-            -# show time from now for upcoming appointments
-            - if appointment.upcoming?
-              %br
-              %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+            %br
+            %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
       - elsif appointment.wait?
         .wait.when{:style => 'padding-top: 5px;'}
           == Waitlist:

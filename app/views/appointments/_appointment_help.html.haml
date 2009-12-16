@@ -1,12 +1,15 @@
 .sidebar.instructions
   - case state
-  - when 'upcoming'
-    == What are upcoming appointments?
+  - when 'confirmed'
+    == What are confirmed appointments?
     %ul
-      %li== They are appointments that have been scheduled with a specific provider.
+      %li== They are appointments that have been scheduled and confirmed.
   - when 'completed'
     %ul
       %li== Completed appointments have finished and been marked as completed.
+  - when 'noshow'
+    %ul
+      %li== Noshow appointments were confirmed and then marked as the customer not showing up.
   - when 'canceled'
     %ul
-      %li== Canceled appointments have been scheduled and then canceled before they occurred.
+      %li== Canceled appointments were confirmed and then canceled before they occurred.

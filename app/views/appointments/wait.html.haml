@@ -16,7 +16,8 @@
         == #{@appointment.state.titleize}
     
     -# allow owners and managers to change appointment state
-    - if (@owner or @manager) and @appointment.upcoming?
+    -#- if (@owner or @manager) and @appointment.upcoming?
+    - if has_privilege?('update calendars', current_company)
       %h4
         = link_to 'Cancel appointment', cancel_appointment_path(@appointment, :subdomain => current_subdomain), :class => 'admin', :id => 'cancel_appointment'
       

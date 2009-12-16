@@ -11,7 +11,7 @@ class AppointmentsControllerTest < ActionController::TestCase
                :duration => 60.minutes, :start_at => '20090303T113000', :mark_as => 'work'
   
   # create free time
-  should_route  :post, '/users/3/calendar/free', 
+  should_route  :post, '/users/3/calendar/free',
                 :controller => 'appointments', :action => 'create_free', :provider_type => 'users', :provider_id => 3
   
   should_route  :get, '/users/1/calendar/block/new', 
@@ -30,6 +30,12 @@ class AppointmentsControllerTest < ActionController::TestCase
   
   # show an appointment
   should_route :get, '/appointments/1', :controller => 'appointments', :action => 'show', :id => 1
+  
+  # change appointment states
+  should_route :get, '/appointments/1/approve', :controller => 'appointments', :action => 'approve', :id => 1
+  should_route :get, '/appointments/1/complete', :controller => 'appointments', :action => 'complete', :id => 1
+  should_route :get, '/appointments/1/noshow', :controller => 'appointments', :action => 'noshow', :id => 1
+  should_route :get, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
   
   # show work appointments by state
   should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'

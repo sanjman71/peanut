@@ -13,7 +13,7 @@
     -# waitlist appointment states
     .span-5.last{:style => 'padding-top: 7px;'}
       #links
-        - build_appointment_state_when_links(params, ['upcoming', 'canceled'], @state, :default => 'upcoming') do |link, separator|
+        - build_appointment_state_search_links(params, ['upcoming', 'canceled'], @state, :default => 'upcoming') do |link, separator|
           = link
           = separator
   

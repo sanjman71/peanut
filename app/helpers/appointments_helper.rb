@@ -1,6 +1,6 @@
 module AppointmentsHelper
   
-  def build_appointment_state_when_links(url_params, state_collection, current_state, options={})
+  def build_appointment_state_search_links(url_params, state_collection, current_state, options={})
     default = options[:default]
     
     state_collection.each do |state|
@@ -22,6 +22,21 @@ module AppointmentsHelper
     end
   end
   
+  # build possible state transitions based on current appointment state
+  def build_appointment_state_transition_links(appointment)
+    transitions = []
+    transitions.push(['Mark as completed', complete_appointment_path(appointment)]) unless appointment.completed? || appointment.canceled?
+    transitions.push(['Mark as noshow', noshow_appointment_path(appointment)]) unless appointment.noshow? || appointment.canceled?
+    transitions.push(['Mark as canceled', cancel_appointment_path(appointment)]) unless appointment.canceled?
+    
+    transitions.each_with_index do |tuple, i|
+      # use separator unless its the last element
+      separator = (i == (transitions.size-1)) ? '' : '&nbsp;|&nbsp;'
+      text, url = tuple
+      yield text, url, separator
+    end
+  end
+
   # return hash of possible start time values
   def free_slot_possible_start_times(slot, duration_in_seconds, options={})
     # initialize hash with apointment start_at hour and minute

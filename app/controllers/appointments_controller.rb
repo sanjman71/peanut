@@ -381,13 +381,10 @@ class AppointmentsController < ApplicationController
   # GET /appointments/1
   def show
     # @appointment has been initialized in before filter
-    
-    # set back link
-    @back   = request.referer
-    
+
     # find appointment roles
     @customer, @owner, @manager = appointment_roles(@appointment)
-    
+
     case @appointment.mark_as
     when Appointment::WORK
       @title = "Appointment Details"
@@ -399,68 +396,71 @@ class AppointmentsController < ApplicationController
     if @appointment.mark_as == Appointment::FREE && @appointment.recurrence?
       @instances_by_day = @appointment.recurrence_parent.recur_instances.future.group_by { |appt| appt.start_at.beginning_of_day }
     end
-    
+
     # show invoices for completed appointments
     # @invoice      = @appointment.invoice
     # @services     = current_company.services.work.all
     # @products     = current_company.products.instock
     # @mode         = :r
-    
+
     # build notes collection, most recent first 
-    @note         = Note.new
-    @notes        = @appointment.notes.sort_recent
-    
+    @note   = Note.new
+    @notes  = @appointment.notes.sort_recent
+
+    # set back link
+    @back   = request.referer
+
     respond_to do |format|
       format.html { render(:action => @appointment.mark_as) }
     end
   end
   
-  # POST /appointments/1/complete
-  def complete
-    # @appointment has been initialized in before filter
-    
-    # checkout to mark appointment as completed
-    @appointment.checkout!
-    
-    flash[:notice]  = "Marked appointment as completed"
-    
-    # redirect to show appointment (based on appointment type)
-    @redirect_path  = url_for(:action => @appointment.mark_as, :subdomain => current_subdomain)
-
-    respond_to do |format|
-      format.html { redirect_to(@redirect_path) }
-      format.js
-    end
+  # GET /appointments/1/approve
+  def approve
+    flash[:notice] = "Todo: appointment approval process"
+    redirect_to(request.referer) and return
   end
   
+  # GET /appointments/1/complete
+  def complete
+    @appointment = current_company.appointments.find(params[:id])
+    @appointment.complete!
+
+    flash[:notice] = "Marked appointment as completed"
+    redirect_to(request.referer) and return
+  end
+
+  # GET /appointments/1/noshow
+  def noshow
+    @appointment = current_company.appointments.find(params[:id])
+    @appointment.noshow!
+
+    flash[:notice] = "Marked appointment as noshow"
+    redirect_to(request.referer) and return
+  end
+
   # GET /appointments/1/cancel
   def cancel
-    @appointment  = current_company.appointments.find(params[:id])
-    @provider  = @appointment.provider
-    
+    @appointment = current_company.appointments.find(params[:id])
+
     case @appointment.mark_as
-    when  Appointment::WORK
+    when Appointment::WORK
       # cancel the work appointment
       AppointmentScheduler.cancel_work_appointment(@appointment)
-      message_id = LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_canceled]
     end
 
     # redirect to the appointment page
-    @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
-    
-    # create log_entry
-    # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-    #                               :message_id => message_id, :customer => @appointment.customer)
+    @redirect_path = appointment_path(@appointment)
 
     # set flash
-    flash[:notice] = "Canceled appointment"
-    
+    flash[:notice] = "Marked appointment as canceled"
+
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
       format.js
     end
   end
-  
+
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
@@ -476,12 +476,12 @@ class AppointmentsController < ApplicationController
         @conflicts = []
         # Find all conflicting work appointments in this series of free appointments
         # Start with the parents
-        if @appointment.recurrence_parent.work_appointments.upcoming.count > 0
+        if @appointment.recurrence_parent.work_appointments.not_canceled.count > 0
           @conflicts << @appointment.recurrence_parent
         end
         # And continue with all the instances
         @appointment.recurrence_parent.recur_instances.future.each do |appointment|
-          if appointment.work_appointments.upcoming.count > 0
+          if appointment.work_appointments.not_canceled.count > 0
             @conflicts << appointment
           end
         end
@@ -520,7 +520,7 @@ class AppointmentsController < ApplicationController
       else
 
         # We're only removing this instance
-        if @appointment.work_appointments.upcoming.count != 0
+        if @appointment.work_appointments.not_canceled.count != 0
           flash[:error] = "You cannot remove this available time until all existing appointments in it have been cancelled or removed"
         else
 
@@ -597,8 +597,8 @@ class AppointmentsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :customer_id => nil)))
     end
     
-    # find state (default to 'upcoming') and customer (default to 'anyone')
-    @state      = params[:state] ? params[:state].to_s : 'upcoming'
+    # find state (default to 'confirmed') and customer (default to 'anyone')
+    @state      = params[:state] ? params[:state].to_s : 'confirmed'
     @customer   = params.has_key?(:customer_id) ? find_customer_from_params : User.anyone
 
     case @customer.id
