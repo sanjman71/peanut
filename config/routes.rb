@@ -174,9 +174,11 @@ ActionController::Routing::Routes.draw do |map|
 
   # Tasks controller
   map.task_appt_messages  '/tasks/appointments/messages/:time_span', 
-                          :controller => 'tasks', :action => 'appointments_messages', :time_span => /whenever/
+                          :controller => 'tasks', :action => 'appointment_messages', :time_span => /whenever/
   map.task_appt_reminders '/tasks/appointments/reminders/:time_span', 
-                          :controller => 'tasks', :action => 'appointments_reminders', :time_span => /\d+-(days|hours)/
+                          :controller => 'tasks', :action => 'appointment_reminders', :time_span => /\d+-(days|hours)/
+  map.task_user_messages  '/tasks/users/messages/:time_span', 
+                          :controller => 'tasks', :action => 'user_messages', :time_span => /whenever/
   map.resources           :tasks, :only => [:index]
 
   # Administrative controllers

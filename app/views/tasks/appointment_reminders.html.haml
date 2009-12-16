@@ -5,8 +5,8 @@
     %h2= @title
     %h5= link_to 'Back to Tasks', tasks_path
     %h5.bottom
-      == Found #{pluralize(@appointments.size, 'appointment')} in the next #{@number ? pluralize(@number, @units) : 'whenever'},
-      == sent #{pluralize(@reminders, 'reminder')}
+      == Found #{pluralize(@appointments.size, 'appointment')} #{@timeline},
+      == sent #{pluralize(@messages, 'message')}
 
   %hr.space
 

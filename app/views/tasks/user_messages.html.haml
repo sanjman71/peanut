@@ -1,0 +1,19 @@
+- title(@title)
+
+.span-24.last
+  .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-10
+    %h2= @title
+    %h5= link_to 'Back to Tasks', tasks_path
+    %h5.bottom
+      == Found #{pluralize(@topics.size, 'message')}
+
+  %hr.space
+
+  .span-24.last#messages
+    - @topics.each do |message_topic|
+      .span-24.last.letterbox.provider{:class => cycle("shaded", "")}[message_topic]
+        .span-5.prepend-1#user_name
+          %h3= message_topic.topic.name
+        .span-5#tag
+          %h4= message_topic.tag
+  

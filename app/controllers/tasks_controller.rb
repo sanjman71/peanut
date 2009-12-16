@@ -11,29 +11,31 @@ class TasksController < ApplicationController
   end
 
   # GET /tasks/appointments/messages/whenever
-  def appointments_messages
+  def appointment_messages
     # find appointments with messages
     @appointments = current_company.appointments.work.all(:include => :message_topics)
-    @reminders    = 0
+    @messages     = 0
+    @timeline     = ''
 
     @title        = "Task Appointment Messages"
 
     respond_to do |format|
-      format.html { render(:action => 'appointments_reminders')}
+      format.html { render(:action => 'appointment_reminders')}
     end
   end
 
   # GET /tasks/appointments/reminders/2-days
   # GET /tasks/appointments/reminders/7-hours
-  def appointments_reminders
+  def appointment_reminders
     # parse time span
     match           = params[:time_span].match(/(\d+)-(days|hours)/)
     @number         = match[1]
     @units          = match[2]
-    
+    @timeline       = "in the next #{@number} #{@units}"
+
     # find appointments in the upcoming time span
     @appointments   = current_company.appointments.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
-    @reminders      = 0
+    @messages       = 0
 
     @appointments.each do |appointment|
       # check appointment messages already sent
@@ -43,8 +45,8 @@ class TasksController < ApplicationController
       success = MessageComposeAppointment.reminder(appointment)
       case success
       when 0
-        # reminder was sent
-        @reminders += 1
+        # reminder message was sent
+        @messages += 1
         # reload appointment object
         appointment.reload
       end
@@ -57,4 +59,15 @@ class TasksController < ApplicationController
     end
   end
   
+  # GET /tasks/users/messages/whenever
+  def user_messages
+    # find users as message topics
+    @topics       = MessageTopic.for_type(User).all(:include => :topic)
+    @messages     = 0
+    @title        = "Task User Messages"
+
+    respond_to do |format|
+      format.html
+    end
+  end
 end
