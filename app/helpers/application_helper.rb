@@ -127,7 +127,7 @@ module ApplicationHelper
       path    = history_index_path
       klasses = []
 
-      if current_controller.controller_name == 'history' and ['index', 'show'].include?(current_controller.action_name)
+      if current_controller.controller_name == 'history' and ['index', 'show', 'waitlist'].include?(current_controller.action_name)
         klasses.push('current')
       end
 

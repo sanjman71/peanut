@@ -3,15 +3,25 @@ class HistoryController < ApplicationController
 
   privilege_required  'read users', :only =>[:index], :on => :current_user
 
-  # GET /history/index
+  # GET /history
   def index
     # find all user's appointments + waitlist
-    @appointments = current_user.appointments.paginate(:page => params[:page], :order => "start_at desc")
-    @waitlists    = current_user.waitlists.all(:order => 'updated_at desc', :include => :waitlist_time_ranges)
+    @appointments = current_user.appointments.company(current_company).paginate(:page => params[:page], :order => "start_at desc")
+    @title        = "Appointment History"
 
     respond_to do |format|
       format.html
     end
   end
 
+  # GET /history/waitlist
+  def waitlist
+    @waitlists  = current_user.waitlists.company(current_company).all(:order => 'updated_at desc', :include => :waitlist_time_ranges)
+    @title      = "Waitlist History"
+
+    respond_to do |format|
+      format.html
+    end
+  end
+  
 end

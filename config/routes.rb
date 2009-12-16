@@ -72,10 +72,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
-  map.resources :history, :only => [:index]
   map.resources :invoices, :member => {:add => :post, :remove => :post}, :collection => {:search => :post}, :only => [:index, :show, :add, :remove]
   map.resources :invoice_line_items
   map.resources :waitlists, :only => [:index, :create]
+
+  # history routes
+  map.resources :history, :only => [:index], :collection => {:waitlist => :get}
   
   # search openings for a specified service and duration, and an optional provider
   map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 

@@ -1,5 +1,5 @@
 class WaitlistsController < ApplicationController
-  privilege_required 'read wait appointments', :only => [:index], :on => :current_company
+  privilege_required 'manage site', :only => [:index], :on => :current_company
 
   # GET /waitlists
   def index
@@ -15,22 +15,22 @@ class WaitlistsController < ApplicationController
     @providers = [User.anyone] + current_company.providers
     
     # find state (default to 'upcoming')
-    @state        = params[:state] ? params[:state].to_s : 'upcoming'
+    # @state        = params[:state] ? params[:state].to_s : 'upcoming'
     
     if @provider.anyone?
       # find waitlist appointments for anyone by state
-      @appointments = @current_company.appointments.wait.send(@state)
-      @anyone       = true
+      @waitlists  = @current_company.waitlists
+      @anyone     = true
     else
       # find waitlist appointments for a provider by state
-      @appointments = @current_company.appointments.wait.provider(@provider).send(@state)
-      @anyone       = false
+      @waitlists  = @current_company.waitlists.provider(@provider)
+      @anyone     = false
     end
     
     # group appointments by provider, map an empty provider to the special 'anyone' user
-    @appointments_by_provider = @appointments.group_by{ |appt| appt.provider }.map{ |provider, appts| [provider || User.anyone, appts] }
+    @waitlists_by_provider = @waitlists.group_by{ |appt| appt.provider }.map{ |provider, appts| [provider || User.anyone, appts] }
     
-    logger.debug("*** #{@appointments.size} waitlist appointments")
+    logger.debug("*** #{@waitlists.size} waitlist appointments")
 
     # set title based on provider
     @title = "Waitlist for #{@provider.name}"
