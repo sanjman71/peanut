@@ -44,22 +44,41 @@
 
   %hr.space
   
+  .span-14.prepend-1.last.prompt
+    == On each of the days you pick, what time will availability start and end?
   .span-14.prepend-1.last
-    .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
-      %h5= label_tag "start_time", "Start time:"
-    .span-12.last.padding-top-5
-      = text_field_tag 'start_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;", :autocomplete => 'off'
+    .span-3.text_field_label
+      = label_tag "starts_at", "Start Time:"
+    .span-4.padding-top-5
+      = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
 
   .span-14.prepend-1.last
-    .span-2{:style => 'font-size: 1.3em; padding-top: 5px;'}
-      %h5= label_tag "end_time", "End time:"
-    .span-12.last.padding-top-5
-      = text_field_tag 'end_at', '', :class => 'timepicker', :style => "width: 90px; background: #EDF3FE; font-size: 1.4em; padding-left: 3px;", :autocomplete => 'off'
+    .span-3.text_field_label
+      = label_tag "ends_at", "End Time:"
+    .span-4.padding-top-5
+      = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
 
   %hr.space
 
   #dates
     = text_field_tag 'dates[]', '', :id => 'date_template', :class => 'hide'
+
+  %hr.space
+  - if @provider.class.to_s == "Resource"
+    .span-14.prepend-1.last.prompt
+      == Advanced: How many #{@provider.name.downcase.pluralize} will be available:
+    .span-14.prepend-1.last.hint.padding-bottom-10
+      == This value is typically 1. It defaults to the capacity of the #{@provider.name}.
+  - else
+    .span-14.prepend-1.last.prompt
+      == Advanced: What capacity will #{@provider.name} have during this free time?
+    .span-14.prepend-1.last.hint.padding-bottom-10
+      == This value is typically 1. It defaults to the provider's capacity, and should always be 1 or more.
+  .span-14.prepend-1.last
+    .span-3.text_field_label
+      = label_tag "capacity", "Capacity:"
+    .span-4.last
+      = text_field_tag 'capacity', @provider.capacity, :class => 'std_text_field_style'
 
   %hr.space
   %hr.space

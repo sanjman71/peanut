@@ -42,12 +42,12 @@
               -# add weekday or weekend class
               - klasses += [0, 6].include?(day.wday) ? ['weekend'] : ['weekday']
               -# add past, today classes based on day of the year
-              - klasses += ['past'] if day.yday < today.yday
-              - klasses += ['today'] if day.yday == today.yday
-              - klasses += ((day.yday >= start_day.yday) && (day.yday <= end_day.yday)) ? ['in-range'] : ['outside-range']
+              - klasses += ['past'] if day < today
+              - klasses += ['today'] if day == today
+              - klasses += ((day >= start_day) && (day <= end_day)) ? ['in-range'] : ['outside-range']
               -# set id as date [year,month,day]
               - id = "#{day.year}#{sprintf("%02d", day.month)}#{sprintf("%02d", day.mday)}"
               %td{:class => klasses.join(" "), :id => id}
                 -# special case for 'Today'
-                %span= (day.yday == today.yday) ? 'Today' : day.strftime("%b %d")
+                %span= (day == today) ? 'Today' : day.strftime("%b %d")
               

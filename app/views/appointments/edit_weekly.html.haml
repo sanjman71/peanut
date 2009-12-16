@@ -90,16 +90,6 @@
     
 %hr.space
     
-- if @provider.class.to_s == "Resource"
-  .span-14.prepend-1.last.prompt
-    == How many #{@provider.name.downcase.pluralize} will be available:
-  .span-14.prepend-1.last.hint.padding-bottom-10
-    == Often the capacity is 1, but you may have more than 1.
-  .span-14.prepend-1.last
-    .span-3.text_field_label
-      = label_tag "capacity", "Capacity:"
-    .span-4.last
-      = text_field_tag 'capacity', '1', :class => 'std_text_field_style'
 
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
   = hidden_field_tag :freq, 'weekly'
@@ -110,7 +100,22 @@
   = hidden_field_tag :dend, ''
   = hidden_field_tag :tend, ''
   = hidden_field_tag :until, ''
-  = hidden_field_tag :capacity, '1'
+
+  - if @provider.class.to_s == "Resource"
+    .span-14.prepend-1.last.prompt
+      == Advanced: How many #{@provider.name.downcase.pluralize} will be available:
+    .span-14.prepend-1.last.hint.padding-bottom-10
+      == This value is typically 1. It defaults to the capacity of the #{@provider.name} and should always be 1 or more.
+  - else
+    .span-14.prepend-1.last.prompt
+      == Advanced: What capacity will #{@provider.name} have during this free time?
+    .span-14.prepend-1.last.hint.padding-bottom-10
+      == This value is typically 1. It defaults to the provider's capacity and should always be 1 or more.
+  .span-14.prepend-1.last
+    .span-3.text_field_label
+      = label_tag "capacity", "Capacity:"
+    .span-4.last
+      = text_field_tag 'capacity', @provider.capacity, :class => 'std_text_field_style'
   
   %hr.space
   %hr.space

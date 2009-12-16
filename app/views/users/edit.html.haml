@@ -68,6 +68,17 @@
 
   %hr.space
 
+  - if @user.provider? and @user.provided_companies.include?(current_company)
+    .span-14.prepend-1.last.prompt
+      == Advanced: Provider's default capacity. This value is typically 1.
+    .span-14.prepend-1.last.hint.padding-bottom-10
+      == When scheduling free time for this provider you can set the default capacity available.
+    .span-14.prepend-1.last
+      .span-3.text_field_label
+        = label_tag "capacity", "Capacity:"
+      .span-4.last
+        = f.text_field :capacity, :class => 'std_text_field_style'
+
   .span-20.prepend-1.last.submit
     = submit_tag "Save Changes", :id => 'user_update_submit'
     == or
