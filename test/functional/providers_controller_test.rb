@@ -39,61 +39,96 @@ class ProvidersControllerTest < ActionController::TestCase
     @user         = Factory(:user, :name => "User")
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
 
-  context "list users without 'read users' privilege" do
-    setup do
-      # list users as regular user
-      @controller.stubs(:current_user).returns(@user)
-      get :index
+  context "list users" do
+    context "without 'read users' privilege" do
+      setup do
+        # list users as regular user
+        @controller.stubs(:current_user).returns(@user)
+        get :index
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+      should_set_the_flash_to /You are not authorized/
     end
 
-    should_respond_with :redirect
-    should_redirect_to('unauthorized_path') { unauthorized_path }
-    should_set_the_flash_to /You are not authorized/
-  end
+    context "with 'read users' privilege" do
+      setup do
+        # list users as company provider
+        @controller.stubs(:current_user).returns(@provider1)
+        get :index
+      end
 
-  context "list users with 'read users' privileges" do
-    setup do
-      # list users as company provider
-      @controller.stubs(:current_user).returns(@provider1)
-      get :index
+      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+
+      should "not be able to change manager role on providers" do
+        assert_select "input.checkbox.manager", 0
+      end
+
+      should "be able to edit themself" do
+        assert_select "a.admin.edit.user", 1
+      end
+
+      should "not be able to sudo" do
+        assert_select "a.admin.sudo.user", 0
+      end
+
+      should_respond_with :success
+      should_render_template 'providers/index.html.haml'
     end
 
-    should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+    context "with 'update users' privilege" do
+      setup do
+        # list users as company manager
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
 
-    should "not be able to change manager role on providers" do
-      assert_select "input.checkbox.manager", 0
+      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+
+      should "be able to change manager role on user providers" do
+        assert_select "input.checkbox.manager", 2
+      end
+
+      should "be able to edit user and resource providers" do
+        assert_select "a.admin.edit.user", 3
+      end
+
+      should "not be able to sudo" do
+        assert_select "a.admin.sudo.user", 0
+      end
+
+      should_respond_with :success
+      should_render_template 'providers/index.html.haml'
     end
+    
+    context "with 'manage site' privilege" do
+      setup do
+        # list users as admin
+        @owner.grant_role('admin')
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
 
-    should "be able to edit themself" do
-      assert_select "a.admin.edit.user", 1
+      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+
+      should "be able to change manager role on user providers" do
+        assert_select "input.checkbox.manager", 2
+      end
+
+      should "be able to edit user and resource providers" do
+        assert_select "a.admin.edit.user", 3
+      end
+
+      should "be able to sudo to each user" do
+        assert_select "a.admin.sudo.user", 3
+      end
+
+      should_respond_with :success
+      should_render_template 'providers/index.html.haml'
     end
-
-    should_respond_with :success
-    should_render_template 'providers/index.html.haml'
-  end
-
-  context "list users with 'update users' privileges" do
-    setup do
-      # list users as company manager
-      @controller.stubs(:current_user).returns(@owner)
-      get :index
-    end
-
-    should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
-
-    should "be able to change manager role on user providers" do
-      assert_select "input.checkbox.manager", 2
-    end
-
-    should "be able to edit user and resource providers" do
-      assert_select "a.admin.edit.user", 3
-    end
-
-    should_respond_with :success
-    should_render_template 'providers/index.html.haml'
   end
   
 end

@@ -31,6 +31,8 @@ ActionController::Routing::Routes.draw do |map|
   
   map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post }
   map.user_notify     '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
+  map.user_edit       '/users/:id/edit',      :controller => 'users', :action => 'edit'
+  map.user_sudo       '/users/:id/sudo',      :controller => 'users', :action => 'sudo'
   map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
   map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
   map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}

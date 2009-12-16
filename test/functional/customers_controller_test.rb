@@ -15,8 +15,6 @@ class CustomersControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
-    @controller   = CustomersController.new
     # create company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -29,34 +27,28 @@ class CustomersControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
   
-  context "search an empty customers database with an empty search" do
-    context "and without 'read users' privilege" do
-      setup do
-        @controller.stubs(:current_user).returns(@user)
-        get :index
-      end
-
-      should_respond_with :redirect
-      should_redirect_to('unauthorized_path') { unauthorized_path }
+  context "search without 'read users' privilege" do
+    setup do
+      @controller.stubs(:current_user).returns(@user)
+      get :index
     end
 
-    context "and with 'read users' privilege" do
-      setup do
-        @controller.stubs(:current_user).returns(@owner)
-        get :index
-      end
-
-      should_respond_with :success
-      should_render_template 'customers/index.html.haml'
-      should_not_set_the_flash
-      should_assign_to :customers
-      should_assign_to(:paginate) { true }
-      should_not_assign_to :search, :search_text
-
-      should "find no customers" do
-        assert_equal [], assigns(:customers)
-      end
+    should_respond_with :redirect
+    should_redirect_to('unauthorized_path') { unauthorized_path }
+  end
+  
+  context "search empty customers database with an empty search" do
+    setup do
+      @controller.stubs(:current_user).returns(@owner)
+      get :index
     end
+
+    should_respond_with :success
+    should_render_template 'customers/index.html.haml'
+    should_not_set_the_flash
+    should_assign_to(:customers) { [] }
+    should_assign_to(:paginate) { true }
+    should_not_assign_to :search, :search_text
   end
   
   context "search non-empty customer database" do
@@ -72,33 +64,57 @@ class CustomersControllerTest < ActionController::TestCase
       assert @appointment.valid?
     end
 
-    context "with an ajax search for 'boo' with 'read users' privilege" do
+    context "all customers" do
       setup do
-        # stub current_user method
+        # as company manager
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+
+      should_respond_with :success
+      should_render_template 'customers/index.html.haml'
+      should_respond_with_content_type "text/html"
+      should_not_set_the_flash
+      should_assign_to(:customers) { [@customer] }
+      should_not_assign_to(:search)
+      should_not_assign_to(:search_text)
+      should_assign_to(:paginate) { false }
+
+      should "have customer edit link" do
+        assert_select "a.admin.edit.customer", 1
+        assert_select "a[href='/customers/%s/edit']" % @customer.id, 1
+      end
+      
+      should "not have customer sudo link" do
+        assert_select "a.admin.customer.sudo", 0
+      end
+    end
+
+    context "with an ajax search for 'boo'" do
+      setup do
+        # as company manager
         @controller.stubs(:current_user).returns(@owner)
         xhr :get, :index, :format => 'js', :search => 'boo'
       end
-    
+
       should_respond_with :success
       should_render_template 'customers/index.js.rjs'
       should_respond_with_content_type "text/javascript"
       should_not_set_the_flash
-      should_assign_to :customers, :search, :search_text
+      should_assign_to(:customers) { [@customer] }
+      should_assign_to(:search) { 'boo' }
+      should_assign_to(:search_text) { "Customers matching 'boo'" }
       should_assign_to(:paginate) { false }
-      
-      should "find customer" do
-        assert_equal [@customer], assigns(:customers)
-        # assert_equal "", @response.body
-      end
 
-      should "have a search value" do
-        assert_equal 'boo', assigns(:search)
+      # TODO: find out why these links are not shown in the tests
+      # should "have customer edit link" do
+      #   assert_select "a.admin.edit.customer", 1
+      #   assert_select "a[href='/customers/%s/edit']" % @customer.id, 1
+      # end
+
+      should "not have customer sudo link" do
+        assert_select "a.admin.customer.sudo", 0
       end
-      
-      should "have search text" do
-        assert_equal "Customers matching 'boo'", assigns(:search_text)
-      end
-      
     end
   end
 

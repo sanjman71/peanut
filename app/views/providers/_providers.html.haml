@@ -26,4 +26,6 @@
     -# allow company managers to edit all providers, and provider to edit themself
     .span-2.prepend-2.action.last
       - if has_privilege?('update users', current_company) or has_privilege?('update users', provider)
-        = link_to "Edit", url_for(:controller => provider.tableize, :action => 'edit', :id => provider.id, :subdomain => current_subdomain), :class => 'admin edit user'
+        = link_to "Edit", user_edit_path(provider), :class => 'admin edit user'
+      - if has_privilege?('manage site', current_company)
+        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(provider), :class => 'admin sudo user'

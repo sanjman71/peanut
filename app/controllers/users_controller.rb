@@ -5,6 +5,7 @@ class UsersController < ApplicationController
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
   privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
+  privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
     case p
@@ -185,6 +186,20 @@ class UsersController < ApplicationController
       flash[:error]  = "We couldn't find a user with that activation code -- check your email? Or maybe you've already activated -- try signing in."
       redirect_back_or_default('/')
     end
+  end
+
+  # GET /users/1/sudo
+  def sudo
+    @sudo_user = User.find_by_id(params[:id])
+    if @sudo_user.blank?
+      flash[:error] = "Invalid user"
+      redirect_to request.referer and return
+    end
+
+    # change current user
+    self.current_user = @sudo_user
+    flash[:notice] = "Now logged in as #{@sudo_user.name}"
+    redirect_to request.referer and return
   end
 
   def suspend

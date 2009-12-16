@@ -1,6 +1,6 @@
 # update pagination header
 page["div#customers_pagination"].html(render(:partial => 'customers_pagination', 
-                                          :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate}))
+                                             :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate}))
 
 # update customer list
 page["div#customers"].html(render(:partial => 'customers', :locals => {:customers => @customers}))

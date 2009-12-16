@@ -14,6 +14,9 @@ class UsersControllerTest < ActionController::TestCase
   should_route :get, '/customers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company customer', :id => "1"
   should_route :put, '/customers/1',            :controller => 'users', :action => 'update', :role => 'company customer', :id => "1"
 
+  should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
+  should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"
+
   context 'invite url with subdomain' do
     setup do
       SubdomainFu.stubs(:subdomain_from).with(anything).returns('peanut')
@@ -26,8 +29,6 @@ class UsersControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
-    @controller     = UsersController.new
     # create company
     @owner          = Factory(:user, :name => "Owner")
     @customer       = Factory(:user, :name => "Customer", :password => 'customer', :password_confirmation => 'customer')
@@ -41,7 +42,6 @@ class UsersControllerTest < ActionController::TestCase
     @company.user_providers.push(@owner)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
   
   context "new customer" do
@@ -525,10 +525,10 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@owner)
         get :edit, :id => @customer.id, :role => 'company customer'
       end
-    
+
       should_respond_with :success
       should_render_template "users/edit.html.haml"
-    
+
       should_assign_to(:index_path) { openings_path }
     end
   end
@@ -613,6 +613,30 @@ class UsersControllerTest < ActionController::TestCase
           assert_equal ["6501239999"], @customer.phone_numbers.collect(&:address)
         end
       end
+    end
+  end
+
+  context "sudo" do
+    context "without 'manage site' privilege" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :sudo, :id => @owner.id
+      end
+
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+
+    context "with 'manage site' privilege" do
+      setup do
+        @request.env['HTTP_REFERER'] = 'http://test.com/users'
+        @owner.grant_role('admin')
+        @controller.stubs(:current_user).returns(@owner)
+        get :sudo, :id => @customer.id
+      end
+
+      should_assign_to(:sudo_user) { @customer}
+
+      should_redirect_to('referer path') { 'http://test.com/users' }
     end
   end
 end

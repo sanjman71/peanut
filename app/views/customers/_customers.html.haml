@@ -20,8 +20,6 @@
     .span-3.prepend-1.last
       -# allow company managers to edit all users, or the user to edit himself
       - if has_privilege?('update users', customer) || has_privilege?('update users', current_company)
-        = link_to "Edit", customer_edit_path(customer), :class => 'admin'
-        == &nbsp;
-        -# allow password reset for non-rpx users
-        -#- if !customer.rpx?
-          -#= link_to 'Reset Password', url_for(:controller => 'users', :id => customer.id, :action => 'notify', :type => 'reset', :subdomain => current_subdomain), :class => 'admin'
+        = link_to "Edit", customer_edit_path(customer), :class => 'admin edit customer'
+      - if has_privilege?('manage site', current_company)
+        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(customer), :class => 'admin customer sudo'
