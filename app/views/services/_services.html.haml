@@ -28,7 +28,11 @@
       .span-3.last.price
         %h3= service.price
       .span-3.last.capacity
-        == Capacity: #{service.capacity}
+        - if service.capacity > 1
+          == Capacity: #{service.capacity}
+        - else
+          -# we don't bother displaying capacity for providers if it's at the default of 1 - this is to reduce confusion
+          == &nbsp;
     .span-3.last.action
       - if_privilege('update services', current_company) do
         = link_to "Edit", edit_service_path(service, :subdomain => current_subdomain), :class => 'admin'

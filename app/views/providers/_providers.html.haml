@@ -10,17 +10,25 @@
           %span.field_missing== No email address
 
     -# allow company managers to toggle manager role
-    .span-5.provider.manager
-      - if has_privilege?('update users', current_company)
-        - if current_user == provider
-          -# 'me' is a company manager
-          %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
-        - elsif provider.respond_to?(:has_privilege?)
-          = check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
-          = label_tag '', 'Company Manager', :class => 'checkbox label'
-          %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+    .span-5
+      .span-5.last.provider.manager
+        - if has_privilege?('update users', current_company)
+          - if current_user == provider
+            -# 'me' is a company manager
+            %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
+          - elsif provider.respond_to?(:has_privilege?)
+            = check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
+            = label_tag '', 'Company Manager', :class => 'checkbox label'
+            %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+          - else
+            -# provider is a resource, which does not have roles
+            == &nbsp;
+      %br
+      .span-5.last.capacity
+        - if provider.capacity > 1
+          == Default capacity: #{provider.capacity}
         - else
-          -# provider is a resource, which does not have roles
+          -# we don't bother displaying capacity for providers if it's at the default of 1 - this is to reduce confusion
           == &nbsp;
           
     -# allow company managers to edit all providers, and provider to edit themself
