@@ -27,11 +27,16 @@ class AppointmentTest < ActiveSupport::TestCase
     @company        = Factory(:company, :subscription => @subscription)
     @anywhere       = Location.anywhere
     @provider       = Factory(:user, :name => "Provider")
+    @provider2      = Factory(:user, :name => "Provider With Capacity 2", :capacity => 2)
     @company.user_providers.push(@provider)
+    @company.user_providers.push(@provider2)
     @company.reload
     @work_service   = Factory.build(:work_service, :name => "Work service", :price => 1.00)
+    @work_service2  = Factory.build(:work_service, :name => "Work service Capacity 2", :price => 1.00, :capacity => 2)
     @company.services.push(@work_service)
+    @company.services.push(@work_service2)
     @work_service.user_providers.push(@provider)
+    @work_service2.user_providers.push(@provider2)
     @free_service   = @company.free_service
     @customer       = Factory(:user)
   end
@@ -48,10 +53,13 @@ class AppointmentTest < ActiveSupport::TestCase
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
   
-    should "have duration of 2 hours, and end_at time adjusted" do
+    should "have duration of 2 hours, and end_at time adjusted, and capacity 1" do
       assert_equal 120 * 60, @appt.duration
       assert_equal 0, @appt.start_at.in_time_zone.hour
       assert_equal 2, @appt.end_at.in_time_zone.hour
+      assert_equal 1, @appt.capacity
+      assert_equal 1, @appt.capacity_slots.first.capacity
+      assert_equal 1, @appt.capacity_slots.count
     end
   
     should "have a valid uid" do
@@ -179,6 +187,19 @@ class AppointmentTest < ActiveSupport::TestCase
         end
       end
     end
+    
+    context "and schedule work appointment to test larger service capacity = 2" do
+      setup do
+        @customer   = Factory(:user)
+        @options    = {:start_at => @free_appt.start_at}
+      end
+  
+      should "raise exception" do
+        assert_raise AppointmentInvalid do
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service2, @work_service2.duration, @customer, @options)
+        end
+      end
+    end
   end
   
   context "create work appointment to check time overlap searching" do
@@ -281,7 +302,36 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
+  context "create free appointment using provider with capacity 2" do
+    setup do
+      # create free time from 10 am to 12 pm
+      @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider2, :time_range => @time_range)
+    end
   
+    should_change("Appointment.count", :by => 1) { Appointment.count }
+    
+    should "have a free appointment of capacity 2 and a capacity slot of capacity 2" do
+      assert_equal 2, @free_appt.capacity
+      assert_equal 2, @free_appt.capacity_slots.first.capacity
+    end
+      
+    context "and schedule work appointment using service capacity 2" do
+      setup do
+        @customer   = Factory(:user)
+        @options    = {:start_at => @free_appt.start_at}
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider2, @work_service2, @work_service2.duration, @customer, @options)
+      end
+  
+      should "have valid work appointment with capacity 2" do
+        assert_valid @work_appt
+        assert 2, @work_appt.capacity
+      end
+    end
+
+  end
+
   #
   # Recurrence Tests
   #

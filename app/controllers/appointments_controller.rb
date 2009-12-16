@@ -31,8 +31,12 @@ class AppointmentsController < ApplicationController
       # build the work appointment parameters
       @duration             = params[:duration].to_i if params[:duration]
       @start_at             = params[:start_at]
+      @capacity             = params[:capacity].to_i if params[:capacity]
+
       @date_time_options    = Hash[:start_at => @start_at]
+      
       @options              = Hash[:commit => false]
+      @options              = @options.merge({:capacity => @capacity }) unless @capacity.blank?
 
       # allow customer to be created during this process
       if @customer.blank?
@@ -77,6 +81,8 @@ class AppointmentsController < ApplicationController
     @duration       = params[:duration].to_i if params[:duration]
     @start_at       = params[:start_at]
     @end_at         = params[:end_at]
+    
+    @capacity       = params[:capacity].to_i if params[:capacity]
 
     # track errors and appointments created
     @errors         = Hash.new
@@ -105,6 +111,8 @@ class AppointmentsController < ApplicationController
           # @options        = {:time_range => @time_range}
           @date_time_options  = Hash[:start_at => @start_at]
           @options            = Hash[:commit => true]
+          @options            = @options.merge({:capacity => @capacity }) unless @capacity.blank?
+
           # create work appointment
           @appointment        = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
           # set redirect path
@@ -143,6 +151,7 @@ class AppointmentsController < ApplicationController
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           @options        = {:time_range => @time_range}
+          @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
           # create free appointment
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
           # set redirect path

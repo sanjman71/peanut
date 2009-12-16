@@ -38,6 +38,15 @@
   .span-15.prepend-4.last
     %em== An accurate duration allows appointments to be scheduled efficiently.
     
+  -# capacity
+  .span-20.last
+    .span-3.prepend-1.text-align-right
+      %h2= label_tag "capacity", "Capacity"
+    .span-16.last
+      = f.text_field :capacity, :class => 'text', :style => "width: 100px;"
+    .span-15.prepend-4.last
+      %em== Advanced: Capacity is typically 1, and must be a number 1 or greater
+
   %hr.space
   
   .span-20.prepend-1.last.submit

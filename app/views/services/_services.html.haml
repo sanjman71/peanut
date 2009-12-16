@@ -7,22 +7,28 @@
         
 - services.each do |service|
   .span-16.last.letterbox.service{:class => cycle("shaded", "")}
-    .span-6.prepend-1.name{:class => service.providers_count? ? '' : 'noproviders'}
-      %h2.margin-bottom-0= service.name
-      - if service.providers_count > 0
-        -# show all service providers
-        == Service providers: 
-        - providers = service.providers.collect { |r| r.name }.sort
-        = providers.join(", ")
-      - else
-        %span.field_missing
-          == No service providers
-          %br
-          == Use the 'edit' link to add service providers
-    .span-3.duration
-      %h3== #{Duration.to_words(service.duration)}
-    .span-3.price
-      %h3= service.price
+    .span-9.prepend-1.last
+      .span-9.last
+        .span-6.name{:class => service.providers_count? ? '' : 'noproviders'}
+          %h2.margin-bottom-0= service.name
+        .span-3.last.duration
+          %h3== #{Duration.to_words(service.duration)}
+      .span-8.last
+        - if service.providers_count > 0
+          -# show all service providers
+          == Service providers: 
+          - providers = service.providers.collect { |r| r.name }.sort
+          = providers.join(", ")
+        - else
+          %span.field_missing
+            == No service providers
+            %br
+            == Use the 'edit' link to add service providers
+    .span-3.price_and_capacity
+      .span-3.last.price
+        %h3= service.price
+      .span-3.last.capacity
+        == Capacity: #{service.capacity}
     .span-3.last.action
       - if_privilege('update services', current_company) do
         = link_to "Edit", edit_service_path(service, :subdomain => current_subdomain), :class => 'admin'

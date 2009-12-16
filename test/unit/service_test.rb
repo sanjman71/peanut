@@ -2,10 +2,12 @@ require 'test/test_helper'
 
 class ServiceTest < ActiveSupport::TestCase
   
-  should_validate_presence_of   :name
-  should_validate_presence_of   :company_id
-  should_validate_presence_of   :price_in_cents
-  should_allow_values_for       :mark_as, "free", "work"
+  should_validate_presence_of     :name
+  should_validate_presence_of     :company_id
+  should_validate_presence_of     :price_in_cents
+  should_allow_values_for         :mark_as, "free", "work"
+  should_validate_presence_of     :capacity
+  should_validate_numericality_of :capacity
   
   should_belong_to              :company
   should_have_many              :appointments
