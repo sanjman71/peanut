@@ -154,10 +154,12 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :products
   
   # reports
-  map.resources         :reports, :only => [:index, :show], :collection => {:route => :post}
+  map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_range      '/reports/range/:start_date..:end_date', :controller => 'reports', :action => 'show'
   map.report_providers  '/reports/range/:start_date..:end_date/providers/:provider_ids',
                         :controller => 'reports', :action => 'show', :conditions => {:provider_ids => /\d(,\d)*/}
+  map.report_services   '/reports/range/:start_date..:end_date/services/:service_ids',
+                        :controller => 'reports', :action => 'show', :conditions => {:service_ids => /\d(,\d)*/}
   
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.

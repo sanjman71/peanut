@@ -90,22 +90,6 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    # SK: not sure if this is the correct privilege
-    # SK: comment out until its more complete
-    # if has_privilege?('read calendars', current_company)
-    # 
-    #   # 'Reports' tab
-    #   name    = 'Reports'
-    #   path    = reports_path
-    #   klasses = []
-    # 
-    #   if current_controller.controller_name == 'reports' and ['index'].include?(current_controller.action_name)
-    #     klasses.push('current')
-    #   end
-    # 
-    #   yield name, path, klasses
-    # end
-
     if has_privilege?('manage site', current_company)
 
       # 'Customers' tab
@@ -131,6 +115,22 @@ module ApplicationHelper
         klasses.push('current')
       end
 
+      yield name, path, klasses
+    end
+
+    # SK: not sure if this is the correct privilege
+    # SK: only managers for now
+    if has_privilege?('manage site', current_company)
+    
+      # 'Reports' tab
+      name    = 'Reports'
+      path    = reports_path
+      klasses = []
+    
+      if current_controller.controller_name == 'reports' and ['index', 'show'].include?(current_controller.action_name)
+        klasses.push('current')
+      end
+    
       yield name, path, klasses
     end
 

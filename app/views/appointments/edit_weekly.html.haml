@@ -37,7 +37,8 @@
 .span-14.prepend-1.last.prompt
   == When will the first appointment in this recurring series start and end?
 .span-14.prepend-1.last.hint.padding-bottom-10
-  == Usually the first appointment will start and end on the same day
+  == We assume the appointment starts and ends on the same day.
+  -#== Usually the first appointment will start and end on the same day
 
 .span-14.prepend-1.last
   .span-2.text_field_label
@@ -54,10 +55,11 @@
     = label_tag "ends_at", "End Time:"
   .span-4.padding-top-5
     = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
-  .span-2.text_field_label
-    = label_tag "end_date", "End Date:"
-  .span-4.last.padding-top-5
-    = text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
+  -# we assume the start and end date are the same
+  -#.span-2.text_field_label
+    -#= label_tag "end_date", "End Date:"
+  -#.span-4.last.padding-top-5
+    -#= text_field_tag 'end_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 
 %hr.space
 
