@@ -86,6 +86,9 @@ class CalendarController < ApplicationController
     @pdf_title  = "#{@daterange.name} PDF Version"
     @pdf_link   = url_for(params.merge(:format => 'pdf', :only_path => true))
 
+    # page title
+    @title      = "#{@provider.name.titleize} Schedule"
+
     logger.debug("*** found #{@waitlists.size} waitlists over #{@daterange.days} days")
 
     respond_to do |format|
