@@ -90,7 +90,7 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    if has_privilege?('manage site', current_company)
+    if has_privilege?('create users', current_company)
 
       # 'Customers' tab
       name    = 'Customers'
