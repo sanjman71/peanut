@@ -1,6 +1,6 @@
 /* appointment styles */
 
-div.free-appointment                              { border: 1px solid; margin-bottom: 10px;}
+div.free-appointment                              { border: 1px solid #ccc; margin-bottom: 10px;}
 div.capacity-and-work                             { }
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 div.appointment.canceled                          { color: #FF1100;}
@@ -23,8 +23,7 @@ div.appointment.waitlist                          { background-color: #FFFFDD; }
 div.appointment .time span                        { font-size: 1.2em;}
 div.slot .time span                               { font-size: 1.2em;}
 
-h4.canceled                                       { color: #FF1100;}
-h4.work                                           { }
+div.appointment.canceled  del span                { color: #FF1100; }
 
 div.appointment.work div.service h6               { color: #009900; }
 

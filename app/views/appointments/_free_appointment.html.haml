@@ -22,14 +22,14 @@
             .span-5.last.editdelete
               -# free appointments may be deleted with 'update calendars' permission
               .span-5.edit-one.last
-                = link_to('Edit this time', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+                -#= link_to('Edit this time', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
               .span-5.delete-one.last
                 = link_to('Delete this time', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
           -# If this is an element of a series, you can edit or delete the entire series
           - if appointment.recurrence?
             .span-5.last.weekly
               .span-5.last.edit-weekly
-                = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.recurrence_parent, :series => 1), :class => "ujs edit")
+                -#= link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.recurrence_parent, :series => 1), :class => "ujs edit")
               .span-5.last.delete-weekly
                 = link_to('Delete series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.recurrence_parent, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to delete all future appointments in this series?")
     

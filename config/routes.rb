@@ -53,7 +53,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   '/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
                 :conditions => {:method => :get}
   map.resources :appointments,
-                :member => {:approve => :get, :noshow => :get, :complete => :get, :cancel => :get, :reschedule => [:get, :post]},
+                :member => {:approve => :get, :noshow => :get, :complete => :get, :cancel => [:get, :post], :reschedule => [:get, :post]},
                 :collection => { :search => [:get, :post] }
 
   map.resources :providers, :member => { :toggle_manager => :post }

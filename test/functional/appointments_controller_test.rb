@@ -28,8 +28,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route  :post, '/users/3/calendar/1/weekly', 
                 :controller => 'appointments', :action => 'update_weekly', :provider_type => 'users', :provider_id => 3, :id => 1
   
-  # show an appointment
+  # rest actions
   should_route :get, '/appointments/1', :controller => 'appointments', :action => 'show', :id => 1
+  should_route :get, '/appointments/1/edit', :controller => 'appointments', :action => 'edit', :id => 1
   
   # change appointment states
   should_route :get, '/appointments/1/approve', :controller => 'appointments', :action => 'approve', :id => 1
