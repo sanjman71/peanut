@@ -22,11 +22,10 @@
 .span-14.prepend-1.last
   = display_flash
   
-.span-15.prepend-1.last
-  - if @appointment.state == 'completed'
-    -# show invoice
-    #invoice
-      = render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => @mode})
+-#.span-15.prepend-1.last
+  -#- if @appointment.state == 'completed'
+    -##invoice
+      -#= render(:partial => 'invoices/invoice.html.haml', :locals => {:invoice => @invoice, :services => @services, :products => @products, :mode => @mode})
 
   -# add note
   .new_note#new_note_container
