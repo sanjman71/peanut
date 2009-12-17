@@ -95,7 +95,8 @@ class CalendarControllerTest < ActionController::TestCase
 
       should_assign_to(:provider) { @johnny }
       should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
-      should_assign_to :appointments, :class => Array
+      should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
+      should_assign_to :capacity_and_work_by_free_appt, :class => Hash
       should_assign_to :calendar_markings, :class => Hash
       should_assign_to(:when) { "this week" }
       should_not_assign_to(:start_date)
@@ -130,7 +131,8 @@ class CalendarControllerTest < ActionController::TestCase
       
       should_assign_to(:provider) { @johnny }
       should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
-      should_assign_to :appointments, :class => Array
+      should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
+      should_assign_to :capacity_and_work_by_free_appt, :class => Hash
       should_assign_to :calendar_markings, :class => Hash
       should_not_assign_to(:when)
       should_assign_to(:start_date) { "20090101" }
@@ -166,7 +168,8 @@ class CalendarControllerTest < ActionController::TestCase
 
     should_assign_to(:provider) { @johnny }
     should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
-    should_assign_to :appointments, :class => Array
+    should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
+    should_assign_to :capacity_and_work_by_free_appt, :class => Hash
     should_assign_to :calendar_markings, :class => Hash
     should_assign_to(:when) { "this week" }
     should_assign_to :daterange, :class => DateRange
