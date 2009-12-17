@@ -11,8 +11,7 @@
         = render(:partial => 'appointments/free_appointment', :locals => {:appointment => object, :day => day, :capacity_and_work_by_free_appt => capacity_and_work_by_free_appt[object.id]})
       - when object.is_a?(Array)
         = render(:partial => 'waitlists/waitlist', :locals => {:day => day, :waitlist => object[0], :waitlist_time_range => object[2]})
-      -# The following should not happen
-      / - when object.is_a?(Appointment) && object.work?
-      /   = render(:partial => 'appointments/free_work_appointments', :locals => {:day => day, :appointment => object})
-      / - when object.is_a?(CapacitySlot)
-      /   = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})
+      - when object.is_a?(Appointment) && object.work?
+        = render(:partial => 'appointments/free_work_appointments', :locals => {:day => day, :appointment => object})
+      - when object.is_a?(CapacitySlot)
+        = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})
