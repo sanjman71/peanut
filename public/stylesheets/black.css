@@ -31,11 +31,11 @@ table.ui-datepicker-calendar thead th   { background: #333333; }
 
 #tabs .ui-widget-header         { background: none; border: none; }
 
-#tabs .ui-tabs-nav              { padding: 0; }
+#tabs li                        { font-size: 0.9em; }
 
 /* tab default state background color */
 #tabs li.ui-state-default       { border: 1px solid #5500BB; background: #5500BB; font-weight: normal; color: #FFFFFF; outline: none; 
-                                  margin-right: 7px; }
+                                  margin-right: 5px; }
 
 /* tab active state background color */
 #tabs li.ui-state-active        { border: 1px solid #CCCCCC; background: #FFFFFF; font-weight: normal; color: #000000; outline: none; }
