@@ -1,7 +1,9 @@
 /* appointment styles */
-                                                    
+
+div.free-appointment                              { border: 1px solid; margin-bottom: 10px;}
+div.capacity-and-work                             { }
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
-div.appointments div.appointment.canceled         { color: #FF1100;}
+div.appointment.canceled                          { color: #FF1100;}
 
 div.appointment.review, div.waitlist.review       { font-size: 1.5em; font-weight: normal; }
 div.appointment.review .label, div.waitlist.review .label                     
@@ -9,13 +11,17 @@ div.appointment.review .label, div.waitlist.review .label
 div.appointment.review .data, div.waitlist.review .data                      
                                                   { color: #007700; }
 
-div.appointment                                   { padding: 7px 0 7px 0; margin-bottom: 5px; }
+div.appointment, div.slot                         { margin-bottom: 5px; background-color: #FFFFFF; }
+div.appointment.shaded, div.slot.shaded           { background-color: #EDF3FE; }  /* white */
 
-div.appointment.free                              { background-color: #EDF3FE; }  /* light blue */
-div.appointment.free.shaded                       { background-color: #FFFFFF; }  /* white */
-div.appointment.work                              { background-color: #EDF3FE; }  /* light blue */
+div.appointment.free                              { }  /* light blue */
+div.appointment.work                              { }
+div.slot                                          { }
 
 div.appointment.waitlist                          { background-color: #FFFFDD; }  /* light yellow */
+
+div.appointment .time span                        { font-size: 1.2em;}
+div.slot .time span                               { font-size: 1.2em;}
 
 h4.canceled                                       { color: #FF1100;}
 h4.work                                           { }
@@ -40,3 +46,4 @@ div.appointment_header                            { background: #E1E0E0 none rep
 
 .provider.group                                   { background: #FFCC00 none repeat scroll 0 0; color: #111111; display: block; 
                                                     font-size: 1.0em;  font-weight: bold; padding: 5px 10px; margin-bottom: 20px; }
+

@@ -53,7 +53,7 @@
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day
-      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day})
+      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day, :capacity_and_work_by_free_appt => @capacity_and_work_by_free_appt})
 
     -# add a send message hidden form
     .last#send_message

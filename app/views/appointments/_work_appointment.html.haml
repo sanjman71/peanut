@@ -1,0 +1,34 @@
+.span-8.last.appointment{:class => [(appointment.canceled? ? 'canceled' : 'work'), cycle("", "shaded")].join(' ')}[appointment]
+  .span-8.last
+    .span-4.time
+      - if appointment.canceled?
+        %del
+          %span== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+        %h4.canceled== Canceled
+      - else
+        %span== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+    .span-4.last
+      .span-4.last.service{:class => appointment.mark_as}
+        - if ((appointment.work? || appointment.free?) && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
+          -# work appointments can be viewed with read permissions
+          = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+        - else
+          %h6= appointment.service.name
+      - if show_location?
+        .span-4.last.location
+          %h6= appointment.location.name
+  .span-8.last
+    .span-4.customer
+      %h6== #{appointment.customer.blank? ? "" : appointment.customer.name}
+    - if has_privilege?("update calendars", current_company)
+      .span-4.last.editdelete
+        -# free appointments may be deleted with 'update calendars' permission
+        -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+        .span-2.edit-one
+          = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+        .span-2.delete-one.last
+          = link_to('Delete', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+    - elsif appointment.work? and has_privilege?("read work appointments", current_company)
+      -# work appointments can be viewed with read permissions
+      .span-4.last.details
+        = link_to "Details", appointment_path(appointment, :subdomain => current_subdomain)

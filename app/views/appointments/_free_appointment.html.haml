@@ -1,0 +1,44 @@
+.span-15.last.free-appointment
+  .span-6.appointment.free
+    .span-5.prepend-1.last
+      .span-5.last.service{:class => appointment.mark_as}
+        - if (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment))
+          -# work appointments can be viewed with read permissions
+          = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+        - else
+          %h6= appointment.service.name
+      .span-5.last.time
+        %span== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+      - if show_location?
+        .span-5.last.location
+          %h6= appointment.location.name
+      .span-5.last.recurring
+        - if appointment.recurrence?
+          %h6== (Recurring series)
+      .span-5.last
+        - if has_privilege?("update calendars", current_company)
+          -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+          - if !appointment.recurrence_parent?
+            .span-5.last.editdelete
+              -# free appointments may be deleted with 'update calendars' permission
+              .span-5.edit-one.last
+                = link_to('Edit this time', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+              .span-5.delete-one.last
+                = link_to('Delete this time', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id), :class => "ujs delete confirm", :question => "Are you sure you want to delete this appointment?")
+          -# If this is an element of a series, you can edit or delete the entire series
+          - if appointment.recurrence?
+            .span-5.last.weekly
+              .span-5.last.edit-weekly
+                = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.recurrence_parent, :series => 1), :class => "ujs edit")
+              .span-5.last.delete-weekly
+                = link_to('Delete series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.recurrence_parent, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to delete all future appointments in this series?")
+    
+  .span-8.prepend-1.last
+    .span-8.last.capacity-and-work
+      - capacity_and_work_by_free_appt.each do |object|
+        -# check what type of object it is - appointment or capacity_slots
+        - case
+        - when object.is_a?(Appointment) && object.work?
+          = render(:partial => 'appointments/work_appointment', :locals => {:day => day, :appointment => object})
+        - when object.is_a?(CapacitySlot)
+          = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})
