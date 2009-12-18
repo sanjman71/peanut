@@ -82,6 +82,21 @@ class UsersControllerTest < ActionController::TestCase
         assert_select "input#user_password_confirmation.required", 1
       end
     end
+
+    context "with 'return_to' param" do
+      setup do
+        # create user as owner
+        @controller.stubs(:current_user).returns(@owner)
+        get :new, :role => 'company customer', :return_to => "/appointments/services/1/confirmation"
+      end
+
+      should "set session return_to value" do
+        assert_equal "/appointments/services/1/confirmation", session[:return_to]
+      end
+
+      should_respond_with :success
+      should_render_template 'users/new.html.haml'
+    end
   end
   
   context "new provider" do

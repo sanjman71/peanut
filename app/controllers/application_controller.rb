@@ -44,6 +44,14 @@ class ApplicationController < ActionController::Base
   # Default layout
   layout "company"
 
+  # Store the URI of the current request in the session.
+  #
+  # We can return to this location by calling #redirect_back_or_default.
+  # Note: this overrides the implementation in authenticated_sytem
+  def store_location(uri=nil)
+    session[:return_to] = uri || request.request_uri
+  end
+
   # check if current user has the specified role, on the optional authorizable object
   def has_role?(role_name, authorizable=nil)
     current_user.blank? ? false : current_user.has_role?(role_name, authorizable)

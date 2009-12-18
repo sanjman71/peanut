@@ -53,5 +53,5 @@
           %br
           = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
           %span{:style => 'font-size: 0.7em;'}== or
-          = link_to 'Create a New Customer', customer_new_path, :class => 'admin'
+          = link_to 'Create a New Customer', customer_new_path(:return_to => request.request_uri), :class => 'admin'
           = hidden_field_tag :customer_search_id, 0

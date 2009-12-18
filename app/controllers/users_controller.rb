@@ -42,6 +42,7 @@ class UsersController < ApplicationController
   
   # GET /providers/new
   # GET /customers/new
+  # GET /customers/new?return_to=
   # GET /invite/dc8a032b9ae52f5c7710f53a945efbc11bb7ce51
   def new
     # @role (always) and @invitation (if it exists) have been initialized at this point
@@ -86,8 +87,16 @@ class UsersController < ApplicationController
     # initialize title
     @title      = "#{@role.split[1].titleize} Signup"
 
-    # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
-    @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
+    # check return_to param
+    if params[:return_to]
+      # store this location
+      store_location(params[:return_to])
+      # use return_to as the back link
+      @back_path = params[:return_to]
+    else
+      # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
+      @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
+    end
 
     respond_to do |format|
       format.html
