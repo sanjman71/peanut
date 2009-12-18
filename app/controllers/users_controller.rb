@@ -77,7 +77,9 @@ class UsersController < ApplicationController
     if @invitation
       @user.email_addresses_attributes = [{:address => @invitation.recipient_email}]
     else
+      # build an email and phone nested object
       @user.email_addresses.build
+      @user.phone_numbers.build
     end
     # @user.email = @invitation.recipient_email if @invitation
 

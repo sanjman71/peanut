@@ -30,7 +30,7 @@
     -# name field
     .span-12.last.padding-bottom-10
       .span-4
-        %h3.text-align-right{:style => "padding-top: 10px;"}== Name:
+        %h3.text-align-right.padding-top-10== Name:
       .span-8.last
         = user_form.text_field :name, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
 
@@ -38,14 +38,29 @@
     - user_form.fields_for :email_addresses do |email_form|
       .span-12.last.padding-bottom-10
         .span-4
-          %h3.text-align-right{:style => "padding-top: 10px;"}== Email:
+          %h3.text-align-right.padding-top-10== Email:
         .span-8.last
           = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'user_email'
+
+    -# phone nested field
+    - user_form.fields_for :phone_numbers do |phone_form|
+      .span-12.last
+        .span-4
+          %h3.text-align-right.padding-top-15== Phone:
+        .span-8.last
+          = phone_form.text_field :address, :class => 'title big', :style => "width: 275px;", :id => 'phone_address'
+          - if phone_form.object.verified?
+            %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
+      .span-12.last.padding-bottom-10
+        .span-4
+          %h3.text-align-right.padding-top-10== Phone Name:
+        .span-8.last
+          = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
 
     -# password fields are not shown if the creator is logged in
     .span-12.last.padding-bottom-10{:class => (creator == "user") ? '' : ''}
       .span-4
-        %h3.text-align-right{:style => "padding-top: 10px;"}== Password:
+        %h3.text-align-right.padding-top-10== Password:
       .span-8.last
         = user_form.password_field :password, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
         

@@ -24,7 +24,7 @@
     .span-16.last
       = f.text_field :name, :class => 'text title', :style => "width: 300px;"
   
-  -# email, nested model
+  -# email nested field
   - f.fields_for :email_addresses do |email_form|
     .span-20.last
       .span-4.text-align-right
@@ -34,8 +34,8 @@
         = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email', :disabled => !email_form.object.changeable?
         - if email_form.object.verified?
           %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
-          
-  -# phone, nested model
+
+  -# phone nested field
   - f.fields_for :phone_numbers do |phone_form|
     .span-20.last
       .span-4.text-align-right
@@ -48,8 +48,8 @@
       .span-4.text-align-right
         %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
       .span-16.last
-        = phone_form.text_field :name, :class => 'text title', :style => "width: 300px;", :id => 'phone_name'
-        %em{:style => 'padding-left: 5px; font-size: 1.1em;'}== e.g. Mobile, Work, Other
+        -#= phone_form.text_field :name, :class => 'text title', :style => "width: 300px;", :id => 'phone_name'
+        = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
 
   - unless @user.rpx == 1
     -# password
@@ -78,6 +78,8 @@
         = label_tag "capacity", "Capacity:"
       .span-4.last
         = f.text_field :capacity, :class => 'std_text_field_style'
+
+  %hr.space
 
   .span-20.prepend-1.last.submit
     = submit_tag "Save Changes", :id => 'user_update_submit'

@@ -46,6 +46,11 @@ $.fn.init_user_create_submit = function() {
       alert("Please enter a valid email address");
       return false;
     }
+
+    // check phone fields
+    if (check_user_phone_fields() == false) {
+      return false;
+    }
     
     if (check_user_password_fields(true) == false) {
       return false;
@@ -105,23 +110,26 @@ function check_user_password_fields(password_required) {
 }
 
 function check_user_phone_fields() {
-  var phone_address = $("input#phone_address").attr('value');
-  var phone_name    = $("input#phone_name").attr('value');
-  
-  // phone address should not be empty
-  if (phone_address != '') {
-    if (phone_name == '') {
-      alert("Please add a valid phone name");
-      return false;
-    }
+  var phone_address     = $("input#phone_address").attr('value');
+  var phone_name        = $("select#phone_name").val();
+  var address_required  = $("input#phone_address").hasClass('required');
+
+  if (address_required && (phone_address == '')) {
+    // phone address is required
+    alert("Please enter a phone number");
+    return false;
   }
 
-  // phone name should not be empty
-  if (phone_name != '') {
-    if (phone_address == '') {
-      alert("Please add a valid phone number");
-      return false;
-    }
+  if ((phone_address == '') && (phone_name != '')) {
+    // phone name, but no address
+    alert("Please enter a phone number");
+    return false;
+  }
+
+  if ((phone_address != '') && (phone_name == '')) {
+    // phone address, but no name
+    alert("Please select a phone name");
+    return false;
   }
 
   return true;

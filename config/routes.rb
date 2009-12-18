@@ -171,7 +171,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :promotions, :only => [:new, :create, :index]
   map.resources :invitations, :only => [:new, :create], :member => {:resend => :get}
-  map.resource  :session
+  map.resource  :session, :only => [:new, :create, :destroy]
 
   # Messages controller
   map.resources :messages, :only => [:index, :create, :new]

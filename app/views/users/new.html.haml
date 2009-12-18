@@ -7,4 +7,4 @@
     %h4{:style => 'font-size: 1.5em;'}== Please check your invitation and try again
 - else
   - submit_url = url_for(:controller => 'users', :action => 'create', :role => @role, :subdomain => current_subdomain)
-  = render :partial => 'sessions/user_form', :locals => {:role => @role, :invitation => @invitation, :submit_url => submit_url, :title_text => @title, :submit_text => 'Create', :back_path => @back_path}
+  = render :partial => 'users/user_form', :locals => {:role => @role, :invitation => @invitation, :submit_url => submit_url, :title_text => @title, :submit_text => 'Create', :back_path => @back_path}
