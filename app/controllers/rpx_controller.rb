@@ -3,7 +3,12 @@ class RpxController < ApplicationController
   include UserSessionHelper
 
   def customer
-    @data = RPXNow.user_data(params[:token])
+    begin
+      @data = RPXNow.user_data(params[:token])
+    rescue Exception => e
+      flash[:error] = "Rpx login error: #{params[:error]}"
+      redirect_to login_path and return
+    end
 
     if @data.blank?
       flash[:error] = "Rpx login error"
