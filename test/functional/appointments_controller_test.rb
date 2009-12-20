@@ -51,15 +51,20 @@ class AppointmentsControllerTest < ActionController::TestCase
     BadgesInit.roles_privileges
 
     @controller   = AppointmentsController.new
-    # create company
+    # create company, with 2 managers
     @owner        = Factory(:user, :name => "Owner")
+    @owner.email_addresses.create(:address => 'owner@walnutcalendar.com')
+    @manager      = Factory(:user, :name => "Manager")
+    @manager.email_addresses.create(:address => 'manager@walnutcalendar.com')
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
     @owner.grant_role('company manager', @company)
-    # create provider
+    @manager.grant_role('company manager', @company)
+    # create provider, with an email address
     @johnny       = Factory(:user, :name => "Johnny")
     @company.user_providers.push(@johnny)
+    @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
     @company.reload
     # create a work service, and assign johnny as a service provider
     @haircut      = Factory.build(:work_service, :duration => 30.minutes, :name => "Haircut", :price => 1.00)
@@ -68,8 +73,9 @@ class AppointmentsControllerTest < ActionController::TestCase
     @company.reload
     # get company free service
     @free_service = @company.free_service
-    # create a customer
+    # create a customer, with an email address
     @customer     = Factory(:user, :name => "Customer")
+    @customer.email_addresses.create(:address => 'customer@walnutcalendar.com')
     # stub current company
     @controller.stubs(:current_company).returns(@company)
     # set the request hostname
@@ -164,7 +170,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
     end
   end
-
+  
   context "create free appointment" do
     context "without privilege 'update calendars'" do
       setup do
@@ -345,7 +351,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
   end
-
+  
   context "create work appointment for a single date that has no free time" do
     setup do
       @controller.stubs(:current_user).returns(@johnny)
@@ -511,17 +517,18 @@ class AppointmentsControllerTest < ActionController::TestCase
   end
   
   context "create work appointment" do
+    setup do
+      # create free time from 9 am to 3 pm local time
+      @today          = Time.zone.now.to_s(:appt_schedule_day)
+      @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+
+      @start_at       = "#{@today}T1000"
+      @duration       = 120.minutes
+    end
+    
     context "with a new customer signup" do
       setup do
-        # create free time from 9 am to 3 pm local time
-        @today          = Time.zone.now.to_s(:appt_schedule_day)
-        @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-        @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
-
-        @start_at       = "#{@today}T1000"
-        @duration       = 120.minutes
-        @anyone         = User.anyone
-
         # create work appointment as anonymous user
         @controller.stubs(:current_user).returns(nil)
         @controller.stubs(:logged_in?).returns(false)
@@ -537,8 +544,8 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create new customer
       should_change("User.count", :by => 1) { User.count}
 
-      # free appointment should coexist with 1 work appointment
-      should_change("Appointment.count", :by => 2) { Appointment.count }
+      # should add work appointment
+      should_change("Appointment.count", :by => 1) { Appointment.count }
 
       should "have two capacity slots" do
         assert_equal 2, @free_appt.capacity_slots.size
@@ -576,6 +583,98 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
+    end
+
+    context "with appointment confirmations" do
+      context "to customer only" do
+        setup do
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+        end
+        
+        # should send appt confirmation to customer
+        should_change("message count", :by => 1) { Message.count }
+        should_change("message topic", :by => 1) { MessageTopic.count }
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to customer" do
+          assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+      end
+
+      context "to provider only" do
+        setup do
+          @company.preferences[:work_appointment_confirmations] = [:provider]
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+        end
+
+        # should send appt confirmation to customer
+        should_change("message count", :by => 1) { Message.count }
+        should_change("message topic", :by => 1) { MessageTopic.count }
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to provider" do
+          assert_equal 1, MessageRecipient.for_messagable(@johnny.primary_email_address).size
+        end
+      end
+
+      context "to managers only" do
+        setup do
+          @company.preferences[:work_appointment_confirmations] = [:managers]
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+        end
+
+        # should send appt confirmation to all managers
+        should_change("message count", :by => 2) { Message.count }
+        should_change("message topic", :by => 2) { MessageTopic.count }
+        should_change("delayed job count", :by => 2) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to owner and manager" do
+          assert_equal 1, MessageRecipient.for_messagable(@owner.primary_email_address).size
+          assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
+        end
+      end
+
+      context "to customer and managers" do
+        setup do
+          @company.preferences[:work_appointment_confirmations] = [:customer, :managers]
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+        end
+
+        # should send appt confirmation to customer and all managers
+        should_change("message count", :by => 3) { Message.count }
+        should_change("message topic", :by => 3) { MessageTopic.count }
+        should_change("delayed job count", :by => 3) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to customer" do
+          assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+
+        should "have appointment confirmation addressed to owner and manager" do
+          assert_equal 1, MessageRecipient.for_messagable(@owner.primary_email_address).size
+          assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
+        end
+      end
+
     end
   end
   

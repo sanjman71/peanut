@@ -129,10 +129,7 @@ class AppointmentsController < ApplicationController
             # reset flash message
             flash[:notice]  = "Your #{@service.name} appointment has been confirmed, and your old appointment has been canceled."
           end
-          
-          # tell the user their confirmation email is being sent
-          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
-          
+
           if !logged_in?
             @redirect_path = openings_path
             # tell the user their account has been created
@@ -142,11 +139,13 @@ class AppointmentsController < ApplicationController
           else
             @redirect_path = history_index_path
           end
-          
-          # # create log_entry
-          # current_company.log_entries.create(:user_id => current_user.id, :etype => LogEntry::INFORMATIONAL, :loggable => @appointment,
-          #                               :message_id => LogEntriesHelper::LOG_ENTRY_MESSAGE_IDS[:appointment_confirmation],
-          #                               :customer => @appointment.customer)
+
+          # send appointment confirmation based on preferences
+          @confirmations = MessageComposeAppointment.confirmations(@appointment, current_company.preferences[:work_appointment_confirmations], {:managers => current_company.managers})
+
+          # tell the user their confirmation email is being sent
+          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
+
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
