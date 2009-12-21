@@ -14,14 +14,21 @@
     - @appointments.each do |appointment|
       .span-24.last.letterbox.provider{:class => cycle("shaded", "")}[appointment]
         .span-5.prepend-1#customer_name
-          %h4= customer_display_name(appointment.customer, current_user)
+          %h4
+            == Customer:
+            = customer_display_name(appointment.customer, current_user)
           - email = appointment.customer.primary_email_address.andand.address || 'No email address'
           %h5.bottom= email
         .span-5#provider_name
-          %h4= appointment.provider.name
-          %h5.bottom{:style => 'font-weight: normal;'}= appointment.service.name
+          %h4
+            == Provider:
+            = appointment.provider.name
+          %h5.bottom{:style => 'font-weight: normal;'}
+            == Service:
+            = appointment.service.name
         .span-6#when
-          %h5{:style => 'font-size: 0.9em;'}=appointment.start_at.to_s(:appt_day_date_time)
+          %h5{:style => 'font-size: 0.9em;'}= appointment.start_at.to_s(:appt_day_date_time)
+          %h5{:style => 'font-size: 0.9em;'}= appointment.state
         .span-5#topics
           - message_topics  = appointment.message_topics
           - message_tags    = message_topics.collect(&:tag)

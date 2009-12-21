@@ -34,11 +34,13 @@ class TasksController < ApplicationController
     @timeline       = "in the next #{@number} #{@units}"
 
     # find appointments in the upcoming time span
-    @appointments   = current_company.appointments.work.future.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
+    @appointments   = current_company.appointments.work.future.not_canceled.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
     @messages       = 0
 
     @appointments.each do |appointment|
-      # check appointment messages already sent
+      # check that appointment reminders are turned on
+      next unless appointment.preferences[:reminder].to_i == 1
+      # check if reminders have already been sent
       message_tags = appointment.message_topics.collect(&:tag)
       next if message_tags.include?('reminder')
       # send appointment reminder

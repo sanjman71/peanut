@@ -98,10 +98,10 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         delete :destroy, :id => @free_appt.id
       end
-  
+
       should_change("Appointment.count", :by => -1) { Appointment.count }
     end
-    
+
     context "new work appointment as guest" do
       setup do
         # book a haircut with johnny during his free time
@@ -109,41 +109,52 @@ class AppointmentsControllerTest < ActionController::TestCase
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
             :duration => @haircut.duration, :mark_as => 'work'
       end
-    
-      should_respond_with :success
-      
+
       should "show rpx login" do
         assert_select 'div#rpx_login', true
       end
-  
+
       should "show (hidden) peanut login" do
         assert_select 'div.hide#peanut_login', true
       end
-    end
-  
-    context "new work appointment as customer" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@customer)
-        ActionView::Base.any_instance.stubs(:current_user).returns(@customer)
-  
-        # book a haircut with johnny during his free time
-        get :new, 
-            :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
-            :duration => @haircut.duration, :mark_as => 'work'
+
+      should "not show reminder options" do
+        assert_select "input#reminder_on", 0
+        assert_select "input#reminder_off", 0
       end
-  
+
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
-  
-      should_assign_to :appointment, :class => Appointment
-      should_assign_to(:service) { @haircut }
-      should_assign_to(:duration) { 30.minutes }
-      should_assign_to(:provider) { @johnny }
-      should_assign_to(:customer) { @customer }
-      should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
-      should_assign_to(:appt_time_start_at) { "0900" }
-      should_assign_to(:appt_time_end_at) { "0930" }
+    end
+
+    context "new work appointment as customer" do
+      context "with no email address" do
+        setup do
+          # stub current user
+          @controller.stubs(:current_user).returns(@customer)
+          # book a haircut with johnny during his free time
+          get :new, 
+              :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
+              :duration => @haircut.duration, :mark_as => 'work'
+        end
+
+        should_assign_to :appointment, :class => Appointment
+        should_assign_to(:service) { @haircut }
+        should_assign_to(:duration) { 30.minutes }
+        should_assign_to(:provider) { @johnny }
+        should_assign_to(:customer) { @customer }
+        should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
+        should_assign_to(:appt_time_start_at) { "0900" }
+        should_assign_to(:appt_time_end_at) { "0930" }
+
+        should "not show reminder options" do
+          assert_select "input#reminder_on", 0
+          assert_select "input#reminder_off", 0
+        end
+
+        should_respond_with :success
+        should_render_template 'appointments/new.html.haml'
+      end
     end
   
     context "create work appointment as customer" do
@@ -674,7 +685,38 @@ class AppointmentsControllerTest < ActionController::TestCase
           assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
       end
+    end
 
+    context "with appointment reminders" do
+      context "turned on" do
+        setup do
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id, :preferences_reminder => '1'}
+        end
+
+        should "set appointment reminders on" do
+          assert_equal 1, assigns(:appointment).preferences[:reminder].to_i
+        end
+      end
+
+      context "turned off" do
+        setup do
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id, :preferences_reminder => '0'}
+        end
+
+        should "set appointment reminders off" do
+          assert_equal 0, assigns(:appointment).preferences[:reminder].to_i
+        end
+      end
     end
   end
   

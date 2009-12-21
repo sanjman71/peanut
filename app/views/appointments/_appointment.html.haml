@@ -20,11 +20,22 @@
   .span-12.last.data
     ~ "<#{tag}>#{appointment.start_at.to_s(:appt_day_date_time)}</#{tag}>"
 
-  -#duration
+  -# duration
   .span-3.label.text-align-right
     == How Long:
   .span-12.last.data
     ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
+
+  -# reminders, for new appointments, and for customers with email addresses
+  - if appointment.new_record? and (appointment.customer.andand.email_addresses_count.to_i > 0)
+    .span-3.label.text-align-right
+      == Reminder:
+    .span-12.last.data
+      = label_tag "reminder_on", "Yes"
+      = radio_button_tag "preferences_reminder", "1", true, :id => 'reminder_on'
+      == &nbsp;
+      = label_tag "reminder_off", "No Thanks"
+      = radio_button_tag "preferences_reminder", "0", false, :id => 'reminder_off'
 
   - if appointment.recurrence?
     .span-3.label.text-align-right

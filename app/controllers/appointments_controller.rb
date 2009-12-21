@@ -84,6 +84,9 @@ class AppointmentsController < ApplicationController
     
     @capacity       = params[:capacity].to_i if params[:capacity]
 
+    # get appointment preferences parameters
+    @preferences    = params.reject{ |k,v| !k.match(/^preferences/)}
+
     # track errors and appointments created
     @errors         = Hash.new
     @created        = Hash.new
@@ -113,8 +116,9 @@ class AppointmentsController < ApplicationController
           @options            = Hash[:commit => true]
           @options            = @options.merge({:capacity => @capacity }) unless @capacity.blank?
 
-          # create work appointment
+          # create work appointment, with preferences
           @appointment        = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
+          @appointment.update_attributes(@preferences) unless @preferences.blank?
           # set redirect path
           @redirect_path      = appointment_path(@appointment, :subdomain => current_subdomain)
           # set flash message
@@ -151,8 +155,9 @@ class AppointmentsController < ApplicationController
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
           @options        = {:time_range => @time_range}
           @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
-          # create free appointment
+          # create free appointment, with preferences
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
+          @appointment.update_attributes(@preferences) unless @preferences.blank?
           # set redirect path
           @redirect_path  = request.referer
           flash[:notice]  = "Created available time"
