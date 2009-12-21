@@ -23,12 +23,14 @@
       == With?
     .span-5.last.field#who
       = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :style => "width: 125px; align: top;")
-  .last{:class => size == :wide ? "span-24" : "span-7"}
-    .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
-      == Time of Day?
-    .span-5.last
-      %span.field#time_of_day
-        = select_tag('time', options_for_select(Appointment::TIMES, time))
+
+  -# time of day, disable until its working
+  -#.last{:class => size == :wide ? "span-24" : "span-7"}
+    -#.span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
+      -#== Time of Day?
+    -#.span-5.last
+      -#%span.field#time_of_day
+        -#= select_tag('time', options_for_select(Appointment::TIMES, time))
         
   -# when select list
   .last#when_select{:class => size == :wide ? "span-24" : "span-7"}
