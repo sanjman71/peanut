@@ -32,6 +32,7 @@ class OpeningsControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
+    @owner.grant_role('company manager', @company)
     @johnny       = Factory(:user, :name => "Johnny")
     @company.user_providers.push(@johnny)
     @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 10.00, :duration => 30.minutes)
@@ -40,12 +41,9 @@ class OpeningsControllerTest < ActionController::TestCase
     @company.reload
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
-    # stub current location to be anywhere
+    # stub current location to anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     @controller.stubs(:current_locations).returns([])
-    # stub helper method (not sure why this generates an error?)
-    ActionView::Base.any_instance.stubs(:service_duration_select_options).returns([])
     # Set the request hostname
     # @request.host = "www.peanut.com"
   end
@@ -88,6 +86,39 @@ class OpeningsControllerTest < ActionController::TestCase
       should_redirect_to("openings_path") { openings_path }
     end
 
+    context "for a private company" do
+      context "as a guest" do
+        setup do
+          # private company
+          @company.preferences[:public] = 0
+          @company.save
+          get :index
+        end
+
+        should_assign_to(:public) { 0 }
+        should_assign_to(:searchable) { false }
+
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
+      end
+
+      context "as company manager" do
+        setup do
+          # private company
+          @company.preferences[:public] = 0
+          @company.save
+          @controller.stubs(:current_user).returns(@owner)
+          get :index
+        end
+
+        should_assign_to(:public) { 0 }
+        should_assign_to(:searchable) { true }
+
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
+      end
+    end
+
     context "with no service and no provider" do
       setup do
         get :index
@@ -103,6 +134,7 @@ class OpeningsControllerTest < ActionController::TestCase
 
       should_not_assign_to :daterange
       should_assign_to(:duration) { 0 }
+      should_assign_to(:searchable) { true }
 
       should "set services collection" do
         assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
@@ -125,11 +157,12 @@ class OpeningsControllerTest < ActionController::TestCase
 
       should_assign_to(:daterange)
       should_assign_to(:duration) { 30 * 60 }
+      should_assign_to(:searchable) { true }
 
       should "set services collection" do
         assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
       end
-      
+
       should_respond_with :success
       should_render_template 'openings/index.html.haml'
     end

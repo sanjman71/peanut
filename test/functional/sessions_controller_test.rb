@@ -7,9 +7,6 @@ class SessionsControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-    # @controller = SessionController.new
-    # create company
-    # @owner          = Factory(:user, :name => "Owner")
     @user       = Factory(:user, :name => "User", :password => 'user', :password_confirmation => 'user')
     @user_email = @user.email_addresses.create(:address => "user@walnut.com")
     assert @user_email.valid?
@@ -22,9 +19,9 @@ class SessionsControllerTest < ActionController::TestCase
       setup do
         post :create, {:email => 'user@walnut.com', :password => 'user'}
       end
-      
+
       should_not_assign_to(:user)
-  
+
       should_redirect_to("root path") { "/" }
     end
 

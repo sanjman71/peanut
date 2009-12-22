@@ -163,11 +163,11 @@ module ApplicationHelper
   def build_signup_links(current_controller, &action)
     # 'Signup' tab
     build_signup_link('Signup', signup_beta_path, 'signup', nil, current_controller, &action)
-    build_signup_link('FAQ', faq_path, 'home', 'faq', current_controller, &action)
-    build_signup_link('Demos', demos_path, 'home', 'demos', current_controller, &action)
 
     if has_privilege?('manage site')
       build_signup_link('Promotions', promotions_path, 'promotions', nil, current_controller, &action)
+      build_signup_link('Demos', demos_path, 'home', 'demos', current_controller, &action)
+      build_signup_link('FAQ', faq_path, 'home', 'faq', current_controller, &action)
       build_signup_link('Companies', companies_path, 'companies', nil, current_controller, &action)
     end
   end

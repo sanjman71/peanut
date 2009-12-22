@@ -339,45 +339,65 @@ class UsersControllerTest < ActionController::TestCase
   end
   
   context "create customer" do
-    context "as an anonymous user" do
-      setup do
-        # stub current user as nobody
-        @controller.stubs(:current_user).returns(nil)
-        post :create, {:role => 'company customer',
-                       :creator => 'anonymous',
-                       :user => {:email_addresses_attributes => [{:address => 'sanjay@walnut.com'}],
-                                 :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
-      end
+    context "as guest user" do
+      context "for a public company" do
+        setup do
+          # stub current user as nobody
+          @controller.stubs(:current_user).returns(nil)
+          post :create, {:role => 'company customer',
+                         :creator => 'anonymous',
+                         :user => {:email_addresses_attributes => [{:address => 'sanjay@walnut.com'}],
+                                   :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
+        end
 
-      should_change("User.count", :by => 1) { User.count }
+        should_change("User.count", :by => 1) { User.count }
 
-      should_assign_to(:creator) {"anonymous"}
-      should_assign_to(:user)
-      should_assign_to(:role) {"company customer"}
-      should_not_assign_to :invitation
+        should_assign_to(:creator) {"anonymous"}
+        should_assign_to(:user)
+        should_assign_to(:role) {"company customer"}
+        should_not_assign_to :invitation
   
-      should "add 'company customer' role on company to user" do
-        @user = User.with_email("sanjay@walnut.com").first
-        assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
-      end
+        should "add 'company customer' role on company to user" do
+          @user = User.with_email("sanjay@walnut.com").first
+          assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
+        end
   
-      should "add 'user manager' role on user to user" do
-        @user = User.with_email("sanjay@walnut.com").first
-        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
-      end
+        should "add 'user manager' role on user to user" do
+          @user = User.with_email("sanjay@walnut.com").first
+          assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
+        end
   
-      should "not add user as a company provider" do
-        @user = User.with_email("sanjay@walnut.com").first
-        assert_equal [], @user.provided_companies
+        should "not add user as a company provider" do
+          @user = User.with_email("sanjay@walnut.com").first
+          assert_equal [], @user.provided_companies
+        end
+
+        should_redirect_to('root path') {"/"}
+        should_set_the_flash_to /Your account was successfully created/i
       end
+      
+      context "for a private company" do
+        setup do
+          # private company
+          @company.preferences[:public] = 0
+          @company.save
+          # stub current user as nobody
+          @controller.stubs(:current_user).returns(nil)
+          post :create, {:role => 'company customer',
+                         :creator => 'anonymous',
+                         :user => {:email_addresses_attributes => [{:address => 'sanjay@walnut.com'}],
+                                   :name => "Sanjay Kapoor", :password => "secret", :password_confirmation => 'secret'}}
+        end
 
-      should_respond_with :redirect
-      should_redirect_to('root path') {"http://test.host/"}
+        should_not_assign_to(:user)
+        should_not_change("User.count") { User.count }
 
-      should_set_the_flash_to /Your account was successfully created/i
+        should_redirect_to('root path') {"/"}
+        should_set_the_flash_to /You are not authorized to create a user account for this company/i
+      end
     end
   
-    context "as an authenticated user" do
+    context "as an authenticated user, with an email address" do
       setup do
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)

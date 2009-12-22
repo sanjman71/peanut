@@ -6,8 +6,7 @@ ActionController::Routing::Routes.draw do |map|
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
 
   # rpx routes
-  map.rpx_customer  '/rpx/customer',  :controller => 'rpx', :action => 'customer'
-  # map.rpx_provider  '/rpx/provider',  :controller => 'rpx', :action => 'provider'
+  map.rpx_login '/rpx/login',  :controller => 'rpx', :action => 'login'
 
   # password routes
   map.password_forgot '/password/forgot', :controller => 'passwords', :action => 'forgot'

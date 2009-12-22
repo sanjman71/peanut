@@ -2,7 +2,9 @@ class RpxController < ApplicationController
 
   include UserSessionHelper
 
-  def customer
+  # GET /rpx/login
+  # called after an rpx authentication
+  def login
     begin
       @data = RPXNow.user_data(params[:token])
     rescue Exception => e
@@ -18,6 +20,12 @@ class RpxController < ApplicationController
     @user = User.with_identifier(@data[:identifier]).first
     
     if @user.blank?
+      # check if rpx user create is for a public company
+      if current_company and current_company.preferences[:public].to_i == 0
+        flash[:error] = "You are not authorized to create a user account for this company"
+        redirect_to login_path and return
+      end
+
       # create user using rpx data
       @user = User.create_rpx(@data[:name], @data[:email], @data[:identifier])
 

@@ -119,6 +119,13 @@ class UsersController < ApplicationController
       params[:user][:password] = :random
     end
 
+    # check if user create is for a public or private company
+    if !logged_in? and current_company and current_company.preferences[:public].to_i == 0
+      # guest users may not create users for a private company
+      flash[:error] = "You are not authorized to create a user account for this company"
+      redirect_to root_path and return
+    end
+
     # create user
     @user = User.create_or_reset(params[:user])
     

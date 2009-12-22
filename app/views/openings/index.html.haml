@@ -4,18 +4,44 @@
 
 -# service providers mapping services to providers
 .span-16.service_providers.hide
-  - @sps.each do |sp|
-    .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
 
 .span-16.services.hide
-  - @sps.each do |sp|
-    .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
   
 .span-24.last
   = display_flash(:all)
 
-- unless @daterange.blank?
-  .span-15.prepend-1.append-1
+- if @daterange.blank?
+  - if @searchable
+    -# show company text
+    .span-15.prepend-1.append-1#company_description
+      %hr.space
+      - if !current_company.description.blank?
+        -# company specific text
+        = Sanitize.clean(current_company.description, Sanitize::Config::WALNUT)
+      - else
+        -# generic text
+        %h3== Welcome to #{current_company.name}'s online scheduling system.
+        %h3== Use the search box at the right to find appointment openings.
+        %h3
+          == Today is
+          %span{:style => 'color: #5500BB; font-weight: normal; font-size: 0.9em;'}= Time.zone.now.to_s(:appt_day)
+  - else
+    -# show company private text
+    .span-15.prepend-1.append-1#company_private
+      %hr.space
+      %h3== Welcome to #{current_company.name}'s online scheduling system.
+      %h3== Online scheduling is available to registered users only.  Its fast, free and easy to use.
+      %h3== Please contact us to signup for online scheduling.
+
+- else
+  -# show openings
+  .span-15.prepend-1.append-1#openings
     .span-15.last.padding-top-10
       -# show count of available timeslots for the service and provider
       %h3
@@ -29,8 +55,8 @@
           %br
           = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
           == if you can't find a suitable timeslot.
-          
-    .span-14.last
+
+    .span-15.last
       -# show daterange name
       %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
 
@@ -47,15 +73,15 @@
           = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
           %span{:style => 'font-size: 0.7em;'}== or
         %h3{:style => 'font-size: 1.3em; color: #666666;'}== Use the search bar to the right to change your search parameters and try again.
-    
-.last{:class => @daterange ? "span-7" : "span-24"}
-  .span-7.mat
-    = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :providers => @providers, :provider => @provider, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => @daterange ? :narrow : :wide})
-  - if @daterange.blank? && !current_company.description.blank?
-    .span-15.prepend-1.last.company_description
-      = Sanitize.clean(current_company.description, Sanitize::Config::WALNUT)
+
+.span-7.last
+  - if @searchable
+    .span-7.last.mat#openings_search
+      = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :providers => @providers, :provider => @provider, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => :narrow})
   - else
-    .last
+    -# no search bar
+    .span-7.last#openings_search
+      == &nbsp;
 
   -#.span-7.last.sidebar.instructions
     -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
