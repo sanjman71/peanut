@@ -24,4 +24,12 @@ module PreferencesHelper
       ["Every 30 minutes", "[0,30]"]
     ]
   end
+  
+  def public_options
+    [
+      ["Public", "1"],
+      ["Private", "0"]
+    ]
+  end
+
 end
