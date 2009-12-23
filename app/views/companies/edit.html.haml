@@ -65,30 +65,40 @@
   - form_for(@company, :url => company_path(@company, :subdomain => current_subdomain)) do |f|
     .span-20.last
       .span-5
-        %h3{:style => 'padding-top: 7px;'}== Time Horizon:
+        %h4{:style => 'padding-top: 7px;'}== Time Horizon:
       .span-15.last
         = f.select :preferences_time_horizon, time_horizon_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
         == Choose how far out you want people to be able to make appointments.
     .span-20.last
       .span-5
-        %h3{:style => 'padding-top: 7px;'}== Start Week On:
+        %h4{:style => 'padding-top: 7px;'}== Start Week On:
       .span-15.last
         = f.select :preferences_start_wday, start_wday_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
         == When showing calendars, what day do you want to start your week
     .span-20.last
-      .span-5
-        %h3{:style => 'padding-top: 7px;'}== Appointment Start Times:
-      .span-15.last
-        = f.select :preferences_appt_start_minutes, appt_start_minutes_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-20.last
+        .span-5
+          %h4{:style => 'padding-top: 7px;'}== Appointment Start Times:
+        .span-15.last
+          = f.select :preferences_appt_start_minutes, appt_start_minutes_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
         == Choose when appointments can start, e.g. on the hour, on the hour and half-hours
     .span-20.last
-      .span-5
-        %h3{:style => 'padding-top: 7px;'}== Public/Private:
-      .span-15.last
-        = f.select :preferences_public, public_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-20.last
+        .span-5
+          %h4{:style => 'padding-top: 7px;'}== Appointment Confirmations:
+        .span-15.last
+          = f.select :preferences_work_appointment_confirmations, appt_confirmation_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-15.prepend-5.last.directions
+        == Choose who receives appointment confirmations
+    .span-20.last
+      .span-20.last
+        .span-5
+          %h4{:style => 'padding-top: 7px;'}== Public/Private:
+        .span-15.last
+          = f.select :preferences_public, public_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
         == Companies marked as public allow anyone to create appointments.
         %br

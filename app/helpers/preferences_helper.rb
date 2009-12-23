@@ -25,6 +25,17 @@ module PreferencesHelper
     ]
   end
   
+  def appt_confirmation_options
+    [
+      ["Customers only", "[:customer]"],
+      ["Providers only", "[:provider]"],
+      ["Managers only", "[:managers]"],
+      ["Customers and providers", "[:customer, :provider]"],
+      ["Customers and managers", "[:customer, :managers]"],
+      ["Providers and managers", "[:provider, :managers]"],
+    ]
+  end
+
   def public_options
     [
       ["Public", "1"],
