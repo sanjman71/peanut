@@ -44,9 +44,9 @@ class TasksController < ApplicationController
       message_tags = appointment.message_topics.collect(&:tag)
       next if message_tags.include?('reminder')
       # send appointment reminder
-      success = MessageComposeAppointment.reminder(appointment)
-      case success
-      when 0
+      message = MessageComposeAppointment.reminder(appointment)
+      case
+      when !message.blank?
         # reminder message was sent
         @messages += 1
         # reload appointment object
