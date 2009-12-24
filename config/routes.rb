@@ -35,7 +35,7 @@ ActionController::Routing::Routes.draw do |map|
   map.user_sudo     '/users/:id/sudo', :controller => 'users', :action => 'sudo'
 
   map.user_email_promote  '/users/:user_id/email/:id/promote', :controller => 'email_addresses', :action => 'promote'
-  map.user_email_promote  '/users/:user_id/email/:id', :controller => 'email_addresses', :action => 'destroy', :conditions => {:method => :delete}
+  map.user_email_delete   '/users/:user_id/email/:id', :controller => 'email_addresses', :action => 'destroy', :conditions => {:method => :delete}
 
   map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
   map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}

@@ -40,7 +40,9 @@
         - markers = []
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address
-        - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? or email_form.object == @primary_email_address
+        - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
+          - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? or email_form.object == @primary_email_address
+          - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin')) if email_form.object.deletable?
         - unless markers.empty?
           %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
 
