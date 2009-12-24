@@ -6,50 +6,73 @@
   
   .span-23.prepend-1.last.mat.padding-bottom-20
     %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
+    - if has_privilege?('update users', @user)
+      = link_to 'Add existing login', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
     -# allow managers to reset (non-rpx) user passwords
-    - if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user) and @user.email_addresses_count > 0
-      = link_to 'Reset Password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @user.primary_email_address.address
+    -#- if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user) and @user.email_addresses_count > 0
+      -#= link_to 'Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @user.primary_email_address.address
 
+  %hr.space
+  .span-24.last
+    = display_flash(:all)
   %hr.space
 
   -# show any user errors
   - unless @user.errors.blank?
     .span-16.notice
       = error_messages_for('user', :header_message => nil)
-  
+
   -# name
   .span-20.last
     .span-4.text-align-right
       %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_name", "Name:"
     .span-16.last
       = f.text_field :name, :class => 'text title', :style => "width: 300px;"
-  
+
   -# email nested field
   - f.fields_for :email_addresses do |email_form|
-    .span-20.last
+    .span-20.last.email_address[email_form.object]{:class => email_form.object.new_record? ? 'hide' : ''}
       .span-4.text-align-right
         %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
       .span-16.last
         -# not allowed to edit rpx user emails
         = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email', :disabled => !email_form.object.changeable?
-        - if email_form.object.verified?
-          %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
+        - markers = []
+        - markers.push('Verified') if email_form.object.verified?
+        - markers.push('Primary') if email_form.object == @primary_email_address
+        - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? or email_form.object == @primary_email_address
+        - unless markers.empty?
+          %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
+
+  - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
+    -# add email link
+    .span-20.last#add_email
+      .span-4.append-16.last.text-align-right
+        %h4= link_to 'Add Email', '#', :class => 'admin', :id => 'add_email'
 
   -# phone nested field
   - f.fields_for :phone_numbers do |phone_form|
-    .span-20.last
-      .span-4.text-align-right
-        %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
-      .span-16.last
-        = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
-        - if phone_form.object.verified?
-          %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
-    .span-20.last
-      .span-4.text-align-right
-        %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
-      .span-16.last
-        -#= phone_form.text_field :name, :class => 'text title', :style => "width: 300px;", :id => 'phone_name'
-        = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
+    .span-20.last.phone_number[phone_form.object]{:class => phone_form.object.new_record? ? 'hide' : ''}
+      .span-20.last
+        .span-4.text-align-right
+          %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
+        .span-16.last
+          = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
+          - markers = []
+          - markers.push('Verified') if phone_form.object.verified?
+          - unless markers.empty?
+            %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
+      .span-20.last
+        .span-4.text-align-right
+          %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
+        .span-16.last
+          = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
+
+  - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
+    -# add phone link
+    .span-20.last#add_phone
+      .span-4.append-16.last.text-align-right
+        %h4= link_to 'Add Phone', '#', :class => 'admin', :id => 'add_phone'
 
   - unless @user.rpx == 1
     -# password
@@ -74,10 +97,10 @@
     .span-14.prepend-1.last.hint.padding-bottom-10
       == When scheduling free time for this provider you can set the default capacity available.
     .span-14.prepend-1.last
-      .span-3.text_field_label
-        = label_tag "capacity", "Capacity:"
+      .span-3.text_field_label.text-align-right.padding-top-5
+        %h3= label_tag "capacity", "Capacity:"
       .span-4.last
-        = f.text_field :capacity, :class => 'std_text_field_style'
+        = f.text_field :capacity, :style => 'width: 50px; font-size: 1.3em;'
 
   %hr.space
 

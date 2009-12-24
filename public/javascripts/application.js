@@ -283,6 +283,14 @@ function validate_email_address(email_address) {
   return true;
 }
 
+function validate_phone_number(phone_number) {
+  var phone_regex = /^[0-9]+$/;
+  if (phone_regex.test(phone_number) == false) {
+    return false;
+  }
+  return true;
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();

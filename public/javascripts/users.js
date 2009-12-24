@@ -31,27 +31,30 @@ $.fn.init_user_create_submit = function() {
 
     if (name_required && user_name == '') {
       alert("Please enter a user name");
-      return false
-    }
-
-    var user_email      = $("input#user_email").attr('value');
-    var email_required  = $("input#user_email").hasClass('required');
-
-    if (email_required && user_email == '') {
-      alert("Please enter a user email");
       return false;
     }
 
-    if ((user_email != '') && validate_email_address(user_email) == false) {
-      alert("Please enter a valid email address");
-      return false;
-    }
+    var errors = 0
+
+    // check email fields
+    $("div.email_address").each(function() {
+      if (check_user_email_fields(this.id) == false) {
+        errors += 1;
+      }
+    })
+
+    if (errors > 0) { return false; }
 
     // check phone fields
-    if (check_user_phone_fields() == false) {
-      return false;
-    }
-    
+    $("div.phone_number").each(function() {
+      if (check_user_phone_fields(this.id) == false) {
+        errors += 1;
+      }
+    })
+
+    if (errors > 0) { return false; }
+
+    // check password fields
     if (check_user_password_fields(true) == false) {
       return false;
     }
@@ -62,17 +65,53 @@ $.fn.init_user_create_submit = function() {
 
 $.fn.init_user_update_submit = function() {
   $("input#user_update_submit").click(function() {
+
+    var errors = 0
+
+    // check email fields
+    $("div.email_address").each(function() {
+      if (check_user_email_fields(this.id) == false) {
+        errors += 1;
+      }
+    })
+
+    if (errors > 0) { return false; }
+
     // check phone fields
-    if (check_user_phone_fields() == false) {
-      return false;
-    }
-    
+    $("div.phone_number").each(function() {
+      if (check_user_phone_fields(this.id) == false) {
+        errors += 1;
+      }
+    })
+
+    if (errors > 0) { return false; }
+
     // check password fields
     if (check_user_password_fields(false) == false) {
       return false;
     }
-    
+
     return true;
+  })
+}
+
+$.fn.init_user_add_email = function() {
+  $("a#add_email").click(function() {
+    // show email fields
+    $("div.email_address.hide").show();
+    // hide link
+    $(this).hide();
+    return false;
+  })
+}
+
+$.fn.init_user_add_phone = function() {
+  $("a#add_phone").click(function() {
+    // show phone fields
+    $("div.phone_number.hide").show();
+    // hide link
+    $(this).hide();
+    return false;
   })
 }
 
@@ -109,10 +148,29 @@ function check_user_password_fields(password_required) {
   return true;
 }
 
-function check_user_phone_fields() {
-  var phone_address     = $("input#phone_address").attr('value');
-  var phone_name        = $("select#phone_name").val();
-  var address_required  = $("input#phone_address").hasClass('required');
+function check_user_email_fields(id) {
+  var user_email      = $("#"+id).find("input#user_email").attr('value');
+  var email_required  = $("#"+id).find("input#user_email").hasClass('required');
+
+  if (email_required && (user_email == '')) {
+    // email is required
+    alert("Please enter a user email");
+    return false;
+  }
+
+  if ((user_email != '') && (validate_email_address(user_email) == false)) {
+    // email address is invalid
+    alert("Please enter a valid email address");
+    return false;
+  }
+  
+  return true;
+}
+
+function check_user_phone_fields(id) {
+  var phone_address     = $("#"+id).find("input#phone_address").attr('value');
+  var phone_name        = $("#"+id).find("select#phone_name").val();
+  var address_required  = $("#"+id).find("input#phone_address").hasClass('required');
 
   if (address_required && (phone_address == '')) {
     // phone address is required
@@ -123,6 +181,12 @@ function check_user_phone_fields() {
   if ((phone_address == '') && (phone_name != '')) {
     // phone name, but no address
     alert("Please enter a phone number");
+    return false;
+  }
+
+  if (phone_address != '' && (validate_phone_number(phone_address) == false)) {
+    // phone address is invalid
+    alert("Please enter a valid phone number using digits only");
     return false;
   }
 
@@ -138,6 +202,8 @@ function check_user_phone_fields() {
 $(document).ready(function() {
   $(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
   $(document).init_toggle_user_company_manager();  // re-bind after an ajax call using jquery live()
+  $(document).init_user_add_email();
+  $(document).init_user_add_phone();
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
   $(document).init_manager_reset_password();

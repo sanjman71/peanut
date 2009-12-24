@@ -1,10 +1,11 @@
 class UsersController < ApplicationController
-  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge]
+  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx]
   before_filter :init_role, :only => [:edit, :update]
   before_filter :init_user_privileges, :only => [:edit, :update]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
   privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
+  privilege_required      'update users', :only => [:add_rpx], :on => :user
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
@@ -157,9 +158,12 @@ class UsersController < ApplicationController
   def edit
     # @role and @user are initialized here
 
-    # build email and phone attributes for the form
-    @user.email_addresses.build unless @user.email_addresses_count > 0
-    @user.phone_numbers.build unless @user.phone_numbers_count > 0
+    # always build an extra email and phone object for the form
+    @user.email_addresses.build
+    @user.phone_numbers.build
+
+    # initialize user's primary email
+    @primary_email_address = @user.primary_email_address
 
     # build notes collection, most recent first
     @note     = Note.new
@@ -220,6 +224,15 @@ class UsersController < ApplicationController
     redirect_to request.referer and return
   end
 
+  # GET /users/1/add_rpx
+  def add_rpx
+    @rpx_emails = @user.email_addresses.select { |o| !o.identifier.blank? }
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def suspend
     @user.suspend! 
     redirect_to users_path
@@ -253,7 +266,7 @@ class UsersController < ApplicationController
       format.json { render(:json => @hash.to_json) }
     end
   end
-    
+
   # There's no page here to update or destroy a user.  If you add those, be
   # smart -- make sure you check that the visitor is authorized to do so, that they
   # supply their old password along with a new one to update it, etc.

@@ -6,7 +6,8 @@ ActionController::Routing::Routes.draw do |map|
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
 
   # rpx routes
-  map.rpx_login '/rpx/login',  :controller => 'rpx', :action => 'login'
+  map.rpx_login '/rpx/login', :controller => 'rpx', :action => 'login'
+  map.rpx_add   '/rpx/add/:id',   :controller => 'rpx', :action => 'add'
 
   # password routes
   map.password_forgot '/password/forgot', :controller => 'passwords', :action => 'forgot'
@@ -20,7 +21,7 @@ ActionController::Routing::Routes.draw do |map|
   map.signup_beta   '/signup/beta',     :controller => 'signup', :action => 'beta'
   map.signup_check  '/signup/check',    :controller => 'signup', :action => 'check', :conditions => {:method => :post}
   map.signup_plan   '/signup/:plan_id', :controller => 'signup', :action => 'new', :conditions => {:method => :get}
-  map.connect       '/signup/:plan_id', :controller => 'signup', :action => 'create', :conditions => {:method => :post}
+  map.signup_create '/signup/:plan_id', :controller => 'signup', :action => 'create', :conditions => {:method => :post}
 
   # invitation signup route
   map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
@@ -28,10 +29,14 @@ ActionController::Routing::Routes.draw do |map|
   map.provider_assign         '/providers/:id/assign',        :controller => 'providers', :action => 'assign',:conditions => {:method => :put}
   map.provider_assign_prompt  '/providers/:id/assign/prompt', :controller => 'providers', :action => 'assign_prompt',:conditions => {:method => :get}
   
-  map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post }
-  map.user_notify     '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
-  map.user_edit       '/users/:id/edit',      :controller => 'users', :action => 'edit'
-  map.user_sudo       '/users/:id/sudo',      :controller => 'users', :action => 'sudo'
+  map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get}
+  map.user_notify   '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
+  map.user_edit     '/users/:id/edit', :controller => 'users', :action => 'edit'
+  map.user_sudo     '/users/:id/sudo', :controller => 'users', :action => 'sudo'
+
+  map.user_email_promote  '/users/:user_id/email/:id/promote', :controller => 'email_addresses', :action => 'promote'
+  map.user_email_promote  '/users/:user_id/email/:id', :controller => 'email_addresses', :action => 'destroy', :conditions => {:method => :delete}
+
   map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
   map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
   map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}

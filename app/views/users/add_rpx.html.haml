@@ -1,0 +1,28 @@
+- title('Add Rpx Login')
+- stylesheet('users', 'notes')
+- javascript('rpx')
+
+.span-23.prepend-1.last.mat.padding-bottom-20
+  %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Add an existing login to your user account
+  = link_to 'Back', user_edit_path(@user), :class => 'admin'
+
+%hr.space
+
+.span-24.last
+  = display_flash
+
+%hr.space
+
+.span-23.prepend-1.last
+  %h3== You have #{pluralize(@rpx_emails.size, 'login')} linked to your account.
+
+.span-10.append-1#logins
+  - @rpx_emails.each do |email|
+    .span-10.prepend-1.last.letterbox.email{:class => cycle("shaded", "")}
+      %h5= email.address
+
+-# rpx login
+.span-12.prepend-1.last
+  #rpx_login_loading{:style => 'color: #5500BB; font-size: 1.5em; font-weight: bold;'}== Login Form Loading ...
+  = RPXNow.embed_code('walnut', rpx_add_url(@user))
+

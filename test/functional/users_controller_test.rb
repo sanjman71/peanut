@@ -16,6 +16,7 @@ class UsersControllerTest < ActionController::TestCase
 
   should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
   should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"
+  should_route :get, '/users/1/add_rpx',        :controller => 'users', :action => 'add_rpx', :id => "1"
 
   context 'invite url with subdomain' do
     setup do
@@ -31,6 +32,8 @@ class UsersControllerTest < ActionController::TestCase
     BadgesInit.roles_privileges
     # create company
     @owner          = Factory(:user, :name => "Owner")
+    @provider       = Factory(:user, :name => "Provider")
+    @provider_email = @provider.email_addresses.create(:address => "provider@walnut.com")
     @customer       = Factory(:user, :name => "Customer", :password => 'customer', :password_confirmation => 'customer')
     @customer_email = @customer.email_addresses.create(:address => "customer@walnut.com")
     @monthly_plan   = Factory(:monthly_plan)
@@ -38,19 +41,20 @@ class UsersControllerTest < ActionController::TestCase
     @company        = Factory(:company, :subscription => @subscription)
     # make owner the company manager
     @owner.grant_role('company manager', @company)
-    # add provider
+    @provider.grant_role('company provider', @provider)
+    # add company providers
     @company.user_providers.push(@owner)
+    @company.user_providers.push(@provider)
     # stub current company methods
     @controller.stubs(:current_company).returns(@company)
   end
-  
+
   context "new customer" do
     context "without 'create users' privilege" do
       setup do
         get :new, :role => 'company provider'
       end
 
-      should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
     
@@ -473,7 +477,7 @@ class UsersControllerTest < ActionController::TestCase
   end
   
   context "edit provider" do
-    context "as nobody" do
+    context "as guest" do
       setup do
         @controller.stubs(:current_user).returns(nil)
         get :edit, :id => @owner.id, :role => 'company provider'
@@ -489,21 +493,49 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@user)
         get :edit, :id => @owner.id, :role => 'company provider'
       end
-  
+
       should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
-  
-    context "with 'update users' privilege" do
+
+    context "with 'update users' privilege as provider" do
       setup do
-        @controller.stubs(:current_user).returns(@owner)
-        get :edit, :id => @owner.id, :role => 'company provider'
+        @controller.stubs(:current_user).returns(@provider)
+        get :edit, :id => @provider.id, :role => 'company provider'
       end
-    
+
+      should_assign_to(:index_path) {"/providers"}
+
+      should "show 'add existing login' link" do
+        assert_select "a#add_rpx", 1
+      end
+
+      # should "not show 'reset password' link" do
+      #   assert_select "a#manager_reset_password", 0
+      # end
+
       should_respond_with :success
       should_render_template "users/edit.html.haml"
-    
+    end
+
+    context "with 'update users' privilege as manager" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :edit, :id => @provider.id, :role => 'company provider'
+      end
+
       should_assign_to(:index_path) {"/providers"}
+
+      should "not show 'add existing login' link" do
+        assert_select "a#add_rpx", 0
+      end
+
+      # should "show 'reset password' link" do
+      #   assert_select "a#manager_reset_password", 1
+      # end
+
+      should_respond_with :success
+      should_render_template "users/edit.html.haml"
     end
   end
   
@@ -679,4 +711,38 @@ class UsersControllerTest < ActionController::TestCase
       should_redirect_to('referer path') { 'http://test.com/users' }
     end
   end
+
+  context "add rpx" do
+    setup do
+      @user = Factory(:user, :name => "User")
+    end
+
+    context "as guest" do
+      setup do
+        get :add_rpx, :id => @user.id
+      end
+
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+
+    context "as user" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        get :add_rpx, :id => @user.id
+      end
+
+      should_respond_with :success
+      should_render_template 'users/add_rpx.html.haml'
+    end
+
+    context "as manager" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :add_rpx, :id => @user.id
+      end
+
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+  end
+  
 end
