@@ -7,7 +7,7 @@
   .span-23.prepend-1.last.mat.padding-bottom-20
     %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
     - if has_privilege?('update users', @user)
-      = link_to 'Add existing login', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
+      = link_to 'Add an existing login', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
     -# allow managers to reset (non-rpx) user passwords
     -#- if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user) and @user.email_addresses_count > 0
       -#= link_to 'Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @user.primary_email_address.address
@@ -112,7 +112,20 @@
     = link_to "Cancel", @index_path, :class => 'admin'
 
 %hr.space
-  
+
+- if (@user == current_user) && has_role?('company manager', current_company)
+  -# current user is a company manager
+  .span-20.last.padding-top-10
+    .span-4.text-align-right
+      %h4{:style => 'font-size: 1.3em;'}== Company Roles:
+    .span-16.last
+      - if has_role?('company provider', current_company)
+        = link_to 'Remove as a company provider', revoke_provider_user_path(@user), :class => 'admin', :method => :put
+      - else
+        = link_to 'Add as a company provider', grant_provider_user_path(@user), :class => 'admin', :method => :put
+
+  %hr.space
+
 .span-15.prepend-1
   -# notes flash message
   #note_flash

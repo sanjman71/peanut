@@ -29,7 +29,8 @@ ActionController::Routing::Routes.draw do |map|
   map.provider_assign         '/providers/:id/assign',        :controller => 'providers', :action => 'assign',:conditions => {:method => :put}
   map.provider_assign_prompt  '/providers/:id/assign/prompt', :controller => 'providers', :action => 'assign_prompt',:conditions => {:method => :get}
   
-  map.resources :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get}
+  map.resources     :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get,
+                                         :grant_provider => :put, :revoke_provider => :put}
   map.user_notify   '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
   map.user_edit     '/users/:id/edit', :controller => 'users', :action => 'edit'
   map.user_sudo     '/users/:id/sudo', :controller => 'users', :action => 'sudo'

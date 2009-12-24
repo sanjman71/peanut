@@ -17,6 +17,8 @@ class UsersControllerTest < ActionController::TestCase
   should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
   should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"
   should_route :get, '/users/1/add_rpx',        :controller => 'users', :action => 'add_rpx', :id => "1"
+  should_route :put, '/users/1/grant_provider', :controller => 'users', :action => 'grant_provider', :id => "1"
+  should_route :put, '/users/1/revoke_provider',:controller => 'users', :action => 'revoke_provider', :id => "1"
 
   context 'invite url with subdomain' do
     setup do

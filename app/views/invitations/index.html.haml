@@ -1,13 +1,18 @@
 - title('Invitations')
+- stylesheet('users')
 
 .span-16
   .span-15.prepend-1.mat.padding-top-10.padding-bottom-10
-    %h3== My Invitations
-    %h5== #{@invitations.size} Invitations sent
-    %h5.bottom
-      = link_to 'Invite a user', new_invitation_path, :class => 'admin'
-      == &nbsp;|&nbsp;
-      = link_to 'Back', providers_path, :class => 'admin'
+    .span-10.padding-top-5
+      %h3== My Invitations
+    .span-5.last
+      %h4.padding-top-5{:style => 'font-size: 1.2em;'}
+        = link_to 'Invite a user', new_invitation_path, :class => 'add provider'
+    .span-15.last#invitations_sent
+      %h5== #{pluralize(@invitations.size, 'Invitation')} sent
+    .span-15.last
+      %h4
+        = link_to 'Back', providers_path, :class => 'admin'
 
   %hr.space
 
@@ -19,19 +24,25 @@
   - @invitations.each do |invitation|
     .span-16.last.letterbox{:class => cycle("shaded", "")}[invitation]
       -# invitation recipient
-      .span-6.prepend-1.name
-        %h2.bottom= invitation.recipient_email
+      .span-5.prepend-1.name
+        %h4
+          == To:
+          = invitation.recipient_email
       
-      .span-6.sent
-        %h5.padding-top-5.bottom
-          - unless invitation.sent_at.blank?
-            = invitation.sent_at.to_s(:appt_day_date_time)
+      .span-7.sent
+        %h6
+          -# show number of times the invitation has been sent
+          = "Sent " + pluralize(invitation.sent, "time")
+          -# show invitation sent at timestamp
+          %br
+          == Last Sent:
+          = invitation.last_sent_at.to_s(:appt_day_date_time)
 
       .span-2.prepend-1.last
         - if invitation.claimed?
-          %h5== Claimed
+          %h6== Claimed
         - else
-          = link_to 'Resend', resend_invitation_path(invitation), :class => 'admin'
+          %h6= link_to 'Resend', resend_invitation_path(invitation), :class => 'admin'
     
 .span-8.last
   -# help

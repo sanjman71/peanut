@@ -1,11 +1,12 @@
 class UsersController < ApplicationController
-  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx]
+  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx, :grant_provider, :revoke_provider]
   before_filter :init_role, :only => [:edit, :update]
   before_filter :init_user_privileges, :only => [:edit, :update]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
   privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
+  privilege_required      'update users', :only => [:grant_provider, :revoke_provider], :on => :current_company
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
@@ -231,6 +232,30 @@ class UsersController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  # PUT /users/1/grant_provider
+  def grant_provider
+    if @user.has_role?('company provider', current_company)
+      flash[:notice] = "You are already a company provider"
+    else
+      @user.grant_role('company provider', current_company)
+      flash[:notice] = "You have been added as a company provider"
+    end
+    redirect_to(user_edit_path(@user)) and return
+  end
+
+  # PUT /users/1/revoke_provider
+  def revoke_provider
+    # check if user has any free appointments where he is the provider
+    if Appointment.free.provider(@user).size > 0
+      # user can not be removed as a company provider
+      flash[:notice] = "You can not be removed as a company provider because you are a provider to at least 1 appointment"
+    else
+      # removing user as a company provider
+      flash[:notice] = "You have been removed as a company provider"
+    end
+    redirect_to(user_edit_path(@user)) and return
   end
 
   def suspend

@@ -9,7 +9,6 @@ class InvitationsControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
     @company = Factory(:company)
     @manager = Factory(:user, :name => "Owner")
     @manager.grant_role('company manager', @company)
@@ -44,7 +43,19 @@ class InvitationsControllerTest < ActionController::TestCase
         post :create, :invitation => {:role => 'company provider', :recipient_email => 'sanjay@jarna.com'}
       end
 
+      should_assign_to(:invitation)
       should_change("invitation count", :by => 1) { Invitation.count }
+      should_change("delayed job count", :by => 1) { Delayed::Job.count}
+
+      should "increment invitation.sent count" do
+        assert_equal 1, assigns(:invitation).sent
+      end
+
+      # sent_at timestamp is updated when delayed job sends the message
+      should "set invitation.last_sent_at timestamp to nil" do
+        assert_equal nil, assigns(:invitation).last_sent_at
+      end
+      
       should_redirect_to("invitations path") { invitations_path }
     end
 
@@ -57,7 +68,10 @@ class InvitationsControllerTest < ActionController::TestCase
         post :create, :invitation => {:role => 'company provider', :recipient_email => 'sanjay@walnut.com'}
       end
 
+      should_assign_to(:invitation)
       should_not_change("invitation count") { Invitation.count }
+      should_not_change("delayed job count") { Delayed::Job.count}
+
       should_redirect_to("providers assign prompt") { provider_assign_prompt_path(@user.id) }
     end
   end

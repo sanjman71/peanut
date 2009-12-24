@@ -27,13 +27,16 @@ class InvitationsController < ApplicationController
     @invitation         = Invitation.new(params[:invitation])
     @invitation.sender  = current_user
     @invitation.company = current_company
-    @email_address      = EmailAddress.with_emailable_user.with_address(params[:invitation][:recipient_email]).first
+    @email_address      = EmailAddress.with_emailable_user.with_address(@invitation.recipient_email).first
 
     if @email_address
       # user already exists; ask caller if they want to assign the user as a provider
       @user = @email_address.emailable
       redirect_to(provider_assign_prompt_path(:id => @user.id)) and return
-    elsif @invitation.save
+    end
+
+    if @invitation.save
+      # valid invitation
       send_invitation(@invitation)
       redirect_to(invitations_path) and return
     else
@@ -48,12 +51,12 @@ class InvitationsController < ApplicationController
     send_invitation(@invitation)
     redirect_to(invitations_path) and return
   end
-  
+
   protected
-  
+
   def send_invitation(invitation)
     begin
-      Delayed::Job.enqueue(InvitationJob.new(:id => invitation.id, :invite_url => invite_url(invitation.token), :method => 'send_invitation'))
+      MessageComposeInvitation.provider(invitation, invite_url(invitation.token))
       flash[:notice] = "An invitation to #{invitation.recipient_email} has been sent"
     rescue Exception => e
       logger.debug("*** invitation error: #{e.message}")
