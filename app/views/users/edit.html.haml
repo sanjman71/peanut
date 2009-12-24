@@ -76,7 +76,7 @@
       .span-4.append-16.last.text-align-right
         %h4= link_to 'Add Phone', '#', :class => 'admin', :id => 'add_phone'
 
-  - unless @user.rpx == 1
+  - unless @user.crypted_password.blank?
     -# password
     .span-20.last
       .span-4.text-align-right
