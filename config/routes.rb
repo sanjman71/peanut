@@ -42,13 +42,11 @@ ActionController::Routing::Routes.draw do |map|
   map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
   map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}
   map.provider_update '/providers/:id',       :controller => 'users', :action => 'update', :role => 'company provider', :conditions => {:method => :put}
-  map.customers       '/providers',           :controller => 'users', :action => 'index', :role => 'company provider', :conditions => {:method => :get}
 
   map.customer_new    '/customers/new',       :controller => 'users', :action => 'new', :role => 'company customer', :conditions => {:method => :get}
   map.customer_create '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
   map.customer_edit   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company customer', :conditions => {:method => :get}
   map.customer_update '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
-  map.customers       '/customers',           :controller => 'users', :action => 'index', :role => 'company customer', :conditions => {:method => :get}
 
   map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work',
                 :conditions => {:method => :get, :state => /upcoming|completed|canceled/}

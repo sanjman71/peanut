@@ -9,13 +9,11 @@ class UsersControllerTest < ActionController::TestCase
   should_route :post, '/providers/create',      :controller => 'users', :action => 'create', :role => 'company provider'
   should_route :get, '/providers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company provider', :id => "1"
   should_route :put, '/providers/1',            :controller => 'users', :action => 'update', :role => 'company provider', :id => "1"
-  should_route :get, '/providers',              :controller => 'users', :action => 'index', :role => 'company provider'
 
   should_route :get, '/customers/new',          :controller => 'users', :action => 'new', :role => 'company customer'
   should_route :post, '/customers/create',      :controller => 'users', :action => 'create', :role => 'company customer'
   should_route :get, '/customers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company customer', :id => "1"
   should_route :put, '/customers/1',            :controller => 'users', :action => 'update', :role => 'company customer', :id => "1"
-  should_route :get, '/customers',              :controller => 'users', :action => 'index', :role => 'company customer'
 
   should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
   should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"

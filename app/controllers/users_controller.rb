@@ -337,10 +337,11 @@ class UsersController < ApplicationController
         # back to referer
         request.referer
       else
-        "/customers"
+        # logged in, default path
+        customers_path
       end
     when "company provider"
-      "/providers"
+      providers_path
     else
       root_path
     end
