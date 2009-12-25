@@ -329,7 +329,16 @@ class UsersController < ApplicationController
     # build the index path based on the user type
     case role
     when "company customer"
-      openings_path
+      case
+      when !logged_in?
+        # not logged in, use openings path
+        openings_path
+      when logged_in? && (request.referer != request.url)
+        # back to referer
+        request.referer
+      else
+        "/customers"
+      end
     when "company provider"
       "/providers"
     else

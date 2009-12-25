@@ -9,10 +9,13 @@ class UsersControllerTest < ActionController::TestCase
   should_route :post, '/providers/create',      :controller => 'users', :action => 'create', :role => 'company provider'
   should_route :get, '/providers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company provider', :id => "1"
   should_route :put, '/providers/1',            :controller => 'users', :action => 'update', :role => 'company provider', :id => "1"
+  should_route :get, '/providers',              :controller => 'users', :action => 'index', :role => 'company provider'
+
   should_route :get, '/customers/new',          :controller => 'users', :action => 'new', :role => 'company customer'
   should_route :post, '/customers/create',      :controller => 'users', :action => 'create', :role => 'company customer'
   should_route :get, '/customers/1/edit',       :controller => 'users', :action => 'edit', :role => 'company customer', :id => "1"
   should_route :put, '/customers/1',            :controller => 'users', :action => 'update', :role => 'company customer', :id => "1"
+  should_route :get, '/customers',              :controller => 'users', :action => 'index', :role => 'company customer'
 
   should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
   should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"
@@ -596,6 +599,7 @@ class UsersControllerTest < ActionController::TestCase
   
     context "with 'update users' privilege" do
       setup do
+        @request.env['HTTP_REFERER'] = '/customers'
         @controller.stubs(:current_user).returns(@owner)
         get :edit, :id => @customer.id, :role => 'company customer'
       end
@@ -603,7 +607,7 @@ class UsersControllerTest < ActionController::TestCase
       should_respond_with :success
       should_render_template "users/edit.html.haml"
 
-      should_assign_to(:index_path) { openings_path }
+      should_assign_to(:index_path) { customers_path }
     end
   end
   
@@ -628,6 +632,10 @@ class UsersControllerTest < ActionController::TestCase
     end
 
     context "with 'update users' privilege" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/customers'
+      end
+
       context "and change name" do
         setup do
           @controller.stubs(:current_user).returns(@owner)
@@ -644,7 +652,7 @@ class UsersControllerTest < ActionController::TestCase
           assert User.authenticate(customer.email_address, 'customer')
         end
 
-        should_redirect_to("openings path") { openings_path }
+        should_redirect_to("customers path") { customers_path }
       end
 
       context "and change password" do
@@ -658,7 +666,7 @@ class UsersControllerTest < ActionController::TestCase
           assert User.authenticate(customer.email_address, 'secret')
         end
 
-        should_redirect_to("openings path") { openings_path }
+        should_redirect_to("customers path") { customers_path }
       end
 
       context "and change email" do
