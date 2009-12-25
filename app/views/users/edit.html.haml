@@ -8,9 +8,6 @@
     %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
     - if has_privilege?('update users', @user)
       = link_to 'Add an existing login', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
-    -# allow managers to reset (non-rpx) user passwords
-    -#- if has_privilege?('update users', @user) and !@user.rpx? and (@user != current_user) and @user.email_addresses_count > 0
-      -#= link_to 'Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @user.primary_email_address.address
 
   %hr.space
   .span-24.last
@@ -41,8 +38,14 @@
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address
         - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
-          - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? or email_form.object == @primary_email_address
-          - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin')) if email_form.object.deletable?
+          - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? || email_form.object == @primary_email_address
+          - if email_form.object.deletable? and (email_form.object != @primary_email_address)
+            -# allow delete for non-primary emails
+            - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin'))
+          - if @user.password? and !email_form.object.new_record?
+            -# allow password reset
+            - markers.push(link_to('Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => email_form.object.address))
+
         - unless markers.empty?
           %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
 
@@ -68,7 +71,7 @@
         .span-4.text-align-right
           %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
         .span-16.last
-          = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
+          = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px; font-size: 1.8em;', :class => 'select big', :id => 'phone_name'})
 
   - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
     -# add phone link
