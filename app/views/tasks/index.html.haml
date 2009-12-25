@@ -12,18 +12,18 @@
         %h3.margin-bottom-0== Appointment Messages
       .span-10.last
         - ['whenever'].each do |ts|
-          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_messages_path(:time_span => ts.to_url_param)
+          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_messages_path(:time_span => ts.to_url_param), :class => 'admin'
         
     .span-16.last.letterbox#task_appointment_reminders
       .span-5.prepend-1.name
         %h3.margin-bottom-0== Appointment Reminders
       .span-10.last
         - ['24 hours', '2 days', '3 days', '7 days'].each do |ts|
-          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_reminders_path(:time_span => ts.to_url_param)
+          %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_reminders_path(:time_span => ts.to_url_param), :class => 'admin'
 
     .span-16.last.letterbox#task_user_messages
       .span-5.prepend-1.name
         %h3.margin-bottom-0== User Messages
       .span-10.last
         - ['whenever'].each do |ts|
-          %span{:style => 'padding-right: 7px;'}= link_to ts, task_user_messages_path(:time_span => ts.to_url_param)
+          %span{:style => 'padding-right: 7px;'}= link_to ts, task_user_messages_path(:time_span => ts.to_url_param), :class => 'admin'

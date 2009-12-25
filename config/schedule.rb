@@ -23,11 +23,20 @@
 # whenever --update-crontab walnut_calendar
 # whenever --write-crontab walnut_calendar
 
+if RAILS_ENV == 'development'
+
+# no development cron jobs
+
+end
+
 if RAILS_ENV == 'production'
 
 every 3.hours do
-  # send appointment reminders for a specific subdomain
-  command "curl http://peakpt.walnutcalendar.com/tasks/appointments/reminders/24-hours?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+  # check/send appointment reminders for all companies with subscriptions
+  Subscription.all.collect(&:company).each do |company|
+    # send appointment reminders for a specific subdomain
+    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/appointments/reminders/24-hours?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+  end
 end
 
 every :reboot do

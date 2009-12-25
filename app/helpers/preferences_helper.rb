@@ -27,6 +27,7 @@ module PreferencesHelper
   
   def appt_confirmation_options
     [
+      ["No confirmations", "[:nobody]"],
       ["Customers only", "[:customer]"],
       ["Providers only", "[:provider]"],
       ["Managers only", "[:managers]"],

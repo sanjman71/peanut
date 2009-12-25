@@ -597,6 +597,23 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
 
     context "with appointment confirmations" do
+      context "to nobody" do
+        setup do
+          @company.preferences[:work_appointment_confirmations] = [:nobody]
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+        end
+        
+        # should send appt confirmation to customer
+        should_not_change("message count") { Message.count }
+        should_not_change("message topic") { MessageTopic.count }
+        should_not_change("delayed job count") { Delayed::Job.count }
+      end
+
       context "to customer only" do
         setup do
           # create work appointment as company manager

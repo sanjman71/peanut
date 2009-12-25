@@ -17,7 +17,7 @@ class TasksController < ApplicationController
     @messages     = 0
     @timeline     = ''
 
-    @title        = "Task Appointment Messages"
+    @title        = "Tasks - Appointment Messages"
 
     respond_to do |format|
       format.html { render(:action => 'appointment_reminders')}
@@ -54,7 +54,7 @@ class TasksController < ApplicationController
       end
     end
 
-    @title = "Task Appointment Reminder"
+    @title = "Tasks - Appointment Reminders"
 
     respond_to do |format|
       format.html
@@ -66,7 +66,7 @@ class TasksController < ApplicationController
     # find users as message topics
     @topics       = MessageTopic.for_type(User).all(:include => :topic)
     @messages     = 0
-    @title        = "Task User Messages"
+    @title        = "Tasks - User Messages"
 
     respond_to do |format|
       format.html
