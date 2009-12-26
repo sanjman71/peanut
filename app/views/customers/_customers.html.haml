@@ -1,7 +1,7 @@
 - customers.each do |customer|
   .span-16.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
     -# customer name and email
-    .span-6.prepend-1
+    .span-7.prepend-1
       %h2.customer.name.bottom= customer.name
       %h4.customer.email.bottom
         - if customer.email_addresses_count > 0
@@ -14,8 +14,13 @@
         - else
           == &nbsp;
 
-    .span-5
-      %h4= link_to "Show Appointments", customer_appointments_path(customer), :class => 'admin'
+    .span-4
+      -# show # of customer appointments
+      - appt_count = customer.appointments_count
+      - if appt_count > 0
+        %h6= link_to pluralize(customer.appointments_count, 'appointment'), customer_appointments_path(customer)
+      - else
+        %h6= pluralize(customer.appointments_count, 'appointment')
 
     .span-3.prepend-1.last
       -# allow company managers to edit all users, or the user to edit himself

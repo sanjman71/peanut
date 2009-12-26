@@ -12,13 +12,12 @@
     %br
     = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => current_subdomain))
     %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-    
 
   %hr.space
 
   .span-14.prepend-1.last
     = display_flash
-  
+
   .span-16.last
     #customers_pagination
       = render(:partial => 'customers_pagination', :locals => {:customers => @customers, :search_text => @search_text, :paginate => @paginate})

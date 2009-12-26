@@ -610,8 +610,8 @@ class AppointmentsController < ApplicationController
       return redirect_to(url_for(params.update(:subdomain => current_subdomain, :customer_id => nil)))
     end
     
-    # find state (default to 'confirmed') and customer (default to 'anyone')
-    @state      = params[:state] ? params[:state].to_s : 'confirmed'
+    # find state (default to 'all') and customer (default to 'anyone')
+    @state      = params[:state] ? params[:state].to_s : 'all'
     @customer   = params.has_key?(:customer_id) ? find_customer_from_params : User.anyone
 
     case @customer.id

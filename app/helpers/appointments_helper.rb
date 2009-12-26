@@ -25,10 +25,14 @@ module AppointmentsHelper
   # build possible state transitions based on current appointment state
   def build_appointment_state_transition_links(appointment)
     transitions = []
-    transitions.push(['Mark as completed', complete_appointment_path(appointment)]) unless appointment.completed? || appointment.canceled?
-    transitions.push(['Mark as noshow', noshow_appointment_path(appointment)]) unless appointment.noshow? || appointment.canceled?
-    transitions.push(['Mark as canceled', cancel_appointment_path(appointment)]) unless appointment.canceled?
-    
+
+    # find valid state transitions for the current appointment state
+    appointment.aasm_events_for_current_state.each do |state_sym|
+      link_name = "Mark as #{state_sym.to_s}"
+      link_url  = eval("#{state_sym.to_s}_appointment_path(appointment)")
+      transitions.push([link_name, link_url])
+    end
+
     transitions.each_with_index do |tuple, i|
       # use separator unless its the last element
       separator = (i == (transitions.size-1)) ? '' : '&nbsp;|&nbsp;'

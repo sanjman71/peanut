@@ -13,7 +13,7 @@
     -# appointment state links
     .span-7.last
       #links
-        - build_appointment_state_search_links(params, ['confirmed', 'completed', 'noshow', 'canceled'], @state, :default => 'confirmed') do |link, separator|
+        - build_appointment_state_search_links(params, Appointment.aasm_states_with_all, @state, :default => 'all') do |link, separator|
           = link
           = separator
       

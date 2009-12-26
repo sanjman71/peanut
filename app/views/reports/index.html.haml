@@ -31,7 +31,7 @@
     .span-3.padding-top-10.text-align-right
       %h5== Appointments:
     .span-12.last.padding-bottom-10
-      = select_tag('report[state]', options_for_select(Appointment::DISPLAY_STATES), :style => "width: 175px; align: top; font-size: 1.2em;")
+      = select_tag('report[state]', options_for_select(Appointment.aasm_states_for_select_with_all), :style => "width: 175px; align: top; font-size: 1.2em;")
 
   .span-15.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
     .span-3.padding-top-10.text-align-right
