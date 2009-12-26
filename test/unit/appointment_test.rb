@@ -48,42 +48,42 @@ class AppointmentTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @today, :start_at => "0000", :end_at => "0100"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
     end
-
+  
     should "create in confirmed state" do
       assert_equal 'confirmed', @free_appt.reload.state
     end
-
+  
     context "then mark as completed" do
       setup do
         @free_appt.complete!
       end
-
+  
       should "change state to completed" do
         assert_equal 'completed', @free_appt.reload.state
       end
     end
-
+  
     context "then mark as canceled" do
       setup do
         @free_appt.cancel!
       end
-
+  
       should "change state to canceled" do
         assert_equal 'canceled', @free_appt.reload.state
       end
     end
-
+  
     context "then mark as noshow" do
       setup do
         @free_appt.noshow!
       end
-
+  
       should "change state to noshow" do
         assert_equal 'noshow', @free_appt.reload.state
       end
     end
   end
-
+  
   context "create free appointment with mismatched duration and end_at values" do
     setup do
       @start_at_utc   = Time.zone.now.beginning_of_day.utc
@@ -91,13 +91,13 @@ class AppointmentTest < ActiveSupport::TestCase
       @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
       @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
       @appt           = AppointmentScheduler.create_free_appointment(@company, @provider,
-                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 120 * 60)
+                                                                     :start_at => @start_at_utc, :end_at => @end_at_utc, :duration => 2.hours)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
   
     should "have duration of 2 hours, and end_at time adjusted, and capacity 1" do
-      assert_equal 120 * 60, @appt.duration
+      assert_equal 2.hours, @appt.duration
       assert_equal 0, @appt.start_at.in_time_zone.hour
       assert_equal 2, @appt.end_at.in_time_zone.hour
       assert_equal 1, @appt.capacity
@@ -205,13 +205,13 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, 120 * 60, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, 2.hours, @customer, @options)
         assert_valid @work_appt
       end
   
       should "have work service with duration of 120 minutes" do
         assert_equal @work_service, @work_appt.service
-        assert_equal 120 * 60, @work_appt.duration
+        assert_equal 2.hours, @work_appt.duration
         assert_equal 10, @work_appt.start_at.hour
         assert_equal 12, @work_appt.end_at.hour
       end
@@ -243,6 +243,22 @@ class AppointmentTest < ActiveSupport::TestCase
         end
       end
     end
+    
+    context "and create a conflicting free appointment" do
+      setup do
+        # create free time from 10 am to 12 pm
+        @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+        @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      end
+  
+      should "raise exception" do
+        assert_raise TimeslotNotEmpty do
+          @free_appt2   = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+        end
+      end
+      
+    end
+    
   end
   
   context "create work appointment to check time overlap searching" do
@@ -250,57 +266,57 @@ class AppointmentTest < ActiveSupport::TestCase
       # start at 2 pm, local time
       @start_at_local = Time.zone.now.beginning_of_day + 14.hours
       @start_at_utc   = @start_at_local.utc
-      
+    
       @appt = @company.appointments.create(:service => @work_service,
                                            :provider => @provider,
                                            :customer => @customer,
                                            :start_at => @start_at_local,
                                            :duration => @work_service.duration)
-  
+
       assert_valid @appt
       @end_at_utc = @appt.end_at.utc
     end
-    
+  
     should "have time of day values based on start/end times in utc format" do
       assert_equal '', @appt.time
-      assert_equal ((@start_at_utc.hour * 60) + @start_at_utc.min) * 60, @appt.time_start_at
-      assert_equal ((@end_at_utc.hour * 60) + @end_at_utc.min) * 60, @appt.time_end_at
+      assert_equal @start_at_utc.hour.hours + @start_at_utc.min.minutes, @appt.time_start_at
+      assert_equal @end_at_utc.hour.hours + @end_at_utc.min.minutes, @appt.time_end_at
     end
-    
+  
     should "match afternoon and anytime time of day searches" do
       assert_equal [@appt], Appointment.time_overlap(Appointment.time_range("afternoon"))
       assert_equal [@appt], Appointment.time_overlap(Appointment.time_range("anytime"))
     end
-    
+  
     should "not match morning, evening, or invalid time of day searches" do
       assert_equal [], Appointment.time_overlap(Appointment.time_range("morning"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("evening"))
       assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
     end
   end
-  
+
   context "create work appointment to check appointment roles and privileges" do
     setup do
       # initialize roles and privileges
       BadgesInit.roles_privileges
-  
+
       # start at 2 pm, local time
       @start_at_local = Time.zone.now.beginning_of_day + 14.hours
-  
+
       @appt = @company.appointments.create(:service => @work_service,
                                            :provider => @provider,
                                            :customer => @customer,
                                            :start_at => @start_at_local,
                                            :duration => @work_service.duration)
-  
+
       assert_valid @appt
       @end_at_utc = @appt.end_at.utc
     end
-    
+  
     should "grant customer 'appointment manager' role on the appointment" do
       assert_equal ['appointment manager'], @customer.roles_on(@appt).collect(&:name).sort
     end
-    
+  
     should "grant provider 'appointment manager' role on the appointment" do
       assert_equal ['appointment manager'], @provider.roles_on(@appt).collect(&:name).sort
     end
@@ -372,9 +388,9 @@ class AppointmentTest < ActiveSupport::TestCase
         assert 2, @work_appt.capacity
       end
     end
-
+  
   end
-
+  
   #
   # Recurrence Tests
   #
@@ -434,10 +450,10 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_recurrence = @start_at + 8.weeks
       @recur_days     = "#{ical_days([@start_at.utc, (@start_at + 4.days).utc])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-      @recurrence     = Appointment.create(:company => @company, :customer => @customer, :provider => @provider,
-                                          :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                          :recur_rule => @recur_rule, :description => "This is the recurrence description")
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                     :description => "This is the recurrence description")
       assert_valid @recurrence
+
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -554,7 +570,7 @@ class AppointmentTest < ActiveSupport::TestCase
       context "then change end time and duration of the recurrence" do
         setup do
           @recurrence.end_at = @recurrence.start_at + 3.hours
-          @recurrence.duration = 3.hours / 60
+          @recurrence.duration = 3.hours
           attr_changed = @recurrence.changed
           attr_changes = @recurrence.changes
           @recurrence.save
@@ -566,7 +582,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 180 * 60, a.duration
+            assert_equal 3.hours, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 3, a.end_at.in_time_zone.hour
           end
@@ -590,7 +606,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
         should "not change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 120 * 60, a.duration
+            assert_equal 2.hours, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 2, a.end_at.in_time_zone.hour
           end
@@ -601,7 +617,7 @@ class AppointmentTest < ActiveSupport::TestCase
       context "then change the recurrence rule to 3 per week and change end time" do
         setup do
           @recurrence.end_at     = @recurrence.start_at + 3.hours
-          @recurrence.duration   = 3.hours / 60
+          @recurrence.duration   = 3.hours
           @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
           @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
           attr_changed = @recurrence.changed
@@ -615,7 +631,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
-            assert_equal 180 * 60, a.duration
+            assert_equal 3.hours, a.duration
             assert_equal 0, a.start_at.in_time_zone.hour
             assert_equal 3, a.end_at.in_time_zone.hour
           end
@@ -625,14 +641,14 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then create a second recurrence" do
         setup do
-          @start_at       = Time.zone.now.beginning_of_day.utc
+          # Create the second recurrence starting after the first (the first goes from 0000 to 0200, this second will go from 0400 to 0430)
+          @start_at       = Time.zone.now.beginning_of_day + 4.hours
           @end_at         = @start_at + 30.minutes
           @end_recurrence = @start_at + 8.weeks
           @recur_days     = "#{ical_days([(@start_at + 1.day), (@start_at + 5.days)])}"
           @recur_rule     = "FREQ=WEEKLY;INTERVAL=2;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-          @recurrence2    = Appointment.create(:company => @company, :customer => @customer,  :provider => @provider,
-                                              :service => @free_service, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                              :recur_rule => @recur_rule, :description => "This is the 2nd recurrence description")
+          @recurrence2    = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                         :description => "This is the 2nd recurrence description")
           assert_valid @recurrence2
           appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
         end
@@ -641,9 +657,9 @@ class AppointmentTest < ActiveSupport::TestCase
       
         should "have duration of 30 minutes" do
           @recurrence2.recur_instances.each do |a|
-            assert_equal 30 * 60, a.duration
-            assert_equal 0, a.start_at.in_time_zone.hour
-            assert_equal 0, a.end_at.in_time_zone.hour
+            assert_equal 30.minutes, a.duration
+            assert_equal 4, a.start_at.in_time_zone.hour
+            assert_equal 4, a.end_at.in_time_zone.hour
             assert_equal 30, a.end_at.min
           end
         end
@@ -683,8 +699,22 @@ class AppointmentTest < ActiveSupport::TestCase
       
       end  
   
+
+      context "create a second conflicting valid recurring free private appointment" do
+        setup do
+          # Each of @start_at, @end_at, @end_recurrence, @recur_days and @recur_rule are reused from previous definition
+        end
+      
+        should "raise exception" do
+          assert_raise TimeslotNotEmpty do
+            @recurrence2  = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, 
+                                                :recur_rule => @recur_rule, :description => "This is the recurrence description")
+          end
+        end
+      end
+      
     end
-  
+    
   end
   
   context "create an available appointment" do
@@ -702,9 +732,8 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_recurrence = @start_at + 13.days
       @recur_days     = "#{ical_days([(@start_at)])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-      @recurrence     = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                          :recur_rule => @recur_rule, :name => "Happy Hour!", 
-                                          :description => "$2 beers, $3 well drinks", :public => true)
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                     :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
       assert_valid @recurrence
       @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks)
     end
@@ -721,9 +750,8 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_at     = @start_at + 2.hours
       @recur_days = "#{ical_days([(@start_at + 3.days)])}"
       @recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-      @recurrence = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                      :recur_rule => @recur_rule, :name => "Happy Hour!", 
-                                      :description => "$2 beers, $3 well drinks", :public => true)
+      @recurrence = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                 :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
       assert_valid @recurrence
       @appointments   = @recurrence.expand_recurrence(@start_at, @start_at + 4.weeks, 3)
     end
@@ -746,9 +774,8 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_recurrence = @start_at + 4.weeks
       @recur_days     = "#{ical_days([(@start_at + 2.days)])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-      @recurrence = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                      :recur_rule => @recur_rule, :name => "Happy Hour!", 
-                                      :description => "$2 beers, $3 well drinks", :public => true)
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                     :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
       assert_valid @recurrence
       @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks)
     end
