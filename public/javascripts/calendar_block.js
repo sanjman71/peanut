@@ -1,7 +1,7 @@
 // edit calendar for the selected provider
 $.fn.init_select_calendar_new_block_provider = function () {
   $("#edit_provider").change(function () {
-    var href = '/' + this.value + '/calendar/block/edit';
+    var href = '/' + this.value + '/calendar/block/new';
     window.location = href;
     return false;
   })
