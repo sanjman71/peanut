@@ -163,7 +163,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@customer)
         post :create_work,
              :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
-             :duration => @haircut.duration, :mark_as => 'work', :customer_id => @customer.id
+             :duration => @haircut.duration, :customer_id => @customer.id
       end
   
       should_respond_with :redirect
@@ -187,8 +187,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         @controller.stubs(:current_user).returns(@customer)
         post :create_free,
-             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @free_service.id, :mark_as => 'free'}
+             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
   
       should_not_change("Appointment.count") { Appointment.count }
@@ -201,8 +200,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # have johnny create free appointments on his calendar
         @controller.stubs(:current_user).returns(@johnny)
         post :create_free,
-             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}", 
-              :service_id => @free_service.id, :mark_as => 'free'}
+             {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
   
       should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -222,8 +220,7 @@ class AppointmentsControllerTest < ActionController::TestCase
          # have johnny create free appointments on his calendar
          @controller.stubs(:current_user).returns(@johnny)
          post :create_block,
-              {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
-               :service_id => @free_service.id, :mark_as => 'free'}
+              {:dates => ["20090201", "20090203"], :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}"}
        end
   
        should_change("Appointment.count", :by => 2) { Appointment.count }
@@ -332,10 +329,22 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "20090201T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
       should_assign_to(:provider) { @johnny }
-      should_assign_to(:free_service) { @free_service }
   
       should_respond_with :redirect
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+      
+      context "and create a conflicting weekly schedule" do
+        setup do
+          @controller.stubs(:current_user).returns(@johnny)
+          post :create_weekly,
+               {:freq => 'weekly', :byday => 'mo,tu', :dstart => "20090201", :tstart => "100000", :tend => "120000", :until => '',
+                :provider_type => "users", :provider_id => "#{@johnny.id}"}
+        end
+        
+        should_not_change("Appointment.recurring.count") { Appointment.recurring.count }
+        should_not_change("Appointment.count") { Appointment.count }
+        should_set_the_flash_to /This time conflicts with existing availability/
+      end
     end
     
     context "with an end date" do
@@ -356,7 +365,6 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "20090201T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=20090515T000000Z" }
       should_assign_to(:provider) { @johnny }
-      should_assign_to(:free_service) { @free_service }
   
       should_respond_with :redirect
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
@@ -368,7 +376,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       @controller.stubs(:current_user).returns(@johnny)
       post :create_work,
            {:dates => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
+            :service_id => @haircut.id, :customer_id => @customer.id}
     end
   
     should_not_change("Appointment.count") { Appointment.count }
@@ -399,7 +407,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create work appointment, today from 9 am to 11 am
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
+            :service_id => @haircut.id, :customer_id => @customer.id}
       @free_appt.reload
     end
   
@@ -447,7 +455,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create work appointment, today from 10 am to 10:30 am local time
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
+            :service_id => @haircut.id, :customer_id => @customer.id}
       @free_appt.reload
     end
   
@@ -495,7 +503,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create work appointment, today from 10 am to 12 pm local time
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-            :service_id => @haircut.id, :customer_id => @customer.id, :mark_as => 'work'}
+            :service_id => @haircut.id, :customer_id => @customer.id}
       @free_appt.reload
     end
   
@@ -547,7 +555,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @haircut.id, :mark_as => 'work',
+              :service_id => @haircut.id,
               :customer => {:name => "Sanjay", :email => "sanjay@walnut.com", :password => 'sanjay', :password_confirmation => 'sanjay'}}
         @free_appt.reload
       end
@@ -605,7 +613,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+                :service_id => @haircut.id, :customer_id => @customer.id}
         end
         
         # should send appt confirmation to customer
@@ -621,7 +629,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+                :service_id => @haircut.id, :customer_id => @customer.id}
         end
         
         # should send appt confirmation to customer
@@ -642,7 +650,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+                :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
         # should send appt confirmation to customer
@@ -663,7 +671,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+                :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
         # should send appt confirmation to all managers
@@ -685,7 +693,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id}
+                :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
         # should send appt confirmation to customer and all managers
@@ -712,7 +720,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id, :preferences_reminder => '1'}
+                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder => '1'}
         end
 
         should "set appointment reminders on" do
@@ -727,7 +735,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :mark_as => 'work', :customer_id => @customer.id, :preferences_reminder => '0'}
+                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder => '0'}
         end
 
         should "set appointment reminders off" do
