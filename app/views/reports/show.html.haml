@@ -6,17 +6,25 @@
     == Custom Report
     %span{:style => 'padding-left: 10px; font-size: 0.5em;'}= link_to 'Back to Reports', reports_path
   %h4== Today is #{Time.now.to_s(:appt_day)}
-  %h4= @text
-  
+  -#%h4= @text
+  .span-23.last#report_when
+    .span-1.text-align-right
+      %h5{:style => 'color: #0000BB;'}== When:
+    .span-22.last
+      %h4== #{@start_date.to_s(:appt_short_month_day_year)} - #{@end_date.to_s(:appt_short_month_day_year)}
+  .span-23.last#report_for
+    .span-1.text-align-right
+      %h5{:style => 'color: #0000BB;'}== For:
+    .span-22.last
+      %h4= @text
+
 %hr.space
 
 .span-23.prepend-1#pagination
   .span-8
-    = page_entries_info(@appointments, :entry_name => 'appointment')
+    %h4= page_entries_info(@appointments, :entry_name => 'appointment')
   .span-15.last
-    = will_paginate(@appointments)
-  
-%hr.space
+    %h4= will_paginate(@appointments)
 
 .span-24#appointments
   = render(:partial => 'appointments/customer_appointments', :locals => {:appointments => @appointments})

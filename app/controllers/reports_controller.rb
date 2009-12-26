@@ -24,6 +24,7 @@ class ReportsController < ApplicationController
     # parse start_date, end_date
     start_date  = sprintf("%s", params[:report][:start_date].split('/').reverse.swap!(1,2).join)
     end_date    = sprintf("%s", params[:report][:end_date].split('/').reverse.swap!(1,2).join)
+    @state      = params[:report][:state].to_s
 
     # parse providers, services
     provider    = params[:report][:provider]
@@ -37,13 +38,13 @@ class ReportsController < ApplicationController
     case
     when ((!provider_id.blank?) and (provider_id.to_i != 0)) # 0 means anyone
       # range with 1 provider
-      redirect_to = report_providers_path(:start_date => start_date, :end_date => end_date, :provider_ids => provider_id)
+      redirect_to = report_providers_path(:start_date => start_date, :end_date => end_date, :state => @state, :provider_ids => provider_id)
     when ((!service_id.blank?) and (service_id.to_i != 0)) # 0 means any
       # range with 1 service
-      redirect_to = report_services_path(:start_date => start_date, :end_date => end_date, :service_ids => service_id)
+      redirect_to = report_services_path(:start_date => start_date, :end_date => end_date, :state => @state, :service_ids => service_id)
     else
       # range with no providers
-      redirect_to = report_range_path(:start_date => start_date, :end_date => end_date)
+      redirect_to = report_range_path(:start_date => start_date, :end_date => end_date, :state => @state)
     end
 
     respond_to do |format|
@@ -52,12 +53,13 @@ class ReportsController < ApplicationController
     end
   end
 
-  # GET /reports/range/20090101..20090201
+  # GET /reports/range/20090101..20090201/all|confirmed
   # GET /reports/range/20090101..20090201/providers/1
   # GET /reports/range/20090101..20090201/services/1
   def show
     @start_date = Time.zone.parse(params[:start_date])
     @end_date   = Time.zone.parse(params[:end_date])
+    @state      = params[:state].to_s
 
     if !params[:provider_ids].blank?
       @provider_ids = params[:provider_ids].split(',')
@@ -69,21 +71,39 @@ class ReportsController < ApplicationController
       @services    = current_company.services.find(@service_ids)
     end
 
-    @appointments = current_company.appointments.work.not_canceled.all(:conditions => ["start_at >= ? AND start_at <= ?", @start_date, @end_date]).paginate(:page => params[:page], :per_page => 20)
+    @conditions = ["start_at >= ? AND start_at <= ?", @start_date, @end_date]
+    @order      = 'appointments.start_at asc'
+    @paginate   = Hash[:page => params[:page], :per_page => 20]
 
-    tuple = ["Report from #{@start_date.to_s(:appt_short_month_day_year)} to #{@end_date.to_s(:appt_short_month_day_year)}"]
+    case @state
+    when 'all'
+      @appointments = current_company.appointments.work.all(:conditions => @conditions, :order => @order).paginate(@paginate)
+    else
+      @appointments = current_company.appointments.work.send(@state).all(:conditions => @conditions, :order => @order).paginate(@paginate)
+    end
+
+    # tuple = ["Report from #{@start_date.to_s(:appt_short_month_day_year)} to #{@end_date.to_s(:appt_short_month_day_year)}"]
+    tuple = ["#{@state.titleize} Appointments"]
 
     case
     when (@providers.blank? and @services.blank?)
-      tuple.push("for all services and providers")
+      tuple.push("All Services and Providers")
     when !@providers.blank?
-      tuple.push("for #{@providers.collect(&:name).join(", ")}")
+      if @providers.size == 1
+        tuple.push("Provider #{@providers.collect(&:name).join(", ")}")
+      else
+        tuple.push("Providers #{@providers.collect(&:name).join(", ")}")
+      end
     when !@services.blank?
-      tuple.push("for #{@services.collect(&:name).join(", ")}")
+      if @services.size == 1
+        tuple.push("Service #{@services.collect(&:name).join(", ")}")
+      else
+        tuple.push("Services #{@services.collect(&:name).join(", ")}")
+      end
     end
 
     @title  = "Custom Report"
-    @text   = tuple.join(" ")
+    @text   = tuple.join(", ")
 
     respond_to do |format|
       format.html

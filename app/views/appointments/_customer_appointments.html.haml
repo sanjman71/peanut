@@ -1,5 +1,5 @@
 - appointments.each do |appointment|
-  .span-16.last.letterbox.appointment{:class => cycle("shaded", "") + " #{appointment.canceled? ? 'canceled' : ''}" }
+  .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]
     -# service and provider
     .span-6.prepend-1
       %h3{:style => 'padding-top: 5px; margin-bottom: 5px;'}= appointment.service.name
@@ -10,29 +10,21 @@
     -# when
     .span-6
       - if appointment.work?
-        - if appointment.canceled?
-          .canceled.when{:style => 'padding-top: 5px;'}
-            == Canceled:
-            = appointment.start_at.to_s(:appt_short_month_day_year)
-            == @
-            = appointment.start_at.to_s(:appt_time)
-        - else
-          .work.when{:style => 'padding-top: 5px;'}
-            == Scheduled:
-            = appointment.start_at.to_s(:appt_short_month_day_year)
-            == @
-            = appointment.start_at.to_s(:appt_time)
-            %br
-            %em= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
-      - elsif appointment.wait?
-        .wait.when{:style => 'padding-top: 5px;'}
-          == Waitlist:
+        .work.when.padding-top-5{:class => appointment.state}
+          %span{:style => 'color: #0000BB; font-weight: bold;'}== #{appointment.state.titleize}:
           = appointment.start_at.to_s(:appt_short_month_day_year)
-          == -
-          = appointment.end_at.to_s(:appt_short_month_day_year)
+          == @
+          = appointment.start_at.to_s(:appt_time)
+          %h5= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+      / - elsif appointment.wait?
+      /   .wait.when{:style => 'padding-top: 5px;'}
+      /     == Waitlist:
+      /     = appointment.start_at.to_s(:appt_short_month_day_year)
+      /     == -
+      /     = appointment.end_at.to_s(:appt_short_month_day_year)
           
     -# appointment details
     .span-2.prepend-1.last{:style => 'margin-top: 3px;'}
-      = link_to 'Details', appointment_path(appointment, :subdomain => current_subdomain)
+      = link_to 'Details', appointment_path(appointment, :subdomain => current_subdomain), :class => 'admin'
   
 
