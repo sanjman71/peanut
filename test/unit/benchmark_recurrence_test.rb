@@ -24,9 +24,8 @@ class BenchmarkRecurrenceTest < ActiveSupport::TestCase
       @end_recurrence = @start_at + 4.weeks
       @recur_days     = "#{ical_days([(@start_at + 2.days)])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-      @recurrence     = Appointment.create(:company => @company, :start_at => @start_at, :end_at => @end_at, :mark_as => "free",
-                                          :recur_rule => @recur_rule, :name => "Benchmarking", 
-                                          :description => "Benchmarking", :public => true)
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                     :name => "Benchmarking", :description => "This is the 2nd recurrence description", :public => true)
       assert_valid @recurrence
       @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks, 3)
     end

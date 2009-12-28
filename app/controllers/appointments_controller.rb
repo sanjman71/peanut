@@ -74,10 +74,12 @@ class AppointmentsController < ApplicationController
     end
 
     # get appointment parameters
-    @service        = current_company.services.find_by_id(params[:service_id])
+    # service and mark_as may be set by create_free and create_block
+    @service        ||= current_company.services.find_by_id(params[:service_id])
+    @mark_as        ||= params[:mark_as]
+
     @customer       = User.find_by_id(params[:customer_id])
 
-    @mark_as        = params[:mark_as]
     @duration       = params[:duration].to_i if params[:duration]
     @start_at       = params[:start_at]
     @end_at         = params[:end_at]
@@ -284,19 +286,21 @@ class AppointmentsController < ApplicationController
   
   # POST /users/1/calendar/free/add
   def create_free
+    @service = current_company.free_service
+    @mark_as = Appointment::FREE
     create
   end
   
   # POST /users/1/calendar/block/add
   def create_block
+    @service = current_company.free_service
+    @mark_as = Appointment::FREE
     create
   end
 
   # POST /users/1/calendar/weekly/add
   def create_weekly
     # @provider initialized in before filter
-
-    @free_service = current_company.free_service
 
     # get recurrence parameters
     @freq         = params[:freq].to_s.upcase
@@ -329,27 +333,33 @@ class AppointmentsController < ApplicationController
     end
 
     # build start_at and end_at times
-    @start_at_utc = Time.zone.parse(@dtstart).utc
-    @end_at_utc   = Time.zone.parse(@dtend).utc
+    @start_at       = Time.zone.parse(@dtstart)
+    @end_at         = Time.zone.parse(@dtend)
 
     # create appointment with recurrence rule
-    @appointment  = current_company.appointments.create(:company => current_company, :provider => @provider, :service => @free_service,
-                                                        :start_at => @start_at_utc, :end_at => @end_at_utc, :mark_as => Appointment::FREE,
-                                                        :recur_rule => @recur_rule, :capacity => @capacity)
+    @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
+    @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
+    @error          = nil
+    
+    begin
+      # Create the first appointment in the sequence
+      @appointment  = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
+    rescue Exception => e
+      @error        = e.message
+    end
 
-    # build redirect path
-    @redirect_path  = build_create_redirect_path(@provider, request.referer)
+    if !@error.blank?
+      # set the flash
+      flash[:error]   = @error
+      @redirect_path  = build_create_redirect_path(@provider, request.referer)
+    else
+      flash[:notice] = 'Weekly appointment was made successfully.'
+      @redirect_path  = request.referer || build_create_redirect_path(@provider, request.referer)
+    end
 
     respond_to do |format|
-      if @appointment.valid?
-        flash[:notice] = 'Weekly appointment was made successfully.'
-        format.html { redirect_to(@redirect_path) and return }
-        format.js
-      else
-        flash[:notice] = 'Problem making weekly appointment.'
-        format.html { render :template => "calendar/edit_weekly.html" }
-        format.js
-      end
+      format.html { redirect_to(@redirect_path) and return }
+      format.js
     end
 
   end
@@ -370,7 +380,8 @@ class AppointmentsController < ApplicationController
       # assign the customer id
       params[:customer_id] = @customer.id
     end
-    
+
+    @mark_as = Appointment::WORK
     create
   end
 

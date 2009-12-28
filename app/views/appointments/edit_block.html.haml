@@ -28,8 +28,6 @@
 - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_block'), :method => :post, :html => {:id => 'add_block_free_time_form'}) do |f|
   = hidden_field_tag :provider_type, @provider.tableize
   = hidden_field_tag :provider_id, @provider.id
-  = hidden_field_tag :service_id, @free_service.id
-  = hidden_field_tag :mark_as, Appointment::FREE
   
   %em.span-14.prepend-1.append-9.last#date_count
     == No dates selected
@@ -48,15 +46,15 @@
     == On each of the days you pick, what time will availability start and end?
   .span-14.prepend-1.last
     .span-3.text_field_label
-      = label_tag "starts_at", "Start Time:"
+      = label_tag "start_at", "Start Time:"
     .span-4.padding-top-5
-      = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+      = text_field_tag 'start_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
 
   .span-14.prepend-1.last
     .span-3.text_field_label
-      = label_tag "ends_at", "End Time:"
+      = label_tag "end_at", "End Time:"
     .span-4.padding-top-5
-      = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+      = text_field_tag 'end_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
 
   %hr.space
 

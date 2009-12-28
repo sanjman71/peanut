@@ -3,8 +3,6 @@
   - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_free'), :method => :post, :html => {:id => 'add_single_free_time_form'}) do |f|
     = hidden_field_tag :provider_type, provider.tableize
     = hidden_field_tag :provider_id, provider.id
-    = hidden_field_tag :service_id, service.id
-    = hidden_field_tag :mark_as, Appointment::FREE
     = hidden_field_tag :capacity, provider.capacity
     
     .add_free_time
