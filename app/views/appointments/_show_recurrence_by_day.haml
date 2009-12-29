@@ -1,11 +1,12 @@
 - stuff_by_day.each do |day, stuff|
   .span-16.last
-    .span-11.last.calendar.date.wide
+    .span-11.prepend-1.last.calendar.date.wide
       = day.to_s(:appt_day)
-    - reset_cycle
-    - stuff.each do |object|
-      -# check what type of stuff it is, possible options:
-      -# appointments, capacity_slots, [waitlist, date, waitlist_time_range]
-      - case
-      - when object.is_a?(Appointment)
-        = render(:partial => 'appointments/free_work_appointments', :locals => {:day => day, :appointment => object})
+    .span-15.prepend-1.last
+      - reset_cycle
+      - stuff.each do |object|
+        -# check what type of stuff it is, possible options:
+        -# appointments, capacity_slots, [waitlist, date, waitlist_time_range]
+        - case
+        - when object.is_a?(Appointment)
+          = render(:partial => 'appointments/free_work_appointments', :locals => {:day => day, :appointment => object})

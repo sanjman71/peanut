@@ -1,4 +1,4 @@
-.span-15.prepend-1.last.appointment{:class => [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')}[appointment]
+.span-15.last.appointment{:class => [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')}[appointment]
   .span-4.time
     - if appointment.work? && appointment.canceled?
       %del== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
