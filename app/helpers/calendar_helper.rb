@@ -3,12 +3,18 @@ module CalendarHelper
   def build_calendar_range_type_links(provider, range_type_collection, current, start_date)
 
     range_type_collection.each do |rt|
+      url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain}
       # add css 'current' class for the current link
       klass       = (rt == current) ? 'current' : ''
-      url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain, :range_type => rt, :start_date => start_date.to_s(:appt_schedule_day)}
-      
-      # use when parameter
-      link  = link_to(rt.titleize, range_type_show_path(url_params), :class => klass)
+      if ((rt == 'daily') && (start_date.today?))
+        url_params.merge!({:when => 'today'})
+        # use when parameter
+        link  = link_to(rt.titleize, when_show_path(url_params), :class => klass)
+      else
+        url_params.merge!({:range_type => rt, :start_date => start_date.to_s(:appt_schedule_day)})
+        # use when parameter
+        link  = link_to(rt.titleize, range_type_show_path(url_params), :class => klass)
+      end      
       
       yield link
     end
@@ -39,6 +45,8 @@ module CalendarHelper
 
   def build_calendar_today_prev_next_links(provider, daterange)
 
+    prev_link = next_link = today_link = nil
+
     start_date         = daterange.start_at.in_time_zone
     end_date           = daterange.end_at.in_time_zone
     current_range_type = daterange.range_type
@@ -60,6 +68,7 @@ module CalendarHelper
       next_date          = start_date + 1.day
       range_word         = "Day"
       today_word         = "Today"
+      today_link         = link_to("#{today_word}",  when_show_path(:when => 'today'))
     when 'weekly'
       prev_date          = start_date - 1.week
       next_date          = (start_date + 1.week < day_after_end) ? (start_date + 1.week) : day_after_end
@@ -80,12 +89,21 @@ module CalendarHelper
 
     url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain, :range_type => current_range_type}
 
-    prev_link = link_to("Previous #{range_word}", range_type_show_path(url_params.merge({:start_date => prev_date.to_s(:appt_schedule_day)})))
-    next_link = link_to("Next #{range_word}", range_type_show_path(url_params.merge({:start_date => next_date.to_s(:appt_schedule_day)})))
-    today_link = link_to("#{today_word}",  range_type_show_path(url_params.merge({:start_date => Time.zone.today.to_time.to_s(:appt_schedule_day)})))
+    if prev_link.blank?
+      prev_link = link_to("Previous #{range_word}", 
+                          range_type_show_path(url_params.merge({:start_date => prev_date.to_s(:appt_schedule_day)})))
+    end
+    if next_link.blank?
+      next_link = link_to("Next #{range_word}", 
+                          range_type_show_path(url_params.merge({:start_date => next_date.to_s(:appt_schedule_day)})))
+    end
+    if today_link.blank?
+      today_link = link_to("#{today_word}",  
+                          range_type_show_path(url_params.merge({:start_date => Time.zone.today.to_time.to_s(:appt_schedule_day)})))
+    end
 
     {:today_link => today_link, :prev_link => prev_link, :next_link => next_link}
 
   end
-
+  
 end
