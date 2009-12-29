@@ -65,6 +65,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
       assert_equal [[0, 8, 8.hours, 4]], @free_appt.capacity_slots.map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity] }
     end
     
+    should "correctly prepare for schedule view" do
+      assert_equal [[0, 8, 4]],
+        (CapacitySlot.build_capacities_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.capacity] }.sort
+    end
+    
+    should "correctly prepare for openings view" do
+      assert_equal [[0, 8]], 
+        (CapacitySlot.build_openings_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour] }.sort
+    end
+    
     context "then reduce capacity of the [0, 8, 8.hours, 4] slot: 3-6 c 1" do
       setup do
         @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
@@ -86,6 +96,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
         assert_equal [[0, 3, 3.hours, 4], [0, 8, 8.hours, 3], [6, 8, 2.hours, 4]], slots
       end
   
+      should "correctly prepare for schedule view" do
+        assert_equal [[0, 3, 4], [3, 6, 3], [6, 8, 4]],
+          (CapacitySlot.build_capacities_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.capacity] }.sort
+      end
+
+      should "correctly prepare for openings view" do
+        assert_equal [[0, 8]],
+          (CapacitySlot.build_openings_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour] }.sort
+      end
+
       context "then reduce capacity of [0, 8, 8.hours, 3]: 5-7 c 2" do
         setup do
           @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0500", :end_at => "0700"})
@@ -122,6 +142,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
             assert_equal [[0, 3, 3.hours, 4], [0, 5, 5.hours, 3], [0, 8, 8.hours, 1], [6, 8, 2.hours, 2], [7, 8, 1.hours, 4]], slots
           end
   
+          should "correctly prepare for schedule view" do
+            assert_equal [[0, 3, 4], [3, 5, 3], [5, 6, 1], [6, 7, 2], [7, 8, 4]],
+              (CapacitySlot.build_capacities_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.capacity] }.sort
+          end
+
+          should "correctly prepare for openings view" do
+            assert_equal [[0, 8]], 
+              (CapacitySlot.build_openings_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour] }.sort
+          end
+
           context "then remove company" do
             setup do
               @company.destroy
@@ -169,7 +199,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
                                                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 3, 3.hours, 4], [0, 8, 8.hours, 3], [6, 8, 2.hours, 4]], slots
     end
-  
+      
     context "then consume more capacity" do
       setup do
         @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0100", :end_at => "0200"})
@@ -316,6 +346,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
           assert_equal [Time.zone.parse("03:00").utc.hour.hours, Time.zone.parse("08:00").utc.hour.hours], @free_appt.capacity_slots.map(&:time_end_at).sort
         end
         
+        should "correctly prepare for schedule view" do
+          assert_equal [[0, 3, 1], [6, 8, 1]],
+            (CapacitySlot.build_capacities_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.capacity] }.sort
+        end
+
+        should "correctly prepare for openings view" do
+          assert_equal [[0, 3], [6, 8]],
+            (CapacitySlot.build_openings_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour] }.sort
+        end
+
         context "THEN find free time from 0100 to 0200" do
           
           setup do
@@ -351,6 +391,16 @@ class CapacitySlotTest < ActiveSupport::TestCase
                             @free_appt.capacity_slots.map(&:time_end_at).sort
             end
   
+            should "correctly prepare for schedule view" do
+              assert_equal [[0, 1, 1], [2, 3, 1], [6, 8, 1]],
+                (CapacitySlot.build_capacities_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.capacity] }.sort
+            end
+
+            should "correctly prepare for openings view" do
+              assert_equal [[0, 1], [2, 3], [6, 8]],
+                (CapacitySlot.build_openings_for_view(@free_appt.capacity_slots)).map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour] }.sort
+            end
+
             context "THEN find free time from 0500 to 0700" do
               setup do
                 @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0500", :end_at => "0700"})
