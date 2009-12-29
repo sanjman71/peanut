@@ -114,8 +114,9 @@ class OpeningsController < ApplicationController
     # find free appointments, group by day (use appt utc time)
     @free_capacity_slots        = AppointmentScheduler.find_free_capacity_slots(current_company, current_location,
                                                                                 @provider, @service, @duration, @daterange)
+    @free_capacity_slots        = CapacitySlot.build_openings_for_view(@free_capacity_slots)
     @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day}
-    
+        
     logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
     
     # build hash of calendar markings
