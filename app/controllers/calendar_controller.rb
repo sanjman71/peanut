@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company]
 
   # Default when value
-  @@default_when = Appointment::WHEN_THIS_WEEK
+  @@default_when = Appointment::WHEN_TODAY
   
   def index
     # redirect to a specific provider, try the current first and default to the first company provider
@@ -48,17 +48,22 @@ class CalendarController < ApplicationController
 
     # find free, work appointments for the specified provider over a daterange
     # For free appointments, we don't care about service or duration, so these are set to nil
-    @free_appointments        = AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
-    @work_appointments        = AppointmentScheduler.find_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
-    
+    @free_appointments   = AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @work_appointments   = AppointmentScheduler.find_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
+    @orphan_appointments = AppointmentScheduler.find_orphan_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
+
+
     # find capacity for the specified provider over the daterange. We don't care about service or duration, so these are set to nil
-    @capacity                 = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @capacity            = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @capacity            = @capacity.group_by { |x| x.free_appointment_id }
+    @capacity            = @capacity.each_with_object({}) {|(k, v), h| h[k] = CapacitySlot.build_capacities_for_view(v) }
+    @capacity            = @capacity.values.flatten
 
     # build hash of calendar markings based on the free appointments
-    @calendar_markings        = build_calendar_markings(@free_appointments)
+    @calendar_markings   = build_calendar_markings(@free_appointments)
 
     # combine capacity and work, sorted by start_at time
-    @capacity_and_work        = (@capacity + @work_appointments).sort_by { |x| x.start_at.in_time_zone }
+    @capacity_and_work   = (@capacity + @work_appointments).sort_by { |x| x.start_at.in_time_zone }
 
     # Group capacity and work by free appointments
     @capacity_and_work_by_free_appt = @capacity_and_work.group_by {|x| x.free_appointment_id }
@@ -69,17 +74,18 @@ class CalendarController < ApplicationController
       array + tuple
     end
 
-    # group free appointments by day
-    @free_appointments_by_day = @free_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+    # group free and work appointments by day
+    @free_appointments_by_day   = @free_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+    @orphan_appointments_by_day = @orphan_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
 
     # group waitlists by day
     @waitlists_by_day = @waitlists.group_by { |waitlist, date, time_range| date }
 
     # group appointments and waitlists by day, appointments before waitlists for any given day
-    @day_keys         = (@free_appointments_by_day.keys + @waitlists_by_day.keys).uniq.sort
+    @day_keys         = (@free_appointments_by_day.keys + @waitlists_by_day.keys + @orphan_appointments_by_day.keys).uniq.sort
     @stuff_by_day     = ActiveSupport::OrderedHash[]
     @day_keys.each do |date|
-      @stuff_by_day[date] = (@free_appointments_by_day[date] || []) + (@waitlists_by_day[date] || [])
+      @stuff_by_day[date] = (@free_appointments_by_day[date] || []) + (@waitlists_by_day[date] || []) + (@orphan_appointments_by_day[date] || [])
     end
 
     # setup pdf link info
@@ -108,5 +114,5 @@ class CalendarController < ApplicationController
       redirect_to url_for(:action => 'show', :start_date => start_date, :end_date => end_date, :subdomain => current_subdomain)
     end
   end
-  
+
 end
