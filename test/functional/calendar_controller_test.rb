@@ -14,6 +14,9 @@ class CalendarControllerTest < ActionController::TestCase
   should_route :get, 'users/1/calendar/monthly/01012009',
                :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'monthly', :start_date => '01012009'
   
+  should_route :get, 'users/1/calendar/when/today',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :when => 'today'
+
   # search provider calendar
   should_route :post, 'users/1/calendar/search', 
                :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_id => 1
