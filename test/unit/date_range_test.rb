@@ -51,11 +51,11 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have start at == beginning of tomorrow in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc + 1.day, @daterange.start_at
+      assert_equal (Time.zone.now.beginning_of_day.utc + 1.day).to_s(:db), @daterange.start_at.to_s(:db)
     end
 
     should 'have end at == end of tomorrow in utc format' do
-      assert_equal Time.zone.now.end_of_day.utc + 1.day, @daterange.end_at
+      assert_equal (Time.zone.now.end_of_day.utc + 1.day).to_s(:db), @daterange.end_at.to_s(:db)
     end
 
     should 'be named Tomorrow' do
@@ -182,11 +182,11 @@ class DateRangeTest < ActiveSupport::TestCase
     end
 
     should 'have end at == end of today in utc format' do
-      assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
+      assert_equal Time.zone.now.end_of_day.to_s(:db), @daterange.end_at.to_s(:db)
     end
 
     should 'have start at == 1 week ago in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc - 6.days, @daterange.start_at
+      assert_equal (Time.zone.now.beginning_of_day - 6.days).to_s(:db), @daterange.start_at.to_s(:db)
     end
 
     should 'have date range of 7 days' do
@@ -206,18 +206,18 @@ class DateRangeTest < ActiveSupport::TestCase
       # e.g. on 28th, 29th, 30th and 31st March, 1 month ago is 28th Feb. The days delta changes on each of these days in March.
       # So, instead of the following array, we calculate our expectation by hand.
       # @expected_days_in_range = Hash[1=>31, 2=>31, 3=>28, 4=>31, 5=>30, 6=>31, 7=>30, 8=>31, 9=>31, 10=>30, 11=>31, 12=>30][Time.zone.now.month]
-      @expected_days_in_range = (Time.zone.now.end_of_day - (Time.zone.now.beginning_of_day - 1.month + 1.day) + 1.second) / (60*60*24)
+      @expected_days_in_range = ((Time.zone.now.end_of_day - (Time.zone.now.beginning_of_day - 1.month + 1.day) + 1.second) / (24.hours)).to_i
     end
   
     should 'have end at == end of today in utc format' do
-      assert_equal Time.zone.now.end_of_day.utc, @daterange.end_at
+      assert_equal Time.zone.now.end_of_day.to_s(:db), @daterange.end_at.to_s(:db)
     end
 
     should 'have start at == 1 month ago in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc - 1.month + 1.day, @daterange.start_at
+      assert_equal (Time.zone.now.beginning_of_day - 1.month + 1.day).to_s(:db), @daterange.start_at.to_s(:db)
     end
 
-    should "have date range of #{@expected_days_in_range} days" do
+    should "have date range of #{@expected_days_in_range.to_s} days" do
       assert_equal @expected_days_in_range, @daterange.days
     end
   end
