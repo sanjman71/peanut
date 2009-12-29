@@ -76,7 +76,7 @@ class CalendarControllerTest < ActionController::TestCase
   end
   
   context "show provider calendar as the provider" do
-    context "default time range, this week" do
+    context "default time range, today" do
       setup do
         add_mary_and_johnny_as_providers
         @controller.stubs(:current_user).returns(@johnny)
@@ -101,10 +101,10 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
       should_assign_to :capacity_and_work_by_free_appt, :class => Hash
       should_assign_to :calendar_markings, :class => Hash
-      should_assign_to(:when) { "this week" }
+      should_assign_to(:when) { "today" }
       should_not_assign_to(:start_date)
       should_assign_to :daterange, :class => DateRange
-      should_assign_to(:pdf_title) { "This Week PDF Version" }
+      should_assign_to(:pdf_title) { "Today PDF Version" }
       should_assign_to(:pdf_link) { "/users/#{@johnny.id}/calendar.pdf" }
       
       should "have link to weekly pdf version" do
@@ -174,7 +174,7 @@ class CalendarControllerTest < ActionController::TestCase
     should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
     should_assign_to :capacity_and_work_by_free_appt, :class => Hash
     should_assign_to :calendar_markings, :class => Hash
-    should_assign_to(:when) { "this week" }
+    should_assign_to(:when) { "today" }
     should_assign_to :daterange, :class => DateRange
   end
 
