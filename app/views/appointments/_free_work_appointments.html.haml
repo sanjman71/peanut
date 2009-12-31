@@ -22,19 +22,19 @@
       %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
   .span-4.last
     - if has_privilege?("update calendars", current_company)
-      .span-4.last.edit
-        -# free appointments may be deleted with 'update calendars' permission
-        .span-3.edit-weekly
-          - if appointment.recurrence_parent
-            = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.id, :series => 1), :class => "ujs edit")
-          - else
-            == &nbsp;
-        -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
-        .span-1.last.edit-one
-          - if !appointment.recurrence_parent?
-            = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
-          - else
-            == &nbsp;
+      / .span-4.last.edit
+      /   -# free appointments may be deleted with 'update calendars' permission
+      /   .span-3.edit-weekly
+      /     - if appointment.recurrence_parent
+      /       = link_to('Edit series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit_weekly', :id => appointment.id, :series => 1), :class => "ujs edit")
+      /     - else
+      /       == &nbsp;
+      /   -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+      /   .span-1.last.edit-one
+      /     - if !appointment.recurrence_parent?
+      /       = link_to('Edit', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'edit', :id => appointment.id), :class => "ujs edit")
+      /     - else
+      /       == &nbsp;
       .span-4.last.delete
         -# free appointments may be deleted with 'update calendars' permission
         .span-3.delete-weekly
