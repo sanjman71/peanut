@@ -189,6 +189,8 @@ ActionController::Routing::Routes.draw do |map|
                           :controller => 'tasks', :action => 'appointment_reminders', :time_span => /\d+-(days|hours)/
   map.task_user_messages  '/tasks/users/messages/:time_span', 
                           :controller => 'tasks', :action => 'user_messages', :time_span => /whenever/
+  map.task_expand_recur   '/tasks/expand_all_recurrences',
+                          :controller => 'tasks', :action => 'expand_all_recurrences'
   map.resources           :tasks, :only => [:index]
 
   # Administrative controllers

@@ -46,4 +46,12 @@ every :reboot do
   command "cd /usr/apps/peanut/current; script/delayed_job -e production start"
 end
 
+every 1.day, :at => '1:00 am' do
+  # Expand recurrences for all companies with subscriptions
+  Subscription.all.collect(&:company).each do |company|
+    # expand recurrences for a specific subdomain
+    command "curl http://#{company.subdomain}.walnutcalendar.com/appointments/expand_all_recurrences > /dev/null"
+  end
+end
+
 end # production

@@ -72,4 +72,19 @@ class TasksController < ApplicationController
       format.html
     end
   end
+
+  # GET /tasks/expand_all_recurrences
+  # Expand all recurrences
+  # This is typically called from a delayed job (though can be called directly)
+  # This will in turn queue a job to expand each recurrence
+  def expand_all_recurrences
+    @title = "Tasks - Expand All Recurrences"
+    @number_of_recurrences = current_company.appointments.recurring.count
+    @time_horizon = Time.zone.now.beginning_of_day + current_company.preferences[:time_horizon].to_i
+    Appointment.expand_all_recurrences(current_company)
+    respond_to do |format|
+      format.html
+    end
+  end
+
 end

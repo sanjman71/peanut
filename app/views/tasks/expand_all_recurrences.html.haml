@@ -1,0 +1,9 @@
+- title(@title)
+
+.span-24.last
+  .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-10
+    %h2= @title
+    %h5= link_to 'Back to Tasks', tasks_path
+    %h5.bottom
+      == Expanding #{pluralize(@number_of_recurrences, 'recurrence')} until #{@time_horizon.to_s}
+

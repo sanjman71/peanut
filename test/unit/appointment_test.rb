@@ -734,8 +734,10 @@ class AppointmentTest < ActiveSupport::TestCase
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
       @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
                                                                      :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
+      # Set the company's time horizon - test the recurrence expansion defaults
+      @company.preferences[:time_horizon] = 4.weeks
       assert_valid @recurrence
-      @recurrence.expand_recurrence(@end_at, @start_at + 4.weeks)
+      @recurrence.expand_recurrence
     end
     
     should_change("Appointment.count", :by => 2) { Appointment.count }
@@ -777,7 +779,10 @@ class AppointmentTest < ActiveSupport::TestCase
       @recurrence     = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
                                                                      :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
       assert_valid @recurrence
-      @appointments   = @recurrence.expand_recurrence(@now, @now + 4.weeks)
+      @company.preferences[:time_horizon] = 4.weeks
+      # If we don't specify the start time, it will assume the end time of the recurrence, or @end_at. That's ~6 months ago.
+      # Instead we specify now as the start time. We don't specify the end time, it will be @now + the time horizon.
+      @appointments   = @recurrence.expand_recurrence(@now)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
