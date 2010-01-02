@@ -713,6 +713,23 @@ class AppointmentTest < ActiveSupport::TestCase
         end
       end
       
+      context "create a second valid recurring free private appointment where the parent does not conflict but its instances do" do
+        setup do
+          @recurrence2    = AppointmentScheduler.create_free_appointment(@company, @provider, :start_at => @start_at + 1.day, :end_at => @end_at + 1.day, :recur_rule => @recur_rule,
+                                                                         :description => "This is the 2nd recurrence description")
+          assert_valid @recurrence2
+          appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
+        end
+
+        # Should have a single appointment = the parent, but the instances shouldn't be there
+        should_change("Appointment.count", :by => 1) { Appointment.count }
+        
+        should "have no recurrence instances" do
+          assert_equal 0, @recurrence2.recur_instances.count
+        end
+
+      end
+      
     end
     
   end
