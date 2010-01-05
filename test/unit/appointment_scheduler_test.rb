@@ -12,20 +12,23 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   context "create a free appointment and a service with no providers, and search for free appointments" do
     setup do
-      @johnny    = Factory(:user, :name => "Johnny")
+      @johnny           = Factory(:user, :name => "Johnny")
       @company.user_providers.push(@johnny)
-      @haircut   = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
+      @haircut          = Factory(:work_service, :name => "Haircut", :duration => 30.minutes, :price => 1.00, :company => @company)
       @company.services.push(@haircut)
-      @customer  = Factory(:user)
+      @customer         = Factory(:user)
+      
+      @now              = Time.zone.now
+      @start_at         = (@now.tomorrow.utc.beginning_of_day).to_s(:appt_schedule)
+      @end_at           = (@now.tomorrow.utc.end_of_day).to_s(:appt_schedule)      
 
       # create free appointment (all day)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny,
-                                                                         :start_at => "20100101000000", :end_at => "20100102000000")
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, @johnny, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
 
       # search for free appointments
-      @daterange  = DateRange.parse_range("20100101000000", "20100301000000")
-      @free_slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
+      @daterange        = DateRange.parse_range(@start_at, @end_at)
+      @free_slots       = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @daterange)
     end
     
     should "find no free capacity slots" do
