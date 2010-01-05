@@ -3,7 +3,11 @@
 .span-23.prepend-1.mat.padding-top-10.bottom
   %h2== Messages
   %h4
-    = link_to 'New Message', new_message_path, :class => 'admin color'
+    %span{:style => 'padding-right: 7px;'}== Total: #{@total_count}
+    - @msgs_by_protocol.keys.each do |protocol|
+      %span{:style => 'padding-right: 7px;'}== #{protocol.titleize}: #{@msgs_by_protocol[protocol]}
+  %h4
+    = link_to 'New Message', new_message_path, :class => 'admin'
 
 %hr.space
 
@@ -13,21 +17,21 @@
 %hr.space
 
 -# column headers
-%h4.span-16.last
-  .span-3.prepend-1#sender_column
-    == From
-  .span-5#subject_column
-    == Subject
-  .span-5.last#when_column
-    == Sent
+%h4.span-20.last
+  .span-4.prepend-1#sender_column
+    %h3.bottom== From
+  .span-8#subject_column
+    %h3.bottom== Subject
+  .span-7.last#when_column
+    %h3.bottom== Sent
 
 %hr.space
 
 - @messages.each do |message|
-  .span-16.last.letterbox.message{:class => cycle("shaded", "")}[message]
-    .span-3.prepend-1#sender
-      = message.sender.name
-    .span-5#subject
-      = message.subject
-    .span-5.last#when
-      = message.updated_at.to_s(:appt_day_date_time)
+  .span-20.last.letterbox.message{:class => cycle("shaded", "")}[message]
+    .span-4.prepend-1#sender
+      %h4= message.sender.name
+    .span-8#subject
+      %h4= message.subject
+    .span-7.last#when
+      %h4= message.updated_at.to_s(:appt_day_date_time)

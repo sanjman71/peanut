@@ -616,7 +616,7 @@ class AppointmentsControllerTest < ActionController::TestCase
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
         
-        # should send appt confirmation to customer
+        # should not send any appt confirmations
         should_not_change("message count") { Message.count }
         should_not_change("message topic") { MessageTopic.count }
         should_not_change("delayed job count") { Delayed::Job.count }
@@ -631,7 +631,7 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-        
+
         # should send appt confirmation to customer
         should_change("message count", :by => 1) { Message.count }
         should_change("message topic", :by => 1) { MessageTopic.count }

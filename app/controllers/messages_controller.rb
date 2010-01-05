@@ -6,6 +6,13 @@ class MessagesController < ApplicationController
   def index
     @messages = Message.all(:include => [:message_recipients, :sender], :order => 'updated_at desc').paginate(:page => params[:page], :per_page => 50)
 
+    # messages by protocol
+    @total_count      = CompanyMessageDelivery.for_company(current_company).count
+    @msgs_by_protocol = MessageRecipient.protocols.inject(Hash[]) do |hash, protocol|
+      hash[protocol] =  CompanyMessageDelivery.for_company(current_company).for_protocol(protocol).count
+      hash
+    end
+
     respond_to do |format|
       format.html
     end
