@@ -16,7 +16,11 @@ class CompanyTest < ActiveSupport::TestCase
   should_have_many              :appointments
   should_have_many              :invitations
   should_have_many              :company_providers
-  
+
+  setup do
+    @montly_plan  = Factory(:monthly_plan)
+    @owner        = Factory(:user, :name => "Owner")
+  end
   
   context "company services" do
     setup do
@@ -74,9 +78,9 @@ class CompanyTest < ActiveSupport::TestCase
       @company.user_providers.push(@provider)
       @company.reload
     end
-
+  
     should_change("company provider count", :by => 1) { CompanyProvider.count }
-
+  
     should "change company.user_providers" do
       assert_equal [@provider], @company.user_providers
     end
@@ -84,15 +88,15 @@ class CompanyTest < ActiveSupport::TestCase
     should "increment company.providers_count" do
       assert_equal 1, @company.providers_count
     end
-
+  
     should "have company.has_provider?(user) return true" do
       assert @company.has_provider?(@provider)
     end
-
+  
     should "assign role 'company provider' on company to user" do
       assert_equal ['company provider'], @provider.roles_on(@company).collect(&:name)
     end
-
+  
     context "and try to add the same provider" do
       setup do
         # @company.user_providers.push(@provider)
@@ -114,66 +118,65 @@ class CompanyTest < ActiveSupport::TestCase
         @company.resource_providers.push(@resource)
         @company.reload
       end
-
+  
       should_change("company provider count", :by => 1) { CompanyProvider.count }
-
+  
       should "change company.resource_providers" do
         assert_equal [@resource], @company.resource_providers
       end
-
+  
       should "change company.providers" do
         assert_equal [@provider, @resource], @company.providers
       end
-
+  
       should "increment company.providers_count" do
         assert_equal 2, @company.providers_count
       end
     end
-
+  
     context "then remove the user provider" do
       setup do
         @company.user_providers.delete(@provider)
         @company.reload
         @provider.reload
       end
-
+  
       should "have no company.user_providers" do
         assert_equal [], @company.user_providers
       end
-
+  
       should "decrement company.providers_count" do
         assert_equal 0, @company.providers_count
       end
-
+  
       should "have company.has_provider? return false" do
         assert !@company.has_provider?(@provider)
       end
-
+  
       should "remove role 'company provider' on company from user" do
         assert_equal [], @provider.roles_on(@company).collect(&:name)
       end
     end
   end
-
+  
   context "company subscriptions" do
     setup do
       @company      = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC")
-      @owner        = Factory(:user, :name => "Owner")
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
       @free_service = @company.free_service
       @company.reload
     end
-
+  
     should_change("services count", :by => 1) { Service.count }
-
+  
     should "have free service" do
       assert_valid @free_service
     end
-
+  
     should "have services_count == 1" do
       assert_equal 1, @company.services_count
     end
-
+  
     should "have work_services_count == 0" do
       assert_equal 0, @company.work_services_count
     end
@@ -182,7 +185,6 @@ class CompanyTest < ActiveSupport::TestCase
   context "company with no preferences" do
     setup do
       @company      = Factory(:company, :name => "mary's hair Salon", :time_zone => "UTC")
-      @owner        = Factory(:user, :name => "Owner")
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
     end
     
@@ -197,6 +199,7 @@ class CompanyTest < ActiveSupport::TestCase
     context "then override default" do
       setup do
         @company.preferences[:time_horizon] = 14.days
+        @company.save
       end
       
       should "have new value" do
@@ -212,6 +215,7 @@ class CompanyTest < ActiveSupport::TestCase
         @company.preferences["custom hash"] = ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}]
         @company.preferences["meaning of life"] = 42
         @company.preferences[:time_horizon] = 5.days
+        @company.save
       end
    
       should "have all preferences set" do
@@ -229,10 +233,9 @@ class CompanyTest < ActiveSupport::TestCase
   
   context "create a company with service, provider, subscription and owner" do
     setup do
-      @owner        = Factory(:user, :name => "Owner")
       @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
       @company      = Factory(:company, :name => "mary's hair Salon", :time_zone => "UTC", :subscription => @subscription)
-
+  
       # add company service service using the push syntax to ensure the callbacks are used
       @haircut      = Factory(:work_service, :name => "Haircut", :price => 10.00, :company => @company)
       assert_valid @haircut
@@ -245,12 +248,12 @@ class CompanyTest < ActiveSupport::TestCase
       @company.user_providers.push(@provider)
       @company.reload
     end
-
+  
     context "destroy the company, all of the services, but none of the providers or owner" do
       setup do
         @company.destroy
       end
-
+  
       should "have no company or join models" do
         assert_equal 0, Company.count
         assert_equal 0, Appointment.count
@@ -262,7 +265,7 @@ class CompanyTest < ActiveSupport::TestCase
       should "have no service" do
         assert_equal 0, Service.count
       end
-
+  
       should "have 1 provider and 1 owner" do
         assert_equal 2, User.count
       end
@@ -290,7 +293,7 @@ class CompanyTest < ActiveSupport::TestCase
     #     assert_equal 1, User.count
     #   end
     # end
-
+  
   end
 
 end
