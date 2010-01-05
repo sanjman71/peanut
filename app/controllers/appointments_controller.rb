@@ -497,20 +497,7 @@ class AppointmentsController < ApplicationController
       # If we are being asked to remove all future free appointments in a recurrence then we need to iterate through all 
       # future recurrence children determining whether or not we can remove them all.
       if params[:series] && @appointment.recurrence?
-        @conflicts = []
-        # Find all conflicting work appointments in this series of free appointments
-        # Start with the parents
-        if @appointment.recurrence_parent.work_appointments.not_canceled.count > 0
-          @conflicts << @appointment.recurrence_parent
-        end
-        # And continue with all the instances
-        @appointment.recurrence_parent.recur_instances.future.each do |appointment|
-          if appointment.work_appointments.not_canceled.count > 0
-            @conflicts << appointment
-          end
-        end
-        
-        if @conflicts.empty?
+        if (current_company.appointments.work.future.not_canceled.in_recurrence(@appointment.id).count == 0)
           # Disable the recurrence parent. For now we remove the recurrence rule
           # Note - important to do it like this - clearing recur_rule means that @appointment.recurrence_parent will be nil when we save if this is
           # the recurrence_parent
@@ -538,6 +525,8 @@ class AppointmentsController < ApplicationController
           end
 
         else
+          # record the conflicting work appointments so we can show them
+          @conflicts = current_company.appointments.work.future.not_canceled.in_recurrence(@appointment.id)
           flash[:error] = "You cannot remove this recurring series as there are some conflicting work appointments"
         end
 
