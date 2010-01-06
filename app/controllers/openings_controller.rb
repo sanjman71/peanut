@@ -147,9 +147,23 @@ class OpeningsController < ApplicationController
       params[s] = sprintf("%s", params[s].split('/').reverse.swap!(1,2).join) if params[s]
     end
     
-    # get provider object
-    provider_type, provider_id = params.delete(:provider).split('/')
-    
+    # check time parameter
+    if params[:time].blank?
+      # use default time
+      params[:time] = 'anytime'
+    end
+
+    # check provider parameter
+    provider = params.delete(:provider)
+    case
+    when provider.blank? || (provider == "0")
+      # any provider
+      provider_type = provider_id = nil
+    else
+      # get provider object
+      provider_type, provider_id = provider.split('/')
+    end
+
     # build redirect path
     @redirect_path = url_for(params.update(:subdomain => current_subdomain, :action => 'index', :provider_type => provider_type, :provider_id => provider_id))
 

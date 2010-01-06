@@ -86,13 +86,13 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :history, :only => [:index], :collection => {:waitlist => :get}
   
   # search openings for a specified service and duration, and an optional provider
-  map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
+  map.connect   '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
                 :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.connect   ':provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
+  map.connect   '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
                  :controller => 'openings', :action => 'index'
-  map.connect   'services/:service_id/:duration/openings/:start_date..:end_date/:time', 
+  map.connect   '/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
                  :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.connect   'services/:service_id/:duration/openings/:when/:time', 
+  map.connect   '/services/:service_id/:duration/openings/:when/:time', 
                  :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration

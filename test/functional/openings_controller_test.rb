@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class OpeningsControllerTest < ActionController::TestCase
 
@@ -8,21 +7,21 @@ class OpeningsControllerTest < ActionController::TestCase
   should_route :get, '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule'
   
   # search appointments for a specified provider, duration and service, with a when range
-  should_route :post, 'users/1/services/3/2700/openings/this-week/anytime',
+  should_route :post, '/users/1/services/3/2700/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
                :duration => 45.minutes, :when => 'this-week', :time => 'anytime'
 
   # search appointments for a specified provider, duration and service, with a date range
-  should_route :post, 'users/1/services/3/2700/openings/20090101..20090201/anytime',
+  should_route :post, '/users/1/services/3/2700/openings/20090101..20090201/anytime',
                :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
                :duration => 45.minutes, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   # search appointments for anyone providing a specified service with a specified service duration, with a when range
-  should_route :post, 'services/3/7200/openings/this-week/anytime', 
+  should_route :post, '/services/3/7200/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, :when => 'this-week', :time => 'anytime'
 
   # search appointments for anyone providing a specified service with a specified service duration, with a date range
-  should_route :post, 'services/3/7200/openings/20090101..20090201/anytime', 
+  should_route :post, '/services/3/7200/openings/20090101..20090201/anytime',
                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, 
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
@@ -48,13 +47,38 @@ class OpeningsControllerTest < ActionController::TestCase
     # @request.host = "www.peanut.com"
   end
   
-  context "search company openings" do
+  context "search" do
+    context "specific service, specific provider, anytime" do
+      setup do
+        post :search, :service_id => @haircut.id, :duration => 90.minutes, :provider => "users/#{@johnny.id}", :when => 'this-week', :time => 'anytime'
+      end
+
+      should_redirect_to("index path, with service and provider") { "/users/#{@johnny.id}/services/#{@haircut.id}/5400/openings/this-week/anytime" }
+    end
+
+    context "specific service, any provider, anytime" do
+      setup do
+        post :search, :service_id => @haircut.id, :duration => 90.minutes, :provider => "0", :when => 'this-week', :time => 'anytime'
+      end
+
+      should_redirect_to("index path, with service and no provider") { "/services/#{@haircut.id}/5400/openings/this-week/anytime" }
+    end
+
+    context "specific service, no provider, anytime" do
+      setup do
+        post :search, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
+      end
+
+      should_redirect_to("index path, with service and no provider") { "/services/#{@haircut.id}/5400/openings/this-week/anytime" }
+    end
+  end
+
+  context "index" do
     context "with an invalid service" do
       setup do
         get :index, :service_id => -1
       end
 
-      should_respond_with :redirect
       should_redirect_to("openings_path") { openings_path }
     end
 
@@ -64,7 +88,6 @@ class OpeningsControllerTest < ActionController::TestCase
         get :index, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
       end
 
-      should_respond_with :redirect
       should_redirect_to("openings services path with default duration value") { "/services/#{@haircut.id}/1800/openings/this-week/anytime" }
     end
 
@@ -73,7 +96,6 @@ class OpeningsControllerTest < ActionController::TestCase
         get :index, :provider_id => '0'
       end
 
-      should_respond_with :redirect
       should_redirect_to("openings_path") { openings_path }
     end
 
@@ -82,7 +104,6 @@ class OpeningsControllerTest < ActionController::TestCase
         get :index, :service_id => '0'
       end
 
-      should_respond_with :redirect
       should_redirect_to("openings_path") { openings_path }
     end
 
