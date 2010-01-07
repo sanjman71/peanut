@@ -28,9 +28,7 @@
         -# generic text
         %h3== Welcome to #{current_company.name}'s online scheduling system.
         %h3== Use the search box at the right to find appointment openings.
-        %h3
-          == Today is
-          %span{:style => 'color: #5500BB; font-weight: normal; font-size: 0.9em;'}= Time.zone.now.to_s(:appt_day)
+        %h3== Today is #{Time.zone.now.to_s(:appt_day)}
   - else
     -# show company private text
     .span-15.prepend-1.append-1#company_private
@@ -43,36 +41,53 @@
   -# show openings
   .span-15.prepend-1.append-1#openings
     .span-15.last.padding-top-10
-      -# show count of available timeslots for the service and provider
-      %h3
-        = highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name], :highlighter => '<strong class="shaded">\1</strong>')
-      %h4{:style => 'color: #666666; line-height: 1.5em;'}
+      -# show search parameters
+      %h4.bigger
+        .span-15.last#search_service
+          .span-2
+            == Service:
+          .span-13.last
+            = @service.name
+        .span-15.last#search_with
+          .span-2
+            == With: 
+          .span-13.last
+            = @provider.name
+        .span-15.last#search_when
+          .span-2
+            == When:
+          .span-13.last
+            = @daterange.name(:with_dates => true)
+        -#= highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name], :highlighter => '<strong class="shaded">\1</strong>')
+      %hr.space
+      %h4.bigger
         - if @free_capacity_slots.blank?
-          == We found no available timeslots matching your search criteria.
+          == We found no available time slots matching your search criteria.
         - else
-          == We found #{pluralize(@free_capacity_slots.size, 'available timeslot')} matching your search criteria.
-          = highlight("Pick a #{Duration.to_words(@duration).singularize} window below or", Duration.to_words(@duration).singularize, :highlighter => '<strong class="shaded">\1</strong>')
-          %br
-          = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
-          == if you can't find a suitable timeslot.
+          == We found #{pluralize(@free_capacity_slots.size, 'available time slot')} matching your search criteria.
+          == Select an available date on the calendar below to see more details and schedule an appointment.
+          %hr.space
+          == Pick a #{Duration.to_words(@duration).singularize} time slot below or add yourself to the
+          -#%br
+          = link_to "waitlist", @waitlist_path, :class => 'notify waitlist'
+          == if you can't find a suitable time slot.
 
     .span-15.last
       -# show daterange name
-      %h3.calendar.date_range_name= @daterange.name(:with_dates => true)
+      -#%h3.calendar.date_range_name= @daterange.name(:with_dates => true)
 
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
       .span-15.last#free_calendar
         = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings})
-      .span-14.last.appointments#free_capacity_slots
+      .span-15.last.appointments#free_capacity_slots.hide
         = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
     .span-15.last
       -# show waitlist text here if there are no available timeslots
       - if @free_capacity_slots.blank?
-        %h2
-          = link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
-          %span{:style => 'font-size: 0.7em;'}== or
-        %h3{:style => 'font-size: 1.3em; color: #666666;'}== Use the search bar to the right to change your search parameters and try again.
+        %h4.bigger= link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
+        %h4== or
+        %h4.bigger== Use the search bar to the right to change your search parameters and try again.
 
 .span-7.last
   - if @searchable

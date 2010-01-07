@@ -5,7 +5,7 @@
 - form_for(Appointment.new, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
   .last{:class => size == :wide ? "span-24" : "span-7"}
     .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
-      == What?
+      == Service?
     .span-5.last.field#what
       = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id))
   .last.duration{:class => size == :wide ? "span-24" : "span-7"}

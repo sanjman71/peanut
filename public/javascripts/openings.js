@@ -138,6 +138,19 @@ $.fn.init_openings_show_single_date = function() {
   );
 }
 
+$.fn.init_show_capacity_slots_on_calendar_select = function() {
+  // set hover states to show selected date, ignore past dates
+  $(".weekday.free:not(.past),.weekend.free:not(.past)").click(function() {
+    $("div#free_capacity_slots").show();
+    // mark this calendar date
+    $(".free.selected").removeClass('selected');
+    $(this).addClass('selected');
+    // hide all capacity slots, show the one selected
+    $(".slots.date").hide();
+    $("#slots_" + $(this).attr("id")).show();
+  })
+}
+
 $.fn.init_datepicker_openings = function() {
   $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});
 }
@@ -147,6 +160,7 @@ $(document).ready(function() {
   $(document).init_search_when_toggle();
   $(document).init_openings_sliders();
   $(document).init_datepicker_openings();
+  $(document).init_show_capacity_slots_on_calendar_select();
   // rounded corners
   $('#search_submit').corners("7px");
 })

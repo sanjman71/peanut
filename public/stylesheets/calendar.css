@@ -4,20 +4,20 @@ table.layout                                      { border-collapse: collapse; c
 
 table.calendar                                    { background: #E1E0E0 none repeat scroll 0 0; margin-bottom: 15px; width: 100%; text-align: left;}
 
-table.calendar th                                 { background: transparent none repeat scroll 0 0; color: #666666; font-size: 10px; padding: 3px;
+table.calendar th                                 { background: transparent none repeat scroll 0 0; color: #111111; font-size: 1.2em; padding: 3px;
                                                     text-align: left;}
                                                     
-table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 9px; padding: 3px;
-                                                    vertical-align: top;}
+table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 1.2em; padding: 3px;
+                                                    vertical-align: top; height: 50px; }
 
 table.calendar td.in-range.free                   { color: #333333; font-weight: bold; }
 table.calendar td.in-range.free.work              { background: #009900 none repeat scroll 0 0; color: #333333; font-weight: bold; }
 table.calendar td.in-range.busy                   { background: #444444 none repeat scroll 0 0; color: #FFFFFF; font-weight: bold; }
 table.calendar td.in-range                        { background: #EDF3FE none repeat scroll 0 0; }
-table.calendar td.outside-range                   { background: #FFFFFF none repeat scroll 0 0; color: #999999; font-size: 9px; padding: 3px;
+table.calendar td.outside-range                   { background: #FFFFFF none repeat scroll 0 0; color: #111111; font-size: 12px; padding: 3px;
                                                     vertical-align: top;}
 
-table.calendar span                               { margin: 3px 0 0; padding: 0; font-size: 9px;}
+table.calendar span                               { margin: 3px 0 0; padding: 0;}
 
 /* change text color for today */
 table.calendar td.today                           { color: #5500BB; font-weight: bold; }
@@ -25,11 +25,12 @@ table.calendar td.today                           { color: #5500BB; font-weight:
 table.calendar td.hover, table.calendar th.hover  { background: #FFCC00 none repeat scroll 0 0; color: #000000; }  /* yellowish */
 
 table.calendar td.mark, table.calendar th.mark    { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
+table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 none repeat scroll 0 0; color: #FFFFFF;}  /* yellowish */
 
 /* calendar attribute styles */
 
-.calendar.date_range_name                         { color: #5500BB; font-weight: bold; font-size: 1.5em; }
-.calendar.date_range_summary                      { color: #5500BB; font-weight: bold; font-size: 1.5em; }
+.calendar.date_range_name                         { color: #111111; font-weight: bold; font-size: 1.5em; }
+.calendar.date_range_summary                      { color: #111111; font-weight: bold; font-size: 1.5em; }
 
 .calendar.cube                                    { text-align: center; width: 40px; border: 1px solid #007700; padding-bottom: 0; }
 .calendar.cube.week_day                           { background: #008800 none repeat scroll 0 0; color: #FFFFFF; display: block; font-size: 0.8em; 

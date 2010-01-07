@@ -42,7 +42,7 @@
 
     -# show free, work calendar
     .span-15.last#free_work_calendar
-      = render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings})
+      = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings})
 
     -# show summary of work and free appointments
     .span-15.last

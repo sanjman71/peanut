@@ -61,6 +61,7 @@ class CalendarController < ApplicationController
 
     # build hash of calendar markings based on the free appointments
     @calendar_markings   = build_calendar_markings(@free_appointments)
+    logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
 
     # combine capacity and work, sorted by start_at time
     @capacity_and_work   = (@capacity + @work_appointments).sort_by { |x| x.start_at.in_time_zone }

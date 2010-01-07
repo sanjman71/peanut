@@ -38,7 +38,14 @@
               - day     = start_day + (day_i - extra_days_at_start).days
               -# check for markings (used as css tags) on this day
               - key     = day.to_s(:appt_schedule_day)
-              - klasses = Array(markings[key])
+              - klasses = []
+              - count   = 0
+              - case
+              - when markings[key].is_a?(Array)
+                - klasses += markings[key]
+              - when markings[key].is_a?(Hash)
+                - klasses += markings[key][:state]
+                - count   = markings[key][:count].to_i
               -# add weekday or weekend class
               - klasses += [0, 6].include?(day.wday) ? ['weekend'] : ['weekday']
               -# add past, today classes based on day of the year
@@ -50,4 +57,7 @@
               %td{:class => klasses.join(" "), :id => id}
                 -# special case for 'Today'
                 %span= (day == today) ? 'Today' : day.strftime("%b %d")
+                %br
+                - if count > 0
+                  %span{:style => 'font-size: 0.8em;'}= pluralize(count, 'time slot')
               

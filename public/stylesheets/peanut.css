@@ -56,6 +56,8 @@ div.block                                         { background: #E1E0E0 none rep
 div.mat                                           { background: #EDF3FE none repeat scroll 0 0; }
 div.mat.shaded                                    { background: #E5ECF9 none repeat scroll 0 0; }
 
+h4.bigger                                         { font-size: 1.3em; line-height: 1.35em; }
+
 /* form styles */
 
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }

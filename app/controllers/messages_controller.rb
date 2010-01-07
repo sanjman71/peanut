@@ -4,14 +4,14 @@ class MessagesController < ApplicationController
 
   # GET /messages
   def index
-    @messages = Message.all(:include => [:message_recipients, :sender], :order => 'updated_at desc').paginate(:page => params[:page], :per_page => 50)
+    @messages = current_company.messages.all(:include => [:message_recipients, :sender], :order => 'messages.updated_at desc').paginate(:page => params[:page], :per_page => 50)
 
     # messages by protocol
-    @total_count      = CompanyMessageDelivery.for_company(current_company).count
     @msgs_by_protocol = MessageRecipient.protocols.inject(Hash[]) do |hash, protocol|
-      hash[protocol] =  CompanyMessageDelivery.for_company(current_company).for_protocol(protocol).count
+      hash[protocol]  =  CompanyMessageDelivery.for_company(current_company).for_protocol(protocol).count
       hash
     end
+    @total_count      = @msgs_by_protocol.values.inject(0) { |sum, i| sum += i }
 
     respond_to do |format|
       format.html

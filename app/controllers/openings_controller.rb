@@ -122,6 +122,9 @@ class OpeningsController < ApplicationController
     # build hash of calendar markings
     @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
 
+    logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
+    logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
+
     # build waitlist path
     @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id)
 

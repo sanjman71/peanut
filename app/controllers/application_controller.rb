@@ -129,8 +129,11 @@ class ApplicationController < ActionController::Base
   def build_calendar_markings_from_slots(capacity_slots)
     capacity_slots.inject(Hash.new) do |hash, slot|
       key = slot.start_at.utc.to_s(:appt_schedule_day)
-      hash[key] ||= []
-      hash[key].push(Appointment::FREE).uniq!
+      hash[key] ||= Hash[]
+      hash[key][:state] = [Appointment::FREE]
+      hash[key][:count] ||= 0
+      hash[key][:count] += 1
+      # hash[key].push(Appointment::FREE).uniq!
       hash
     end
   end
