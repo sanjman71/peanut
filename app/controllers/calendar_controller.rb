@@ -33,6 +33,11 @@ class CalendarController < ApplicationController
 
     @free_service = current_company.free_service
     @providers    = current_company.providers
+    
+    # find services collection for the current company & provider; valid services must have at least 1 service provider
+    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
+    @services = Array(current_company.services.with_provider(@provider.id))
+    
 
     if params[:start_date] and params[:end_date]
       # build daterange using range values

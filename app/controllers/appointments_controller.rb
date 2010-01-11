@@ -15,6 +15,9 @@ class AppointmentsController < ApplicationController
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
+    # set title
+    @title                = "Book Appointment"
+
     @provider = init_provider(:default => nil)
 
     if @provider.blank?
@@ -26,38 +29,46 @@ class AppointmentsController < ApplicationController
     @service  = current_company.services.find_by_id(params[:service_id])
     @customer = current_user
 
-    case (@mark_as = params[:mark_as])
-    when Appointment::WORK
-      # build the work appointment parameters
-      @duration             = params[:duration].to_i if params[:duration]
-      @start_at             = params[:start_at]
-      @capacity             = params[:capacity].to_i if params[:capacity]
+    begin
 
-      @date_time_options    = Hash[:start_at => @start_at]
+      case (@mark_as = params[:mark_as])
+      when Appointment::WORK
+        # build the work appointment parameters
+        @duration             = params[:duration] ? params[:duration].to_i : @service.duration
+        @start_at             = params[:start_at]
+        @capacity             = params[:capacity].to_i if params[:capacity]
+
+        @date_time_options    = Hash[:start_at => @start_at]
       
-      @options              = Hash[:commit => false]
-      @options              = @options.merge({:capacity => @capacity }) unless @capacity.blank?
+        @options              = Hash[:commit => false]
+        @options              = @options.merge({:capacity => @capacity }) unless @capacity.blank?
 
-      # allow customer to be created during this process
-      if @customer.blank?
-        @customer           = User.anyone
-        @customer_signup    = :all
-        # set return_to url in case user uses rpx to login and needs to be redirected back
-        session[:return_to] = request.url
-      else
-        @customer_signup    = nil
+        # allow customer to be created during this process
+        if @customer.blank?
+          @customer           = User.anyone
+          @customer_signup    = :all
+          # set return_to url in case user uses rpx to login and needs to be redirected back
+          session[:return_to] = request.url
+        else
+          @customer_signup    = nil
+        end
+
+        # build the work appointment without committing the changes
+        @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
+
+        # set appointment date, start_at and end_at times in local time
+        @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
+        @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
+        @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
+
       end
 
-      # build the work appointment without committing the changes
-      @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
-
-      # set appointment date, start_at and end_at times in local time
-      @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
-      @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
-      @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
-
-      # set title
-      @title                = "Book Appointment"
+    rescue AppointmentInvalid => e
+      flash[:error] = e.message
+      redirect_to request.referrer and return
+    rescue Exception => e
+      flash[:error] = e.message
+      redirect_to request.referrer and return
     end
 
     respond_to do |format|

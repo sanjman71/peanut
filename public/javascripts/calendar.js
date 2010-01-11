@@ -1,3 +1,44 @@
+// add appointment for a provider on a specific day
+$.fn.init_add_appointment = function() {
+  $("#add_appointment_form").submit(function () {
+    var provider_type   = $("#add_appointment_form input#provider_type").attr('value');
+    var provider_id     = $("#add_appointment_form input#provider_id").attr('value');
+    var service_id      = $("#add_appointment_form select#service_id").attr('value');
+    var apt_start_date  = $("#add_appointment_form input#apt_start_date").attr('value');
+    var apt_start_time  = $("#add_appointment_form input#apt_start_time").attr('value');
+    var errors    = 0;
+    
+    if (!apt_start_date) {
+      $("#add_appointment_form input#apt_start_date").addClass('highlighted');
+      alert("Please select a date");
+      return false; 
+    } else {
+      $("#add_appointment_form input#apt_start_date").removeClass('highlighted');
+    }
+    
+    if (!apt_start_time) {
+      $("#add_appointment_form input#apt_start_time").addClass('highlighted');
+      alert("Please select a start time");
+      return false; 
+    } else {
+      $("#add_appointment_form input#apt_start_time").removeClass('highlighted');
+    }
+
+    // normalize time format, validate that start_at < end_at
+    var apt_start_time = convert_time_ampm_to_string(apt_start_time)
+
+    // normalize date format
+    var apt_start_date = convert_date_to_string(apt_start_date);
+
+    // replace hidden tag formatted version
+    $("#add_appointment_form input#start_at").attr('value', apt_start_date + 'T' + apt_start_time);
+
+    // Navigate the page
+    window.location.href = '/schedule/' + provider_type + '/' + provider_id + '/services/' + service_id + '/' + apt_start_date + 'T' + apt_start_time
+    return false;
+  })
+}
+
 // add free time for a provider on a specific day
 $.fn.init_add_single_free_time = function() {
   $("#add_single_free_time_form").submit(function () {
@@ -5,7 +46,7 @@ $.fn.init_add_single_free_time = function() {
     var start_at  = $("input#start_at").attr('value');
     var end_at    = $("input#end_at").attr('value');
     var errors    = 0;
-    
+
     if (!when) {
       $("input#date").addClass('highlighted');
       alert("Please select a date");
@@ -13,7 +54,7 @@ $.fn.init_add_single_free_time = function() {
     } else {
       $("input#date").removeClass('highlighted');
     }
-    
+
     if (!start_at) {
       $("input#start_at").addClass('highlighted');
       alert("Please select a start time");
@@ -195,6 +236,7 @@ $(document).ready(function() {
   $(document).init_schedule_timepicker();
   $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
+  $(document).init_add_appointment();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
   $(document).init_add_calendar_markings();
