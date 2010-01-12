@@ -146,11 +146,15 @@ class AppointmentsController < ApplicationController
             @redirect_path = history_index_path
           end
 
-          # send appointment confirmation based on preferences
-          @confirmations = MessageComposeAppointment.confirmations(@appointment, current_company.preferences[:work_appointment_confirmations], {:managers => current_company.managers})
-
-          # tell the user their confirmation email is being sent
-          flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
+          begin
+            # send appointment confirmation based on preferences
+            @confirmations = MessageComposeAppointment.confirmations(@appointment, current_company.preferences[:work_appointment_confirmations], {:managers => current_company.managers})
+            # tell the user their confirmation email is being sent
+            flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
+          rescue Exception => e
+            # error sending confirmation
+            logger.debug("[error] sending appointment confirmation: #{e.message}")
+          end
 
         when Appointment::FREE
           # build time range

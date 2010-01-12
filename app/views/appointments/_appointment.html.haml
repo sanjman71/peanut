@@ -26,7 +26,7 @@
   .span-12.last.data
     ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
 
-  -# reminders, for new appointments, and for customers with email addresses
+  -# reminders, for new appointments and for customers with email addresses
   - if appointment.new_record? and (appointment.customer.andand.email_addresses_count.to_i > 0)
     .span-3.label.text-align-right
       == Reminder:
@@ -36,6 +36,8 @@
       == &nbsp;
       = label_tag "reminder_off", "No Thanks"
       = radio_button_tag "preferences_reminder", "0", false, :id => 'reminder_off'
+    .span-15.prepend-3
+      %em.small== An email reminder will be sent 24 hours before the appointment if you select 'Yes'
 
   - if appointment.recurrence?
     .span-3.label.text-align-right

@@ -1,0 +1,22 @@
+- capacity_slots_by_day.each do |day, slots|
+  .span-15.last.slots.date{:id => "slots_#{day.to_s(:appt_schedule_day)}", :style => 'padding-top: 5px;'}
+    .span-12.calendar.date.wide= day.to_s(:appt_day)
+
+    -# group slots by provider
+    - reset_cycle
+    - slots.group_by { |slot| slot.free_appointment.provider }.each do |provider, slots|
+      -# collect all provider slots for this date
+      - slot_start_times = slots.inject([]) do |array, slot|
+        - array += free_slot_possible_start_times(slot, service.duration, :appt_start_minutes => current_company.preferences[:appt_start_minutes])
+        - array
+      - slot_id = "slots_#{day.to_s(:appt_schedule_day)}_provider_#{provider.id}"
+      -# build schedule path with start_at value of 'datetime' that will be filled in later
+      - url = schedule_path(:provider_type => provider.tableize, :provider_id => provider.id, :service_id => service.id, :duration => service.duration, :start_at => "datetime")
+
+      .span-15.last.free.provider.slot{:class => cycle("", "shaded"), :id => slot_id}
+        .span-15.last
+          .span-5.provider.padding-top-5
+            %h4{:style => 'margin-left: 5px;'}= provider.name
+          .span-4.times
+            = select_tag('slot_times', options_for_select(slot_start_times.collect{ |h| ["#{h[:time_12]} #{h[:time_ampm]}", "#{h[:date_t]}#{h[:time_sec]}"] }.insert(0, 'Select a time'), 'Select a time'))
+            %span{:style => 'padding-left: 5px;'}= link_to "Book It", '', :class => 'bookit', :url => url, :slot_id => slot_id

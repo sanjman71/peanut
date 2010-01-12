@@ -142,12 +142,33 @@ $.fn.init_show_capacity_slots_on_calendar_select = function() {
   // set hover states to show selected date, ignore past dates
   $(".weekday.free:not(.past),.weekend.free:not(.past)").click(function() {
     $("div#free_capacity_slots").show();
-    // mark this calendar date
+    // unmark all selected calendar dates, and mark this calendar date as selected
     $(".free.selected").removeClass('selected');
     $(this).addClass('selected');
-    // hide all capacity slots, show the one selected
+    // hide all capacity slots, and show this one
+    var slot_id = "#slots_" + $(this).attr("id");
     $(".slots.date").hide();
-    $("#slots_" + $(this).attr("id")).show();
+    $(slot_id).show();
+  })
+}
+
+$.fn.init_openings_bookit = function() {
+  $("a.bookit").click(function() {
+    // find selected datetime of this capacity slot
+    var slot_id  = $(this).attr('slot_id');
+    var datetime = $("div#" + slot_id + " select#slot_times :selected").val();
+
+    // validate datetime
+    var datetime_regex = /^[0-9]{8,8}T[0-9]{6,6}$/;
+    if (datetime_regex.test(datetime) == false) {
+      alert("Please select a time");
+      return false;
+    }
+
+    // build url using datetime
+    var url = $(this).attr('url').replace(/datetime/, datetime);
+    $(this).attr('href', url);
+    return true;
   })
 }
 
@@ -161,6 +182,7 @@ $(document).ready(function() {
   $(document).init_openings_sliders();
   $(document).init_datepicker_openings();
   $(document).init_show_capacity_slots_on_calendar_select();
+  $(document).init_openings_bookit();
   // rounded corners
   $('#search_submit').corners("7px");
 })

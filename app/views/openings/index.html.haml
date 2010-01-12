@@ -64,15 +64,12 @@
         - if @free_capacity_slots.blank?
           == We found no available time slots matching your search criteria.
         - else
-          == We found #{pluralize(@free_capacity_slots.size, 'available time slot')} matching your search criteria.
-          == Select an available date on the calendar below to see more details and schedule an appointment.
-          %hr.space
-          == Pick a #{Duration.to_words(@duration).singularize} time slot below or add yourself to the
-          -#%br
+          == Click an available date on the calendar below to schedule an appointment,
+          == or add yourself to the
           = link_to "waitlist", @waitlist_path, :class => 'notify waitlist'
           == if you can't find a suitable time slot.
 
-    .span-15.last
+    -#.span-15.last
       -# show daterange name
       -#%h3.calendar.date_range_name= @daterange.name(:with_dates => true)
 
@@ -80,7 +77,7 @@
       .span-15.last#free_calendar
         = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings})
       .span-15.last.appointments#free_capacity_slots.hide
-        = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
+        = render(:partial => 'appointments/free_capacity_slots2', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
     .span-15.last
       -# show waitlist text here if there are no available timeslots

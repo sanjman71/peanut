@@ -21,7 +21,7 @@ module AppointmentsHelper
       yield link, separator
     end
   end
-  
+
   # build possible state transitions based on current appointment state
   def build_appointment_state_transition_links(appointment)
     transitions = []
@@ -41,27 +41,56 @@ module AppointmentsHelper
     end
   end
 
-  # return hash of possible start time values
+  # returns array of possible start time values based on slot, duration, and options
+  # supported options:
+  # appt_start_minutes - when appointments are allowed to start
   def free_slot_possible_start_times(slot, duration_in_seconds, options={})
-    # initialize hash with apointment start_at hour and minute
-    hash = {:start_hour => slot.start_at.hour, :start_minute => slot.start_at.min, :minute_interval => 5}
-            
+    start_hour      = slot.start_at.hour
+    start_minute    = slot.start_at.min
+    minute_interval = 5
+
     # adjust slot end_at based on duration
     begin
       end_at = slot.end_at - duration_in_seconds
     rescue
       end_at = slot.end_at
     end
-    
-    # update hash with end_at hour and minute
-    hash.update(:end_hour => end_at.hour, :end_minute => end_at.min)
 
-    # update hash with options args
-    hash.update(options)
+    end_hour    = end_at.hour
+    end_minute  = end_at.min
 
-    hash
+    # make sure appt_start_minute is an array
+    appt_start_minutes = options[:appt_start_minutes].is_a?(String) ? eval(options[:appt_start_minutes]) : Array(options[:appt_start_minutes])
+
+    # build minute increments
+    minute_increments = (0..59).step(60/(60/minute_interval)).collect { |i| i }
+
+    start_times_array = start_hour.upto(end_hour).inject([]) do |array, hour|
+      first_hour = (hour == start_hour)
+      last_hour  = (hour == end_hour)
+      minute_increments.each do |minute|
+        # if its the first hour, check that the minute is after the start minute
+        next if first_hour and minute < start_minute
+        # if its the last hour, check that the minute is before the end minute
+        next if last_hour and minute > end_minute
+        # check that the minute is included in the appt_start_minute array
+        next unless appt_start_minutes.include?(minute)
+        # build time in 12-hour and 24-hour formats
+        time_12   = "#{sprintf("%d", hour == 12 ? hour : hour % 12)}:#{sprintf("%02d", minute)}"
+        time_24   = "#{sprintf("%02d", hour)}#{sprintf("%02d", minute)}"
+        time_ampm = hour < 12 ? "am" : "pm"
+        time_sec  = "#{time_24}00"  # 24 hour time with seconds
+        date_t    = "#{slot.start_at.to_s(:appt_schedule_day)}T"  # e.g. 20091010T
+        array.push(Hash[:time_12 => time_12, :time_24 => time_24, :time_ampm => time_ampm, :time_sec => time_sec, :date_t => date_t])
+      end
+
+      # return array built so far
+      array
+    end
+
+    start_times_array
   end
-  
+
   def service_duration_select_options
     collection = []
 

@@ -6,10 +6,15 @@ div.appointments                                  { border-collapse: collapse; f
 div.appointment.canceled                          { color: #FF1100;}
 
 div.appointment.review, div.waitlist.review       { font-size: 1.5em; font-weight: normal; }
+
+/*
 div.appointment.review .label, div.waitlist.review .label                     
                                                   { color: #999999; }
+*/
+/*
 div.appointment.review .data, div.waitlist.review .data                      
                                                   { color: #007700; }
+*/
 
 div.appointment, div.slot                         { margin-bottom: 5px; background-color: #FFFFFF; }
 div.appointment.shaded, div.slot.shaded           { background-color: #EDF3FE; }  /* white */
@@ -30,8 +35,6 @@ div.appointment.work div.service h6               { color: #009900; }
 div.appointment a, div.slot a                     { color: #5500BB; font-weight: bold; }
 div.appointment a:hover, div.slot a:hover         { color: #5500BB; background-color: #FF6600; }
 div.appointment a:visited, div.slot a:visited     { color: #5500BB; font-weight: bold; }
-
-a.bookit                                          { background-color: #FFCC00; }
 
 a.notify.waitlist                                 { color: #008800; font-weight: bold; }
 a:hover.notify.waitlist                           { color: #008800; background-color: #FF6600; }

@@ -112,16 +112,18 @@ class ApplicationController < ActionController::Base
     appointments.inject(Hash.new) do |hash, appointment|
       # convert appointment start_at to utc format, and use that day as the key 
       key = appointment.start_at.utc.to_s(:appt_schedule_day)
-      hash[key] ||= []
-      hash[key].push(appointment.mark_as).uniq!
-      
+      hash[key] ||= Hash[]
+      hash[key][:state] ||= []
+      hash[key][:count] ||= 0
+      hash[key][:state].push(appointment.mark_as).uniq!
+
       if appointment.mark_as == Appointment::NONE
         # if the unscheduled time is not the entire day, it means there is at least one free/work appointment
         if appointment.duration != (24.hours)
-          hash[key].push(Appointment::BUSY).uniq!
+          hash[key][:state].push(Appointment::BUSY).uniq!
         end
       end
-      
+
       hash
     end
   end

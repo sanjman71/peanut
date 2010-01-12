@@ -58,6 +58,6 @@
                 -# special case for 'Today'
                 %span= (day == today) ? 'Today' : day.strftime("%b %d")
                 %br
-                - if count > 0
-                  %span{:style => 'font-size: 0.8em;'}= pluralize(count, 'time slot')
+                %span{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
+                
               
