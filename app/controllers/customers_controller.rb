@@ -6,7 +6,7 @@ class CustomersController < ApplicationController
   
   # GET /customers
   def index
-    @search = params[:search]
+    @search = params[:q]
     @role   = Company.customer_role
     
     if !@search.blank?
@@ -21,7 +21,7 @@ class CustomersController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @customers.to_json(:only => ['id', 'name', 'email'])) }
+      format.json { render(:json => @customers.to_json(:only => ['id', 'name']))}
     end
   end
 
