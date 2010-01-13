@@ -168,8 +168,6 @@ $.fn.init_openings_add_calendar_markings = function() {
       time_slot_count += parseInt($(this).attr('count'));
     })
 
-    console.log("slot date: " + $(this).attr('id') + ", time slot count: " + time_slot_count);
-
     if (time_slot_count > 0) {
       // extract calendar date and mark the calendar
       re    = /slots_(\d+)/
