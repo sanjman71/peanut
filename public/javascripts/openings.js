@@ -75,6 +75,7 @@ $.fn.init_search_when_toggle = function() {
   })
 }
 
+// Note: deprecated
 $.fn.init_openings_sliders = function() {
   // show sliders on click
   $(".pick_time").click(function () {
@@ -138,20 +139,6 @@ $.fn.init_openings_show_single_date = function() {
   );
 }
 
-$.fn.init_show_capacity_slots_on_calendar_select = function() {
-  // set hover states to show selected date, ignore past dates
-  $(".weekday.free:not(.past),.weekend.free:not(.past)").click(function() {
-    $("div#free_capacity_slots").show();
-    // unmark all selected calendar dates, and mark this calendar date as selected
-    $(".free.selected").removeClass('selected');
-    $(this).addClass('selected');
-    // hide all capacity slots, and show this one
-    var slot_id = "#slots_" + $(this).attr("id");
-    $(".slots.date").hide();
-    $(slot_id).show();
-  })
-}
-
 $.fn.init_openings_bookit = function() {
   $("a.bookit").click(function() {
     // find selected datetime of this capacity slot
@@ -172,6 +159,42 @@ $.fn.init_openings_bookit = function() {
   })
 }
 
+$.fn.init_openings_add_calendar_markings = function() {
+  // find capacity slots by date, and mark calendar based on these slots
+  $("div#free_capacity_slots div.slots.date").each(function () {
+    // count the number of available time slots for this date
+    var time_slot_count = 0;
+    $(this).find("div.provider.slot").each(function() {
+      time_slot_count += parseInt($(this).attr('count'));
+    })
+
+    console.log("slot date: " + $(this).attr('id') + ", time slot count: " + time_slot_count);
+
+    if (time_slot_count > 0) {
+      // extract calendar date and mark the calendar
+      re    = /slots_(\d+)/
+      match = $(this).attr('id').match(re);
+      date  = match[1];
+      // mark as free
+      $("div#free_calendar td#" + date).addClass('free');
+      // add 'available' text
+      $("div#free_calendar td#" + date).find("span#available").text('Available');
+    }
+  })
+
+  // set hover states to show selected date, ignore past dates
+  $(".weekday.free:not(.past),.weekend.free:not(.past)").click(function() {
+    $("div#free_capacity_slots").show();
+    // unmark all selected calendar dates, and mark this calendar date as selected
+    $(".free.selected").removeClass('selected');
+    $(this).addClass('selected');
+    // hide all capacity slots, and show this one
+    var slot_id = "#slots_" + $(this).attr("id");
+    $(".slots.date").hide();
+    $(slot_id).show();
+  })
+}
+
 $.fn.init_datepicker_openings = function() {
   $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});
 }
@@ -179,9 +202,8 @@ $.fn.init_datepicker_openings = function() {
 $(document).ready(function() {
   $(document).init_search_openings();
   $(document).init_search_when_toggle();
-  $(document).init_openings_sliders();
+  $(document).init_openings_add_calendar_markings();
   $(document).init_datepicker_openings();
-  $(document).init_show_capacity_slots_on_calendar_select();
   $(document).init_openings_bookit();
   // rounded corners
   $('#search_submit').corners("7px");

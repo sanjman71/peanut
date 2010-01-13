@@ -55,8 +55,8 @@ class OpeningsController < ApplicationController
       @daterange  = DateRange.parse_range(@start_date, @end_date)
     elsif params[:when]
       # build daterange using when value, don't use a default
-      @when       = params[:when].from_url_param 
-      @daterange  = DateRange.parse_when(@when, :include => :today)
+      @when       = params[:when].from_url_param
+      @daterange  = DateRange.parse_when(@when, :include => :today, :end_on => ((current_company.preferences[:start_wday].to_i - 1) % 7))
     end
 
     # initialize time objects
@@ -115,15 +115,18 @@ class OpeningsController < ApplicationController
     @free_capacity_slots        = AppointmentScheduler.find_free_capacity_slots(current_company, current_location,
                                                                                 @provider, @service, @duration, @daterange)
     @free_capacity_slots        = CapacitySlot.build_openings_for_view(@free_capacity_slots)
-    @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day}
+    @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day }
         
     logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
     
     # build hash of calendar markings
-    @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
+    # @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
 
-    logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
-    logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
+    # use an empty calendar markings hash, and mark the calendar using the free_capacity_slots_by_day hash using javascript
+    @calendar_markings  = Hash[]
+
+    # logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
+    # logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
 
     # build waitlist path
     @waitlist_path      = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id)

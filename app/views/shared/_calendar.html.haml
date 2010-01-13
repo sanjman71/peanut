@@ -58,6 +58,6 @@
                 -# special case for 'Today'
                 %span= (day == today) ? 'Today' : day.strftime("%b %d")
                 %br
-                %span{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
+                %span#available{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
                 
               
