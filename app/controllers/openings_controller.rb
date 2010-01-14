@@ -56,12 +56,15 @@ class OpeningsController < ApplicationController
     elsif params[:when]
       # build daterange using when value, don't use a default
       @when       = params[:when].from_url_param
-      @daterange  = DateRange.parse_when(@when, :include => :today, :end_on => ((current_company.preferences[:start_wday].to_i - 1) % 7))
+      @daterange  = DateRange.parse_when(@when, :include => :today, :start_week_on => current_company.preferences[:start_wday].to_i)
     end
 
     # initialize time objects
     @time         = params[:time].from_url_param if params[:time]
     @time_range   = params[:time].blank? ? nil : TimeRange.new(:when => params[:time].from_url_param) # xxx no when parameter?
+
+    # initialize today
+    @today        = Time.zone.now.beginning_of_day
 
     # initialize location & locations
     if params[:location_id]

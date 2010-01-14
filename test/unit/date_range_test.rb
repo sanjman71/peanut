@@ -71,62 +71,174 @@ class DateRangeTest < ActiveSupport::TestCase
   end
 
   context 'this week, including today' do
-    setup do
-      @daterange = DateRange.parse_when('this week', :include => :today)
-      assert_valid @daterange
-      # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-      @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
-      
-    end
+    context "with week starting on monday" do
+      setup do
+        @daterange = DateRange.parse_when('this week', :include => :today)
+        assert_valid @daterange
+        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+        @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
+      end
 
-    should 'have days count based on current time and day of week' do
-      assert_equal @days_left_in_week[Time.zone.now.wday], @daterange.days
-    end
+      should 'have days count based on current time and day of week' do
+        assert_equal @days_left_in_week[Time.zone.now.wday], @daterange.days
+      end
 
-    should 'have start day == beginning of today (adjusting for today) in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at.utc
-    end
+      should 'have start day == beginning of today (adjusting for today) in utc format' do
+        assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at.utc
+      end
 
-    should 'be named This Week' do
-      assert_equal 'This Week', @daterange.name
+      should "have end day of sunday" do
+        assert_equal 0, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'be named This Week' do
+        assert_equal 'This Week', @daterange.name
+      end
+    end
+    
+    context "with week starting on sunday" do
+      setup do
+        @daterange = DateRange.parse_when('this week', :include => :today, :start_week_on => 0)
+        assert_valid @daterange
+        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
+      end
+
+      should 'have days count based on current time and day of week' do
+        assert_equal @days_left_in_week[Time.zone.now.wday], @daterange.days
+      end
+
+      should 'have start day == beginning of today (adjusting for today) in utc format' do
+        assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at.utc
+      end
+
+      should "have end day of saturday" do
+        assert_equal 6, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'be named This Week' do
+        assert_equal 'This Week', @daterange.name
+      end
     end
   end
 
   context 'next week' do
-    setup do
-      @daterange = DateRange.parse_when('next week')
-      assert_valid @daterange
+    context "with week starting on monday" do
+      setup do
+        @daterange = DateRange.parse_when('next week')
+        assert_valid @daterange
+      end
+
+      should 'have date range of 7 days' do
+        assert_equal 7, @daterange.days
+      end
+
+      should 'have start day of monday' do
+        assert_equal 1, @daterange.start_at.in_time_zone.wday
+      end
+
+      should 'have end day of sunday' do
+        assert_equal 0, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'be named Next Week' do
+        assert_equal 'Next Week', @daterange.name
+      end
     end
 
-    should 'have date range of 7 days' do
-      assert_equal 7, @daterange.days
-    end
+    context "with week starting on sunday" do
+      setup do
+        @daterange = DateRange.parse_when('next week', :start_week_on => 0)
+        assert_valid @daterange
+      end
 
-    should 'have start day of monday' do
-      assert_equal 1, @daterange.start_at.wday
+      should 'have date range of 7 days' do
+        assert_equal 7, @daterange.days
+      end
+
+      should 'have start day of sunday' do
+        assert_equal 0, @daterange.start_at.in_time_zone.wday
+      end
+
+      should 'have end day of saturday' do
+        assert_equal 6, @daterange.end_at.in_time_zone.wday
+      end
     end
     
-    should 'be named Next Week' do
-      assert_equal 'Next Week', @daterange.name
+    context "including today and week starting on sunday" do
+      setup do
+        @daterange = DateRange.parse_when('next week', :start_week_on => 0, :include => :today)
+        assert_valid @daterange
+        @today = Time.zone.now
+        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
+      end
+
+      should 'have date range of 7 days + days left this week' do
+        assert_equal 7 + @days_left_in_week[@today.wday], @daterange.days
+      end
+
+      should 'have start day of today' do
+        assert_equal @today.wday, @daterange.start_at.in_time_zone.wday
+      end
+
+      should 'have end day of saturday' do
+        assert_equal 6, @daterange.end_at.in_time_zone.wday
+      end
     end
   end
 
   context 'next 2 weeks' do
-    setup do
-      @daterange = DateRange.parse_when('next 2 weeks')
-      assert_valid @daterange
-    end
+    context "with week starting on monday" do
+      setup do
+        @daterange = DateRange.parse_when('next 2 weeks')
+        assert_valid @daterange
+        @today = Time.zone.now
+        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+        @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
+      end
 
-    should 'have date range of 14 days' do
-      assert_equal 14, @daterange.days
-    end
+      should 'have date range of 14 days + days left this week' do
+        assert_equal 14 + @days_left_in_week[@today.wday], @daterange.days
+      end
 
-    should 'have start at == beginning of today in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
-    end
+      should 'have start at == beginning of today in utc format' do
+        assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
+      end
 
-    should 'be named Next 2 Weeks' do
-      assert_equal 'Next 2 Weeks', @daterange.name
+      should 'have end day of sunday' do
+        assert_equal 0, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'be named Next 2 Weeks' do
+        assert_equal 'Next 2 Weeks', @daterange.name
+      end
+    end
+    
+    context "with with week starting on sunday" do
+      setup do
+        @daterange = DateRange.parse_when('next 2 weeks', :start_week_on => 0)
+        assert_valid @daterange
+        @today = Time.zone.now
+        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
+      end
+
+      should 'have date range of 14 days + days left this week' do
+        assert_equal 14 + @days_left_in_week[@today.wday], @daterange.days
+      end
+
+      should 'have start at == beginning of today in utc format' do
+        assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
+      end
+
+      should 'have end day of saturday' do
+        assert_equal 6, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'be named Next 2 Weeks' do
+        assert_equal 'Next 2 Weeks', @daterange.name
+      end
     end
   end
 
@@ -160,10 +272,13 @@ class DateRangeTest < ActiveSupport::TestCase
     setup do
       @daterange = DateRange.parse_when('next 6 weeks')
       assert_valid @daterange
+      @today = Time.zone.now
+      # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
+      @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
     end
     
-    should 'have date range of 42 days' do
-      assert_equal 42, @daterange.days
+    should 'have date range of 42 days + days left this week' do
+      assert_equal 42 + @days_left_in_week[@today.wday], @daterange.days
     end
 
     should 'have start day == beginning of today in utc format' do

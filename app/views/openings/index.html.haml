@@ -74,8 +74,10 @@
       -#%h3.calendar.date_range_name= @daterange.name(:with_dates => true)
 
     - cache(@openings_cache_key, :expires_in => 5.minutes) do
+      .span-15.last#today
+        = render(:partial => 'shared/today', :locals => {:today => @today})
       .span-15.last#free_calendar
-        = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings})
+        = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
       .span-15.last.appointments#free_capacity_slots.hide
         = render(:partial => 'appointments/free_capacity_slots2', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 

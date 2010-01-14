@@ -132,6 +132,7 @@ require "#{RAILS_ROOT}/lib/range.rb"
 require "#{RAILS_ROOT}/lib/duration.rb"
 require "#{RAILS_ROOT}/lib/shared/array.rb"
 require "#{RAILS_ROOT}/lib/shared/string.rb"
+require "#{RAILS_ROOT}/lib/shared/time_calculations.rb"
 
 # RPX key
 RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
