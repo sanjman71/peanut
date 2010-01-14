@@ -1,9 +1,9 @@
 // add appointment for a provider on a specific day
 $.fn.init_add_appointment = function() {
   $("#add_appointment_form").submit(function () {
-    var provider_type   = $("#add_appointment_form input#provider_type").attr('value');
-    var provider_id     = $("#add_appointment_form input#provider_id").attr('value');
+    // Provider is built into the form when it's generated - the end user doesn't provide this information.
     var service_id      = $("#add_appointment_form select#service_id").attr('value');
+    var customer_id     = $("#add_appointment_form input#customer_id").attr('value');
     var apt_start_date  = $("#add_appointment_form input#apt_start_date").attr('value');
     var apt_start_time  = $("#add_appointment_form input#apt_start_time").attr('value');
     var errors    = 0;
@@ -24,6 +24,24 @@ $.fn.init_add_appointment = function() {
       $("#add_appointment_form input#apt_start_time").removeClass('highlighted');
     }
 
+    if (!customer_id) {
+      $("#add_appointment_form input#customer_name").addClass('highlighted');
+      alert("Please select a customer");
+      return false; 
+    } else {
+      $("#add_appointment_form input#customer_name").removeClass('highlighted');
+    }
+
+    if (!service_id) {
+      $("#add_appointment_form select#service_id").addClass('highlighted');
+      alert("Please select a service");
+      return false; 
+    } else {
+      $("#add_appointment_form select#service_id").removeClass('highlighted');
+    }
+
+    // We have all the required fields
+
     // normalize time format, validate that start_at < end_at
     var apt_start_time = convert_time_ampm_to_string(apt_start_time)
 
@@ -33,8 +51,9 @@ $.fn.init_add_appointment = function() {
     // replace hidden tag formatted version
     $("#add_appointment_form input#start_at").attr('value', apt_start_date + 'T' + apt_start_time);
 
-    // Navigate the page
-    window.location.href = '/schedule/' + provider_type + '/' + provider_id + '/services/' + service_id + '/' + apt_start_date + 'T' + apt_start_time
+    // post
+    $.post(this.action, $(this).serialize(), null, "script");
+    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
 }
@@ -231,6 +250,34 @@ $.fn.init_send_pdf = function() {
   })
 }
 
+$.fn.init_autocomplete_customers = function() {
+  // Set up the autocomplete
+  // Setup help for the JSON solution from here: http://blog.schuager.com/2008/09/jquery-autocomplete-json-apsnet-mvc.html
+  // and here: http://www.it-eye.nl/weblog/2008/08/23/using-jquery-autocomplete-with-grails-and-json/
+  // This will dynamically invoke the index function on the customers controller, asking for JSON data
+  // The parse option is used to parse the JSON result into rows, each containing all the data for the row, the value displayed and the formatted value
+  // The formatItem option is also used to format the rows displayed in the pulldown
+  $("#customer_name").autocomplete($("#customer_name").attr("url"),
+                                          {
+                                            dataType:'json',
+                                            parse: function(data) {
+                                                      var rows = new Array();
+                                                      for(var i=0; i<data.length; i++){
+                                                          rows[i] = { data:data[i], value:data[i].user.name, result:data[i].user.name };
+                                                      }
+                                                      return rows;
+                                                  },
+                                            formatItem: function(data,i,max,value,term) { return value; },
+                                            autoFill: false
+                                          });
+  
+  $("#customer_name").result(function(event, data, formatted) {
+    // set the customer id
+    $("#customer_id").attr("value", data.user.id);
+  });
+
+}
+
 $(document).ready(function() {
   $(document).init_schedule_datepicker();
   $(document).init_schedule_timepicker();
@@ -241,6 +288,7 @@ $(document).ready(function() {
   $(document).init_show_appointment_on_hover();
   $(document).init_add_calendar_markings();
   $(document).init_send_pdf();
+  $(document).init_autocomplete_customers();
 })
 
 // Re-bind after an ajax call

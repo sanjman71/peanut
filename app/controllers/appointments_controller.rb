@@ -91,7 +91,7 @@ class AppointmentsController < ApplicationController
 
     @customer       = User.find_by_id(params[:customer_id])
 
-    @duration       = params[:duration].to_i if params[:duration]
+    @duration       = params[:duration] ? params[:duration].to_i : @service.duration
     @start_at       = params[:start_at]
     @end_at         = params[:end_at]
     
@@ -128,6 +128,11 @@ class AppointmentsController < ApplicationController
           @date_time_options  = Hash[:start_at => @start_at]
           @options            = Hash[:commit => true]
           @options            = @options.merge({:capacity => @capacity }) unless @capacity.blank?
+
+          if ((current_user.has_privilege?('update calendars', current_company)) ||
+              (current_user.has_privilege?('update calendars', @provider)))
+            @options            = @options.merge({:force_add => true}) 
+          end
 
           # create work appointment, with preferences
           @appointment        = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
@@ -194,7 +199,15 @@ class AppointmentsController < ApplicationController
 
     if @errors.keys.size > 0
       # set the flash
-      flash[:error]   = "There were #{@errors.keys.size} errors creating appointments"
+      if @errors.keys.size == 1
+        flash[:error] = "There was an error creating your appointment</br><ul>"
+      else
+        flash[:error] = "There were #{@errors.keys.size} errors creating appointments</br><ul>"
+      end
+      @errors.values.each do |error|
+        flash[:error] += "<li>" + error + "</li>"
+      end
+      flash[:error] += "</ul>"
       @redirect_path  = build_create_redirect_path(@provider, request.referer)
     else
       @redirect_path  = @redirect_path || build_create_redirect_path(@provider, request.referer)
