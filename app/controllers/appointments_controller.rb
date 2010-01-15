@@ -153,7 +153,7 @@ class AppointmentsController < ApplicationController
 
           begin
             # send appointment confirmation based on preferences
-            @confirmations = MessageComposeAppointment.confirmations(@appointment, current_company.preferences[:work_appointment_confirmations], {:managers => current_company.managers})
+            @confirmations = MessageComposeAppointment.confirmations(@appointment, current_company.preferences[:work_appointment_confirmations], {:company => current_company})
             # tell the user their confirmation email is being sent
             flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
           rescue Exception => e
