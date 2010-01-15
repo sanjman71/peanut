@@ -222,7 +222,10 @@ class AppointmentsController < ApplicationController
     
     respond_to do |format|
       format.html { redirect_back_or_default(@redirect_path) and return }
-      format.js { render(:update) { |page| page.redirect_to(redirect_back_or_default_uri(@redirect_path)) } }
+      format.js { 
+        rbdu = redirect_back_or_default_uri(@redirect_path)
+        render(:update) { |page| page.redirect_to(rbdu) }
+        }
     end
   end
 
