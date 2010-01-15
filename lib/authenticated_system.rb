@@ -10,6 +10,9 @@ module AuthenticatedSystem
     # Future calls avoid the database because nil is not equal to false.
     def current_user
       @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+      # explicitly set current user to false to avoid doing this check again
+      @current_user = false if @current_user.nil?
+      @current_user
     end
 
     # Store the given user id in the session.
@@ -87,6 +90,11 @@ module AuthenticatedSystem
       session[:return_to] = request.request_uri
     end
 
+    # Clear the URI of the current request in the session.
+    def clear_location
+      session[:return_to] = nil
+    end
+
     # Redirect to the URI stored by the most recent store_location call or
     # to the passed default.  Set an appropriately modified
     #   after_filter :store_location, :only => [:index, :new, :show, :edit]
@@ -94,6 +102,14 @@ module AuthenticatedSystem
     def redirect_back_or_default(default)
       redirect_to(session[:return_to] || default)
       session[:return_to] = nil
+    end
+
+    # URI to redirect to
+    # This is useful for a page.redirect_to RJS directive
+    def redirect_back_or_default_uri(default)
+      result = session[:return_to] || default
+      session[:return_to] = nil
+      result
     end
 
     # Inclusion hook to make #current_user and #logged_in?
