@@ -47,6 +47,17 @@ else
                       ])
           end
         end
+      elsif object.is_a?(Appointment) && object.work?
+        appointment = object
+        next if appointment.canceled?
+        # This must be an orphaned work appointment
+        rows.push([
+                    appointment.start_at.to_s(:appt_time),
+                    appointment.end_at.to_s(:appt_time),
+                    Duration.to_words(appointment.duration),
+                    appointment.service.name,
+                    appointment.customer ? appointment.customer.name : ""
+                  ])
       end
     end
     
@@ -61,12 +72,14 @@ else
     #   ]
     # end
     
-    pdf.table rows, 
-      :border_style => :grid,  
-      :row_colors => ["FFFFFF", "DDDDDD"],  
-      :headers => ["Start Time", "End Time", "Duration", "Service", "Customer"],  
-      :align => { 0 => :right, 1 => :right }
+    if !rows.empty?
+      pdf.table rows, 
+        :border_style => :grid,  
+        :row_colors => ["FFFFFF", "DDDDDD"],  
+        :headers => ["Start Time", "End Time", "Duration", "Service", "Customer"],  
+        :align => { 0 => :right, 1 => :right }
       
-    pdf.move_down(15)
+      pdf.move_down(15)
+    end
   end
 end
