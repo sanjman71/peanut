@@ -41,13 +41,12 @@ class CalendarController < ApplicationController
     # find services collection for the current company & provider; valid services must have at least 1 service provider
     # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
     @services = Array(current_company.services.with_provider(@provider.id))
-    
 
     if params[:start_date] and params[:end_date]
       # build daterange using range values
       @start_date = params[:start_date]
       @end_date   = params[:end_date]
-      @daterange  = DateRange.parse_range(@start_date, @end_date)
+      @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
     elsif params[:start_date] and params[:range_type]
       @start_date = params[:start_date]
       @daterange  = DateRange.parse_range_type(@start_date, params[:range_type])
@@ -55,7 +54,7 @@ class CalendarController < ApplicationController
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
       @start_date = params[:start_date] ? Time.parse(params[:start_date]).in_time_zone : nil
-      @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date)
+      @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date, :start_week_on => current_company.preferences[:start_wday].to_i)
     end
 
     # find free, work appointments for the specified provider over a daterange
