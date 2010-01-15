@@ -57,7 +57,7 @@
               %td{:class => klasses.join(" "), :id => id}
                 -# special case for 'Today'
                 .date{:style => 'padding-bottom: 3px;'}
-                  = (day == today) ? 'Today' : day.strftime("%b %d")
+                  = (day.to_s(:appt_schedule_day) == today.to_s(:appt_schedule_day)) ? 'Today' : day.strftime("%b %d")
                   %span#add_free_time{:style => 'visibility: hidden;'}= link_to image_tag('add.png', :size => '13x13'), '#', :title => 'Add Free Time', :class => 'admin', :id => 'add_free_time'
                 #available{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
                 
