@@ -101,8 +101,8 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
       end
       
-      should "show add single free time form" do
-        assert_select "form#add_single_free_time_form", 1
+      should "show add appointment form" do
+        assert_select "form#add_appointment_form", 1
       end
 
       should "have hidden send message form" do
@@ -141,8 +141,8 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => /^#{date_range_name}(\s)+Today$/}
       end
 
-      should "show add single free time form" do
-        assert_select "form#add_single_free_time_form", 1
+      should "show add appointment form" do
+        assert_select "form#add_appointment_form", 1
       end
 
       should "have hidden send message form" do
@@ -178,8 +178,8 @@ class CalendarControllerTest < ActionController::TestCase
       assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
     end
 
-    should "not show add single free time form" do
-      assert_select "form#add_single_free_time_form", 0
+    should "not show add appointment form" do
+      assert_select "form#add_appointment_form", 0
     end
 
     should "have hidden send message form" do
