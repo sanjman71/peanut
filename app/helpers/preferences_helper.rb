@@ -1,13 +1,13 @@
 module PreferencesHelper
   def time_horizon_options
     [
-      ["1 week", 7.days],
-      ["2 weeks", 14.days],
-      ["4 weeks", 28.days],
-      ["2 months", 2.months],
-      ["3 months", 3.months],
-      ["6 months", 6.months],
-      ["1 year", 1.year]
+      ["1 week", 7.days.to_s],
+      ["2 weeks", 14.days.to_s],
+      ["4 weeks", 28.days.to_s],
+      ["2 months", 2.months.to_s],
+      ["3 months", 3.months.to_s],
+      ["6 months", 6.months.to_s],
+      ["1 year", 1.year.to_s]
     ]
   end
 
