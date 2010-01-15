@@ -176,7 +176,7 @@ $.fn.init_openings_add_calendar_markings = function() {
       // mark as free
       $("div#free_calendar td#" + date).addClass('free');
       // add 'available' text
-      $("div#free_calendar td#" + date).find("span#available").text('Available');
+      $("div#free_calendar td#" + date).find("#available").text('Available');
     }
   })
 
