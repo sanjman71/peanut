@@ -13,8 +13,12 @@ class DateRangeTest < ActiveSupport::TestCase
       assert_true @daterange.include?(@today)
     end
     
+    should "should not include yesterday" do
+      assert_false @daterange.include?(@daterange.start_at-1.second)
+    end
+
     should "should not include tomorrow" do
-      assert_false @daterange.include?(@today+1.day)
+      assert_false @daterange.include?(@daterange.end_at+1.second)
     end
   end 
   
