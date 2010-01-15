@@ -81,7 +81,7 @@ class CompanyTest < ActiveSupport::TestCase
   
     should_change("company provider count", :by => 1) { CompanyProvider.count }
   
-    should "change company.user_providers" do
+    should "change company.user_providers collection" do
       assert_equal [@provider], @company.user_providers
     end
     
@@ -97,6 +97,10 @@ class CompanyTest < ActiveSupport::TestCase
       assert_equal ['company provider'], @provider.roles_on(@company).collect(&:name)
     end
   
+    should "add user to company.authorized_providers collection" do
+      assert @company.reload.authorized_providers.include?(@provider)
+    end
+
     context "and try to add the same provider" do
       setup do
         # @company.user_providers.push(@provider)
@@ -155,6 +159,10 @@ class CompanyTest < ActiveSupport::TestCase
   
       should "remove role 'company provider' on company from user" do
         assert_equal [], @provider.roles_on(@company).collect(&:name)
+      end
+
+      should "remove user from company.authorized_providers collection" do
+        assert_false @company.reload.authorized_providers.include?(@provider)
       end
     end
   end
