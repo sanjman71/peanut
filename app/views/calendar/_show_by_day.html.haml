@@ -1,7 +1,6 @@
 - stuff_by_day.each do |day, stuff|
-  .span-15.last
-    .span-11.last.calendar.date.wide
-      = day.to_s(:appt_day)
+  .span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
+    .span-11.last.calendar.date.wide= day.to_s(:appt_day)
     - reset_cycle
     - stuff.each do |object|
       -# check what type of stuff it is, possible options:

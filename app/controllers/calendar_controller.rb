@@ -6,7 +6,7 @@ class CalendarController < ApplicationController
   privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company]
 
   # Default when value
-  @@default_when = Appointment::WHEN_TODAY
+  @@default_when = Appointment::WHEN_NEXT_2WEEKS
   
   def index
     # redirect to a specific provider, try the current first and default to the first company provider
@@ -20,7 +20,9 @@ class CalendarController < ApplicationController
   
   # GET /users/1/calendar
   # GET /users/1/calendar/when/next-week
+  # GET /users/1/calendar/when/next-2-weeks/20090201
   # GET /users/1/calendar/range/20090101..20090201
+  # GET /users/1/calendar/monthly/20100101
   def show
     # @provider initialized in before_filter
     
@@ -43,7 +45,8 @@ class CalendarController < ApplicationController
     else
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
-      @daterange  = DateRange.parse_when(@when, :include => :today)
+      @start_date = params[:start_date] ? Time.parse(params[:start_date]).in_time_zone : nil
+      @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date)
     end
 
     # find free, work appointments for the specified provider over a daterange
@@ -60,13 +63,19 @@ class CalendarController < ApplicationController
     @capacity            = @capacity.values.flatten
 
     # build hash of calendar markings based on the free appointments
-    @calendar_markings   = build_calendar_markings(@free_appointments)
-    logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
+    # @calendar_markings   = build_calendar_markings(@free_appointments)
+    # logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
+
+    # use an empty calendar markings hash, and mark the calendar using the free_capacity_slots_by_day hash using javascript
+    @calendar_markings   = Hash[]
+
+    # initialize today
+    @today               = DateRange.today.beginning_of_day
 
     # combine capacity and work, sorted by start_at time
     @capacity_and_work   = (@capacity + @work_appointments).sort_by { |x| x.start_at.in_time_zone }
 
-    # Group capacity and work by free appointments
+    # group capacity and work by free appointments
     @capacity_and_work_by_free_appt = @capacity_and_work.group_by {|x| x.free_appointment_id }
     
     # find waitlist appointments for the specified provider over a daterange

@@ -1,4 +1,4 @@
-.span-15.last.free-appointment
+.span-15.last.free_appointment
   .span-6.appointment.free
     .span-5.prepend-1.last
       .span-5.last.service{:class => appointment.mark_as}
@@ -33,12 +33,11 @@
               .span-5.last.delete-weekly
                 = link_to('Delete series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.recurrence_parent, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to delete all future appointments in this series?")
     
-  .span-8.prepend-1.last
-    .span-8.last.capacity-and-work
-      - capacity_and_work_by_free_appt.each do |object|
-        -# check what type of object it is - appointment or capacity_slots
-        - case
-        - when object.is_a?(Appointment) && object.work?
-          = render(:partial => 'appointments/work_appointment', :locals => {:day => day, :appointment => object})
-        - when object.is_a?(CapacitySlot)
-          = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})
+  .span-8.prepend-1.last.capacity_and_work
+    - capacity_and_work_by_free_appt.each do |object|
+      -# check what type of object it is - appointment or capacity_slots
+      - case
+      - when object.is_a?(Appointment) && object.work?
+        = render(:partial => 'appointments/work_appointment', :locals => {:day => day, :appointment => object})
+      - when object.is_a?(CapacitySlot)
+        = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})

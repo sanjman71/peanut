@@ -15,6 +15,8 @@ a.rounded, .rounded.button                        { outline: none; border: none;
 .rounded.button                                   { color: #FFFFFF; background-color: #111111; padding: 5px 5px; }
 .rounded.button.color                             { background-color: #4400AA; }
 
+.rounded.button.smaller                           { font-size: 0.8em; }
+
 /* error styles */
 
 .field_error                                      { background-color: #FF8800; padding: 5px; }
@@ -70,7 +72,7 @@ label.big                                         { font-size: 16px; }
 .select                                           { font-size: 12px; }
 .select.big                                       { font-size: 15px; }
 
-.submitting                                       { font-weight: bold; color: #5500BB; background-color: #FFCC00; padding: 5px 5px;}
+.submitting                                       { font-weight: bold; color: #111111; background-color: #FFF6BF; padding: 5px 5px;}
   
 /* admin styles */
 

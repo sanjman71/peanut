@@ -1,7 +1,8 @@
 /* appointment styles */
 
-div.free-appointment                              { border: 1px solid #ccc; margin-bottom: 10px;}
-div.capacity-and-work                             { }
+div.free_appointment                              { background: url(/images/gray_gradient.jpg) 0% 0% repeat-x; }
+
+div.capacity_and_work                             { }
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
 div.appointment.canceled                          { color: #FF1100;}
 
@@ -16,7 +17,7 @@ div.appointment.review .data, div.waitlist.review .data
                                                   { color: #007700; }
 */
 
-div.appointment, div.slot                         { margin-bottom: 5px; background-color: #FFFFFF; }
+div.appointment, div.slot                         { margin-bottom: 5px; }
 div.appointment.shaded, div.slot.shaded           { background-color: #EDF3FE; }  /* white */
 
 div.appointment.free                              { }  /* light blue */

@@ -2,6 +2,22 @@ require 'test/test_helper'
 
 class DateRangeTest < ActiveSupport::TestCase
 
+  context "include" do
+    setup do 
+      @daterange = DateRange.parse_when('today')
+      assert_valid @daterange
+      @today = Time.zone.now
+    end
+    
+    should "should include today" do
+      assert_true @daterange.include?(@today)
+    end
+    
+    should "should not include tomorrow" do
+      assert_false @daterange.include?(@today+1.day)
+    end
+  end 
+  
   context 'today' do
     setup do 
       @daterange = DateRange.parse_when('today')
@@ -240,34 +256,34 @@ class DateRangeTest < ActiveSupport::TestCase
         assert_equal 'Next 2 Weeks', @daterange.name
       end
     end
+    
+    context "that ends on sunday" do
+      setup do
+        @daterange = DateRange.parse_when('next 2 weeks', :end_on => 0)
+        assert_valid @daterange
+        # calculate days to add based on current day and end on day
+        # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night - no days are added
+        @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.zone.now.wday]
+      end
+
+      should 'have start at == beginning of today in utc format' do
+        assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
+      end
+
+      should "have last day a sunday" do
+        assert_equal 0, @daterange.end_at.in_time_zone.wday
+      end
+
+      should 'have the days count adjusted to end day' do
+        assert_equal 14 + @days_to_add, @daterange.days
+      end
+
+      should 'be named Next 2 Weeks' do
+        assert_equal 'Next 2 Weeks', @daterange.name
+      end
+    end
   end
 
-  context 'next 2 weeks that ends on a sunday' do
-    setup do
-      @daterange = DateRange.parse_when('next 2 weeks', :end_on => 0)
-      assert_valid @daterange
-      # calculate days to add based on current day and end on day
-      # 2 weeks starting on Monday (day #1) begins at 00:00 on Monday and ends at 23:59:59 on Sunday night - no days are added
-      @days_to_add = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2][Time.zone.now.wday]
-    end
-    
-    should 'have start at == beginning of today in utc format' do
-      assert_equal Time.zone.now.beginning_of_day.utc, @daterange.start_at
-    end
-    
-    should "have last day a sunday" do
-      assert_equal 0, @daterange.end_at.in_time_zone.wday
-    end
-    
-    should 'have the days count adjusted to end day' do
-      assert_equal 14 + @days_to_add, @daterange.days
-    end
-    
-    should 'be named Next 2 Weeks' do
-      assert_equal 'Next 2 Weeks', @daterange.name
-    end
-  end
-  
   context 'next 6 weeks' do
     setup do
       @daterange = DateRange.parse_when('next 6 weeks')

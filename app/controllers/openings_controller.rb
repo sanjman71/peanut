@@ -64,7 +64,7 @@ class OpeningsController < ApplicationController
     @time_range   = params[:time].blank? ? nil : TimeRange.new(:when => params[:time].from_url_param) # xxx no when parameter?
 
     # initialize today
-    @today        = Time.zone.now.beginning_of_day
+    @today        = DateRange.today.beginning_of_day
 
     # initialize location & locations
     if params[:location_id]

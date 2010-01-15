@@ -106,11 +106,65 @@ $.fn.init_search_calendar_with_date_range = function () {
   })
 }
 
-$.fn.init_datepicker = function() {
-  $(".datepicker").datepicker({minDate: +0, maxDate: '+3m'});
+$.fn.init_add_calendar_markings = function() {
+  // find capacity slots by date, and mark calendar based on these slots
+  $("div#calendar_by_day div.calendar_schedule_date").each(function () {
+    // extract calendar date
+    re    = /date_(\d+)/
+    match = $(this).attr('id').match(re);
+    date  = match[1];
+
+    // count capacity slots for this date
+    var capacity_slots = 0;
+    $(this).find("div.capacity_and_work div.capacity_slot").each(function() {
+      capacity_slots += 1;
+    })
+
+    // count work appointments for this date
+    var work_appointments = 0;
+    $(this).find("div.capacity_and_work div.appointment.work").each(function() {
+      work_appointments += 1;
+    })
+
+    var text = [];
+
+    // mark the calendar
+    if (capacity_slots > 0) {
+      // mark as free
+      $("div#free_work_calendar td#" + date).addClass('free');
+      // add text
+      text.push('Free');
+    }
+
+    if (work_appointments > 0) {
+      // mark as work
+      //$("div#free_work_calendar td#" + date).addClass('work');
+      // add text
+      text.push('Work');
+    }
+
+    // mark text
+    $("div#free_work_calendar td#" + date).find("span#available").text(text.join(", "));
+  })
+
+  // add click handler to show selected free date, allow past dates
+  $(".weekday.free,.weekend.free").click(function() {
+    $("div#calendar_by_day").show();
+    // unmark all selected calendar dates, and mark this calendar date as selected
+    $(".free.selected").removeClass('selected');
+    $(this).addClass('selected');
+    // hide all date, and show this one
+    var date_id = "div#date_" + $(this).attr("id");
+    $(".calendar_schedule_date").hide();
+    $(date_id).show();
+  })
 }
 
-$.fn.init_timepicker = function() {
+$.fn.init_schedule_datepicker = function() {
+  $(".datepicker").datepicker({minDate: '-3m', maxDate: '+3m'});
+}
+
+$.fn.init_schedule_timepicker = function() {
   $(".timepicker").timepickr({convention:12, left:-180});
 }
 
@@ -137,12 +191,13 @@ $.fn.init_send_pdf = function() {
 }
 
 $(document).ready(function() {
-  $(document).init_datepicker();
-  $(document).init_timepicker();
+  $(document).init_schedule_datepicker();
+  $(document).init_schedule_timepicker();
   $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
+  $(document).init_add_calendar_markings();
   $(document).init_send_pdf();
 })
 

@@ -133,6 +133,7 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :post}
 
   # show/edit calendars scoped by provider (and optional format)
+  map.when_start_show ':provider_type/:provider_id/calendar/when/:when/:start_date', :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
   map.when_show       ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
   map.connect         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'

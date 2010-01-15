@@ -26,7 +26,7 @@ table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 no
 
 /* calendar attribute styles */
 
-.calendar.date_range_name                         { color: #111111; font-weight: bold; font-size: 1.5em; }
+.calendar.date_range_name                         { color: #111111; font-weight: bold; font-size: 1.3em; }
 .calendar.date_range_summary                      { color: #111111; font-weight: bold; font-size: 1.5em; }
 
 .calendar.cube                                    { text-align: center; width: 40px; border: 1px solid #007700; padding-bottom: 0; }

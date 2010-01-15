@@ -43,6 +43,16 @@ module CalendarHelper
     end
   end
 
+  def build_calendar_prev_next_links(provider, daterange)
+    next_when   = daterange.name.to_url_param
+    next_start  = (daterange.end_at.in_time_zone + 1.day).to_s(:appt_schedule_day)
+    prev_start  = (daterange.start_at.in_time_zone - daterange.days.days).to_s(:appt_schedule_day)
+    next_link   = link_to("Next", when_start_show_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => next_start))
+    prev_link   = link_to("Previous", when_start_show_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => prev_start))
+
+    Hash[:prev_link => prev_link, :next_link => next_link]
+  end
+
   def build_calendar_today_prev_next_links(provider, daterange)
 
     prev_link = next_link = today_link = nil
@@ -103,7 +113,6 @@ module CalendarHelper
     end
 
     {:today_link => today_link, :prev_link => prev_link, :next_link => next_link}
-
   end
   
 end
