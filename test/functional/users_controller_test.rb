@@ -752,5 +752,53 @@ class UsersControllerTest < ActionController::TestCase
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
   end
-  
+
+  context "revoke provider on owner" do
+    context "as user" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        put :revoke_provider, :id => @owner.id
+      end
+
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+
+    context "as owner" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        put :revoke_provider, :id => @owner.id
+      end
+
+      should "remove owner as a company provider" do
+        assert_false @company.has_provider?(@owner)
+      end
+
+      should "remove owner from authorized_providers collection" do
+        assert_false @company.reload.authorized_providers.include?(@owner)
+      end
+
+      should "set the flash" do
+        assert_match /You have been removed as a company provider/, flash[:notice]
+      end
+
+      should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
+    end
+
+    context "as owner who is not a provider" do
+      setup do
+        # remove owner as a company provider
+        @company.user_providers.delete(@owner)
+        assert_false @company.has_provider?(@owner)
+        assert_false @company.reload.authorized_providers.include?(@owner)
+        @controller.stubs(:current_user).returns(@owner)
+        put :revoke_provider, :id => @owner.id
+      end
+
+      should "set the flash" do
+        assert_match /You are not a company provider/, flash[:notice]
+      end
+
+      should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
+    end
+  end
 end

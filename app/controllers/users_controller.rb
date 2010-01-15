@@ -247,14 +247,22 @@ class UsersController < ApplicationController
 
   # PUT /users/1/revoke_provider
   def revoke_provider
-    # check if user has any free appointments where he is the provider
+    # check if user has any free appointments where they are the provider
     if Appointment.free.provider(@user).size > 0
-      # user can not be removed as a company provider
-      flash[:notice] = "You can not be removed as a company provider because you are a provider to at least 1 appointment"
+      # user can not be removed as a company provider until all appointments are removed
+      flash[:notice] = "You can not be removed as a company provider because you are a provider to at least 1 appointment."
+      flash[:notice] += "<br/>Please remove these appointments and try again."
     else
       # removing user as a company provider
-      flash[:notice] = "You have been removed as a company provider"
+      if current_company.providers.include?(@user)
+        current_company.user_providers.delete(@user)
+        # @user.revoke_role('company provider', current_company)
+        flash[:notice] = "You have been removed as a company provider"
+      else
+        flash[:notice] = "You are not a company provider"
+      end
     end
+
     redirect_to(user_edit_path(@user)) and return
   end
 
