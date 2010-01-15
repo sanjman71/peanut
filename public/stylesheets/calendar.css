@@ -11,8 +11,10 @@ table.calendar td                                 { background: #F5F5F5 none rep
                                                     padding: 3px 3px 13px 3px; vertical-align: top; }
 
 table.calendar td.in-range.free                   { color: #333333; font-weight: bolder; }
-table.calendar td.in-range.free.work              { background: #009900 none repeat scroll 0 0; color: #333333; font-weight: bolder; }
+table.calendar td.in-range.work                   { color: #333333; font-weight: bolder; }
+/*
 table.calendar td.in-range.busy                   { background: #444444 none repeat scroll 0 0; color: #FFFFFF; font-weight: bolder; }
+*/
 table.calendar td.in-range                        { background: #EDF3FE none repeat scroll 0 0; }
 table.calendar td.outside-range                   { background: #FFFFFF none repeat scroll 0 0; font-weight: lighter; }
 

@@ -56,8 +56,9 @@
               - id = "#{day.year}#{sprintf("%02d", day.month)}#{sprintf("%02d", day.mday)}"
               %td{:class => klasses.join(" "), :id => id}
                 -# special case for 'Today'
-                %span= (day == today) ? 'Today' : day.strftime("%b %d")
-                %br
-                %span#available{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
+                .date{:style => 'padding-bottom: 3px;'}
+                  = (day == today) ? 'Today' : day.strftime("%b %d")
+                  %span#add_free_time{:style => 'visibility: hidden;'}= link_to image_tag('add.png', :size => '13x13'), '#', :title => 'Add Free Time', :class => 'admin', :id => 'add_free_time'
+                #available{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
                 
               

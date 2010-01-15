@@ -176,13 +176,18 @@ $.fn.init_add_calendar_markings = function() {
 
     // count capacity slots for this date
     var capacity_slots = 0;
-    $(this).find("div.capacity_and_work div.capacity_slot").each(function() {
+    $(this).find("div.free_appointment div.capacity_and_work div.capacity_slot").each(function() {
       capacity_slots += 1;
     })
 
-    // count work appointments for this date
+    // count work appointments for this date; there are multiple ways to count work appointments
     var work_appointments = 0;
-    $(this).find("div.capacity_and_work div.appointment.work").each(function() {
+
+    $(this).find("div.free_appointment div.capacity_and_work div.appointment.work").each(function() {
+      work_appointments += 1;
+    })
+
+    $(this).find("div.appointment.work").each(function() {
       work_appointments += 1;
     })
 
@@ -190,34 +195,41 @@ $.fn.init_add_calendar_markings = function() {
 
     // mark the calendar
     if (capacity_slots > 0) {
-      // mark as free
+      // mark as free, add text
       $("div#free_work_calendar td#" + date).addClass('free');
-      // add text
       text.push('Free');
     }
 
     if (work_appointments > 0) {
-      // mark as work
-      //$("div#free_work_calendar td#" + date).addClass('work');
-      // add text
+      // mark as work, add text
+      $("div#free_work_calendar td#" + date).addClass('work');
       text.push('Work');
     }
 
     // mark text
-    $("div#free_work_calendar td#" + date).find("span#available").text(text.join(", "));
+    $("div#free_work_calendar td#" + date).find("#available").text(text.join(", "));
   })
 
-  // add click handler to show selected free date, allow past dates
-  $(".weekday.free,.weekend.free").click(function() {
+  // add click handler to show selected free, work dates; allow past dates
+  $("td.weekday.free,td.weekday.work,td.weekend.free,td.weekend.work").click(function() {
     $("div#calendar_by_day").show();
     // unmark all selected calendar dates, and mark this calendar date as selected
-    $(".free.selected").removeClass('selected');
+    $(".free.selected,.work.selected").removeClass('selected');
     $(this).addClass('selected');
-    // hide all date, and show this one
-    var date_id = "div#date_" + $(this).attr("id");
+    // hide all dates, and show this date
     $(".calendar_schedule_date").hide();
+    var date_id = "div#date_" + $(this).attr("id");
     $(date_id).show();
   })
+
+  // add hover state to all future calendar dates
+  /*
+  $("td.weekday:not(.past) .date,td.weekend:not(.past) .date").hover(function () {
+    $(this).find("span#add_free_time").css('visibility', 'visible');
+    }, function () {
+    $(this).find("span#add_free_time").css('visibility', 'hidden');
+  })
+  */
 }
 
 $.fn.init_schedule_datepicker = function() {
