@@ -1,4 +1,8 @@
 class CalendarController < ApplicationController
+
+  # Set bounce-back for the show page
+  after_filter :store_location, :only => [:show]
+
   before_filter :init_provider, :only => [:show]
   before_filter :init_provider_privileges, :only => [:show]
   
