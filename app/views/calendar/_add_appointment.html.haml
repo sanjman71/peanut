@@ -31,9 +31,11 @@
         == Customer
       .span-4.last.padding-bottom-10#customer_search
         = text_field_tag '', '', :size => 12, :id => :customer_name, :url => customers_path(:subdomain => current_subdomain, :format => :json)
+      .span-6.last
+        %em== Search using name, phone # or email
       - if has_privilege?('create users', current_company)
-        .span-6.last
-          %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', customer_new_path, :class => 'customer add'
+        .span-4.prepend-2.last
+          %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a new customer', customer_new_path, :class => 'customer add'
 
       .span-3.append-3.last.padding-bottom-10
         #submit= f.submit 'Add', :name => nil, :class => 'button big'
