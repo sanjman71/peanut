@@ -20,7 +20,6 @@ $.fn.init_autocomplete_customers = function() {
           success: function(data) {
             $.each(data, function(i, item) {
               // add customer data as a hash with keys 'name' and 'id'
-              console.log(item.user.name + ":" + item.user.id + ":" + item.user.email);
               customers.push({name:item.user.name, id:item.user.id});
             })
             
@@ -42,7 +41,6 @@ $.fn.show_appointment_customer = function() {
 $.fn.init_change_appointment_customer = function() {
   // called when the user selects a customer from the autocomplete list
   $("#customer_search_text").result(function(event, data, formatted) {
-    console.log("selected: " + data.name + ":", data.id);
     // change the customer name and id
     $("#customer_name").html(data.name);
     $("#customer_id").attr("value", data.id);

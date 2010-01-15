@@ -1,0 +1,24 @@
+.span-6.prepend-1.last.mat
+= label_tag 'add_single_free_time_form', "Schedule Available Time for #{provider.name}", :class => 'big'
+- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_free'), :method => :post, :html => {:id => 'add_single_free_time_form'}) do |f|
+  = hidden_field_tag :provider_type, provider.tableize
+  = hidden_field_tag :provider_id, provider.id
+  = hidden_field_tag :capacity, provider.capacity
+  
+  .add_free_time
+    .span-6.last#when_label
+      == When
+    .span-6.last#when_text
+      = text_field_tag 'date', '', :size => 10, :class => 'datepicker', :autocomplete => 'off'
+    .span-6.last#start_at_label
+      == Start
+    .span-6.last#start_at_text
+      = text_field_tag 'start_at', '', :size => 10, :class => 'timepicker', :autocomplete => 'off'
+      %span.example== e.g. 8:15 am
+    .span-6.last#end_at_label
+      == End
+    .span-6.last.append-bottom#end_at_text
+      = text_field_tag 'end_at', '', :size => 10, :class => 'timepicker', :autocomplete => 'off'
+      %span.example== e.g. 5:30 pm
+    .span-3.append-3.last.padding-bottom-10
+      #submit= f.submit 'Add', :name => nil, :class => 'button big'

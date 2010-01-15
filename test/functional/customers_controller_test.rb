@@ -94,7 +94,7 @@ class CustomersControllerTest < ActionController::TestCase
       setup do
         # as company manager
         @controller.stubs(:current_user).returns(@owner)
-        xhr :get, :index, :format => 'js', :search => 'boo'
+        xhr :get, :index, :format => 'js', :q => 'boo'
       end
 
       should_respond_with :success

@@ -115,7 +115,7 @@ $.fn.init_live_customers_search = function () {
     var search_term = this.value;
     // excecut search, throttle how often its called
     var search_execution = function () {
-      $.get(search_url, {search : search_term}, null, "script");
+      $.get(search_url, {q : search_term}, null, "script");
       // show search progress bar
       $('#search_progress').show();
     }.sleep(300);

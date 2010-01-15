@@ -1,0 +1,39 @@
+/ map.schedule      '/schedule/:provider_type/:provider_id/services/:service_id/:start_at',
+/                   :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+
+.span-6.prepend-1.last.mat
+  = label_tag 'add_appointment_form', "Schedule an appointment for #{provider.name}", :class => 'big'
+  - form_for(Appointment.new, :url => schedule_work_path, :html => {:id => 'add_appointment_form'}) do |f|
+    -# We don't bother with duration or capacity - both will be obtained from the service
+    -# We don't bother with customer - it will default to current_user
+    -# start_at is assigned by javascript based on the date and time
+    = hidden_field_tag :provider_type, provider.tableize
+    = hidden_field_tag :provider_id, provider.id
+    = hidden_field_tag :mark_as, 'work'
+    = hidden_field_tag :start_at
+    = hidden_field_tag :customer_id
+    = hidden_field_tag :force_add, 1
+    
+    .add_appointment
+      .span-2#service_label
+        == Service
+      .span-4.last.padding-bottom-10#service
+        = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]})
+      .span-2#start_date_label
+        == Date
+      .span-4.last.padding-bottom-10#start_date_text
+        = text_field_tag :apt_start_date, '', :size => 12, :class => 'datepicker', :autocomplete => 'off'
+      .span-2#start_time_label
+        == Start Time
+      .span-4.last.padding-bottom-10#start_time_text
+        = text_field_tag :apt_start_time, '', :size => 12, :class => 'timepicker', :autocomplete => 'off'
+      .span-2#customer_label
+        == Customer
+      .span-4.last.padding-bottom-10#customer_search
+        = text_field_tag '', '', :size => 12, :id => :customer_name, :url => customers_path(:subdomain => current_subdomain, :format => :json)
+      - if has_privilege?('create users', current_company)
+        .span-6.last
+          %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', customer_new_path, :class => 'customer add'
+
+      .span-3.append-3.last.padding-bottom-10
+        #submit= f.submit 'Add', :name => nil, :class => 'button big'
