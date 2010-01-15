@@ -221,7 +221,7 @@ $.fn.init_add_calendar_markings = function() {
 }
 
 $.fn.init_schedule_datepicker = function() {
-  $(".datepicker").datepicker({minDate: '-3m', maxDate: '+3m'});
+  $(".datepicker").datepicker({minDate: 0, maxDate: '+3m'});
 }
 
 $.fn.init_schedule_timepicker = function() {
