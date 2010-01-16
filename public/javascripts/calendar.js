@@ -67,9 +67,10 @@ $.fn.init_add_single_free_time = function() {
   // open dialog on click
   $("a#add_free_time").click(function() {
     // set dialog date fields
-    var date = $(this).parents("td").attr('id');
-    $("form#add_single_free_time_form input#date").attr('value', date);
-    $("form#add_single_free_time_form div#free_date").text(date);
+    var normalized_date = $(this).parents("td").attr('id');
+    var calendar_date   = convert_string_to_date(normalized_date)
+    $("form#add_single_free_time_form input#date").attr('value', normalized_date);
+    $("form#add_single_free_time_form div#free_date").text(calendar_date);
     // clear start_at, end_at time fields
     $("form#add_single_free_time_form div#free_start_at_text input#free_start_at").val('');
     $("form#add_single_free_time_form div#free_end_at_text input#free_end_at").val('');
@@ -106,9 +107,6 @@ $.fn.init_add_single_free_time = function() {
       alert("The start time must be earlier than the end time");
       return false;
     }
-
-    // normalize date format
-    //var when = convert_date_to_string(when);
 
     // replace start_at, end_at values with normalized values
     $("input#free_start_at").attr('value', start_at);
