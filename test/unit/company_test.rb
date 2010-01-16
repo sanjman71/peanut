@@ -197,7 +197,9 @@ class CompanyTest < ActiveSupport::TestCase
     end
     
     should "have default preferences" do
-      assert_equal( ({:time_horizon => 28.days, :start_wday => 0, :appt_start_minutes=>[0], :work_appointment_confirmations=>[:customer], :public=>1}), @company.preferences)
+      assert_equal( ({:time_horizon => 28.days, :start_wday => '0', :appt_start_minutes=>[0], :public=>'1', 
+                      :work_appointment_confirmation_customer=>'1', :work_appointment_confirmation_manager=>'0',
+                      :work_appointment_confirmation_provider=>'0'}), @company.preferences)
     end
   
     should "have nil preferences[:foo]" do
@@ -211,7 +213,9 @@ class CompanyTest < ActiveSupport::TestCase
       end
       
       should "have new value" do
-        assert_equal( ({:time_horizon => 14.days, :start_wday => 0, :appt_start_minutes=>[0], :work_appointment_confirmations=>[:customer], :public=>1}), @company.preferences)
+        assert_equal( ({:time_horizon => 14.days, :start_wday => '0', :appt_start_minutes=>[0], :public=>'1',
+                        :work_appointment_confirmation_customer=>'1', :work_appointment_confirmation_manager=>'0',
+                        :work_appointment_confirmation_provider=>'0'}), @company.preferences)
       end
     end
   

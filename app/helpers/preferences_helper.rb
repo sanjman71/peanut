@@ -24,16 +24,11 @@ module PreferencesHelper
       ["Every 30 minutes", "[0,30]"]
     ]
   end
-  
+
   def appt_confirmation_options
     [
-      ["No confirmations", "[:nobody]"],
-      ["Customers only", "[:customer]"],
-      ["Providers only", "[:provider]"],
-      ["Managers only", "[:managers]"],
-      ["Customers and providers", "[:customer, :provider]"],
-      ["Customers and managers", "[:customer, :managers]"],
-      ["Providers and managers", "[:provider, :managers]"],
+      ["Yes", "1"],
+      ["No", "0"]
     ]
   end
 

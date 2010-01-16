@@ -743,7 +743,9 @@ class AppointmentsControllerTest < ActionController::TestCase
     context "with appointment confirmations" do
       context "to nobody" do
         setup do
-          @company.preferences[:work_appointment_confirmations] = [:nobody]
+          @company.preferences[:work_appointment_confirmation_customer] = '0'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
@@ -760,6 +762,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       context "to customer only" do
         setup do
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
@@ -780,7 +785,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       context "to provider only" do
         setup do
-          @company.preferences[:work_appointment_confirmations] = [:provider]
+          @company.preferences[:work_appointment_confirmation_customer] = '0'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '1'
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
@@ -801,7 +808,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       context "to managers only" do
         setup do
-          @company.preferences[:work_appointment_confirmations] = [:managers]
+          @company.preferences[:work_appointment_confirmation_customer] = '0'
+          @company.preferences[:work_appointment_confirmation_manager]  = '1'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
@@ -823,7 +832,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       context "to customer and managers" do
         setup do
-          @company.preferences[:work_appointment_confirmations] = [:customer, :managers]
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:work_appointment_confirmation_manager]  = '1'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
