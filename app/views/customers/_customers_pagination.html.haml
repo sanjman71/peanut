@@ -1,5 +1,5 @@
 .span-10.prepend-1.append-bottom.customers.header
-  = search_text ? search_text : page_entries_info(customers, :entry_name => 'customer')
+  %h4.bigger.bottom= search_text ? search_text : page_entries_info(customers, :entry_name => 'customer')
 .span-4.prepend-1.last#pagination
   - if paginate
     -# force all unnecessary params to nil here

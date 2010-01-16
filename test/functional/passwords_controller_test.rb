@@ -19,7 +19,7 @@ class PasswordsControllerTest < ActionController::TestCase
       should_not_assign_to(:user)
 
       should "set flash error" do
-        assert_match /Could not find the specified email address/, flash[:error]
+        assert_match /Invalid email address/, flash[:error]
       end
 
       should_redirect_to("password forgot path") { password_forgot_path }
@@ -31,10 +31,11 @@ class PasswordsControllerTest < ActionController::TestCase
       end
 
       should_assign_to(:user)
+      should_assign_to(:password)
 
       should "change user password to a random password" do
         user = User.with_email("sanjay@walnut.com").first
-        assert User.authenticate('sanjay@walnut.com', assigns(:user).password)
+        assert User.authenticate('sanjay@walnut.com', assigns(:password))
       end
 
       should_redirect_to("login path") { login_path }

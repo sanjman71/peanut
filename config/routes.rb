@@ -47,6 +47,7 @@ ActionController::Routing::Routes.draw do |map|
   map.customer_create '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
   map.customer_edit   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company customer', :conditions => {:method => :get}
   map.customer_update '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
+  map.customer_delete '/customers/:id',       :controller => 'users', :action => 'destroy', :role => 'company customer', :conditions => {:method => :delete}
 
   map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work',
                 :conditions => {:method => :get, :state => /upcoming|completed|canceled/}

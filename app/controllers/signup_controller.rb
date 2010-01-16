@@ -72,7 +72,7 @@ class SignupController < ApplicationController
     Company.transaction do
       # get and remove terms from params
       @terms        = params[:company].delete(:terms).to_i
-      @user         = logged_in? ? current_user : User.create_or_reset(params[:user])
+      @user         = logged_in? ? current_user : User.create(params[:user])
       @plan         = Plan.find(params[:plan_id])
       # subscription and company objects are dependent on each other
       @subscription = Subscription.new(:user => @user, :plan => @plan)

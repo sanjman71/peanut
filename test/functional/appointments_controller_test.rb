@@ -690,7 +690,9 @@ class AppointmentsControllerTest < ActionController::TestCase
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id,
-              :customer => {:name => "Sanjay", :email => "sanjay@walnut.com", :password => 'sanjay', :password_confirmation => 'sanjay'}}
+              :customer => {:name => "Sanjay", :password => 'sanjay', :password_confirmation => 'sanjay',
+                            :email_addresses_attributes => [{:address => "sanjay@walnut.com"}]}
+             }
         @free_appt.reload
       end
   
@@ -712,17 +714,17 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:duration)  { 120.minutes }
       should_assign_to(:mark_as) { "work" }
       should_assign_to(:appointment)
-      
-      should "create user in active state" do
+
+      should "create user with email address, in active state" do
         user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
-      
+
       should "create user with specified password" do
         user = User.authenticate('sanjay@walnut.com', 'sanjay')
         assert_equal assigns(:customer), user
       end
-      
+
       should "set the flash for the created work appointment" do
         assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
       end

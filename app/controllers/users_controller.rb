@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx, :grant_provider, :revoke_provider]
-  before_filter :init_role, :only => [:edit, :update]
-  before_filter :init_user_privileges, :only => [:edit, :update]
+  before_filter :init_role, :only => [:edit, :update, :destroy]
+  before_filter :init_user_privileges, :only => [:edit, :update, :destroy]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
   privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
@@ -129,17 +129,17 @@ class UsersController < ApplicationController
     end
 
     # create user
-    @user = User.create_or_reset(params[:user])
-    
+    @user = User.create(params[:user])
+
     # @user.register! if @user && @user.valid?
     # success = @user && @user.valid?
-    
+
     # if success && @user.errors.empty?
     if @user.valid?
       # if there was an invitation, use the invitation company; otherwise use the current company
       @company        = @invitation ? @invitation.company : current_company
-      
-      # initialize the new user
+
+      # initialize the new user, and the redirect path
       @redirect_path  = user_initialize(@company, @user, @role, @creator, @invitation)
     else
       @error    = true
@@ -155,7 +155,7 @@ class UsersController < ApplicationController
     end
   end
 
-  # /users/1/edit
+  # GET /users/1/edit
   def edit
     # @role and @user are initialized here
 
@@ -178,6 +178,7 @@ class UsersController < ApplicationController
     end
   end
   
+  # PUT /users/1
   def update
     # @role and @user are initialized here
 
@@ -276,9 +277,39 @@ class UsersController < ApplicationController
     redirect_to users_path
   end
 
+  # DELETE /users/1
   def destroy
-    @user.delete!
-    redirect_to users_path
+    # check user roles
+    @company_roles = @user.roles.collect(&:name).uniq.select { |s| s.match(/^company/) }.sort
+
+    # track exceptions
+    @messages = []
+
+    # check each role
+    @company_roles.each do |role|
+      case role
+      when 'company customer'
+        if @user.appointments_count > 0
+          @messages.push("Can not delete a customer with appointments.")
+        end
+      when 'company manager'
+        @messages.push("Can not delete company managers.")
+      end
+    end
+
+    if @messages.empty?
+      @user.destroy
+      flash[:notice] = "Deleted customer #{@user.name}"
+    else
+      flash[:notice] = @messages.join("<br/>")
+    end
+
+    @redirect_path = request.referer || users_path
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+    end
   end
 
   def purge

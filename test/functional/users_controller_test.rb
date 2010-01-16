@@ -305,10 +305,10 @@ class UsersControllerTest < ActionController::TestCase
         setup do
           # stub current user as company owner
           @controller.stubs(:current_user).returns(@owner)
-          # create user should generate a password
           post :create, {:role => 'company provider',
                          :creator => 'user',
-                         :user => {:email_addresses_attributes => [{:address => "sanjay@jarna.com"}], :name => "Sanjay Kapoor"}}
+                         :user => {:email_addresses_attributes => [{:address => "sanjay@jarna.com"}], :name => "Sanjay Kapoor",
+                                   :password => "secret", :password_confirmation => 'secret'}}
         end
 
         should_change("User.count", :by => 1) { User.count }
@@ -408,22 +408,33 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)
-        # create user should generate a password
         post :create, {:role => 'company customer',
                        :creator => 'user',
-                       :user => {:email_addresses_attributes => [{:address => "joe@jarna.com"}], :name => "Joe Bloggs"}}
+                       :user => {:email_addresses_attributes => [{:address => "joe@jarna.com"}], :name => "Joe Bloggs",
+                                :password => "secret", :password_confirmation => 'secret'}}
       end
 
       should_change("User.count", :by => 1) { User.count }
+      should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
 
       should_assign_to(:creator) {"user"}
       should_assign_to(:user)
       should_assign_to(:role) {"company customer"}
       should_not_assign_to :invitation
 
+      should "create user with email" do
+        @user = User.with_email("joe@jarna.com").first
+        assert_equal @user, assigns(:user)
+      end
+
       should "add 'company customer' role on company to user" do
         @user = User.with_email("joe@jarna.com").first
         assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
+      end
+
+      should "add user to company.authorized_customers collection" do
+        @user = User.with_email("joe@jarna.com").first
+        assert @company.authorized_customers.include?(@user)
       end
 
       should "add 'user manager' role on user to user" do
@@ -441,14 +452,13 @@ class UsersControllerTest < ActionController::TestCase
       should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
     end
     
-    context "as authenticated user, without an email address" do
+    context "as an authenticated user, without an email address" do
       setup do
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)
-        # create user should generate a password
         post :create, {:role => 'company customer',
                        :creator => 'user',
-                       :user => {:name => "Joe Bloggs"}}
+                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret'}}
       end
 
       should_change("User.count", :by => 1) { User.count }
@@ -465,6 +475,54 @@ class UsersControllerTest < ActionController::TestCase
 
       should "add 'user manager' role on user to user" do
         @user = User.find_by_name("Joe Bloggs")
+        assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
+      end
+
+      should "not add user as a company provider" do
+        assert_equal [], assigns(:user).provided_companies
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('customers_path') { customers_path }
+
+      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
+    end
+
+    context "as an authenticated user, with a phone number" do
+      setup do
+        # stub current user as the company owner
+        @controller.stubs(:current_user).returns(@owner)
+        post :create, {:role => 'company customer',
+                       :creator => 'user',
+                       :user => {:phone_numbers_attributes => [{:address => "5559991212", :name => "Mobile"}], :name => "Joe Bloggs",
+                                 :password => "secret", :password_confirmation => 'secret'}}
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+      should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+      should_assign_to(:creator) {"user"}
+      should_assign_to(:user)
+      should_assign_to(:role) {"company customer"}
+      should_not_assign_to :invitation
+
+      should "create user with phone number" do
+        @user = User.with_phone("5559991212").first
+        assert_equal @user, assigns(:user)
+      end
+
+      should "add 'company customer' role on company to user" do
+        @user = User.with_phone("5559991212").first
+        assert_equal ['company customer'], @user.roles_on(@company).collect(&:name).sort
+      end
+
+      should "add user to company.authorized_customers collection" do
+        @user = User.with_phone("5559991212").first
+        assert @company.authorized_customers.include?(@user)
+      end
+
+      should "add 'user manager' role on user to user" do
+        @user = User.with_phone("5559991212").first
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
 

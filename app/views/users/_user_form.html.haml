@@ -68,7 +68,7 @@
         
     .span-12.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
       .span-4
-        %h3.text-align-right{:style => "padding-top: 10px;"}== Confirm password:
+        %h3.text-align-right{:style => "padding-top: 10px; font-size: 1.3em;"}== Confirm password:
       .span-8.last
         = user_form.password_field :password_confirmation, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
         

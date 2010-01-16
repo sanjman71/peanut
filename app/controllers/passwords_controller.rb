@@ -13,12 +13,19 @@ class PasswordsController < ApplicationController
     @user   = User.with_email(@email).first
 
     if @user.blank?
-      flash[:error] = "Could not find the specified email address"
+      flash[:error] = "Invalid email address"
       redirect_to(password_forgot_path) and return
     end
 
     # reset user's password with a random one
-    @user = User.create_or_reset(:email => @email, :password => :random)
+    @password = User.generate_password(10)
+    @user.password = @password
+    @user.password_confirmation = @password
+    @user.save
+
+    # send user the new password
+    MessageComposeUser.password_reset(@user, @password)
+
     flash[:notice] = "A new password will be sent to #{@email}"
 
     # set redirect path based on authenticated flag

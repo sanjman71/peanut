@@ -409,7 +409,7 @@ class AppointmentsController < ApplicationController
     if params[:customer]
       # create new user, assign a random password
       options   = params[:customer]
-      @customer = User.create_or_reset(options)
+      @customer = User.create(options)
       if !@customer.valid?
         # not a valid customer
         flash[:error] = @customer.errors.full_messages.join("\n")
@@ -417,6 +417,13 @@ class AppointmentsController < ApplicationController
       end
       # assign the customer id
       params[:customer_id] = @customer.id
+
+      begin
+        # send user created message
+        MessageComposeUser.created(@customer.reload)
+      rescue
+      
+      end
     end
 
     @mark_as = Appointment::WORK
