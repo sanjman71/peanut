@@ -810,7 +810,66 @@ class UsersControllerTest < ActionController::TestCase
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
   end
+  
+  context "delete user" do
+    context "as regular user" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        delete :destroy, :id => @owner.id
+      end
 
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+
+    context "who is a company manager" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        delete :destroy, :id => @owner.id
+      end
+
+      should_assign_to(:company_roles) { ['company manager', 'company provider'] }
+
+      should "not delete user" do
+        assert User.find_by_id(@owner.id)
+      end
+
+      should_redirect_to('users path') { "/users" }
+    end
+    
+    context "who is a company provider" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        delete :destroy, :id => @provider.id
+      end
+
+      should_assign_to(:company_roles) { ['company provider'] }
+
+      should "not delete user" do
+        assert User.find_by_id(@owner.id)
+      end
+
+      should_redirect_to('users path') { "/users" }
+    end
+    
+    context "who is a company customer" do
+      setup do
+        # add customer
+        @customer = Factory(:user, :name => "Customer")
+        @customer.grant_role('company customer', @company)
+        @controller.stubs(:current_user).returns(@owner)
+        delete :destroy, :id => @customer.id
+      end
+
+      should_assign_to(:company_roles) { ['company customer'] }
+
+      should "delete user" do
+        assert_nil User.find_by_id(@customer.id)
+      end
+
+      should_redirect_to('users path') { "/users" }
+    end
+  end
+  
   context "revoke provider on owner" do
     context "as user" do
       setup do

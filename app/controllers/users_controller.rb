@@ -4,7 +4,7 @@ class UsersController < ApplicationController
   before_filter :init_user_privileges, :only => [:edit, :update, :destroy]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
-  privilege_required_any  'update users', :only => [:edit, :update], :on => [:user, :current_company]
+  privilege_required_any  'update users', :only => [:edit, :update, :destroy], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
   privilege_required      'update users', :only => [:grant_provider, :revoke_provider], :on => :current_company
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
@@ -237,10 +237,10 @@ class UsersController < ApplicationController
 
   # PUT /users/1/grant_provider
   def grant_provider
-    if @user.has_role?('company provider', current_company)
+    if current_company.providers.include?(@user)
       flash[:notice] = "You are already a company provider"
     else
-      @user.grant_role('company provider', current_company)
+      current_company.user_providers.push(@user)
       flash[:notice] = "You have been added as a company provider"
     end
     redirect_to(user_edit_path(@user)) and return
@@ -254,10 +254,9 @@ class UsersController < ApplicationController
       flash[:notice] = "You can not be removed as a company provider because you are a provider to at least 1 appointment."
       flash[:notice] += "<br/>Please remove these appointments and try again."
     else
-      # removing user as a company provider
+      # remove user as a company provider
       if current_company.providers.include?(@user)
         current_company.user_providers.delete(@user)
-        # @user.revoke_role('company provider', current_company)
         flash[:notice] = "You have been removed as a company provider"
       else
         flash[:notice] = "You are not a company provider"
@@ -294,6 +293,8 @@ class UsersController < ApplicationController
         end
       when 'company manager'
         @messages.push("Can not delete company managers.")
+      when 'company provider'
+        @messages.push("Can not delete company providers.")
       end
     end
 
