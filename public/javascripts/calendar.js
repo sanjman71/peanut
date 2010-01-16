@@ -60,34 +60,42 @@ $.fn.init_add_appointment = function() {
 
 // add free time for a provider on a specific day
 $.fn.init_add_single_free_time = function() {
-  $("#add_single_free_time_form").submit(function () {
-    var when      = $("input#date").attr('value');
-    var start_at  = $("input#start_at").attr('value');
-    var end_at    = $("input#end_at").attr('value');
-    var errors    = 0;
+  
+  // initialize add free time dialog
+  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 225, title: $("div#add_free_time_dialog").attr('title') });
+  
+  // open dialog on click
+  $("a#add_free_time").click(function() {
+    // set dialog date fields
+    var date = $(this).parents("td").attr('id');
+    $("form#add_single_free_time_form input#date").attr('value', date);
+    $("form#add_single_free_time_form div#free_date").text(date);
+    // clear start_at, end_at time fields
+    $("form#add_single_free_time_form div#free_start_at_text input#free_start_at").val('');
+    $("form#add_single_free_time_form div#free_end_at_text input#free_end_at").val('');
+    // open dialog
+    $("div#add_free_time_dialog").dialog('open');
+    return false;
+  })
+
+  $("form#add_single_free_time_form").submit(function () {
+    var when      = $("input#date").attr('value'); // use hidden field date
+    var start_at  = $("input#free_start_at").attr('value');
+    var end_at    = $("input#free_end_at").attr('value');
 
     if (!when) {
-      $("input#date").addClass('highlighted');
       alert("Please select a date");
       return false; 
-    } else {
-      $("input#date").removeClass('highlighted');
     }
 
     if (!start_at) {
-      $("input#start_at").addClass('highlighted');
       alert("Please select a start time");
       return false; 
-    } else {
-      $("input#start_at").removeClass('highlighted');
     }
 
     if (!end_at) {
-      $("input#end_at").addClass('highlighted');
       alert("Please select an end time");
       return false; 
-    } else {
-      $("input#end_at").removeClass('highlighted');
     }
 
     // normalize time format, validate that start_at < end_at
@@ -100,15 +108,19 @@ $.fn.init_add_single_free_time = function() {
     }
 
     // normalize date format
-    var when = convert_date_to_string(when);
+    //var when = convert_date_to_string(when);
 
-    // replace form data with formatted versions
-    $("input#start_at").attr('value', start_at);
-    $("input#end_at").attr('value', end_at);
-    $("input#date").attr('value', when);
+    // replace start_at, end_at values with normalized values
+    $("input#free_start_at").attr('value', start_at);
+    $("input#free_end_at").attr('value', end_at);
+
+    // serialize form
+    data = $(this).serialize();
+    //alert("form serialize: " + data);
+    //return false;
 
     // post
-    $.post(this.action, $(this).serialize(), null, "script");
+    $.post(this.action, data, null, "script");
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
@@ -223,13 +235,11 @@ $.fn.init_add_calendar_markings = function() {
   })
 
   // add hover state to all future calendar dates
-  /*
   $("td.weekday:not(.past) .date,td.weekend:not(.past) .date").hover(function () {
     $(this).find("span#add_free_time").css('visibility', 'visible');
     }, function () {
     $(this).find("span#add_free_time").css('visibility', 'hidden');
   })
-  */
 }
 
 $.fn.init_schedule_datepicker = function() {
@@ -237,7 +247,8 @@ $.fn.init_schedule_datepicker = function() {
 }
 
 $.fn.init_schedule_timepicker = function() {
-  $(".timepicker").timepickr({convention:12, left:-180});
+  $(".appointment.work.timepicker").timepickr({convention:12, left:-180});
+  $(".appointment.free.timepicker").timepickr({convention:12, left:0});
 }
 
 $.fn.init_send_pdf = function() {

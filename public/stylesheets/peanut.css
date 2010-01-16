@@ -5,6 +5,8 @@ a.current, a.current:hover                        { text-decoration: none; }
 
 a img                                             { border: 0 none; vertical-align: top; }
 
+a.image img:hover                                 { -webkit-transform: scale(1.3); }
+
 /* rounded corner support */
 
 a.rounded, .rounded.button                        { outline: none; border: none; text-decoration: none; cursor: pointer; white-space: nowrap; 

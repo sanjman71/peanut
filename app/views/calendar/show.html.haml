@@ -35,7 +35,7 @@
   .span-15.prepend-1.last#schedule_container
   
     .span-15.last#schedule_help
-      %h4== Click a highlighted date on the calendar below to see appointments for that date.
+      %h4== Click a highlighted date on the calendar below to see appointments for that date, or click on the '+' image next to a date to add free time.
 
     .span-15.last#schedule_date_range_and_links
       .span-3
@@ -53,13 +53,6 @@
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
 
-    -# show summary of work and free appointments
-    -#.span-15.last
-      -#%h3.calendar.date_range_summary
-        -#= @work_appointments.size > 0 ? pluralize(@work_appointments.size, 'Appointment') : "No Appointments"
-        -#== and
-        -#= @free_appointments.size > 0 ? pluralize(@free_appointments.size, 'Available Timeslot') : "No Available Timeslots"
-
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
       = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day, :capacity_and_work_by_free_appt => @capacity_and_work_by_free_appt})
@@ -73,3 +66,4 @@
   - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
     = render(:partial => 'calendar/add_appointment', :locals => {:provider => @provider, :services => @services})
     = render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})
+    = render(:partial => 'calendar/add_free_time_dialog', :locals => {:provider => @provider, :service => @free_service})
