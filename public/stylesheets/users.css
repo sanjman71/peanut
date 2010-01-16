@@ -13,5 +13,7 @@ a:visited.customer.add, a:visited.provider.add    { color: #008800; font-weight:
 .customer.nosms                                   { color: #666666; }
 .customer.phone                                   { color: #333333; }
 
+.provider.summary                                 { color: #777777; font-weight: 1.1em; }
+
 .employee.name                                    { color: #111111; }
 .employee.roles                                   { color: #007700; }

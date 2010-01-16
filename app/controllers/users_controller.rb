@@ -1,12 +1,12 @@
 class UsersController < ApplicationController
-  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx, :grant_provider, :revoke_provider]
+  before_filter :init_user, :only => [:edit, :update, :suspend, :unsuspend, :destroy, :purge, :add_rpx, :grant, :revoke]
   before_filter :init_role, :only => [:edit, :update, :destroy]
   before_filter :init_user_privileges, :only => [:edit, :update, :destroy]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
   privilege_required_any  'update users', :only => [:edit, :update, :destroy], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
-  privilege_required      'update users', :only => [:grant_provider, :revoke_provider], :on => :current_company
+  privilege_required      'update users', :only => [:grant, :revoke], :on => :current_company
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
@@ -222,7 +222,7 @@ class UsersController < ApplicationController
 
     # change current user
     self.current_user = @sudo_user
-    flash[:notice] = "Now logged in as #{@sudo_user.name}"
+    flash[:notice] = "Successfully logged in as #{@sudo_user.name}"
     redirect_to request.referer and return
   end
 
@@ -235,35 +235,58 @@ class UsersController < ApplicationController
     end
   end
 
-  # PUT /users/1/grant_provider
-  def grant_provider
-    if current_company.providers.include?(@user)
-      flash[:notice] = "You are already a company provider"
+  # PUT /users/1/grant/:role
+  # valid roles: 'provider'
+  def grant
+    @role = params[:role]
+
+    case @role
+    when 'provider'
+      if current_company.providers.include?(@user)
+        flash[:notice] = "User #{@user.name} is already a company provider"
+      elsif !current_company.may_add_provider?
+        flash[:notice] = "Your company plan does not allow any more company providers.  Please upgrade your plan first."
+      else
+        current_company.user_providers.push(@user)
+        flash[:notice] = "User #{@user.name} has been added as a company provider"
+      end
     else
-      current_company.user_providers.push(@user)
-      flash[:notice] = "You have been added as a company provider"
+      flash[:notice] = "Invalid role"
     end
-    redirect_to(user_edit_path(@user)) and return
+
+    respond_to do |format|
+      format.html { redirect_to(user_edit_path(@user)) and return }
+    end
   end
 
-  # PUT /users/1/revoke_provider
-  def revoke_provider
-    # check if user has any free appointments where they are the provider
-    if Appointment.free.provider(@user).size > 0
-      # user can not be removed as a company provider until all appointments are removed
-      flash[:notice] = "You can not be removed as a company provider because you are a provider to at least 1 appointment."
-      flash[:notice] += "<br/>Please remove these appointments and try again."
-    else
-      # remove user as a company provider
-      if current_company.providers.include?(@user)
-        current_company.user_providers.delete(@user)
-        flash[:notice] = "You have been removed as a company provider"
+  # PUT /users/1/revoke/:role
+  # valid roles: 'provider'
+  def revoke
+    @role = params[:role]
+
+    case @role
+    when 'provider'
+      # check if user has any free appointments where they are the provider
+      if Appointment.free.provider(@user).size > 0
+        # user can not be removed as a company provider until all appointments are removed
+        flash[:notice] = "User can not be removed as a company provider because they are a provider to at least 1 appointment."
+        flash[:notice] += "<br/>Please remove these appointments and try again."
       else
-        flash[:notice] = "You are not a company provider"
+        # remove user as a company provider
+        if current_company.providers.include?(@user)
+          current_company.user_providers.delete(@user)
+          flash[:notice] = "User #{@user.name} has been removed as a company provider"
+        else
+          flash[:notice] = "User #{@user.name} is not a company provider"
+        end
       end
+    else
+      flash[:notice] = "Invalid role"
     end
 
-    redirect_to(user_edit_path(@user)) and return
+    respond_to do |format|
+      format.html { redirect_to(user_edit_path(@user)) and return }
+    end
   end
 
   def suspend

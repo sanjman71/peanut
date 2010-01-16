@@ -18,8 +18,8 @@ class UsersControllerTest < ActionController::TestCase
   should_route :get, '/users/1/edit',           :controller => 'users', :action => 'edit', :id => "1"
   should_route :get, '/users/1/sudo',           :controller => 'users', :action => 'sudo', :id => "1"
   should_route :get, '/users/1/add_rpx',        :controller => 'users', :action => 'add_rpx', :id => "1"
-  should_route :put, '/users/1/grant_provider', :controller => 'users', :action => 'grant_provider', :id => "1"
-  should_route :put, '/users/1/revoke_provider',:controller => 'users', :action => 'revoke_provider', :id => "1"
+  should_route :put, '/users/1/grant/provider', :controller => 'users', :action => 'grant', :id => "1", :role => 'provider'
+  should_route :put, '/users/1/revoke/provider',:controller => 'users', :action => 'revoke', :id => "1", :role => 'provider'
 
   context 'invite url with subdomain' do
     setup do
@@ -575,6 +575,11 @@ class UsersControllerTest < ActionController::TestCase
       #   assert_select "a#manager_reset_password", 0
       # end
 
+      should "not show 'add/remove company provider' link" do
+        assert_select "a#remove_company_provider", 0
+        assert_select "a#add_company_provider", 0
+      end
+
       should_respond_with :success
       should_render_template "users/edit.html.haml"
     end
@@ -594,6 +599,10 @@ class UsersControllerTest < ActionController::TestCase
       # should "show 'reset password' link" do
       #   assert_select "a#manager_reset_password", 1
       # end
+
+      should "show 'remove company provider' link" do
+        assert_select "a#remove_company_provider", 1
+      end
 
       should_respond_with :success
       should_render_template "users/edit.html.haml"
@@ -874,7 +883,7 @@ class UsersControllerTest < ActionController::TestCase
     context "as user" do
       setup do
         @controller.stubs(:current_user).returns(@user)
-        put :revoke_provider, :id => @owner.id
+        put :revoke, :id => @owner.id, :role => 'provider'
       end
 
       should_redirect_to('unauthorized_path') { unauthorized_path }
@@ -883,7 +892,7 @@ class UsersControllerTest < ActionController::TestCase
     context "as owner" do
       setup do
         @controller.stubs(:current_user).returns(@owner)
-        put :revoke_provider, :id => @owner.id
+        put :revoke, :id => @owner.id, :role => 'provider'
       end
 
       should "remove owner as a company provider" do
@@ -895,7 +904,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should "set the flash" do
-        assert_match /You have been removed as a company provider/, flash[:notice]
+        assert_match /User Owner has been removed as a company provider/, flash[:notice]
       end
 
       should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
@@ -908,11 +917,11 @@ class UsersControllerTest < ActionController::TestCase
         assert_false @company.has_provider?(@owner)
         assert_false @company.reload.authorized_providers.include?(@owner)
         @controller.stubs(:current_user).returns(@owner)
-        put :revoke_provider, :id => @owner.id
+        put :revoke, :id => @owner.id, :role => 'provider'
       end
 
       should "set the flash" do
-        assert_match /You are not a company provider/, flash[:notice]
+        assert_match /User Owner is not a company provider/, flash[:notice]
       end
 
       should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }

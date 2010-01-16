@@ -28,6 +28,7 @@ span.field_missing                                { color: #FF3333; }
 /* padding, border styles */
 
 .padding-5                                        { padding: 5px; }
+.padding-top-3                                    { padding-top: 3px; }
 .padding-top-5                                    { padding-top: 5px; }
 .padding-top-10                                   { padding-top: 10px; }
 .padding-top-15                                   { padding-top: 15px; }
@@ -62,6 +63,8 @@ div.mat                                           { background: #EDF3FE none rep
 div.mat.shaded                                    { background: #E5ECF9 none repeat scroll 0 0; }
 
 h4.bigger                                         { font-size: 1.3em; line-height: 1.35em; }
+
+.bold                                             { font-weight: bold; }
 
 /* form styles */
 
