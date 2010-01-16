@@ -6,8 +6,9 @@
   
   .span-23.prepend-1.last.mat.padding-bottom-20
     %h3.padding-top-10{:style => 'font-size: 2.0em;'}== Edit Profile
-    - if has_privilege?('update users', @user)
-      = link_to 'Add an existing login', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
+    - if has_privilege?('update users', @user) and (@user == current_user)
+      -# allow users to link their existing accounts
+      = link_to 'Link an existing account', add_rpx_user_path(@user), :class => 'admin', :id => 'add_rpx'
 
   %hr.space
   .span-24.last
