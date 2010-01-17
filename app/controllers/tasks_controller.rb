@@ -28,26 +28,26 @@ class TasksController < ApplicationController
   # GET /tasks/appointments/reminders/7-hours
   def appointment_reminders
     # parse time span
-    match           = params[:time_span].match(/(\d+)-(days|hours)/)
+    match           = params[:time_span].match(/(\d+)-(day|days|hours)/)
     @number         = match[1]
     @units          = match[2]
     @timeline       = "in the next #{@number} #{@units}"
 
-    # find appointments in the upcoming time span
+    # find all future appointments within the specified time span
     @appointments   = current_company.appointments.work.future.not_canceled.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
     @messages       = 0
 
     @appointments.each do |appointment|
-      # check that appointment reminders are turned on
-      next unless appointment.preferences[:reminder].to_i == 1
-      # check if reminders have already been sent
+      # check that appointment customer reminders are turned on
+      next unless appointment.preferences[:reminder_customer].to_i == 1
+      # check if reminder has already been sent
       message_tags = appointment.message_topics.collect(&:tag)
       next if message_tags.include?('reminder')
       # send appointment reminder
       message = MessageComposeAppointment.reminder(appointment)
       case
       when !message.blank?
-        # reminder message was sent
+        # reminder message was queued/sent
         @messages += 1
         # reload appointment object
         appointment.reload

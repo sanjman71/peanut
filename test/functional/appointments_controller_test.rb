@@ -126,9 +126,9 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_select 'div.hide#peanut_login', true
       end
   
-      should "not show reminder options" do
-        assert_select "input#reminder_on", 0
-        assert_select "input#reminder_off", 0
+      should "not show customer reminder options" do
+        assert_select "input#reminder_customer_on", 0
+        assert_select "input#reminder_customer_off", 0
       end
   
       should_respond_with :success
@@ -155,9 +155,9 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:appt_time_start_at) { "0900" }
         should_assign_to(:appt_time_end_at) { "0930" }
   
-        should "not show reminder options" do
-          assert_select "input#reminder_on", 0
-          assert_select "input#reminder_off", 0
+        should "not show customer reminder options" do
+          assert_select "input#reminder_customer_on", 0
+          assert_select "input#reminder_customer_off", 0
         end
   
         should_respond_with :success
@@ -867,11 +867,11 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder => '1'}
+                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '1'}
         end
   
         should "set appointment reminders on" do
-          assert_equal 1, assigns(:appointment).preferences[:reminder].to_i
+          assert_equal 1, assigns(:appointment).preferences[:reminder_customer].to_i
         end
       end
   
@@ -882,11 +882,11 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
-                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder => '0'}
+                :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '0'}
         end
   
         should "set appointment reminders off" do
-          assert_equal 0, assigns(:appointment).preferences[:reminder].to_i
+          assert_equal 0, assigns(:appointment).preferences[:reminder_customer].to_i
         end
       end
     end

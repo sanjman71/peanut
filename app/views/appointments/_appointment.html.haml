@@ -32,10 +32,10 @@
       == Reminder:
     .span-12.last.data
       = label_tag "reminder_on", "Yes"
-      = radio_button_tag "preferences_reminder", "1", true, :id => 'reminder_on'
+      = radio_button_tag "preferences_reminder_customer", "1", true, :id => 'reminder_on'
       == &nbsp;
       = label_tag "reminder_off", "No Thanks"
-      = radio_button_tag "preferences_reminder", "0", false, :id => 'reminder_off'
+      = radio_button_tag "preferences_reminder_customer", "0", false, :id => 'reminder_off'
     .span-15.prepend-3
       %em.small== An email reminder will be sent 24 hours before the appointment if you select 'Yes'
 
