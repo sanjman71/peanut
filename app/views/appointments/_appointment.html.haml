@@ -38,6 +38,12 @@
       = radio_button_tag "preferences_reminder_customer", "0", false, :id => 'reminder_off'
     .span-15.prepend-3
       %em.small== An email reminder will be sent 24 hours before the appointment if you select 'Yes'
+  - elsif !appointment.new_record?
+    -# not a new record, show reminder preference value
+    .span-3.label.text-align-right
+      == Reminder:
+    .span-12.last.data
+      = appointment.preferences[:reminder_customer].to_i == 1 ? 'On' : 'Off'
 
   - if appointment.recurrence?
     .span-3.label.text-align-right
