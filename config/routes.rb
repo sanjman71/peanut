@@ -39,6 +39,9 @@ ActionController::Routing::Routes.draw do |map|
   map.user_email_promote  '/users/:user_id/email/:id/promote', :controller => 'email_addresses', :action => 'promote'
   map.user_email_delete   '/users/:user_id/email/:id', :controller => 'email_addresses', :action => 'destroy', :conditions => {:method => :delete}
 
+  map.user_phone_promote  '/users/:user_id/phone/:id/promote', :controller => 'phone_numbers', :action => 'promote'
+  map.user_phone_delete   '/users/:user_id/phone/:id', :controller => 'phone_numbers', :action => 'destroy', :conditions => {:method => :delete}
+
   map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
   map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
   map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}

@@ -163,8 +163,9 @@ class UsersController < ApplicationController
     @user.email_addresses.build
     @user.phone_numbers.build
 
-    # initialize user's primary email
+    # initialize user's primary email, phone
     @primary_email_address = @user.primary_email_address
+    @primary_phone_number  = @user.primary_phone_number
 
     # build notes collection, most recent first
     @note     = Note.new

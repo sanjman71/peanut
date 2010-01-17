@@ -41,7 +41,8 @@
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address
         - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
-          - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin')) unless email_form.object.new_record? || email_form.object == @primary_email_address
+          - unless email_form.object.new_record? || email_form.object == @primary_email_address
+            - markers.push(link_to('Make primary', user_email_promote_path(@user, email_form.object), :class => 'admin'))
           - if email_form.object.deletable? and (email_form.object != @primary_email_address)
             -# allow delete for non-primary emails
             - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin'))
@@ -68,8 +69,15 @@
           = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
           - markers = []
           - markers.push('Verified') if phone_form.object.verified?
+          - markers.push('Primary') if phone_form.object == @primary_phone_number
+          - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
+            - unless phone_form.object.new_record? || phone_form.object == @primary_phone_number
+              - markers.push(link_to('Make primary', user_phone_promote_path(@user, phone_form.object), :class => 'admin'))
+            - if phone_form.object.deletable? and (phone_form.object != @primary_phone_number)
+              -# allow delete for non-primary phones
+              - markers.push(link_to('Delete', user_phone_delete_path(@user, phone_form.object), :method => :delete, :class => 'admin'))
           - unless markers.empty?
-            %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
+            %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
       .span-20.last
         .span-4.text-align-right
           %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
