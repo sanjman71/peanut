@@ -53,4 +53,4 @@ table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 no
 .hint                                             { font-style: italic; }
 .prompt                                           { font-size: 1.3em; font-weight: bold; }
 .std_text_field_style                             { width: 100px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
-.large_text_field_style                           { width: 130px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
+.large_text_field_style                           { width: 150px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */

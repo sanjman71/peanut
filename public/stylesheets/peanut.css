@@ -59,6 +59,7 @@ div.container div.box                             { padding: 13px 0px 13px 40px;
 div.label.block                                   { background-color: #EEEEEE; }
 
 span.block                                        { padding: 3px 0 3px 5px; font-size: 0.9em; }
+h4.block                                          { padding: 3px 0 3px 5px; }
 
 /*
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;

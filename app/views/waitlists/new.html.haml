@@ -23,42 +23,42 @@
 
   .waitlist.review{:style => 'font-size: 1.3em;'}
     -# what
-    .span-15.last#what
-      .span-3.label.text-align-right
-        %h3== What:
+    .span-15.last.padding-bottom-5#what
+      .span-3.label.block
+        %h4.bottom.block== What:
       .span-12.last.data
-        %h3= @waitlist.service.name
+        %h4= @waitlist.service.name
 
     -# with
-    .span-15#with
-      .span-3.label.text-align-right
-        %h3== With:
+    .span-15.last.padding-bottom-5#with
+      .span-3.label.block
+        %h4.bottom.block== With:
       .span-12.last.data
-        %h3= @waitlist.provider.name
+        %h4= @waitlist.provider.name
 
     - if @customer_signup
       -# show customer signup before user selects time ranges
       = render(:partial => 'appointments/appointment_customer_signup', :locals => {:signup => @customer_signup})
     - else
       -# when
-      .span-15#when
-        .span-3.label.text-align-right
-          %h3== When:
+      .span-15.last.padding-bottom-5#when
+        .span-3.label.block
+          %h4.bottom.block== When:
         .span-12.last.data
           %h4== Tell us the dates and times that you would like be waitlisted for:
       
       -# nested time range attributes
       - f.fields_for :waitlist_time_ranges do |time_range_form|
-        %h4.span-12.prepend-3#when_dates
-          .span-2
-            %span{:style => 'font-size: 1.3em; padding-right: 5px;'}== Dates:
+        %h4.span-12.prepend-3.last#when_dates
+          .span-2.padding-top-5
+            %span{:style => 'padding-right: 5px;'}== Dates:
           = time_range_form.text_field :start_date, :id => 'start_date', :class => 'datepicker large_text_field_style', :autocomplete => 'off'
           %span{:style => 'padding: 0 5px;'}== to
           = time_range_form.text_field :end_date, :id => 'end_date', :class => 'datepicker large_text_field_style', :autocomplete => 'off'
 
-        %h4.span-12.prepend-3#when_times
-          .span-2
-            %span{:style => 'font-size: 1.3em; padding-right: 5px;'}== Times:
+        %h4.span-12.prepend-3.last#when_times
+          .span-2.padding-top-5
+            %span{:style => 'padding-right: 5px;'}== Times:
           = time_range_form.text_field :start_time_hours, :id => 'start_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
           %span{:style => 'padding: 0 5px;'}== to
           = time_range_form.text_field :end_time_hours, :id => 'end_time', :class => 'timepicker large_text_field_style', :autocomplete => 'off'
