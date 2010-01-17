@@ -17,21 +17,21 @@
 %hr.space
 
 -# column headers
-%h4.span-20.last
+%h4.span-24.last
   .span-4.prepend-1#sender_column
-    %h3.bottom== From
-  .span-8#subject_column
-    %h3.bottom== Subject
-  .span-7.last#when_column
-    %h3.bottom== Sent
+    %h4.bottom== From
+  .span-9#subject_column
+    %h4.bottom== Subject
+  .span-10.last#when_column
+    %h4.bottom== Sent
 
 %hr.space
 
 - @messages.each do |message|
-  .span-20.last.letterbox.message{:class => cycle("shaded", "")}[message]
+  .span-24.last.letterbox.message{:class => cycle("shaded", "")}[message]
     .span-4.prepend-1#sender
       %h4= message.sender.name
-    .span-8#subject
+    .span-9#subject
       %h4= message.subject
-    .span-7.last#when
+    .span-10.last#when
       %h4= message.updated_at.to_s(:appt_day_date_time)

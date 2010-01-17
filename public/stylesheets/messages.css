@@ -1,0 +1,6 @@
+input.message.normal                               { width: 350px; font-size: 1.7em; }
+
+textarea.message                                  { height: 30px; width: 500px; }
+textarea.message.normal                           { height: 70px; width: 500px; font-size: 1.5em; }
+
+

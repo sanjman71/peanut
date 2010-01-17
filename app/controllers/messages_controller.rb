@@ -8,7 +8,7 @@ class MessagesController < ApplicationController
 
     # messages by protocol
     @msgs_by_protocol = MessageRecipient.protocols.inject(Hash[]) do |hash, protocol|
-      hash[protocol]  =  CompanyMessageDelivery.for_company(current_company).for_protocol(protocol).count
+      hash[protocol]  = CompanyMessageDelivery.for_company(current_company).for_protocol(protocol).count
       hash
     end
     @total_count      = @msgs_by_protocol.values.inject(0) { |sum, i| sum += i }

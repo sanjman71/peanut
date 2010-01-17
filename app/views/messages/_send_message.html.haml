@@ -11,23 +11,23 @@
         = recipient_form.hidden_field :protocol, :value => protocol
         = recipient_form.hidden_field :messagable_type, :value => recipient.class.to_s
         = recipient_form.hidden_field :messagable_id, :value => recipient.id
-      .span-10.last{:style => 'padding-bottom: 10px;'}
-        .span-2.text-align-right
-          = label_tag 'message_to', 'To:'
-        .span-8.last
+      .span-10.last.padding-bottom-10
+        .span-3.label.block
+          %h4.bottom.block= label_tag 'message_to', 'To:'
+        .span-7.last
           - if recipient
-            = recipient.address
+            %h4= recipient.address
           - else
-            = text_field_tag "address", '', :name => "message[address]", :class => 'message short', :id => 'message_address', :size => 30
-    .span-10.last{:style => 'padding-bottom: 10px;'}
-      .span-2.text-align-right
-        = label_tag 'message_subject', 'Subject:'
-      .span-8.last
-        = message_form.text_field :subject, :class => 'message short', :id => 'message_subject'
-    .span-10.last{:style => 'padding-bottom: 10px;'}
-      .span-2.text-align-right
-        = label_tag 'message_body', 'Message:'
-      .span-8.last
-        = message_form.text_area 'body', :class => 'message short', :id => 'message_body', :style => 'margin: 0;'
-    .span-9.prepend-1.last
-      = submit_tag "Send", :class => 'title rounded button color', :id => 'send_message_button', :style => 'font-size: 1.2em;'
+            = text_field_tag "address", '', :name => "message[address]", :class => 'message normal', :id => 'message_address'
+    .span-10.last.padding-bottom-10
+      .span-3.label.block
+        %h4.bottom.block= label_tag 'message_subject', 'Subject:'
+      .span-7.last
+        = message_form.text_field :subject, :class => 'message normal', :id => 'message_subject'
+    .span-10.last.padding-bottom-10
+      .span-3.label.block
+        %h4.bottom.block= label_tag 'message_body', 'Message:'
+      .span-7.last
+        = message_form.text_area 'body', :class => 'message normal', :id => 'message_body', :style => 'margin: 0;'
+    .span-7.prepend-3.last
+      = submit_tag "Send", :class => 'title rounded button color', :id => 'send_message_button'
