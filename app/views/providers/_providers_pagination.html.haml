@@ -1,6 +1,5 @@
 .span-10.prepend-1.append-bottom.providers.header
-  = search_text ? search_text : page_entries_info(providers, :entry_name => 'provider')
+  %h4.bottom= search_text ? search_text : page_entries_info(providers, :entry_name => 'provider')
 .span-4.prepend-1.last#pagination
   - if paginate
-    -# force all unnecessary params to nil here
-    = will_paginate(providers, :page_links => false, :params => {:controller => 'providers', :search => nil, :authenticity_token => nil, :_ => nil, :subdomain => current_subdomain})
+    = will_paginate(providers)

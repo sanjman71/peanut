@@ -16,14 +16,20 @@
 
 %hr.space
 
+.span-24.last
+  .span-13.prepend-1.append-bottom
+    %h4.bottom= page_entries_info(@messages, :entry_name => 'message')
+  .span-10.last#pagination
+    = will_paginate(@messages)
+
 -# column headers
 %h4.span-24.last
   .span-4.prepend-1#sender_column
-    %h4.bottom== From
+    %h4.bottom.column.header== From
   .span-9#subject_column
-    %h4.bottom== Subject
+    %h4.bottom.column.header== Subject
   .span-10.last#when_column
-    %h4.bottom== Sent
+    %h4.bottom.column.header== Sent
 
 %hr.space
 

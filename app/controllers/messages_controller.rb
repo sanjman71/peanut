@@ -2,9 +2,11 @@ class MessagesController < ApplicationController
 
   privilege_required    'manage site', :only => [:index]
 
+  @@per_page  = 25
+
   # GET /messages
   def index
-    @messages = current_company.messages.all(:include => [:message_recipients, :sender], :order => 'messages.updated_at desc').paginate(:page => params[:page], :per_page => 50)
+    @messages = current_company.messages.all(:include => [:message_recipients, :sender], :order => 'messages.updated_at desc').paginate(:page => params[:page], :per_page => @@per_page)
 
     # messages by protocol
     @msgs_by_protocol = MessageRecipient.protocols.inject(Hash[]) do |hash, protocol|
@@ -27,39 +29,39 @@ class MessagesController < ApplicationController
   
   # POST /messages
   def create
-    Message.transaction do
-      @address  = params[:message].delete("address")
-      @message  = Message.create(params[:message])
+    @sender_id  = params[:message][:sender_id]
+    # use sender_id if specified, default to current user
+    @sender     = @sender_id ? User.find(@sender_id) : current_user
+    @subject    = params[:message][:subject]
+    @body       = params[:message][:body]
+    @address    = params[:message][:address]
+    @recipients = []
+    # topic is current company, default to sender
+    @topic      = current_company || @sender
+    @tag        = 'message'
+
+    # map address to a messagable
+    if @address
+      # map address to a messable
+      @messagable = EmailAddress.find_by_address(@address)
+      @recipients.push(@messagable) if @messagable
+    end
     
-      if @address
-        # map address to a messable
-        @messagable = EmailAddress.find_by_address(@address)
-      end
-    
-      if @message.valid? and @messagable
-        # add messagable
-        @message.message_recipients.create(:messagable => @messagable, :protocol => @messagable.protocol)
-      end
+    if @recipients.empty?
+      # message must have at least 1 recipient
+      flash[:error] = "Message has no recipients"
+    else
+      @message = MessageCompose.send(@sender, @subject, @body, @recipients, @topic, @tag)
 
-      logger.debug("*** referer: #{request.referer}")
-
-      if @message.valid? and @message.message_recipients.size == 0
-        # not allowed to have a message with no recipients
-        flash[:error] = "Message has no recipients"
-        raise ActiveRecord::Rollback
-      end
-
-      if @message.valid?
-        # send message
-        @message.send!
+      if @message
         flash[:notice] = "Message sent"
         @redirect_path = request.referer
       else
         flash[:error]  = "There was an error sending the message"
         @redirect_path = request.referer
       end
-    end # transaction
-
+    end
+    
     @redirect_path ||= messages_path
 
     respond_to do |format|

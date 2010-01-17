@@ -60,6 +60,7 @@ div.label.block                                   { background-color: #EEEEEE; }
 
 span.block                                        { padding: 3px 0 3px 5px; font-size: 0.9em; }
 h4.block                                          { padding: 3px 0 3px 5px; }
+h4.column.header                                  { color: #000088; font-weight: bold; }
 
 /*
 div.block                                         { background: #E1E0E0 none repeat scroll 0 0; border-bottom: 1px solid #DFDFDF;
@@ -113,12 +114,18 @@ div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
 
-.pagination a                                     { background: #008800; color: #FFFFFF; }
+.pagination a                                     { background: #EEEEEE; color: #111111; }
+.pagination a:hover                               { background: #333; color: #FFF; }
 
-.pagination span, .pagination a                   { display: block; margin-right: 2px; padding: 0.2em 0.5em; float: left; 
-                                                    text-decoration: none; }
+.pagination span, .pagination a                   { display: block; width: 15px; text-align: center; margin-right: 0px; padding: 0.1em 0.1em; 
+                                                    float: left; text-decoration: none; }
 
-.pagination span.disabled                         { background: #FFFFFF; color: #999999; }
+.pagination span.current                          { background: #0099FF; color: #111111; }
+
+.pagination a.prev_page, .pagination a.next_page, .pagination span.prev_page, .pagination span.next_page  
+                                                  { width: 70px; }
+
+.pagination span.disabled                         { display: none; }
 
 /* highlight styles */
 

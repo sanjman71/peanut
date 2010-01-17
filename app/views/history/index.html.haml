@@ -20,7 +20,7 @@
     .span-11
       %h4= page_entries_info @appointments unless @appointments.blank?
     .span-4.last
-      = will_paginate(@appointments, :page_links => false)
+      = will_paginate(@appointments)
 
   #appointments.appointments
     = render(:partial => 'appointments/customer_appointments', :locals => {:customer => current_user, :appointments => @appointments})
