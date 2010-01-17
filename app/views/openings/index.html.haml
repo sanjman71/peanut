@@ -43,19 +43,19 @@
     .span-15.last.padding-top-10
       -# show search parameters
       %h4.bigger
-        .span-15.last#search_service
-          .span-2
-            == Service:
+        .span-15.last.padding-bottom-5#search_service
+          .span-2.label.block
+            %span.block== Service:
           .span-13.last
             = @service.name
-        .span-15.last#search_with
-          .span-2
-            == With: 
+        .span-15.last.padding-bottom-5#search_with
+          .span-2.label.block
+            %span.block== With: 
           .span-13.last
             = @provider.name
-        .span-15.last#search_when
-          .span-2
-            == When:
+        .span-15.last.padding-bottom-5#search_when
+          .span-2.label.block
+            %span.block== When:
           .span-13.last
             = @daterange.name(:with_dates => true)
         -#= highlight("#{@service.name} with #{@provider.name}", [@service.name, @provider.name], :highlighter => '<strong class="shaded">\1</strong>')

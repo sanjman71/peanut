@@ -19,7 +19,7 @@
     .span-14.notice.last
       = error_messages_for('appointment', :header_message => nil)
 
-  .span-16.last
+  .span-15.prepend-1.last
     = render :partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => @customer_signup}
 
   %hr.space
