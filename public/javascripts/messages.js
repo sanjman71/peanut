@@ -30,7 +30,7 @@ $.fn.init_message_info = function() {
   })
 
   // get message details
-  $("a.message.details").click(function() {
+  $("a.message.info").click(function() {
     url = $(this).attr('href') + ".js";
     $.post(url, {}, null, "script");
     return false;

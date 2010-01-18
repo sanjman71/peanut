@@ -39,7 +39,7 @@
     .span-4.prepend-1#sender
       %h4
         = message.sender.name
-        %span#message_info_icon{:style => 'padding-left: 2px; visibility: hidden;'}= link_to image_tag('info.png', :size => '20x20'), info_message_path(message), :class => 'message details image', :id => 'message_info'
+        %span#message_info_icon{:style => 'padding-left: 2px; visibility: hidden;'}= link_to image_tag('info.png', :size => '20x20'), info_message_path(message), :class => 'message info image', :id => 'message_info'
     .span-9#subject
       %h4= message.subject
     .span-10.last#when
