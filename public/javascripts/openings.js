@@ -181,7 +181,7 @@ $.fn.init_openings_add_calendar_markings = function() {
   })
 
   // set hover states to show selected date, ignore past dates
-  $(".weekday.free:not(.past),.weekend.free:not(.past)").click(function() {
+  $("td.weekday.free:not(.past),td.weekend.free:not(.past)").click(function() {
     $("div#free_capacity_slots").show();
     // unmark all selected calendar dates, and mark this calendar date as selected
     $(".free.selected").removeClass('selected');
@@ -191,6 +191,12 @@ $.fn.init_openings_add_calendar_markings = function() {
     $(".slots.date").hide();
     $(slot_id).show();
   })
+
+  // mark the first available date, if there is one
+  var first_date = $("td.free:not(.past):first")
+  if (first_date) {
+    $(first_date).click();
+  }
 }
 
 $.fn.init_datepicker_openings = function() {
