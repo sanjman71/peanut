@@ -31,7 +31,7 @@ $.fn.init_message_info = function() {
 
   // get message details
   $("a.message.info").click(function() {
-    url = $(this).attr('href') + ".js";
+    url = $(this).attr('href');
     $.post(url, {}, null, "script");
     return false;
   })
