@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
 
-  privilege_required    'manage site', :only => [:index, :show]
+  privilege_required    'manage site', :only => [:index, :create, :info]
 
   @@per_page  = 25
 
