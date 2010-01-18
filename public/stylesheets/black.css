@@ -61,7 +61,10 @@ table.ui-datepicker-calendar thead th   { background: #333333; }
 
 /* dialogs */
 
-.ui-dialog.ui-widget-content          { padding: 0; background: none; background: #FFFFFF; border: none; }
+/*
+.ui-dialog.ui-widget-content          { padding: 0; background: none; background: #999; border: none; }
+*/
+.ui-dialog.ui-widget-content          { padding: 0; border: none; }
 
-.ui-dialog-content.ui-widget-content  { color: #333; }
+.ui-dialog-content.ui-widget-content  { color: #FFFFFF; }
 
