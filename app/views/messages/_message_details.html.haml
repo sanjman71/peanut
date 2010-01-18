@@ -1,0 +1,6 @@
+.last#to
+  - to.each do |to|
+    %h4.bottom== To: #{to[:address]} [#{to[:state]}]
+.last#tags
+  %h4.bottom== Tags: #{tags.join(",")}
+

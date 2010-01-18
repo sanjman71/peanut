@@ -1,6 +1,6 @@
 class MessagesController < ApplicationController
 
-  privilege_required    'manage site', :only => [:index]
+  privilege_required    'manage site', :only => [:index, :show]
 
   @@per_page  = 25
 
@@ -67,6 +67,31 @@ class MessagesController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(@redirect_path) }
       format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+    end
+  end
+  
+  # GET /messages/1
+  def show
+    @message = current_company.messages.find(params[:id], :include => [:message_recipients, :message_topics])
+
+    # build to collection
+    @to = @message.message_recipients.inject([]) do |array, recipient|
+      messagable = recipient.messagable
+      # use state, address, protocol
+      array.push(Hash[:state => recipient.state, :address => messagable.address, :protocol => messagable.protocol])
+      array
+    end
+
+    # build tags
+    @tags = @message.message_topics.collect(&:tag)
+
+    # build object from message, to, tags
+    @object = Hash[:id => @message.id, :subject => @message.subject, :body => @message.body, :to => @to, :tags => @tags]
+
+    respond_to do |format|
+      # format.js { render(:json => @object.to_json) }
+      format.js { }
+      # format.json { render(:json => @message.to_json(:only => ['id', 'subject'])) }
     end
   end
   

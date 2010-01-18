@@ -190,7 +190,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resource  :session, :only => [:new, :create, :destroy]
 
   # Messages controller
-  map.resources :messages, :only => [:index, :create, :new]
+  map.resources :messages, :only => [:index, :create, :new, :show]
 
   # Tasks controller
   map.task_appt_messages  '/tasks/appointments/messages/:time_span', 

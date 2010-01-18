@@ -1,4 +1,5 @@
 - title("Messages")
+- javascript('messages')
 
 .span-23.prepend-1.mat.padding-top-10.bottom
   %h2== Messages
@@ -36,8 +37,12 @@
 - @messages.each do |message|
   .span-24.last.letterbox.message{:class => cycle("shaded", "")}[message]
     .span-4.prepend-1#sender
-      %h4= message.sender.name
+      %h4
+        = message.sender.name
+        %span#message_details_icon{:style => 'padding-left: 2px; visibility: hidden;'}= link_to image_tag('info.png', :size => '20x20'), message_path(message), :class => 'message details image', :id => 'message_details'
     .span-9#subject
       %h4= message.subject
     .span-10.last#when
       %h4= message.updated_at.to_s(:appt_day_date_time)
+    -# message details
+    .span-23.prepend-1.last{:id => "message_#{message.id}_details"}

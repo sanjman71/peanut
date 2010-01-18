@@ -5,7 +5,7 @@ a.current, a.current:hover                        { text-decoration: none; }
 
 a img                                             { border: 0 none; vertical-align: top; }
 
-a.image img:hover                                 { -webkit-transform: scale(1.3); }
+a.image img:hover                                 { -webkit-transform: scale(1.5); }
 
 /* rounded corner support */
 
