@@ -1,0 +1,5 @@
+# update message details
+page["#message_#{@message.id}_info"].html(render(:partial => 'message_info', :locals => {:message => @message, :to => @to, :tags => @tags}))
+
+# hide details link
+page["div#message_#{@message.id} a#message_info"].hide();

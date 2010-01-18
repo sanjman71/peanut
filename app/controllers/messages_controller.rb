@@ -70,8 +70,8 @@ class MessagesController < ApplicationController
     end
   end
   
-  # GET /messages/1
-  def show
+  # GET /messages/1/info
+  def info
     @message = current_company.messages.find(params[:id], :include => [:message_recipients, :message_topics])
 
     # build to collection

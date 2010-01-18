@@ -21,23 +21,23 @@ $.fn.init_new_message = function() {
   })
 }
 
-$.fn.init_message_details = function() {
+$.fn.init_message_info = function() {
   // show icon on message hover
   $("div.message").hover(function () {
-    $(this).find("span#message_details_icon").css('visibility', 'visible');
+    $(this).find("span#message_info_icon").css('visibility', 'visible');
     }, function () {
-    $(this).find("span#message_details_icon").css('visibility', 'hidden');
+    $(this).find("span#message_info_icon").css('visibility', 'hidden');
   })
 
   // get message details
   $("a.message.details").click(function() {
     url = $(this).attr('href') + ".js";
-    $.get(url, {}, null, "script");
+    $.post(url, {}, null, "script");
     return false;
   })
 }
 
 $(document).ready(function() {
   $(document).init_new_message();
-  $(document).init_message_details();
+  $(document).init_message_info();
 })
