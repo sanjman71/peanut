@@ -1,9 +1,28 @@
 - title('Online Scheduling for Small Businesses')
+- javascript("home")
 
-.span-14.prepend-1.last
+.span-23.prepend-1.last
   = display_flash
 
 .span-23.prepend-1.padding-top-10
   %h3== Walnut Calendar provides online scheduling for small businesses.
   %h3== We are currently in a private beta.
-  %h3== #{link_to('Contact', "mailto:support@walnutindustries.com")} us if you are interested in signing up for the beta.
+  %hr.space
+  %h3== Let us know if you are interested in signing up for the beta.
+
+  - form_tag(tryit_path, :id => 'tryit') do
+    .span-15.last.padding-bottom-5
+      .span-3.label.block{:style => 'margin-top: 15px;'}
+        %h4.bottom.block== Name:
+      .span-12.last.data
+        = text_field_tag 'name', '', :class => 'text', :style => 'font-size: 1.5em;'
+
+    .span-15.last.padding-bottom-5
+      .span-3.label.block{:style => 'margin-top: 15px;'}
+        %h4.bottom.block== Email:
+      .span-12.last.data
+        = text_field_tag 'email', '', :class => 'text', :style => 'font-size: 1.5em;'
+
+    .span-12.prepend-3.last
+      = submit_tag "Signup", :name => nil, :class => 'button big', :id => 'tryit'
+    
