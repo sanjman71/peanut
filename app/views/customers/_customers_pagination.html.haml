@@ -1,6 +1,5 @@
-.span-10.prepend-1.append-bottom.customers.header
+.span-7.prepend-1.append-bottom.customers.header
   %h4.bottom= search_text ? search_text : page_entries_info(customers, :entry_name => 'customer')
-.span-4.prepend-1.last#pagination
+.span-8.last#pagination
   - if paginate
-    -# force all unnecessary params to nil here
-    = will_paginate(customers, :page_links => false, :params => {:controller => 'customers', :search => nil, :authenticity_token => nil, :_ => nil, :subdomain => current_subdomain})
+    = will_paginate(customers, :page_links => true)
