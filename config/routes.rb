@@ -210,10 +210,11 @@ ActionController::Routing::Routes.draw do |map|
   map.connect   '/log_entries/:state', :controller => 'log_entries', :action => 'index', :state => /seen|unseen/
 
   # map the root to the home controller, and let the home controller figure out the subdomain
-  map.root  :controller => 'home', :action => 'index'
-  map.faq   '/faq', :controller => 'home', :action => 'faq'
-  map.demos '/demos', :controller => 'home', :action => 'demos'
-  
+  map.root      :controller => 'home', :action => 'index'
+  map.faq       '/faq', :controller => 'home', :action => 'faq'
+  map.demos     '/demos', :controller => 'home', :action => 'demos'
+  map.tryit     '/tryit', :controller => 'home', :action => 'tryit'
+
   # map the company root edit action to the companies controller
   map.edit_company_root  'edit', :controller => 'companies', :action => 'edit'
 
