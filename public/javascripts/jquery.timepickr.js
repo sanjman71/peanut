@@ -108,7 +108,8 @@ $.widget('ui.timepickr', {
 	show: function() {
 		this.menu.css({
 			top: this.element.position().top + this.element.height() + this.options.top,
-			zIndex: 1000
+			zIndex: 1000,
+			left: this.element.position().left
 		});
 		this.menu.find('ol:eq(0)').css('left', this.element.position().left).show();
 	},
