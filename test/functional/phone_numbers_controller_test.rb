@@ -9,7 +9,7 @@ class PhoneNumbersControllerTest < ActionController::TestCase
     # initialize roles and privileges
     BadgesInit.roles_privileges
     @user   = Factory(:user, :name => "User")
-    @phone1 = @user.phone_numbers.create(:address => '1113876818', :name => 'Mobile', :priority => 1)
+    @phone1 = @user.phone_numbers.create(:address => '2223876818', :name => 'Mobile', :priority => 1)
     @phone2 = @user.phone_numbers.create(:address => '5553876818', :name => 'Mobile', :priority => 5)
     @phone3 = @user.phone_numbers.create(:address => '3333876818', :name => 'Mobile', :priority => 3)
   end
