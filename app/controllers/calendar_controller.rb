@@ -13,8 +13,17 @@ class CalendarController < ApplicationController
   @@default_when = Appointment::WHEN_NEXT_2WEEKS
   
   def index
-    # redirect to a specific provider, try the current first and default to the first company provider
-    provider = current_company.user_providers.find_by_id(current_user.id) || current_company.providers.first
+    # redirect to a specific provider. Try the most recently used, then current user, then first company provider
+    if session[:provider_class] == 'Resource'
+      provider = current_company.resource_providers.find_by_id(session[:provider_id].to_i) ||
+                 current_company.user_providers.find_by_id(current_user.id) || 
+                 current_company.providers.first
+    else
+      provider = current_company.user_providers.find_by_id(session[:provider_id].to_i) ||
+                 current_company.user_providers.find_by_id(current_user.id) || 
+                 current_company.providers.first
+    end
+
     if provider.blank?
       redirect_to root_path(:subdomain => current_subdomain) and return
     end
@@ -29,6 +38,10 @@ class CalendarController < ApplicationController
   # GET /users/1/calendar/monthly/20100101
   def show
     # @provider initialized in before_filter
+
+    # Remember which provider we're working with
+    session[:provider_class] = @provider.class.to_s
+    session[:provider_id]    = @provider.id.to_i
     
     # if current_company.providers_count == 0
     #   # redirect to company home page
