@@ -43,14 +43,30 @@ table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 no
 .calendar.date.wide                               { color: #111111; font-size: 1.2em; text-align: left; margin-bottom: 7px; width: 100%;
                                                     border-bottom: 2px solid #CCCCCC; background: #EEEEEE; padding: 3px 0px 3px 15px;}
 
+/* calendar menu */
+
+ul.calendar.menu                                  { position: absolute; left: -20px; background: white; list-style-type: none; width: 115px; 
+                                                    font-weight: normal; font-size: 0.9em; }
+
+
+/*
+ul.calendar.schedule.menu li a                    { color: #0099FF; background-color: #FFFFFF; }
+ul.calendar.schedule.menu li:hover                { color: #FFFFFF; background-color: #0099FF; }
+ul.calendar.schedule.menu li a:hover              { color: inherit; background-color: inherit; }
+*/
+
+ul.calendar.menu li a                             { color: #3A2313; background-color: #FFFFFF; font-size: 0.9em; font-weight: bold; }
+ul.calendar.menu li a:hover                       { color: #00BBFF; }
+
 /* calendar time range slider styles */
 
 .slider .time                                     { color: #333333; }
-
 .slider .time.mark                                { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
+
+/* other calendar stuff */
 
 .text_field_label                                 { font-size: 1.1em; padding-top: 5px; }
 .hint                                             { font-style: italic; }
 .prompt                                           { font-size: 1.3em; font-weight: bold; }
-.std_text_field_style                             { width: 100px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
-.large_text_field_style                           { width: 150px; background: #EDF3FE; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
+.std_text_field_style                             { width: 100px; background: #FFFFFF; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
+.large_text_field_style                           { width: 150px; background: #FFFFFF; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */

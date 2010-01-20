@@ -1,14 +1,24 @@
+-# Arguments:
+-# daterange => days to show
+-# today => day to show as 'Today'
+-# calendar_markings => hash of days to markings for that day
+-# add_free_time_link => if 1, show link
+-# add_appointment_link => if 1, show link
+
+-# Locals:
 -# total_days => number of days to show
 -# start_day => day to start calendar with
--# today => day to show as 'Today'
 -# markings => hash mapping days to markings for that day
 -# show_weeks => if true, show weeks, otherwise, just show the day names; defaults to true
 
 -# Calculate how many extra days we need to add at the start, so that the calendar begins on the first day of the week
-- start_day = daterange.start_at.in_time_zone.beginning_of_day
-- end_day = daterange.end_at.in_time_zone.end_of_day
-- total_days = daterange.days
-- today = DateRange.today unless local_assigns[:today]
+- start_day             = daterange.start_at.in_time_zone.beginning_of_day
+- end_day               = daterange.end_at.in_time_zone.end_of_day
+- total_days            = daterange.days
+- today                 = DateRange.today unless local_assigns[:today]
+- add_free_time_link    = 0 unless local_assigns[:add_free_time_link]
+- add_appointment_link  = 0 unless local_assigns[:add_appointment_link]
+
 - if current_company
   - extra_days_at_start = (start_day.wday - current_company.preferences[:start_wday].to_i) % 7
   - extra_days_at_end = (((current_company.preferences[:start_wday].to_i - 1) % 7) - end_day.wday) % 7
@@ -58,7 +68,12 @@
                 -# special case for 'Today'
                 .date{:style => 'padding-bottom: 3px;'}
                   = (day.to_s(:appt_schedule_day) == today.to_s(:appt_schedule_day)) ? 'Today' : day.strftime("%b %d")
-                  %span#add_free_time{:style => 'visibility: hidden;'}= link_to image_tag('add2.png', :size => '16x16', :style => 'padding-top: 3px;'), '#', :title => 'Add Free Time', :class => 'admin image', :id => 'add_free_time'
+                  %span#calendar_add_menu{:style => 'visibility: hidden; position: relative;'}
+                    = link_to image_tag('add2.png', :size => '16x16', :style => 'padding-top: 3px;'), '#', :title => 'Add Free Time', :class => 'admin image', :id => 'calendar_add_menu'
+                    -# menu links
+                    %ul#calendar_add_menu_links.calendar.menu.hide
+                      %li= link_to 'Add Appointment', '', :id => 'calendar_add_appointment' if add_appointment_link == 1
+                      %li= link_to 'Add Free Time', '', :id => 'calendar_add_free_time' if add_free_time_link == 1
                 #available{:style => 'font-size: 0.8em;'}= count > 0 ? "Availabile" : "&nbsp;"
                 
               

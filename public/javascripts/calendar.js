@@ -1,58 +1,70 @@
 // add appointment for a provider on a specific day
 $.fn.init_add_appointment = function() {
-  $("#add_appointment_form").submit(function () {
+
+  // initialize add appointment dialog
+  $("div#add_appointment_dialog").dialog({ autoOpen: false, width: 575, height: 375, title: $("div#add_appointment_dialog").attr('title') });
+
+  // open add appointment dialog on click
+  $("a#calendar_add_appointment").click(function() {
+    // set dialog date field
+    var normalized_date = $(this).parents("td").attr('id');
+    var calendar_date   = convert_string_to_date(normalized_date)
+    $("form#add_appointment_form input#apt_start_date").val(calendar_date);
+    // clear start_at, customer fields
+    $("form#add_appointment_form input#apt_start_time").val('');
+    $("form#add_appointment_form input#customer_name").val('');
+    // open dialog
+    $("div#add_appointment_dialog").dialog('open');
+    return false;
+  })
+
+    
+  $("form#add_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
-    var service_id      = $("#add_appointment_form select#service_id").attr('value');
-    var customer_id     = $("#add_appointment_form input#customer_id").attr('value');
-    var apt_start_date  = $("#add_appointment_form input#apt_start_date").attr('value');
-    var apt_start_time  = $("#add_appointment_form input#apt_start_time").attr('value');
-    var errors    = 0;
+    var service_id      = $("form#add_appointment_form select#service_id").attr('value');
+    var customer_id     = $("form#add_appointment_form input#customer_id").attr('value');
+    var apt_start_date  = $("form#add_appointment_form input#apt_start_date").attr('value');
+    var apt_start_time  = $("form#add_appointment_form input#apt_start_time").attr('value');
     
     if (!apt_start_date) {
-      $("#add_appointment_form input#apt_start_date").addClass('highlighted');
       alert("Please select a date");
       return false; 
-    } else {
-      $("#add_appointment_form input#apt_start_date").removeClass('highlighted');
     }
     
+    if (!service_id) {
+      alert("Please select a service");
+      return false; 
+    }
+
     if (!apt_start_time) {
-      $("#add_appointment_form input#apt_start_time").addClass('highlighted');
       alert("Please select a start time");
       return false; 
-    } else {
-      $("#add_appointment_form input#apt_start_time").removeClass('highlighted');
     }
 
     if (!customer_id) {
-      $("#add_appointment_form input#customer_name").addClass('highlighted');
       alert("Please select a customer");
       return false; 
-    } else {
-      $("#add_appointment_form input#customer_name").removeClass('highlighted');
     }
 
-    if (!service_id) {
-      $("#add_appointment_form select#service_id").addClass('highlighted');
-      alert("Please select a service");
-      return false; 
-    } else {
-      $("#add_appointment_form select#service_id").removeClass('highlighted');
-    }
-
-    // We have all the required fields
-
-    // normalize time format, validate that start_at < end_at
+    // normalize time format
     var apt_start_time = convert_time_ampm_to_string(apt_start_time)
 
     // normalize date format
     var apt_start_date = convert_date_to_string(apt_start_date);
 
     // replace hidden tag formatted version
-    $("#add_appointment_form input#start_at").attr('value', apt_start_date + 'T' + apt_start_time);
+    $("form#add_appointment_form input#start_at").attr('value', apt_start_date + 'T' + apt_start_time);
+
+    // disable apt_start_time field
+    $("form#add_appointment_form input#apt_start_time").attr('disabled', 'disabled');
+
+    // serialize form
+    data = $(this).serialize();
+    //alert("form serialize: " + data);
+    //return false;
 
     // post
-    $.post(this.action, $(this).serialize(), null, "script");
+    $.post(this.action, data, null, "script");
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
@@ -62,15 +74,15 @@ $.fn.init_add_appointment = function() {
 $.fn.init_add_single_free_time = function() {
   
   // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 225, title: $("div#add_free_time_dialog").attr('title') });
+  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 275, title: $("div#add_free_time_dialog").attr('title') });
   
-  // open dialog on click
-  $("a#add_free_time").click(function() {
+  // open add free time dialog on click
+  $("a#calendar_add_free_time").click(function() {
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
     var calendar_date   = convert_string_to_date(normalized_date)
     $("form#add_single_free_time_form input#date").attr('value', normalized_date);
-    $("form#add_single_free_time_form div#free_date").text(calendar_date);
+    $("form#add_single_free_time_form div#free_date input#free_date").val(calendar_date);
     // clear start_at, end_at time fields
     $("form#add_single_free_time_form div#free_start_at_text input#free_start_at").val('');
     $("form#add_single_free_time_form div#free_end_at_text input#free_end_at").val('');
@@ -103,14 +115,18 @@ $.fn.init_add_single_free_time = function() {
     var start_at = convert_time_ampm_to_string(start_at)
     var end_at   = convert_time_ampm_to_string(end_at)
 
-    if (!(start_at <= end_at)) {
+    if (!(start_at < end_at)) {
       alert("The start time must be earlier than the end time");
       return false;
     }
 
-    // replace start_at, end_at values with normalized values
-    $("input#free_start_at").attr('value', start_at);
-    $("input#free_end_at").attr('value', end_at);
+    // set hidden start_at, end_at  fields with normalized values
+    $("input#start_at[type='hidden']").attr('value', start_at);
+    $("input#end_at[type='hidden']").attr('value', end_at);
+    
+    // hide visible start_at, end_at fields
+    $("input#free_start_at").attr('disabled', 'disabled');
+    $("input#free_end_at").attr('disabled', 'disabled');
 
     // serialize form
     data = $(this).serialize();
@@ -232,11 +248,19 @@ $.fn.init_add_calendar_markings = function() {
     $(date_id).show();
   })
 
-  // add hover state to all future calendar dates
-  $("td.weekday:not(.past) .date,td.weekend:not(.past) .date").hover(function () {
-    $(this).find("span#add_free_time").css('visibility', 'visible');
+  // show add menu icon on calendar date hover
+  $("td:not(.past) .date").hover(function () {
+    $(this).find("span#calendar_add_menu").css('visibility', 'visible');
     }, function () {
-    $(this).find("span#add_free_time").css('visibility', 'hidden');
+    $(this).find("span#calendar_add_menu").css('visibility', 'hidden');
+    // hide add menu links
+    $(this).find("ul#calendar_add_menu_links").hide();
+  })
+
+  // show add menu links on click
+  $("a#calendar_add_menu").click(function() {
+    $(this).next("ul#calendar_add_menu_links").show(300);
+    return false;
   })
 }
 
@@ -245,7 +269,7 @@ $.fn.init_schedule_datepicker = function() {
 }
 
 $.fn.init_schedule_timepicker = function() {
-  $(".appointment.work.timepicker").timepickr({convention:12, left:-180});
+  $(".appointment.work.timepicker").timepickr({convention:12, left:0});
   $(".appointment.free.timepicker").timepickr({convention:12, left:0});
 }
 
@@ -253,7 +277,7 @@ $.fn.init_send_pdf = function() {
   $("#send_pdf_dialog").dialog({ autoOpen: false });
   
   $("#send_pdf").click(function() {
-    // open dialog when link is clicked
+    // open dialog on click
     $("#send_pdf_dialog").dialog('open');
     return false;
   })

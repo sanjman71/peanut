@@ -1,25 +1,29 @@
-.span-9.prepend-1.last.hide.dialog#add_free_time_dialog{:title => "Schedule Available Time For #{provider.name.titleize}"}
+.span-9.prepend-1.last.dialog.hide#add_free_time_dialog{:title => "Schedule Available Time for #{provider.name.titleize}"}
   - form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_free'), :method => :post, :html => {:id => 'add_single_free_time_form'}) do |f|
     = hidden_field_tag :provider_type, provider.tableize
     = hidden_field_tag :provider_id, provider.id
     = hidden_field_tag :capacity, provider.capacity
+    -# set to selected caledar date on open
     = hidden_field_tag :date, nil
+    -# set to normalized values before submit
+    = hidden_field_tag :start_at, nil
+    = hidden_field_tag :end_at, nil
 
     .add_free_time
-      .span-8.last
-        .span-1
-          == Date
+      .span-9.last.padding-top-10
+        .span-2.label
+          %h4.bottom.block{:style => 'color: #fff;'}== Date
         .span-7.last#free_date
-          == &nbsp;
-      .span-8.last.padding-top-10
-        .span-1
-          == Start
+          = text_field_tag 'date', '', :id =>'free_date', :class => 'large disabled', :disabled => true
+      .span-9.last.padding-top-10
+        .span-2.label
+          %h4.bottom.block{:style => 'color: #fff;'}== Start
         .span-7.last#free_start_at_text
-          = text_field_tag 'start_at', '', :id => 'free_start_at', :size => 10, :class => 'appointment free timepicker', :autocomplete => 'off'
-      .span-8.last.padding-top-10
-        .span-1
-          == End
+          = text_field_tag 'start_at', '', :id => 'free_start_at', :class => 'appointment free timepicker large', :autocomplete => 'off'
+      .span-9.last.padding-top-10
+        .span-2.label
+          %h4.bottom.block{:style => 'color: #fff;'}== End
         .span-7.last#free_end_at_text
-          = text_field_tag 'end_at', '', :id => 'free_end_at', :size => 10, :class => 'appointment free timepicker', :autocomplete => 'off'
-      .span-3.append-5.last.padding-top-10.padding-bottom-10
-        #submit= f.submit 'Add', :name => nil, :class => 'button big', :id => 'add_single_free_time'
+          = text_field_tag 'end_at', '', :id => 'free_end_at', :class => 'appointment free timepicker large', :autocomplete => 'off'
+      .span-9.last.padding-top-10.padding-bottom-10
+        #submit= f.submit 'Add', :name => nil, :class => 'large', :id => 'add_single_free_time'

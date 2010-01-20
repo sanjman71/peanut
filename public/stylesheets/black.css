@@ -58,13 +58,3 @@ table.ui-datepicker-calendar thead th   { background: #333333; }
                                 { color: #FFFFFF; text-decoration: none; outline: none; background: #FF6600;
                                   -moz-border-radius-topleft: 10px; -webkit-border-top-left-radius: 10px; -moz-border-radius-topright: 10px; -webkit-border-top-right-radius: 10px;}
 
-
-/* dialogs */
-
-/*
-.ui-dialog.ui-widget-content          { padding: 0; background: none; background: #999; border: none; }
-*/
-.ui-dialog.ui-widget-content          { padding: 0; border: none; }
-
-.ui-dialog-content.ui-widget-content  { color: #FFFFFF; }
-

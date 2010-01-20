@@ -1,0 +1,33 @@
+/* jquery widget styles, overrides jquery theme in many cases */
+
+.ui-widget select.large, .ui-widget input.large, .ui-widget submit.large
+                                      { font-size: 1.2em; line-height: normal; }
+.ui-widget select.normal, .ui-widget input.normal, .ui-widget submit.normal
+                                      { font-size: 1.0em; }
+.ui-widget select.small, .ui-widget input.small, .ui-widget submit.small
+                                      { font-size: 0.9em; }
+.ui-widget input.disabled             { background-color: #DDDDDD; }
+
+.ui-widget input.bottom               { margin-bottom: 0px; padding-bottom: 0px; }
+
+/* dialog */
+
+/*
+.ui-dialog.ui-widget-content          { padding: 0; background: none; background: #999; border: none; }
+*/
+
+/*
+.ui-dialog.ui-widget-content          { padding: 0; border: none; }
+.ui-dialog-content.ui-widget-content  { color: #FFFFFF; }
+*/
+
+.ui-dialog.ui-widget-content          { padding: 0; border: none; background: #333; }
+.ui-dialog-content.ui-widget-content  { color: #fff; }
+
+.ui-dialog-titlebar                   { background: #ff6600; color: #fff; }
+.ui-dialog-titlebar.ui-widget-header  { border: #ff6600; }
+
+/* timepicker */
+
+.ui-timepickr ol li.ui-state-default  { background: #ff6600; border: #ff6600; }
+.ui-timepickr ol li.ui-state-hover    { background: #EDF3FE; border: #EDF3FE; color: #333; }

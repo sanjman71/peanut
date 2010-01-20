@@ -3,16 +3,22 @@
 - javascript('appointments', 'calendar', 'waitlists', 'messages', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
 - prev_next_links = build_calendar_prev_next_links(@provider, @daterange)
 
-.span-16.append-1
+.span-16
   .span-15.prepend-1.last.mat.padding-top-10
-    .span-8
+    .span-9
+      -# schedule for provider
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text big')
         -#== &nbsp;|&nbsp;
         -#= link_to 'Email PDF Schedule', '', :id => 'send_pdf'
       -#= render(:partial => 'calendar/send_pdf_dialog')
-    .span-6.prepend-1.last
+      -# schedule add blocks of time links
+      %h4{:style => 'font-size: 1.0em;'}
+        = link_to "Add Blocks of Available Time", new_block_path
+        == &nbsp;or&nbsp;
+        = link_to "Add a Weekly Schedule", new_weekly_path
+    .span-6.last
       %h6{:style => 'margin-bottom: 20px; font-weight: normal;'}
         = link_to @pdf_title, @pdf_link, :id => 'pdf_version'
       -##links
@@ -35,7 +41,9 @@
   .span-15.prepend-1.last#schedule_container.padding-bottom-20
   
     .span-15.last#schedule_help
-      %h4== Click a highlighted date on the calendar below to see appointments for that date, or click on the '+' image next to a date to add free time.
+      %h4
+        == Click a highlighted date on the calendar below to see appointments for that date,
+        == or click on the '+' icon next to a date to add free time or appointments.
 
     .span-15.last#schedule_date_range_and_links
       .span-3
@@ -51,7 +59,8 @@
 
     -# show free, work calendar
     .span-15.last#free_work_calendar
-      = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
+      = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today, |
+                                                          :add_free_time_link => 1, :add_appointment_link => @services.empty? ? 0 : 1}) |
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
@@ -61,9 +70,15 @@
     .last#send_message
       = render(:partial => 'messages/send_message', :locals => {:sender => current_user, :protocol => 'email', :hidden => true})
 
-.add_appointment_free_time.span-7.last
-  -# show add free time form if the user can update the providers calendar or update company calendars
-  - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
-    = render(:partial => 'calendar/add_appointment', :locals => {:provider => @provider, :services => @services})
-    = render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})
-    = render(:partial => 'calendar/add_free_time_dialog', :locals => {:provider => @provider, :service => @free_service})
+.span-8.last
+  -# schedule help
+  .span-7.prepend-1.last
+    = render(:partial => 'schedule_help')
+
+-#.add_appointment_free_time.span-7.last
+-# show add free time form if the user can update the providers calendar or update company calendars
+- if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
+  -#= render(:partial => 'calendar/add_appointment', :locals => {:provider => @provider, :services => @services})
+  -#= render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})
+  = render(:partial => 'calendar/add_appointment_dialog', :locals => {:provider => @provider, :services => @services})
+  = render(:partial => 'calendar/add_free_time_dialog', :locals => {:provider => @provider, :service => @free_service})
