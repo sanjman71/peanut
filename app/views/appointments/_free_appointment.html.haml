@@ -11,7 +11,7 @@
         %span== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
       - if show_location?
         .span-5.last.location
-          %h6= appointment.location.name
+          %h6= appointment.location.andand.name
       .span-5.last.recurring
         - if appointment.recurrence?
           %h6== (Recurring series)

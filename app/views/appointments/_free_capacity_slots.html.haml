@@ -14,7 +14,7 @@
             .span-4.time
               == #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
             .span-6.last.location
-              = show_location? ? slot.free_appointment.location.name : "&nbsp;"
+              = show_location? ? slot.free_appointment.location.anand.name : "&nbsp;"
           .span-15.last{:style => 'margin-left: 5px;'}
             .span-2.pick_time
               = link_to "Pick a Time", ''

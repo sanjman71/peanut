@@ -14,7 +14,7 @@
         %h6= appointment.service.name
     - if show_location?
       .span-3.last.location
-        %h6= appointment.location.name
+        %h6= appointment.location.andand.name
   .span-4.customer
     - if appointment.free? && appointment.recur_parent
       %h6== (Recurring series)
