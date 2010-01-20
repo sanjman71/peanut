@@ -167,7 +167,8 @@
   .span-22.last
     - if current_company.may_add_location?
       - if has_privilege?("update companies", current_company)
-        = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+        -#= link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+        == Locations support coming soon ...
     - else
       = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(:subdomain => current_subdomain, :id => current_company.subscription)}"
   .span-22.last
@@ -175,3 +176,5 @@
       == You do not yet have any locations
     - else
       = render :partial => 'locations/locations', :object => @company.locations.paginate(:page => params[:locations_page]), :locals => {:locatable => @company}
+
+%hr.space
