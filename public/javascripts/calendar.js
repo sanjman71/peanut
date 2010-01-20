@@ -2,7 +2,7 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div#add_appointment_dialog").dialog({ autoOpen: false, width: 575, height: 325, title: $("div#add_appointment_dialog").attr('title') });
+  $("div#add_appointment_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 325, title: $("div#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
@@ -74,7 +74,7 @@ $.fn.init_add_appointment = function() {
 $.fn.init_add_single_free_time = function() {
   
   // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 230, title: $("div#add_free_time_dialog").attr('title') });
+  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 230, title: $("div#add_free_time_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
