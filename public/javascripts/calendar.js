@@ -2,7 +2,7 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div#add_appointment_dialog").dialog({ autoOpen: false, width: 575, height: 375, title: $("div#add_appointment_dialog").attr('title') });
+  $("div#add_appointment_dialog").dialog({ autoOpen: false, width: 575, height: 325, title: $("div#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
@@ -74,7 +74,7 @@ $.fn.init_add_appointment = function() {
 $.fn.init_add_single_free_time = function() {
   
   // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 275, title: $("div#add_free_time_dialog").attr('title') });
+  $("div#add_free_time_dialog").dialog({ autoOpen: false, width: 575, height: 230, title: $("div#add_free_time_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
@@ -308,7 +308,7 @@ $.fn.init_autocomplete_customers = function() {
                                             parse: function(data) {
                                                       var rows = new Array();
                                                       for(var i=0; i<data.length; i++){
-                                                          rows[i] = { data:data[i], value:data[i].user.name, result:data[i].user.name };
+                                                          rows[i] = { data:data[i], value: data[i].name+(data[i].email ? " "+data[i].email : '')+(data[i].phone ? " "+data[i].phone : ''), result:data[i].name };
                                                       }
                                                       return rows;
                                                   },
@@ -318,7 +318,7 @@ $.fn.init_autocomplete_customers = function() {
   
   $("#customer_name").result(function(event, data, formatted) {
     // set the customer id
-    $("#customer_id").attr("value", data.user.id);
+    $("#customer_id").attr("value", data.id);
   });
 
 }

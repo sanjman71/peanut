@@ -7,21 +7,31 @@ class CustomersController < ApplicationController
   # GET /customers
   def index
     @search = params[:q]
-    @role   = Company.customer_role
     
     if !@search.blank?
-      @customers    = current_company.authorized_users.with_role(@role).search_by_name_email_phone(@search).order_by_name
+      @customers    = current_company.authorized_customers.search_by_name_email_phone(@search).order_by_name
       @search_text  = "Customers matching '#{@search}'"
       @paginate     = false
     else
-      @customers    = current_company.authorized_users.with_role(@role).order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
+      @customers    = current_company.authorized_customers.order_by_name.paginate(:page => params[:page], :per_page => @@per_page)
       @paginate     = true
     end
     
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @customers.to_json(:only => ['id', 'name']))}
+      format.json do
+        # build collection using customer name, emails, and phones
+        @collection = @customers.inject([]) do |array, customer|
+          hash = Hash[:id => customer.id, :name => customer.name,
+                      :email => customer.primary_email_address.andand.address || '',
+                      :phone => customer.primary_phone_number.andand.address || '']
+          array.push(hash)
+          array
+        end
+        render(:json => @collection.to_json)
+        # render(:json => @customers.to_json(:include => [:email_addresses, :phone_numbers], :only => ["id", "name", "address"]))
+      end
     end
   end
 

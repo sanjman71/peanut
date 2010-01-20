@@ -1,11 +1,13 @@
 /* jquery widget styles, overrides jquery theme in many cases */
 
+/*
 .ui-widget select.large, .ui-widget input.large, .ui-widget submit.large
                                       { font-size: 1.2em; line-height: normal; }
 .ui-widget select.normal, .ui-widget input.normal, .ui-widget submit.normal
                                       { font-size: 1.0em; }
 .ui-widget select.small, .ui-widget input.small, .ui-widget submit.small
                                       { font-size: 0.9em; }
+*/
 .ui-widget input.disabled             { background-color: #DDDDDD; }
 
 .ui-widget input.bottom               { margin-bottom: 0px; padding-bottom: 0px; }
