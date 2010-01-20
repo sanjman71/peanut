@@ -9,7 +9,7 @@
       -# schedule for provider
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
-        = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text big')
+        = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
         -#== &nbsp;|&nbsp;
         -#= link_to 'Email PDF Schedule', '', :id => 'send_pdf'
       -#= render(:partial => 'calendar/send_pdf_dialog')
