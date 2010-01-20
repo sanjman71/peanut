@@ -3,9 +3,9 @@
     .span-24.last.letterbox.service{:class => cycle("shaded", "")}
       -# company information
       .span-7.prepend-1.name
-        %h2= company.name
-        %h4= company.time_zone
-        %h5.bottom== State: #{company.state.titleize}
+        %h4.bigger.bottom.padding-bottom-5= company.name
+        %h4.bottom.padding-bottom-5= company.time_zone
+        %h4.bottom== State: #{company.state.titleize}
       
       -# company plan and subscription
       .span-5
@@ -20,7 +20,7 @@
           == Next Billing Date: #{company.subscription.next_billing_at ? company.subscription.next_billing_at.to_date : ''}
         
       -# company objects and limits
-      .span-5
+      .span-6
         == Services: #{company.work_services_count}
         %br
         == Providers: #{company.providers_count}
@@ -30,7 +30,7 @@
         == (#{plan_limit_text(company.plan, 'locations')})
       
       -# link to company site
-      .span-6.last.action
+      .span-5.last.action
         - case company.state
         - when 'frozen'
           = link_to 'Activate', unfreeze_company_path(company), :method => :put, :class => 'admin'

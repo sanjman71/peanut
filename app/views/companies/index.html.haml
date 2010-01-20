@@ -11,17 +11,18 @@
   
   %hr.space
 
-  .span-15.prepend-1
-    %h3{:style => 'color: #5500BB; font-weight: bold;'}
-      .span-3== Companies:
-      = @companies.size
-      %hr.space{:style => 'margin-bottom: 7px;'}
-      .span-3== Billing Errors:
-      = @billing_errors.size
-      
+  %h4.span-15.prepend-1.padding-bottom-10
+    .span-3== Companies:
+    .span-12.last= @companies.size
+  %h4.span-15.prepend-1
+    .span-3== Billing Errors:
+    .span-12.last= @billing_errors.size
+
+  %hr.space
+
   .span-15.prepend-1.append-1.last
-    .highlight#flash
-    
+    = display_flash(:all)
+
   #companies
     = render(:partial => 'companies.html.haml', :locals => {:companies => @companies})
 
