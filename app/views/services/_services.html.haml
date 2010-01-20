@@ -10,10 +10,10 @@
     .span-9.prepend-1.last
       .span-9.last
         .span-6.name{:class => service.providers_count? ? '' : 'noproviders'}
-          %h2.margin-bottom-0= service.name
+          %h4.bigger.bottom= service.name
         .span-3.last.duration
-          %h3== #{Duration.to_words(service.duration)}
-      .span-8.last
+          %h4.bottom== #{Duration.to_words(service.duration)}
+      .span-8.append-1.last
         - if service.providers_count > 0
           -# show all service providers
           == Service providers: 
@@ -26,13 +26,13 @@
             == Use the 'edit' link to add service providers
     .span-3.price_and_capacity
       .span-3.last.price
-        %h3= service.price
+        %h4.bottom= service.price
       .span-3.last.capacity
         - if service.capacity > 1
-          == Capacity: #{service.capacity}
+          %h4.bottom== Capacity: #{service.capacity}
         - else
           -# we don't bother displaying capacity for providers if it's at the default of 1 - this is to reduce confusion
-          == &nbsp;
+          %h4.bottom== &nbsp;
     .span-3.last.action
       - if_privilege('update services', current_company) do
         = link_to "Edit", edit_service_path(service, :subdomain => current_subdomain), :class => 'admin'
