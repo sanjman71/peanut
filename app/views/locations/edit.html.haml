@@ -1,18 +1,22 @@
 - title('Edit a location')
 - stylesheet('locations')
+- javascript('locations')
 
 .span-16
   .span-14.prepend-1.append-1.mat
     %h2== Edit a location
 
-  .span-14.prepend-1.append-1  
+  %hr.space
+
+  .span-15.prepend-1
     = display_flash(:all)
 
-    = render :partial => 'edit_location', :object => @location, :locals => {:form_submit => 'Update', :submit_url => location_path(@location, :subdomain => current_subdomain) }
+  %hr.space
 
-.span-7.prepend-1.last
-  .sidebar.instructions
-    %h3== Editing a location
-    %ul
-      %li== Please fill in the address for this location. Fields marked * are required.
-      %li== You can give this location a name (e.g. "Downtown") if you wish.
+  .span-15.prepend-1.padding-bottom-10
+    = render :partial => 'edit_location', :locals => {:location => @location, :form_submit => 'Update', :submit_url => location_path(@location) }
+
+.span-8.last
+  -# locations help
+  .span-7.prepend-1.last
+    = render(:partial => 'locations/location_help', :locals => {:title => 'Editing a Location'})

@@ -39,19 +39,18 @@ class LocationsController < ApplicationController
 
   # GET /locations/new
   def new
-    
     if !current_company
       flash[:error] = "To add a location you must be working with a specific company."
       redirect_to root_path and return
     end
-    
+
     if !current_company.may_add_location?
       flash[:error] = "Your plan does not allow you to add another location."
       redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
     end
-    
+
     @location = Location.new
-  
+
     respond_to do |format|
       format.html # new.html.haml
       format.js # new.js.rjs
@@ -80,21 +79,25 @@ class LocationsController < ApplicationController
     
     if !current_company.may_add_location?
       flash[:error] = "Your plan does not allow you to add another location."
-      redirect_to(edit_company_root_path(:subdomain => current_subdomain)) and return
+      redirect_to(edit_company_root_path) and return
     end
     
     @location = initialize_location(Location.new, params[:location])
     
-    if @location.errors.empty? && (current_company.locations << @location)
-    
+    if @location.errors.empty?
+      # add company location
+      current_company.locations.push(@location)
+    end
+  
+    if @location.errors.empty?
       flash[:notice] = "Location was successfully added to #{current_company.name}"
-
+    
       respond_to do |format|
         format.html { redirect_to(redirect_success_path) }
       end
     else
-      flash[:error] = "Problem adding location to #{current_company.name}."
-
+      flash[:error] = "There was an error adding location to #{current_company.name}."
+    
       respond_to do |format|
         format.html { render :action => "new" }
       end
@@ -115,7 +118,7 @@ class LocationsController < ApplicationController
       end
     else
       respond_to do |format|
-        flash[:error] = 'Problem updating location.'
+        flash[:error] = 'There was an error updating the location.'
         format.html { render :action => "edit" }
       end
     end
@@ -140,7 +143,7 @@ class LocationsController < ApplicationController
   protected
 
   def redirect_success_path
-    edit_company_root_path(:subdomain => current_subdomain)
+    edit_company_root_path
   end
   
   #
@@ -151,7 +154,7 @@ class LocationsController < ApplicationController
   #
   def initialize_location(location, params)
 
-    location.name           = params[:name] unless params[:name].blank?
+    location.name           = params[:name] ? params[:name] : ''  # default to no name
     location.street_address = params[:street_address] unless params[:street_address].blank?
     location.country        = Country.find(params[:country_id].to_i) unless params[:country_id].blank?
     location.state          = State.find(params[:state_id].to_i) unless params[:state_id].blank?
@@ -161,7 +164,6 @@ class LocationsController < ApplicationController
       location.errors.add(:country, "cannot be blank") if country.blank?
       return
     else
-
       begin
         # Initialize the country, state, city and zip in order
         if !params[:city].blank? && location.state
@@ -171,7 +173,7 @@ class LocationsController < ApplicationController
         if params[:city].blank?
           location.errors.add(:city, "cannot be blank")
         else
-          location.errors.add(:city, "#{params[:city]} is invalid in #{location.state.name}")
+          location.errors.add(:city, "#{params[:city]} is not a valid city in #{location.state.name}")
         end
         location.city = nil
       end
@@ -184,15 +186,18 @@ class LocationsController < ApplicationController
         if params[:zip].blank?
           location.errors.add(:zip, "cannot be blank")
         else
-          location.errors.add(:zip, "#{params[:zip]} is invalid in #{location.state.name}")
+          location.errors.add(:zip, "#{params[:zip]} is not a valid zip in #{location.state.name}")
         end
         location.zip = nil
       end
-      
     end
     
-    location.geocode_latlng unless !location.errors.empty?
-    
+    # save location, geocode coordinates
+    if location.errors.empty?
+      location.save
+      location.geocode_latlng
+    end
+
     location
   end
   

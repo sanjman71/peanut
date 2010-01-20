@@ -4,10 +4,10 @@
 = hidden_field_tag 'initial_provider_type', provider.tableize
 - form_for(Appointment.new, :url => url_for(:controller => 'openings', :action => 'search', :subdomain => current_subdomain), :method => :post, :html => {:id => 'search_openings_form'}) do |f|
   .last{:class => size == :wide ? "span-24" : "span-7"}
-    .span-2.text-align-right#what_text{:style => 'padding-top: 7px;'}
+    .span-2.text-align-right#what_text.padding-top-5
       == Service?
     .span-5.last.field#what
-      = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id))
+      = select_tag('service_id', options_for_select(services.collect{ |s| [s.name, s.id]}, service.id), :class => 'openings search wide', :style => 'padding-top: 0px;')
   .last.duration{:class => size == :wide ? "span-24" : "span-7"}
     .span-5.prepend-2.last#duration_in_words
       = Duration.to_words(duration, :prepend => "Typically") if @service
@@ -19,10 +19,10 @@
         %span.field#duration
           = select_tag('duration', options_for_select(service_duration_select_options, duration))
   .last{:class => size == :wide ? "span-24" : "span-7"}
-    .span-2.text-align-right#who_text{:style => 'padding-top: 7px;'}
+    .span-2.text-align-right#who_text.padding-top-5
       == With?
     .span-5.last.field#who
-      = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :style => "width: 125px; align: top;")
+      = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
 
   -# time of day, disable until its working
   -#.last{:class => size == :wide ? "span-24" : "span-7"}
@@ -34,7 +34,7 @@
         
   -# when select list
   .last#when_select{:class => size == :wide ? "span-24" : "span-7"}
-    .span-2.text-align-right#when_text{:style => 'padding-top: 7px;'}
+    .span-2.text-align-right#when_text.padding-top-5
       == When?
     .span-5.last
       %span.field#when
@@ -47,7 +47,7 @@
       
   -# when date range fields
   .last#when_date_range_start.hide{:class => size == :wide ? "span-24" : "span-7"}
-    .span-2.text-align-right#when_text{:style => 'padding-top: 0px;'}
+    .span-2.text-align-right#when_text.padding-top-5
       == When?
     .span-5.last
       %span.field#date_range_start
@@ -72,7 +72,7 @@
       .span-2.text-align-right#where_text.padding-top-5
         == Where?
       .span-5.last.field#where
-        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px; align: top;")
+        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :class => 'openings search wide')
   %br
   .last{:class => size == :wide ? "span-24" : "span-7", :style => 'margin-left: 15px; padding-top: 10px;'}
     %h4.span-3.last= link_to submit_text, '', :class => 'rounded button color', :id => 'search_submit'

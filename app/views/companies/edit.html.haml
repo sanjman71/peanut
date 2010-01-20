@@ -162,15 +162,14 @@
 %hr.space
 
 .span-22.prepend-1.append-1.last.mat.padding-top-10.padding-bottom-10
-  .span-6.last
-    %h2== Company Locations
   .span-22.last
-    - if current_company.may_add_location?
-      - if has_privilege?("update companies", current_company)
-        -#= link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
-        == Locations support coming soon ...
-    - else
-      = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(:subdomain => current_subdomain, :id => current_company.subscription)}"
+    %h2
+      %span{:style => 'padding-right: 5px;'}== Company Locations
+      - if current_company.may_add_location?
+        - if has_privilege?("update companies", current_company)
+          = link_to "Add a Location", new_location_path, :class => 'add_address', :style => 'font-size: 13px;'
+      - else
+        = "You cannot add any additional locations on your current plan. #{link_to "Change Subscription", edit_subscription_path(current_company.subscription)}"
   .span-22.last
     - if @company.locations.empty?
       == You do not yet have any locations

@@ -77,11 +77,15 @@ h4.bigger                                         { font-size: 1.3em; line-heigh
 /* form styles */
 
 input.title.big                                   { color: #000000; font-size: 20px; font-weight: bold; }
+input.big                                         { font-size: 1.5em; }
 
 label.big                                         { font-size: 16px; }
 
 .button                                           { font-size: 12px;}
 .button.big                                       { font-size: 15px; }
+
+select.big                                        { font-size: 1.3em; }
+select.openings.search.wide                       { width: 175px; padding-top: 0px; }
 
 .select                                           { font-size: 12px; }
 .select.big                                       { font-size: 15px; }

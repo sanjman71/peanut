@@ -2,12 +2,12 @@
 -# horizontal = determines whether to output the address on a single line
 -# render_country = should we print out the country
 
-- horizontal = false if local_assigns[:horizontal].nil?
-- render_country = false if local_assigns[:render_country].nil?
-- render_phone = false if local_assigns[:render_phone].nil?
-- render_email = false if local_assigns[:render_email].nil?
-- render_notes = false if local_assigns[:render_notes].nil?
-- line_break = horizontal ? '' : '<br />'
+- horizontal      = false if local_assigns[:horizontal].nil?
+- render_country  = false if local_assigns[:render_country].nil?
+- render_phone    = false if local_assigns[:render_phone].nil?
+- render_email    = false if local_assigns[:render_email].nil?
+- render_notes    = false if local_assigns[:render_notes].nil?
+- line_break      = horizontal ? '' : '<br />'
 
 .address
   = "#{h(location_address.street_address)},#{line_break}" unless location_address.street_address.blank?

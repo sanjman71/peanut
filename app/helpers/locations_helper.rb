@@ -72,7 +72,7 @@ module LocationsHelper
   end
   
   def states_for_select(country)
-    s = State.in_country(country).order_by_code.collect { |c| [c.name, c.id] }
+    s = country.states.order_by_code.collect { |c| [c.name, c.id] }
   end
   
   def countries_for_select()

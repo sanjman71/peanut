@@ -38,7 +38,6 @@ class CalendarControllerTest < ActionController::TestCase
     @owner.grant_role('company manager', @company)
     # stub current company
     @controller.stubs(:current_company).returns(@company)
-    # ActionView::Base.any_instance.stubs(:current_company).returns(@company)
     # stub current location to be anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     # set the request hostname

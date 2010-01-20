@@ -21,7 +21,7 @@
         = will_paginate locations, :param_name => page_param_name
       .locations.last
         - locations.each_with_index do |location, i|
-          .span-10.last
+          .span-10.last.padding-bottom-10
             = render :partial => 'locations/location', :object => location, :locals => {:with_distance => false, :i => i,:geodist => nil, :show_location_title => show_location_title, :short_locations => short_locations, :locatable => locatable}
     .bottompage.last
       = will_paginate locations, :param_name => page_param_name
