@@ -732,10 +732,10 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "set the flash for the created appointment and created user account" do
         assert_match /Your user account has been created/, flash[:notice]
       end
-  
-      # should send appt confirmation and account created messages
-      should_change("delayed job count", :by => 2) { Delayed::Job.count }
-  
+
+      # should send account created messages
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
     end
