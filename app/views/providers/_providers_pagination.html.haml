@@ -1,5 +1,5 @@
-.span-10.prepend-1.append-bottom.providers.header
-  %h4.bottom= search_text ? search_text : page_entries_info(providers, :entry_name => 'provider')
-.span-4.prepend-1.last#pagination
+.span-8.prepend-1.append-bottom.providers.header
+  %h4.bottom= search_text ? search_text : page_entries_info(providers, :entry_name => 'provider').gsub(/ in total/,'')
+.span-6.prepend-1.last#pagination
   - if paginate
-    = will_paginate(providers)
+    %h4.bottom= will_paginate(providers, :page_links => true, :inner_window => 1, :outer_window => 1)

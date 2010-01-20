@@ -2,7 +2,7 @@
   .span-16.last.customer.letterbox{:class => cycle("shaded", "")}[customer]
     -# customer name and email
     .span-7.prepend-1
-      %h2.customer.name.bottom= customer.name
+      %h4.bigger.customer.name.bottom= customer.name
       %h4.customer.email.bottom
         - if customer.email_addresses_count > 0
           = customer.primary_email_address.address

@@ -2,7 +2,7 @@
   .span-16.last.letterbox.provider{:class => cycle("shaded", "")}[provider]
     -# provider name and email
     .span-6.prepend-1.name
-      %h2.provider.name.bottom= provider.name
+      %h4.bigger.provider.name.bottom= provider.name
       %h4.provider.email
         - if provider.email_addresses_count > 0
           = provider.primary_email_address.address

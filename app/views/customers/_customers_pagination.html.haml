@@ -1,5 +1,5 @@
-.span-6.prepend-1.append-bottom.customers.header
-  %h4.bottom{:style => 'font-size: 1.0em;'}= search_text ? search_text : page_entries_info(customers, :entry_name => 'customer').gsub(/ in total/,'')
-.span-8.prepend-1.last#pagination
+.span-8.prepend-1.append-bottom.customers.header
+  %h4.bottom= search_text ? search_text : page_entries_info(customers, :entry_name => 'customer').gsub(/ in total/,'')
+.span-6.prepend-1.last#pagination
   - if paginate
-    %h4.bottom{:style => 'font-size: 1.1em;'}= will_paginate(customers, :page_links => true, :inner_window => 1, :outer_window => 1)
+    %h4.bottom= will_paginate(customers, :page_links => true, :inner_window => 1, :outer_window => 1)
