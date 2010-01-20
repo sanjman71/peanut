@@ -69,10 +69,10 @@
   - if @locations.size > 1
     %br
     .last{:class => size == :wide ? "span-24" : "span-7"}
-      .span-3.text-align-right
+      .span-2.text-align-right#where_text.padding-top-5
         == Where?
-      .span-4.last.field#where
-        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px;")
+      .span-5.last.field#where
+        = select_tag('location_id', options_for_select(build_company_location_select_options, current_location.id), :style => "width: 125px; align: top;")
   %br
   .last{:class => size == :wide ? "span-24" : "span-7", :style => 'margin-left: 15px; padding-top: 10px;'}
     %h4.span-3.last= link_to submit_text, '', :class => 'rounded button color', :id => 'search_submit'
