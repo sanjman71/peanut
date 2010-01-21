@@ -90,7 +90,7 @@
 
 .span-7.last
   - if @searchable
-    .span-7.last.mat#openings_search
+    .span-7.last.mat#openings_search.padding-top-10
       = render(:partial => 'openings/search', :locals => {:title => @daterange ? "Modify Your Search" : "Make an Appointment", :submit_text => @daterange ? "Search Again" : "Search", :providers => @providers, :provider => @provider, :services => @services, :service => @service, :duration => @duration, :when_range => @when, :time => @time, :size => :narrow})
   - else
     -# no search bar
