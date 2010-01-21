@@ -13,18 +13,18 @@ $.fn.init_add_appointment = function() {
     // clear start_at, customer fields
     $("form#add_appointment_form input#apt_start_time").val('');
     $("form#add_appointment_form input#customer_name").val('');
+    $("form#add_appointment_form input#customer_id").val('');
     // open dialog
     $("div#add_appointment_dialog").dialog('open');
     return false;
   })
 
-    
   $("form#add_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
-    var service_id      = $("form#add_appointment_form select#service_id").attr('value');
-    var customer_id     = $("form#add_appointment_form input#customer_id").attr('value');
-    var apt_start_date  = $("form#add_appointment_form input#apt_start_date").attr('value');
-    var apt_start_time  = $("form#add_appointment_form input#apt_start_time").attr('value');
+    var service_id      = $("form#add_appointment_form select#service_id").val();
+    var customer_id     = $("form#add_appointment_form input#customer_id").val();
+    var apt_start_date  = $("form#add_appointment_form input#apt_start_date").val();
+    var apt_start_time  = $("form#add_appointment_form input#apt_start_time").val();
     
     if (!apt_start_date) {
       alert("Please select a date");
@@ -63,6 +63,9 @@ $.fn.init_add_appointment = function() {
     //alert("form serialize: " + data);
     //return false;
 
+    // enable apt_start_time field
+    $("form#add_appointment_form input#apt_start_time").removeAttr('disabled');
+
     // post
     $.post(this.action, data, null, "script");
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
@@ -74,7 +77,7 @@ $.fn.init_add_appointment = function() {
 $.fn.init_add_single_free_time = function() {
   
   // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 230, show: 'fadeIn(slow)', title: $("div#add_free_time_dialog").attr('title') });
+  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_time_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
@@ -124,7 +127,7 @@ $.fn.init_add_single_free_time = function() {
     $("input#start_at[type='hidden']").attr('value', start_at);
     $("input#end_at[type='hidden']").attr('value', end_at);
     
-    // hide visible start_at, end_at fields
+    // disable start_at, end_at fields
     $("input#free_start_at").attr('disabled', 'disabled');
     $("input#free_end_at").attr('disabled', 'disabled');
 
@@ -132,6 +135,10 @@ $.fn.init_add_single_free_time = function() {
     data = $(this).serialize();
     //alert("form serialize: " + data);
     //return false;
+
+    // enable start_at, end_at fields
+    $("input#free_start_at").removeAttr('disabled');
+    $("input#free_end_at").removeAttr('disabled');
 
     // post
     $.post(this.action, data, null, "script");
