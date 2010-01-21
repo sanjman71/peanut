@@ -199,15 +199,15 @@ $.fn.init_openings_add_calendar_markings = function() {
   }
 }
 
-$.fn.init_datepicker_openings = function() {
-  $(".datepicker").datepicker({minDate: +0, maxDate: '+2m'});
+$.fn.init_openings_datepicker = function() {
+  $(".openings.datepicker").datepicker({minDate: +0, maxDate: '+2m'});
 }
 
 $(document).ready(function() {
   $(document).init_search_openings();
   $(document).init_search_when_toggle();
   $(document).init_openings_add_calendar_markings();
-  $(document).init_datepicker_openings();
+  $(document).init_openings_datepicker();
   $(document).init_openings_bookit();
   // rounded corners
   $('#search_submit').corners("7px");

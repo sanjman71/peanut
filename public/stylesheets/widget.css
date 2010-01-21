@@ -12,6 +12,13 @@
 
 .ui-widget input.bottom               { margin-bottom: 0px; padding-bottom: 0px; }
 
+.ui-widget-content h4                 { color: #FFFFFF; }
+
+/* datepicker */
+
+/* this is required to make sure the datepicker opens in front of the dialog */
+.ui-datepicker                        { z-index: 10001; }
+
 /* dialog */
 
 /*

@@ -13,22 +13,22 @@
     .add_appointment
       .span-11.last.padding-top-10
         .span-3.label
-          %h4.bottom.block{:style => 'color: #fff;'}== Date
+          %h4.bottom.block== Date
         .span-8.last#apt_start_date
           = text_field_tag 'date', '', :id =>'apt_start_date', :class => 'big disabled', :disabled => true
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
-          %h4.bottom.block{:style => 'color: #fff;'}== Service
+          %h4.bottom.block== Service
         .span-8.last#service
           = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]}), :class => 'big'
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
-          %h4.bottom.block{:style => 'color: #fff;'}== Start Time
+          %h4.bottom.block== Start Time
         .span-8.last#start_time_text
           = text_field_tag :apt_start_time, '', :class => 'appointment work timepicker big', :autocomplete => 'off'
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
-          %h4.bottom.block{:style => 'color: #fff;'}== Customer
+          %h4.bottom.block== Customer
         .span-8.last#customer_search
           = text_field_tag '', '', :class => 'big', :autocomplete => 'off', :id => 'customer_name', :url => customers_path(:format => :json)
         .span-8.prepend-3.last

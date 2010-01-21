@@ -1,0 +1,52 @@
+.span-15.prepend-1.last.dialog.hide#add_waitlist_dialog{:title => "Add Yourself to the Waitlist"}
+  - form_for(waitlist, :url => waitlists_path, :html => {:method => :post, :id => 'add_waitlist_form'}) do |f|
+    = hidden_field :waitlist, :service_id
+    = hidden_field :waitlist, :provider_id
+    = hidden_field :waitlist, :provider_type
+    = hidden_field :waitlist, :customer_id
+
+    .waitlist.add
+      -# what
+      .span-15.last.padding-bottom-5#what
+        .span-3.label
+          %h4.bottom.block.widget-color== Service:
+        .span-12.last.data
+          %h4= waitlist.service.name
+
+      -# with
+      .span-15.last.padding-bottom-5#with
+        .span-3.label
+          %h4.bottom.block== With:
+        .span-12.last.data
+          %h4= waitlist.provider.name
+
+      -# when
+      .span-15.last.padding-bottom-5#when
+        .span-3.label
+          %h4.bottom.block== When:
+        .span-12.last.data
+          %h4== Tell us the dates and times to be waitlisted for:
+
+      -# nested time range attributes
+      - f.fields_for :waitlist_time_ranges do |time_range_form|
+        .span-12.prepend-3.last.padding-bottom-10#when_dates
+          .span-2.padding-top-5
+            == Dates:
+          .span-10.last
+            = time_range_form.text_field :start_date, :id => 'waitlist_start_date', :style => 'color: #111', :class => 'waitlist datepicker big', :autocomplete => 'off', :size => 12
+            %span{:style => 'padding: 0 5px;'}== to
+            = time_range_form.text_field :end_date, :id => 'waitlist_end_date', :class => 'waitlist datepicker big', :autocomplete => 'off', :size => 12
+
+        .span-12.prepend-3.last.padding-bottom-10#when_times
+          .span-2.padding-top-5
+            == Times:
+          .span-10.last
+            = time_range_form.text_field :start_time_hours, :id => 'waitlist_start_time', :class => 'waitlist timepicker big', :autocomplete => 'off', :size => 12
+            %span{:style => 'padding: 0 5px;'}== to
+            = time_range_form.text_field :end_time_hours, :id => 'waitlist_end_time', :class => 'waitlist timepicker big', :autocomplete => 'off', :size => 12
+
+    -# submit
+    .span-15.last
+      #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_waitlist_submit'
+
+
