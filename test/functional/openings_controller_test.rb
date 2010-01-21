@@ -116,8 +116,14 @@ class OpeningsControllerTest < ActionController::TestCase
           get :index
         end
 
+        should_not_assign_to(:daterange)
         should_assign_to(:public) { 0 }
         should_assign_to(:searchable) { false }
+        should_not_assign_to(:waitlist)
+
+        should "not have 'add waitlist' link" do
+          assert_select "a#add_waitlist", 0
+        end
 
         should_respond_with :success
         should_render_template 'openings/index.html.haml'
@@ -132,8 +138,10 @@ class OpeningsControllerTest < ActionController::TestCase
           get :index
         end
 
+        should_not_assign_to(:daterange)
         should_assign_to(:public) { 0 }
         should_assign_to(:searchable) { true }
+        should_not_assign_to(:waitlist)
 
         should_respond_with :success
         should_render_template 'openings/index.html.haml'
@@ -153,9 +161,10 @@ class OpeningsControllerTest < ActionController::TestCase
         assert_true assigns(:provider).anyone?
       end
 
-      should_not_assign_to :daterange
+      should_not_assign_to(:daterange)
       should_assign_to(:duration) { 0 }
       should_assign_to(:searchable) { true }
+      should_not_assign_to(:waitlist)
 
       should "set services collection" do
         assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
@@ -166,26 +175,62 @@ class OpeningsControllerTest < ActionController::TestCase
     end
 
     context "with a specific service" do
-      setup do
-        get :index, :service_id => @haircut.id, :duration => @haircut.duration, :when => 'this-week', :time => 'anytime'
+      context "as guest" do
+        setup do
+          get :index, :service_id => @haircut.id, :duration => @haircut.duration, :when => 'this-week', :time => 'anytime'
+        end
+
+        should_assign_to(:service) { @haircut}
+
+        should "have 'anyone' user" do
+          assert_true assigns(:provider).anyone?
+        end
+
+        should_assign_to(:daterange)
+        should_assign_to(:duration) { 30 * 60 }
+        should_assign_to(:searchable) { true }
+        should_not_assign_to(:waitlist)
+
+        should "have 'add waitlist' link" do
+          assert_select "a#add_waitlist", 1
+        end
+
+        should "set services collection" do
+          assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
+        end
+
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
       end
+      
+      context "as company manager" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          get :index, :service_id => @haircut.id, :duration => @haircut.duration, :when => 'this-week', :time => 'anytime'
+        end
 
-      should_assign_to(:service) { @haircut}
+        should_assign_to(:service) { @haircut}
 
-      should "have 'anyone' user" do
-        assert_true assigns(:provider).anyone?
+        should "have 'anyone' user" do
+          assert_true assigns(:provider).anyone?
+        end
+
+        should_assign_to(:daterange)
+        should_assign_to(:duration) { 30 * 60 }
+        should_assign_to(:searchable) { true }
+        should_assign_to(:waitlist)
+
+        should "have 'add waitlist' link" do
+          assert_select "a#add_waitlist", 1
+        end
+
+        should "set services collection" do
+          assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
+        end
+
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
       end
-
-      should_assign_to(:daterange)
-      should_assign_to(:duration) { 30 * 60 }
-      should_assign_to(:searchable) { true }
-
-      should "set services collection" do
-        assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
-      end
-
-      should_respond_with :success
-      should_render_template 'openings/index.html.haml'
     end
   end
 

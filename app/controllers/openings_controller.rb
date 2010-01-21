@@ -132,7 +132,7 @@ class OpeningsController < ApplicationController
     # logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
 
     # show waitlist link if the user is logged in
-    if logged_in?
+    if current_user
       # build waitlist object, and a child time range object
       @waitlist = Waitlist.new(:provider => @provider, :service => @service, :customer => current_user || nil)
       @waitlist.waitlist_time_ranges.build

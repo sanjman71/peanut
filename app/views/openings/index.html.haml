@@ -79,7 +79,7 @@
     .span-15.last
       -# show waitlist text here if there are no available timeslots
       - if @free_capacity_slots.blank?
-        %h4.bigger= link_to "Notify me if there is an opening", @waitlist_path, :class => 'notify waitlist'
+        %h4.bigger= link_to "Notify me if there is an opening", '', :class => 'notify waitlist', :id => 'add_waitlist'
         %h4== or
         %h4.bigger== Use the search bar to the right to change your search parameters and try again.
 
