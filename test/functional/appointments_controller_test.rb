@@ -109,7 +109,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       should_change("Appointment.count", :by => -1) { Appointment.count }
     end
-  
+
     context "new work appointment as guest" do
       setup do
         # book a haircut with johnny during his free time
@@ -117,24 +117,24 @@ class AppointmentsControllerTest < ActionController::TestCase
             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
             :duration => @haircut.duration, :mark_as => 'work'
       end
-  
+
       should "show rpx login" do
         assert_select 'div#rpx_login', true
       end
-  
+
       should "show (hidden) peanut login" do
         assert_select 'div.hide#peanut_login', true
       end
-  
+
       should "not show customer reminder options" do
         assert_select "input#reminder_customer_on", 0
         assert_select "input#reminder_customer_off", 0
       end
-  
+
       should_respond_with :success
       should_render_template 'appointments/new.html.haml'
     end
-  
+
     context "new work appointment as customer" do
       context "with no email address" do
         setup do
@@ -858,8 +858,8 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
       end
     end
-  
-    context "with appointment reminders" do
+
+    context "with appointment customer reminders" do
       context "turned on" do
         setup do
           # create work appointment as company manager
@@ -869,12 +869,13 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '1'}
         end
-  
-        should "set appointment reminders on" do
-          assert_equal 1, assigns(:appointment).preferences[:reminder_customer].to_i
+
+        should "set appointment customer reminder to 1" do
+          @appointment = Appointment.find(assigns(:appointment).id)
+          assert_equal 1, @appointment.preferences[:reminder_customer].to_i
         end
       end
-  
+
       context "turned off" do
         setup do
           # create work appointment as company manager
@@ -884,9 +885,10 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '0'}
         end
-  
-        should "set appointment reminders off" do
-          assert_equal 0, assigns(:appointment).preferences[:reminder_customer].to_i
+
+        should "set appointment customer reminder to 0" do
+          @appointment = Appointment.find(assigns(:appointment).id)
+          assert_equal 0, @appointment.preferences[:reminder_customer].to_i
         end
       end
     end
