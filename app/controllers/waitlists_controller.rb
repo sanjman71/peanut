@@ -48,7 +48,7 @@ class WaitlistsController < ApplicationController
     # initialize provider, service
     @provider = find_provider_from_params || User.anyone
     @service  = current_company.services.find(params[:service_id])
-    @customer = current_user
+    @customer = current_user || nil
 
     case
     when @customer.blank?
@@ -58,7 +58,7 @@ class WaitlistsController < ApplicationController
     else
       @customer_signup = nil
     end
-    
+
     # build waitlist object, and one child time range object
     @waitlist = Waitlist.new(:provider => @provider, :service => @service, :customer => @customer)
     @waitlist.waitlist_time_ranges.build

@@ -48,7 +48,7 @@ class WaitlistsControllerTest < ActionController::TestCase
     context "as anonymous user" do
       setup do
         # stub current user
-        @controller.stubs(:current_user).returns(nil)
+        @controller.stubs(:current_user).returns(false)
         get :new, :service_id => @haircut.id, :provider_id => @johnny.id, :provider_type => 'users'
       end
 
