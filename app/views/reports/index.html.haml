@@ -9,41 +9,41 @@
 
 - form_for(User.new, :url => route_reports_path, :method => :post, :html => {:id => 'report_form'}) do |f|
 
-  .span-15.prepend-1.last#report_filter{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== Filter by:
-    .span-12.last.padding-bottom-10
-      = select_tag('filter', options_for_select(@filters), :id => 'report_filter', :style => "width: 175px; align: top; font-size: 1.2em;")
+  .span-15.prepend-1.last.padding-bottom-10#report_filter
+    .span-4.label.block
+      %h4.bigger.block.bottom== Filter by:
+    .span-11.last
+      = select_tag('filter', options_for_select(@filters), :id => 'report_filter', :class => 'big top')
 
-  .span-15.prepend-1.last.hide.report_filter#report_provider{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== Provider:
-    .span-12.last.padding-bottom-10
-      = select_tag('report[provider]', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@sel_provider.tableize}/#{@sel_provider.id}"), :style => "width: 175px; align: top; font-size: 1.2em;")
+  .span-15.prepend-1.last.padding-bottom-10.hide.report_filter#report_provider
+    .span-4.label.block
+      %h4.bigger.block.bottom== Provider:
+    .span-11.last.padding-bottom-10
+      = select_tag('report[provider]', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@sel_provider.tableize}/#{@sel_provider.id}"), :class => 'big top')
 
-  .span-15.prepend-1.last.hide.report_filter#report_service{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== Service:
-    .span-12.last.padding-bottom-10
-      = select_tag('report[service]', options_for_select(@services.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@sel_service.tableize}/#{@sel_service.id}"), :style => "width: 175px; align: top; font-size: 1.2em;")
+  .span-15.prepend-1.last.padding-bottom-10.hide.report_filter#report_service
+    .span-4.label.block
+      %h4.bigger.block.bottom== Service:
+    .span-11.last.padding-bottom-10
+      = select_tag('report[service]', options_for_select(@services.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@sel_service.tableize}/#{@sel_service.id}"), :class => 'big top')
 
-  .span-15.prepend-1.last#report_appointment_state{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== Appointments:
-    .span-12.last.padding-bottom-10
-      = select_tag('report[state]', options_for_select(Appointment.aasm_states_for_select_with_all), :style => "width: 175px; align: top; font-size: 1.2em;")
+  .span-15.prepend-1.last.padding-bottom-10#report_appointment_state
+    .span-4.label.block
+      %h4.bigger.block.bottom== Appointments:
+    .span-11.last
+      = select_tag('report[state]', options_for_select(Appointment.aasm_states_for_select_with_all), :class => 'big top')
 
-  .span-15.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== Start Date:
-    .span-12.last.padding-bottom-10
-      = text_field_tag 'report[start_date]', '', :class => 'report datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;', :autocomplete => 'off'
+  .span-15.prepend-1.last.padding-bottom-10
+    .span-4.label.block
+      %h4.bigger.block.bottom== Start Date:
+    .span-11.last.padding-bottom-10
+      = text_field_tag 'report[start_date]', '', :class => 'report datepicker big top', :style => 'padding: 3px;', :size => 12, :autocomplete => 'off'
 
-  .span-15.prepend-1.last{:style => 'font-size: 1.3em; margin-bottom: 5px;'}
-    .span-3.padding-top-10.text-align-right
-      %h5== End Date:
-    .span-12.last.padding-bottom-10
-      = text_field_tag 'report[end_date]', '', :class => 'report datepicker', :style => 'width: 90px; font-size: 1.0em; padding: 3px;', :autocomplete => 'off'
+  .span-15.prepend-1.last.padding-bottom-10
+    .span-4.label.block
+      %h4.bigger.block.bottom== End Date:
+    .span-11.last.padding-bottom-10
+      = text_field_tag 'report[end_date]', '', :class => 'report datepicker big top', :style => 'padding: 3px;', :size => 12, :autocomplete => 'off'
 
-  .span-4.prepend-2.append-10.last
-    %h4= link_to 'Generate', '', :class => 'rounded button color', :id => 'report_submit'
+  .span-4.prepend-1.append-10.last
+    %h4= link_to 'Generate', '', :class => 'rounded button color big', :id => 'report_submit'
