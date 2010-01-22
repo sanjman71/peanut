@@ -25,7 +25,7 @@ $.fn.init_toggle_user_company_manager = function() {
 }
 
 $.fn.init_user_create_submit = function() {
-  $("input#user_create_submit").click(function() {
+  $("form#add_user_form").submit(function() {
     var user_name     = $("input#user_name").attr('value');
     var name_required = $("input#user_name").hasClass('required');
 
@@ -59,8 +59,49 @@ $.fn.init_user_create_submit = function() {
       return false;
     }
 
-    return true;
+    // serialize form
+    data = $(this).serialize();
+
+    if (this.action.match(/.json$/)) {
+      // json request, handle json response
+      $.post(this.action, data, function(data) { add_user_response(data); }, "json");
+    } else {
+      // js, html request
+      $.post(this.action, data, null, "script");
+    }
+
+    // show progress
+    $(this).find("div#submit").hide();
+    $(this).find("div#progress").show();
+    return false;
   })
+  
+  $("a#add_user_cancel_dialog").click(function() {
+    // click on return dialog link
+    $("a#add_user_return_dialog").click();
+    return false;
+  })
+  
+  $("a#add_user_return_dialog").click(function() {
+    // close this dialog, open dialog specified with 'dialog' attribute
+    $(this).parents(".dialog").dialog("close");
+    var dialog = $(this).attr('dialog');
+    $(dialog).dialog("open");
+    return false;
+  })
+}
+
+// handle add user response:
+// - on success, response should have user hash containing id and name
+function add_user_response(json) {
+  //alert("user created: " + json.user.name);
+
+  // hide progress, show submit
+  $("form#add_user_form").find("div#progress").hide();
+  $("form#add_user_form").find("div#submit").show();
+
+  // click the return dialog link
+  $("a#add_user_return_dialog").click();
 }
 
 $.fn.init_user_update_submit = function() {
@@ -122,6 +163,17 @@ $.fn.init_manager_reset_password = function() {
   })
 }
 
+$.fn.init_user_add_dialog = function() {
+  // initialize add free time dialog
+  $("div.dialog#add_user_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 750, height: 475, open: before_open_user_add_dialog,
+                                           show: 'fadeIn(slow)', title: $("div.dialog#add_user_dialog").attr('title') });
+}
+
+function before_open_user_add_dialog(event, ui) {
+  // clear all form input fields
+  $("div.dialog#add_user_dialog :input").not(':button, :submit, :reset, :hidden').val('');
+}
+
 function check_user_password_fields(password_required) {
   // check that password is visible
   if (!$("input#user_password").is(":visible")) {
@@ -149,16 +201,16 @@ function check_user_password_fields(password_required) {
 }
 
 function check_user_email_fields(id) {
-  var user_email      = $("#"+id).find("input#user_email").attr('value');
-  var email_required  = $("#"+id).find("input#user_email").hasClass('required');
+  var email_address   = $("#"+id).find("input#email_address").attr('value');
+  var email_required  = $("#"+id).find("input#email_address").hasClass('required');
 
-  if (email_required && (user_email == '')) {
+  if (email_required && (email_address == '')) {
     // email is required
     alert("Please enter a user email");
     return false;
   }
 
-  if ((user_email != '') && (validate_email_address(user_email) == false)) {
+  if ((email_address != '') && (validate_email_address(email_address) == false)) {
     // email address is invalid
     alert("Please enter a valid email address");
     return false;
@@ -207,4 +259,5 @@ $(document).ready(function() {
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
   $(document).init_manager_reset_password();
+  $(document).init_user_add_dialog();
 })

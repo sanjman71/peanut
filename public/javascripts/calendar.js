@@ -2,7 +2,7 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div#add_appointment_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 325, show: 'fadeIn(slow)', title: $("div#add_appointment_dialog").attr('title') });
+  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 325, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
@@ -15,10 +15,20 @@ $.fn.init_add_appointment = function() {
     $("form#add_appointment_form input#customer_name").val('');
     $("form#add_appointment_form input#customer_id").val('');
     // open dialog
-    $("div#add_appointment_dialog").dialog('open');
+    $("div.dialog#add_appointment_dialog").dialog('open');
     return false;
   })
 
+  $("a#calendar_add_customer").click(function() {
+    // close this dialog
+    $("div.dialog#add_appointment_dialog").dialog('close');
+    // show add user dialog, set return dialog link, disable escape
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
+    $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
+    $("div.dialog#add_user_dialog").dialog('open');
+    return false;
+  })
+  
   $("form#add_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
     var service_id      = $("form#add_appointment_form select#service_id").val();
@@ -77,7 +87,7 @@ $.fn.init_add_appointment = function() {
 $.fn.init_add_single_free_time = function() {
   
   // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_time_dialog").attr('title') });
+  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_time_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {

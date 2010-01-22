@@ -41,7 +41,7 @@
           .span-4
             %h3.text-align-right.padding-top-10== Email:
           .span-8.last
-            = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'user_email'
+            = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'email_address'
 
     -# phone nested field
     - user_form.fields_for :phone_numbers do |phone_form|

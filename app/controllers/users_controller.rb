@@ -151,6 +151,10 @@ class UsersController < ApplicationController
         format.html { render(:template => template) }
       else
         format.html { redirect_back_or_default(@redirect_path) }
+        format.json do
+          flash.discard
+          render(:json => @user.to_json(:only => [:id, :name]))
+        end
       end
     end
   end

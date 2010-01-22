@@ -1,6 +1,6 @@
 - title(@title || "Schedule")
 - stylesheet('appointments', 'calendar', 'jquery.timepickr', 'datePicker', 'jquery.autocomplete')
-- javascript('appointments', 'calendar', 'waitlists', 'messages', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
+- javascript('appointments', 'calendar', 'waitlists', 'users', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
 - prev_next_links = build_calendar_prev_next_links(@provider, @daterange)
 
 .span-16
@@ -75,10 +75,14 @@
   .span-7.prepend-1.last
     = render(:partial => 'schedule_help')
 
--#.add_appointment_free_time.span-7.last
--# show add free time form if the user can update the providers calendar or update company calendars
+-# special actions require special privileges
 - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
-  -#= render(:partial => 'calendar/add_appointment', :locals => {:provider => @provider, :services => @services})
-  -#= render(:partial => 'calendar/add_free_time', :locals => {:provider => @provider, :service => @free_service, :daterange => @daterange})
+  -# hidden forms for add appointment, add free time, and add customer
   = render(:partial => 'calendar/add_appointment_dialog', :locals => {:provider => @provider, :services => @services})
   = render(:partial => 'calendar/add_free_time_dialog', :locals => {:provider => @provider, :service => @free_service})
+  - @customer = User.new
+  - @customer.email_addresses.build
+  - @customer.phone_numbers.build
+  = render(:partial => 'users/user_form_dialog', |
+           :locals => {:user => @customer, :role => 'company customer', :submit_url => customer_create_format_path(:format => :json), :title => 'Add Customer', :submit_text => 'Create'}) |
+

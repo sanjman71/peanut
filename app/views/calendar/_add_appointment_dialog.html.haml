@@ -36,7 +36,7 @@
 
       - if has_privilege?('create users', current_company)
         .span-8.prepend-3.last
-          %h4.bottom.small= link_to 'Add a new customer', customer_new_path, :class => 'customer add'
+          %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'calendar_add_customer'
 
       .span-8.last.padding-top-10.padding-bottom-10
         #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_appointment'

@@ -49,6 +49,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.customer_new    '/customers/new',       :controller => 'users', :action => 'new', :role => 'company customer', :conditions => {:method => :get}
   map.customer_create '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
+  map.customer_create_format '/customers/create.:format', :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
   map.customer_edit   '/customers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company customer', :conditions => {:method => :get}
   map.customer_update '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
   map.customer_delete '/customers/:id',       :controller => 'users', :action => 'destroy', :role => 'company customer', :conditions => {:method => :delete}

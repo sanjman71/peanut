@@ -90,7 +90,7 @@ class CustomersControllerTest < ActionController::TestCase
       end
     end
 
-    context "with an ajax search for 'boo'" do
+    context "with a ajax js search for 'boo'" do
       setup do
         # as company manager
         @controller.stubs(:current_user).returns(@owner)

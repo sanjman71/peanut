@@ -33,10 +33,10 @@
   - f.fields_for :email_addresses do |email_form|
     .span-20.last.email_address[email_form.object]{:class => email_form.object.new_record? ? 'hide' : ''}
       .span-4.text-align-right
-        %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_email", "Email:"
+        %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "email_address", "Email:"
       .span-16.last
         -# not allowed to edit rpx user emails
-        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'user_email', :disabled => !email_form.object.changeable?
+        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'email_address', :disabled => !email_form.object.changeable?
         - markers = []
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address

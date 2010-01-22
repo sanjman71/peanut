@@ -1,0 +1,77 @@
+-# if there is a user logged in, this user is being created by somebody else as their proxy
+- creator     = current_user ? "user" : "anonymous"
+-# check for an invitation
+- invitation  = nil unless local_assigns[:invitation]
+-# check for role
+- role        = nil unless local_assigns[:role]
+
+-# email, phone is always optional
+- user_phone_flag = 'optional'
+- user_email_flag = 'optional'
+
+.span-15.last.dialog.hide#add_user_dialog{:title => title}
+  -# show any user errors
+  - unless user.errors.blank?
+    .span-10.prepend-1.last.notice
+      = error_messages_for('user', :header_message => nil)
+
+  - form_for("user", user, :url => submit_url, :html => {:id => 'add_user_form'}) do |user_form|
+    = hidden_field_tag 'creator', creator
+    - if invitation
+      = hidden_field_tag 'invitation_token', invitation.token
+    
+    -# name field
+    .span-15.last.padding-bottom-10
+      .span-3.padding-top-10.label
+        %h4.bottom.block== Name:
+      .span-12.last
+        = user_form.text_field :name, :class => 'title big required', :autocomplete => 'off'
+
+    -# email nested field
+    - user_form.fields_for :email_addresses do |email_form|
+      .span-15.last.email_address[email_form.object]
+        .span-3.padding-top-10.label
+          %h4.bottom.block== Email:
+        .span-12.last
+          = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :id => 'email_address', :autocomplete => 'off'
+          %em= user_email_flag
+
+    -# phone nested field
+    - user_form.fields_for :phone_numbers do |phone_form|
+      .span-15.last.phone_number[phone_form.object]
+        .span-15.last
+          .span-3.padding-top-10.label
+            %h4.bottom.block== Phone:
+          .span-12.last
+            = phone_form.text_field :address, :class => ['title', 'big', user_phone_flag].join(' '), :id => 'phone_address', :autocomplete => 'off'
+            %em= user_phone_flag
+        .span-15.last.padding-bottom-10
+          .span-3.padding-top-10.label
+            %h4.bottom.block== Phone Name:
+          .span-12.last
+            = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
+            
+    -# password fields are not shown if the creator is logged in
+    .span-15.last.padding-bottom-10{:class => (creator == "user") ? '' : ''}
+      .span-3.padding-top-10.label
+        %h4.bottom.block== Password:
+      .span-12.last
+        = user_form.password_field :password, :class => 'title big required', :autocomplete => 'off'
+        
+    .span-15.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
+      .span-3.padding-top-10.label
+        %h4.bottom.block.small== Confirm password:
+      .span-12.last
+        = user_form.password_field :password_confirmation, :class => 'title big required'
+        
+    -# return, submit links
+    .span-15.last.padding-bottom-10
+      #return.hide
+        -# navigate back to caller dialog, always hidden
+        = link_to 'Return', '', :id => 'add_user_return_dialog', :dialog => ''
+      #submit
+        = submit_tag submit_text, :name => nil, :class => 'big', :id => 'add_user_submit'
+        == or
+        = link_to 'Cancel', '', :id => 'add_user_cancel_dialog'
+      #progress.hide
+        %h3.submitting== Adding ...
