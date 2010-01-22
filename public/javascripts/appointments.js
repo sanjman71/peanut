@@ -20,7 +20,7 @@ $.fn.init_autocomplete_customers = function() {
           success: function(data) {
             $.each(data, function(i, item) {
               // add customer data as a hash with keys 'name' and 'id'
-              customers.push({name:item.user.name, id:item.user.id});
+              customers.push({name:item.name, id:item.id});
             })
             
             // init autocomplete field with customer data
