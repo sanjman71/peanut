@@ -171,17 +171,8 @@ $.fn.init_confirm_appointment = function() {
 
   $("form#confirm_appointment_form").submit(function() {
     // validate customer signup
-    /*
     var customer_ok = $(document).validate_appointment_customer();
     if (customer_ok == false) {
-      return false;
-    }
-    */
-
-    // validate customer id
-    var customer_id = $("input#customer_id").val();
-    if (!customer_id) {
-      alert("Please select a customer");
       return false;
     }
 
