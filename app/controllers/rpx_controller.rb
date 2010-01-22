@@ -20,6 +20,11 @@ class RpxController < ApplicationController
       redirect_to login_path and return
     end
 
+    # set session return_to value if it was specified
+    @return_to = params[:return_to]
+    session[:return_to] = @return_to unless @return_to.blank?
+
+    # check if its for a user we already know about
     @user = User.with_identifier(@data[:identifier]).first
     
     if @user.blank?
@@ -34,19 +39,19 @@ class RpxController < ApplicationController
 
       if @user.valid?
         # create user session
-        redirect_path = session_initialize(@user)
+        @redirect_path = session_initialize(@user)
       end
 
       if @user.valid?
-        redirect_back_or_default(redirect_path) and return
+        redirect_back_or_default(@redirect_path) and return
       else
         flash[:error] = @user.errors.full_messages.join("<br/>")
         render(:template => "sessions/new") and return
       end
     else
       # create user session
-      redirect_path = session_initialize(@user)
-      redirect_back_or_default(redirect_path) and return
+      @redirect_path = session_initialize(@user)
+      redirect_back_or_default(@redirect_path) and return
     end
   end
 

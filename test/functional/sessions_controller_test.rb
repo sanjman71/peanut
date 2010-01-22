@@ -31,10 +31,20 @@ class SessionsControllerTest < ActionController::TestCase
       end
       
       should_not_assign_to(:user)
-  
+      
       should_redirect_to("root path") { "/" }
     end
     
+    context "with return_to" do
+      setup do
+        post :create, {:email => 'user@walnut.com', :password => 'user', :return_to => "/users/#{@user.id}/edit"}
+      end
+  
+      should_not_assign_to(:user)
+      should_assign_to(:return_to)
+
+      should_redirect_to("return_to path") { "/users/#{@user.id}/edit" }
+    end
   end
 
 end
