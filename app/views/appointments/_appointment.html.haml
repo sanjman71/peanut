@@ -74,11 +74,11 @@
               %span{:style => 'font-size: 0.8em; color: #333333;'}== or
               %span= link_to 'Change Customer', '', :id => 'hide_customer_default', :class => 'admin'
           %span#customer_search.hide
-            = label_tag "customer_search_text", "Find a customer by typing their name", :class => '', :style => 'font-weight: bold; color: #5500BB; font-size: 0.8em;'
+            = label_tag "customer_search_text", "Find a customer by typing their name"
             %br
-            = text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => customers_path)
+            = text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => customers_path(:format => :json))
             %br
             = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
-            %span{:style => 'font-size: 0.7em;'}== or
-            = link_to 'Create a New Customer', customer_new_path(:return_to => request.request_uri), :class => 'admin'
-            = hidden_field_tag :customer_search_id, 0
+            -#%span{:style => 'font-size: 0.7em;'}== or
+            -#= link_to 'Create a New Customer', customer_new_path(:return_to => request.request_uri), :class => 'admin'
+            -#= hidden_field_tag :customer_search_id, 0

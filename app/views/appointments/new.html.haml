@@ -27,7 +27,8 @@
   -# confirm appointment
   .span-8.prepend-1.last
     #confirm_appointment
-      = link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em; color: #FFFFFF; font-weight: normal;'
+      = submit_tag 'Confirm Appointment', :class => 'big', :id => 'confirm_appointment', :name => nil
+      -#= link_to "Confirm", '', :class => 'rounded button color', :id => 'confirm_appointment_submit', :style => 'font-size: 1.5em; color: #FFFFFF; font-weight: normal;'
       %span#cancel{:style => 'font-size: 1.0em;'}
         == &nbsp;or&nbsp;
         = link_to 'Cancel', openings_path

@@ -13,7 +13,7 @@ $.fn.init_autocomplete_customers = function() {
   // post json, override global ajax beforeSend defined in application.js
   $.ajax({
           type: "GET",
-          url: $("#customer_search_text").attr("url"),
+          url: $("input#customer_search_text").attr("url"),
           dataType: "json",
           async:false,
           beforeSend: function(xhr) {xhr.setRequestHeader("Accept", "application/json");},
@@ -22,10 +22,10 @@ $.fn.init_autocomplete_customers = function() {
               // add customer data as a hash with keys 'name' and 'id'
               customers.push({name:item.name, id:item.id});
             })
-            
+
             // init autocomplete field with customer data
-            $("#customer_search_text").autocomplete(customers, 
-                                                   {matchContains:true, minChars:0, formatItem: function(item) {return item.name}});
+            $("input#customer_search_text").autocomplete(customers,
+                                            {matchContains:true, minChars:0, mustMatch:true, formatItem: function(item) {return item.name}});
           }
         });
 }
@@ -39,11 +39,17 @@ $.fn.show_appointment_customer = function() {
 }
 
 $.fn.init_change_appointment_customer = function() {
+
   // called when the user selects a customer from the autocomplete list
-  $("#customer_search_text").result(function(event, data, formatted) {
+  $("input#customer_search_text").result(function(event, data, formatted) {
+    if (!data) {
+      // no entry selected
+      return;
+    }
+
     // change the customer name and id
-    $("#customer_name").html(data.name);
-    $("#customer_id").attr("value", data.id);
+    $("span#customer_name").html(data.name);
+    $("input#customer_id").attr("value", data.id);
     $(document).show_appointment_customer();
   })
 
@@ -163,23 +169,33 @@ $.fn.init_confirm_appointment = function() {
     return false;
   })
 
-  $("#confirm_appointment_submit").click(function() {
+  $("form#confirm_appointment_form").submit(function() {
     // validate customer signup
+    /*
     var customer_ok = $(document).validate_appointment_customer();
-
-    if (customer_ok == true) {
-      // post the appointment confirmation
-      $.post($("#confirm_appointment_form").attr("action"), $("#confirm_appointment_form").serialize(), null, "script");
-      // show progress message
-      $("div#confirm_appointment").replaceWith("<h3 class='submitting' style='text-align: center;'>Confirming Appointment...</h3>");
+    if (customer_ok == false) {
+      return false;
     }
-    
+    */
+
+    // validate customer id
+    var customer_id = $("input#customer_id").val();
+    if (!customer_id) {
+      alert("Please select a customer");
+      return false;
+    }
+
+    // post the appointment confirmation
+    $.post(this.action, $(this).serialize(), null, "script");
+    // show progress message
+    $("div#confirm_appointment").replaceWith("<h3 class='submitting' style='text-align: center;'>Confirming Appointment...</h3>");
     return false;
   })
 }
 
+/*
 $.fn.init_complete_appointment = function() {
-  $("#complete_appointment").click(function() {
+  $("a#complete_appointment").click(function() {
     $.post($(this).attr("href"), {}, null, "script");
     // show progress bar
     $(this).hide();
@@ -187,6 +203,7 @@ $.fn.init_complete_appointment = function() {
     return false;
   })
 }
+*/
 
 $.fn.init_send_message = function() {
   $("#send_message_link").click(function() {
@@ -235,7 +252,7 @@ $(document).ready(function() {
   $(document).init_select_appointments_customer();
   $(document).init_change_appointment_customer();
   $(document).init_confirm_appointment();
-  $(document).init_complete_appointment();
+  //$(document).init_complete_appointment();
   $(document).init_send_message();
   $(document).init_reschedule_appointment();
 })
