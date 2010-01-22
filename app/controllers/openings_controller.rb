@@ -141,6 +141,9 @@ class OpeningsController < ApplicationController
       # @waitlist_path = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id)
     end
 
+    # initialize customer
+    @customer = current_user || nil
+
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
 

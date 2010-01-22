@@ -1,0 +1,48 @@
+- return_to         = nil if local_assigns[:return_to].blank?
+- rpx_return_url    = rpx_login_url + (return_to ? "?return_to=#{return_to}" : '')
+- login_return_path = login_path + (return_to ? "?return_to=#{return_to}" : '')
+
+.span-15.prepend-1.last.dialog.hide#rpx_login_dialog{:title => "Login"}
+  .span-15.last.padding-bottom-20#intro
+    %h4.bottom= intro
+    
+  -# rpx login
+  .span-15#rpx_login_form
+    .span-15.last.padding-bottom-10
+      %h4.bottom== You can login using your existing account with a provider below
+
+    -# rpx login
+    .span-15.last
+      -# rpx login form
+      %h4.bigger#rpx_login_loading== Login Form Loading ...
+      = RPXNow.embed_code('walnut', rpx_return_url)
+
+    .span-15.last.padding-top-10
+      == Click #{link_to 'here', '', :id => 'show_walnut_login_form'} to login with your email and password
+
+  -# walnut login
+  .span-15.last#walnut_login_form.hide
+    -# walnut login header
+    .span-15.last.padding-bottom-20
+      %h4.bottom== Please enter your email and password
+    
+    -# walnut login
+    .span-15.last
+      - form_tag(login_return_path, :id => 'login_user_form') do
+        .span-15.last.padding-bottom-10
+          .span-3.label.padding-top-10
+            %h4.block.bottom== Email:
+          .span-12.last
+            = text_field_tag 'email', '', :class => 'title big required', :id => 'email_address'
+        .span-15.last.padding-bottom-5
+          .span-3.label.padding-top-10
+            %h4.block.bottom== Password:
+          .span-12.last
+            = password_field_tag 'password', nil, :class => 'title big required', :id => 'user_password'
+        .span-15.last
+          = submit_tag 'Log in', :name => nil, :class => 'big'
+
+        .span-12.prepend-3.last
+          == Click #{link_to 'here', '', :id => 'show_rpx_login_form'} to login with an existing account
+  
+

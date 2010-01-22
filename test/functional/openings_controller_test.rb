@@ -189,6 +189,7 @@ class OpeningsControllerTest < ActionController::TestCase
         should_assign_to(:daterange)
         should_assign_to(:duration) { 30 * 60 }
         should_assign_to(:searchable) { true }
+        should_not_assign_to(:customer)
         should_not_assign_to(:waitlist)
 
         should "have 'add waitlist' link" do
@@ -199,6 +200,14 @@ class OpeningsControllerTest < ActionController::TestCase
           assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
         end
 
+        should "have rpx login dialog" do
+          assert_select "div#rpx_login_dialog", 1
+        end
+
+        should "not have confirm appointment dialog" do
+          assert_select "div#confirm_appointment_dialog", 0
+        end
+        
         should_respond_with :success
         should_render_template 'openings/index.html.haml'
       end
@@ -218,6 +227,7 @@ class OpeningsControllerTest < ActionController::TestCase
         should_assign_to(:daterange)
         should_assign_to(:duration) { 30 * 60 }
         should_assign_to(:searchable) { true }
+        should_assign_to(:customer) { @owner }
         should_assign_to(:waitlist)
 
         should "have 'add waitlist' link" do
@@ -226,6 +236,14 @@ class OpeningsControllerTest < ActionController::TestCase
 
         should "set services collection" do
           assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
+        end
+
+        should "not have rpx login dialog" do
+          assert_select "div#rpx_login_dialog", 0
+        end
+
+        should "have confirm appointment dialog" do
+          assert_select "div#confirm_appointment_dialog", 1
         end
 
         should_respond_with :success

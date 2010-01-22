@@ -174,6 +174,40 @@ function before_open_user_add_dialog(event, ui) {
   $("div.dialog#add_user_dialog :input").not(':button, :submit, :reset, :hidden').val('');
 }
 
+$.fn.init_user_login_dialog = function() {
+
+  // initialize login dialog
+  $("div.dialog#rpx_login_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 650, height: 475, show: 'fadeIn(slow)',
+                                            title: $("div.dialog#rpx_login_dialog").attr('title') });
+
+  $("a#show_rpx_login_form").click(function() {
+    // hide walnut login, show rpx login
+    $("div#walnut_login_form").hide();
+    $("div#rpx_login_form").show();
+    return false;
+  })
+
+  $("a#show_walnut_login_form").click(function() {
+    // hide rpx login, show walnut login
+    $("div#rpx_login_form").hide();
+    $("div#walnut_login_form").show();
+    return false;
+  })
+  
+  $("form#login_user_form").submit(function() {
+    // validate login email
+    if (check_user_email_fields(this.id) == false) {
+      return false;
+    }
+    
+    return true;
+  })
+}
+
+$.fn.open_user_login_dialog = function() {
+  $("div.dialog#rpx_login_dialog").dialog('open');
+}
+
 function check_user_password_fields(password_required) {
   // check that password is visible
   if (!$("input#user_password").is(":visible")) {
@@ -260,4 +294,5 @@ $(document).ready(function() {
   $(document).init_user_create_submit();
   $(document).init_manager_reset_password();
   $(document).init_user_add_dialog();
+  $(document).init_user_login_dialog();
 })

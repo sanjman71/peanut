@@ -76,6 +76,7 @@ $.fn.init_search_when_toggle = function() {
 }
 
 // Note: deprecated
+/*
 $.fn.init_openings_sliders = function() {
   // show sliders on click
   $(".pick_time").click(function () {
@@ -117,6 +118,7 @@ $.fn.init_openings_sliders = function() {
     book_it.find("a").text("Book " + book_time);
   })
 }
+*/
 
 // Note: not currently used
 $.fn.init_openings_show_single_date = function() {
@@ -144,18 +146,45 @@ $.fn.init_openings_bookit = function() {
     // find selected datetime of this capacity slot
     var slot_id  = $(this).attr('slot_id');
     var datetime = $("div#" + slot_id + " select#slot_times :selected").val();
+    var provider = $("div#" + slot_id + " div.provider h4").text();
 
     // validate datetime
-    var datetime_regex = /^[0-9]{8,8}T[0-9]{6,6}$/;
-    if (datetime_regex.test(datetime) == false) {
+    var regex = /^([0-9]{8,8})T([0-9]{6,6})$/;
+    var match = datetime.match(regex);
+    if (!match) {
       alert("Please select a time");
       return false;
     }
 
-    // build url using datetime
-    var url = $(this).attr('url').replace(/datetime/, datetime);
-    $(this).attr('href', url);
-    return true;
+    // check confirm appointment form
+    var confirm_appointment_form = $("form#confirm_appointment_form").size();
+
+    if (confirm_appointment_form == 0) {
+      // open user login dialog
+      $(document).open_user_login_dialog();
+    } else {
+      // break datetime into date and time parts, and build datetime string
+      var date      = match[1];
+      var time      = match[2];
+      var dt_string = build_date_time_string(date, time);
+
+      // build post url using datetime
+      var url = $(this).attr('url').replace(/datetime/, datetime);
+
+      // set dialog action url
+      $("form#confirm_appointment_form").attr('action', url);
+
+      // set dialog datetime string
+      $("div.dialog#confirm_appointment_dialog #start_date_time").text(dt_string);
+
+      // set dialog provider
+      $("div.dialog#confirm_appointment_dialog #provider_name").text(provider);
+
+      // open confirm appointment dialog
+      $("div.dialog#confirm_appointment_dialog").dialog('open');
+    }
+
+    return false;
   })
 }
 
@@ -199,6 +228,14 @@ $.fn.init_openings_add_calendar_markings = function() {
   }
 }
 
+// confirm a work appointmenet
+$.fn.init_openings_confirm_appointmenet = function() {
+  // initialize confirm appointment dialog
+  $("div.dialog#confirm_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 325, show: 'fadeIn(slow)',
+                                                      title: $("div.dialog#confirm_appointment_dialog").attr('title') });
+
+}
+
 $.fn.init_openings_datepicker = function() {
   $(".openings.datepicker").datepicker({minDate: +0, maxDate: '+2m'});
 }
@@ -209,6 +246,7 @@ $(document).ready(function() {
   $(document).init_openings_add_calendar_markings();
   $(document).init_openings_datepicker();
   $(document).init_openings_bookit();
+  $(document).init_openings_confirm_appointmenet();
   // rounded corners
   $('#search_submit').corners("7px");
 })

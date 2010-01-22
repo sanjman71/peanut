@@ -17,7 +17,7 @@
       - if slot_start_times.size > 0
         .span-15.last.free.provider.slot{:class => cycle("", "shaded"), :id => slot_id, :count => slot_start_times.size}
           .span-15.last
-            .span-5.provider.padding-top-5
+            .span-5.provider.padding-top-5[provider]
               %h4{:style => 'margin-left: 5px;'}= provider.name
             .span-4.times
               = select_tag('slot_times', options_for_select(slot_start_times.collect{ |h| ["#{h[:time_12]} #{h[:time_ampm]}", "#{h[:date_t]}#{h[:time_sec]}"] }.insert(0, 'Select a time'), 'Select a time'))

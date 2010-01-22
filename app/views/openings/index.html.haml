@@ -1,6 +1,6 @@
 - title("Schedule an Apppointment")
 - stylesheet('appointments', 'calendar')
-- javascript('service_providers', 'openings', 'waitlists', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
+- javascript('service_providers', 'openings', 'appointments', 'waitlists', 'users', 'rpx', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
 
 -# service providers mapping services to providers
 .span-16.service_providers.hide
@@ -101,3 +101,14 @@
 
 -#.span-7.last.sidebar.instructions
   -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
+
+- if @searchable
+  - if !@customer.blank?
+    -# initialize appointment confirmation dialog if company is searchable and there is a valid customer
+    = render(:partial => "calendar/confirm_appointment_dialog", |
+             :locals => {:service => @service, :customer => @customer, :appointment => Appointment.new, :duration => @duration}) |
+  - else @customer.blank?
+    -# company is searchable, but customer is not logged in
+    = render(:partial => "sessions/rpx_login_dialog", |
+             :locals => {:intro => "Before confirming your appointment, we need to know who you are.", :return_to => request.path}) |
+

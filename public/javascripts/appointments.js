@@ -171,15 +171,23 @@ $.fn.init_confirm_appointment = function() {
 
   $("form#confirm_appointment_form").submit(function() {
     // validate customer signup
+    /*
     var customer_ok = $(document).validate_appointment_customer();
     if (customer_ok == false) {
+      return false;
+    }
+    */
+
+    var customer_id = $(this).find("input#customer_id");
+    if (!customer_id) {
+      alert("Please specify an appointment customer");
       return false;
     }
 
     // post the appointment confirmation
     $.post(this.action, $(this).serialize(), null, "script");
     // show progress message
-    $("div#confirm_appointment").replaceWith("<h3 class='submitting' style='text-align: center;'>Confirming Appointment...</h3>");
+    $(this).find("div#submit").replaceWith("<h3 class='submitting' style='text-align: center;'>Confirming Appointment...</h3>");
     return false;
   })
 }

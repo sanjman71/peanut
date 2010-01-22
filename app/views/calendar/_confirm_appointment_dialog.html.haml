@@ -1,0 +1,52 @@
+.span-12.prepend-1.last.dialog.hide#confirm_appointment_dialog{:title => "Confirm Your Appointment"}
+  - form_for(appointment, :url => '', :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
+    = hidden_field_tag :customer_id, customer.id
+
+    .confirm_appointment
+      -# what
+      .span-12.last.padding-bottom-10#what
+        .span-3.label
+          %h4.bottom.block== Service:
+        .span-9.last.data
+          %h4.bottom.block#service_name= service.name
+
+      -# with
+      .span-12.last.padding-bottom-10#with
+        .span-3.label
+          %h4.bottom.block== With:
+        .span-9.last.data
+          %h4.bottom.block#provider_name== &nbsp;
+
+      -# when
+      .span-12.last.padding-bottom-10#with
+        .span-3.label
+          %h4.bottom.block== When:
+        .span-9.last.data
+          %h4.bottom.block#start_date_time== &nbsp;
+
+      -# duration
+      .span-12.last.padding-bottom-10#with
+        .span-3.label
+          %h4.bottom.block== How Long:
+        .span-9.last.data
+          %h4.bottom.block#duration= Duration.to_words(duration)
+
+      -# reminders, for new appointments with customers with a primary email address
+      - if appointment.new_record? and (customer.andand.email_addresses_count.to_i > 0)
+        .span-12.last#reminder
+          .span-3.label
+            %h4.bottom.block== Reminder:
+          .span-9.last.data
+            = label_tag "reminder_on", "Yes"
+            = radio_button_tag "preferences_reminder_customer", "1", true, :id => 'reminder_on'
+            == &nbsp;
+            = label_tag "reminder_off", "No Thanks"
+            = radio_button_tag "preferences_reminder_customer", "0", false, :id => 'reminder_off'
+        .span-9.prepend-3.last.padding-bottom-10
+          %em.small== An email reminder will be sent 24 hours before the appointment
+
+      .span-12.last.padding-top-10.padding-bottom-10
+        #submit= submit_tag 'Confirm Appointment', :class => 'big', :id => 'confirm_appointment', :name => nil
+
+
+
