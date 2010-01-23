@@ -6,7 +6,9 @@ class CalendarControllerTest < ActionController::TestCase
   should_route :get, '/users/1/calendar',  :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1
   should_route :get, '/users/1/calendar.pdf',
                :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :format => 'pdf'
-  
+  should_route :get, '/users/1/calendar/when/today.pdf',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :when => 'today', :format => 'pdf'
+
   should_route :get, '/users/1/calendar/daily/01012009',
                :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'daily', :start_date => '01012009'
   should_route :get, '/users/1/calendar/weekly/01012009',
@@ -93,8 +95,6 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to(:today)
       should_not_assign_to(:start_date)
       should_assign_to :daterange, :class => DateRange
-      should_assign_to(:pdf_title) { "Next 2 Weeks PDF Version" }
-      should_assign_to(:pdf_link) { "/users/#{@johnny.id}/calendar.pdf" }
 
       should "show date range name" do
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
@@ -108,8 +108,16 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "div#send_message", 1
       end
 
-      should "have link to weekly pdf version" do
-        assert_select "a#pdf_version[href='%s']" % assigns(:pdf_link), assigns(:pdf_title)
+      should "have link to pdf today" do
+        assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
+      end
+
+      should "have link to pdf date range" do
+        assert_select "a#pdf_schedule_date_range", 1
+      end
+
+      should "have hidden pdf date range dialog" do
+        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
       end
 
       should_respond_with :success
@@ -132,8 +140,6 @@ class CalendarControllerTest < ActionController::TestCase
       should_not_assign_to(:when)
       should_assign_to(:start_date) { "20090101" }
       should_assign_to :daterange, :class => DateRange
-      should_assign_to(:pdf_title) { "Monthly starting on Jan 01 2009 PDF Version" }
-      should_assign_to(:pdf_link) { "/users/#{@johnny.id}/calendar/monthly/20090101.pdf" }
 
       should "show date range name and 'today' link" do
         date_range_name = assigns(:daterange).name(:with_dates => true)
@@ -148,8 +154,16 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "div#send_message", 1
       end
       
-      should "have link to monthly pdf version" do
-        assert_select "a#pdf_version[href='%s']" % assigns(:pdf_link), assigns(:pdf_title)
+      should "have link to pdf today" do
+        assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
+      end
+
+      should "have link to pdf date range" do
+        assert_select "a#pdf_schedule_date_range", 1
+      end
+
+      should "have hidden pdf date range dialog" do
+        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
       end
 
       should_respond_with :success

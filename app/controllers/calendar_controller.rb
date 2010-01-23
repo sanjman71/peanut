@@ -32,6 +32,7 @@ class CalendarController < ApplicationController
   end
   
   # GET /users/1/calendar
+  # GET /users/1/calendar/when/today
   # GET /users/1/calendar/when/next-week
   # GET /users/1/calendar/when/next-2-weeks/20090201
   # GET /users/1/calendar/range/20090101..20090201
@@ -119,14 +120,8 @@ class CalendarController < ApplicationController
       @stuff_by_day[date] = (@free_appointments_by_day[date] || []) + (@waitlists_by_day[date] || []) + (@orphan_appointments_by_day[date] || [])
     end
 
-    # setup pdf link info
-    @pdf_title  = "#{@daterange.name} PDF Version"
-    @pdf_link   = url_for(params.merge(:format => 'pdf', :only_path => true))
-
     # page title
-    @title      = "#{@provider.name.titleize} Schedule"
-
-    logger.debug("*** found #{@waitlists.size} waitlists over #{@daterange.days} days")
+    @title = "#{@provider.name.titleize} Schedule"
 
     respond_to do |format|
       format.html
@@ -142,7 +137,8 @@ class CalendarController < ApplicationController
       # reformat start_date, end_date strings, and redirect to index action
       start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
       end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
-      redirect_to url_for(:action => 'show', :start_date => start_date, :end_date => end_date, :subdomain => current_subdomain)
+      format      = params[:format]
+      redirect_to url_for(:action => 'show', :start_date => start_date, :end_date => end_date, :format => format)
     end
   end
 

@@ -336,6 +336,15 @@ function validate_phone_number(phone_number) {
   return true;
 }
 
+// returns true if the start date is < the end date
+// start_date => e.g. 01/01/2010
+// end_date => e.g. 02/01/2010
+function validate_start_before_end_date(start_date, end_date) {
+  start_date = new Date(start_date);
+  end_date   = new Date(end_date);
+  return ((start_date < end_date) ? true : false);
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();

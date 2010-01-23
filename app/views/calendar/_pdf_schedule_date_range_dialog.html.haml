@@ -1,0 +1,18 @@
+.span-11.prepend-1.last.dialog.hide#pdf_schedule_date_range_dialog{:title => "PDF Schedule for #{provider.name.titleize}"}
+  - form_for(Appointment.new, :url => calendar_search_path(:format => 'pdf'), :html => {:id => 'pdf_schedule_date_range_form'}) do |f|
+  
+    .span-11.last.padding-bottom-5.padding-top-10
+      .span-3.label
+        %h4.bottom.block== Start Date:
+      .span-8.last.data
+        = text_field_tag :start_date, '', :id => 'pdf_start_date', :class => 'pdf datepicker big', :autocomplete => 'off', :size => 12
+
+    .span-11.last.padding-bottom-5
+      .span-3.label
+        %h4.bottom.block== End Date:
+      .span-8.last.data
+        = text_field_tag :end_date, '', :id => 'pdf_end_date', :class => 'pdf datepicker big', :autocomplete => 'off', :size => 12
+
+    .span-11.last.padding-top-10
+      #submit= f.submit 'View PDF Schedule', :name => nil
+

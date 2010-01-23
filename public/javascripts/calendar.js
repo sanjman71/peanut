@@ -282,7 +282,7 @@ $.fn.init_add_calendar_markings = function() {
 }
 
 $.fn.init_schedule_datepicker = function() {
-  $(".datepicker").datepicker({minDate: 0, maxDate: '+3m'});
+  $(".pdf.datepicker").datepicker({minDate: '-1m', maxDate: '+3m'});
 }
 
 $.fn.init_schedule_timepicker = function() {
@@ -290,7 +290,45 @@ $.fn.init_schedule_timepicker = function() {
   $(".appointment.free.timepicker").timepickr({convention:12, left:0});
 }
 
-$.fn.init_send_pdf = function() {
+$.fn.init_schedule_pdf = function() {
+  // initialize show pdf date range dialog
+  $("div.dialog#pdf_schedule_date_range_dialog").dialog({modal: true, autoOpen: false, hide: 'slide', width: 475, height: 225, show: 'fadeIn(slow)', title: $("div#pdf_schedule_date_range_dialog").attr('title')})
+
+  $("a#pdf_schedule_date_range").click(function() {
+    // clear date form fields
+    $("div.dialog#pdf_schedule_date_range_dialog input.datepicker").val('');
+    // open dialog on click
+    $("div.dialog#pdf_schedule_date_range_dialog").dialog('open');
+    return false;
+  })
+
+  $("form#pdf_schedule_date_range_form").submit(function() {
+    // check start, end dates
+    var start_date  = $(this).find("input#pdf_start_date").attr('value');
+    var end_date    = $(this).find("input#pdf_end_date").val();
+  
+    if (!start_date) {
+      alert("Please enter a start date");
+      return false;
+    }
+
+    if (!end_date) {
+      alert("Please enter an end date");
+      return false;
+    }
+
+    if (validate_start_before_end_date(start_date, end_date) == false) {
+      alert("The start date must be before the end date");
+      return false;
+    }
+  
+    // close dialog
+    $("div.dialog#pdf_schedule_date_range_dialog").dialog('close');
+
+    return true;
+  })
+
+  /*
   $("#send_pdf_dialog").dialog({ autoOpen: false });
   
   $("#send_pdf").click(function() {
@@ -310,6 +348,7 @@ $.fn.init_send_pdf = function() {
     $(this).replaceWith("<h3 class ='submitting'>Sending...</h3>");
     return false;
   })
+  */
 }
 
 $.fn.init_autocomplete_customers = function() {
@@ -349,7 +388,7 @@ $(document).ready(function() {
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
   $(document).init_add_calendar_markings();
-  $(document).init_send_pdf();
+  $(document).init_schedule_pdf();
   $(document).init_autocomplete_customers();
 })
 

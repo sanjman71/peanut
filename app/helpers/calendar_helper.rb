@@ -9,7 +9,7 @@ module CalendarHelper
       if ((rt == 'daily') && (start_date.today?))
         url_params.merge!({:when => 'today'})
         # use when parameter
-        link  = link_to(rt.titleize, when_show_path(url_params), :class => klass)
+        link  = link_to(rt.titleize, calendar_when_path(url_params), :class => klass)
       else
         url_params.merge!({:range_type => rt, :start_date => start_date.to_s(:appt_schedule_day)})
         # use when parameter
@@ -47,8 +47,8 @@ module CalendarHelper
     next_when   = daterange.name.to_url_param
     next_start  = (daterange.end_at.in_time_zone + 1.day).to_s(:appt_schedule_day)
     prev_start  = (daterange.start_at.in_time_zone - daterange.days.days).to_s(:appt_schedule_day)
-    next_link   = link_to("Next", when_start_show_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => next_start))
-    prev_link   = link_to("Previous", when_start_show_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => prev_start))
+    next_link   = link_to("Next", calendar_when_start_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => next_start))
+    prev_link   = link_to("Previous", calendar_when_start_path(:provider_id => provider.id, :provider_type => provider.tableize, :when => next_when, :start_date => prev_start))
 
     Hash[:prev_link => prev_link, :next_link => next_link]
   end
@@ -78,7 +78,7 @@ module CalendarHelper
       next_date          = start_date + 1.day
       range_word         = "Day"
       today_word         = "Today"
-      today_link         = link_to("#{today_word}",  when_show_path(:when => 'today'))
+      today_link         = link_to("#{today_word}",  calendar_when_path(:when => 'today'))
     when 'weekly'
       prev_date          = start_date - 1.week
       next_date          = (start_date + 1.week < day_after_end) ? (start_date + 1.week) : day_after_end
