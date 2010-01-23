@@ -134,6 +134,9 @@ require "#{RAILS_ROOT}/lib/shared/array.rb"
 require "#{RAILS_ROOT}/lib/shared/string.rb"
 require "#{RAILS_ROOT}/lib/shared/time_calculations.rb"
 
+# Pull in the serialized_hash functionality
+require "#{RAILS_ROOT}/lib/shared/serialized_hash.rb"
+
 # RPX key
 RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
 
@@ -151,5 +154,3 @@ AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
 
-# Pull in the serialized_hash functionality
-require "#{RAILS_ROOT}/lib/shared/serialized_hash"
