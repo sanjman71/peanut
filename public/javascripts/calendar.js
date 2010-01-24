@@ -317,8 +317,8 @@ $.fn.init_schedule_pdf = function() {
       return false;
     }
 
-    if (validate_start_before_end_date(start_date, end_date) == false) {
-      alert("The start date must be before the end date");
+    if (validate_start_before_equal_end_date(start_date, end_date) == false) {
+      alert("The end date is earlier than the start date");
       return false;
     }
   

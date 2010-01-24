@@ -345,6 +345,12 @@ function validate_start_before_end_date(start_date, end_date) {
   return ((start_date < end_date) ? true : false);
 }
 
+function validate_start_before_equal_end_date(start_date, end_date) {
+  start_date = new Date(start_date);
+  end_date   = new Date(end_date);
+  return ((start_date <= end_date) ? true : false);
+}
+
 $(document).ready(function() {
   // initialize all ujs links
   $(document).init_ujs_links();
