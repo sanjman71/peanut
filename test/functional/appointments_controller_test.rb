@@ -395,7 +395,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @haircut.id, :customer_id => @customer.id, :force_add => 1}
+              :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
       # Should fail to add the appointment
@@ -417,7 +417,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@johnny)
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
-             :service_id => @haircut.id, :customer_id => @customer.id, :force_add => 1}
+             :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
       # Should succeed
@@ -439,7 +439,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@mary)
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
-             :service_id => @haircut.id, :customer_id => @customer.id, :force_add => 1}
+             :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
       should_not_change("Appointment.count") { Appointment.count }
@@ -484,7 +484,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @haircut.id, :customer_id => @customer.id, :force_add => 0}
+              :service_id => @haircut.id, :customer_id => @customer.id, :force => 0}
       end
     
       # Should fail to add the appointment
@@ -507,7 +507,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
-              :service_id => @haircut.id, :customer_id => @customer.id, :force_add => 1}
+              :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
       # Should succeed in adding the appointment
