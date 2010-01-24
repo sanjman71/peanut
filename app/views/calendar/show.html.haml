@@ -89,5 +89,8 @@
   = render(:partial => 'users/user_form_dialog', |
            :locals => {:user => @customer, :role => 'company customer', :submit_url => customer_create_format_path(:format => :json), :title => 'Add Customer', :submit_text => 'Create'}) |
 
+-# cancel appointment dialog
+= render(:partial => "calendar/cancel_appointment_dialog", :locals => {:provider => @provider})
+
 -# pdf date range dialog
 = render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @provider})

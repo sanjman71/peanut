@@ -14,6 +14,10 @@
 
 .ui-widget-content h4                 { color: #FFFFFF; }
 
+/* rounded corners */
+
+.rounded.button.widget                { color: #333333; background-color: #FFF; }
+
 /* datepicker */
 
 /* this is required to make sure the datepicker opens in front of the dialog */

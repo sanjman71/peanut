@@ -521,11 +521,11 @@ class AppointmentsController < ApplicationController
       AppointmentScheduler.cancel_work_appointment(@appointment)
     end
 
-    # redirect to the appointment page
-    @redirect_path = appointment_path(@appointment)
+    # redirect to referer; default to apointment path
+    @redirect_path = request.referer || appointment_path(@appointment)
 
     # set flash
-    flash[:notice] = "Marked appointment as canceled"
+    flash[:notice] = "Canceled appointment"
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }

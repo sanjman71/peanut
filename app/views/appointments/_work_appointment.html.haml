@@ -1,4 +1,7 @@
 .span-8.last.appointment{:class => [(appointment.canceled? ? 'work canceled' : 'work'), cycle("", "shaded")].join(' ')}[appointment]
+  -# used by javascript code
+  .span-8.last.start_date_time
+    = appointment.start_at.to_s(:appt_day_date_time)
   .span-8.last
     .span-4.time
       - if appointment.canceled?

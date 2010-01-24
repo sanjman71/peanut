@@ -281,6 +281,28 @@ $.fn.init_add_calendar_markings = function() {
   })
 }
 
+$.fn.init_cancel_appointment = function() {
+  // initialize cancel appointment dialog
+  $("div.dialog#cancel_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)',
+                                                     title: $("div.dialog#cancel_appointment_dialog").attr('title') });
+
+  // user click on 'cancel appointment', results in opening cancel appointment dialog
+  $("a.cancel").click(function() {
+    // fill in appointment values
+    var service_name    = $(this).parents("div.appointment").find("div.service a").text();
+    var start_date_time = $(this).parents("div.appointment").find("div.start_date_time").text();
+    var customer_name   = $(this).parents("div.appointment").find("div.customer h6").text();
+    var cancel_url      = $(this).attr('href');
+    $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
+    $("div.dialog#cancel_appointment_dialog").find("#start_date_time").text(start_date_time);
+    $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
+    $("div.dialog#cancel_appointment_dialog").find("a#cancel_appointment").attr('href', cancel_url);
+    // open dialog
+    $("div.dialog#cancel_appointment_dialog").dialog('open');
+    return false;
+  })
+}
+
 $.fn.init_schedule_datepicker = function() {
   $(".pdf.datepicker").datepicker({minDate: '-1m', maxDate: '+3m'});
 }
@@ -385,6 +407,7 @@ $(document).ready(function() {
   $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
   $(document).init_add_appointment();
+  $(document).init_cancel_appointment();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
   $(document).init_add_calendar_markings();

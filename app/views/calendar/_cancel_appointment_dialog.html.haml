@@ -1,0 +1,37 @@
+- provider = nil if local_assigns[:provider].blank?
+
+.span-12.prepend-1.last.dialog.hide#cancel_appointment_dialog{:title => "Cancel Appointment"}
+  - form_for(Appointment.new, :url => cancel_appointment_path(":id"), :html => {:method => :post, :id => 'cancel_appointment_form'}) do |f|
+    .cancel_appointment
+      -# what
+      .span-12.last.padding-bottom-10#what
+        .span-3.label
+          %h4.bottom.block== Service:
+        .span-9.last.data
+          %h4.bottom.block#service_name== &nbsp;
+
+      -# with
+      .span-12.last.padding-bottom-10#with
+        .span-3.label
+          %h4.bottom.block== With:
+        .span-9.last.data
+          %h4.bottom.block#provider_name= provider.andand.name
+
+      -# when
+      .span-12.last.padding-bottom-10#with
+        .span-3.label
+          %h4.bottom.block== When:
+        .span-9.last.data
+          %h4.bottom.block#start_date_time== &nbsp;
+
+      -# customer
+      .span-12.last.padding-bottom-10#customer
+        .span-3.label
+          %h4.bottom.block== Customer:
+        .span-9.last.data
+          %h4.bottom.block#customer_name== &nbsp;
+
+      -# confirm link
+      .span-12.last.padding-top-10
+        = link_to 'Confirm', '', :id => 'cancel_appointment', :class => 'rounded button widget'
+
