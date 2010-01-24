@@ -69,10 +69,6 @@
     .span-15.last#calendar_by_day.hide
       = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day, :capacity_and_work_by_free_appt => @capacity_and_work_by_free_appt})
 
-    -# add a send message hidden form
-    .last#send_message
-      = render(:partial => 'messages/send_message', :locals => {:sender => current_user, :protocol => 'email', :hidden => true})
-
 .span-8.last
   -# schedule help
   .span-7.prepend-1.last

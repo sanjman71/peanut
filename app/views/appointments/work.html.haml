@@ -33,16 +33,9 @@
 
 .span-14.prepend-1.last
   = display_flash
-  
+
 .span-23.prepend-1
   = render(:partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => false})
-  
-%hr.space
-
--#.span-23.prepend-1.text
-  -#- # allow owners and managers to send the customer a message
-  -#- if (@owner or @manager) and !@appointment.canceled?
-    -#= render(:partial => 'send_message', :locals => {:appointment => @appointment})
 
 %hr.space
 

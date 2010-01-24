@@ -110,10 +110,6 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "form#cancel_appointment_form", 1
       end
 
-      should "have hidden send message form" do
-        assert_select "div#send_message", 1
-      end
-
       should "have link to pdf today" do
         assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
       end
@@ -162,10 +158,6 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "form#cancel_appointment_form", 1
       end
 
-      should "have hidden send message form" do
-        assert_select "div#send_message", 1
-      end
-      
       should "have link to pdf today" do
         assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
       end
@@ -205,10 +197,6 @@ class CalendarControllerTest < ActionController::TestCase
 
     should "not show add appointment form" do
       assert_select "form#add_appointment_form", 0
-    end
-
-    should "have hidden send message form" do
-      assert_select "div#send_message", 1
     end
 
     should_respond_with :success
