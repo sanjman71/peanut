@@ -127,11 +127,11 @@ class AppointmentsController < ApplicationController
           @options            = @options.merge({:capacity => @capacity }) unless @capacity.blank?
 
           # We allow force adding the appointment if the capability is requested and the user has permission
-          # The caller must set params[:force_add].to_i != 0, e.g. 1 would be good.
-          if ((!params[:force_add].blank?) && (params[:force_add].to_i != 0) &&
+          # The caller must set params[:force].to_i != 0, e.g. 1 would be good.
+          if ((!params[:force].blank?) && (params[:force].to_i != 0) &&
               ((current_user.has_privilege?('update calendars', current_company)) ||
                (current_user.has_privilege?('update calendars', @provider))))
-            @options            = @options.merge({:force_add => true})
+            @options            = @options.merge({:force => true})
           end
 
           # create work appointment, with preferences
