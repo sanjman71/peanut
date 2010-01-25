@@ -154,3 +154,6 @@ AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
 
+# Application SMTP provider; valid options are :google, :message_pub
+SMTP_PROVIDER = :google
+SMTP_FROM     = "Walnut Messaging <messaging@walnutindustries.com>"

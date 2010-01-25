@@ -4,6 +4,6 @@ ActionMailer::Base.smtp_settings = {
   :port => "587",
   :authentication => :plain,
   :domain => "walnutindustries.com",
-  :user_name => "app@walnutindustries.com",
+  :user_name => "messaging@walnutindustries.com",
   :password => "1ndus7ry!"
 }
