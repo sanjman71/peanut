@@ -11,7 +11,7 @@ pdf.move_down(10)
 pdf.stroke_color "aaaaaa"
 
 if @stuff_by_day.blank?
-  pdf.text("No Appoinments Scheduled")
+  pdf.text("No Appointments Scheduled")
 else
   @stuff_by_day.each do |day, stuff|
     # date
@@ -23,49 +23,43 @@ else
 
     stuff.each do |object|
       if object.is_a?(Appointment) && object.free?
-        # find capacity and work objects for this free appointment
-        @capacity_and_work_by_free_appt[object.id].each do |capacity_or_appointment|
-          if capacity_or_appointment.is_a?(Appointment) && capacity_or_appointment.work?
-            appointment = capacity_or_appointment
-            # skip canceled appointments
-            next if appointment.canceled?
-            rows.push([
-                        appointment.start_at.to_s(:appt_time),
-                        appointment.end_at.to_s(:appt_time),
-                        Duration.to_words(appointment.duration),
-                        appointment.service.name,
-                        appointment.customer ? appointment.customer.name : ""
-                      ])
-          elsif capacity_or_appointment.is_a?(CapacitySlot)
-            capacity_slot = capacity_or_appointment
-            rows.push([
-                      capacity_slot.start_at.to_s(:appt_time),
-                      capacity_slot.end_at.to_s(:appt_time),
-                      Duration.to_words(capacity_slot.duration),
-                      capacity_slot.free_appointment.service.name,
-                      capacity_slot.free_appointment.customer ? capacity_slot.free_appointment.customer.name : ""
-                      ])
-          elsif capacity_or_appointment.is_a?(CapacitySlot2)
-            capacity_slot = capacity_or_appointment
-            rows.push([
-                      capacity_slot.start_at.to_s(:appt_time),
-                      capacity_slot.end_at.to_s(:appt_time),
-                      Duration.to_words(capacity_slot.duration),
-                      "Free",
-                      ""
-                      ])
-          end
-        end
-      elsif object.is_a?(Appointment) && object.work?
         appointment = object
         next if appointment.canceled?
-        # This must be an orphaned work appointment
+        rows.push([
+                    appointment.start_at.to_s(:appt_time),
+                    appointment.end_at.to_s(:appt_time),
+                    Duration.to_words(appointment.duration),
+                    "Scheduled Availability",
+                    "#{pluralize(appointment.capacity, 'slot')} made available"
+                  ])
+      elsif object.is_a?(Appointment) && object.work?
+        appointment = object
+        # skip canceled appointments
+        next if appointment.canceled?
         rows.push([
                     appointment.start_at.to_s(:appt_time),
                     appointment.end_at.to_s(:appt_time),
                     Duration.to_words(appointment.duration),
                     appointment.service.name,
                     appointment.customer ? appointment.customer.name : ""
+                  ])
+      elsif object.is_a?(CapacitySlot)
+        capacity_slot = object
+        rows.push([
+                  capacity_slot.start_at.to_s(:appt_time),
+                  capacity_slot.end_at.to_s(:appt_time),
+                  Duration.to_words(capacity_slot.duration),
+                  capacity_slot.free_appointment.service.name,
+                  capacity_slot.free_appointment.customer ? capacity_slot.free_appointment.customer.name : ""
+                  ])
+      elsif object.is_a?(CapacitySlot2)
+        capacity_slot = object
+        rows.push([
+                  capacity_slot.start_at.to_s(:appt_time),
+                  capacity_slot.end_at.to_s(:appt_time),
+                  Duration.to_words(capacity_slot.duration),
+                  (capacity_slot.capacity >= 1) ? "Free - #{pluralize(capacity_slot.capacity, 'slot')} available" : "Overbooked by #{pluralize(capacity_slot.capacity.abs, 'slot')}",
+                  ""
                   ])
       end
     end

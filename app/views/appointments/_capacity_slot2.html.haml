@@ -1,8 +1,8 @@
-.span-15.last.slot{:class => [(slot.capacity < 0 ? "overbooked" : "free"), cycle("", "shaded")].join(' ')}[slot]
+.span-15.last.slot{:class => [(slot.capacity > 0 ? "free" : "overbooked" ), cycle("", "shaded")].join(' ')}[slot]
   .span-4.time
     %span== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
   .span-6.service{:class => 'free'}
-    - if slot.capacity >= 1
+    - if slot.capacity > 0
       %h6==Free - #{pluralize(slot.capacity, 'slot')} available
-    - elsif slot.capacity < 1
+    - else
       %h6==Overbooked by #{pluralize(slot.capacity.abs, 'slot')}
