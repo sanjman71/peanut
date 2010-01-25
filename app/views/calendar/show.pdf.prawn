@@ -46,6 +46,15 @@ else
                       capacity_slot.free_appointment.service.name,
                       capacity_slot.free_appointment.customer ? capacity_slot.free_appointment.customer.name : ""
                       ])
+          elsif capacity_or_appointment.is_a?(CapacitySlot2)
+            capacity_slot = capacity_or_appointment
+            rows.push([
+                      capacity_slot.start_at.to_s(:appt_time),
+                      capacity_slot.end_at.to_s(:appt_time),
+                      Duration.to_words(capacity_slot.duration),
+                      "Free",
+                      ""
+                      ])
           end
         end
       elsif object.is_a?(Appointment) && object.work?
