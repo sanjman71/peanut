@@ -223,6 +223,15 @@ $.fn.init_add_calendar_markings = function() {
       capacity_slots += 1;
     })
 
+    $(this).find("div.capacity_slot").each(function() {
+      capacity_slots += 1;
+    })
+
+    // count capacity slot 2 divs, but not those that indicate overbooked - only those that are free
+    $(this).find("div.capacity_slot2.free").each(function() {
+      capacity_slots += 1;
+    })
+
     // count work appointments for this date; there are multiple ways to count work appointments
     var work_appointments = 0;
 
