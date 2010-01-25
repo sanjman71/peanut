@@ -98,7 +98,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 11 am local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
       @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
     end
     
@@ -530,7 +530,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 11 am local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T0900"
       @duration       = 2.hours
@@ -578,7 +578,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 30.minutes
@@ -626,7 +626,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes
@@ -674,7 +674,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes

@@ -208,7 +208,7 @@ class WaitlistTest < ActiveSupport::TestCase
       @tomorrow_plus1 = (Time.zone.now + 2.days).to_s(:appt_schedule_day)
       @yesterday      = (Time.zone.now - 1.day).to_s(:appt_schedule_day)
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0800", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
     end
 
     context "where wait date range does not overlap with free time" do
@@ -335,7 +335,7 @@ class WaitlistTest < ActiveSupport::TestCase
       @tomorrow_plus1 = (Time.zone.now + 2.days).to_s(:appt_schedule_day)
       @yesterday      = (Time.zone.now - 1.day).to_s(:appt_schedule_day)
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0800", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
       assert @free_appt.valid?
       # create waitlist with future time range
       wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "080000", :end_time_hours => "120000"}]

@@ -54,7 +54,7 @@ class AppointmentsController < ApplicationController
         end
 
         # build the work appointment without committing the changes
-        @appointment          = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
+        @appointment          = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
 
         # set appointment date, start_at and end_at times in local time
         @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
@@ -135,7 +135,7 @@ class AppointmentsController < ApplicationController
           end
 
           # create work appointment, with preferences
-          @appointment        = AppointmentScheduler.create_work_appointment(current_company, @provider, @service, @duration, @customer, @date_time_options, @options)
+          @appointment        = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
           # set flash message
@@ -170,7 +170,7 @@ class AppointmentsController < ApplicationController
           @options        = {:time_range => @time_range}
           @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
           # create free appointment, with preferences
-          @appointment    = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
+          @appointment    = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
           flash[:notice]  = "Created available time"
@@ -384,7 +384,7 @@ class AppointmentsController < ApplicationController
     
     begin
       # Create the first appointment in the sequence
-      @appointment  = AppointmentScheduler.create_free_appointment(current_company, @provider, @options)
+      @appointment  = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
     rescue Exception => e
       @error        = e.message
     end

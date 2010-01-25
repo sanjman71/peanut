@@ -54,7 +54,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0 to 8 tomorrow
       @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
+      @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 4)
     end
   
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -179,7 +179,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0 to 8 tomorrow
       @tomorrow           = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range         = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt          = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
+      @free_appt          = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 4)
   
       @consume_time_range = TimeRange.new({:day => @tomorrow, :start_at => "0300", :end_at => "0600"})
       @capacity = 1
@@ -302,7 +302,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 0000 to 0800 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -333,7 +333,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "THEN schedule work appointment from 0300 to 0600" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -376,7 +376,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
           context "THEN schedule a work appointment from 0100 to 0200" do
             setup do
               @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-              @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+              @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
               assert_valid @work_appt
               @free_appt.reload # Reload the capacity slots list
             end
@@ -435,7 +435,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
               context "THEN schedule a work appointment from 0600 to 0800" do
                 setup do
                   @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                   assert_valid @work_appt
                   @free_appt.reload # Reload the capacity slots list
                 end
@@ -472,7 +472,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @day_after      = (Time.zone.now + 2.days).to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :end_day => @day_after, :start_at => "2100", :end_at => "0500"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -499,7 +499,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "THEN schedule work appointment from 0000 to 0300" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -530,7 +530,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
           context "THEN schedule a work appointment from 2200 to 2300" do
             setup do
               @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-              @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+              @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
               assert_valid @work_appt
               @free_appt.reload # Reload the capacity slots list
             end
@@ -590,7 +590,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
               context "THEN schedule a work appointment from 0300 to 0500" do
                 setup do
                   @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                   assert_valid @work_appt
                   @free_appt.reload # Reload the capacity slots list
                 end
@@ -626,7 +626,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
       @capacity       = 4
   
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => @capacity)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => @capacity)
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -649,7 +649,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       should "raise exception" do
         assert_raise AppointmentInvalid, "No capacity available" do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
       end
     end
@@ -670,7 +670,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       should "raise exception" do
         e = assert_raise AppointmentInvalid do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
         assert_match /No capacity available/, e.message
       end
@@ -692,7 +692,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       should "raise exception" do
         assert_raise AppointmentInvalid do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
       end
     end
@@ -712,7 +712,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "THEN schedule work appointment from 0300 to 0600 capacity 1" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -744,7 +744,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
           context "THEN schedule a work appointment from 0100 to 0200 capacity 3" do
             setup do
               @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-              @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+              @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
               assert_valid @work_appt
               @free_appt.reload # Reload the capacity slots list
             end
@@ -779,7 +779,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
                 setup do
                   @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+                  @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                   @free_appt.reload
                 end
       
@@ -809,7 +809,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
                   should "raise exception" do
                     e = assert_raise AppointmentInvalid do
                       @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-                      @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+                      @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                     end
                     assert_match /No capacity available/, e.message 
                   end
@@ -839,7 +839,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 1500 to 2300 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1500", :end_at => "2300"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 4)
       @free_appt.reload
     end
   
@@ -869,7 +869,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "THEN schedule work appointment from 1800 to 2100" do
         setup do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at}
-          @work_appt1 = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+          @work_appt1 = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
           assert_valid @work_appt1
           @free_appt.reload # Reload the capacity slots list
         end
@@ -899,7 +899,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
           context "THEN schedule a work appointment from 1600 to 1700 capacity 3" do
             setup do
               @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
-              @work_appt2 = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @time_range.duration, @customer, @options)
+              @work_appt2 = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
               assert_valid @work_appt2
               @free_appt.reload # Reload the capacity slots list
             end
@@ -960,7 +960,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 1000 to 1200 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1000", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 1)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 1)
     end
   
     should "have 1 capacity slot of 10-12 c 1" do
@@ -983,7 +983,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "and schedule work appointment" do
         setup do
           @options    = {:start_at => @time_range.start_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -1029,7 +1029,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "and schedule work appointment" do
         setup do
           @options    = {:start_at => @time_range.start_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -1070,7 +1070,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # create free time from 1000 to 1200 tomorrow
       @tomorrow       = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "1000", :end_at => "1200"})
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 4)
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 4)
     end
   
     should "have 1 capacity slot of 10-12 c 4" do
@@ -1093,7 +1093,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "and schedule work appointment" do
         setup do
           @options    = {:start_at => @time_range.start_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -1139,7 +1139,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       context "and schedule work appointment" do
         setup do
           @options    = {:start_at => @time_range.start_at}
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, @provider, @work_service, @work_service.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
           assert_valid @work_appt
           @free_appt.reload # Reload the capacity slots list
         end
@@ -1196,7 +1196,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       setup do
         @today   = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
         @time_range = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
-        @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 1)
+        @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 1)
         @test_ranges = generate_test_ranges(@time_range)
       end
           
@@ -1213,7 +1213,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
         @today   = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
         @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
         @time_range = TimeRange.new({:day => @today, :end_day => @tomorrow, :start_at => "1500", :end_at => "1100"})
-        @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 1)
+        @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 1)
         @test_ranges = generate_test_ranges(@time_range)
       end
     
@@ -1234,7 +1234,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
     #     @today   = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
     #     @day_after_tomorrow   = (Time.zone.now + 2.days).to_s(:appt_schedule_day) # e.g. 20081201
     #     @time_range = TimeRange.new({:day => @today, :end_day => @day_after_tomorrow, :start_at => "1500", :end_at => "1100"})
-    #     @free_appt  = AppointmentScheduler.create_free_appointment(@company, @provider, :time_range => @time_range, :capacity => 1)
+    #     @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range, :capacity => 1)
     #     @test_ranges = generate_test_ranges(@time_range)
     #   end
     # 
