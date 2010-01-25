@@ -21,7 +21,8 @@ else
 
     rows = []
 
-    stuff.each do |object|
+    # sort all day's stuff by start at time
+    stuff.sort_by{|o| o.respond_to?(:start_at) ? o.start_at : ""}.each do |object|
       if object.is_a?(Appointment) && object.free?
         # find capacity and work objects for this free appointment
         @capacity_and_work_by_free_appt[object.id].each do |capacity_or_appointment|
