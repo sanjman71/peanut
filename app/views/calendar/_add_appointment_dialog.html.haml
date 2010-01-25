@@ -20,7 +20,7 @@
         .span-3.padding-top-5.label
           %h4.bottom.block== Service
         .span-8.last#service
-          = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]}), :class => 'big'
+          = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]}), :class => 'big appointment services wide'
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Start Time

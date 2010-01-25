@@ -87,6 +87,7 @@ label.big                                         { font-size: 16px; }
 
 select.big                                        { font-size: 1.3em; }
 select.openings.search.wide                       { width: 175px; padding-top: 0px; }
+select.appointment.services.wide                  { width: 225px; padding-top: 0px; }
 
 .select                                           { font-size: 12px; }
 .select.big                                       { font-size: 15px; }

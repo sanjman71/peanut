@@ -2,7 +2,7 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 325, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
+  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 325, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
