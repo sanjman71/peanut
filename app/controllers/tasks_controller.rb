@@ -92,18 +92,24 @@ class TasksController < ApplicationController
   # GET /tasks/users/1/send_pdf_schedule/today
   # Send pdf schedule to the specified user
   def send_pdf_schedule
-    @user   = User.find(params[:user_id])
-    @when   = params[:today]
+    @user     = User.find(params[:user_id])
+    @when     = params[:today].to_s
+    @subject  = (@when == 'today') ? "Today's PDF Schedule" : "Your PDF Schedule"
 
     # build url to generate pdf schedule, with token to ensure request is authenticated
-    @url    = calendar_when_format_url(:provider_type => @user.class.to_s.tableize, :provider_id => @user.id, :when => 'today', :format => 'pdf')
-    @url    += "?token=#{AUTH_TOKEN_INSTANCE}"
+    @url      = calendar_when_format_url(:provider_type => @user.class.to_s.tableize, :provider_id => @user.id, :when => @when, :format => 'pdf')
+    @url      += "?token=#{AUTH_TOKEN_INSTANCE}"
 
-    # create delayed job to generate and send pdf schedule
-    @job = PdfMailerJob.new(:url => @url, :address => 'sanjay@jarna.com')
-    Delayed::Job.enqueue(@job)
+    @email    = @user.primary_email_address
 
-    flash[:notice] = "Sent #{@when} PDF Schedule to #{@user.name}"
+    if @email.blank?
+      flash[:error] = "User #{@user.name} does not have an email address"
+    else
+      # create delayed job to generate and send pdf schedule
+      @job = PdfMailerJob.new(:url => @url, :address => 'sanjay@jarna.com', :subject => @subject)
+      Delayed::Job.enqueue(@job)
+      flash[:notice] = "Sent #{@when} PDF Schedule to #{@user.name}"
+    end
 
     redirect_to(tasks_path) and return
   end
