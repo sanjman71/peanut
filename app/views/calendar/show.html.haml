@@ -10,9 +10,6 @@
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
-        -#== &nbsp;|&nbsp;
-        -#= link_to 'Email PDF Schedule', '', :id => 'send_pdf'
-      -#= render(:partial => 'calendar/send_pdf_dialog')
       -# schedule add blocks of time links
       %h4{:style => 'font-size: 1.0em;'}
         = link_to "Add Blocks of Available Time", new_block_path
@@ -23,18 +20,6 @@
       = link_to 'Today', calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today'
       == &nbsp;or&nbsp;
       = link_to 'Pick a Date Range', '', :id => 'pdf_schedule_date_range'
-
-      -##links
-        -#- build_calendar_range_type_links(@provider, DateRange::RANGE_TYPES, @daterange.range_type, @daterange.start_at) do |link|
-          -#= link + " | "
-        -#= link_to "Date Range", '', :id => 'show_dates'
-        -#%br
-        -#== or
-        -#%br
-        -#= today_prev_next[:today_link]
-      
-      -#dates.hide
-        -#= render(:partial => 'shared/date_range', :locals => {:object => Appointment.new, :url => url_for(:action => 'search', :provider_type => @provider.class.to_s.tableize, :provider_id => @provider.id, :subdomain => current_subdomain), :submit_id => 'search_calendar_with_date_range_submit'})
       
   .span-14.prepend-1.last.padding-top-10
     = display_flash
@@ -67,7 +52,7 @@
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
-      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day, :capacity_and_work_by_free_appt => @capacity_and_work_by_free_appt})
+      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day})
 
 .span-8.last
   -# schedule help
