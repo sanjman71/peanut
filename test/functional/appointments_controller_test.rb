@@ -98,7 +98,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 11 am local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
       @appt_datetime  = @time_range.start_at.in_time_zone.to_s(:appt_schedule)
     end
     
@@ -106,7 +106,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         delete :destroy, :id => @free_appt.id
       end
-  
+      
       should_change("Appointment.count", :by => -1) { Appointment.count }
     end
 
@@ -145,7 +145,7 @@ class AppointmentsControllerTest < ActionController::TestCase
               :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime, 
               :duration => @haircut.duration, :mark_as => 'work'
         end
-  
+      
         should_assign_to :appointment, :class => Appointment
         should_assign_to(:service) { @haircut }
         should_assign_to(:duration) { 30.minutes }
@@ -154,17 +154,17 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
         should_assign_to(:appt_time_start_at) { "0900" }
         should_assign_to(:appt_time_end_at) { "0930" }
-  
+      
         should "not show customer reminder options" do
           assert_select "input#reminder_customer_on", 0
           assert_select "input#reminder_customer_off", 0
         end
-  
+      
         should_respond_with :success
         should_render_template 'appointments/new.html.haml'
       end
     end
-  
+      
     context "create work appointment as customer" do
       setup do
         # stub current user
@@ -173,15 +173,15 @@ class AppointmentsControllerTest < ActionController::TestCase
              :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
              :duration => @haircut.duration, :customer_id => @customer.id
       end
-  
+      
       should_respond_with :redirect
       should_redirect_to ("history_index_path") { history_index_path }
-  
+      
       context "delete free appointment containing active work appointment" do
         setup do
           delete :destroy, :id => @free_appt.id
         end
-  
+      
         should_not_change("Appointment.count") { Appointment.count }
         should "not delete free appointment" do
           assert Appointment.find(@free_appt.id)
@@ -522,7 +522,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
       
     end
-
+  
   end
   
   context "create work appointment for a single date with free time, replacing free time" do
@@ -530,7 +530,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 11 am local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T0900"
       @duration       = 2.hours
@@ -550,7 +550,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     
     # There should be no available capacity slots
     should "have no capacity slots" do
-      assert_equal 0, @free_appt.capacity_slots.size
+      assert_equal 0, CapacitySlot2.count
     end
   
     should_assign_to(:service) { @haircut }
@@ -578,7 +578,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 30.minutes
@@ -598,7 +598,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   
     # There should be two available capacity slots
       should "have two capacity slots" do
-      assert_equal 2, @free_appt.capacity_slots.size
+      assert_equal 2, CapacitySlot2.count
     end
   
     should_assign_to(:service) { @haircut }
@@ -626,7 +626,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes
@@ -645,7 +645,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change("Appointment.count", :by => 2) { Appointment.count }
     
     should "have two capacity slots" do
-      assert_equal 2, @free_appt.capacity_slots.size
+      assert_equal 2, CapacitySlot2.count
     end
   
     should_assign_to(:service) { @haircut }
@@ -674,7 +674,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
-      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt      = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
   
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes
@@ -703,7 +703,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_change("Appointment.count", :by => 1) { Appointment.count }
   
       should "have two capacity slots" do
-        assert_equal 2, @free_appt.capacity_slots.size
+        assert_equal 2, CapacitySlot2.count
       end
   
       should_assign_to(:service) { @haircut }
@@ -714,17 +714,17 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:duration)  { 120.minutes }
       should_assign_to(:mark_as) { "work" }
       should_assign_to(:appointment)
-
+  
       should "create user with email address, in active state" do
         user = User.with_email("sanjay@walnut.com").first
         assert_equal 'active', user.state
       end
-
+  
       should "create user with specified password" do
         user = User.authenticate('sanjay@walnut.com', 'sanjay')
         assert_equal assigns(:customer), user
       end
-
+  
       should "set the flash for the created work appointment" do
         assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
       end
@@ -732,10 +732,10 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "set the flash for the created appointment and created user account" do
         assert_match /Your user account has been created/, flash[:notice]
       end
-
+  
       # should send account created messages
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
-
+  
       should_respond_with :redirect
       should_redirect_to("openings path") { "/openings" }
     end
@@ -858,7 +858,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
       end
     end
-
+  
     context "with appointment customer reminders" do
       context "turned on" do
         setup do
@@ -869,13 +869,13 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '1'}
         end
-
+  
         should "set appointment customer reminder to 1" do
           @appointment = Appointment.find(assigns(:appointment).id)
           assert_equal 1, @appointment.preferences[:reminder_customer].to_i
         end
       end
-
+  
       context "turned off" do
         setup do
           # create work appointment as company manager
@@ -885,7 +885,7 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '0'}
         end
-
+  
         should "set appointment customer reminder to 0" do
           @appointment = Appointment.find(assigns(:appointment).id)
           assert_equal 0, @appointment.preferences[:reminder_customer].to_i
