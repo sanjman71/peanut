@@ -71,6 +71,7 @@ Rails::Initializer.run do |config|
   config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   config.gem 'json' # uses native components
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
+  config.gem 'mechanize', :version => '0.9.3'
   config.gem 'mime-types', :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
   config.gem 'prawn', :version => '~> 0.5.1'
