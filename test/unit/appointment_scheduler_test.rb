@@ -23,7 +23,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @end_at           = (@now.tomorrow.utc.end_of_day).to_s(:appt_schedule)      
 
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler.create_free_appointment(@company, @johnny, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
 
       # search for free appointments
@@ -60,7 +60,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       # create free appointment that ended a few minutes ago
       @end_at             = (Time.now.utc - 3.minutes).to_s(:appt_schedule)
       @start_at           = (Time.now.utc - 10.hours).to_s(:appt_schedule)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
     end
     
@@ -90,7 +90,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       # create a free appointment that starts in 1 hour
       @start_at           = (Time.now + 1.hour).to_s(:appt_schedule)
       @end_at             = (Time.now + 3.hours).to_s(:appt_schedule)
-      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, @johnny, :start_at => @start_at, :duration => 120.minutes, :end_at => @end_at)
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :start_at => @start_at, :duration => 120.minutes, :end_at => @end_at)
       assert_valid @free_appointment
     end
   
@@ -123,11 +123,11 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @end_at           = (beginning_of_day + 1.day).to_s(:appt_schedule)
 
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler.create_free_appointment(@company, @johnny, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => @start_at)
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, :start_at => @start_at)
       @end_appt         = (beginning_of_day + @haircut.duration).to_s(:appt_schedule)
       assert_valid @work_appointment
 
@@ -202,12 +202,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @customer  = Factory(:user)
   
       # create free appointment (all day)
-      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny,
+      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny,
                                                                         :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
       
       # schedule the work appointment, with a custom duration
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, 60.minutes, @customer, :start_at => "20080801100000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, 60.minutes, @customer, :start_at => "20080801100000")
       assert_valid @work_appointment
     end
   
@@ -266,12 +266,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @customer  = Factory(:user)
 
       # create free appointment (all day)
-      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, 
+      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, 
                                                                         :start_at => "20080801000000", :end_at => "20080802000000")
       assert_valid @free_appointment
 
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801233000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801233000")
       assert_valid @work_appointment
     end
 
@@ -329,12 +329,12 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       @customer  = Factory(:user)
   
       # create free appointment (all day)
-      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, @johnny, 
+      @free_appointment  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, 
                                                                         :start_at => "20080801000000", :end_at => "20080801003000")
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler.create_work_appointment(@company, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801000000")
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, :start_at => "20080801000000")
       assert_valid @work_appointment
     end
   
