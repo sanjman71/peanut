@@ -74,9 +74,9 @@ class CalendarController < ApplicationController
     # find free, work appointments & capacity for the specified provider over a daterange
     # For free appointments, we don't care about service or duration, so these are set to nil
     # For capacity_slots we don't care about service, duration or capacity, so these are set to nil
-    @free_appointments   = AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
-    @work_appointments   = AppointmentScheduler.find_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
-    @capacity_slots      = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @free_appointments   = AppointmentScheduler2.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @work_appointments   = AppointmentScheduler2.find_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
+    @capacity_slots      = AppointmentScheduler2.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
 
     # build hash of calendar markings based on the free appointments
     # @calendar_markings   = build_calendar_markings(@free_appointments)
@@ -88,8 +88,8 @@ class CalendarController < ApplicationController
     # initialize today
     @today               = DateRange.today.beginning_of_day
 
-    # combine capacity and work, sorted by start_at time
-    @capacity_and_work   = (@capacity_slots + @work_appointments).sort_by { |x| x.start_at.in_time_zone }
+    # combine capacity and work, sorted by start_at time. Where an dppointment and a capacity slot are at the same time, the capacity slot comes first
+    @capacity_and_work   = (@capacity_slots + @work_appointments).sort_by { |x| [x.start_at.in_time_zone, (x.class == Appointment ? 1 : 0)] }
 
     # find waitlist appointments for the specified provider over a daterange
     @waitlists = Waitlist.find_matching(current_company, current_location, @provider, @daterange).inject([]) do |array, waitlist|

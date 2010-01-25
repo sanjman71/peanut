@@ -271,7 +271,7 @@ class CompanyTest < ActiveSupport::TestCase
         assert_equal 0, Appointment.count
         assert_equal 0, Subscription.count
         assert_equal 0, CompanyProvider.count
-        assert_equal 0, CapacitySlot.count
+        assert_equal 0, CapacitySlot2.count
       end
       
       should "have no service" do

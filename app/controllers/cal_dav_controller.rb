@@ -78,7 +78,7 @@ class CalDavController < ApplicationController
     @daterange    = DateRange.parse_when('next 4 weeks')    
 
     # find free, work appointments for the specified provider over a daterange
-    @appointments = AppointmentScheduler.find_free_work_appointments(current_company, @location, @provider, @daterange)
+    @appointments = AppointmentScheduler2.find_free_work_appointments(current_company, @location, @provider, @daterange)
 
     if @appointments
       return CalDavResource.new(@appointments, current_company)
