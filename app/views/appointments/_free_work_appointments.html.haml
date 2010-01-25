@@ -1,18 +1,20 @@
 .span-15.last.appointment{:class => [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')}[appointment]
+  .span-15.last.start_date_time.hide
+    = appointment.start_at.to_s(:appt_day_date_time)
   .span-4.time
     - if appointment.work? && appointment.canceled?
+      -# canceled work appointment
       %del== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
-      %span== Canceled
     - else
       %span== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
   .span-4
     .span-4.last.service{:class => appointment.mark_as}
       - if (appointment.work? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# work appointments can be viewed with read permissions
-        = link_to appointment.service.name, appointment_path(appointment, :subdomain => current_subdomain)
+        = link_to appointment.service.name, appointment_path(appointment)
       - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# free appointments can be viewed with read permissions
-        = link_to "Scheduled Availability", appointment_path(appointment, :subdomain => current_subdomain)
+        = link_to "Scheduled Availability", appointment_path(appointment)
       - else
         %h6= appointment.service.name
     - if show_location?
@@ -42,3 +44,6 @@
               = link_to('Cancel availability', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
             - else
               = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
+          - elsif appointment.work? && appointment.canceled?
+            -# canceled work appointment
+            == Canceled

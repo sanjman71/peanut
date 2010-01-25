@@ -4,7 +4,6 @@ div.free_appointment                              { background: url(/images/gray
 
 div.capacity_and_work                             { }
 div.appointments                                  { border-collapse: collapse; font-size: 11px; font-weight: normal; margin: 0; padding 0 0 3px; }
-div.appointment.canceled                          { color: #FF1100;}
 
 div.appointment.review, div.waitlist.review       { font-size: 1.5em; font-weight: normal; }
 
@@ -26,10 +25,14 @@ div.slot                                          { }
 
 div.appointment.waitlist                          { background-color: #FFFFDD; }  /* light yellow */
 
-div.appointment .time span                        { font-size: 1.2em;}
-div.slot .time span                               { font-size: 1.2em;}
+div.appointment.canceled                          { color: #FF1100;}
 
+div.appointment .time span                        { font-size: 1.0em;}
+div.slot .time span                               { font-size: 1.0em;}
+
+/*
 div.appointment.canceled  del span                { color: #FF1100; }
+*/
 
 div.appointment.work div.service h6               { color: #009900; }
 

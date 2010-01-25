@@ -1,7 +1,8 @@
 - provider = nil if local_assigns[:provider].blank?
 
 .span-12.prepend-1.last.dialog.hide#cancel_appointment_dialog{:title => "Cancel Appointment"}
-  - form_for(Appointment.new, :url => cancel_appointment_path(":id"), :html => {:method => :post, :id => 'cancel_appointment_form'}) do |f|
+  -# form submit url is not used; 'cancel_appointment' link below is used instead
+  - form_for(Appointment.new, :url => '', :html => {:method => :post, :id => 'cancel_appointment_form'}) do |f|
     .cancel_appointment
       -# what
       .span-12.last.padding-bottom-10#what
