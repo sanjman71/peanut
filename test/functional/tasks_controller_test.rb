@@ -6,6 +6,7 @@ class TasksControllerTest < ActionController::TestCase
   should_route :get, '/tasks/appointments/messages/whenever', :controller => 'tasks', :action => 'appointment_messages', :time_span => 'whenever'
   should_route :get, '/tasks/users/messages/whenever', :controller => 'tasks', :action => 'user_messages', :time_span => 'whenever'
   should_route :get, '/tasks/expand_all_recurrences', :controller => 'tasks', :action => 'expand_all_recurrences'
+  should_route :get, '/tasks/users/1/send_pdf_schedule/today', :controller => 'tasks', :action => 'send_pdf_schedule', :user_id => '1', :when => 'today'
 
   def setup
     # initialize roles and privileges

@@ -7,29 +7,38 @@
 
     %hr.space
 
+    .span-16.last
+      = display_flash(:all)
+
     .span-16.last.letterbox#task_appointment_messages
       .span-5.prepend-1.name
-        %h4.bigger.margin-bottom-0== Appointment Messages
+        %h4.bigger.bottom== Appointment Messages
       .span-10.last
         - ['whenever'].each do |ts|
           %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_messages_path(:time_span => ts.to_url_param), :class => 'admin'
         
     .span-16.last.letterbox#task_appointment_reminders
       .span-5.prepend-1.name
-        %h4.bigger.margin-bottom-0== Appointment Reminders
+        %h4.bigger.bottom== Appointment Reminders
       .span-10.last
         - ['24 hours', '2 days', '3 days', '7 days'].each do |ts|
           %span{:style => 'padding-right: 7px;'}= link_to ts, task_appt_reminders_path(:time_span => ts.to_url_param), :class => 'admin'
 
     .span-16.last.letterbox#task_user_messages
       .span-5.prepend-1.name
-        %h4.bigger.margin-bottom-0== User Messages
+        %h4.bigger.bottom== User Messages
       .span-10.last
         - ['whenever'].each do |ts|
           %span{:style => 'padding-right: 7px;'}= link_to ts, task_user_messages_path(:time_span => ts.to_url_param), :class => 'admin'
 
     .span-16.last.letterbox#task_expand_all_recurrences
       .span-5.prepend-1.name
-        %h4.bigger.margin-bottom-0== Expand All Recurrences
+        %h4.bigger.bottom== Expand All Recurrences
       .span-10.last
         %span{:style => 'padding-right: 7px;'}= link_to "Expand All Recurrences", task_expand_recur_path, :class => 'admin'
+
+    .span-16.last.letterbox#task_send_pdf_schedule
+      .span-5.prepend-1.name
+        %h4.bigger.bottom== Send PDF Schedule
+      .span-10.last
+        %span{:style => 'padding-right: 7px;'}= link_to "Pick Provider", '', :id => 'send_pdf_schedule', :class => 'admin'

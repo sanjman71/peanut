@@ -11,6 +11,7 @@ class TasksController < ApplicationController
   end
 
   # GET /tasks/appointments/messages/whenever
+  # List all appointment messages
   def appointment_messages
     # find appointments with messages
     @appointments = current_company.appointments.work.all(:include => :message_topics)
@@ -62,6 +63,7 @@ class TasksController < ApplicationController
   end
   
   # GET /tasks/users/messages/whenever
+  # List all messages with users as message topics
   def user_messages
     # find users as message topics
     @topics       = MessageTopic.for_type(User).all(:include => :topic)
@@ -85,6 +87,25 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  # GET /tasks/users/1/send_pdf_schedule/today
+  # Send pdf schedule to the specified user
+  def send_pdf_schedule
+    @user   = User.find(params[:user_id])
+    @when   = params[:today]
+
+    # build url to generate pdf schedule, with token to ensure request is authenticated
+    @url    = calendar_when_format_url(:provider_type => @user.class.to_s.tableize, :provider_id => @user.id, :when => 'today', :format => 'pdf')
+    @url    += "?token=#{AUTH_TOKEN_INSTANCE}"
+
+    # create delayed job to generate and send pdf schedule
+    @job = PdfMailerJob.new(:url => @url, :address => 'sanjay@jarna.com')
+    Delayed::Job.enqueue(@job)
+
+    flash[:notice] = "Sent #{@when} PDF Schedule to #{@user.name}"
+
+    redirect_to(tasks_path) and return
   end
 
 end

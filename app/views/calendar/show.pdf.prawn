@@ -1,9 +1,9 @@
-pdf.text("Schedule for #{@provider.name}", :size => 20, :style => :bold)
+pdf.text("Schedule for #{@provider.name} [#{@daterange.name(:with_dates => true)}]", :size => 15, :style => :bold)
 
 pdf.move_down(10)
 
-pdf.fill_color("5500BB")
-pdf.text("#{@daterange.name(:with_dates => true)}", :size => 15)
+# pdf.fill_color("111111")
+# pdf.text("#{@daterange.name(:with_dates => true)}", :size => 15)
 
 pdf.fill_color("000000")
 pdf.move_down(10)
@@ -11,7 +11,7 @@ pdf.move_down(10)
 pdf.stroke_color "aaaaaa"
 
 if @stuff_by_day.blank?
-  pdf.text("No Appoinments Scheduled")
+  pdf.text("No Appointments Scheduled")
 else
   @stuff_by_day.each do |day, stuff|
     # date

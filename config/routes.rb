@@ -202,6 +202,8 @@ ActionController::Routing::Routes.draw do |map|
                           :controller => 'tasks', :action => 'user_messages', :time_span => /whenever/
   map.task_expand_recur   '/tasks/expand_all_recurrences',
                           :controller => 'tasks', :action => 'expand_all_recurrences'
+  map.task_send_pdf_schedule '/tasks/users/:user_id/send_pdf_schedule/:when',
+                             :controller => 'tasks', :action => 'send_pdf_schedule', :when => /today/
   map.resources           :tasks, :only => [:index]
 
   # Administrative controllers

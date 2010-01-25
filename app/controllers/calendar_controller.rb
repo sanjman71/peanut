@@ -5,9 +5,9 @@ class CalendarController < ApplicationController
 
   before_filter :init_provider, :only => [:show]
   before_filter :init_provider_privileges, :only => [:show]
-  
+
   privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
-  privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company]
+  privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company], :unless => :auth_token?
 
   # Default when value
   @@default_when = Appointment::WHEN_NEXT_2WEEKS
