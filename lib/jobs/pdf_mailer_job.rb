@@ -56,11 +56,10 @@ class PdfMailerJob < Struct.new(:params)
       PdfMailer.deliver_email(address, subject, body, file)
     rescue Exception => e
       logger.debug("#{Time.now}: [pdf mailer exception] #{e.message}")
-      return
+    ensure
+      # always delete pdf file
+      File.delete(file) if File.exists(file)
     end
-
-    # delete pdf file
-    # File.delete(file) if File.exists(file)
   end
 
 end
