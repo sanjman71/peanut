@@ -4,7 +4,7 @@
 
     -# group slots by provider
     - reset_cycle
-    - slots.group_by { |slot| slot.free_appointment.provider }.each do |provider, slots|
+    - slots.group_by { |slot| slot.provider }.each do |provider, slots|
       -# collect all provider slots for this date
       - slot_start_times = slots.inject([]) do |array, slot|
         - array += free_slot_possible_start_times(slot, service.duration, :appt_start_minutes => current_company.preferences[:appt_start_minutes])
