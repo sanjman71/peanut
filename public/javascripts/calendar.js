@@ -274,6 +274,9 @@ $.fn.init_add_calendar_markings = function() {
     $(date_id).show();
   })
 
+  // mark the first calendar date that has free time
+  $("td.free:first").click();
+
   // show add menu icon on calendar date hover
   $("td:not(.past) .date").hover(function () {
     $(this).find("span#calendar_add_menu").css('visibility', 'visible');

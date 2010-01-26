@@ -209,7 +209,7 @@ $.fn.init_openings_add_calendar_markings = function() {
     }
   })
 
-  // set hover states to show selected date, ignore past dates
+  // add click handler to show selected date, ignore past dates
   $("td.weekday.free:not(.past),td.weekend.free:not(.past)").click(function() {
     $("div#free_capacity_slots").show();
     // unmark all selected calendar dates, and mark this calendar date as selected
@@ -221,11 +221,8 @@ $.fn.init_openings_add_calendar_markings = function() {
     $(slot_id).show();
   })
 
-  // mark the first available date, if there is one
-  var first_date = $("td.free:not(.past):first")
-  if (first_date) {
-    $(first_date).click();
-  }
+  // mark the first available non-past date, if there is one
+  $("td.free:not(.past):first").click();
 }
 
 // confirm a work appointmenet
