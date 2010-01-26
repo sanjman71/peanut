@@ -41,7 +41,9 @@ table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 no
                                                     width: 75px; text-align: center; }
 
 .calendar.date.wide                               { color: #111111; font-size: 1.2em; text-align: left; margin-bottom: 7px; width: 100%;
-                                                    border-bottom: 2px solid #CCCCCC; background: #EEEEEE; padding: 3px 0px 3px 15px;}
+                                                    border-bottom: 2px solid #CCCCCC; background: #EEEEEE; padding: 3px 0px 3px 0px;}
+
+.calendar.date.wide span                          { padding-left: 5px; }
 
 /* calendar menu */
 

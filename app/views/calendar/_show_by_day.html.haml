@@ -1,6 +1,7 @@
 - stuff_by_day.each do |day, stuff|
   .span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
-    .span-11.last.calendar.date.wide= day.to_s(:appt_day)
+    .span-11.last.calendar.date.wide
+      %span= day.to_s(:appt_day)
     - reset_cycle
     -# sort all day's stuff by start at time; where an appointment and a capacity slot are at the same time, the capacity slot always comes first
     - stuff.sort_by{ |o| [o.start_at.in_time_zone, (o.class == CapacitySlot2 ? 0 : 1)] }.each do |object|

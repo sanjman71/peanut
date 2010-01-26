@@ -1,6 +1,7 @@
 - capacity_slots_by_day.each do |day, slots|
-  .span-15.last.slots.date{:id => "slots_#{day.to_s(:appt_schedule_day)}", :style => 'padding-top: 5px;'}
-    .span-12.calendar.date.wide= day.to_s(:appt_day)
+  .span-15.last.slots.date.padding-top-5{:id => "slots_#{day.to_s(:appt_schedule_day)}"}
+    .span-12.calendar.date.wide
+      %span= day.to_s(:appt_day)
 
     -# group slots by provider
     - reset_cycle
