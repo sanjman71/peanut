@@ -2,8 +2,8 @@
   .span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
     .span-11.last.calendar.date.wide= day.to_s(:appt_day)
     - reset_cycle
-    -# sort all day's stuff by start at time
-    - stuff.sort_by{|o| o.respond_to?(:start_at) ? o.start_at : ""}.each do |object|
+    -# sort all day's stuff by start at time; where an appointment and a capacity slot are at the same time, the capacity slot always comes first
+    - stuff.sort_by{ |o| [o.start_at.in_time_zone, (o.class == CapacitySlot2 ? 0 : 1)] }.each do |object|
       -# check what type of stuff it is, possible options:
       -# appointments, capacity_slots, [waitlist, date, waitlist_time_range]
       - case
