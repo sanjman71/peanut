@@ -121,6 +121,7 @@ $.fn.init_openings_sliders = function() {
 */
 
 // Note: not currently used
+/*
 $.fn.init_openings_show_single_date = function() {
   // set hover states to show selected date, ignore past dates
   $(".weekday.free:not(.past),.weekend.free:not(.past)").hover(
@@ -140,6 +141,7 @@ $.fn.init_openings_show_single_date = function() {
     }
   );
 }
+*/
 
 $.fn.init_openings_bookit = function() {
   $("a.bookit").click(function() {
