@@ -89,7 +89,7 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to(:provider) { @johnny }
       should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
       should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
-      should_assign_to :capacity_and_work_by_free_appt, :class => Hash
+      should_assign_to :capacity_and_work_by_day, :class => Hash
       should_assign_to :calendar_markings, :class => Hash
       should_assign_to(:when) { "next 2 weeks" }
       should_assign_to(:today)
@@ -136,7 +136,7 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to(:provider) { @johnny }
       should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
       should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
-      should_assign_to :capacity_and_work_by_free_appt, :class => Hash
+      should_assign_to :capacity_and_work_by_day, :class => Hash
       should_assign_to :calendar_markings, :class => Hash
       should_assign_to(:today)
       should_not_assign_to(:when)
@@ -185,7 +185,7 @@ class CalendarControllerTest < ActionController::TestCase
     should_assign_to(:provider) { @johnny }
     should_assign_to(:providers, :class => Array) { [@johnny, @mary] }
     should_assign_to :stuff_by_day, :class => ActiveSupport::OrderedHash
-    should_assign_to :capacity_and_work_by_free_appt, :class => Hash
+    should_assign_to :capacity_and_work_by_day, :class => Hash
     should_assign_to :calendar_markings, :class => Hash
     should_assign_to(:today)
     should_assign_to(:when) { "next 2 weeks" }
