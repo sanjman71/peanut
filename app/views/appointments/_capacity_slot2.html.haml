@@ -1,12 +1,3 @@
-<<<<<<< HEAD:app/views/appointments/_capacity_slot2.html.haml
-.span-15.last.slot{:class => [(slot.capacity < 0 ? "overbooked" : "free"), cycle("", "shaded")].join(' ')}[slot]
-  .span-4.time
-    %span== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
-  .span-6.service{:class => 'free'}
-    - if slot.capacity >= 1
-      %h6==Free - #{pluralize(slot.capacity, 'slot')} available
-    - elsif slot.capacity < 1
-=======
 .span-15.last.slot{:class => [(slot.capacity > 0 ? "free" : "overbooked" ), cycle("", "shaded")].join(' ')}[slot]
   .span-4.time
     %span== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
@@ -14,5 +5,4 @@
     - if slot.capacity > 0
       %h6==Free - #{pluralize(slot.capacity, 'slot')} available
     - else
->>>>>>> edb4a0f3e65f97bbfb6418bfc9a025610e95b9c9:app/views/appointments/_capacity_slot2.html.haml
       %h6==Overbooked by #{pluralize(slot.capacity.abs, 'slot')}
