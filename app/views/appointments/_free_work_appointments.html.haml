@@ -44,6 +44,3 @@
               = link_to('Cancel availability', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
             - else
               = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
-          - elsif appointment.work? && appointment.canceled?
-            -# canceled work appointment
-            == Canceled
