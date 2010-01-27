@@ -16,7 +16,7 @@
 
       -# show provider slots iff if the provider has at least 1 time slot
       - if slot_start_times.size > 0
-        .span-15.last.free.provider.slot{:class => cycle("", "shaded"), :id => slot_id, :count => slot_start_times.size}
+        .span-15.last.free.provider.slot{:class => cycle("shaded", ""), :id => slot_id, :count => slot_start_times.size}
           .span-15.last
             .span-5.provider.padding-top-5[provider]
               %h4{:style => 'margin-left: 5px;'}= provider.name
