@@ -88,8 +88,8 @@ class CalendarController < ApplicationController
     # initialize today
     @today               = DateRange.today.beginning_of_day
 
-    # combine capacity and work, sorted by start_at time; where an appointment and a capacity slot are at the same time, the capacity slot comes first
-    @capacity_and_work   = (@capacity_slots + @work_appointments).sort_by{ |o| [o.start_at.in_time_zone, (o.class == CapacitySlot2 ? 0 : 1)] }
+    # combine capacity and work; sorting time slots is done in the view
+    @capacity_and_work   = (@capacity_slots + @work_appointments)
 
     # find waitlist appointments for the specified provider over a daterange
     @waitlists = Waitlist.find_matching(current_company, current_location, @provider, @daterange).inject([]) do |array, waitlist|
