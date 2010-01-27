@@ -26,7 +26,7 @@ class OpeningsControllerTest < ActionController::TestCase
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
   def setup
-    # create a valid company, with 1 provider and 1 work service
+    # create a valid company, with 1 service and 2 providers
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
@@ -34,17 +34,18 @@ class OpeningsControllerTest < ActionController::TestCase
     @owner.grant_role('company manager', @company)
     @johnny       = Factory(:user, :name => "Johnny")
     @company.user_providers.push(@johnny)
+    @peter        = Factory(:user, :name => "Peter")
+    @company.user_providers.push(@peter)
     @haircut      = Factory.build(:work_service, :name => "Haircut", :price => 10.00, :duration => 30.minutes)
     @company.services.push(@haircut)
     @haircut.user_providers.push(@johnny)
+    @haircut.user_providers.push(@peter)
     @company.reload
     # stub current company method for the controller and the view
     @controller.stubs(:current_company).returns(@company)
     # stub current location to anywhere
     @controller.stubs(:current_location).returns(Location.anywhere)
     @controller.stubs(:current_locations).returns([])
-    # Set the request hostname
-    # @request.host = "www.peanut.com"
   end
   
   context "search" do
@@ -174,7 +175,7 @@ class OpeningsControllerTest < ActionController::TestCase
       should_render_template 'openings/index.html.haml'
     end
 
-    context "with a specific service" do
+    context "with a specific service and any provider" do
       context "as guest" do
         setup do
           get :index, :service_id => @haircut.id, :duration => @haircut.duration, :when => 'this-week', :time => 'anytime'
@@ -200,6 +201,9 @@ class OpeningsControllerTest < ActionController::TestCase
           assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
         end
 
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
+
         should "have rpx login dialog" do
           assert_select "div#rpx_login_dialog", 1
         end
@@ -208,8 +212,25 @@ class OpeningsControllerTest < ActionController::TestCase
           assert_select "div#confirm_appointment_dialog", 0
         end
         
-        should_respond_with :success
-        should_render_template 'openings/index.html.haml'
+        should "have service select list with 1 service" do
+          assert_select "select.openings.search.wide#service_id", 1
+          assert_select "select.openings.search.wide#service_id" do
+            assert_select "option[value='#{@haircut.id}']", {:text => 'Haircut'}
+          end
+        end
+
+        should "have provider select list with 2 providers'" do
+          assert_select "select.openings.search.wide#provider", 1
+          assert_select "select.openings.search.wide#provider option", 2
+          assert_select "select.openings.search.wide#provider" do
+            assert_select "option[value='users/#{@johnny.id}']", {:text => 'Johnny'}
+            assert_select "option[value='users/#{@peter.id}']", {:text => 'Peter'}
+          end
+        end
+
+        should "have no available capacity slots" do
+          assert_select "div#free_capacity_slots div.slots", 0
+        end
       end
       
       context "as company manager" do
@@ -238,6 +259,9 @@ class OpeningsControllerTest < ActionController::TestCase
           assert_equal ['Select a service', 'Haircut'], assigns(:services).collect(&:name)
         end
 
+        should_respond_with :success
+        should_render_template 'openings/index.html.haml'
+
         should "not have rpx login dialog" do
           assert_select "div#rpx_login_dialog", 0
         end
@@ -246,8 +270,25 @@ class OpeningsControllerTest < ActionController::TestCase
           assert_select "div#confirm_appointment_dialog", 1
         end
 
-        should_respond_with :success
-        should_render_template 'openings/index.html.haml'
+        should "have service select list with 1 service" do
+          assert_select "select.openings.search.wide#service_id", 1
+          assert_select "select.openings.search.wide#service_id" do
+            assert_select "option[value='#{@haircut.id}']", {:text => 'Haircut'}
+          end
+        end
+
+        should "have provider select list with 2 providers'" do
+          assert_select "select.openings.search.wide#provider", 1
+          assert_select "select.openings.search.wide#provider option", 2
+          assert_select "select.openings.search.wide#provider" do
+            assert_select "option[value='users/#{@johnny.id}']", {:text => 'Johnny'}
+            assert_select "option[value='users/#{@peter.id}']", {:text => 'Peter'}
+          end
+        end
+
+        should "have no available capacity slots" do
+          assert_select "div#free_capacity_slots div.slots", 0
+        end
       end
     end
   end
