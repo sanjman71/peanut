@@ -100,8 +100,8 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 0, @appt.start_at.in_time_zone.hour
       assert_equal 2, @appt.end_at.in_time_zone.hour
       assert_equal 1, @appt.capacity
-      assert_equal 1, @company.capacity_slots.provider(@provider).location(Location.anywhere).first.capacity
-      assert_equal 1, @company.capacity_slots.provider(@provider).location(Location.anywhere).count
+      assert_equal 1, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.capacity
+      assert_equal 1, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).count
     end
   
     should "have a valid uid" do
@@ -112,11 +112,11 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create free appointment and test unscheduled time" do
     setup do
-      @start_at_utc   = Time.zone.now.beginning_of_day.utc
-      @end_at_utc     = @start_at_utc + 1.hour
-      @start_at_day   = @start_at_utc.to_s(:appt_schedule_day)
-      @daterange      = DateRange.parse_range(@start_at_day, @start_at_day)
-      @appt           = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at_utc, :end_at => @end_at_utc)
+      @start_at     = Time.zone.now.beginning_of_day + 1.hour
+      @end_at       = @start_at + 23.hours
+      @start_at_day = @start_at.to_s(:appt_schedule_day)
+      @daterange    = DateRange.parse_range(@start_at_day, @start_at_day)
+      @appt         = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
     end
       
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -128,11 +128,10 @@ class AppointmentTest < ActiveSupport::TestCase
     should "have 1 unscheduled slot today for 23 hours starting at 1 am" do
       # build mapping of unscheduled time
       @unscheduled = @company.capacity_slots.provider(@provider)
-      assert_equal [@start_at_day], @unscheduled.keys
-      assert_equal 1, @unscheduled[@start_at_day].size
-      assert_equal 23.hours, @unscheduled[@start_at_day].first.duration
-      assert_equal 1, @unscheduled[@start_at_day].first.start_at.in_time_zone.hour
-      assert_equal 0, @unscheduled[@start_at_day].first.end_at.in_time_zone.hour
+      assert_equal 1, @unscheduled.size
+      assert_equal 23.hours, @unscheduled.first.duration
+      assert_equal 1, @unscheduled.first.start_at.in_time_zone.hour
+      assert_equal 0, @unscheduled.first.end_at.in_time_zone.hour
     end
   
     context "then remove company" do
@@ -372,7 +371,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     should "have a free appointment of capacity 2 and a capacity slot of capacity 2" do
       assert_equal 2, @free_appt.capacity
-      assert_equal 2, @company.provider(@provider).location(Location.anywhere).capacity_slots.first.capacity
+      assert_equal 2, @company.capacity_slots.provider(@provider2).general_location(Location.anywhere).first.capacity
     end
       
     context "and schedule work appointment using service capacity 2" do
@@ -498,11 +497,9 @@ class AppointmentTest < ActiveSupport::TestCase
       
       should "have instances with capacity slots with a duration of 2 hours and start at 0000 and finish at 0200" do
         @recurrence.recur_instances.each do |a|
-          assert_equal 2.hours, a.capacity_slots.first.duration
-          assert_equal 0, @company.capacity_slots.provider(@provider).location(Location.anywhere).first.start_at.in_time_zone.hour
-          assert_equal 2, @company.capacity_slots.provider(@provider).location(Location.anywhere).first.end_at.in_time_zone.hour
-          assert_equal 0.hours - Time.zone.utc_offset, @company.capacity_slots.provider(@provider).location(Location.anywhere).first.time_start_at
-          assert_equal 2.hours - Time.zone.utc_offset, @company.capacity_slots.provider(@provider).location(Location.anywhere).first.time_end_at
+          assert_equal 2.hours, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.duration
+          assert_equal 0, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.start_at.in_time_zone.hour
+          assert_equal 2, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.end_at.in_time_zone.hour
         end
       end
       
