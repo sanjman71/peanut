@@ -164,7 +164,7 @@ class WalnutDemo
     recur_rule = "FREQ=WEEKLY;BYDAY=#{days}"
     start_at   = Time.zone.now.beginning_of_day + start_time
     end_at     = Time.zone.now.beginning_of_day + end_time
-    free_appt  = AppointmentScheduler2.create_free_appointment(company, Location.anywhere, provider, :start_at => start_at, :end_at => end_at,
+    free_appt  = AppointmentScheduler.create_free_appointment(company, Location.anywhere, provider, :start_at => start_at, :end_at => end_at,
                     :recur_rule => recur_rule, :description => "Available")
     puts "create_weekly_free_appt: finished creating weekly available time for #{provider.name} at #{company.name}"
   end

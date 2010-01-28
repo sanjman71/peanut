@@ -54,7 +54,7 @@ class AppointmentsController < ApplicationController
         end
 
         # build the work appointment without committing the changes
-        @appointment          = AppointmentScheduler2.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
+        @appointment          = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
 
         # set appointment date, start_at and end_at times in local time
         @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
@@ -135,7 +135,7 @@ class AppointmentsController < ApplicationController
           end
 
           # create work appointment, with preferences
-          @appointment        = AppointmentScheduler2.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
+          @appointment        = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
           # set flash message
@@ -144,7 +144,7 @@ class AppointmentsController < ApplicationController
           # check if its an appointment reschedule
           if has_reschedule_id?
             # cancel the old work appointment
-            AppointmentScheduler2.cancel_work_appointment(get_reschedule_appointment)
+            AppointmentScheduler.cancel_work_appointment(get_reschedule_appointment)
             # reset reschedule id
             reset_reschedule_id
             # reset flash message
@@ -170,7 +170,7 @@ class AppointmentsController < ApplicationController
           @options        = {:time_range => @time_range}
           @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
           # create free appointment, with preferences
-          @appointment    = AppointmentScheduler2.create_free_appointment(current_company, current_location, @provider, @options)
+          @appointment    = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
           flash[:notice]  = "Created available time"
@@ -249,7 +249,7 @@ class AppointmentsController < ApplicationController
     @daterange = DateRange.parse_when('next 4 weeks', :end_on => ((current_company.preferences[:start_wday].to_i - 1) % 7))
         
     # find free work appointments
-    @free_work_appts    = AppointmentScheduler2.find_free_work_appointments(current_company, current_location, @provider, @daterange)
+    @free_work_appts    = AppointmentScheduler.find_free_work_appointments(current_company, current_location, @provider, @daterange)
 
     # group appointments by day
     @free_work_appts_by_day = @free_work_appts.group_by { |appt| appt.start_at.utc.beginning_of_day }
@@ -384,7 +384,7 @@ class AppointmentsController < ApplicationController
     
     begin
       # Create the first appointment in the sequence
-      @appointment  = AppointmentScheduler2.create_free_appointment(current_company, current_location, @provider, @options)
+      @appointment  = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
     rescue Exception => e
       @error        = e.message
     end
@@ -518,7 +518,7 @@ class AppointmentsController < ApplicationController
     case @appointment.mark_as
     when Appointment::WORK
       # cancel the work appointment
-      AppointmentScheduler2.cancel_work_appointment(@appointment)
+      AppointmentScheduler.cancel_work_appointment(@appointment)
     end
 
     # redirect to referer; default to apointment path

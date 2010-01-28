@@ -19,7 +19,7 @@ class CalDavResourceTest < ActiveSupport::TestCase
       @company.user_providers.push(@johnny)
       @today            = Time.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range       = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
-      @free_appt        = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      @free_appt        = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
       @cal_dav_resource = CalDavResource.new(@company.appointments, @company)
     end
 

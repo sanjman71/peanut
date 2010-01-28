@@ -228,7 +228,7 @@ $.fn.init_add_calendar_markings = function() {
     })
 
     // count capacity slot 2 divs, but not those that indicate overbooked - only those that are free
-    $(this).find("div.capacity_slot2.free").each(function() {
+    $(this).find("div.capacity_slot.free").each(function() {
       capacity_slots += 1;
     })
 

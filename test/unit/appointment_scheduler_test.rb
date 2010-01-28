@@ -1,6 +1,6 @@
 require 'test/test_helper'
 
-class AppointmentScheduler2Test < ActiveSupport::TestCase
+class AppointmentSchedulerTest < ActiveSupport::TestCase
   
   def setup
     @owner          = Factory(:user, :name => "Owner")
@@ -32,7 +32,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @end_at           = (@start_tomorrow + 8.hours).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
   
       # search for free capacity
@@ -40,7 +40,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
     
     should "find no free capacity slots" do
-      slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+      slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [], slots
@@ -53,7 +53,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "find 1 slot 0 8 c 1" do
-        slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+        slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -69,20 +69,20 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       # create free appointment that ended a few minutes ago
       @start_at         = (@start_tomorrow - 2.days).to_s(:appt_schedule)
       @end_at           = (@start_tomorrow - 2.days + 8.hours).to_s(:appt_schedule)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
     end
     
     context "and search for free appointments" do
       should "find no slots without :keep_old => true" do
-        slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+        slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [], slots
       end
   
       should "find 1 slot 0 8 c 1 with :keep_old => true" do
-        slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :keep_old => true).
+        slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :keep_old => true).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -100,7 +100,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       # create a free appointment that starts tomorrow
       @start_at           = (@start_tomorrow).to_s(:appt_schedule)
       @end_at             = (@start_tomorrow + 8.hours).to_s(:appt_schedule)
-      @free_appointment   = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
     end
   
@@ -108,7 +108,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and search for free capacity slots" do
       should "find 1 slot 0 8 c 1" do
-        slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+        slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -126,45 +126,45 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @end_at           = (@start_tomorrow + 8.hours).to_s(:appt_schedule)
   
       # create free appointment
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, :capacity => 3)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, :capacity => 3)
       assert_valid @free_appointment
       
-      AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => (@start_tomorrow + 0.hours).to_s(:appt_schedule), :capacity => 1)
-      AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => (@start_tomorrow + 1.hours).to_s(:appt_schedule), :capacity => 2)
-      AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => (@start_tomorrow + 2.hours).to_s(:appt_schedule), :capacity => 1)
-      AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => (@start_tomorrow + 5.hours).to_s(:appt_schedule), :capacity => 1)
+      AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => (@start_tomorrow + 0.hours).to_s(:appt_schedule), :capacity => 1)
+      AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => (@start_tomorrow + 1.hours).to_s(:appt_schedule), :capacity => 2)
+      AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => (@start_tomorrow + 2.hours).to_s(:appt_schedule), :capacity => 1)
+      AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => (@start_tomorrow + 5.hours).to_s(:appt_schedule), :capacity => 1)
     end
 
     should "have 1 slot from after the work appointment to end of day capacity 1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 1, 1.hours, 2], [1, 2, 1.hour, 1], [3, 5, 2.hours, 3], [5, 7, 2.hours, 2], [7, 8, 1.hours, 3]], slots
     end
 
     should "find free capacity slots capacity 1" do
-      slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 1).
+      slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 1).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 2, 2.hours, 1], [3, 8, 5.hours, 2]], slots
     end
 
     should "find free capacity slots capacity 2" do
-      slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 2).
+      slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 2).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 1, 1.hour, 2], [3, 8, 5.hours, 2]], slots
     end
 
     should "find free capacity slots capacity 3" do
-      slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 3).
+      slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 3).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[3, 5, 2.hours, 3], [7, 8, 1.hours, 3]], slots
     end
 
     should "find free capacity slots capacity 4" do
-      slots = AppointmentScheduler2.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 4).
+      slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange, :capacity => 4).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [], slots
@@ -186,11 +186,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @end_at           = (@start_tomorrow + 8.hours).to_s(:appt_schedule)
   
       # create free appointment
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @customer, :start_at => @start_at)
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @customer, :start_at => @start_at)
       @end_appt         = (@start_tomorrow + @haircut.duration).to_s(:appt_schedule)
       assert_valid @work_appointment
   
@@ -210,7 +210,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
     
     should "have 1 slot from after the work appointment to end of day capacity 1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[1, 8, 7.hours, 1]], slots
@@ -218,7 +218,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
       
       # should have 1 free appointment and 1 work appointment in a 'canceled' state
@@ -230,7 +230,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
       
       should "have 1 slot from after the work appointment to end of day capacity 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -250,11 +250,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow + 4.hours).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, with a custom duration
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => @start_work)
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, :start_at => @start_work)
       assert_valid @work_appointment
     end
   
@@ -271,7 +271,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 2 capacity slots from start of free time to start of work appt, end of work appt to end of free time" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 4, 4.hours, 1], [6, 8, 2.hours, 1]], slots
@@ -279,7 +279,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment, and 1 work appointment in a 'canceled' state
@@ -291,7 +291,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -312,11 +312,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow + 8.hours - 1.hour).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => @start_work)
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 1.hour, @customer, :start_at => @start_work)
       assert_valid @work_appointment
     end
   
@@ -333,7 +333,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 1 slot 0 7 c 1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 7, 7.hours, 1]], slots
@@ -341,7 +341,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -353,7 +353,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -372,11 +372,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @end_at           = (@start_tomorrow + @haircut.duration).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
       
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @customer, :start_at => @start_at)
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @customer, :start_at => @start_at)
       assert_valid @work_appointment
     end
   
@@ -393,7 +393,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have no slots" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [], slots
@@ -401,7 +401,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment in a canceled state
@@ -413,7 +413,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 1 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 1, 1.hour, 1]], slots
@@ -434,11 +434,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow + 8.hours - 1.hour).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
   
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
       assert_valid @work_appointment
     end
   
@@ -455,7 +455,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 2 slots 0 7 c 1; 8 9 c -1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 7, 7.hours, 1], [8, 9, 1.hour, -1]], slots
@@ -463,7 +463,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -475,7 +475,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -495,11 +495,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow + 8.hours + 1.hour).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
   
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
       assert_valid @work_appointment
     end
   
@@ -516,7 +516,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 2 slots 0 8 c 1; 9 11 c -1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 8, 8.hours, 1], [9, 11, 2.hours, -1]], slots
@@ -524,7 +524,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -536,7 +536,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -556,11 +556,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow - 1.hour).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
   
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
       assert_valid @work_appointment
     end
   
@@ -577,7 +577,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 2 slots 0 7 c 1; 8 9 c -1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[1, 8, 7.hours, 1], [23, 0, 1.hour, -1]], slots
@@ -585,7 +585,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -597,7 +597,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
@@ -617,11 +617,11 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       @start_work       = (@start_tomorrow - 3.hours).to_s(:appt_schedule)
   
       # create free appointment (all day)
-      @free_appointment = AppointmentScheduler2.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
+      @free_appointment = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at)
       assert_valid @free_appointment
   
       # schedule the work appointment, the free appointment should be split into free/work time
-      @work_appointment = AppointmentScheduler2.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
+      @work_appointment = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @haircut, 2.hours, @customer, {:start_at => @start_work}, {:force => true})
       assert_valid @work_appointment
     end
   
@@ -638,7 +638,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
     end
   
     should "have 2 slots 0 7 c 1; 8 9 c -1" do
-      slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+      slots = @company.capacity_slots.provider(@provider).general_location(@location).
                 map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [[0, 8, 8.hours, 1], [21, 23, 2.hours, -1]], slots
@@ -646,7 +646,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler2.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_work_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -658,7 +658,7 @@ class AppointmentScheduler2Test < ActiveSupport::TestCase
       end
   
       should "have 1 slot 0 8 c 1" do
-        slots = @company.capacity_slot2s.provider(@provider).general_location(@location).
+        slots = @company.capacity_slots.provider(@provider).general_location(@location).
                   map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
