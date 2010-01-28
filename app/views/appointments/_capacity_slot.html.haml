@@ -1,9 +1,0 @@
-.span-8.last.slot{:class => [cycle("", "shaded")].join(' ')}[slot]
-  .span-4.time
-    %span== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
-  .span-4.last
-    .span-4.last.service{:class => 'free'}
-      %h6==Free
-    - if slot.free_appointment.capacity > 1
-      .span-4.last.capacity
-        == #{pluralize(slot.capacity, 'slot')} available
