@@ -21,13 +21,17 @@ class CapacitySlotTest < ActiveSupport::TestCase
     @chicago        = Factory(:chicago, :state => @il)
     @z60610         = Factory(:zip, :name => "60610", :state => @il)
     @location       = Factory(:location, :street_address => "123 main st.", :country => @us, :state => @il, :city => @chicago, :zip => @zip)
+    @location2      = Factory(:location, :street_address => "456 side st.", :country => @us, :state => @il, :city => @chicago, :zip => @zip)
     assert_valid    @location
+    assert_valid    @location2
 
     @company        = Factory(:company, :subscription => @subscription)
     @company.locations.push(@location)
+    @company.locations.push(@location2)
     @location.reload
     assert_valid @company
     assert_equal @company, @location.company
+    assert_equal @company, @location2.company
 
     @anywhere       = Location.anywhere
     @customer       = Factory(:user, :name => "Customer")
@@ -274,7 +278,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
   
       should "raise exception if we reduce capacity by 5-7 c 2" do
-        assert_raise AppointmentInvalid, "No capacity available" do
+        assert_raise AppointmentInvalid, "Not enough capacity available" do
           CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
         end
       end
@@ -361,7 +365,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
   context "with no capacity" do
     should "raise exception if we reduce capacity by 5-7 c 2" do
-      assert_raise AppointmentInvalid, "No capacity available" do
+      assert_raise AppointmentInvalid, "Not enough capacity available" do
         CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
       end
     end
@@ -861,7 +865,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid, "No capacity available" do
+        assert_raise AppointmentInvalid, "Not enough capacity available" do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -1354,6 +1358,249 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
     end
   
+  end
+  
+  #
+  # check the consolidate_capacity_slots function, to make sure it only does this as appropriate
+  #
+  context "create two adjacent capacity slots capacity 4 in the same location" do
+    setup do
+      # create free time from 0 to 4 and 4-8 tomorrow, in the same location
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow, :end_at => @start_tomorrow + 4.hours, :capacity => 4)
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow + 4.hours, :end_at => @start_tomorrow + 8.hours, :capacity => 4)
+    end
+      
+    should_change("CapacitySlot.count", :by => 2) { CapacitySlot.count }
+    
+    should "have two capacity slots from 0-4 c 4 and 4-8 c 4" do
+      slots = @company.capacity_slots.provider(@provider).
+                map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+      assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location.id]], slots
+    end
+    
+    context "consolidate the capacity slots" do
+      setup do
+        CapacitySlot.consolidate_capacity_slots(@company, @location, @provider, @start_tomorrow, @start_tomorrow + 8.hours)
+      end
+
+      # Should have one slot
+      should_change("CapacitySlot.count", :by => -1) { CapacitySlot.count }
+
+      should "have one capacity slot from 0-8 c 4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 8, 8.hours, 4, @location.id]], slots
+      end
+
+    end
+    
+  end
+    
+  context "create two adjacent capacity slots capacity 4 in different locations" do
+    setup do
+      # create free time from 0-4 and 4-8 tomorrow, in different locations
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow, :end_at => @start_tomorrow + 4.hours, :capacity => 4)
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location2,
+                                    :start_at => @start_tomorrow + 4.hours, :end_at => @start_tomorrow + 8.hours, :capacity => 4)
+    end
+      
+    should_change("CapacitySlot.count", :by => 2) { CapacitySlot.count }
+    
+    should "have two capacity slots from 0-4 c 4 and 4-8 c 4" do
+      slots = @company.capacity_slots.provider(@provider).
+                map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+      assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id]], slots
+    end
+    
+    context "consolidate the capacity slots" do
+      setup do
+        CapacitySlot.consolidate_capacity_slots(@company, @location, @provider, @start_tomorrow, @start_tomorrow + 8.hours)
+      end
+
+      # Should have two slots still
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+
+      should "have two capacity slots from 0-4 c 4 and 4-8 c 4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id]], slots
+      end
+
+    end
+    
+  end
+
+  context "create three adjacent capacity slots capacity 4 in alternating locations" do
+    setup do
+      # create free time from 0-4, 4-8 and 8-12 tomorrow, in different locations
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow, :end_at => @start_tomorrow + 4.hours, :capacity => 4)
+      @slot2 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location2,
+                                    :start_at => @start_tomorrow + 4.hours, :end_at => @start_tomorrow + 8.hours, :capacity => 4)
+      @slot3 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow + 8.hours, :end_at => @start_tomorrow + 12.hours, :capacity => 4)
+    end
+      
+    should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
+    
+    should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+      slots = @company.capacity_slots.provider(@provider).
+                map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+      assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id], [8, 12, 4.hours, 4, @location.id]], slots
+    end
+    
+    context "consolidate the capacity slots from 4-8 for @location" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, @location, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should still have three slots
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+
+      should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id], [8, 12, 4.hours, 4, @location.id]], slots
+      end
+
+    end
+    
+    context "consolidate the capacity slots from 4-8 for @location2" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, @location2, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should still have three slots
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+
+      should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id], [8, 12, 4.hours, 4, @location.id]], slots
+      end
+
+    end
+
+  end
+
+  context "create three adjacent capacity slots capacity 4, one slot in one location then two in a second location" do
+    setup do
+      # create free time from 0-4, 4-8 and 8-12 tomorrow, in different locations
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow, :end_at => @start_tomorrow + 4.hours, :capacity => 4)
+      @slot2 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location2,
+                                    :start_at => @start_tomorrow + 4.hours, :end_at => @start_tomorrow + 8.hours, :capacity => 4)
+      @slot3 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location2,
+                                    :start_at => @start_tomorrow + 8.hours, :end_at => @start_tomorrow + 12.hours, :capacity => 4)
+    end
+      
+    # Should have three slots
+    should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
+    
+    should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+      slots = @company.capacity_slots.provider(@provider).
+                map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+      assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id], [8, 12, 4.hours, 4, @location2.id]], slots
+    end
+    
+    # We have to consolidate using @location separately from @location2
+    context "consolidate the capacity slots for @location" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, @location, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should still have three slots
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+
+      should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, @location2.id], [8, 12, 4.hours, 4, @location2.id]], slots
+      end
+
+    end
+
+    context "consolidate the capacity slots for @location2" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, @location2, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should have two slots
+      should_change("CapacitySlot.count", :by => -1) { CapacitySlot.count }
+
+      should "have two capacity slots from 0-4 c 4, 4-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 12, 8.hours, 4, @location2.id]], slots
+      end
+
+    end
+    
+  end
+
+  # Using Location.anywhere will ensure that we're using the correct version of specific_location vs general_location in the consolidation function
+  context "create three adjacent capacity slots capacity 4, one slot in one location then two in Location.anywhere" do
+    setup do
+      # create free time from 0-4, 4-8 and 8-12 tomorrow, in different locations
+      @slot1 = CapacitySlot.create(:company => @company, :provider => @provider, :location => @location,
+                                    :start_at => @start_tomorrow, :end_at => @start_tomorrow + 4.hours, :capacity => 4)
+      @slot2 = CapacitySlot.create(:company => @company, :provider => @provider, :location => Location.anywhere,
+                                    :start_at => @start_tomorrow + 4.hours, :end_at => @start_tomorrow + 8.hours, :capacity => 4)
+      @slot3 = CapacitySlot.create(:company => @company, :provider => @provider, :location => Location.anywhere,
+                                    :start_at => @start_tomorrow + 8.hours, :end_at => @start_tomorrow + 12.hours, :capacity => 4)
+    end
+      
+    # Should have three slots
+    should_change("CapacitySlot.count", :by => 3) { CapacitySlot.count }
+    
+    should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+      slots = @company.capacity_slots.provider(@provider).
+                map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+      assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, Location.anywhere.id], [8, 12, 4.hours, 4, Location.anywhere.id]], slots
+    end
+    
+    # We have to consolidate using @location separately from @location2
+    context "consolidate the capacity slots for @location" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, @location, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should still have three slots
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+
+      should "have three capacity slots from 0-4 c 4, 4-8 c 4 and 8-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 8, 4.hours, 4, Location.anywhere.id], [8, 12, 4.hours, 4, Location.anywhere.id]], slots
+      end
+
+    end
+
+    context "consolidate the capacity slots for Location.anywhere" do
+      setup do
+        # Note that we consolidate using 4-8, so we test that we are impacting abutting slots also
+        CapacitySlot.consolidate_capacity_slots(@company, Location.anywhere, @provider, @start_tomorrow + 4.hours, @start_tomorrow + 8.hours)
+      end
+
+      # Should have two slots
+      should_change("CapacitySlot.count", :by => -1) { CapacitySlot.count }
+
+      should "have two capacity slots from 0-4 c 4, 4-12 c4" do
+        slots = @company.capacity_slots.provider(@provider).
+                  map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity, s.location_id]}.sort_by{|s| [s[0], s[1], s[3]] }
+        assert_equal [[0, 4, 4.hours, 4, @location.id], [4, 12, 8.hours, 4, Location.anywhere.id]], slots
+      end
+
+    end
+    
   end
 
   # # 
