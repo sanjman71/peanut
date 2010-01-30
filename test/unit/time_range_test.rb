@@ -143,28 +143,30 @@ class TimeRangeTest < ActiveSupport::TestCase
       @time_range = TimeRange.new(:day => @now.to_s(:appt_schedule_day))
     end
   
-    should "start today at 0000 hours" do
+    should "start today at 00:00:00 hours" do
       assert_equal 0, @time_range.start_at.in_time_zone.hour
       assert_equal 0, @time_range.start_at.in_time_zone.min
+      assert_equal 0, @time_range.start_at.in_time_zone.sec
       assert_equal @now.yday, @time_range.start_at.in_time_zone.yday
     end
   
-    should "end tomorrow at 0000" do
-      assert_equal 0, @time_range.end_at.in_time_zone.hour
-      assert_equal 0, @time_range.end_at.in_time_zone.min
+    should "end tomorrow at 00:00:00" do
+      assert_equal 00, @time_range.end_at.in_time_zone.hour
+      assert_equal 00, @time_range.end_at.in_time_zone.min
+      assert_equal 00, @time_range.end_at.in_time_zone.sec
       assert_equal @now.yday+1, @time_range.end_at.in_time_zone.yday
     end
 
     should "have time_start_at and time_end_at in local time" do
       # Note that we add 24 hours to the calculation of time_end_at, as the end_day is one day later than the start day
-      assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes, @time_range.time_start_at
-      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes, @time_range.time_end_at
+      assert_equal @time_range.start_at.in_time_zone.hour.hours + @time_range.start_at.in_time_zone.min.minutes + @time_range.start_at.in_time_zone.sec.seconds, @time_range.time_start_at
+      assert_equal @time_range.end_at.in_time_zone.hour.hours + @time_range.end_at.in_time_zone.min.minutes + @time_range.end_at.in_time_zone.sec.seconds, @time_range.time_end_at
     end
 
     should "have time_start_at_utc and time_end_at_utc in UTC time" do
       # Note that we add 24 hours to the calculation of time_end_at_utc, as the end_day is one day later than the start day
-      assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes, @time_range.time_start_at_utc
-      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes, @time_range.time_end_at_utc 
+      assert_equal @time_range.start_at.utc.hour.hours + @time_range.start_at.utc.min.minutes + @time_range.start_at.utc.sec.seconds, @time_range.time_start_at_utc
+      assert_equal @time_range.end_at.utc.hour.hours + @time_range.end_at.utc.min.minutes + @time_range.end_at.utc.sec.seconds, @time_range.time_end_at_utc 
     end
   
   end
