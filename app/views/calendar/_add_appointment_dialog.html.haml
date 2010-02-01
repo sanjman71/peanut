@@ -1,31 +1,57 @@
+- appointment = Appointment.new if local_assigns[:appointment].nil?
+
+-# service providers mapping services to providers
+.span-16.service_providers.hide
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
+
+.span-16.services.hide
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
+
 .span-11.prepend-1.last.dialog.hide#add_appointment_dialog{:title => "Schedule an Appointment for #{provider.name.titleize}"}
-  - form_for(Appointment.new, :url => schedule_work_path, :html => {:id => 'add_appointment_form'}) do |f|
+  - form_for(appointment, :url => schedule_work_path, :html => {:id => 'add_appointment_form'}) do |f|
     -# We don't bother with duration or capacity - both will be obtained from the service
     -# We don't bother with customer - it will default to current_user
     -# start_at is assigned by javascript based on the date and time
-    = hidden_field_tag :provider_type, provider.tableize
-    = hidden_field_tag :provider_id, provider.id
+    = hidden_field_tag 'initial_provider_id', provider.id
+    = hidden_field_tag 'initial_provider_type', provider.tableize
     = hidden_field_tag :mark_as, 'work'
     = hidden_field_tag :start_at
     = hidden_field_tag :customer_id
     = hidden_field_tag :force, 1
     
     .add_appointment
-      .span-11.last.padding-top-10
+      .span-11.last.date.padding-top-10
         .span-3.label
           %h4.bottom.block== Date
         .span-8.last#apt_start_date
           = text_field_tag 'date', '', :id =>'apt_start_date', :class => 'big disabled', :disabled => true
-      .span-11.last.padding-top-10
+      .span-11.last.service.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Service
         .span-8.last#service
           = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]}), :class => 'big appointment services wide'
+      .span-11.last.duration.padding-top-10
+        .span-8.last.prepend-3.last#duration_in_words
+          = Duration.to_words(duration, :prepend => "Typically") if @service
+      .span-11.last.change-duration.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== How long?
+        .span-8.last#duration
+          = select_tag('duration', options_for_select(service_duration_select_options, nil))
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Start Time
         .span-8.last#start_time_text
           = text_field_tag :apt_start_time, '', :class => 'appointment work timepicker big', :autocomplete => 'off'
+      .span-11.last
+        .span-2.text-align-right#who_text.padding-top-5
+          == With?
+        .span-5.last.field#who
+          = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Customer
