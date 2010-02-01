@@ -92,20 +92,20 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :history, :only => [:index], :collection => {:waitlist => :get}
   
   # search openings for a specified service and duration, and an optional provider
-  map.connect   '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
-                :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.connect   '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
-                 :controller => 'openings', :action => 'index'
-  map.connect   '/services/:service_id/:duration/openings/:start_date..:end_date/:time', 
-                 :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-  map.connect   '/services/:service_id/:duration/openings/:when/:time', 
-                 :controller => 'openings', :action => 'index'
+  map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time',
+                              :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+  map.openings_provider_when  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
+                              :controller => 'openings', :action => 'index'
+  map.openings_anyone_dates   '/services/:service_id/:duration/openings/:start_date..:end_date/:time',
+                              :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+  map.openings_anyone_when    '/services/:service_id/:duration/openings/:when/:time',
+                              :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration
-  map.schedule      '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
-                    :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule      '/schedule/:provider_type/:provider_id/services/:service_id/:start_at',
-                    :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+  map.schedule_service_start_duration '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
+                                      :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+  map.schedule_service_start          '/schedule/:provider_type/:provider_id/services/:service_id/:start_at',
+                                      :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
   map.schedule      '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                     :controller => 'appointments', :action => 'create_work', :mark_as => 'work', :conditions => {:method => :post}
   map.schedule_work '/schedule/work',
@@ -143,16 +143,16 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :post}
 
   # show/edit calendars scoped by provider (and optional format)
-  map.calendar_when_start   ':provider_type/:provider_id/calendar/when/:when/:start_date', :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
-  map.calendar_when         ':provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
-  map.calendar_when_format  ':provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
-  map.calendar_date_range         ':provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
-  map.calendar_date_range_format  ':provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.calendar_show         ':provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
-  map.calendar_show_format  ':provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
-  map.range_type_show ':provider_type/:provider_id/calendar/:range_type/:start_date', 
+  map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date', :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
+  map.calendar_when         '/:provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
+  map.calendar_when_format  '/:provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
+  map.calendar_date_range         '/:provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
+  map.calendar_date_range_format  '/:provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
+  map.calendar_show         '/:provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
+  map.calendar_show_format  '/:provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
+  map.range_type_show '/:provider_type/:provider_id/calendar/:range_type/:start_date', 
                        :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
-  map.connect         ':provider_type/:provider_id/calendar/:range_type/:start_date.:format', 
+  map.connect         '/:provider_type/:provider_id/calendar/:range_type/:start_date.:format', 
                        :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
 
   # search calendars scoped by provider
