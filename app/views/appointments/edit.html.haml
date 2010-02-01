@@ -1,0 +1,64 @@
+- stylesheet('appointments', 'notes')
+- javascript('appointments', 'notes')
+
+- appointment = Appointment.new if local_assigns[:appointment].nil?
+.span-24.mat.padding-top-10
+  .span-24
+    .span-10.prepend-1
+      - if @appointment.free?
+        %h2==Edit Availability
+      - else
+        %h2==Edit Appointment
+    .span-13.last
+      - if has_privilege?('update calendars', current_company)
+        - build_appointment_state_transition_links(@appointment) do |text, url, separator|
+          = link_to text, url, :class => 'admin'
+          = separator
+  .span-24.last
+    = render(:partial => 'appointment_header', :locals => {:appointment => @appointment})
+
+.span-14.prepend-1.last
+  = display_flash
+  
+.span-14.prepend-1.last
+  - form_for(appointment, :url => schedule_work_path, :html => {:id => 'edit_appointment_form'}) do |f|
+    -# We don't bother with duration or capacity - both will be obtained from the service
+    -# We don't bother with customer - it will default to current_user
+    -# start_at is assigned by javascript based on the date and time
+    = hidden_field_tag :provider_type, provider.tableize
+    = hidden_field_tag :provider_id, provider.id
+    = hidden_field_tag :mark_as, 'work'
+    = hidden_field_tag :start_at
+    = hidden_field_tag :customer_id
+    = hidden_field_tag :force, 1
+
+    .add_appointment
+      .span-11.last.padding-top-10
+        .span-3.label
+          %h4.bottom.block== Date
+        .span-8.last#apt_start_date
+          = text_field_tag 'date', '', :id =>'apt_start_date', :class => 'big disabled', :disabled => true
+      .span-11.last.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Service
+        .span-8.last#service
+          = select_tag :service_id, options_for_select(services.map {|s| [s.name, s.id]}), :class => 'big appointment services wide'
+      .span-11.last.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Start Time
+        .span-8.last#start_time_text
+          = text_field_tag :apt_start_time, '', :class => 'appointment work timepicker big', :autocomplete => 'off'
+      .span-11.last.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Customer
+        .span-8.last#customer_search
+          = text_field_tag '', '', :class => 'big', :autocomplete => 'off', :id => 'customer_name', :url => customers_path(:format => :json)
+        .span-8.prepend-3.last
+          %em.small== Search using name, phone number or email
+
+      - if has_privilege?('create users', current_company)
+        .span-8.prepend-3.last
+          %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'calendar_add_customer'
+
+      .span-8.last.padding-top-10.padding-bottom-10
+        #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_appointment'

@@ -533,6 +533,34 @@ class AppointmentsController < ApplicationController
     end
   end
 
+  # GET /appointments/1/edit
+  def edit
+    @appointment = company.appointments.find(params[:id])
+    
+    respond_to do |format|
+      format.html
+    end
+    
+  end
+  
+  # PUT /appointments/1
+  def update
+    @appointment = company.appointments.find(params[:id])
+    
+    if @appointment.update_attributes(params[:appointment])
+    
+      respond_to do |format|
+        format.html
+        format.js
+      end
+    else
+      respond_to do |format|
+        format.html
+        format.js
+      end
+    end
+  end
+  
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
