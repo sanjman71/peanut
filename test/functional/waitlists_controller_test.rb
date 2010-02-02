@@ -2,10 +2,10 @@ require 'test/test_helper'
 
 class WaitlistsControllerTest < ActionController::TestCase
 
-  # show waitlist for a specific provider by state
+  # show waitlist for a specific user by state
   should_route :get, '/users/1/waitlist/upcoming',  
                :controller => 'waitlists', :action => 'index', :provider_type => 'users', :provider_id => 1, :state => 'upcoming'
-  # show waitlist for a specific provider, no state
+  # show waitlist for a specific user, no state
   should_route :get, '/users/1/waitlist', :controller => 'waitlists', :action => 'index', :provider_type => 'users', :provider_id => 1
   # show waitlist for anyone
   should_route :get, '/waitlists', :controller => 'waitlists', :action => 'index'
@@ -44,64 +44,64 @@ class WaitlistsControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
   
-  context "new" do
-    context "as anonymous user" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(false)
-        get :new, :service_id => @haircut.id, :provider_id => @johnny.id, :provider_type => 'users'
-      end
+  # context "new" do
+  #   context "as anonymous user" do
+  #     setup do
+  #       # stub current user
+  #       @controller.stubs(:current_user).returns(false)
+  #       get :new, :service_id => @haircut.id, :provider_id => @johnny.id, :provider_type => 'users'
+  #     end
+  # 
+  #     should_respond_with :success
+  # 
+  #     should "show rpx login" do
+  #       assert_select 'div#rpx_login', true
+  #     end
+  # 
+  #     should "not show date and time fields" do
+  #       assert_select 'div#when', false
+  #     end
+  #   end
+  #   
+  #   context "as registered user" do
+  #     setup do
+  #       # stub current user
+  #       @controller.stubs(:current_user).returns(@customer)
+  #       get :new, :service_id => @haircut.id, :provider_id => @johnny.id, :provider_type => 'users'
+  #     end
+  # 
+  #     should_respond_with :success
+  # 
+  #     should "not show rpx login" do
+  #       assert_select 'div#rpx_login', false
+  #     end
+  # 
+  #     should "show date and time fields" do
+  #       assert_select 'div#when', true
+  #     end
+  #   end
+  # 
+  #   context "for 'anyone' provider" do
+  #     context "as registered user" do
+  #       setup do
+  #         # stub current user
+  #         @controller.stubs(:current_user).returns(@customer)
+  #         get :new, :service_id => @haircut.id, :provider_id => 0, :provider_type => 'users'
+  #       end
+  # 
+  #       should_respond_with :success
+  # 
+  #       should "not show rpx login" do
+  #         assert_select 'div#rpx_login', false
+  #       end
+  # 
+  #       should "show date and time fields" do
+  #         assert_select 'div#when', true
+  #       end
+  #     end
+  #   end
+  # end
 
-      should_respond_with :success
-
-      should "show rpx login" do
-        assert_select 'div#rpx_login', true
-      end
-
-      should "not show date and time fields" do
-        assert_select 'div#when', false
-      end
-    end
-    
-    context "as registered user" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@customer)
-        get :new, :service_id => @haircut.id, :provider_id => @johnny.id, :provider_type => 'users'
-      end
-
-      should_respond_with :success
-
-      should "not show rpx login" do
-        assert_select 'div#rpx_login', false
-      end
-
-      should "show date and time fields" do
-        assert_select 'div#when', true
-      end
-    end
-
-    context "for 'anyone' provider" do
-      context "as registered user" do
-        setup do
-          # stub current user
-          @controller.stubs(:current_user).returns(@customer)
-          get :new, :service_id => @haircut.id, :provider_id => 0, :provider_type => 'users'
-        end
-
-        should_respond_with :success
-
-        should "not show rpx login" do
-          assert_select 'div#rpx_login', false
-        end
-
-        should "show date and time fields" do
-          assert_select 'div#when', true
-        end
-      end
-    end
-  end
-  
   context "create" do
     context "with no time range attributes" do
       setup do
@@ -109,11 +109,12 @@ class WaitlistsControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(nil)
         post :create, :waitlist => {:service_id => @haircut.id, :provider_type => 'users', :provider_id => @johnny.id, :customer_id => @customer.id}
       end
-
+  
       should_redirect_to("openings path") { openings_path }
       should_change("waitlist.count", :by => 1) { Waitlist.count }
+      should_not_change("waitlist time range count") { WaitlistTimeRange.count }
     end
-    
+
     context "with time range attributes" do
       setup do
         # stub current user

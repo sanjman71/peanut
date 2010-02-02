@@ -118,12 +118,12 @@ class AppointmentsControllerTest < ActionController::TestCase
             :duration => @haircut.duration, :mark_as => 'work'
       end
 
-      should "show rpx login" do
-        assert_select 'div#rpx_login', true
+      should "not show rpx login" do
+        assert_select 'div#rpx_login', 0
       end
 
-      should "show (hidden) peanut login" do
-        assert_select 'div.hide#peanut_login', true
+      should "not show (hidden) peanut login" do
+        assert_select 'div.hide#peanut_login', 0
       end
 
       should "not show customer reminder options" do

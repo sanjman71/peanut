@@ -42,41 +42,36 @@ class WaitlistsController < ApplicationController
 
   # GET /waitlist/users/1/services/3
   # GET /waitlist/users/0/services/3  # 0 refers to the special 'anyone' user
-  def new
-    @title = "Waitlist Add"
-
-    # initialize provider, service
-    @provider = find_provider_from_params || User.anyone
-    @service  = current_company.services.find(params[:service_id])
-    @customer = current_user || nil
-
-    case
-    when @customer.blank?
-      @customer_signup = :rpx
-      # set return_to url in case user uses rpx to login and needs to be redirected back
-      session[:return_to] = request.url
-    else
-      @customer_signup = nil
-    end
-
-    # build waitlist object, and one child time range object
-    @waitlist = Waitlist.new(:provider => @provider, :service => @service, :customer => @customer)
-    @waitlist.waitlist_time_ranges.build
-
-    respond_to do |format|
-      format.html
-    end
-  end
+  # def new
+  #   @title = "Waitlist Add"
+  # 
+  #   # initialize provider, service
+  #   @provider = find_provider_from_params || User.anyone
+  #   @service  = current_company.services.find(params[:service_id])
+  #   @customer = current_user || nil
+  # 
+  #   case
+  #   when @customer.blank?
+  #     @customer_signup = :rpx
+  #     # set return_to url in case user uses rpx to login and needs to be redirected back
+  #     session[:return_to] = request.url
+  #   else
+  #     @customer_signup = nil
+  #   end
+  # 
+  #   # build waitlist object, and one child time range object
+  #   @waitlist = Waitlist.new(:provider => @provider, :service => @service, :customer => @customer)
+  #   @waitlist.waitlist_time_ranges.build
+  # 
+  #   respond_to do |format|
+  #     format.html
+  #   end
+  # end
 
   # POST /waitlist
   def create
-    @wait_attrs = params[:waitlist].delete(:waitlist_time_ranges_attributes)
-    @waitlist   = current_company.waitlists.create(params[:waitlist])
-
-    if @waitlist.valid? and !@wait_attrs.blank?
-      # updated nested attributes
-      @waitlist.update_attributes(:waitlist_time_ranges_attributes => @wait_attrs)
-    end
+    # create waitlist with 0 or more time range attributes
+    @waitlist = current_company.waitlists.create(params[:waitlist])
 
     if @waitlist.valid?
       flash[:notice]  = "You have been added to the waitlist"
@@ -84,7 +79,7 @@ class WaitlistsController < ApplicationController
     else
       flash[:error] = "There was an error adding you to the waitlist"
       logger.debug("[error] #{@waitlist.errors.full_messages}")
-      @redirect_path = request.referer
+      @redirect_path = request.referer || openings_path
     end
 
     respond_to do |format|
@@ -94,7 +89,7 @@ class WaitlistsController < ApplicationController
   end
 
   protected
-  
+
   # find provider from the params hash
   def find_provider_from_params
     case params[:provider_type]
