@@ -25,8 +25,8 @@
             %br
             == Use the 'edit' link to add service providers
     .span-3.price_and_capacity
-      .span-3.last.price
-        %h4.bottom= service.price
+      -#.span-3.last.price
+        -#%h4.bottom= service.price
       .span-3.last.capacity
         - if service.capacity > 1
           %h4.bottom== Capacity: #{service.capacity}

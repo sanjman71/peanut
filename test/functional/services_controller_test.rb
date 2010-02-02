@@ -6,8 +6,6 @@ class ServicesControllerTest < ActionController::TestCase
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-
-    @controller   = ServicesController.new
     # create owner and company
     @owner        = Factory(:user, :name => "Owner")
     @monthly_plan = Factory(:monthly_plan)
@@ -18,11 +16,14 @@ class ServicesControllerTest < ActionController::TestCase
     # create provider
     @provider     = Factory(:user, :name => "Provider")
     @provider.grant_role('company provider', @company)
+    # create service(s)
+    @haircut      = Factory.build(:work_service, :duration => 30.minutes, :name => "Haircut", :price => 1.00)
+    @company.services.push(@haircut)
+    @haircut.user_providers.push(@provider)
     # create user
     @user         = Factory(:user, :name => "User")
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
-    ActionView::Base.any_instance.stubs(:current_company).returns(@company)
   end
 
   context "create service" do
@@ -49,7 +50,7 @@ class ServicesControllerTest < ActionController::TestCase
     end
   end
   
-  context "show services" do
+  context "list services" do
     context "without privilege 'read services'" do
       setup do
         @controller.stubs(:current_user).returns(@user)
@@ -59,16 +60,71 @@ class ServicesControllerTest < ActionController::TestCase
       should_redirect_to("unauthorized_path") { unauthorized_path }
     end
     
-    context "with privilege 'read services'" do
+    context "as provider" do
       setup do
         @controller.stubs(:current_user).returns(@provider)
         get :index
       end
   
       should_respond_with :success
+      should_render_template 'services/index.html.haml'
+
+      should "show service" do
+        assert_select "div.service", 1
+      end
       
-      should "not show add service form" do
-        assert_select "form#new_service_form", 0
+      should "show service name" do
+        assert_select "div.name", 1
+      end
+
+      should "show service duration" do
+        assert_select "div.duration", 1
+      end
+
+      should "not show service price" do
+        assert_select "div.price", 0
+      end
+
+      should "show service capacity" do
+        assert_select "div.capacity", 1
+      end
+
+      should "not show add service link" do
+        assert_select "a.service.add", 0
+      end
+    end
+
+    context "as owner" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+  
+      should_respond_with :success
+      should_render_template 'services/index.html.haml'
+
+      should "show service" do
+        assert_select "div.service", 1
+      end
+
+      should "show service name" do
+        assert_select "div.name", 1
+      end
+
+      should "show service duration" do
+        assert_select "div.duration", 1
+      end
+
+      should "not show service price" do
+        assert_select "div.price", 0
+      end
+
+      should "show service capacity" do
+        assert_select "div.capacity", 1
+      end
+
+      should "show add service link" do
+        assert_select "a.service.add", 1
       end
     end
   end
