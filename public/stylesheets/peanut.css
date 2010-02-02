@@ -40,6 +40,8 @@ span.field_missing                                { color: #FF3333; }
 
 .letterbox                                        { padding-top: 10px; padding-bottom: 10px; }
 
+.margin-top-5                                     { margin-top: 5px; }
+.margin-top-10                                    { margin-top: 10px; }
 .margin-bottom-0                                  { margin-bottom: 0px; }
 
 .text-align-right                                 { text-align: right; }

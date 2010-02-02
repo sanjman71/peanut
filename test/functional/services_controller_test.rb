@@ -26,6 +26,38 @@ class ServicesControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
 
+  context "new service" do
+    context "as guest" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        get :new
+      end
+
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+    end
+
+    context "as provider" do
+      setup do
+        @controller.stubs(:current_user).returns(@provider)
+        get :new
+      end
+
+      should_redirect_to("unauthorized_path") { unauthorized_path }
+    end
+
+    context "as owner" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :new
+      end
+
+      should_assign_to(:service)
+
+      should_respond_with :success
+      should_render_template 'services/new.html.haml'
+    end
+  end
+
   context "create service" do
     context "without privilege 'create services'" do
       setup do

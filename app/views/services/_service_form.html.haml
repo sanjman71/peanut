@@ -15,41 +15,39 @@
       .notice= error_messages_for('service', :header_message => nil)
 
   -# name
-  .span-20.last
-    .span-3.prepend-1.padding-top-10.text-align-right
-      %h2= label_tag "service_name", "Name"
+  .span-19.prepend-1.last
+    .span-3.label.block.margin-top-10
+      %h4.bigger.block.bottom= label_tag "service_name", "Name"
     .span-16.last
-      = f.text_field :name, :class => 'text title big', :style => "width: 200px;"
-    
+      = f.text_field :name, :class => 'text title big', :size => 30
+  
   -# price
-  .span-20.last
-    .span-3.prepend-1.text-align-right
-      %h2= label_tag "service_price", "Price"
+  .span-19.prepend-1.last
+    .span-3.label.block.margin-top-10
+      %h4.bigger.block.bottom= label_tag "service_price", "Price"
     .span-16.last
-      = f.text_field :price, :class => 'text', :style => "width: 100px;"
-      
+      = f.text_field :price, :class => 'text big', :style => "width: 100px;"
+
   -# duration
-  .span-20.last
-    .span-3.prepend-1.text-align-right
-      %h2= label_tag "service_duration", "Duration"
-    .span-16.last
-      = f.text_field :duration_in_minutes, :class => 'text blue muted', :style => "width: 100px;"
-      %b{:style => 'font-size: 12px;'}== &nbsp;Minutes
-  .span-15.prepend-4.last
-    %em== An accurate duration allows appointments to be scheduled efficiently.
+  .span-19.prepend-1.last.padding-bottom-10
+    .span-3.label.block.margin-top-10
+      %h4.bigger.block.bottom= label_tag "service_duration", "Duration"
+    .span-16.last.bottom
+      = f.text_field :duration_in_minutes, :class => 'text big', :style => "width: 100px;"
+      %b== &nbsp;Minutes
+    .span-16.prepend-3.last
+      %em== An accurate duration allows appointments to be scheduled efficiently
     
   -# capacity
-  .span-20.last
-    .span-3.prepend-1.text-align-right
-      %h2= label_tag "capacity", "Capacity"
+  .span-19.prepend-1.last.padding-bottom-10
+    .span-3.label.block.margin-top-10
+      %h4.bigger.block.bottom= label_tag "capacity", "Capacity"
     .span-16.last
-      = f.text_field :capacity, :class => 'text', :style => "width: 100px;"
-    .span-15.prepend-4.last
+      = f.text_field :capacity, :class => 'text big', :style => "width: 100px;"
+    .span-16.prepend-3.last
       %em== Advanced: Capacity is typically 1, and must be a number 1 or greater
 
-  %hr.space
-  
-  .span-20.prepend-1.last.submit
+  .span-19.prepend-1.last.submit
     = submit_tag(action)
     == or
     = link_to "Cancel", services_path(:subdomain => current_subdomain), :class => 'admin'
