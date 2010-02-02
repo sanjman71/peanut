@@ -117,6 +117,19 @@ class CalendarController < ApplicationController
     respond_to do |format|
       format.html
       format.pdf
+      format.email do
+        @link     = url_for(params.merge(:format => "pdf", :address => nil))
+        @subject  = 'Your PDF Schedule'
+        @email    = EmailAddress.find_by_id(params[:address].to_i) || @provider.primary_email_address
+        if !@email.blank?
+          @job = PdfMailerJob.new(:url => @link, :address => @email.address, :subject => @subject)
+          Delayed::Job.enqueue(@job)
+          flash[:notice] = "Sent PDF Schedule to #{@email.address}"
+        else
+          flash[:notice] = "Could not find a valid email address"
+        end
+        redirect_to(request.referer || calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)) and return
+      end
     end
   end
   

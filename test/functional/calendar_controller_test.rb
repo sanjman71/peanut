@@ -34,6 +34,7 @@ class CalendarControllerTest < ActionController::TestCase
     BadgesInit.roles_privileges
     # create company
     @owner        = Factory(:user, :name => "Owner")
+    @owner_email  = @owner.email_addresses.create(:address => 'owner@walnutcalendar.com')
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
@@ -203,4 +204,58 @@ class CalendarControllerTest < ActionController::TestCase
     should_render_template 'calendar/show.html.haml'
   end
 
+  context "send calendar as pdf email" do
+    context "to provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @johnny_email = @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
+        @controller.stubs(:current_user).returns(@owner)
+        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :format => 'email'
+      end
+
+      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf" }
+      should_assign_to(:subject) { "Your PDF Schedule" }
+      should_assign_to(:email) { @johnny_email }
+      should_assign_to(:job, :class => PdfMailerJob)
+
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
+    end
+
+    context "to provider without an email" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @controller.stubs(:current_user).returns(@owner)
+        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :format => 'email'
+      end
+
+      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf" }
+      should_assign_to(:subject) { "Your PDF Schedule" }
+      should_not_assign_to(:email)
+      should_not_assign_to(:job)
+
+      should_not_change("delayed job count") { Delayed::Job.count }
+
+      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
+    end
+
+    context "to owner" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @johnny_email = @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
+        @controller.stubs(:current_user).returns(@owner)
+        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :address => @owner_email.id, :format => 'email'
+      end
+
+      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf" }
+      should_assign_to(:subject) { "Your PDF Schedule" }
+      should_assign_to(:email) { @owner_email }
+      should_assign_to(:job, :class => PdfMailerJob)
+
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
+    end
+  end
 end
