@@ -106,6 +106,7 @@ class UsersController < ApplicationController
   end
  
   # POST /customers/create
+  # POST /customers/create?return_to=
   # POST /providers/create
   def create
     # @role (always) and @invitation (if it exists) are initialized in a before filter
@@ -137,20 +138,24 @@ class UsersController < ApplicationController
     # if success && @user.errors.empty?
     if @user.valid?
       # if there was an invitation, use the invitation company; otherwise use the current company
-      @company        = @invitation ? @invitation.company : current_company
+      @company = @invitation ? @invitation.company : current_company
+
+      # store location if return_to was specified
+      store_location(params[:return_to]) if params[:return_to]
 
       # initialize the new user, and the redirect path
-      @redirect_path  = user_initialize(@company, @user, @role, @creator, @invitation)
+      @redirect_path = user_initialize(@company, @user, @role, @creator, @invitation)
     else
       @error    = true
       template  ='users/new'
     end
-    
+
     respond_to do |format|
       if @error
         format.html { render(:template => template) }
       else
         format.html { redirect_back_or_default(@redirect_path) }
+        format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
         format.json do
           flash.discard
           render(:json => @user.to_json(:only => [:id, :name]))

@@ -1,15 +1,16 @@
-- return_to         = nil if local_assigns[:return_to].blank?
-- rpx_return_url    = rpx_login_url + (return_to ? "?return_to=#{return_to}" : '')
-- login_return_path = login_path + (return_to ? "?return_to=#{return_to}" : '')
+- return_to           = nil if local_assigns[:return_to].blank?
+- rpx_return_url      = rpx_login_url + (return_to ? "?return_to=#{return_to}" : '')
+- login_return_path   = login_path + (return_to ? "?return_to=#{return_to}" : '')
+- signup_return_path  = customer_create_path + (return_to ? "?return_to=#{return_to}" : '')
 
 .span-15.prepend-1.last.dialog.hide#rpx_login_dialog{:title => "Login"}
   .span-15.last.padding-bottom-20#intro
     %h4.bottom= intro
     
-  -# rpx login
+  -# rpx login wrapper
   .span-15#rpx_login_form
     .span-15.last.padding-bottom-10
-      %h4.bottom== You can login using your existing account with a provider below
+      %h4.bottom== Login using your existing account with a provider below:
 
     -# rpx login
     .span-15.last
@@ -20,12 +21,15 @@
     .span-15.last.padding-top-10
       == Click #{link_to 'here', '', :id => 'show_walnut_login_form'} to login with your email and password
 
-  -# walnut login
+  -# walnut login wrapper
   .span-15.last#walnut_login_form.hide
     -# walnut login header
     .span-15.last.padding-bottom-20
-      %h4.bottom== Please enter your email and password
-    
+      %h4.bottom
+        == Login using your email and password, or
+        = link_to 'signup', '', :id => 'show_user_signup_form'
+        == for a new account.
+
     -# walnut login
     .span-15.last
       - form_tag(login_return_path, :id => 'login_user_form') do
@@ -44,5 +48,13 @@
 
         .span-12.prepend-3.last
           == Click #{link_to 'here', '', :id => 'show_rpx_login_form'} to login with an existing account
-  
+
+  -# user signup wrapper
+  .span-15.last#user_signup_form.hide
+    - @signup_user = User.new
+    - @signup_user.email_addresses.build
+    - @signup_user.phone_numbers.build
+    = render(:partial => 'users/user_form_dialog', |
+             :locals => {:user => @signup_user, :role => 'company customer', :user_email => 'required', :submit_url => signup_return_path, |
+                         :title => 'Signup', :submit_text => 'Create'}) |
 

@@ -4,10 +4,9 @@
 - invitation  = nil unless local_assigns[:invitation]
 -# check for role
 - role        = nil unless local_assigns[:role]
-
--# email, phone is always optional
-- user_phone_flag = 'optional'
-- user_email_flag = 'optional'
+-# check email, phone flags
+- user_phone  = 'optional' unless local_assigns[:user_phone]
+- user_email  = 'optional' unless local_assigns[:user_email]
 
 .span-15.last.dialog.hide#add_user_dialog{:title => title}
   -# show any user errors
@@ -33,8 +32,8 @@
         .span-3.padding-top-10.label
           %h4.bottom.block== Email:
         .span-12.last
-          = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :id => 'email_address', :autocomplete => 'off'
-          %em= user_email_flag
+          = email_form.text_field :address, :class => ['title', 'big', user_email].join(' '), :id => 'email_address', :autocomplete => 'off'
+          %em= user_email
 
     -# phone nested field
     - user_form.fields_for :phone_numbers do |phone_form|
@@ -43,8 +42,8 @@
           .span-3.padding-top-10.label
             %h4.bottom.block== Phone:
           .span-12.last
-            = phone_form.text_field :address, :class => ['title', 'big', user_phone_flag].join(' '), :id => 'phone_address', :autocomplete => 'off'
-            %em= user_phone_flag
+            = phone_form.text_field :address, :class => ['title', 'big', user_phone].join(' '), :id => 'phone_address', :autocomplete => 'off'
+            %em= user_phone
         .span-15.last.padding-bottom-10
           .span-3.padding-top-10.label
             %h4.bottom.block== Phone Name:

@@ -68,7 +68,8 @@
   - @customer.email_addresses.build
   - @customer.phone_numbers.build
   = render(:partial => 'users/user_form_dialog', |
-           :locals => {:user => @customer, :role => 'company customer', :submit_url => customer_create_format_path(:format => :json), :title => 'Add Customer', :submit_text => 'Create'}) |
+           :locals => {:user => @customer, :role => 'company customer', :submit_url => customer_create_format_path(:format => :json), |
+                       :title => 'Add Customer', :submit_text => 'Create'}) |
 
 -# cancel appointment dialog
 = render(:partial => "calendar/cancel_appointment_dialog", :locals => {:provider => @provider})

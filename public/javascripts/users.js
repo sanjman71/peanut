@@ -55,7 +55,7 @@ $.fn.init_user_create_submit = function() {
     if (errors > 0) { return false; }
 
     // check password fields
-    if (check_user_password_fields(true) == false) {
+    if (check_user_password_fields("form#add_user_form", true) == false) {
       return false;
     }
 
@@ -128,7 +128,7 @@ $.fn.init_user_update_submit = function() {
     if (errors > 0) { return false; }
 
     // check password fields
-    if (check_user_password_fields(false) == false) {
+    if (check_user_password_fields("form.edit_user", false) == false) {
       return false;
     }
 
@@ -194,6 +194,16 @@ $.fn.init_user_login_dialog = function() {
     return false;
   })
   
+  $("a#show_user_signup_form").click(function() {
+    // close this dialog
+    $("div.dialog#rpx_login_dialog").dialog('close');
+    // show add user dialog, set return dialog link, disable escape
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#rpx_login_dialog");
+    $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
+    $("div.dialog#add_user_dialog").dialog('open');
+    return false;
+  })
+
   $("form#login_user_form").submit(function() {
     // validate login email
     if (check_user_email_fields(this.id) == false) {
@@ -208,15 +218,15 @@ $.fn.open_user_login_dialog = function() {
   $("div.dialog#rpx_login_dialog").dialog('open');
 }
 
-function check_user_password_fields(password_required) {
+function check_user_password_fields(id, password_required) {
   // check that password is visible
-  if (!$("input#user_password").is(":visible")) {
+  if (!$(id).find("input#user_password").is(":visible")) {
     // password is not visible, skip validation
     return true;
   }
 
-  var password  = $("input#user_password").attr('value');
-  var password2 = $("input#user_password_confirmation").attr('value');
+  var password  = $(id).find("input#user_password").val();
+  var password2 = $(id).find("input#user_password_confirmation").val();
 
   if ((password == '') && (password_required == true)) {
     alert("Please enter a password");
