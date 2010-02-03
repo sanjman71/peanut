@@ -92,7 +92,7 @@
         .span-15.last
           = f.select :preferences_work_appointment_confirmation_customer, appt_confirmation_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
-        == Customers receive appointment confirmations
+        == If 'yes', customers are sent appointment confirmations
     .span-20.last.padding-bottom-10
       .span-20.last
         .span-5
@@ -100,7 +100,7 @@
         .span-15.last
           = f.select :preferences_work_appointment_confirmation_provider, appt_confirmation_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
-        == Providers receive appointment confirmations
+        == If 'yes', providers are sent appointment confirmations
     .span-20.last.padding-bottom-10
       .span-20.last
         .span-5
@@ -108,7 +108,7 @@
         .span-15.last
           = f.select :preferences_work_appointment_confirmation_manager, appt_confirmation_options, {:style => 'margin-top: 5px;', :class => 'select big'}
       .span-15.prepend-5.last.directions
-        == Managers receive appointment confirmations
+        == If 'yes', managers are sent appointment confirmations
     .span-20.last.padding-bottom-10
       .span-20.last
         .span-5
@@ -119,6 +119,14 @@
         == Companies marked as public allow anyone to create appointments.
         %br
         == Companies marked as private allow only registered users to create appointments.
+    .span-20.last.padding-bottom-10
+      .span-20.last
+        .span-5
+          %h4.bottom{:style => 'padding-top: 7px;'}== Email Text:
+        .span-15.last
+          = f.text_area :preferences_email_text, :style => 'width: 550px; height: 100px;'
+      .span-15.prepend-5.last.directions
+        == Text included with each email sent to a customer
     .span-20.last.padding-top-10
       = f.submit 'Update Company Preferences', :class => 'button big'
       == or
@@ -127,36 +135,34 @@
 %hr.space
 
 .span-23.prepend-1.last.mat.padding-top-10.padding-bottom-20
-  %h2 Company Logo
+  %h2.bottom.padding-bottom== Company Logo
   .span-23.last.padding-top-10
-    .span-6
+    .span-23.last
       - if @company.logo && @company.logo.id
-        .span-6.last
-          .span-6.last
-            %h3 Current Logo:
-          .span-6.last
-            = image_tag @company.logo.image.url
-          .span-6.last.padding-top-10
-            - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
-              - f.fields_for :logo do |lf|
-                = lf.hidden_field :_delete, {:value => '1'}
-                = lf.submit 'Delete', :class => 'button big'
+        .span-23.last
+          %h4== Current Logo:
+        .span-23.last
+          = image_tag @company.logo.image.url
+        .span-23.last.padding-top-10
+          - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :method => :put } do |f|
+            - f.fields_for :logo do |lf|
+              = lf.hidden_field :_delete, {:value => '1'}
+              = lf.submit 'Delete', :class => 'button big'
       - else
         - @company.build_logo # It's important to build the logo before making it's fields_for form below, otherwise you get a nil.new_record? error. It's equally important only to do this if the logo doesn't already exist. If you do this when it does exist, you will over-write the existing logo.
-        .span-6.last
-          No logo uploaded yet.
-    .span-16.last
+        == No logo uploaded yet.
+    .span-23.last
       - form_for @company, :url => company_path(@company, :subdomain => current_subdomain), :html => { :multipart => true, :method => :put } do |f|
-        .span-16.last.padding-top-10
-          .span-5
+        .span-23.last.padding-top-10
+          .span-4
             - if @company.logo && @company.logo.id
-              %h3==Upload a new logo:
+              %h4==Upload a new logo:
             - else
-              %h3==Upload a logo:
-          .span-11.last
+              %h4==Upload a logo:
+          .span-19.last
             - f.fields_for :logo do |lf|
               = lf.file_field :image
-        .span-16.last.padding-top-10
+        .span-23.last.padding-top-10
           = f.submit 'Upload', :class => 'button big'
 
 %hr.space

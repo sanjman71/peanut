@@ -857,8 +857,29 @@ class AppointmentsControllerTest < ActionController::TestCase
           assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
       end
+
+      context "with company email text" do
+        setup do
+          @email_text = "Appointment cancelations are allowed up to 24 hours before your appointment."
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:email_text] = @email_text
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :customer_id => @customer.id}
+        end
+
+        should_assign_to(:confirmations, :class => Array)
+
+        should "have company email text as part of message body" do
+          @message = assigns(:confirmations).first
+          assert_match /#{@email_text}/, @message.body
+        end
+      end
     end
-  
+
     context "with appointment customer reminders" do
       context "turned on" do
         setup do
