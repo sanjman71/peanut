@@ -12,15 +12,14 @@
       
   %hr.space
   
-  .span-23.prepend-1.last
-    %h3
-      %span{:style => 'color: #5500BB; font-weight: bold; font-size: 1.2em;'}== People who provide this service
+  .span-23.prepend-1.last.padding-top-10
+    %h3.bold== People who provide this service
   #service_providers
     = render(:partial => 'service_providers/service_providers.html.haml', :locals => {:service_providers => @service_providers, :non_providers => @non_providers})
     
   %hr.space
   
   .span-20.prepend-1.last
-    = link_to 'Done', services_path(:subdomain => current_subdomain), :class => 'rounded button color', :style => 'padding: 3px 7px;'
+    = link_to 'Done', services_path(:subdomain => current_subdomain), :class => 'rounded button', :style => 'padding: 3px 7px;'
   -#= button_to "Done", :url => services_path(:subdomain => current_subdomain)
               
