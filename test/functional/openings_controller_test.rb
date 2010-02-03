@@ -120,6 +120,7 @@ class OpeningsControllerTest < ActionController::TestCase
         should_not_assign_to(:daterange)
         should_assign_to(:public) { 0 }
         should_assign_to(:searchable) { false }
+        should_not_assign_to(:customer)
         should_not_assign_to(:waitlist)
 
         should "not have 'add waitlist' link" do
@@ -142,6 +143,7 @@ class OpeningsControllerTest < ActionController::TestCase
         should_not_assign_to(:daterange)
         should_assign_to(:public) { 0 }
         should_assign_to(:searchable) { true }
+        should_not_assign_to(:customer)
         should_not_assign_to(:waitlist)
 
         should_respond_with :success
@@ -165,6 +167,7 @@ class OpeningsControllerTest < ActionController::TestCase
       should_not_assign_to(:daterange)
       should_assign_to(:duration) { 0 }
       should_assign_to(:searchable) { true }
+      should_not_assign_to(:customer)
       should_not_assign_to(:waitlist)
 
       should "set services collection" do
@@ -211,7 +214,11 @@ class OpeningsControllerTest < ActionController::TestCase
         should "not have confirm appointment dialog" do
           assert_select "div#confirm_appointment_dialog", 0
         end
-        
+
+        should "not have add waitlist dialog" do
+          assert_select "div#add_waitlist_dialog", 0
+        end
+
         should "have service select list with 1 service" do
           assert_select "select.openings.search.wide#service_id", 1
           assert_select "select.openings.search.wide#service_id" do
@@ -268,6 +275,10 @@ class OpeningsControllerTest < ActionController::TestCase
 
         should "have confirm appointment dialog" do
           assert_select "div#confirm_appointment_dialog", 1
+        end
+
+        should "have add waitlist dialog" do
+          assert_select "div#add_waitlist_dialog", 1
         end
 
         should "have service select list with 1 service" do

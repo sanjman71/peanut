@@ -103,13 +103,21 @@ $.fn.init_waitlist_dialog = function() {
 
   // open dialog when 'add waitlist' link is clicked
   $("a#add_waitlist").click(function() {
-    // clear date, time fields
-    $("form#add_waitlist_form input#waitlist_start_date").val('');
-    $("form#add_waitlist_form input#waitlist_end_date").val('');
-    $("form#add_waitlist_form input#waitlist_start_time").val('');
-    $("form#add_waitlist_form input#waitlist_start_time").val('');
-    // open dialog
-    $("div.dialog#add_waitlist_dialog").dialog('open');
+    // check add waitlist form
+    var add_waitlist_form = $("form#add_waitlist_form").size();
+
+    if (add_waitlist_form == 0) {
+      // open user login dialog
+      $(document).open_user_login_dialog();
+    } else {
+      // clear date, time fields
+      $("form#add_waitlist_form input#waitlist_start_date").val('');
+      $("form#add_waitlist_form input#waitlist_end_date").val('');
+      $("form#add_waitlist_form input#waitlist_start_time").val('');
+      $("form#add_waitlist_form input#waitlist_start_time").val('');
+      // open add waitlist dialog
+      $("div.dialog#add_waitlist_dialog").dialog('open');
+    }
     return false;
   })
 }

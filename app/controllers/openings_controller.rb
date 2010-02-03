@@ -131,18 +131,15 @@ class OpeningsController < ApplicationController
     # logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
     # logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
 
+    # initialize customer
+    @customer = current_user || nil
+
     # show waitlist link if the user is logged in
-    if current_user
+    if @customer
       # build waitlist object, and a child time range object
       @waitlist = Waitlist.new(:provider => @provider, :service => @service, :customer => current_user || nil)
       @waitlist.waitlist_time_ranges.build
-
-      # deprecated - build waitlist path
-      # @waitlist_path = waitlist_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :service_id => @service.id)
     end
-
-    # initialize customer
-    @customer = current_user || nil
 
     # build openings cache key
     @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)

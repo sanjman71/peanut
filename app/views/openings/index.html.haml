@@ -92,23 +92,16 @@
     .span-7.last#openings_search
       == &nbsp;
 
--# waitlist
-- if !@waitlist.blank?
-  = render(:partial => 'waitlists/add_waitlist_dialog', :locals => {:waitlist => @waitlist})
-- else
-  = render(:partial => 'shared/message_dialog', :locals => {:id => 'add_waitlist_dialog', :title => 'Waitlist', |
-           :text => "Please login before adding yourself to the waitlist."}) |
-
--#.span-7.last.sidebar.instructions
-  -#= render(:partial => "openings/search_instructions", :locals => {:when_range => @when, :free_appointments => @free_appointments})
-
 - if @searchable
   - if !@customer.blank?
-    -# initialize appointment confirmation dialog if company is searchable and there is a valid customer
+    -# company is searchable and user is authenticated
+    -# initialize appointment confirmation dialog
     = render(:partial => "calendar/confirm_appointment_dialog", |
              :locals => {:service => @service, :customer => @customer, :appointment => Appointment.new, :duration => @duration}) |
+    -# initialize waitlist dialog
+    = render(:partial => 'waitlists/add_waitlist_dialog', :locals => {:waitlist => @waitlist})
   - else @customer.blank?
-    -# company is searchable, but customer is not logged in
+    -# company is searchable, but user is not authenticated
     = render(:partial => "sessions/rpx_login_dialog", |
-             :locals => {:intro => "Before confirming your appointment, we need to know who you are.", :return_to => request.path}) |
+             :locals => {:intro => "Please tell us who you are by logging in or creating a new account.", :return_to => request.path}) |
 
