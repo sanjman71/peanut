@@ -11,7 +11,7 @@
 .span-16.services.hide
   - unless @sps.blank?
     - @sps.each do |sp|
-      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically")}
+      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically"), :service_duration_in_secs => sp[5]}
   
 .span-24.last
   = display_flash(:all)
@@ -74,7 +74,7 @@
       .span-15.last#free_calendar
         = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
       .span-15.last.appointments#free_capacity_slots.hide
-        = render(:partial => 'appointments/free_capacity_slots2', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
+        = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
     .span-15.last
       -# show waitlist text here if there are no available timeslots
