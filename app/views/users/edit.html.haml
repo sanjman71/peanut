@@ -107,16 +107,23 @@
 
   %hr.space
 
-  - if @user.provider? and @user.provided_companies.include?(current_company)
-    .span-14.prepend-1.last.prompt
-      == Advanced: Provider's default capacity. This value is typically 1.
-    .span-14.prepend-1.last.hint.padding-bottom-10
-      == When scheduling free time for this provider you can set the default capacity available.
-    .span-14.prepend-1.last
-      .span-3.text_field_label.text-align-right.padding-top-5
-        %h3= label_tag "capacity", "Capacity:"
-      .span-4.last
+  - if current_company.authorized_providers.include?(@user)
+    .span-20.last.bottom.padding-bottom-5
+      .span-4.text_field_label.text-align-right.padding-top-5
+        %h3.bottom= label_tag "capacity", "Capacity:"
+      .span-16.last
         = f.text_field :capacity, :style => 'width: 50px; font-size: 1.3em;'
+    .span-16.prepend-4.last.hint.padding-bottom-10
+      %em== Advanced: Provider's default capacity. This value is typically 1.
+      %br
+      %em== When scheduling free time for this provider you can set the default capacity available.
+    .span-20.last
+      .span-4.text_field_label.text-align-right.padding-top-5
+        %h3= label_tag "preferences_provider_email_text", "Email Text:"
+      .span-16.last
+        = f.text_area :preferences_provider_email_text, :style => 'width: 550px; height: 100px;'
+    .span-16.prepend-4.last.hint.padding-bottom-10
+      %em== Text included as part of each email sent to a customer.
 
   %hr.space
 
