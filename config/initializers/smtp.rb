@@ -1,5 +1,5 @@
 ActionMailer::Base.smtp_settings = {
-  :tls => true,
+  :enable_starttls_auto => true,
   :address => "smtp.gmail.com",
   :port => "587",
   :authentication => :plain,
