@@ -124,6 +124,14 @@
         = f.text_area :preferences_provider_email_text, :style => 'width: 550px; height: 100px;'
     .span-16.prepend-4.last.hint.padding-bottom-10
       %em== Text included as part of each email sent to a customer.
+    .span-20.last.bottom.padding-bottom-5
+      .span-4.text_field_label.text-align-right.padding-top-5
+        %h3.bottom= label_tag "preferences_provider_email_daily_schedule", "Daily Schedule:"
+      .span-16.last
+        = f.select :preferences_provider_email_daily_schedule, yes_no_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+        -#= f.text_area :preferences_provider_email_text, :style => 'width: 550px; height: 100px;'
+    .span-16.prepend-4.last.hint.padding-bottom-10
+      %em== If 'yes', a daily schedule will be emailed to you every day.
 
   %hr.space
 

@@ -12,8 +12,8 @@ class UserTest < ActiveSupport::TestCase
       @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret")
     end
     
-    should "have empty preferences" do
-      assert_equal Hash.new, @user.preferences
+    should "have default preferences" do
+      assert_equal Hash[:provider_email_text => '', :provider_email_daily_schedule => '0'], @user.preferences
     end
 
     should "have nil preferences['foo']" do
