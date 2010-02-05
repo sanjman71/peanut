@@ -19,21 +19,36 @@ $.fn.init_services = function() {
   // build services array
   $(".services.hide .service").each(function(index, service)
   {
-    var service_id            = $(service).attr("service_id");
-    var allow_custom_duration = $(service).attr("allow_custom_duration");
-    var service_duration      = $(service).attr("service_duration");
+    var service_id                = $(service).attr("service_id");
+    var allow_custom_duration     = $(service).attr("allow_custom_duration");
+    var service_duration_in_words = $(service).attr("service_duration");
+    var service_duration_in_secs  = $(service).attr("service_duration_in_secs");
 
     // populate array with the custom duration and service duration info
-    services.push([service_id, allow_custom_duration, service_duration]);
+    services.push([service_id, allow_custom_duration, service_duration_in_words, service_duration_in_secs]);
   });
 }
 
 $.fn.init_providers = function () {
+
+  if ($('select#provider').count == 0) {
+    return;
+  }
+  var specific_providers_only = false;
+  var blah = $("select#provider").attr("specific_providers_only");
+  if ($("select#provider").attr("specific_providers_only"))
+  {
+    specific_providers_only = true;
+  }
+
   // find the selected service
   var service_id = $('#service_id').val();
+  if (!service_id){
+    service_id = $('#appointment_service_id').val();
+  }
   
   // remove all providers
-  $('#provider').removeOption(/./);
+  $('select#provider').removeOption(/./);
   
   // find the provider initially selected
   var initial_provider_id = $('#initial_provider_id').attr("value");
@@ -46,14 +61,31 @@ $.fn.init_providers = function () {
     if (service_provider[0] == service_id)
     {
       // add the provider type and id (e.g. users/3) as the type, and the provider name as the value 
-      $('#provider').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_provider_id) && (service_provider[3] == initial_provider_type));
+      $('select#provider').addOption(service_provider[3]+'/'+service_provider[1], service_provider[2], (service_provider[1] == initial_provider_id) && (service_provider[3] == initial_provider_type));
       num_providers += 1;
     }
   })
 
-  var allow_custom_duration     = false;
-  var default_duration_in_words = '';
+  // add the special 'Anyone' provider iff a service has been selected and the service has 0 or > 1 providers
+  if (service_id != 0 && (num_providers == 0 || num_providers > 1) && !specific_providers_only)
+  {
+    $('select#provider').addOption(0, "Anyone", 0 == initial_provider_id);
+  }
+  
+}
 
+$.fn.init_duration = function() {
+  // set the duration selected value based on the selected service
+
+  // find the selected service
+  var service_id = $('#service_id').val();
+  if (!service_id) {
+    service_id = $('#appointment_service_id').val();
+  }
+
+  var allow_custom_duration     = false;
+  
+  // Search for the default duration for this service
   $.each(services, function (index, service) {
     if (service[0] == service_id)
     {
@@ -63,15 +95,12 @@ $.fn.init_providers = function () {
         allow_custom_duration = true;
       }
       
-      // store the service duration string
-      default_duration_in_words = service[2];
+      // update default duration text and the selected duration
+      $("#duration_in_words").html(service[2]);
+      $("select#duration option[value=" + service[3] + "]").attr("selected", 'selected');
+      $("select#appointment_duration option[value=" + service[3] + "]").attr("selected", 'selected');
     }
   })
-  
-  // add the special 'Anyone' provider iff a service has been selected and the service has 0 or > 1 providers
-  if (service_id != 0 && (num_providers == 0 || num_providers > 1)) {
-    $('#provider').addOption(0, "Anyone", 0 == initial_provider_id);
-  }
   
   // check if the selected service allows a custom duration
   if (allow_custom_duration)
@@ -83,25 +112,37 @@ $.fn.init_providers = function () {
     $(".duration .change").hide();
   }
 
-  // update default duration text
-  $("#duration_in_words").html(default_duration_in_words);
+  // Make sure the provider_id and provider_type fields are updated, if they exist
+  update_provider();
+
 }
 
-$.fn.init_default_duration = function() {
-  // set the duration selected value based on the duration text
-  var duration_text = $("#duration_in_words").text().replace("Typically ", '');
-  $("select#duration option:contains(" + duration_text + ")").attr("selected", 'selected');
+$.fn.init_select_change = function() {
+  $("#provider").change(function () {
+    update_provider();
+  })
+
+  // when a service is selected, rebuild the provider service provider select list
+  $("#service_id, #appointment_service_id").change(function () {
+    $(document).init_providers();
+    $(document).init_duration();
+    return false;
+  })
+}
+
+function update_provider() {
+  // split selected provider value into provider type and id
+  var tuple           = $("#provider option:selected").attr("value").split("/");
+  var provider_type   = tuple[0];
+  var provider_id     = tuple[1];
+  $("#appointment_provider_id").attr("value", provider_id);
+  $("#appointment_provider_type").attr("value", provider_type);
 }
 
 $(document).ready(function() {
   $(document).init_service_providers();
   $(document).init_services();
   $(document).init_providers();
-    
-  // when a service is selected, rebuild the provider service provider select list
-  $("#service_id").change(function () {
-    $(document).init_providers();
-    $(document).init_default_duration();
-    return false;
-  })
+  $(document).init_duration();
+  $(document).init_select_change();    
 })
