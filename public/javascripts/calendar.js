@@ -19,7 +19,7 @@ $.fn.init_add_appointment = function() {
     return false;
   })
 
-  $("a#calendar_add_customer").click(function() {
+  $("a#add_appointment_add_customer").click(function() {
     // close this dialog
     $("div.dialog#add_appointment_dialog").dialog('close');
     // show add user dialog, set return dialog link, disable escape
