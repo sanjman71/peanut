@@ -87,7 +87,7 @@ $.fn.init_autocomplete_customers = function() {
 
   $("#appointment_customer_name").result(function(event, data, formatted) {
     // set the customer id
-    $("#customer_id").attr("value", data.id);
+    $("#appointment_customer_id").attr("value", data.id);
   });
 
 }
