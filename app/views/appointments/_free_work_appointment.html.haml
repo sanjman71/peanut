@@ -31,7 +31,7 @@
       - else
         %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
   .span-3.last
-    - if has_privilege?("update calendars", current_company)
+    - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
       .span-3.last.cancel
         -# free appointments may be deleted with 'update calendars' permission
         .span-3.last.cancel-weekly
@@ -43,6 +43,8 @@
             - if appointment.free?
               = link_to('Cancel availability', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
             - else
+              = link_to('Edit', edit_appointment_path(appointment))
+              |
               = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
           - elsif appointment.work? && appointment.canceled?
             == Canceled

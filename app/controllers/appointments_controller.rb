@@ -191,7 +191,7 @@ class AppointmentsController < ApplicationController
     # Otherwise:
     if !logged_in?
       # The user is not logged in. They made the appointment from the openings page, and will have to log in to see their history etc.
-      @redirect_path = openings_path
+      @redirect_path = openings_path(:subdomain => current_subdomain)
       # tell the user their account has been created
       flash[:notice] += "<br/>Your user account has been created."
       # clear session return_to to ensure the user starts clean when they login
@@ -203,7 +203,7 @@ class AppointmentsController < ApplicationController
 
     else
       # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
-      @redirect_path = history_index_path
+      @redirect_path = history_index_path(:subdomain => current_subdomain)
     end
 
     # Set up our flash
@@ -535,28 +535,73 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/edit
   def edit
-    @appointment = company.appointments.find(params[:id])
+    @appointment = current_company.appointments.find(params[:id])
+
+    # find services collection for the current company; valid services must have at least 1 service provider
+    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
+    @services = Array(current_company.services.with_providers.work)    
+
+    @providers = current_company.providers
+    
+    # build service providers collection mapping services to providers
+    # This is used for the javascript in some of the appointment create/edit dialogs - same as in openings controller
+    @sps = @services.inject([]) do |array, service|
+      service.providers.each do |provider|
+        array << [service.id, provider.id, provider.name, provider.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
+      end
+      array
+    end
     
     respond_to do |format|
       format.html
+      format.js
     end
     
   end
   
   # PUT /appointments/1
   def update
-    @appointment = company.appointments.find(params[:id])
-    
+    @appointment = current_company.appointments.find(params[:id])
+
+    # Repair the params[:provider_type] for the update_attributes below
+    if !params[:appointment][:provider_type].blank?
+      params[:appointment][:provider_type] = params[:appointment][:provider_type].singularize.capitalize
+    end
+
+
     if @appointment.update_attributes(params[:appointment])
     
+      # we'll try to go to the provider's schedule
+      @provider = @appointment.provider
+
+      # Set up our redirect path
+      if !logged_in?
+        # The user is not logged in. They made the appointment from the openings page, and will have to log in to see their history etc.
+        @redirect_path = openings_path(:subdomain => current_subdomain)
+        # tell the user their account has been created
+        # clear session return_to to ensure the user starts clean when they login
+        clear_location
+
+      elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+        # If the user has the right to see company calendars, or this provider's calendar, we go there by default
+        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
+
+      else
+        # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
+        @redirect_path = history_index_path(:subdomain => current_subdomain)
+      end
+
+      flash[:notice] = "Your appointment has been updated"
+
       respond_to do |format|
-        format.html
-        format.js
+        format.html { redirect_to(@redirect_path) }
+        format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
       end
     else
+      flash[:error] = "There was a problem updating your appointment<br/>"
       respond_to do |format|
-        format.html
-        format.js
+        format.html { redirect_to(edit_appointment_path(@appointment)) }
+        format.js { render(:update) { |page| page.redirect_to(edit_appointment_path(@appointment)) } }
       end
     end
   end
