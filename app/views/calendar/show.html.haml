@@ -3,6 +3,17 @@
 - javascript('appointments', 'calendar', 'waitlists', 'users', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'service_providers')
 - prev_next_links = build_calendar_prev_next_links(@provider, @daterange)
 
+-# service providers mapping services to providers
+.span-16.service_providers.hide
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
+
+.span-16.services.hide
+  - unless @sps.blank?
+    - @sps.each do |sp|
+      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically"), :service_duration_in_secs => sp[5]}
+  
 .span-16
   .span-15.prepend-1.last.mat.padding-top-10
     .span-9
