@@ -9,6 +9,6 @@ else
   page["#free_calendar"].html(render(:partial => 'shared/calendar.html.haml', :locals => {:daterange => @daterange, :markings => @calendar_markings})) unless (@daterange.blank? || @calendar_markings.blank?)
 
   # update appointments
-  page["#free_schedule"].html(render(:partial => 'free_work_appointments', :locals => {:appointments_by_day => @appointments_by_day})) unless @appointments_by_day.blank?
+  page["#free_schedule"].html(render(:partial => 'free_work_appointment', :locals => {:appointments_by_day => @appointments_by_day})) unless @appointments_by_day.blank?
 end
 
