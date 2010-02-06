@@ -212,7 +212,7 @@ $.fn.init_ujs_links = function () {
     // Check if its a rails delete link
     if ($(this).attr("class").match(/delete/i))
       var params = {_method : 'delete'};
-      
+
     // Check if a confirmation is required
     if ($(this).attr("class").match(/confirm/i)) {
       question  = $(this).attr("question") || "Are you sure?"
@@ -225,6 +225,7 @@ $.fn.init_ujs_links = function () {
     }
     
     $.post($(this).attr("href"), params, null, "script");
+
     return false;
   });
 }
@@ -285,7 +286,7 @@ function convert_string_to_date(s) {
 // convert '03:00 pm' time format to 'hhmmss' 24 hour time format
 function convert_time_ampm_to_string(s) {
   re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
-  match   = s.match(re);
+  match   = s.toLowerCase().match(re);
 
   // convert hour to integer, leave minute as string
   hour    = parseInt(match[1], 10); 
