@@ -2,6 +2,14 @@ require 'test/test_helper'
 
 class DateRangeTest < ActiveSupport::TestCase
 
+  def setup
+    # The number of days left in the week, if the week starts on Sunday and Monday respectively
+    @days_left_in_week_start_sun            = Hash[0=>0, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
+    @days_left_in_week_start_sun_incl_today = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
+    @days_left_in_week_start_mon            = Hash[0=>1, 1=>0, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
+    @days_left_in_week_start_mon_incl_today = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
+  end
+
   context "include" do
     setup do 
       @daterange = DateRange.parse_when('today')
@@ -95,12 +103,10 @@ class DateRangeTest < ActiveSupport::TestCase
       setup do
         @daterange = DateRange.parse_when('this week', :include => :today)
         assert_valid @daterange
-        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-        @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
       end
 
       should 'have days count based on current time and day of week' do
-        assert_equal @days_left_in_week[Time.zone.now.wday], @daterange.days
+        assert_equal @days_left_in_week_start_mon_incl_today[Time.zone.now.wday], @daterange.days
       end
 
       should 'have start day == beginning of today (adjusting for today) in utc format' do
@@ -120,12 +126,10 @@ class DateRangeTest < ActiveSupport::TestCase
       setup do
         @daterange = DateRange.parse_when('this week', :include => :today, :start_week_on => 0)
         assert_valid @daterange
-        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
       end
 
       should 'have days count based on current time and day of week' do
-        assert_equal @days_left_in_week[Time.zone.now.wday], @daterange.days
+        assert_equal @days_left_in_week_start_sun_incl_today[Time.zone.now.wday], @daterange.days
       end
 
       should 'have start day == beginning of today (adjusting for today) in utc format' do
@@ -190,12 +194,10 @@ class DateRangeTest < ActiveSupport::TestCase
         @daterange = DateRange.parse_when('next week', :start_week_on => 0, :include => :today)
         assert_valid @daterange
         @today = Time.zone.now
-        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
       end
 
       should 'have date range of 7 days + days left this week' do
-        assert_equal 7 + @days_left_in_week[@today.wday], @daterange.days
+        assert_equal 7 + @days_left_in_week_start_sun_incl_today[@today.wday], @daterange.days
       end
 
       should 'have start day of today' do
@@ -214,12 +216,10 @@ class DateRangeTest < ActiveSupport::TestCase
         @daterange = DateRange.parse_when('next 2 weeks')
         assert_valid @daterange
         @today = Time.zone.now
-        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-        @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
       end
 
       should 'have date range of 14 days + days left this week' do
-        assert_equal 14 + @days_left_in_week[@today.wday], @daterange.days
+        assert_equal 14 + @days_left_in_week_start_mon[@today.wday], @daterange.days
       end
 
       should 'have start at == beginning of today in utc format' do
@@ -240,12 +240,10 @@ class DateRangeTest < ActiveSupport::TestCase
         @daterange = DateRange.parse_when('next 2 weeks', :start_week_on => 0)
         assert_valid @daterange
         @today = Time.zone.now
-        # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-        @days_left_in_week = Hash[0=>7, 1=>6, 2=>5, 3=>4, 4=>3, 5=>2, 6=>1]
       end
 
       should 'have date range of 14 days + days left this week' do
-        assert_equal 14 + @days_left_in_week[@today.wday], @daterange.days
+        assert_equal 14 + @days_left_in_week_start_sun[@today.wday], @daterange.days
       end
 
       should 'have start at == beginning of today in utc format' do
@@ -293,12 +291,10 @@ class DateRangeTest < ActiveSupport::TestCase
       @daterange = DateRange.parse_when('next 6 weeks')
       assert_valid @daterange
       @today = Time.zone.now
-      # sunday is day 0, saturday is day 6. This assumes that we're including today, as above
-      @days_left_in_week = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
     end
     
     should 'have date range of 42 days + days left this week' do
-      assert_equal 42 + @days_left_in_week[@today.wday], @daterange.days
+      assert_equal 42 + @days_left_in_week_start_mon[@today.wday], @daterange.days
     end
 
     should 'have start day == beginning of today in utc format' do
