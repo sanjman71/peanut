@@ -561,11 +561,24 @@ class AppointmentsController < ApplicationController
   
   # PUT /appointments/1
   def update
+
     @appointment = current_company.appointments.find(params[:id])
 
     # Repair the params[:provider_type] for the update_attributes below
     if !params[:appointment][:provider_type].blank?
       params[:appointment][:provider_type] = params[:appointment][:provider_type].singularize.capitalize
+    end
+
+    # Make sure to remove the parameters that aren't valid for this appointment
+    params[:appointment].delete(:mark_as)
+    if @appointment.free?
+      # If this is a free appointment, we expect incoming start and end time. We remove duration.
+      params[:appointment].delete(:duration)
+      params[:appointment].delete(:customer_id)
+      params[:appointment].delete(:service_id)
+    else
+      # If this is a work appointment, we expect incoming start time and duration. We remove end time.
+      params[:appointment].delete(:end_at)
     end
 
     # Check the force parameter for the update_attributes below

@@ -44,13 +44,14 @@ $.fn.init_edit_appointment = function() {
 
     // normalize time format
     start_time = convert_time_ampm_to_string(start_time)
-    if (end_time)
+    // We only normalize the end time for a free appointment
+    if (end_time && free)
     {
       end_time   = convert_time_ampm_to_string(end_time)
     }
     // normalize date format
     start_date = convert_date_to_string(start_date);
-    if (end_date)
+    if (end_date && free)
     {
       end_date = convert_date_to_string(end_date);
     } else {

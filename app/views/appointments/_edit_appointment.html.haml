@@ -21,13 +21,13 @@
   -# Deal with the type of appt
   = f.hidden_field :mark_as
   = f.hidden_field :start_at
-  = f.hidden_field :end_at
-  = f.hidden_field :customer_id
   = hidden_field_tag :force, 1
-  
-  -# If this is a free appointment, we won't be changing the service id
+
+  -# We include end_at only for free appointments
   - if appointment.free?
-    = f.hidden_field :service_id
+    = f.hidden_field :end_at
+  - else
+    = f.hidden_field :customer_id
 
   .edit_appointment
     .span-11.last.date.padding-top-10
@@ -54,13 +54,15 @@
         .span-8.last#service
           = f.select :service_id, options_for_select(services.map {|s| [s.name, s.id]}, service.id), :class => 'big appointment services wide'
       .span-11.last.duration.padding-top-10
-        .span-8.last.prepend-3.last#duration_in_words
+        .span-8.prepend-3.last#duration_in_words
           = Duration.to_words(appointment.service.duration, :prepend => "Typically") if appointment.service
+        .span-8.prepend-3.last#current_duration_in_words
+          = Duration.to_words(appointment.duration, :prepend => "Currently")
       .span-11.last.change-duration.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== How long?
         .span-8.last
-          = f.select :duration, options_for_select(service_duration_select_options, nil), :class => 'big wide'
+          = f.select :duration, options_for_select(service_duration_select_options, appointment.duration), :class => 'big wide'
       - if choose_provider
         .span-11.last
           .span-3.padding-top-5.label

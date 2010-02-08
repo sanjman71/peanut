@@ -77,7 +77,8 @@ $.fn.init_providers = function () {
 
 $.fn.init_duration = function() {
   // If we don't have a duration selector or a service selector, we don't bother with this
-  if (($('select#duration').size() == 0) || (($('select#service_id').size() == 0) && ($('select#appointment_service_id').size() == 0))) {
+  if ((($('select#duration').size() == 0) && ($('select#appointment_duration').size() == 0))||
+      (($('select#service_id').size() == 0) && ($('select#appointment_service_id').size() == 0))) {
     return;
   }
 
@@ -102,7 +103,7 @@ $.fn.init_duration = function() {
       }
       
       // update default duration text and the selected duration
-      $("#duration_in_words").html(service[2]);
+      $("div#duration_in_words").html(service[2]);
       $("select#duration option[value=" + service[3] + "]").attr("selected", 'selected');
       $("select#appointment_duration option[value=" + service[3] + "]").attr("selected", 'selected');
     }
@@ -133,7 +134,7 @@ $.fn.init_select_change = function() {
   })
 
   // when a service is selected, rebuild the provider service provider select list
-  $("#service_id, #appointment_service_id").change(function () {
+  $("select#service_id, select#appointment_service_id").change(function () {
     $(document).init_providers();
     $(document).init_duration();
     return false;
