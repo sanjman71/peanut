@@ -857,8 +857,78 @@ class AppointmentsControllerTest < ActionController::TestCase
           assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
       end
+
+      context "with company email text" do
+        setup do
+          @email_text = "Appointment cancelations are allowed up to 24 hours before your appointment."
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:email_text] = @email_text
+          @company.save
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :customer_id => @customer.id}
+        end
+
+        should_assign_to(:confirmations, :class => Array)
+
+        should "have company email text as part of message body" do
+          @message = assigns(:confirmations).first
+          assert_match /#{@email_text}/, @message.body
+        end
+      end
+
+      context "with provider email text" do
+        setup do
+          @provider_email_text = "No credit cards, cash only."
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.save
+          @johnny.preferences[:provider_email_text] = @provider_email_text
+          @johnny.save
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
+                :service_id => @haircut.id, :customer_id => @customer.id}
+        end
+
+        should_assign_to(:confirmations, :class => Array)
+
+        should "have provider email text as part of message body" do
+          @message = assigns(:confirmations).first
+          assert_match /#{@provider_email_text}/, @message.body
+        end
+      end
+
+      context "with company and provider email text" do
+        setup do
+          @company_email_text  = "Appointment cancelations are allowed up to 24 hours before your appointment."
+          @provider_email_text = "No credit cards, cash only."
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:email_text] = @company_email_text
+          @company.save
+          @johnny.preferences[:provider_email_text] = @provider_email_text
+          @johnny.save
+          # create work appointment as company manager
+          @controller.stubs(:current_user).returns(@owner)
+          # create work appointment, today from 10 am to 12 pm local time
+          post :create_work,
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+                :service_id => @haircut.id, :customer_id => @customer.id}
+        end
+
+        should_assign_to(:confirmations, :class => Array)
+
+        should "have company email text as part of message body" do
+          @message = assigns(:confirmations).first
+          assert_match /#{@company_email_text}\n\n#{@provider_email_text}/, @message.body
+        end
+      end
     end
-  
+
     context "with appointment customer reminders" do
       context "turned on" do
         setup do

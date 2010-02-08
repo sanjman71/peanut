@@ -68,7 +68,6 @@ Rails::Initializer.run do |config|
   config.gem "haml", :version => '2.2.4'
   config.gem "hpricot", :version => '0.8.1' # required by sanitize, uses native components
   config.gem "httparty" # used by google weather plugin
-  config.gem 'javan-whenever', :lib => false, :source => 'http://gems.github.com'
   config.gem 'json' # uses native components
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
   config.gem 'mechanize', :version => '0.9.3'
@@ -78,7 +77,7 @@ Rails::Initializer.run do |config|
   config.gem 'ri_cal'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
-  # config.gem 'unicode', :lib => false, :version => '~> 0.1' # not compatible with ruby 1.9
+  config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
   config.gem 'curb'
   
   # Only load the plugins named here, in the order given. By default, all plugins 
