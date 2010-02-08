@@ -2,7 +2,7 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 325, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
+  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 400, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
@@ -79,6 +79,79 @@ $.fn.init_add_appointment = function() {
     // post
     $.post(this.action, data, null, "script");
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
+    return false;
+  })
+}
+
+// change appointment
+$.fn.init_edit_appointment = function() {
+
+  $("a#edit_appointment_add_customer").click(function() {
+    // close this dialog
+    $("div.dialog#edit_appointment_dialog").dialog('close');
+    // show add user dialog, set return dialog link, disable escape
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
+    $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
+    $("div.dialog#add_user_dialog").dialog('open');
+    return false;
+  })
+  
+  $("form#edit_appointment_form").submit(function () {
+    // Provider is built into the form when it's generated - the end user doesn't provide this information.
+    var provider_id = $("form#edit_appointment_form select#provider_id").val();
+    var service_id  = $("form#edit_appointment_form select#service_id").val();
+    var customer_id = $("form#edit_appointment_form input#customer_id").val();
+    var start_date  = $("form#edit_appointment_form input#start_date").val();
+    var start_time  = $("form#edit_appointment_form input#start_time").val();
+    
+    if (!start_date) {
+      alert("Please select a date");
+      return false; 
+    }
+    
+    if (!provider_id) {
+      alert("Please select a provider");
+      return false; 
+    }
+
+    if (!service_id) {
+      alert("Please select a service");
+      return false; 
+    }
+
+    if (!start_time) {
+      alert("Please select a start time");
+      return false; 
+    }
+
+    if (!customer_id) {
+      alert("Please select a customer");
+      return false; 
+    }
+
+    // normalize time format
+    var start_time = convert_time_ampm_to_string(start_time)
+
+    // normalize date format
+    var start_date = convert_date_to_string(start_date);
+
+    // replace hidden tag formatted version
+    $("form#edit_appointment_form input#start_at").attr('value', start_date + 'T' + start_time);
+
+    // disable start_time field
+    $("form#edit_appointment_form input#start_time").attr('disabled', 'disabled');
+
+    // serialize form
+    data = $(this).serialize();
+    //alert("form serialize: " + data);
+    //return false;
+
+    // enable start_time field
+    $("form#edit_appointment_form input#start_time").removeAttr('disabled');
+
+    // this is an update, so it's put
+    $.put(this.action, data, null, "script");
+    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Updating...</h3>");
     return false;
   })
 }
@@ -218,18 +291,17 @@ $.fn.init_add_calendar_markings = function() {
     date  = match[1];
 
     // count capacity slots for this date
-    var capacity_slots = 0;
-    $(this).find("div.free_appointment div.capacity_and_work div.capacity_slot").each(function() {
-      capacity_slots += 1;
-    })
+    var free_capacity_slots = 0;
+    var overbooked_capacity_slots = 0;
 
-    $(this).find("div.capacity_slot").each(function() {
-      capacity_slots += 1;
-    })
-
-    // count capacity slot 2 divs, but not those that indicate overbooked - only those that are free
+    // count free capacity slots
     $(this).find("div.capacity_slot.free").each(function() {
-      capacity_slots += 1;
+      free_capacity_slots += 1;
+    })
+
+    // count overbooked capacity slots
+    $(this).find("div.capacity_slot.overbooked").each(function() {
+      overbooked_capacity_slots += 1;
     })
 
     // count work appointments for this date; there are multiple ways to count work appointments
@@ -246,7 +318,7 @@ $.fn.init_add_calendar_markings = function() {
     var text = [];
 
     // mark the calendar
-    if (capacity_slots > 0) {
+    if (free_capacity_slots > 0) {
       // mark as free, add text
       $("div#free_work_calendar td#" + date).addClass('free');
       text.push('Free');
@@ -258,8 +330,14 @@ $.fn.init_add_calendar_markings = function() {
       text.push('Work');
     }
 
+    if (overbooked_capacity_slots > 0) {
+      // mark as overbooked, add text
+      $("div#free_work_calendar td#" + date).addClass('overbooked');
+      text.push('<br/>Overbooked');
+    }
+
     // mark text
-    $("div#free_work_calendar td#" + date).find("#available").text(text.join(", "));
+    $("div#free_work_calendar td#" + date).find("#available").html(text.join(", "));
   })
 
   // add click handler to show selected free, work dates; allow past dates
@@ -419,6 +497,7 @@ $(document).ready(function() {
   $(document).init_search_calendar_with_date_range();
   $(document).init_add_single_free_time();
   $(document).init_add_appointment();
+  $(document).init_edit_appointment();
   $(document).init_cancel_appointment();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
@@ -430,4 +509,5 @@ $(document).ready(function() {
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
   $(document).init_select_calendar_show_provider();
+  $(document).init_edit_appointment();
 })
