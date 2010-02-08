@@ -27,7 +27,8 @@ class InvoiceTest < ActiveSupport::TestCase
                                      :provider => @johnny,
                                      :customer => @user,
                                      :start_at_string => "today 2 pm",
-                                     :duration => @haircut.duration)
+                                     :duration => @haircut.duration,
+                                     :force => true)
 
       assert_valid @appt
 

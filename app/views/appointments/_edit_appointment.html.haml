@@ -10,60 +10,74 @@
 
 - form_for(appointment, :html => {:id => 'edit_appointment_form'}) do |f|
 
+  -# Deal with the provider
   = hidden_field_tag :initial_provider_id, provider.id
   = hidden_field_tag :initial_provider_type, provider.tableize
   = hidden_field_tag :initial_service_id, service.id
     
   = f.hidden_field :provider_id
   = f.hidden_field :provider_type
-  
+
+  -# Deal with the type of appt
   = f.hidden_field :mark_as
   = f.hidden_field :start_at
   = f.hidden_field :end_at
   = f.hidden_field :customer_id
   = hidden_field_tag :force, 1
   
+  -# If this is a free appointment, we won't be changing the service id
+  - if appointment.free?
+    = f.hidden_field :service_id
+
   .edit_appointment
     .span-11.last.date.padding-top-10
       .span-3.label
         %h4.bottom.block== Date
       .span-8.last
         = f.text_field :start_date, :id =>'start_date', :class => 'datepicker std_text_field_style'
-    .span-11.last.service.padding-top-10
-      .span-3.padding-top-5.label
-        %h4.bottom.block== Service
-      .span-8.last#service
-        = f.select :service_id, options_for_select(services.map {|s| [s.name, s.id]}, service.id), :class => 'big appointment services wide'
-    .span-11.last.duration.padding-top-10
-      .span-8.last.prepend-3.last#duration_in_words
-        = Duration.to_words(appointment.service.duration, :prepend => "Typically") if appointment.service
-    .span-11.last.change-duration.padding-top-10
-      .span-3.padding-top-5.label
-        %h4.bottom.block== How long?
-      .span-8.last
-        = f.select :duration, options_for_select(service_duration_select_options, nil), :class => 'big wide'
     .span-11.last.padding-top-10
       .span-3.padding-top-5.label
         %h4.bottom.block== Start Time
       .span-8.last
         = f.text_field :start_time, :id =>'start_time', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
-    - if choose_provider
-      .span-11.last
+    - if appointment.free?
+      -# Free appointment
+      .span-11.last.padding-top-10
         .span-3.padding-top-5.label
-          %h4.bottom.block== With?
-        .span-8.last#who
-          = select_tag :provider, options_for_select(providers.collect{ |o| [o.name, "#{o.class.to_s}/#{o.id}"]}, "#{provider.class.to_s}/#{provider.id}"), :class => 'big wide', :specific_providers_only => 1
-    .span-11.last.padding-top-10
-      .span-3.padding-top-5.label
-        %h4.bottom.block== Customer
-      .span-8.last
-        = f.text_field :customer_name, :class => 'big', :autocomplete => 'off', :url => customers_path(:format => :json)
-      .span-8.prepend-3.last
-        %em.small== Search using name, phone number or email
+          %h4.bottom.block== End Time
+        .span-8.last
+          = f.text_field :end_time, :id =>'end_time', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+    - else
+      .span-11.last.service.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Service
+        .span-8.last#service
+          = f.select :service_id, options_for_select(services.map {|s| [s.name, s.id]}, service.id), :class => 'big appointment services wide'
+      .span-11.last.duration.padding-top-10
+        .span-8.last.prepend-3.last#duration_in_words
+          = Duration.to_words(appointment.service.duration, :prepend => "Typically") if appointment.service
+      .span-11.last.change-duration.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== How long?
+        .span-8.last
+          = f.select :duration, options_for_select(service_duration_select_options, nil), :class => 'big wide'
+      - if choose_provider
+        .span-11.last
+          .span-3.padding-top-5.label
+            %h4.bottom.block== With?
+          .span-8.last#who
+            = select_tag :provider, options_for_select(providers.collect{ |o| [o.name, "#{o.class.to_s}/#{o.id}"]}, "#{provider.class.to_s}/#{provider.id}"), :class => 'big wide', :specific_providers_only => 1
+      .span-11.last.padding-top-10
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Customer
+        .span-8.last
+          = f.text_field :customer_name, :class => 'big', :autocomplete => 'off', :url => customers_path(:format => :json)
+        .span-8.prepend-3.last
+          %em.small== Search using name, phone number or email
     
-    - if has_privilege?('create users', current_company)
-      .span-8.prepend-3.last
-        %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'edit_appointment_add_customer'
+      - if has_privilege?('create users', current_company)
+        .span-8.prepend-3.last
+          %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'edit_appointment_add_customer'
 
     .span-8.last.padding-top-10.padding-bottom-10
       #submit= f.submit 'Update', :name => nil, :class => 'big', :id => 'edit_appointment'

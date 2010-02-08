@@ -568,6 +568,15 @@ class AppointmentsController < ApplicationController
       params[:appointment][:provider_type] = params[:appointment][:provider_type].singularize.capitalize
     end
 
+    # Check the force parameter for the update_attributes below
+    # This will be checked in the capacity_slot changes as part of the save process (after_save filter)
+    if ((!params[:force].blank?) && (params[:force].to_i != 0) &&
+        ((current_user.has_privilege?('update calendars', current_company)) ||
+         (current_user.has_privilege?('update calendars', @provider))))
+      @appointment.force = true
+    else
+      @appointment.force = false
+    end
 
     if @appointment.update_attributes(params[:appointment])
     
@@ -598,7 +607,7 @@ class AppointmentsController < ApplicationController
         format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
       end
     else
-      flash[:error] = "There was a problem updating your appointment<br/>"
+      flash[:error] = "There was a problem updating your appointment<br/>" + @appointment.errors.full_messages.join("<br/>")
       respond_to do |format|
         format.html { redirect_to(edit_appointment_path(@appointment)) }
         format.js { render(:update) { |page| page.redirect_to(edit_appointment_path(@appointment)) } }

@@ -31,9 +31,10 @@ $.fn.init_services = function() {
 
 $.fn.init_providers = function () {
 
-  if ($('select#provider').count == 0) {
+  if ($("select#provider").size() == 0) {
     return;
   }
+
   var specific_providers_only = false;
   var blah = $("select#provider").attr("specific_providers_only");
   if ($("select#provider").attr("specific_providers_only"))
@@ -75,12 +76,17 @@ $.fn.init_providers = function () {
 }
 
 $.fn.init_duration = function() {
+  // If we don't have a duration selector or a service selector, we don't bother with this
+  if (($('select#duration').size() == 0) || (($('select#service_id').size() == 0) && ($('select#appointment_service_id').size() == 0))) {
+    return;
+  }
+
   // set the duration selected value based on the selected service
 
   // find the selected service
-  var service_id = $('#service_id').val();
+  var service_id = $('select#service_id').val();
   if (!service_id) {
-    service_id = $('#appointment_service_id').val();
+    service_id = $('select#appointment_service_id').val();
   }
 
   var allow_custom_duration     = false;
@@ -118,7 +124,11 @@ $.fn.init_duration = function() {
 }
 
 $.fn.init_select_change = function() {
-  $("#provider").change(function () {
+  if ($("select#provider").size() == 0) {
+    return;
+  }
+
+  $("select#provider").change(function () {
     update_provider();
   })
 
@@ -131,8 +141,13 @@ $.fn.init_select_change = function() {
 }
 
 function update_provider() {
+  // Make sure we have a provider selector on the page
+  if ($("select#provider").size() == 0) {
+    return;
+  }
+
   // split selected provider value into provider type and id
-  var tuple           = $("#provider option:selected").attr("value").split("/");
+  var tuple           = $("select#provider option:selected").attr("value").split("/");
   var provider_type   = tuple[0];
   var provider_id     = tuple[1];
   $("#appointment_provider_id").attr("value", provider_id);

@@ -1,17 +1,23 @@
 $.fn.init_edit_appointment = function() {
   $("form#edit_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
+    var free_work   = $("form#edit_appointment_form input#mark_as").val();
     var service_id  = $("form#edit_appointment_form select#appointment_service_id").val();
     var customer_id = $("form#edit_appointment_form input#appointment_customer_id").val();
     var start_date  = $("form#edit_appointment_form input#start_date").val();
+    var end_date    = $("form#edit_appointment_form input#start_date").val();
     var start_time  = $("form#edit_appointment_form input#start_time").val();
+    var end_time    = $("form#edit_appointment_form input#end_time").val();
+  
+    var free        = (free_work == "free")
+    var work        = (free_work == "work")
   
     if (!start_date) {
       alert("Please select a date");
       return false; 
     }
   
-    if (!service_id) {
+    if (work && !service_id) {
       alert("Please select a service");
       return false; 
     }
@@ -21,21 +27,40 @@ $.fn.init_edit_appointment = function() {
       return false; 
     }
 
-    if (!customer_id) {
+    if (free && !end_time) {
+      alert("Please select an end time");
+      return false; 
+    }
+
+    if (work && !customer_id) {
       alert("Please select a customer");
       return false; 
     }
 
+    if (work && !duration) {
+      alert("Please select a duration");
+      return false; 
+    }
+
     // normalize time format
-    var start_time = convert_time_ampm_to_string(start_time)
-
+    start_time = convert_time_ampm_to_string(start_time)
+    if (end_time)
+    {
+      end_time   = convert_time_ampm_to_string(end_time)
+    }
     // normalize date format
-    var start_date = convert_date_to_string(start_date);
-
+    start_date = convert_date_to_string(start_date);
+    if (end_date)
+    {
+      end_date = convert_date_to_string(end_date);
+    } else {
+      end_date = start_date
+    }
+    
     // replace hidden tag formatted version
     $("form#edit_appointment_form input#appointment_start_at").attr('value', start_date + 'T' + start_time);
     // force end_at to be recalculated while saving the appointment
-    $("form#edit_appointment_form input#appointment_end_at").attr('value', '');
+    $("form#edit_appointment_form input#appointment_end_at").attr('value', start_date + 'T' + end_time);
 
     // disable start_time field
     $("form#edit_appointment_form input#appointment_start_time").attr('disabled', 'disabled');

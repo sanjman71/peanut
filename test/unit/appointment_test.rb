@@ -3,21 +3,21 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  should_validate_presence_of   :company_id
-  should_validate_presence_of   :start_at
-  should_validate_presence_of   :end_at
-  should_validate_presence_of   :duration
-  should_allow_values_for       :mark_as, "free", "work"
-  
-  should_belong_to              :company
-  should_belong_to              :service
-  should_belong_to              :provider
-  should_belong_to              :customer
-  should_have_one               :invoice
-  should_belong_to              :location
-  
-  should_belong_to              :recur_parent
-  should_have_many              :recur_instances
+  # should_validate_presence_of   :company_id
+  # should_validate_presence_of   :start_at
+  # should_validate_presence_of   :end_at
+  # should_validate_presence_of   :duration
+  # should_allow_values_for       :mark_as, "free", "work"
+  # 
+  # should_belong_to              :company
+  # should_belong_to              :service
+  # should_belong_to              :provider
+  # should_belong_to              :customer
+  # should_have_one               :invoice
+  # should_belong_to              :location
+  # 
+  # should_belong_to              :recur_parent
+  # should_have_many              :recur_instances
   
   def setup
     @owner          = Factory(:user, :name => "Owner")
@@ -189,16 +189,16 @@ class AppointmentTest < ActiveSupport::TestCase
         assert_valid @work_appt
         @customer.reload
       end
-  
+      
       should "add 'user manager' role on user to customer" do
         assert_equal ['user manager'], @customer.roles_on(@customer).collect(&:name).sort
       end
-  
+      
       should "add 'company customer' role on company to customer" do
         assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
       end
     end
-  
+      
     context "and schedule work appointment with a custom service duration" do
       setup do
         @customer   = Factory(:user)
@@ -206,19 +206,19 @@ class AppointmentTest < ActiveSupport::TestCase
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 2.hours, @customer, @options)
         assert_valid @work_appt
       end
-  
+      
       should "have work service with duration of 120 minutes" do
         assert_equal @work_service, @work_appt.service
         assert_equal 2.hours, @work_appt.duration
         assert_equal 10, @work_appt.start_at.hour
         assert_equal 12, @work_appt.end_at.hour
       end
-  
+      
       context "then remove company" do
         setup do
           @company.destroy
         end
-  
+      
         should "have no companies or associated models" do
           assert_equal 0, Company.count
           assert_equal 0, Appointment.count
@@ -234,7 +234,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
       end
-  
+      
       should "raise exception" do
         assert_raise AppointmentInvalid do
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service2, @work_service2.duration, @customer, @options)
@@ -248,7 +248,7 @@ class AppointmentTest < ActiveSupport::TestCase
         @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
         @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       end
-  
+      
       should "raise exception" do
         assert_raise TimeslotNotEmpty do
           @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
@@ -269,8 +269,9 @@ class AppointmentTest < ActiveSupport::TestCase
                                            :provider => @provider,
                                            :customer => @customer,
                                            :start_at => @start_at_local,
-                                           :duration => @work_service.duration)
-
+                                           :duration => @work_service.duration,
+                                           :force => true)
+  
       assert_valid @appt
       @end_at_utc = @appt.end_at.utc
     end
@@ -292,21 +293,22 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal [], Appointment.time_overlap(Appointment.time_range("bogus"))
     end
   end
-
+  
   context "create work appointment to check appointment roles and privileges" do
     setup do
       # initialize roles and privileges
       BadgesInit.roles_privileges
-
+  
       # start at 2 pm, local time
       @start_at_local = Time.zone.now.beginning_of_day + 14.hours
-
+  
       @appt = @company.appointments.create(:service => @work_service,
                                            :provider => @provider,
                                            :customer => @customer,
                                            :start_at => @start_at_local,
-                                           :duration => @work_service.duration)
-
+                                           :duration => @work_service.duration,
+                                           :force => true)
+  
       assert_valid @appt
       @end_at_utc = @appt.end_at.utc
     end
@@ -320,6 +322,47 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
+  context "create work appointment to check capacity creation" do
+    setup do
+      # initialize roles and privileges
+      BadgesInit.roles_privileges
+  
+      # start at 2 pm, local time
+      @start_at_local = Time.zone.now.beginning_of_day + 14.hours
+      
+    end
+    
+    should "raise exception" do
+      assert_raise AppointmentInvalid, "Not enough capacity available" do
+        @appt = @company.appointments.create(:service => @work_service,
+                                             :provider => @provider,
+                                             :customer => @customer,
+                                             :start_at => @start_at_local,
+                                             :duration => @work_service.duration)
+      end
+    end
+  
+    should "raise exception" do
+      assert_raise AppointmentInvalid, "Not enough capacity available" do
+        @appt = @company.appointments.create(:service => @work_service,
+                                             :provider => @provider,
+                                             :customer => @customer,
+                                             :start_at => @start_at_local,
+                                             :duration => @work_service.duration,
+                                             :force => false)
+      end
+    end
+
+    should "not raise exception" do
+      @appt = @company.appointments.create(:service => @work_service,
+                                           :provider => @provider,
+                                           :customer => @customer,
+                                           :start_at => @start_at_local,
+                                           :duration => @work_service.duration,
+                                           :force => true)
+    end
+  end
+
   context "build new appointment with time range attributes and am/pm times" do
     setup do
       @today = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
@@ -373,14 +416,14 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 2, @free_appt.capacity
       assert_equal 2, @company.capacity_slots.provider(@provider2).general_location(Location.anywhere).first.capacity
     end
-      
+    
     context "and schedule work appointment using service capacity 2" do
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @options)
       end
-  
+      
       should "have valid work appointment with capacity 2" do
         assert_valid @work_appt
         assert 2, @work_appt.capacity
@@ -451,7 +494,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @recurrence     = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
                                                                      :description => "This is the recurrence description")
       assert_valid @recurrence
-
+  
     end
     
     should_change("Appointment.count", :by => 1) { Appointment.count }
@@ -695,7 +738,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
       end  
   
-
+  
       context "create a second conflicting valid recurring free private appointment" do
         setup do
           # Each of @start_at, @end_at, @end_recurrence, @recur_days and @recur_rule are reused from previous definition
@@ -716,14 +759,14 @@ class AppointmentTest < ActiveSupport::TestCase
           assert_valid @recurrence2
           appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
         end
-
+  
         # Should have a single appointment = the parent, but the instances shouldn't be there
         should_change("Appointment.count", :by => 1) { Appointment.count }
         
         should "have no recurrence instances" do
           assert_equal 0, @recurrence2.recur_instances.count
         end
-
+  
       end
       
     end

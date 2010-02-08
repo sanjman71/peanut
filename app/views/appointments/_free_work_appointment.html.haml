@@ -2,7 +2,7 @@
   .span-15.last.start_date_time.hide
     = appointment.start_at.to_s(:appt_day_date_time)
   .span-4.time
-    - if appointment.work? && appointment.canceled?
+    - if appointment.canceled?
       -# canceled work appointment
       %del== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
     - else
@@ -32,19 +32,19 @@
         %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
   .span-3.last
     - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
-      .span-3.last.cancel
+      .span-3.last.editcancel
+        .span-3.last.editcancel-one
+          - if !appointment.recurrence_parent? && !appointment.canceled?
+            = link_to('Edit', edit_appointment_path(appointment))
+            |
+            - if appointment.free?
+              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
+            - else
+              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
+          - elsif appointment.canceled?
+            == Canceled
         -# free appointments may be deleted with 'update calendars' permission
         .span-3.last.cancel-weekly
           - if appointment.recurrence_parent
             = link_to('Cancel series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to cancel all future availability in this series?")
         -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
-        .span-3.last.cancel-one
-          - if !appointment.recurrence_parent? && !appointment.canceled?
-            - if appointment.free?
-              = link_to('Cancel availability', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
-            - else
-              = link_to('Edit', edit_appointment_path(appointment))
-              |
-              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
-          - elsif appointment.work? && appointment.canceled?
-            == Canceled

@@ -7,6 +7,7 @@
     %h2{:style => 'margin-bottom: 5px;'}
       = @title
       %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
+      %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Edit', edit_appointment_path(@appointment), :style => 'color: #FF1100;'
     -# appointment state
     - if @appointment.canceled?
       %h4.canceled{:style => 'margin-bottom: 5px;'}

@@ -12,6 +12,10 @@
   - unless @sps.blank?
     - @sps.each do |sp|
       .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically"), :service_duration_in_secs => sp[5]}
-  
+
+- if @appointment.free?
+  %h2==Change availability for #{@appointment.provider.name}  
+- else
+  %h2==Change #{@appointment.service.name} appointment with #{@appointment.provider.name} for #{@appointment.customer.name}
 .span-14.prepend-1.last
   = render :partial => 'appointments/edit_appointment', :locals => {:appointment => @appointment, :provider => @appointment.provider, :choose_provider => true, :services => @services, :providers => @providers }
