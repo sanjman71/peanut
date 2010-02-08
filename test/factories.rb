@@ -100,6 +100,7 @@ Factory.define :appointment_today, :class => Appointment do |a|
   a.start_at        { |o| Factory.next :today_hour }  # choose an hour from today
   a.duration        { |o| o.service.duration }
   a.end_at          { |o| o.start_at + o.service.duration }  # add duration to start_at
+  a.force           true
 end
 
 Factory.define :log_entry do |e|
