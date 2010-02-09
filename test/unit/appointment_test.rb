@@ -332,7 +332,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
     end
     
-    should "raise exception" do
+    should "raise exception, default force value" do
       assert_raise AppointmentInvalid, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
@@ -342,7 +342,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
     end
   
-    should "raise exception" do
+    should "raise exception, force is false" do
       assert_raise AppointmentInvalid, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
