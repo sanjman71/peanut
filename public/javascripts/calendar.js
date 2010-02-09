@@ -23,7 +23,7 @@ $.fn.init_add_appointment = function() {
     // close this dialog
     $("div.dialog#add_appointment_dialog").dialog('close');
     // show add user dialog, set return dialog link, disable escape
-    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#edit_appointment_dialog");
     $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
     $("div.dialog#add_user_dialog").dialog('open');
     return false;

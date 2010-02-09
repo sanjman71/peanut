@@ -5,7 +5,7 @@ $.fn.init_edit_appointment = function() {
     var service_id  = $("form#edit_appointment_form select#appointment_service_id").val();
     var customer_id = $("form#edit_appointment_form input#appointment_customer_id").val();
     var start_date  = $("form#edit_appointment_form input#start_date").val();
-    var end_date    = $("form#edit_appointment_form input#start_date").val();
+    var end_date    = $("form#edit_appointment_form input#end_date").val();
     var start_time  = $("form#edit_appointment_form input#start_time").val();
     var end_time    = $("form#edit_appointment_form input#end_time").val();
   
