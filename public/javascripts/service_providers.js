@@ -142,8 +142,8 @@ $.fn.init_select_change = function() {
 }
 
 function update_provider() {
-  // Make sure we have a provider selector on the page
-  if ($("select#provider").size() == 0) {
+  // Make sure we have a provider selector on the page and a provider has been selected
+  if (($("select#provider").size() == 0) || ($("select#provider option:selected").size() == 0)) {
     return;
   }
 
