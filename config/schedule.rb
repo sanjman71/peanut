@@ -47,10 +47,17 @@ every :reboot do
 end
 
 every 1.day, :at => '1:00 am' do
-  # Expand recurrences for all companies with subscriptions
+  # expand recurrences for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|
     # expand recurrences for a specific subdomain
     command "curl http://#{company.subdomain}.walnutcalendar.com/appointments/expand_all_recurrences > /dev/null"
+  end
+end
+
+every 1.day, :at => '6:00 am' do
+  # send daily schedules for all companies with subscriptions
+  Subscription.all.collect(&:company).each do |company|
+    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/schedules/messages/daily > /dev/null"
   end
 end
 

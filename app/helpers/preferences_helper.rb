@@ -26,16 +26,20 @@ module PreferencesHelper
   end
 
   def appt_confirmation_options
-    [
-      ["Yes", "1"],
-      ["No", "0"]
-    ]
+    yes_no_options
   end
 
   def public_options
     [
       ["Public", "1"],
       ["Private", "0"]
+    ]
+  end
+
+  def yes_no_options
+    [
+      ["Yes", "1"],
+      ["No", "0"]
     ]
   end
 

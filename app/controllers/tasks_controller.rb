@@ -75,6 +75,29 @@ class TasksController < ApplicationController
     end
   end
 
+  # GET /tasks/schedules/messages/daily
+  # Send (daily, monthly, ...) provider schedules as pdf emails.  Emails are sent using a delayed job.
+  def schedule_messages
+    # find company providers with daily schedules preference set
+    @providers = current_company.authorized_providers.select{|o| o.preferences[:provider_email_daily_schedule] == '1'}
+
+    @providers.each do |provider|
+      # build url to email pdf schedule, with token to ensure request is authenticated
+      @email_url  = calendar_when_format_url(:provider_type => provider.tableize, :provider_id => provider.id, :when => 'today', :format => 'email')
+      @email_url  += "?token=#{AUTH_TOKEN_INSTANCE}"
+      # create delayed job to generate and send pdf schedule
+      @job = PdfMailerJob.new(:url => @email_url)
+      Delayed::Job.enqueue(@job)
+    end
+
+    @title  = "Tasks - Schedule Messages"
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+
   # GET /tasks/expand_all_recurrences
   # Expand all recurrences
   # This is typically called from a delayed job (though can be called directly)
@@ -84,34 +107,10 @@ class TasksController < ApplicationController
     @number_of_recurrences = current_company.appointments.recurring.count
     @time_horizon = Time.zone.now.beginning_of_day + current_company.preferences[:time_horizon].to_i
     Appointment.expand_all_recurrences(current_company)
+
     respond_to do |format|
       format.html
     end
-  end
-
-  # GET /tasks/users/1/send_pdf_schedule/today
-  # Send pdf schedule to the specified user
-  def send_pdf_schedule
-    @user     = User.find(params[:user_id])
-    @when     = params[:today].to_s
-    @subject  = (@when == 'today') ? "Today's PDF Schedule" : "Your PDF Schedule"
-
-    # build url to generate pdf schedule, with token to ensure request is authenticated
-    @url      = calendar_when_format_url(:provider_type => @user.class.to_s.tableize, :provider_id => @user.id, :when => @when, :format => 'pdf')
-    @url      += "?token=#{AUTH_TOKEN_INSTANCE}"
-
-    @email    = @user.primary_email_address
-
-    if @email.blank?
-      flash[:error] = "User #{@user.name} does not have an email address"
-    else
-      # create delayed job to generate and send pdf schedule
-      @job = PdfMailerJob.new(:url => @url, :address => 'sanjay@jarna.com', :subject => @subject)
-      Delayed::Job.enqueue(@job)
-      flash[:notice] = "Sent #{@when} PDF Schedule to #{@user.name}"
-    end
-
-    redirect_to(tasks_path) and return
   end
 
 end

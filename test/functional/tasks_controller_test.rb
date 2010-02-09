@@ -5,8 +5,8 @@ class TasksControllerTest < ActionController::TestCase
   should_route :get, '/tasks/appointments/reminders/2-days', :controller => 'tasks', :action => 'appointment_reminders', :time_span => '2-days'
   should_route :get, '/tasks/appointments/messages/whenever', :controller => 'tasks', :action => 'appointment_messages', :time_span => 'whenever'
   should_route :get, '/tasks/users/messages/whenever', :controller => 'tasks', :action => 'user_messages', :time_span => 'whenever'
+  should_route :get, '/tasks/schedules/messages/daily', :controller => 'tasks', :action => 'schedule_messages', :time_span => 'daily'
   should_route :get, '/tasks/expand_all_recurrences', :controller => 'tasks', :action => 'expand_all_recurrences'
-  should_route :get, '/tasks/users/1/send_pdf_schedule/today', :controller => 'tasks', :action => 'send_pdf_schedule', :user_id => '1', :when => 'today'
 
   def setup
     # initialize roles and privileges
@@ -121,4 +121,19 @@ class TasksControllerTest < ActionController::TestCase
     end
   end
 
+  context "schedules" do
+    setup do
+      @provider.preferences[:provider_email_daily_schedule] = '1'
+      @provider.save
+      @controller.stubs(:current_user).returns(@owner)
+      get :schedule_messages, :time_span => 'daily', :token => AUTH_TOKEN_INSTANCE
+    end
+
+    should_assign_to(:providers) { [@provider] }
+
+    should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+    should_respond_with :success
+    should_render_template 'tasks/schedule_messages.html.haml'
+  end
 end

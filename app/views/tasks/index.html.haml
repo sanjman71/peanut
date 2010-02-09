@@ -31,14 +31,14 @@
         - ['whenever'].each do |ts|
           %span{:style => 'padding-right: 7px;'}= link_to ts, task_user_messages_path(:time_span => ts.to_url_param), :class => 'admin'
 
+    .span-16.last.letterbox#task_schedule_messages
+      .span-5.prepend-1.name
+        %h4.bigger.bottom== Schedule Messages
+      .span-10.last
+        %span{:style => 'padding-right: 7px;'}= link_to 'daily', task_schedule_messages_path(:time_span => 'daily'), :class => 'admin'
+
     .span-16.last.letterbox#task_expand_all_recurrences
       .span-5.prepend-1.name
         %h4.bigger.bottom== Expand All Recurrences
       .span-10.last
         %span{:style => 'padding-right: 7px;'}= link_to "Expand All Recurrences", task_expand_recur_path, :class => 'admin'
-
-    .span-16.last.letterbox#task_send_pdf_schedule
-      .span-5.prepend-1.name
-        %h4.bigger.bottom== Send PDF Schedule
-      .span-10.last
-        %span{:style => 'padding-right: 7px;'}= link_to "Pick Provider", '', :id => 'send_pdf_schedule', :class => 'admin'

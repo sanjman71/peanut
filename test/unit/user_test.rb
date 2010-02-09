@@ -13,7 +13,7 @@ class UserTest < ActiveSupport::TestCase
     end
     
     should "have default preferences" do
-      assert_equal( ({:provider_email_text=>""}), @user.preferences)
+      assert_equal Hash[:provider_email_text => '', :provider_email_daily_schedule => '0'], @user.preferences
     end
 
     should "have nil preferences['foo']" do

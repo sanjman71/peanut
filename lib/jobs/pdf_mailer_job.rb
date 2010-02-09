@@ -5,6 +5,10 @@ class PdfMailerJob < Struct.new(:params)
     1
   end
 
+  def pdf_dir
+    "#{RAILS_ROOT}/pdf"
+  end
+
   def logger
     case RAILS_ENV
     when 'development'
@@ -17,39 +21,53 @@ class PdfMailerJob < Struct.new(:params)
   def perform
     logger.info("#{Time.now}: [pdf mailer] new job: #{params.inspect}")
 
-    address = params[:address]
-    file    = params[:file]
-    url     = params[:url]
-    subject = params[:subject] || 'Your PDF Schedule'
-    body    = params[:body] || "Your schedule is attached."
+    url = params[:url]
 
-    if address.blank?
-      logger.debug("#{Time.now}: [pdf mailer error] no address")
+    if url.blank?
+      logger.debug("#{Time.now}: [pdf mailer error] no url")
       return
     end
 
-    if file.blank? and url.blank?
-      logger.debug("#{Time.now}: [pdf mailer error] no file or url")
+    if url.match(/.email/)
+      # get url that generates an email
+      get(url)
+    elsif url.match(/.pdf/)
+      # get url that generates a pdf
+      address = params[:address]
+      subject = params[:subject] || 'Your PDF Schedule'
+      body    = params[:body] || "Your schedule is attached."
+      get_pdf(url, address, subject, body)
+      # cleanup old pdf files
+      cleanup_pdf_files
+    else
+      logger.debug("#{Time.now}: [pdf mailer error] invalid url #{url}")
+      return
+    end
+  end
+
+  def get(url)
+    # get url
+    agent = WWW::Mechanize.new
+    agent.get(url)
+  end
+
+  def get_pdf(url, address, subject, body)
+    # get pdf from specified url
+    agent = WWW::Mechanize.new
+    agent.get(url)
+
+    # validate content type
+    if agent.page.response["content-type"] != "application/pdf; charset=utf-8"
+      logger.debug("#{Time.now}: [pdf mailer error] content type is not application/pdf")
       return
     end
 
-    if !url.blank?
-      # get pdf from specified url
-      agent = WWW::Mechanize.new
-      agent.get(url)
-      # validate content type
-      if agent.page.response["content-type"] != "application/pdf; charset=utf-8"
-        logger.debug("#{Time.now}: [pdf mailer error] content type is not application/pdf")
-        return
-      end
-      # create pdf directory
-      pdf_dir   = "#{RAILS_ROOT}/pdf"
-      system "mkdir -p #{pdf_dir}"
-      # create pdf file
-      timestamp = Time.now.strftime("%Y%m%d%H%M%S")
-      file      = "#{pdf_dir}/schedule.%s.pdf" % timestamp
-      File.open(file, 'wb') { |o| o << agent.page.body }
-    end
+    # create pdf directory
+    system "mkdir -p #{pdf_dir}"
+    # create pdf file
+    timestamp = Time.now.strftime("%Y%m%d%H%M%S")
+    file      = "#{pdf_dir}/schedule.%s.pdf" % timestamp
+    File.open(file, 'wb') { |o| o << agent.page.body }
 
     begin
       # send email
@@ -57,8 +75,20 @@ class PdfMailerJob < Struct.new(:params)
     rescue Exception => e
       logger.debug("#{Time.now}: [pdf mailer exception] #{e.message}")
     ensure
-      # always delete pdf file
-      File.delete(file) if File.exists(file)
+      # pdf files are cleaned up after the message is sent
+    end
+  end
+
+  def cleanup_pdf_files
+    dir       = Dir.new(pdf_dir)
+    pdf_files = dir.entries[2..-1].sort # remove '.', '..' entries
+
+    pdf_files.each do |file_name|
+      mod_time = File.new("#{pdf_dir}/#{file_name}").atime
+      if mod_time < (Time.now - 1.hour)
+        FileUtils.rm_rf(File.join(pdf_dir, file_name))
+        logger.debug("#{Time.now}: [pdf mailer] cleanup, deleted file #{file_name}")
+      end
     end
   end
 
