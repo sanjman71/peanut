@@ -20,7 +20,7 @@
         .span-3.label
           %h4.bottom.block== Date
         .span-8.last
-          -# field is disabled when adding appointments
+          -# field is always disabled
           = text_field_tag 'date', '', :id =>'start_date', :class => 'big appointment add edit datepicker disabled', :disabled => false
       .span-11.last.service.padding-top-10
         .span-3.padding-top-5.label

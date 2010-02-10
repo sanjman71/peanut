@@ -2,7 +2,8 @@
   -# hidden div used by javascript to edit/cancel appointment
   .span-15.last.start_date_time.hide{:appt_day_date_time => appointment.start_at.to_s(:appt_day_date_time), |
                                      :appt_schedule_day => appointment.start_at.to_s(:appt_schedule_day), |
-                                     :appt_time => appointment.start_at.to_s(:appt_time)} |
+                                     :appt_start_time => appointment.start_at.to_s(:appt_time).downcase, |
+                                     :appt_end_time => appointment.end_at.to_s(:appt_time).downcase} |
   .span-4.time
     - if appointment.canceled?
       -# canceled work appointment
@@ -37,7 +38,7 @@
       .span-3.last.editcancel
         .span-3.last.editcancel-one
           - if !appointment.recurrence_parent? && !appointment.canceled?
-            = link_to('Edit', edit_appointment_path(appointment), :id => 'edit_appointment')
+            = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
             |
             - if appointment.free?
               = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")

@@ -1,14 +1,14 @@
 class AppointmentsController < ApplicationController
   before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                          :update_weekly, :create_work]
+                                          :update_weekly, :create_work, :update]
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                     :update_weekly, :create_work]
+                                                     :update_weekly, :create_work, :update]
   before_filter :init_appointment, :only => [:show]
   before_filter :get_reschedule_id, :only => [:new]
 
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                       :update_weekly],
+                                                       :update_weekly, :update],
                                               :on => [:provider, :current_company]
     
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
@@ -561,6 +561,8 @@ class AppointmentsController < ApplicationController
 
   # PUT /appointments/1
   def update
+    # @provider initialized in before filter
+
     @appointment = current_company.appointments.find(params[:id])
 
     # Make sure to remove the parameters that aren't valid for this appointment
@@ -576,14 +578,19 @@ class AppointmentsController < ApplicationController
     # end
 
     # Update appointment fields
-    @provider = init_provider(:default => nil)
-    @service  = init_service(:default => nil)
-    @customer = User.find(params[:customer_id])
+    @service              = init_service(:default => (@appointment.free? ? @appointment.company.free_service : nil))
+    @customer             = User.find_by_id(params[:customer_id])
 
     @appointment.provider = @provider
     @appointment.service  = @service
     @appointment.start_at = params[:start_at]
-    @appointment.end_at   = @appointment.start_at + params[:duration].to_i
+    if !params[:duration].blank?
+      # build end time using start time and duration
+      @appointment.end_at = @appointment.start_at + params[:duration].to_i
+    else
+      # use specified end time
+      @appointment.end_at = params[:end_at]
+    end
     @appointment.customer = @customer
 
     # Check the force parameter

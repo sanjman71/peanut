@@ -20,7 +20,7 @@ $.fn.init_add_appointment = function() {
     $("form#add_appointment_form input#customer_name").val('');
     $("form#add_appointment_form input#customer_id").val('');
     // set form url
-    $("form#add_appointment_form").attr('action', appointment_create_path);
+    $("form#add_appointment_form").attr('action', appointment_create_work_path);
     $("form#add_appointment_form input#_method").val('post');
     // open dialog
     $("div.dialog#add_appointment_dialog").dialog('open');
@@ -39,11 +39,11 @@ $.fn.init_add_appointment = function() {
   
   $("form#add_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
-    var service_id    = $("form#add_appointment_form select#service_id").val();
-    var customer_id   = $("form#add_appointment_form input#customer_id").val();
-    var start_date    = $("form#add_appointment_form input#start_date").val();
-    var start_time    = $("form#add_appointment_form input#start_time").val();
-    var provider      = $("form#add_appointment_form select#provider option:selected").val();
+    var service_id    = $(this).find("select#service_id").val();
+    var customer_id   = $(this).find("input#customer_id").val();
+    var start_date    = $(this).find("input#start_date").val();
+    var start_time    = $(this).find("input#start_time").val();
+    var provider      = $(this).find("select#provider option:selected").val();
     var provider_type = provider.split('/')[0];
     var provider_id   = provider.split('/')[1];
 
@@ -74,7 +74,7 @@ $.fn.init_add_appointment = function() {
     var start_date = convert_date_to_string(start_date);
 
     // replace hidden tag formatted version
-    $("form#add_appointment_form input#start_at").attr('value', start_date + 'T' + start_time);
+    $(this).find("input#start_at").attr('value', start_date + 'T' + start_time);
 
     // set provider_type, provider_id hidden fields; disable provider field
     $(this).find("input#provider_type").attr('value', provider_type);
@@ -91,10 +91,16 @@ $.fn.init_add_appointment = function() {
     //return false;
 
     // enable start_time field
-    $("form#add_appointment_form input#start_time").removeAttr('disabled');
+    $(this).find("input#start_time").removeAttr('disabled');
 
-    // post
-    $.post(this.action, data, null, "script");
+    // check if its a post or put
+    if ($(this).attr('method') == 'put') {
+      // put
+      $.put(this.action, data, null, "script");
+    } else {
+      // post
+      $.post(this.action, data, null, "script");
+    }
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
@@ -102,34 +108,53 @@ $.fn.init_add_appointment = function() {
 
 // edit appointment
 $.fn.init_edit_appointment = function() {
-
-  // open add appointment dialog on click
-  $("a#edit_appointment").click(function() {
-    // enable start_date field
-    $("form#add_appointment_form input#start_date").removeClass('disabled');
-    $("form#add_appointment_form input#start_date").attr('disabled', '');
-    // enable providers
-    $("form#add_appointment_form div#providers").attr('disabled', '');
+  // open add free time dialog on click
+  $("a#edit_free_appointment").click(function() {
+    var form          = "form#add_single_free_time_form";
     // fill in appointment values since this is an edit form
     var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
-    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_time').toLowerCase();
+    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
+    var end_time      = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_end_time');
+    $(form).find("input#free_date").val(start_date);
+    $(form).find("input#free_start_at").val(start_time);
+    $(form).find("input#free_end_at").val(end_time);
+    // set form url and method
+    var appointment_id = $(this).attr('href').match(/\w\/(\d+)/)[1];
+    $(form).attr('action', appointment_update_free_path.replace(/:id/,appointment_id));
+    $(form).attr('method', 'put');
+    // open dialog
+    $("div#add_free_time_dialog").dialog('open');
+    return false;
+  })
+  
+  // open add appointment dialog on click
+  $("a#edit_work_appointment").click(function() {
+    var form          = "form#add_appointment_form";
+    // enable start_date field
+    $(form).find("input#start_date").removeClass('disabled');
+    $(form).find("input#start_date").attr('disabled', '');
+    // enable providers
+    $(form).find("div#providers").attr('disabled', '');
+    // fill in appointment values since this is an edit form
+    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
+    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
     var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
-    $("form#add_appointment_form input#start_date").val(start_date);
-    $("form#add_appointment_form input#start_time").val(start_time);
-    $("form#add_appointment_form select#service_id").val(service_name).attr('selected', 'selected');
-    $("form#add_appointment_form select#service_id").change();
-    $("form#add_appointment_form input#customer_name").val(customer_name);
-    $("form#add_appointment_form input#customer_id").val(customer_id);
-    // set form url
+    $(form).find("input#start_date").val(start_date);
+    $(form).find("input#start_time").val(start_time);
+    $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
+    $(form).find("select#service_id").change();
+    $(form).find("input#customer_name").val(customer_name);
+    $(form).find("input#customer_id").val(customer_id);
+    // set form url and method
     var appointment_id = $(this).attr('href').match(/\w\/(\d+)/)[1];
-    $("form#add_appointment_form").attr('action', appointment_update_path.replace(/:id/,appointment_id));
-    $("form#add_appointment_form input#_method").val('put');
+    $(form).attr('action', appointment_update_work_path.replace(/:id/,appointment_id));
+    $(form).attr('method', 'put');
     // open dialog
     $("div.dialog#add_appointment_dialog").dialog('open');
     return false;
-  })
+  })  
 }
 
 $.fn.init_cancel_appointment = function() {
@@ -162,25 +187,26 @@ $.fn.init_add_single_free_time = function() {
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
+    var form            = "form#add_single_free_time_form";
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
     var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
-    $("form#add_single_free_time_form input#date").attr('value', normalized_date);
-    $("form#add_single_free_time_form div#free_date input#free_date").val(calendar_date);
+    $(form).find("input#date").attr('value', normalized_date);
+    $(form).find("input#free_date").val(calendar_date);
     // clear start_at, end_at time fields
-    $("form#add_single_free_time_form div#free_start_at_text input#free_start_at").val('');
-    $("form#add_single_free_time_form div#free_end_at_text input#free_end_at").val('');
+    $(form).find("input#free_start_at").val('');
+    $(form).find("input#free_end_at").val('');
     // open dialog
     $("div#add_free_time_dialog").dialog('open');
     return false;
   })
 
   $("form#add_single_free_time_form").submit(function () {
-    var when      = $("input#date").attr('value'); // use hidden field date
-    var start_at  = $("input#free_start_at").attr('value');
-    var end_at    = $("input#free_end_at").attr('value');
+    var free_date = $(this).find("input#free_date").val();
+    var start_at  = $(this).find("input#free_start_at").val();
+    var end_at    = $(this).find("input#free_end_at").val();
 
-    if (!when) {
+    if (!free_date) {
       alert("Please select a date");
       return false; 
     }
@@ -195,6 +221,9 @@ $.fn.init_add_single_free_time = function() {
       return false; 
     }
 
+    // normalize date
+    var free_date = convert_date_to_string(free_date);
+
     // normalize time format, validate that start_at < end_at
     var start_at = convert_time_ampm_to_string(start_at)
     var end_at   = convert_time_ampm_to_string(end_at)
@@ -204,13 +233,16 @@ $.fn.init_add_single_free_time = function() {
       return false;
     }
 
-    // set hidden start_at, end_at  fields with normalized values
-    $("input#start_at[type='hidden']").attr('value', start_at);
-    $("input#end_at[type='hidden']").attr('value', end_at);
+    // set hidden date field
+    $(this).find("input#date").attr('value', free_date);
+
+    // set hidden start_at, end_at fields with normalized values
+    $(this).find("input#start_at[type='hidden']").attr('value', free_date + 'T' + start_at);
+    $(this).find("input#end_at[type='hidden']").attr('value', free_date + 'T' + end_at);
     
     // disable start_at, end_at fields
-    $("input#free_start_at").attr('disabled', 'disabled');
-    $("input#free_end_at").attr('disabled', 'disabled');
+    $(this).find("input#free_start_at").attr('disabled', 'disabled');
+    $(this).find("input#free_end_at").attr('disabled', 'disabled');
 
     // serialize form
     data = $(this).serialize();
@@ -218,11 +250,15 @@ $.fn.init_add_single_free_time = function() {
     //return false;
 
     // enable start_at, end_at fields
-    $("input#free_start_at").removeAttr('disabled');
-    $("input#free_end_at").removeAttr('disabled');
+    $(this).find("input#free_start_at").removeAttr('disabled');
+    $(this).find("input#free_end_at").removeAttr('disabled');
 
-    // post
-    $.post(this.action, data, null, "script");
+    // check if its a post or put
+    if ($(this).attr('method') == 'put') {
+      $.put(this.action, data, null, "script");
+    } else {
+      $.post(this.action, data, null, "script");
+    }
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
     return false;
   })
