@@ -106,7 +106,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
     should "have a valid uid" do
       assert !(@appt.uid.blank?)
-      assert_match Regexp.new("[0-9]*-[0-9]*@walnutindustries.com"), @appt.uid
+      assert_match /[0-9]{8}T[0-9]{6}-([A-Z]|[0-9]){5}@walnutindustries.com/, @appt.uid
     end
   end
   
@@ -176,8 +176,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
   
       should "have confirmation code of exactly 5 characters" do
-        assert_equal 5, @work_appt.confirmation_code.size
-        assert_match /([A-Z]|[0-9])+/, @work_appt.confirmation_code
+        assert_match /([A-Z]|[0-9]){5}/, @work_appt.confirmation_code
       end
     end
   
@@ -510,7 +509,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
     should "have a valid uid" do
       assert !(@recurrence.uid.blank?)
-      assert_match Regexp.new("[0-9]+-[0-9]+@walnutindustries.com"), @recurrence.uid
+      assert_match /[0-9]{8}T[0-9]{6}-([A-Z]|[0-9]){5}@walnutindustries.com/, @recurrence.uid
     end
       
     context "then expand the recurring appointment" do
