@@ -1,5 +1,4 @@
 - appointment = Appointment.new if local_assigns[:appointment].nil?
-- choose_provider = false if local_assigns[:choose_provider].nil?
 
 .span-11.prepend-1.last.dialog.hide#add_work_appointment_dialog{:title => "Schedule an Appointment"}
   - form_for(appointment, :url => schedule_work_path, :html => {:id => 'add_work_appointment_form'}) do |f|
@@ -13,7 +12,6 @@
     = hidden_field_tag :start_at
     = hidden_field_tag :customer_id
     = hidden_field_tag :force, 1
-    = hidden_field_tag '_method', ''
     
     .add_appointment
       .span-11.last.date.padding-top-10

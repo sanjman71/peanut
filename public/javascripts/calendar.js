@@ -120,6 +120,7 @@ $.fn.init_edit_work_appointment = function() {
     // fill in appointment values since this is an edit form
     var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").attr('appt_schedule_day'));
     var start_time    = $(this).parents("div.appointment").attr('appt_start_time');
+    var duration      = $(this).parents("div.appointment").attr('appt_duration');
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
     var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
@@ -128,6 +129,7 @@ $.fn.init_edit_work_appointment = function() {
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
     $(form).find("select#service_id").change();
+    $(form).find("select#duration").val(duration).attr('selected', 'selected'); // set this after the service
     $(form).find("input#customer_name").val(customer_name);
     $(form).find("input#customer_id").val(customer_id);
     // set form url and method
@@ -168,8 +170,8 @@ $.fn.init_add_free_appointment = function() {
   $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', 
                                                 title: $("div#add_free_appointment_dialog").attr('title') });
   
-  // open add free time dialog on click
-  $("a#calendar_add_free_time").click(function() {
+  // open add free appointment dialog on click
+  $("a#calendar_add_free_appointment").click(function() {
     var form            = "form#add_free_appointment_form";
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
@@ -358,19 +360,19 @@ $.fn.init_add_calendar_markings = function() {
     // mark the calendar
     if (free_capacity_slots > 0) {
       // mark as free, add text
-      $("div#free_work_calendar td#" + date).addClass('free');
+      $("div#free_work_calendar td#" + date).addClass('activity').addClass('free');
       text.push('Free');
     }
 
     if (work_appointments > 0) {
       // mark as work, add text
-      $("div#free_work_calendar td#" + date).addClass('work');
+      $("div#free_work_calendar td#" + date).addClass('activity').addClass('work');
       text.push('Work');
     }
 
     if (overbooked_capacity_slots > 0) {
       // mark as overbooked, add text
-      $("div#free_work_calendar td#" + date).addClass('overbooked');
+      $("div#free_work_calendar td#" + date).addClass('activity').addClass('overbooked');
       text.push('<br/>Overbooked');
     }
 
@@ -391,10 +393,11 @@ $.fn.init_add_calendar_markings = function() {
   })
 
   // mark the first calendar date that has free or work time
-  $("td.work:first").click();
+  $("td.activity:first").click();
+  //$("td.free,td.work").find(":eq(0)").click();
 
-  // show add menu icon on calendar date hover
-  $("td:not(.past) .date").hover(function () {
+  // show add menu icon on calendar date hover, allow past dates
+  $("td .date").hover(function () {
     $(this).find("span#calendar_add_menu").css('visibility', 'visible');
     }, function () {
     $(this).find("span#calendar_add_menu").css('visibility', 'hidden');

@@ -2,10 +2,12 @@
 - appt_schedule_day   =  appointment.start_at.to_s(:appt_schedule_day)
 - appt_start_time     = appointment.start_at.to_s(:appt_time).downcase
 - appt_end_time       = appointment.end_at.to_s(:appt_time).downcase
+- appt_duration       = appointment.duration.to_s
 - appt_klasses        = [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')
 
 .span-15.last.appointment[appointment]{:class => appt_klasses, :appt_day_date_time => appt_day_date_time, :appt_schedule_day => appt_schedule_day, |
-                                       :appt_start_time => appt_start_time, :appt_end_time => appt_end_time} |
+                                       :appt_start_time => appt_start_time, :appt_end_time => appt_end_time, |
+                                       :appt_duration => appt_duration} |
   .span-4.time
     - if appointment.canceled?
       -# canceled work appointment

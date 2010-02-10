@@ -62,7 +62,7 @@
     -# show free, work calendar
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today, |
-                                                          :add_free_time_link => 1, :add_appointment_link => @services.empty? ? 0 : 1}) |
+                                                          :add_free_appointment_link => 1, :add_work_appointment_link => @services.empty? ? 0 : 1}) |
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
