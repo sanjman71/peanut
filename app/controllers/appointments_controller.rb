@@ -330,6 +330,11 @@ class AppointmentsController < ApplicationController
   def create_free
     @service = current_company.free_service
     @mark_as = Appointment::FREE
+    # check start_at, end_at values; convert 201001001T0100 to 0100
+    start_match       = params[:start_at].match(/(\d+)T(\d+)/)
+    end_match         = params[:end_at].match(/(\d+)T(\d+)/)
+    params[:start_at] = start_match[2] unless start_match.blank?
+    params[:end_at]   = end_match[2] unless end_match.blank?
     create
   end
   
