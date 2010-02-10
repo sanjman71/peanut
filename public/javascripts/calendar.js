@@ -1,5 +1,5 @@
 // add appointment for a provider on a specific day
-$.fn.init_add_appointment = function() {
+$.fn.init_add_work_appointment = function() {
 
   // initialize add appointment dialog
   $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 450, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
@@ -106,27 +106,7 @@ $.fn.init_add_appointment = function() {
   })
 }
 
-// edit appointment
-$.fn.init_edit_appointment = function() {
-  // open add free time dialog on click
-  $("a#edit_free_appointment").click(function() {
-    var form          = "form#add_single_free_time_form";
-    // fill in appointment values since this is an edit form
-    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
-    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
-    var end_time      = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_end_time');
-    $(form).find("input#free_date").val(start_date);
-    $(form).find("input#free_start_at").val(start_time);
-    $(form).find("input#free_end_at").val(end_time);
-    // set form url and method
-    var appointment_id = $(this).attr('href').match(/\w\/(\d+)/)[1];
-    $(form).attr('action', appointment_update_free_path.replace(/:id/,appointment_id));
-    $(form).attr('method', 'put');
-    // open dialog
-    $("div#add_free_time_dialog").dialog('open');
-    return false;
-  })
-  
+$.fn.init_edit_work_appointment = function() {
   // open add appointment dialog on click
   $("a#edit_work_appointment").click(function() {
     var form          = "form#add_appointment_form";
@@ -141,6 +121,7 @@ $.fn.init_edit_appointment = function() {
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
     var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
+    var appt_id       = $(this).parents("div.appointment").attr('id').match(/\w_(\d+)/)[1];
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
@@ -148,8 +129,7 @@ $.fn.init_edit_appointment = function() {
     $(form).find("input#customer_name").val(customer_name);
     $(form).find("input#customer_id").val(customer_id);
     // set form url and method
-    var appointment_id = $(this).attr('href').match(/\w\/(\d+)/)[1];
-    $(form).attr('action', appointment_update_work_path.replace(/:id/,appointment_id));
+    $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');
     // open dialog
     $("div.dialog#add_appointment_dialog").dialog('open');
@@ -180,14 +160,14 @@ $.fn.init_cancel_appointment = function() {
 }
 
 // add free time for a provider on a specific day
-$.fn.init_add_single_free_time = function() {
+$.fn.init_add_free_appointment = function() {
   
-  // initialize add free time dialog
-  $("div#add_free_time_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_time_dialog").attr('title') });
+  // initialize add free appointment dialog
+  $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_appointment_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
-    var form            = "form#add_single_free_time_form";
+    var form            = "form#add_free_appointment_form";
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
     var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
@@ -197,11 +177,11 @@ $.fn.init_add_single_free_time = function() {
     $(form).find("input#free_start_at").val('');
     $(form).find("input#free_end_at").val('');
     // open dialog
-    $("div#add_free_time_dialog").dialog('open');
+    $("div#add_free_appointment_dialog").dialog('open');
     return false;
   })
 
-  $("form#add_single_free_time_form").submit(function () {
+  $("form#add_free_appointment_form").submit(function () {
     var free_date = $(this).find("input#free_date").val();
     var start_at  = $(this).find("input#free_start_at").val();
     var end_at    = $(this).find("input#free_end_at").val();
@@ -260,6 +240,27 @@ $.fn.init_add_single_free_time = function() {
       $.post(this.action, data, null, "script");
     }
     $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
+    return false;
+  })
+}
+
+$.fn.init_edit_free_appointment = function() {
+  // open add free time dialog on click
+  $("a#edit_free_appointment").click(function() {
+    var form          = "form#add_free_appointment_form";
+    // fill in appointment values since this is an edit form
+    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
+    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
+    var end_time      = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_end_time');
+    var appt_id       = $(this).parents("div.appointment").attr('id').match(/\w_(\d+)/)[1];
+    $(form).find("input#free_date").val(start_date);
+    $(form).find("input#free_start_at").val(start_time);
+    $(form).find("input#free_end_at").val(end_time);
+    // set form url and method
+    $(form).attr('action', appointment_update_free_path.replace(/:id/, appt_id));
+    $(form).attr('method', 'put');
+    // open dialog
+    $("div#add_free_appointment_dialog").dialog('open');
     return false;
   })
 }
@@ -508,9 +509,10 @@ $(document).ready(function() {
   $(document).init_schedule_datepicker();
   $(document).init_schedule_timepicker();
   $(document).init_search_calendar_with_date_range();
-  $(document).init_add_single_free_time();
-  $(document).init_add_appointment();
-  $(document).init_edit_appointment();
+  $(document).init_add_free_appointment();
+  $(document).init_add_work_appointment();
+  $(document).init_edit_free_appointment();
+  $(document).init_edit_work_appointment();
   $(document).init_cancel_appointment();
   $(document).init_select_calendar_show_provider();
   $(document).init_show_appointment_on_hover();
