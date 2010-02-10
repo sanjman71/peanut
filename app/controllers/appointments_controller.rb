@@ -1,13 +1,14 @@
 class AppointmentsController < ApplicationController
-  before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
-                                          :create_work]
-  before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly,
-                                                     :create_work]
+  before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
+                                          :update_weekly, :create_work]
+  before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
+                                                     :update_weekly, :create_work]
   before_filter :init_appointment, :only => [:show]
   before_filter :get_reschedule_id, :only => [:new]
 
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
-  privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly, :update_weekly],
+  privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
+                                                       :update_weekly],
                                               :on => [:provider, :current_company]
     
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
@@ -16,7 +17,7 @@ class AppointmentsController < ApplicationController
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
     # set title
-    @title                = "Book Appointment"
+    @title = "Book Appointment"
 
     @provider = init_provider(:default => nil)
 
@@ -556,32 +557,36 @@ class AppointmentsController < ApplicationController
       format.html
       format.js
     end
-    
   end
-  
+
   # PUT /appointments/1
   def update
-
     @appointment = current_company.appointments.find(params[:id])
 
-    # Repair the params[:provider_type] for the update_attributes below
-    if !params[:appointment][:provider_type].blank?
-      params[:appointment][:provider_type] = params[:appointment][:provider_type].singularize.capitalize
-    end
-
     # Make sure to remove the parameters that aren't valid for this appointment
-    params[:appointment].delete(:mark_as)
-    if @appointment.free?
-      # If this is a free appointment, we expect incoming start and end time. We remove duration.
-      params[:appointment].delete(:duration)
-      params[:appointment].delete(:customer_id)
-      params[:appointment].delete(:service_id)
-    else
-      # If this is a work appointment, we expect incoming start time and duration. We remove end time.
-      params[:appointment].delete(:end_at)
-    end
+    # params[:appointment].delete(:mark_as)
+    # if @appointment.free?
+    #   # If this is a free appointment, we expect incoming start and end time. We remove duration.
+    #   params[:appointment].delete(:duration)
+    #   params[:appointment].delete(:customer_id)
+    #   params[:appointment].delete(:service_id)
+    # else
+    #   # If this is a work appointment, we expect incoming start time and duration. We remove end time.
+    #   params[:appointment].delete(:end_at)
+    # end
 
-    # Check the force parameter for the update_attributes below
+    # Update appointment fields
+    @provider = init_provider(:default => nil)
+    @service  = init_service(:default => nil)
+    @customer = User.find(params[:customer_id])
+
+    @appointment.provider = @provider
+    @appointment.service  = @service
+    @appointment.start_at = params[:start_at]
+    @appointment.end_at   = @appointment.start_at + params[:duration].to_i
+    @appointment.customer = @customer
+
+    # Check the force parameter
     # This will be checked in the capacity_slot changes as part of the save process (after_save filter)
     if ((!params[:force].blank?) && (params[:force].to_i != 0) &&
         ((current_user.has_privilege?('update calendars', current_company)) ||
@@ -591,26 +596,22 @@ class AppointmentsController < ApplicationController
       @appointment.force = false
     end
 
-    if @appointment.update_attributes(params[:appointment])
-    
-      # we'll try to go to the provider's schedule
-      @provider = @appointment.provider
-
+    if @appointment.save
       # Set up our redirect path
       if !logged_in?
         # The user is not logged in. They made the appointment from the openings page, and will have to log in to see their history etc.
-        @redirect_path = openings_path(:subdomain => current_subdomain)
+        @redirect_path = openings_path
         # tell the user their account has been created
         # clear session return_to to ensure the user starts clean when they login
         clear_location
-
-      elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
-        # If the user has the right to see company calendars, or this provider's calendar, we go there by default
-        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
-
       else
-        # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
-        @redirect_path = history_index_path(:subdomain => current_subdomain)
+        @redirect_path = request.referer
+      # elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+      #   # If the user has the right to see company calendars, or this provider's calendar, we go there by default
+      #   @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
+      # else
+      #   # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
+      #   @redirect_path = history_index_path
       end
 
       flash[:notice] = "Your appointment has been updated"
@@ -621,9 +622,13 @@ class AppointmentsController < ApplicationController
       end
     else
       flash[:error] = "There was a problem updating your appointment<br/>" + @appointment.errors.full_messages.join("<br/>")
+
+      # @redirect_path = edit_appointment_path(@appointment)
+      @redirect_path = request.referer
+
       respond_to do |format|
-        format.html { redirect_to(edit_appointment_path(@appointment)) }
-        format.js { render(:update) { |page| page.redirect_to(edit_appointment_path(@appointment)) } }
+        format.html { redirect_to(@redirect_path) }
+        format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
       end
     end
   end

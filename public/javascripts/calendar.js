@@ -2,18 +2,26 @@
 $.fn.init_add_appointment = function() {
 
   // initialize add appointment dialog
-  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 400, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
+  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 450, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
   $("a#calendar_add_appointment").click(function() {
-    // set dialog date field
+    // set start date field
     var normalized_date = $(this).parents("td").attr('id');
-    var calendar_date   = convert_string_to_date(normalized_date)
-    $("form#add_appointment_form input#apt_start_date").val(calendar_date);
+    var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
+    $("form#add_appointment_form input#start_date").val(calendar_date);
+    // disable start_date field
+    $("form#add_appointment_form input#start_date").addClass('disabled');
+    $("form#add_appointment_form input#start_date").attr('disabled', 'disabled');
+    // disable providers
+    $("form#add_appointment_form div#providers").attr('disabled', 'disabled');
     // clear start_at, customer fields
-    $("form#add_appointment_form input#apt_start_time").val('');
+    $("form#add_appointment_form input#start_time").val('');
     $("form#add_appointment_form input#customer_name").val('');
     $("form#add_appointment_form input#customer_id").val('');
+    // set form url
+    $("form#add_appointment_form").attr('action', appointment_create_path);
+    $("form#add_appointment_form input#_method").val('post');
     // open dialog
     $("div.dialog#add_appointment_dialog").dialog('open');
     return false;
@@ -23,7 +31,7 @@ $.fn.init_add_appointment = function() {
     // close this dialog
     $("div.dialog#add_appointment_dialog").dialog('close');
     // show add user dialog, set return dialog link, disable escape
-    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#edit_appointment_dialog");
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
     $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
     $("div.dialog#add_user_dialog").dialog('open');
     return false;
@@ -31,89 +39,19 @@ $.fn.init_add_appointment = function() {
   
   $("form#add_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
-    var service_id      = $("form#add_appointment_form select#service_id").val();
-    var customer_id     = $("form#add_appointment_form input#customer_id").val();
-    var apt_start_date  = $("form#add_appointment_form input#apt_start_date").val();
-    var apt_start_time  = $("form#add_appointment_form input#apt_start_time").val();
-    
-    if (!apt_start_date) {
-      alert("Please select a date");
-      return false; 
-    }
-    
-    if (!service_id) {
-      alert("Please select a service");
-      return false; 
-    }
+    var service_id    = $("form#add_appointment_form select#service_id").val();
+    var customer_id   = $("form#add_appointment_form input#customer_id").val();
+    var start_date    = $("form#add_appointment_form input#start_date").val();
+    var start_time    = $("form#add_appointment_form input#start_time").val();
+    var provider      = $("form#add_appointment_form select#provider option:selected").val();
+    var provider_type = provider.split('/')[0];
+    var provider_id   = provider.split('/')[1];
 
-    if (!apt_start_time) {
-      alert("Please select a start time");
-      return false; 
-    }
-
-    if (!customer_id) {
-      alert("Please select a customer");
-      return false; 
-    }
-
-    // normalize time format
-    var apt_start_time = convert_time_ampm_to_string(apt_start_time)
-
-    // normalize date format
-    var apt_start_date = convert_date_to_string(apt_start_date);
-
-    // replace hidden tag formatted version
-    $("form#add_appointment_form input#start_at").attr('value', apt_start_date + 'T' + apt_start_time);
-
-    // disable apt_start_time field
-    $("form#add_appointment_form input#apt_start_time").attr('disabled', 'disabled');
-
-    // serialize form
-    data = $(this).serialize();
-    //alert("form serialize: " + data);
-    //return false;
-
-    // enable apt_start_time field
-    $("form#add_appointment_form input#apt_start_time").removeAttr('disabled');
-
-    // post
-    $.post(this.action, data, null, "script");
-    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
-    return false;
-  })
-}
-
-// change appointment
-$.fn.init_edit_appointment = function() {
-
-  $("a#edit_appointment_add_customer").click(function() {
-    // close this dialog
-    $("div.dialog#edit_appointment_dialog").dialog('close');
-    // show add user dialog, set return dialog link, disable escape
-    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
-    $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
-    $("div.dialog#add_user_dialog").dialog('open');
-    return false;
-  })
-  
-  $("form#edit_appointment_form").submit(function () {
-    // Provider is built into the form when it's generated - the end user doesn't provide this information.
-    var provider_id = $("form#edit_appointment_form select#provider_id").val();
-    var service_id  = $("form#edit_appointment_form select#service_id").val();
-    var customer_id = $("form#edit_appointment_form input#customer_id").val();
-    var start_date  = $("form#edit_appointment_form input#start_date").val();
-    var start_time  = $("form#edit_appointment_form input#start_time").val();
-    
     if (!start_date) {
       alert("Please select a date");
       return false; 
     }
     
-    if (!provider_id) {
-      alert("Please select a provider");
-      return false; 
-    }
-
     if (!service_id) {
       alert("Please select a service");
       return false; 
@@ -136,22 +74,82 @@ $.fn.init_edit_appointment = function() {
     var start_date = convert_date_to_string(start_date);
 
     // replace hidden tag formatted version
-    $("form#edit_appointment_form input#start_at").attr('value', start_date + 'T' + start_time);
+    $("form#add_appointment_form input#start_at").attr('value', start_date + 'T' + start_time);
 
-    // disable start_time field
-    $("form#edit_appointment_form input#start_time").attr('disabled', 'disabled');
+    // set provider_type, provider_id hidden fields; disable provider field
+    $(this).find("input#provider_type").attr('value', provider_type);
+    $(this).find("input#provider_id").attr('value', provider_id);
+    $(this).find("select#provider").attr('disabled', 'disabled');
+
+    // disable start_date, start_time field
+    $(this).find("input#start_date").attr('disabled', 'disabled');
+    $(this).find("input#start_time").attr('disabled', 'disabled');
 
     // serialize form
     data = $(this).serialize();
-    //alert("form serialize: " + data);
+    //alert("form action: " + this.action + ", form serialize: " + data);
     //return false;
 
     // enable start_time field
-    $("form#edit_appointment_form input#start_time").removeAttr('disabled');
+    $("form#add_appointment_form input#start_time").removeAttr('disabled');
 
-    // this is an update, so it's put
-    $.put(this.action, data, null, "script");
-    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Updating...</h3>");
+    // post
+    $.post(this.action, data, null, "script");
+    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
+    return false;
+  })
+}
+
+// edit appointment
+$.fn.init_edit_appointment = function() {
+
+  // open add appointment dialog on click
+  $("a#edit_appointment").click(function() {
+    // enable start_date field
+    $("form#add_appointment_form input#start_date").removeClass('disabled');
+    $("form#add_appointment_form input#start_date").attr('disabled', '');
+    // enable providers
+    $("form#add_appointment_form div#providers").attr('disabled', '');
+    // fill in appointment values since this is an edit form
+    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
+    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_time').toLowerCase();
+    var service_name  = $(this).parents("div.appointment").find("div.service a").text();
+    var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
+    var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
+    $("form#add_appointment_form input#start_date").val(start_date);
+    $("form#add_appointment_form input#start_time").val(start_time);
+    $("form#add_appointment_form select#service_id").val(service_name).attr('selected', 'selected');
+    $("form#add_appointment_form select#service_id").change();
+    $("form#add_appointment_form input#customer_name").val(customer_name);
+    $("form#add_appointment_form input#customer_id").val(customer_id);
+    // set form url
+    var appointment_id = $(this).attr('href').match(/\w\/(\d+)/)[1];
+    $("form#add_appointment_form").attr('action', appointment_update_path.replace(/:id/,appointment_id));
+    $("form#add_appointment_form input#_method").val('put');
+    // open dialog
+    $("div.dialog#add_appointment_dialog").dialog('open');
+    return false;
+  })
+}
+
+$.fn.init_cancel_appointment = function() {
+  // initialize cancel appointment dialog
+  $("div.dialog#cancel_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)',
+                                                     title: $("div.dialog#cancel_appointment_dialog").attr('title') });
+
+  // user click on 'cancel appointment', results in opening cancel appointment dialog
+  $("a.cancel").click(function() {
+    // fill in appointment values
+    var service_name    = $(this).parents("div.appointment").find("div.service a").text();
+    var start_date_time = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_day_date_time');
+    var customer_name   = $(this).parents("div.appointment").find("div.customer h6").text();
+    var cancel_url      = $(this).attr('href');
+    $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
+    $("div.dialog#cancel_appointment_dialog").find("#start_date_time").text(start_date_time);
+    $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
+    $("div.dialog#cancel_appointment_dialog").find("a#cancel_appointment").attr('href', cancel_url);
+    // open dialog
+    $("div.dialog#cancel_appointment_dialog").dialog('open');
     return false;
   })
 }
@@ -166,7 +164,7 @@ $.fn.init_add_single_free_time = function() {
   $("a#calendar_add_free_time").click(function() {
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
-    var calendar_date   = convert_string_to_date(normalized_date)
+    var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
     $("form#add_single_free_time_form input#date").attr('value', normalized_date);
     $("form#add_single_free_time_form div#free_date input#free_date").val(calendar_date);
     // clear start_at, end_at time fields
@@ -371,30 +369,9 @@ $.fn.init_add_calendar_markings = function() {
   })
 }
 
-$.fn.init_cancel_appointment = function() {
-  // initialize cancel appointment dialog
-  $("div.dialog#cancel_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)',
-                                                     title: $("div.dialog#cancel_appointment_dialog").attr('title') });
-
-  // user click on 'cancel appointment', results in opening cancel appointment dialog
-  $("a.cancel").click(function() {
-    // fill in appointment values
-    var service_name    = $(this).parents("div.appointment").find("div.service a").text();
-    var start_date_time = $(this).parents("div.appointment").find("div.start_date_time").text();
-    var customer_name   = $(this).parents("div.appointment").find("div.customer h6").text();
-    var cancel_url      = $(this).attr('href');
-    $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
-    $("div.dialog#cancel_appointment_dialog").find("#start_date_time").text(start_date_time);
-    $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
-    $("div.dialog#cancel_appointment_dialog").find("a#cancel_appointment").attr('href', cancel_url);
-    // open dialog
-    $("div.dialog#cancel_appointment_dialog").dialog('open');
-    return false;
-  })
-}
-
 $.fn.init_schedule_datepicker = function() {
   $(".pdf.datepicker").datepicker({minDate: '-1m', maxDate: '+3m'});
+  $(".appointment.add.edit.datepicker").datepicker({minDate: '0m', maxDate: '+3m'});
 }
 
 $.fn.init_schedule_timepicker = function() {
@@ -509,5 +486,4 @@ $(document).ready(function() {
 // Re-bind after an ajax call
 $(document).ajaxComplete(function(request, settings) {
   $(document).init_select_calendar_show_provider();
-  $(document).init_edit_appointment();
 })

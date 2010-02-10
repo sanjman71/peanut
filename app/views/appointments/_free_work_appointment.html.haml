@@ -1,6 +1,8 @@
 .span-15.last.appointment{:class => [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')}[appointment]
-  .span-15.last.start_date_time.hide
-    = appointment.start_at.to_s(:appt_day_date_time)
+  -# hidden div used by javascript to edit/cancel appointment
+  .span-15.last.start_date_time.hide{:appt_day_date_time => appointment.start_at.to_s(:appt_day_date_time), |
+                                     :appt_schedule_day => appointment.start_at.to_s(:appt_schedule_day), |
+                                     :appt_time => appointment.start_at.to_s(:appt_time)} |
   .span-4.time
     - if appointment.canceled?
       -# canceled work appointment
@@ -21,7 +23,7 @@
       .span-4.last.location
         %h6= appointment.location.andand.name
   .span-4
-    .span-4.customer
+    .span-4.customer[appointment.customer]
       - if appointment.free?
         .span-4.last
           == #{pluralize(appointment.capacity, 'slot')} made available
@@ -35,7 +37,7 @@
       .span-3.last.editcancel
         .span-3.last.editcancel-one
           - if !appointment.recurrence_parent? && !appointment.canceled?
-            = link_to('Edit', edit_appointment_path(appointment))
+            = link_to('Edit', edit_appointment_path(appointment), :id => 'edit_appointment')
             |
             - if appointment.free?
               = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
