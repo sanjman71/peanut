@@ -43,7 +43,7 @@
           %h4.bottom.block== With
         .span-8.last.field#who
           -# field is disabled when adding appointments
-          = select_tag(:provider, options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
+          = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Customer

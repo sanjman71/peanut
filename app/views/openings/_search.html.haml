@@ -22,7 +22,7 @@
     .span-2.text-align-right#who_text.padding-top-5
       == With?
     .span-5.last.field#who
-      = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
+      = select_tag('provider', options_for_select(providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide anyone')
 
   -# time of day, disable until its working
   -#.last{:class => size == :wide ? "span-24" : "span-7"}
