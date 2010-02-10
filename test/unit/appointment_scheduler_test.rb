@@ -58,6 +58,21 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
                   sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
         assert_equal [[0, 8, 8.hours, 1]], slots
       end
+
+      context "then cancel the free time and search again" do
+        setup do
+          AppointmentScheduler.cancel_appointment(@free_appointment)
+        end
+
+        should "find no free capacity slots" do
+          slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+                    map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
+                    sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+          assert_equal [], slots
+        end
+
+      end
+
     end
   end
   
@@ -114,6 +129,20 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
         assert_equal [[0, 8, 8.hours, 1]], slots
       end
   
+      context "then cancel the free time and search again" do
+        setup do
+          AppointmentScheduler.cancel_appointment(@free_appointment)
+        end
+
+        should "find no free capacity slots" do
+          slots = AppointmentScheduler.find_free_capacity_slots(@company, Location.anywhere, @provider, @haircut, @haircut.duration, @daterange).
+                    map{|s| [s.start_at.in_time_zone.hour, s.end_at.in_time_zone.hour, s.duration, s.capacity]}.
+                    sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
+          assert_equal [], slots
+        end
+
+      end
+
     end
   end
   
@@ -218,7 +247,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
       
       # should have 1 free appointment and 1 work appointment in a 'canceled' state
@@ -279,7 +308,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment, and 1 work appointment in a 'canceled' state
@@ -341,7 +370,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -401,7 +430,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment in a canceled state
@@ -463,7 +492,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -524,7 +553,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -585,7 +614,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change
@@ -646,7 +675,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
   
     context "and then cancel the work appointment" do
       setup do
-        AppointmentScheduler.cancel_work_appointment(@work_appointment)
+        AppointmentScheduler.cancel_appointment(@work_appointment)
       end
   
       # should have 1 free appointment + 1 work appointment, so the total number of appointments should not change

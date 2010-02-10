@@ -1113,7 +1113,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
             context "then cancel the work appt from 1600 to 1700 capacity 3" do
               
               setup do
-                AppointmentScheduler.cancel_work_appointment(@work_appt2)
+                AppointmentScheduler.cancel_appointment(@work_appt2)
               end
               
               should "have capacity slots of 15-18 c 4; 18-21 c 3; 21-23 c 4" do
@@ -1126,7 +1126,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
               context "then cancel the work appt from 1800 to 2100 capacity 1" do
       
                 setup do
-                  AppointmentScheduler.cancel_work_appointment(@work_appt1)
+                  AppointmentScheduler.cancel_appointment(@work_appt1)
                 end
       
                 should "have capacity slots of 15-23 c 4" do
@@ -1191,7 +1191,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1234,7 +1234,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1296,7 +1296,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1340,7 +1340,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
       

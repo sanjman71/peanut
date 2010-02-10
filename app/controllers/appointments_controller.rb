@@ -144,7 +144,7 @@ class AppointmentsController < ApplicationController
           # check if its an appointment reschedule
           if has_reschedule_id?
             # cancel the old work appointment
-            AppointmentScheduler.cancel_work_appointment(get_reschedule_appointment)
+            AppointmentScheduler.cancel_appointment(get_reschedule_appointment)
             # reset reschedule id
             reset_reschedule_id
             # reset flash message
@@ -515,17 +515,18 @@ class AppointmentsController < ApplicationController
   def cancel
     @appointment = current_company.appointments.find(params[:id])
 
-    case @appointment.mark_as
-    when Appointment::WORK
-      # cancel the work appointment
-      AppointmentScheduler.cancel_work_appointment(@appointment)
-    end
+    # cancel the appointment
+    AppointmentScheduler.cancel_appointment(@appointment)
 
     # redirect to referer; default to apointment path
     @redirect_path = request.referer || appointment_path(@appointment)
 
     # set flash
-    flash[:notice] = "Canceled appointment"
+    if @appointment.mark_as == Appointment::WORK
+      flash[:notice] = "Canceled appointment"
+    else
+      flash[:notice] = "Canceled availability"
+    end
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
