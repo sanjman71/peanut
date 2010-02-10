@@ -1,8 +1,8 @@
 - appointment = Appointment.new if local_assigns[:appointment].nil?
 - choose_provider = false if local_assigns[:choose_provider].nil?
 
-.span-11.prepend-1.last.dialog.hide#add_appointment_dialog{:title => "Schedule an Appointment"}
-  - form_for(appointment, :url => schedule_work_path, :html => {:id => 'add_appointment_form'}) do |f|
+.span-11.prepend-1.last.dialog.hide#add_work_appointment_dialog{:title => "Schedule an Appointment"}
+  - form_for(appointment, :url => schedule_work_path, :html => {:id => 'add_work_appointment_form'}) do |f|
     -# We don't bother with duration or capacity - both will be obtained from the service
     -# We don't bother with customer - it will default to current_user
     -# start_at is assigned by javascript based on the date and time
@@ -36,7 +36,7 @@
         .span-8.last.prepend-3.last#duration_in_words
           = Duration.to_words(duration, :prepend => "Typically") if @service
       .span-11.last.change-duration.padding-top-10
-        .span-3.padding-top-5.label
+        .span-3.padding-top-3.label
           %h4.bottom.block== How long
         .span-8.last#duration
           = select_tag('duration', options_for_select(service_duration_select_options, nil))
@@ -56,7 +56,7 @@
 
       - if has_privilege?('create users', current_company)
         .span-8.prepend-3.last
-          %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'add_appointment_add_customer'
+          %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'add_work_appointment_add_customer'
 
       .span-8.last.padding-top-10.padding-bottom-10
-        #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_appointment'
+        #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_work_appointment'

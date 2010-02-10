@@ -1,43 +1,45 @@
 // add appointment for a provider on a specific day
 $.fn.init_add_work_appointment = function() {
 
-  // initialize add appointment dialog
-  $("div.dialog#add_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 450, show: 'fadeIn(slow)', title: $("div.dialog#add_appointment_dialog").attr('title') });
+  // initialize add work appointment dialog
+  $("div.dialog#add_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 450, show: 'fadeIn(slow)',
+                                                       title: $("div.dialog#add_work_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
-  $("a#calendar_add_appointment").click(function() {
+  $("a#calendar_add_work_appointment").click(function() {
+    var form            = "form#add_work_appointment_form";
     // set start date field
     var normalized_date = $(this).parents("td").attr('id');
     var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
-    $("form#add_appointment_form input#start_date").val(calendar_date);
+    $(form).find("input#start_date").val(calendar_date);
     // disable start_date field
-    $("form#add_appointment_form input#start_date").addClass('disabled');
-    $("form#add_appointment_form input#start_date").attr('disabled', 'disabled');
+    $(form).find("input#start_date").addClass('disabled');
+    $(form).find("input#start_date").attr('disabled', 'disabled');
     // disable providers
-    $("form#add_appointment_form div#providers").attr('disabled', 'disabled');
+    $(form).find("div#providers").attr('disabled', 'disabled');
     // clear start_at, customer fields
-    $("form#add_appointment_form input#start_time").val('');
-    $("form#add_appointment_form input#customer_name").val('');
-    $("form#add_appointment_form input#customer_id").val('');
-    // set form url
-    $("form#add_appointment_form").attr('action', appointment_create_work_path);
-    $("form#add_appointment_form input#_method").val('post');
+    $(form).find("input#start_time").val('');
+    $(form).find("input#customer_name").val('');
+    $(form).find("input#customer_id").val('');
+    // set form url and method
+    $(form).attr('action', appointment_create_work_path);
+    $(form).attr('method', 'post');
     // open dialog
-    $("div.dialog#add_appointment_dialog").dialog('open');
+    $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
   })
 
-  $("a#add_appointment_add_customer").click(function() {
+  $("a#add_work_appointment_add_customer").click(function() {
     // close this dialog
-    $("div.dialog#add_appointment_dialog").dialog('close');
+    $("div.dialog#add_work_appointment_dialog").dialog('close');
     // show add user dialog, set return dialog link, disable escape
-    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_appointment_dialog");
+    $("div.dialog#add_user_dialog a#add_user_return_dialog").attr('dialog', "div.dialog#add_work_appointment_dialog");
     $("div.dialog#add_user_dialog").dialog('option', 'closeOnEscape', false);
     $("div.dialog#add_user_dialog").dialog('open');
     return false;
   })
   
-  $("form#add_appointment_form").submit(function () {
+  $("form#add_work_appointment_form").submit(function () {
     // Provider is built into the form when it's generated - the end user doesn't provide this information.
     var service_id    = $(this).find("select#service_id").val();
     var customer_id   = $(this).find("input#customer_id").val();
@@ -109,15 +111,15 @@ $.fn.init_add_work_appointment = function() {
 $.fn.init_edit_work_appointment = function() {
   // open add appointment dialog on click
   $("a#edit_work_appointment").click(function() {
-    var form          = "form#add_appointment_form";
+    var form          = "form#add_work_appointment_form";
     // enable start_date field
     $(form).find("input#start_date").removeClass('disabled');
     $(form).find("input#start_date").attr('disabled', '');
     // enable providers
     $(form).find("div#providers").attr('disabled', '');
     // fill in appointment values since this is an edit form
-    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
-    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
+    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").attr('appt_schedule_day'));
+    var start_time    = $(this).parents("div.appointment").attr('appt_start_time');
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
     var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
@@ -132,7 +134,7 @@ $.fn.init_edit_work_appointment = function() {
     $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');
     // open dialog
-    $("div.dialog#add_appointment_dialog").dialog('open');
+    $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
   })  
 }
@@ -146,7 +148,7 @@ $.fn.init_cancel_appointment = function() {
   $("a.cancel").click(function() {
     // fill in appointment values
     var service_name    = $(this).parents("div.appointment").find("div.service a").text();
-    var start_date_time = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_day_date_time');
+    var start_date_time = $(this).parents("div.appointment").attr('appt_day_date_time');
     var customer_name   = $(this).parents("div.appointment").find("div.customer h6").text();
     var cancel_url      = $(this).attr('href');
     $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
@@ -163,7 +165,8 @@ $.fn.init_cancel_appointment = function() {
 $.fn.init_add_free_appointment = function() {
   
   // initialize add free appointment dialog
-  $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', title: $("div#add_free_appointment_dialog").attr('title') });
+  $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 250, show: 'fadeIn(slow)', 
+                                                title: $("div#add_free_appointment_dialog").attr('title') });
   
   // open add free time dialog on click
   $("a#calendar_add_free_time").click(function() {
@@ -249,9 +252,9 @@ $.fn.init_edit_free_appointment = function() {
   $("a#edit_free_appointment").click(function() {
     var form          = "form#add_free_appointment_form";
     // fill in appointment values since this is an edit form
-    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").find("div.start_date_time").attr('appt_schedule_day'));
-    var start_time    = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_start_time');
-    var end_time      = $(this).parents("div.appointment").find("div.start_date_time").attr('appt_end_time');
+    var start_date    = convert_yymmdd_string_to_mmddyy($(this).parents("div.appointment").attr('appt_schedule_day'));
+    var start_time    = $(this).parents("div.appointment").attr('appt_start_time');
+    var end_time      = $(this).parents("div.appointment").attr('appt_end_time');
     var appt_id       = $(this).parents("div.appointment").attr('id').match(/\w_(\d+)/)[1];
     $(form).find("input#free_date").val(start_date);
     $(form).find("input#free_start_at").val(start_time);
@@ -387,8 +390,8 @@ $.fn.init_add_calendar_markings = function() {
     $(date_id).show();
   })
 
-  // mark the first calendar date that has free time
-  $("td.free:first").click();
+  // mark the first calendar date that has free or work time
+  $("td.work:first").click();
 
   // show add menu icon on calendar date hover
   $("td:not(.past) .date").hover(function () {

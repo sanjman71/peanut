@@ -76,8 +76,7 @@
 -# special actions require special privileges
 - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
   -# hidden forms for add/edit appointment, add free time, and add customer
-  = render(:partial => 'calendar/add_appointment_dialog', |
-           :locals => {:provider => @provider, :services => @services, :providers => @providers, :choose_provider => false}) |
+  = render(:partial => 'calendar/add_work_appointment_dialog', :locals => {:provider => @provider, :services => @services, :providers => @providers})
   = render(:partial => 'calendar/add_free_appointment_dialog', :locals => {:provider => @provider, :service => @free_service, :providers => @providers})
   - @customer = User.new
   - @customer.email_addresses.build

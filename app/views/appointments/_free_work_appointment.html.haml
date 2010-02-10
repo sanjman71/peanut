@@ -1,9 +1,11 @@
-.span-15.last.appointment{:class => [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')}[appointment]
-  -# hidden div used by javascript to edit/cancel appointment
-  .span-15.last.start_date_time.hide{:appt_day_date_time => appointment.start_at.to_s(:appt_day_date_time), |
-                                     :appt_schedule_day => appointment.start_at.to_s(:appt_schedule_day), |
-                                     :appt_start_time => appointment.start_at.to_s(:appt_time).downcase, |
-                                     :appt_end_time => appointment.end_at.to_s(:appt_time).downcase} |
+- appt_day_date_time  = appointment.start_at.to_s(:appt_day_date_time)
+- appt_schedule_day   =  appointment.start_at.to_s(:appt_schedule_day)
+- appt_start_time     = appointment.start_at.to_s(:appt_time).downcase
+- appt_end_time       = appointment.end_at.to_s(:appt_time).downcase
+- appt_klasses        = [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')
+
+.span-15.last.appointment[appointment]{:class => appt_klasses, :appt_day_date_time => appt_day_date_time, :appt_schedule_day => appt_schedule_day, |
+                                       :appt_start_time => appt_start_time, :appt_end_time => appt_end_time} |
   .span-4.time
     - if appointment.canceled?
       -# canceled work appointment
