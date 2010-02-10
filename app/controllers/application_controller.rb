@@ -183,6 +183,7 @@ class ApplicationController < ActionController::Base
       # find the provider; the send method can throw an exception
       @method   = "#{params[:provider_type].singularize}_providers"
       @provider = current_company.send(@method).find(params[:provider_id])
+      return @provider
     rescue Exception => e
       # check for the special anyone provider
       if User.anyone.tableize == params[:provider_type] and User.anyone.id == params[:provider_id].to_i
@@ -201,8 +202,24 @@ class ApplicationController < ActionController::Base
   end
 
   def init_provider_privileges
-    if current_user
+    if current_user and !@provider.blank?
       @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)
+    end
+  end
+
+  def init_service(options={})
+    begin
+      # find the company service
+      @service = current_company.services.find(params[:service_id])
+      return @service
+    rescue Exception => e
+      if options[:default]
+        @service = options[:default]
+        return @service
+      else
+        logger.debug("xxx invalid service #{params[:service_id]}")
+        redirect_to(unauthorized_path) and return
+      end
     end
   end
 

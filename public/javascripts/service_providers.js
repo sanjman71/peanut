@@ -125,10 +125,7 @@ $.fn.init_duration = function() {
 }
 
 $.fn.init_select_change = function() {
-  if ($("select#provider").size() == 0) {
-    return;
-  }
-
+  // when a provider is selected, set the provider id and type
   $("select#provider").change(function () {
     update_provider();
   })
@@ -142,7 +139,7 @@ $.fn.init_select_change = function() {
 }
 
 function update_provider() {
-  // Make sure we have a provider selector on the page and a provider has been selected
+  // make sure we have a provider selector on the page and a provider has been selected
   if (($("select#provider").size() == 0) || ($("select#provider option:selected").size() == 0)) {
     return;
   }

@@ -272,7 +272,7 @@ function convert_date_to_string(s) {
 }
 
 // convert yyyymmdd string to mm/dd/yyyy
-function convert_string_to_date(s) {
+function convert_yymmdd_string_to_mmddyy(s) {
   re    = /(\d{4,4})(\d{2,2})(\d{2,2})/
   match = s.match(re);
   if (!match) {
