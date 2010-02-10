@@ -124,14 +124,17 @@ $.fn.init_edit_work_appointment = function() {
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
     var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
+    var provider      = $(this).parents("div.appointment").attr('appt_provider'); // e.g. 'users/11'
     var appt_id       = $(this).parents("div.appointment").attr('id').match(/\w_(\d+)/)[1];
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
     $(form).find("select#service_id").change();
-    $(form).find("select#duration").val(duration).attr('selected', 'selected'); // set this after the service
+    $(form).find("select#duration").val(duration).attr('selected', 'selected'); // set duration after service
     $(form).find("input#customer_name").val(customer_name);
     $(form).find("input#customer_id").val(customer_id);
+    // select current appointment provider
+    $(form).find("select#provider").val(provider).attr('selected', 'selected');
     // set form url and method
     $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');
