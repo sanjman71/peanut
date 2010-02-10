@@ -24,6 +24,8 @@ $.fn.init_add_work_appointment = function() {
     // set form url and method
     $(form).attr('action', appointment_create_work_path);
     $(form).attr('method', 'post');
+    // set form submit text
+    $(form).find("input:submit").val("Add");
     // open dialog
     $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
@@ -138,6 +140,8 @@ $.fn.init_edit_work_appointment = function() {
     // set form url and method
     $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');
+    // set form submit text
+    $(form).find("input:submit").val("Update");
     // open dialog
     $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
@@ -184,6 +188,8 @@ $.fn.init_add_free_appointment = function() {
     // clear start_at, end_at time fields
     $(form).find("input#free_start_at").val('');
     $(form).find("input#free_end_at").val('');
+    // set form submit text
+    $(form).find("input:submit").val("Add");
     // open dialog
     $("div#add_free_appointment_dialog").dialog('open');
     return false;
@@ -267,6 +273,8 @@ $.fn.init_edit_free_appointment = function() {
     // set form url and method
     $(form).attr('action', appointment_update_free_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');
+    // set form submit text
+    $(form).find("input:submit").val("Update");
     // open dialog
     $("div#add_free_appointment_dialog").dialog('open');
     return false;
