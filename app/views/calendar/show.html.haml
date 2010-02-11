@@ -62,7 +62,7 @@
     -# show free, work calendar
     .span-15.last#free_work_calendar
       = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today, |
-                                                          :add_free_time_link => 1, :add_appointment_link => @services.empty? ? 0 : 1}) |
+                                                          :add_free_appointment_link => 1, :add_work_appointment_link => @services.empty? ? 0 : 1}) |
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
@@ -76,9 +76,8 @@
 -# special actions require special privileges
 - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
   -# hidden forms for add/edit appointment, add free time, and add customer
-  = render(:partial => 'calendar/add_appointment_dialog', |
-           :locals => {:provider => @provider, :services => @services, :providers => @providers, :choose_provider => false}) |
-  = render(:partial => 'calendar/add_free_time_dialog', :locals => {:provider => @provider, :service => @free_service, :providers => @providers})
+  = render(:partial => 'calendar/add_work_appointment_dialog', :locals => {:provider => @provider, :services => @services, :providers => @providers})
+  = render(:partial => 'calendar/add_free_appointment_dialog', :locals => {:provider => @provider, :service => @free_service, :providers => @providers})
   - @customer = User.new
   - @customer.email_addresses.build
   - @customer.phone_numbers.build
@@ -93,6 +92,8 @@
 = render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @provider})
 
 %script{:type => "text/javascript"}
-  var appointment_create_path = "#{schedule_work_path}";
-  var appointment_update_path = "#{appointment_path(':id')}";
+  var appointment_create_work_path = "#{schedule_work_path}";
+  var appointment_update_work_path = "#{appointment_path(':id')}";
+  var appointment_create_free_path = "#{url_for(:controller => 'appointments', :action => 'create_free')}"
+  var appointment_update_free_path = "#{appointment_path(':id')}";
   

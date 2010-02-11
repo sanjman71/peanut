@@ -41,7 +41,6 @@ class OpeningsTest < ActionController::IntegrationTest
     assert_have_selector "div#free_calendar"
     assert_have_selector "div#free_capacity_slots"
     assert_have_no_selector "div#free_capacity_slots div.slots"
-    assert_have_selector "div#add_waitlist_dialog"
     assert_have_selector "div#rpx_login_dialog"
   end
   
