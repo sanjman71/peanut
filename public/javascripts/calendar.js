@@ -158,11 +158,17 @@ $.fn.init_cancel_appointment = function() {
     // fill in appointment values
     var service_name    = $(this).parents("div.appointment").find("div.service a").text();
     var start_date_time = $(this).parents("div.appointment").attr('appt_day_date_time');
-    var customer_name   = $(this).parents("div.appointment").find("div.customer h6").text();
+    var customer_name   = $(this).parents("div.appointment").find("div.customer:first-child").text();
     var cancel_url      = $(this).attr('href');
     $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
     $("div.dialog#cancel_appointment_dialog").find("#start_date_time").text(start_date_time);
-    $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
+    if ($(this).hasClass('work')) {
+      // work appointments have customers
+      $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
+    } else {
+      // clear customer field
+      $("div.dialog#cancel_appointment_dialog").find("#customer_name").text('');
+    }
     $("div.dialog#cancel_appointment_dialog").find("a#cancel_appointment").attr('href', cancel_url);
     // open dialog
     $("div.dialog#cancel_appointment_dialog").dialog('open');

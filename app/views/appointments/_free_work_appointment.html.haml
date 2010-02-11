@@ -46,9 +46,11 @@
             = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
             |
             - if appointment.free?
-              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
+              - question = "Are you sure you want to cancel this availability?"
             - else
-              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
+              - question = "Are you sure you want to cancel this appointment?"
+            - klasses = ["ujs", "cancel", "confirm", appointment.mark_as]
+            = link_to('Cancel', cancel_appointment_path(appointment), :class => klasses.join(" "), :question => question)
           - elsif appointment.canceled?
             == Canceled
         -# free appointments may be deleted with 'update calendars' permission

@@ -530,8 +530,12 @@ class AppointmentsController < ApplicationController
     # redirect to referer; default to apointment path
     @redirect_path = request.referer || appointment_path(@appointment)
 
-    # set flash
-    flash[:notice] = "Canceled appointment"
+    # set flash based on appointment type
+    if @appointment.free?
+      flash[:notice] = "Canceled available time"
+    else
+      flash[:notice] = "Canceled appointment"
+    end
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
@@ -584,7 +588,11 @@ class AppointmentsController < ApplicationController
         @redirect_path = request.referer
       end
 
-      flash[:notice] = "Your appointment has been updated"
+      if @appointment.free?
+        flash[:notice] = "Your available time has been updated"
+      else
+        flash[:notice] = "Your appointment has been updated"
+      end
 
       respond_to do |format|
         format.html { redirect_to(@redirect_path) }
