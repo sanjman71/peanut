@@ -22,8 +22,7 @@
         = link_to appointment.service.name, appointment_path(appointment)
       - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# free appointments can be viewed with read permissions
-        - appt_text = ( (appointment.recurrence?) ? "Recurring Availability" : "Scheduled Availability" )
-        = link_to appt_text, appointment_path(appointment)
+        = ( (appointment.recurrence?) ? "Recurring Availability" : "Scheduled Availability" )
       - else
         %h6= appointment.service.name
     - if show_location?
@@ -37,14 +36,14 @@
             == #{pluralize(appointment.capacity, 'slot')} made available
         - else
           .span-4.last.customer[appointment.customer]
-            - if appointment.customer.blank
+            - if appointment.customer.blank?
               == &nbsp
             - else
               .span-4.last.customer_name
                 %h6= appointment.customer.name
-              - if !appointment.customer.primary_phone.blank?
+              - if !appointment.customer.primary_phone_number.blank?
                 .span-4.last.customer_phone_email
-                  %h6= appointment.customer.primary_phone.address
+                  %h6= appointment.customer.primary_phone_number.address
       - if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
         .span-3.last
           == &nbsp;
@@ -61,6 +60,3 @@
                   = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
               - elsif appointment.canceled?
                 == Canceled
-    - if (has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)) && appointment.recurrence?
-      .span-7.last.cancel-weekly
-        = link_to('Cancel this and all following availability', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to cancel this and all following availability in this series?")
