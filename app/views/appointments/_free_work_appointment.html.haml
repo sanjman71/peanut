@@ -22,37 +22,45 @@
         = link_to appointment.service.name, appointment_path(appointment)
       - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# free appointments can be viewed with read permissions
-        = link_to "Scheduled Availability", appointment_path(appointment)
+        - appt_text = ( (appointment.recurrence?) ? "Recurring Availability" : "Scheduled Availability" )
+        = link_to appt_text, appointment_path(appointment)
       - else
         %h6= appointment.service.name
     - if show_location?
       .span-4.last.location
         %h6= appointment.location.andand.name
-  .span-4
-    .span-4.customer[appointment.customer]
-      - if appointment.free?
-        .span-4.last
-          == #{pluralize(appointment.capacity, 'slot')} made available
-        - if appointment.recur_parent
+  .span-7.last
+    .span-7.last.slots_edit_cancel
+      .span-4
+        - if appointment.free?
           .span-4.last
-            == Part of recurring series
-      - else
-        %h6= appointment.customer ? appointment.customer.name : "&nbsp;"
-  .span-3.last
-    - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
-      .span-3.last.editcancel
-        .span-3.last.editcancel-one
-          - if !appointment.recurrence_parent? && !appointment.canceled?
-            = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
-            |
-            - if appointment.free?
-              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
+            == #{pluralize(appointment.capacity, 'slot')} made available
+        - else
+          .span-4.last.customer[appointment.customer]
+            - if appointment.customer.blank
+              == &nbsp
             - else
-              = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
-          - elsif appointment.canceled?
-            == Canceled
-        -# free appointments may be deleted with 'update calendars' permission
-        .span-3.last.cancel-weekly
-          - if appointment.recurrence_parent
-            = link_to('Cancel series', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to cancel all future availability in this series?")
-        -# You can't edit or delete a recurrence parent on its own - you will impact the entire series
+              .span-4.last.customer_name
+                %h6= appointment.customer.name
+              - if !appointment.customer.primary_phone.blank?
+                .span-4.last.customer_phone_email
+                  %h6= appointment.customer.primary_phone.address
+      - if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
+        .span-3.last
+          == &nbsp;
+      - else
+        .span-3.last
+          .span-3.last.editcancel
+            .span-3.last.editcancel-one
+              - if !appointment.recurrence_parent? && !appointment.canceled?
+                = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
+                |
+                - if appointment.free?
+                  = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this availability?")
+                - else
+                  = link_to('Cancel', cancel_appointment_path(appointment), :class => "ujs cancel confirm", :question => "Are you sure you want to cancel this appointment?")
+              - elsif appointment.canceled?
+                == Canceled
+    - if (has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)) && appointment.recurrence?
+      .span-7.last.cancel-weekly
+        = link_to('Cancel this and all following availability', url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'destroy', :id => appointment.id, :series => 1), :class => "ujs delete confirm", :question => "Are you sure you want to cancel this and all following availability in this series?")
