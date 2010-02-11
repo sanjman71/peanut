@@ -539,48 +539,11 @@ class AppointmentsController < ApplicationController
     end
   end
 
-  # GET /appointments/1/edit
-  def edit
-    @appointment = current_company.appointments.find(params[:id])
-
-    # find services collection for the current company; valid services must have at least 1 service provider
-    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
-    @services = Array(current_company.services.with_providers.work)    
-
-    @providers = current_company.providers
-    
-    # build service providers collection mapping services to providers
-    # This is used for the javascript in some of the appointment create/edit dialogs - same as in openings controller
-    @sps = @services.inject([]) do |array, service|
-      service.providers.each do |provider|
-        array << [service.id, provider.id, provider.name, provider.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
-      end
-      array
-    end
-    
-    respond_to do |format|
-      format.html
-      format.js
-    end
-  end
-
   # PUT /appointments/1
   def update
     # @provider initialized in before filter
 
-    @appointment = current_company.appointments.find(params[:id])
-
-    # Make sure to remove the parameters that aren't valid for this appointment
-    # params[:appointment].delete(:mark_as)
-    # if @appointment.free?
-    #   # If this is a free appointment, we expect incoming start and end time. We remove duration.
-    #   params[:appointment].delete(:duration)
-    #   params[:appointment].delete(:customer_id)
-    #   params[:appointment].delete(:service_id)
-    # else
-    #   # If this is a work appointment, we expect incoming start time and duration. We remove end time.
-    #   params[:appointment].delete(:end_at)
-    # end
+    @appointment          = current_company.appointments.find(params[:id])
 
     # Update appointment fields
     @service              = init_service(:default => (@appointment.free? ? @appointment.company.free_service : nil))
@@ -588,6 +551,7 @@ class AppointmentsController < ApplicationController
 
     @appointment.provider = @provider
     @appointment.service  = @service
+    @appointment.customer = @customer
     @appointment.start_at = params[:start_at]
     if !params[:duration].blank?
       # build end time using start time and duration
@@ -596,7 +560,6 @@ class AppointmentsController < ApplicationController
       # use specified end time
       @appointment.end_at = params[:end_at]
     end
-    @appointment.customer = @customer
 
     # Check the force parameter
     # This will be checked in the capacity_slot changes as part of the save process (after_save filter)
@@ -617,13 +580,8 @@ class AppointmentsController < ApplicationController
         # clear session return_to to ensure the user starts clean when they login
         clear_location
       else
+        # apointment updates are done in dialogs, so redirect to the referer page
         @redirect_path = request.referer
-      # elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
-      #   # If the user has the right to see company calendars, or this provider's calendar, we go there by default
-      #   @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
-      # else
-      #   # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
-      #   @redirect_path = history_index_path
       end
 
       flash[:notice] = "Your appointment has been updated"
@@ -635,7 +593,7 @@ class AppointmentsController < ApplicationController
     else
       flash[:error] = "There was a problem updating your appointment<br/>" + @appointment.errors.full_messages.join("<br/>")
 
-      # @redirect_path = edit_appointment_path(@appointment)
+      # apointment updates are done in dialogs, so redirect to the referer page
       @redirect_path = request.referer
 
       respond_to do |format|

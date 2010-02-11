@@ -1,8 +1,0 @@
--# create a new appointment if we don't have one to edit. Shouldn't happen
-- appointment = Appointment.new if local_assigns[:appointment].nil?
--# We can't choose the provider if we don't have company-wide rights
-- choose_provider = false if (local_assigns[:choose_provider].nil? || !(has_privilege?('update calendars', current_company)))
-
-.span-11.prepend-1.last.dialog.hide#edit_appointment_dialog{:title => "Edit Appointment"}
-  = render(:partial => 'appointments/edit_appointment', :locals => {:appointment => appointment, :provider => provider, :services => services, :providers => providers, :choose_provider => choose_provider})
-  
