@@ -87,7 +87,7 @@ class CalendarController < ApplicationController
     # find free, work appointments & capacity for the specified provider over a daterange
     # For free appointments, we don't care about service or duration, so these are set to nil
     # For capacity_slots we don't care about service, duration or capacity, so these are set to nil
-    @free_appointments   = AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+    @free_appointments   = AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true, :include_canceled => true)
     @work_appointments   = AppointmentScheduler.find_work_appointments(current_company, current_location, @provider, @daterange, :keep_old => true)
     @capacity_slots      = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
 

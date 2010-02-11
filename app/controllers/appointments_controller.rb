@@ -516,8 +516,33 @@ class AppointmentsController < ApplicationController
   def cancel
     @appointment = current_company.appointments.find(params[:id])
 
-    # cancel the appointment
-    AppointmentScheduler.cancel_appointment(@appointment)
+    # If this is (part of) a recurrence, and we've been asked to cancel the series, we do so
+    if params[:series] && @appointment.recurrence?
+      
+      # We try cancel the series regardless of impact on existing appointments. 
+      # If we're allowed to overbook that will be fine. We'll get an exception if we're not allowed to do it
+      force = current_user.has_privilege?("update calendars", current_company) || current_user.has_privilege?("update calendars", @appointment.provider)
+  
+      # First cancel the recurrence parent, so it doesn't continue to expand
+      rp = @appointment.recurrence_parent
+      AppointmentScheduler.cancel_appointment(rp, force)
+
+      # Now cancel all expanded instances after this appointment, including this one. This does not include the recurrence parent itself.
+      rp.recur_instances.after_incl(self.start_at).each do |recur_instance|
+        AppointmentScheduler.cancel_appointment(recur_instance, force)
+      end
+      
+      flash[:notice] = "We have canceled this and all future availability in this series. No more will be created."
+    
+    elsif @appointment.recurrence_parent?
+      
+      
+    else
+
+      # cancel the appointment
+      AppointmentScheduler.cancel_appointment(@appointment)
+      
+    end
 
     # redirect to referer; default to apointment path
     @redirect_path = request.referer || appointment_path(@appointment)
