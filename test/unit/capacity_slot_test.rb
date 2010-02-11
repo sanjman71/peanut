@@ -369,6 +369,21 @@ class CapacitySlotTest < ActiveSupport::TestCase
         CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
       end
     end
+    
+    context "reduce capacity by 5-7 c 2 forced" do
+      setup do
+        CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2, :force => true)
+      end
+      
+      context "then increase capacity by 5-7 c 1 not forced" do
+        should "not raise an exception" do
+          assert_nothing_raised do
+            CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, 1)
+          end
+        end
+      end
+      
+    end
   end
   
   
