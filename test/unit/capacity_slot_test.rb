@@ -278,7 +278,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
   
       should "raise exception if we reduce capacity by 5-7 c 2" do
-        assert_raise AppointmentInvalid, "Not enough capacity available" do
+        assert_raise OutOfCapacity, "Not enough capacity available" do
           CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
         end
       end
@@ -365,9 +365,24 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
   context "with no capacity" do
     should "raise exception if we reduce capacity by 5-7 c 2" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
       end
+    end
+    
+    context "reduce capacity by 5-7 c 2 forced" do
+      setup do
+        CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2, :force => true)
+      end
+      
+      context "then increase capacity by 5-7 c 1 not forced" do
+        should "not raise an exception" do
+          assert_nothing_raised do
+            CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, 1)
+          end
+        end
+      end
+      
     end
   end
   
@@ -865,7 +880,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid, "Not enough capacity available" do
+        assert_raise OutOfCapacity, "Not enough capacity available" do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -886,7 +901,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # end
   
       should "raise exception" do
-        e = assert_raise AppointmentInvalid do
+        e = assert_raise OutOfCapacity do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -908,7 +923,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid do
+        assert_raise OutOfCapacity do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -1010,7 +1025,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
                   # end
       
                   should "raise exception" do
-                    e = assert_raise AppointmentInvalid do
+                    e = assert_raise OutOfCapacity do
                       @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
                       @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                     end
@@ -1113,7 +1128,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
             context "then cancel the work appt from 1600 to 1700 capacity 3" do
               
               setup do
-                AppointmentScheduler.cancel_work_appointment(@work_appt2)
+                AppointmentScheduler.cancel_appointment(@work_appt2)
               end
               
               should "have capacity slots of 15-18 c 4; 18-21 c 3; 21-23 c 4" do
@@ -1126,7 +1141,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
               context "then cancel the work appt from 1800 to 2100 capacity 1" do
       
                 setup do
-                  AppointmentScheduler.cancel_work_appointment(@work_appt1)
+                  AppointmentScheduler.cancel_appointment(@work_appt1)
                 end
       
                 should "have capacity slots of 15-23 c 4" do
@@ -1191,7 +1206,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1234,7 +1249,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1296,7 +1311,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
   
@@ -1340,7 +1355,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       
         context "and cancel work appointment" do
           setup do
-            AppointmentScheduler.cancel_work_appointment(@work_appt)
+            AppointmentScheduler.cancel_appointment(@work_appt)
             assert_valid @work_appt
           end
       

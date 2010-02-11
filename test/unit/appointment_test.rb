@@ -3,21 +3,21 @@ require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
-  # should_validate_presence_of   :company_id
-  # should_validate_presence_of   :start_at
-  # should_validate_presence_of   :end_at
-  # should_validate_presence_of   :duration
-  # should_allow_values_for       :mark_as, "free", "work"
-  # 
-  # should_belong_to              :company
-  # should_belong_to              :service
-  # should_belong_to              :provider
-  # should_belong_to              :customer
-  # should_have_one               :invoice
-  # should_belong_to              :location
-  # 
-  # should_belong_to              :recur_parent
-  # should_have_many              :recur_instances
+  should_validate_presence_of   :company_id
+  should_validate_presence_of   :start_at
+  should_validate_presence_of   :end_at
+  should_validate_presence_of   :duration
+  should_allow_values_for       :mark_as, "free", "work"
+  
+  should_belong_to              :company
+  should_belong_to              :service
+  should_belong_to              :provider
+  should_belong_to              :customer
+  should_have_one               :invoice
+  should_belong_to              :location
+  
+  should_belong_to              :recur_parent
+  should_have_many              :recur_instances
   
   def setup
     @owner          = Factory(:user, :name => "Owner")
@@ -39,7 +39,7 @@ class AppointmentTest < ActiveSupport::TestCase
     @free_service   = @company.free_service
     @customer       = Factory(:user)
   end
-  
+
   context "appointment state" do
     setup do
       # create free time from 12 midnight to 1 am
@@ -51,36 +51,52 @@ class AppointmentTest < ActiveSupport::TestCase
     should "create in confirmed state" do
       assert_equal 'confirmed', @free_appt.reload.state
     end
-  
+    
+    # Should have corresponding capacity
+    should_change("CapacitySlot.count", :by => 1) { CapacitySlot.count }
+      
     context "then mark as completed" do
       setup do
         @free_appt.complete!
       end
-  
+      
       should "change state to completed" do
         assert_equal 'completed', @free_appt.reload.state
       end
+    
+      # Should still consume capacity
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+    
     end
-  
+      
     context "then mark as canceled" do
       setup do
         @free_appt.cancel!
       end
-  
+      
       should "change state to canceled" do
         assert_equal 'canceled', @free_appt.reload.state
       end
+    
+      # Should remove capacity
+      should_change("CapacitySlot.count", :by => -1) { CapacitySlot.count }
+    
     end
-  
+      
     context "then mark as noshow" do
       setup do
         @free_appt.noshow!
       end
-  
+      
       should "change state to noshow" do
         assert_equal 'noshow', @free_appt.reload.state
       end
+    
+      # Should still consume capacity
+      should_not_change("CapacitySlot.count") { CapacitySlot.count }
+    
     end
+
   end
   
   context "create free appointment with mismatched duration and end_at values" do
@@ -235,8 +251,8 @@ class AppointmentTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid do
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service2, @work_service2.duration, @customer, @options)
+        assert_raise OutOfCapacity do
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @options)
         end
       end
     end
@@ -332,7 +348,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     should "raise exception, default force value" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
                                              :customer => @customer,
@@ -342,7 +358,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   
     should "raise exception, force is false" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
                                              :customer => @customer,
@@ -351,7 +367,7 @@ class AppointmentTest < ActiveSupport::TestCase
                                              :force => false)
       end
     end
-
+  
     should "not raise exception" do
       @appt = @company.appointments.create(:service => @work_service,
                                            :provider => @provider,
@@ -361,7 +377,7 @@ class AppointmentTest < ActiveSupport::TestCase
                                            :force => true)
     end
   end
-
+  
   context "build new appointment with time range attributes and am/pm times" do
     setup do
       @today = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
@@ -429,6 +445,52 @@ class AppointmentTest < ActiveSupport::TestCase
       end
     end
   
+  end
+  
+  context "test transactional behavior of appointment changes and capacity slots by creating a work appointment with no capacity, force => false" do
+    setup do
+      # create free time from 12 midnight to 1 am
+      @today      = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range = TimeRange.new({:day => @today, :start_at => "0000", :end_at => "0100"})
+      @options    = {:start_at => @time_range.start_at}
+      begin
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
+      rescue Exception => e
+      end
+    end
+    
+    should "not create any appointments or capacity slots" do
+      assert_equal 0, Appointment.count
+      assert_equal 0, CapacitySlot.count
+    end
+    
+  end
+  
+  context "create a free appointment 0200 - 0300 and consume the capacity with work" do
+    setup do
+      # create free time from 12 midnight to 1 am
+      @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range     = TimeRange.new({:day => @today, :start_at => "0200", :end_at => "0300"})
+      @options        = {:start_at => @time_range.start_at}
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
+      @work_appt      = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 1.hour, @customer, @options)
+    end
+    
+    should_not_change("CapacitySlot.count") { CapacitySlot.count }
+    
+    context "then extend the free appointment without force => true" do
+      setup do
+        @time_range = TimeRange.new({:day => @today, :start_at => "0200", :end_at => "0400"})
+      end
+  
+      should "not raise an exception" do
+        assert_nothing_raised do
+          @free_appt.update_attributes(:end_at => @time_range.end_at)
+        end
+      end
+  
+    end
+    
   end
   
   #

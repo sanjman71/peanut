@@ -145,7 +145,7 @@ class AppointmentsController < ApplicationController
           # check if its an appointment reschedule
           if has_reschedule_id?
             # cancel the old work appointment
-            AppointmentScheduler.cancel_work_appointment(get_reschedule_appointment)
+            AppointmentScheduler.cancel_appointment(get_reschedule_appointment)
             # reset reschedule id
             reset_reschedule_id
             # reset flash message
@@ -521,21 +521,61 @@ class AppointmentsController < ApplicationController
   def cancel
     @appointment = current_company.appointments.find(params[:id])
 
-    case @appointment.mark_as
-    when Appointment::WORK
-      # cancel the work appointment
-      AppointmentScheduler.cancel_work_appointment(@appointment)
-    end
+    # If we're allowed to overbook that will be fine. We'll get an exception if we're not allowed to do it
+    force = current_user.has_privilege?("update calendars", current_company) || current_user.has_privilege?("update calendars", @appointment.provider)
 
-    # redirect to referer; default to apointment path
-    @redirect_path = request.referer || appointment_path(@appointment)
+    # We'll log errors, but will carry on regardless
+    error = []
 
-    # set flash based on appointment type
-    if @appointment.free?
-      flash[:notice] = "Canceled available time"
+    # If this is (part of) a recurrence, and we've been asked to cancel the series, we do so
+    if params[:series] && @appointment.recurrence?
+
+      # We try cancel the series regardless of impact on existing appointments. 
+      # First cancel the recurrence parent, so it doesn't continue to expand
+      rp = @appointment.recurrence_parent
+
+      begin
+        AppointmentScheduler.cancel_appointment(rp, force)
+      rescue OutOfCapacity => e
+        error << e.message
+      end
+
+      # Now cancel all expanded instances after this appointment, including this one. This does not include the recurrence parent itself.
+      rp.recur_instances.after_incl(self.start_at).each do |recur_instance|
+        begin
+          AppointmentScheduler.cancel_appointment(recur_instance, force)
+        rescue OutOfCapacity => e
+          error << e.message
+        end
+      end
+
+      if error.empty?
+        flash[:notice] = "We have canceled this and all future availability in this series. No more will be created."
+      else
+        flash[:error] = "We had issues canceling #{error.size} availability appointments in this series. We have canceled all possible availability."
+      end
+    
     else
-      flash[:notice] = "Canceled appointment"
+
+      # cancel the appointment
+      begin
+        AppointmentScheduler.cancel_appointment(@appointment, force)
+      rescue OutOfCapacity => e
+        error << e.message
+      end
+      
+      # set flash
+      appt_text = ( (@appointment.mark_as == Appointment::WORK) ? "appointment" : "availability" )
+      if error.empty?
+        flash[:notice] = "We have canceled this #{appt_text}."
+      else
+        flash[:notice] = "We had a problem canceling this #{appt_text} - #{error[0]}."
+      end
+
     end
+
+    # redirect to referer; default to appointment path
+    @redirect_path = request.referer || appointment_path(@appointment)
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
