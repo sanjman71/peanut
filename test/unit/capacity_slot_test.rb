@@ -278,7 +278,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
   
       should "raise exception if we reduce capacity by 5-7 c 2" do
-        assert_raise AppointmentInvalid, "Not enough capacity available" do
+        assert_raise OutOfCapacity, "Not enough capacity available" do
           CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
         end
       end
@@ -365,7 +365,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
   
   context "with no capacity" do
     should "raise exception if we reduce capacity by 5-7 c 2" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         CapacitySlot.change_capacity(@company, @location, @provider, @start_tomorrow + 5.hours, @start_tomorrow + 7.hours, -2)
       end
     end
@@ -880,7 +880,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid, "Not enough capacity available" do
+        assert_raise OutOfCapacity, "Not enough capacity available" do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -901,7 +901,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       # end
   
       should "raise exception" do
-        e = assert_raise AppointmentInvalid do
+        e = assert_raise OutOfCapacity do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -923,7 +923,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid do
+        assert_raise OutOfCapacity do
           @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
           @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
         end
@@ -1025,7 +1025,7 @@ class CapacitySlotTest < ActiveSupport::TestCase
                   # end
       
                   should "raise exception" do
-                    e = assert_raise AppointmentInvalid do
+                    e = assert_raise OutOfCapacity do
                       @options    = {:start_at => @time_range.start_at, :end_at => @time_range.end_at, :capacity => @capacity}
                       @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @time_range.duration, @customer, @options)
                     end

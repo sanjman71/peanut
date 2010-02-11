@@ -251,8 +251,8 @@ class AppointmentTest < ActiveSupport::TestCase
       end
       
       should "raise exception" do
-        assert_raise AppointmentInvalid do
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service2, @work_service2.duration, @customer, @options)
+        assert_raise OutOfCapacity do
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @options)
         end
       end
     end
@@ -348,7 +348,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
     
     should "raise exception, default force value" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
                                              :customer => @customer,
@@ -358,7 +358,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   
     should "raise exception, force is false" do
-      assert_raise AppointmentInvalid, "Not enough capacity available" do
+      assert_raise OutOfCapacity, "Not enough capacity available" do
         @appt = @company.appointments.create(:service => @work_service,
                                              :provider => @provider,
                                              :customer => @customer,
