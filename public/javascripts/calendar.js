@@ -156,7 +156,7 @@ $.fn.init_cancel_appointment = function() {
   // user click on 'cancel appointment', results in opening cancel appointment dialog
   $("a.cancel").click(function() {
     // fill in appointment values
-    var service_name    = $(this).parents("div.appointment").find("div.service a").text();
+    var service_name    = $(this).parents("div.appointment").find("div.service").text();
     var start_date_time = $(this).parents("div.appointment").attr('appt_day_date_time');
     var customer_name   = $(this).parents("div.appointment").find("div.customer:first-child").text();
     var cancel_url      = $(this).attr('href');
