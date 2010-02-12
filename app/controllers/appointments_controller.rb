@@ -556,6 +556,34 @@ class AppointmentsController < ApplicationController
         flash[:error] = "We had issues canceling #{error.size} availability appointments in this series. We have canceled all possible availability."
       end
     
+      #
+      # Not using this code yet - deals with recurrences
+      #
+
+      # elsif @appointment.recurrence_parent?
+      # 
+      #   # cancel the recurrence, including all future instances of it
+      #   begin
+      #     AppointmentScheduler.cancel_appointment(@appointment, force)
+      #   rescue OutOfCapacity => e
+      #     error << e.message
+      #   end
+      #   
+      #   # Now cancel all expanded instances after this appointment, including this one. This does not include the recurrence parent itself.
+      #   @appointment.recur_instances.future.each do |recur_instance|
+      #     begin
+      #       AppointmentScheduler.cancel_appointment(recur_instance, force)
+      #     rescue OutOfCapacity => e
+      #       error << e.message
+      #     end
+      #   end
+      # 
+      #   if error.empty?
+      #     flash[:notice] = "We have canceled all availability in this series. No more will be created"
+      #   else
+      #     flash[:error] = "We had issues canceling all availability in this series. We have canceled all possible availability."
+      #   end
+
     else
 
       # cancel the appointment
@@ -606,15 +634,8 @@ class AppointmentsController < ApplicationController
       @appointment.end_at = params[:end_at]
     end
 
-    # Check the force parameter
-    # This will be checked in the capacity_slot changes as part of the save process (after_save filter)
-    if ((!params[:force].blank?) && (params[:force].to_i != 0) &&
-        ((current_user.has_privilege?('update calendars', current_company)) ||
-         (current_user.has_privilege?('update calendars', @provider))))
-      @appointment.force = true
-    else
-      @appointment.force = false
-    end
+    # Force is always true as user has already been authenticated
+    @appointment.force = true
 
     if @appointment.save
       # Set up our redirect path
