@@ -155,23 +155,30 @@ $.fn.init_cancel_appointment = function() {
 
   // user click on 'cancel appointment', results in opening cancel appointment dialog
   $("a.cancel").click(function() {
-    // fill in appointment values
+    // fill in dialog appointment values
     var service_name    = $(this).parents("div.appointment").find("div.service").text();
     var start_date_time = $(this).parents("div.appointment").attr('appt_day_date_time');
     var customer_name   = $(this).parents("div.appointment").find("div.customer:first-child").text();
     var cancel_url      = $(this).attr('href');
-    $("div.dialog#cancel_appointment_dialog").find("#service_name").text(service_name);
-    $("div.dialog#cancel_appointment_dialog").find("#start_date_time").text(start_date_time);
+    var dialog_div      = "div.dialog#cancel_appointment_dialog";
+    $(dialog_div).find("#service_name").text(service_name);
+    $(dialog_div).find("#start_date_time").text(start_date_time);
     if ($(this).hasClass('work')) {
       // work appointments have customers
-      $("div.dialog#cancel_appointment_dialog").find("#customer_name").text(customer_name);
+      $(dialog_div).find("#customer_name").text(customer_name);
     } else {
-      // clear customer field
-      $("div.dialog#cancel_appointment_dialog").find("#customer_name").text('');
+      // free appointment; clear customer field
+      $(dialog_div).find("#customer_name").text('');
     }
-    $("div.dialog#cancel_appointment_dialog").find("a#cancel_appointment").attr('href', cancel_url);
+    $(dialog_div).find("a#cancel_appointment").attr('href', cancel_url);
     // open dialog
-    $("div.dialog#cancel_appointment_dialog").dialog('open');
+    $(dialog_div).dialog('open');
+    return false;
+  })
+
+  $("a#cancel_appointment").click(function() {
+    $.get(this.href, {}, null, "script");
+    $(this).replaceWith("<h3 class ='submitting'>Canceling...</h3>");
     return false;
   })
 }
