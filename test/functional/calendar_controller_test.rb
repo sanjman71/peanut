@@ -100,10 +100,15 @@ class CalendarControllerTest < ActionController::TestCase
       should "show date range name" do
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
       end
-      
-      should "have hidden add appointment form" do
-        assert_select "div.dialog.hide#add_appointment_dialog", 1
-        assert_select "form#add_appointment_form", 1
+
+      should "have hidden add work appointment form" do
+        assert_select "div.dialog.hide#add_work_appointment_dialog", 1
+        assert_select "form#add_work_appointment_form", 1
+      end
+
+      should "have hidden add free appointment form" do
+        assert_select "div.dialog.hide#add_free_appointment_dialog", 1
+        assert_select "form#add_free_appointment_form", 1
       end
 
       should "have hidden cancel appointment form" do
@@ -149,9 +154,14 @@ class CalendarControllerTest < ActionController::TestCase
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => /^#{date_range_name}(\s)+Today$/}
       end
 
-      should "have hidden add appointment form" do
-        assert_select "div.dialog.hide#add_appointment_dialog", 1
-        assert_select "form#add_appointment_form", 1
+      should "have hidden add work appointment form" do
+        assert_select "div.dialog.hide#add_work_appointment_dialog", 1
+        assert_select "form#add_work_appointment_form", 1
+      end
+
+      should "have hidden add free appointment form" do
+        assert_select "div.dialog.hide#add_free_appointment_dialog", 1
+        assert_select "form#add_free_appointment_form", 1
       end
 
       should "have hidden cancel appointment form" do
