@@ -43,7 +43,7 @@
                 %h6= appointment.customer.name
               - if !appointment.customer.primary_phone_number.blank?
                 .span-4.last.customer_phone_email
-                  %h6= appointment.customer.primary_phone_number.address
+                  %h6= number_to_phone(appointment.customer.primary_phone_number.address.to_i, :area_code => true, :delimiter => " ")
       - if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
         .span-3.last
           == &nbsp;
