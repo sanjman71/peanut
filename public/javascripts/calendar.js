@@ -124,7 +124,7 @@ $.fn.init_edit_work_appointment = function() {
     var start_time    = $(this).parents("div.appointment").attr('appt_start_time');
     var duration      = $(this).parents("div.appointment").attr('appt_duration');
     var service_name  = $(this).parents("div.appointment").find("div.service a").text();
-    var customer_name = $(this).parents("div.appointment").find("div.customer h6").text();
+    var customer_name = $(this).parents("div.appointment").find("div.customer div.customer_name").children().text();
     var customer_id   = $(this).parents("div.appointment").find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
     var provider      = $(this).parents("div.appointment").attr('appt_provider'); // e.g. 'users/11'
     var appt_id       = $(this).parents("div.appointment").attr('id').match(/\w_(\d+)/)[1];
@@ -158,7 +158,7 @@ $.fn.init_cancel_appointment = function() {
     // fill in dialog appointment values
     var service_name    = $(this).parents("div.appointment").find("div.service").text();
     var start_date_time = $(this).parents("div.appointment").attr('appt_day_date_time');
-    var customer_name   = $(this).parents("div.appointment").find("div.customer:first-child").text();
+    var customer_name   = $(this).parents("div.appointment").find("div.customer div.customer_name").children().text();
     var cancel_url      = $(this).attr('href');
     var dialog_div      = "div.dialog#cancel_appointment_dialog";
     $(dialog_div).find("#service_name").text(service_name);
@@ -416,9 +416,17 @@ $.fn.init_add_calendar_markings = function() {
     $(date_id).show();
   })
 
-  // mark the first calendar date that has free or work time
-  $("td.activity:first").click();
-  //$("td.free,td.work").find(":eq(0)").click();
+  // mark a calendar date
+  if (calendar_highlight_date == 'first-activity') {
+    // mark the first calendar date with activity
+    $("table.calendar td.activity:first").click();
+  } else if ($("table.calendar td#"+calendar_highlight_date).size() > 0) {
+    // mark the specified date
+    $("table.calendar td#"+calendar_highlight_date).click();
+  } else {
+    // default to first calendar date with activity
+    $("table.calendar td.activity:first").click();
+  }
 
   // show add menu icon on calendar date hover, allow past dates
   $("td .date").hover(function () {

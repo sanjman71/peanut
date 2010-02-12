@@ -31,7 +31,7 @@ class CalendarController < ApplicationController
     redirect_to url_for(url_params) and return
   end
   
-  # GET /users/1/calendar
+  # GET /users/1/calendar?date=20100101
   # GET /users/1/calendar/when/today
   # GET /users/1/calendar/when/next-week
   # GET /users/1/calendar/when/next-2-weeks/20090201
@@ -57,11 +57,6 @@ class CalendarController < ApplicationController
       array
     end
     
-    # if current_company.providers_count == 0
-    #   # redirect to company home page
-    #   redirect_to root_path(:subdomain => current_subdomain) and return
-    # end
-
     @free_service = current_company.free_service
     @providers    = current_company.providers
     
@@ -83,6 +78,9 @@ class CalendarController < ApplicationController
       @start_date = params[:start_date] ? Time.parse(params[:start_date]).in_time_zone : nil
       @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date, :start_week_on => current_company.preferences[:start_wday].to_i)
     end
+
+    # initialize calendar date we are supposed to highlight
+    @calendar_highlight_date = params[:highlight] ? params[:highlight].to_s : "first-activity"
 
     # find free, work appointments & capacity for the specified provider over a daterange
     # For free appointments, we don't care about service or duration, so these are set to nil

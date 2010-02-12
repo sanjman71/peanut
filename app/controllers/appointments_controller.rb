@@ -7,6 +7,7 @@ class AppointmentsController < ApplicationController
   before_filter :init_appointment_and_provider, :only => [:cancel]
   before_filter :get_reschedule_id, :only => [:new]
 
+  privilege_required      'authenticated', :only => [:create_work], :on => :current_company
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
@@ -32,7 +33,6 @@ class AppointmentsController < ApplicationController
     @customer = current_user
 
     begin
-
       case (@mark_as = params[:mark_as])
       when Appointment::WORK
         # build the work appointment parameters
@@ -62,9 +62,7 @@ class AppointmentsController < ApplicationController
         @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
         @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
         @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
-
       end
-
     rescue AppointmentInvalid => e
       flash[:error] = e.message
       redirect_to request.referrer and return
@@ -105,6 +103,7 @@ class AppointmentsController < ApplicationController
     # track errors and appointments created
     @errors         = Hash.new
     @created        = Hash.new
+    @appointments   = []
 
     # initialize dates collection
     case
@@ -121,9 +120,6 @@ class AppointmentsController < ApplicationController
       begin
         case @mark_as
         when Appointment::WORK
-          # build time range
-          # @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-          # @options        = {:time_range => @time_range}
           @date_time_options  = Hash[:start_at => @start_at]
           @options            = Hash[:commit => true]
           @options            = @options.merge({:capacity => @capacity }) unless @capacity.blank?
@@ -133,15 +129,18 @@ class AppointmentsController < ApplicationController
           if ((!params[:force].blank?) && (params[:force].to_i != 0) &&
               ((current_user.has_privilege?('update calendars', current_company)) ||
                (current_user.has_privilege?('update calendars', @provider))))
-            @options            = @options.merge({:force => true})
+            @options = @options.merge({:force => true})
           end
 
           # create work appointment, with preferences
-          @appointment        = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
+          @appointment = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
+          # track new appointments
+          @appointments.push(@appointment)
+          
           # set flash message
-          flash[:notice]      = "Your #{@service.name} appointment has been confirmed."
+          flash[:notice] = "Your #{@service.name} appointment has been confirmed."
 
           # check if its an appointment reschedule
           if has_reschedule_id?
@@ -175,10 +174,12 @@ class AppointmentsController < ApplicationController
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
-          flash[:notice]  = "Created available time"
+          # track new appointments
+          @appointments.push(@appointment)
 
+          flash[:notice]  = "Created available time"
         end
-        
+
         logger.debug("*** created #{@appointment.mark_as} appointment")
         @created[date] = "Created #{@appointment.mark_as} appointment"
       rescue Exception => e
@@ -188,24 +189,18 @@ class AppointmentsController < ApplicationController
       end
     end
 
-    # Set up our redirect.
-    # If the user is a provider or manager, they are probably coming from a provider's schedule, and will redirect_back to there
-    # Otherwise:
-    if !logged_in?
-      # The user is not logged in. They made the appointment from the openings page, and will have to log in to see their history etc.
-      @redirect_path = openings_path(:subdomain => current_subdomain)
-      # tell the user their account has been created
-      flash[:notice] += "<br/>Your user account has been created."
-      # clear session return_to to ensure the user starts clean when they login
-      clear_location
-
-    elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
-      # If the user has the right to see company calendars, or this provider's calendar, we go there by default
-      @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
-
+    # Set up our redirect; check if the user has the right to see company calendars, or this provider's calendar
+    if current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
+      if @appointments.size == 1
+        # Redirect to referer, highlight appointment's date
+        @redirect_path = build_highlight_appointment_redirect_path(request.referer, @appointments.first)
+      else
+        # Redirect to provider's calendar show page
+        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
+      end
     else
-      # If the user is logged in but doesn't have read calendar privileges, we send them to their history page
-      @redirect_path = history_index_path(:subdomain => current_subdomain)
+      # If the user doesn't have read calendar privileges, redirect to their history page
+      @redirect_path = history_index_path
     end
 
     # Set up our flash
@@ -226,11 +221,8 @@ class AppointmentsController < ApplicationController
     end
     
     respond_to do |format|
-      format.html { redirect_back_or_default(@redirect_path) and return }
-      format.js { 
-        rbdu = redirect_back_or_default_uri(@redirect_path)
-        render(:update) { |page| page.redirect_to(rbdu) }
-        }
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
 
@@ -415,27 +407,6 @@ class AppointmentsController < ApplicationController
   # POST /book/work/users/7/services/4/60/20090901T060000
   # anyone can create work appointments
   def create_work
-    # check for a customer signup
-    if params[:customer]
-      # create new user, assign a random password
-      options   = params[:customer]
-      @customer = User.create(options)
-      if !@customer.valid?
-        # not a valid customer
-        flash[:error] = @customer.errors.full_messages.join("\n")
-        redirect_to request.referer and return
-      end
-      # assign the customer id
-      params[:customer_id] = @customer.id
-
-      begin
-        # send user created message
-        MessageComposeUser.created(@customer.reload)
-      rescue
-      
-      end
-    end
-
     @mark_as = Appointment::WORK
     create
   end
@@ -603,8 +574,8 @@ class AppointmentsController < ApplicationController
 
     end
 
-    # redirect to referer; default to appointment path
-    @redirect_path = request.referer || appointment_path(@appointment)
+    # redirect to referer; default to appointment show path
+    @redirect_path = build_highlight_appointment_redirect_path(request.referer || appointment_path(@appointment), @appointment)
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
@@ -647,7 +618,7 @@ class AppointmentsController < ApplicationController
         clear_location
       else
         # apointment updates are done in dialogs, so redirect to the referer page
-        @redirect_path = request.referer
+        @redirect_path = build_highlight_appointment_redirect_path(request.referer, @appointment)
       end
 
       if @appointment.free?
@@ -672,7 +643,7 @@ class AppointmentsController < ApplicationController
       end
     end
   end
-  
+
   # DELETE /appointments/1
   def destroy
     @appointment  = current_company.appointments.find(params[:id])
@@ -860,4 +831,9 @@ class AppointmentsController < ApplicationController
     calendar_show_path = url_for(:controller => 'calendar', :action => 'show', :provider_type => provider.tableize, :provider_id => provider.id, :subdomain => current_subdomain)
   end
   
+  # build path with highlight url param based on the appointment date
+  def build_highlight_appointment_redirect_path(s, appointment)
+    add_url_params(s, Hash[:highlight => appointment.start_at.to_s(:appt_schedule_day)])
+  end
+
 end

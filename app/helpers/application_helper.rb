@@ -218,15 +218,16 @@ module ApplicationHelper
     return "" if user.blank?
     (user == current_user) ? "Me" : user.name
   end
-  
+
   def build_company_location_select_options
     anywhere = Location.anywhere
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}
   end
-  
-  def mobile_carrier_select_options
-    [["Select a carrier", nil]] + MobileCarrier.all.collect { |o| [o.name, o.id] }
-  end
+
+  # def mobile_carrier_select_options
+  #   [["Select a carrier", nil]] + MobileCarrier.all.collect { |o| [o.name, o.id] }
+  # end
+
   def use_tiny_mce
     # Avoid multiple inclusions
     unless @content_for_tiny_mce

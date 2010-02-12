@@ -25,9 +25,13 @@ module BadgesExtensions
       if current_company
         # load and cache privileges on current company
         @current_privileges[current_company] = current_user.privileges(current_company).collect(&:name)
+        # logged in users always have the 'authenticated' privilege
+        @current_privileges[current_company].push('authenticated')
       else
         # load and cache privileges without an authorizable object
         @current_privileges[:noauth] = current_user.privileges.collect(&:name)
+        # logged in users always have the 'authenticated' privilege
+        @current_privileges[:noauth].push('authenticated')
       end
     else
       # no privilege cache

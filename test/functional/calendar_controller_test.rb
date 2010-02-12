@@ -96,6 +96,7 @@ class CalendarControllerTest < ActionController::TestCase
       should_assign_to(:today)
       should_not_assign_to(:start_date)
       should_assign_to :daterange, :class => DateRange
+      should_assign_to(:calendar_highlight_date) { 'first-activity' }
 
       should "show date range name" do
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
@@ -148,6 +149,7 @@ class CalendarControllerTest < ActionController::TestCase
       should_not_assign_to(:when)
       should_assign_to(:start_date) { "20090101" }
       should_assign_to :daterange, :class => DateRange
+      should_assign_to(:calendar_highlight_date) { 'first-activity' }
 
       should "show date range name and 'today' link" do
         date_range_name = assigns(:daterange).name(:with_dates => true)

@@ -140,6 +140,24 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  # remove all url params from the specified string
+  # e.g. '/users/1?x=1&y=2' => '/users/1'
+  def remove_url_params(s)
+    return s if s.blank?
+    s.gsub(/\?.+/,'')
+  end
+
+  # add hash as url parameters to the specified string
+  def add_url_params(s, hash)
+    return s if s.blank?
+    array = hash.each_pair.inject([]) do |array, keyvalue|
+      array.push("#{keyvalue[0]}=#{keyvalue[1]}")
+      array
+    end
+    # remove all url params before adding new ones
+    remove_url_params(s) + "?" + array.join("&")
+  end
+
   private
   
   # Initialize the current company and all related parameters (e.g. locations, time zone, ...)

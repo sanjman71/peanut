@@ -166,36 +166,13 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_render_template 'appointments/new.html.haml'
       end
     end
-      
-    context "create work appointment as customer" do
-      setup do
-        # stub current user
-        @controller.stubs(:current_user).returns(@customer)
-        post :create_work,
-             :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
-             :duration => @haircut.duration, :customer_id => @customer.id
-      end
-      
-      should_respond_with :redirect
-      should_redirect_to ("history_index_path") { history_index_path }
-      
-      context "delete free appointment containing active work appointment" do
-        setup do
-          delete :destroy, :id => @free_appt.id
-        end
-      
-        should_not_change("Appointment.count") { Appointment.count }
-        should "not delete free appointment" do
-          assert Appointment.find(@free_appt.id)
-        end
-      end
-    end
   end
   
   context "create free appointment" do
     context "without privilege 'update calendars'" do
       setup do
         @controller.stubs(:current_user).returns(@customer)
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_free,
              {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
@@ -208,6 +185,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         setup do
           # have johnny create free appointments on his calendar
           @controller.stubs(:current_user).returns(@johnny)
+          @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
           post :create_free,
                {:date => "20090201", :start_at => "0900", :end_at => "1100", :provider_type => "users", :provider_id => @johnny.id}
         end
@@ -220,13 +198,14 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:end_at) { "1100" }
         should_assign_to(:mark_as) { "free" }
   
-        should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+        should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
       end
 
       context "with datetimes for start_at and end_at" do
         setup do
           # have johnny create free appointments on his calendar
           @controller.stubs(:current_user).returns(@johnny)
+          @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
           post :create_free,
                {:date => "20090201", :start_at => "20090201T0900", :end_at => "20090201T1100", :provider_type => "users", :provider_id => @johnny.id}
         end
@@ -239,7 +218,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:end_at) { "1100" }
         should_assign_to(:mark_as) { "free" }
   
-        should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
+        should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
       end
     end
   
@@ -394,7 +373,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
   
-  context "create work appointment for a single date that has no free time" do
+  context "create work appointment for a single date with no free time" do
     setup do
       # create free time from 9 am to 3 pm local time
       @today          = Time.zone.now.to_s(:appt_schedule_day)
@@ -408,65 +387,63 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@customer)
         # create work appointment, today from 10 am to 12 pm local time
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
-      # Should fail to add the appointment
+      # should not add the appointment
       should_not_change("Appointment.count") { Appointment.count }
     
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at) { @start_at }
       should_assign_to(:mark_as) { "work" }
-    
-      should_respond_with :redirect
+
       should_redirect_to("user history page" ) { "/history" }
-      
     end
-    
+
     context "as a provider requesting force add in their own calendar" do
-      
       setup do
         @controller.stubs(:current_user).returns(@johnny)
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
              :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
     
-      # Should succeed
+      # should add the appointment
       should_change("Appointment.count", :by => 1) { Appointment.count }
     
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at) { @start_at }
       should_assign_to(:mark_as) { "work" }
-      
-      should_respond_with :redirect
-      should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
-      
+      should_assign_to(:appointments)
+
+      should_redirect_to("provider's calendar path, with highlight date" ) { "/users/#{@johnny.id}/calendar?highlight=#{@today}" }
     end
     
     context "as a provider requesting force add in another provider's calendar" do
-      
       setup do
         @controller.stubs(:current_user).returns(@mary)
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
              :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
-    
+
+      # should not add the appointment
       should_not_change("Appointment.count") { Appointment.count }
-    
+
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at) { @start_at }
       should_assign_to(:mark_as) { "work" }
-    
-      should_respond_with :redirect
+      should_assign_to(:appointments)
+
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
-      
     end
     
     context "as an owner without requesting to force add" do
@@ -474,22 +451,22 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :customer_id => @customer.id}
       end
     
-      # Should fail to add the appointment
+      # should not add the appointment
       should_not_change("Appointment.count") { Appointment.count }
     
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at) { @start_at }
       should_assign_to(:mark_as) { "work" }
+      should_assign_to(:appointments)
     
-      should_respond_with :redirect
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
-      
     end
     
     context "as an owner requesting not to force add" do
@@ -497,22 +474,22 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :customer_id => @customer.id, :force => 0}
       end
     
-      # Should fail to add the appointment
+      # should fail to add the appointment
       should_not_change("Appointment.count") { Appointment.count }
     
       should_assign_to(:service) { @haircut }
       should_assign_to(:provider) { @johnny }
       should_assign_to(:start_at) { @start_at }
       should_assign_to(:mark_as) { "work" }
-    
+
       should_respond_with :redirect
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
-      
     end
 
     context "as an owner with request to force add" do
@@ -520,12 +497,13 @@ class AppointmentsControllerTest < ActionController::TestCase
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
              {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
               :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
 
-      # Should succeed in adding the appointment
+      # should succeed in adding the appointment
       should_change("Appointment.count", :by => 1) { Appointment.count }
 
       should_assign_to(:service) { @haircut }
@@ -534,8 +512,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:mark_as) { "work" }
 
       should_respond_with :redirect
-      should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
-
+      should_redirect_to("provider's calendar path, with highlight date" ) { "/users/#{@johnny.id}/calendar?highlight=#{@today}" }
     end
   end
 
@@ -545,14 +522,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1100")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
-  
       @start_at       = "#{@today}T0900"
       @duration       = 2.hours
-  
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-  
       # create work appointment, today from 9 am to 11 am
+      @request.env['HTTP_REFERER'] = '/users/0/calendar'
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :customer_id => @customer.id}
@@ -592,14 +567,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
-  
       @start_at       = "#{@today}T1000"
       @duration       = 30.minutes
-  
       # create work appointment as customer
-      @controller.stubs(:current_user).returns(@customer)
-  
+      @controller.stubs(:current_user).returns(@customer)  
       # create work appointment, today from 10 am to 10:30 am local time
+      @request.env['HTTP_REFERER'] = '/users/0/calendar'
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :customer_id => @customer.id}
@@ -610,7 +583,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     should_change("Appointment.count", :by => 2) { Appointment.count }
   
     # There should be two available capacity slots
-      should "have two capacity slots" do
+    should "have two capacity slots" do
       assert_equal 2, CapacitySlot.count
     end
   
@@ -639,14 +612,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       @today          = Time.zone.now.to_s(:appt_schedule_day)
       @time_range     = TimeRange.new(:day => @today, :start_at => "0900", :end_at => "1500")
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
-  
       @start_at       = "#{@today}T1000"
       @duration       = 120.minutes
-  
       # create work appointment as customer
       @controller.stubs(:current_user).returns(@customer)
-  
       # create work appointment, today from 10 am to 12 pm local time
+      @request.env['HTTP_REFERER'] = '/users/0/calendar'
       post :create_work,
            {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
             :service_id => @haircut.id, :customer_id => @customer.id}
@@ -695,8 +666,6 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         # create work appointment as anonymous user
         @controller.stubs(:current_user).returns(nil)
-        @controller.stubs(:logged_in?).returns(false)
-  
         # create work appointment, today from 10 am to 12 pm local time
         post :create_work,
              {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
@@ -704,50 +673,9 @@ class AppointmentsControllerTest < ActionController::TestCase
               :customer => {:name => "Sanjay", :password => 'sanjay', :password_confirmation => 'sanjay',
                             :email_addresses_attributes => [{:address => "sanjay@walnut.com"}]}
              }
-        @free_appt.reload
-      end
-  
-      # create new customer
-      should_change("User.count", :by => 1) { User.count}
-  
-      # should add work appointment
-      should_change("Appointment.count", :by => 1) { Appointment.count }
-  
-      should "have two capacity slots" do
-        assert_equal 2, CapacitySlot.count
-      end
-  
-      should_assign_to(:service) { @haircut }
-      should_assign_to(:provider) { @johnny }
-      should_assign_to(:customer) { User.with_email("sanjay@walnut.com").first }
-      should_assign_to(:start_at) { @start_at }
-      should_not_assign_to(:end_at)
-      should_assign_to(:duration)  { 120.minutes }
-      should_assign_to(:mark_as) { "work" }
-      should_assign_to(:appointment)
-  
-      should "create user with email address, in active state" do
-        user = User.with_email("sanjay@walnut.com").first
-        assert_equal 'active', user.state
-      end
-  
-      should "create user with specified password" do
-        user = User.authenticate('sanjay@walnut.com', 'sanjay')
-        assert_equal assigns(:customer), user
-      end
-  
-      should "set the flash for the created work appointment" do
-        assert_match /Your Haircut appointment has been confirmed/, flash[:notice]
       end
       
-      should "set the flash for the created appointment and created user account" do
-        assert_match /Your user account has been created/, flash[:notice]
-      end
-  
-      # should send account created messages
-      should_change("delayed job count", :by => 1) { Delayed::Job.count }
-  
-      should_redirect_to("openings path") { "/openings" }
+      should_redirect_to("unauthorized") { unauthorized_path }
     end
   
     context "with appointment confirmations" do
@@ -759,6 +687,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -778,6 +707,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -801,6 +731,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -824,6 +755,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -848,6 +780,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -877,6 +810,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -900,6 +834,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -925,6 +860,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
@@ -945,6 +881,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '1'}
@@ -961,6 +898,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment as company manager
           @controller.stubs(:current_user).returns(@owner)
           # create work appointment, today from 10 am to 12 pm local time
+          @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '0'}
@@ -1022,6 +960,8 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
 
       should_not_change("appointment duration") { @free_appt.reload.duration }
+
+      should_redirect_to("referer") { "/users/0/calendar?highlight=#{@free_appt.start_at.to_s(:appt_schedule_day)}" }
     end
 
     context "change duration" do
@@ -1087,7 +1027,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_equal @mary, @work_appt.reload.provider
       end
 
-      should_redirect_to("referer") { "/users/0/calendar" }
+      should_redirect_to("referer") { "/users/0/calendar?highlight=#{@work_appt.start_at.to_s(:appt_schedule_day)}" }
     end
 
     context "change service" do
@@ -1219,7 +1159,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_nil CapacitySlot.find_by_id(@free_slot.id)
       end
 
-      should_redirect_to("referer") { "/users/#{@johnny.id}/calendar" }
+      should_redirect_to("referer") { "/users/#{@johnny.id}/calendar?highlight=#{@free_appt.start_at.to_s(:appt_schedule_day)}" }
     end
   end
 
@@ -1260,7 +1200,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_not_change("capacity slot count") { CapacitySlot.count}
       should_change("free slot duration", :by => 30.minutes) { @free_slot.reload.duration }
 
-      should_redirect_to("referer") { "/openings" }
+      should_redirect_to("referer") { "/openings?highlight=#{@work_appt.start_at.to_s(:appt_schedule_day)}" }
     end
   end
   
