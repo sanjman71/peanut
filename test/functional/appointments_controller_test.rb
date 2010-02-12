@@ -1183,4 +1183,85 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_change("appointment duration", :by => 1.hour) { @work_appt.reload.duration }
     end
   end
+
+  context "cancel free appointment" do
+    setup do
+      # create free time from 10 am to 12 pm
+      @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      # find free slot that corresponds to free appointmen t
+      @free_slot    = CapacitySlot.find(:first, :conditions => {:start_at => @free_appt.start_at})
+    end
+
+    context "without 'update calendar' privilege" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/openings'
+        get :cancel, :id => @free_appt.id
+      end
+
+      should_redirect_to("unauthorized") { "/unauthorized" }
+    end
+
+    context "with privileges" do
+      setup do
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        @controller.stubs(:current_user).returns(@owner)
+        get :cancel, :id => @free_appt.id
+      end
+
+      should "change appointment state to canceled" do
+        assert_equal "canceled", @free_appt.reload.state
+      end
+
+      should_change("capacity slot count", :by => -1) { CapacitySlot.count}
+      should "remove free slot" do
+        assert_nil CapacitySlot.find_by_id(@free_slot.id)
+      end
+
+      should_redirect_to("referer") { "/users/#{@johnny.id}/calendar" }
+    end
+  end
+
+  context "cancel work appointment" do
+    setup do
+      # create free time from 10 am to 12 pm
+      @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      # create work appointment
+      @options      = {:start_at => @free_appt.start_at}
+      @work_appt    = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @options)
+      assert @work_appt.valid?
+      # find free slot that starts after work appointment
+      @free_slot    = CapacitySlot.find(:first, :conditions => {:start_at => @work_appt.start_at + @haircut.duration})
+    end
+
+    context "without 'update calendar' privilege" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/openings'
+        get :cancel, :id => @work_appt.id
+      end
+
+      should_redirect_to("unauthorized") { "/unauthorized" }
+    end
+
+    context "with privileges" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/openings'
+        @controller.stubs(:current_user).returns(@owner)
+        get :cancel, :id => @work_appt.id
+      end
+
+      should "change appointment state to canceled" do
+        assert_equal "canceled", @work_appt.reload.state
+      end
+
+      should_not_change("capacity slot count") { CapacitySlot.count}
+      should_change("free slot duration", :by => 30.minutes) { @free_slot.reload.duration }
+
+      should_redirect_to("referer") { "/openings" }
+    end
+  end
+  
 end

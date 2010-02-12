@@ -4,15 +4,16 @@ class AppointmentsController < ApplicationController
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
                                                      :update_weekly, :create_work, :update]
   before_filter :init_appointment, :only => [:show]
+  before_filter :init_appointment_and_provider, :only => [:cancel]
   before_filter :get_reschedule_id, :only => [:new]
 
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
+  privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                       :update_weekly, :update],
+                                                       :update_weekly, :update, :cancel],
                                               :on => [:provider, :current_company]
     
-  privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
-  
+
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
   def new
@@ -519,10 +520,10 @@ class AppointmentsController < ApplicationController
 
   # GET /appointments/1/cancel
   def cancel
-    @appointment = current_company.appointments.find(params[:id])
+    # @appointment, @provider initialized in before filter
 
-    # If we're allowed to overbook that will be fine. We'll get an exception if we're not allowed to do it
-    force = current_user.has_privilege?("update calendars", current_company) || current_user.has_privilege?("update calendars", @appointment.provider)
+    # Force is always true as user has already been authenticated
+    force = true
 
     # We'll log errors, but will carry on regardless
     error = []
@@ -812,12 +813,12 @@ class AppointmentsController < ApplicationController
   protected
 
   def init_appointment
-    @appointment = Appointment.find(params[:id])
+    @appointment = current_company.appointments.find(params[:id])
   end
-  
-  # find appointment from the params hash
-  def find_appointment_from_params
-    current_company.appointments.find(params[:id])
+
+  def init_appointment_and_provider
+    init_appointment
+    @provider = @appointment.andand.provider
   end
 
   # find customer from the params hash, return nil if we can't find the customer
@@ -827,11 +828,6 @@ class AppointmentsController < ApplicationController
     rescue
       nil
     end
-  end
-
-  # find customer from the params hash, throw exception if we can't find the customer
-  def find_customer_from_params!
-    current_company.authorized_users.with_role(Company.customer_role).find(params[:customer_id])
   end
 
   def appointment_free_time_scheduled_at(appointment)
