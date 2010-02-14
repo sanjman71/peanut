@@ -22,7 +22,7 @@
       .span-10.prepend-1.last.notice
         = error_messages_for('user', :header_message => nil)
 
-  - form_for("user", @user, :url => submit_url) do |user_form|
+  - form_for("user", @user, :url => submit_url, :html => {:id => 'add_user_form'}) do |user_form|
     = hidden_field_tag 'creator', creator
     - if invitation
       = hidden_field_tag 'invitation_token', invitation.token
@@ -78,8 +78,11 @@
         
     -# submit
     .span-12.last.padding-bottom-10
-      .span-10.prepend-2.last
-        = submit_tag submit_text, :name => nil, :style => 'font-size: 15px;', :id => 'user_create_submit'
-        - if back_path
-          == or
-          = link_to 'Cancel', back_path
+      .span-11.prepend-1.last#submit
+        %h4
+          = submit_tag submit_text, :name => nil, :id => 'user_create_submit'
+          - if back_path
+            == or
+            %span.small= link_to 'Cancel', back_path
+      .span-10.prepend-1.last#progress.hide
+        %h3.submitting== Adding ...

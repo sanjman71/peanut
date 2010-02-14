@@ -589,52 +589,46 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)
-        # set flash discard expectation
-        ActionController::Flash::FlashHash.any_instance.expects(:discard).once
         post :create, {:format => "json",
                        :role => 'company customer',
                        :creator => 'user',
-                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret'},
+                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret',
                                  :phone_numbers_attributes => [{:address => "9999999999", :name => "Mobile"}]}
+                      }
       end
 
-      should_change("User.count", :by => 1) { User.count }
+      should_not_change("User.count") { User.count }
       should_not_change("PhoneNumber.count") { PhoneNumber.count}
 
-      should "send json response with new user hash" do
-        @json = JSON.parse(@response.body)
-        @user = User.find_by_name("Joe Bloggs")
-        assert_equal Hash["user" => Hash["id" => @user.id, "name" => "Joe Bloggs"]], @json
-      end
-
       should_respond_with_content_type "application/json"
-      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
+
+      should "send json response with errors user hash" do
+        @json = JSON.parse(@response.body)
+        assert_equal Hash["user" => Hash["id" => 0, "errors" => ["Address Phone number is already in use"]]], @json
+      end
     end
 
     context "with a json request with a duplicate email" do
       setup do
         # stub current user as the company owner
         @controller.stubs(:current_user).returns(@owner)
-        # set flash discard expectation
-        ActionController::Flash::FlashHash.any_instance.expects(:discard).once
         post :create, {:format => "json",
                        :role => 'company customer',
                        :creator => 'user',
-                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret'},
-                                 :email_addresses_attributes => [{:address => "owner@walntu.coms"}]}
+                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret',
+                                 :email_addresses_attributes => [{:address => "owner@walnut.com"}]}
+                      }
       end
 
-      should_change("User.count", :by => 1) { User.count }
+      should_not_change("User.count") { User.count }
       should_not_change("EmailAddress.count") { EmailAddress.count}
 
-      should "send json response with new user hash" do
-        @json = JSON.parse(@response.body)
-        @user = User.find_by_name("Joe Bloggs")
-        assert_equal Hash["user" => Hash["id" => @user.id, "name" => "Joe Bloggs"]], @json
-      end
-
       should_respond_with_content_type "application/json"
-      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
+
+      should "send json response with errors user hash" do
+        @json = JSON.parse(@response.body)
+        assert_equal Hash["user" => Hash["id" => 0, "errors" => ["Address Email address is already in use"]]], @json
+      end
     end
 
     context "with a json request" do
@@ -650,13 +644,14 @@ class UsersControllerTest < ActionController::TestCase
 
       should_change("User.count", :by => 1) { User.count }
 
+      should_respond_with_content_type "application/json"
+
       should "send json response with new user hash" do
         @json = JSON.parse(@response.body)
         @user = User.find_by_name("Joe Bloggs")
         assert_equal Hash["user" => Hash["id" => @user.id, "name" => "Joe Bloggs"]], @json
       end
 
-      should_respond_with_content_type "application/json"
       should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
     end
   end

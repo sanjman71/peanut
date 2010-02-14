@@ -87,7 +87,7 @@ class UsersController < ApplicationController
     # @user.email = @invitation.recipient_email if @invitation
 
     # initialize title
-    @title      = "#{@role.split[1].titleize} Signup"
+    @title = "#{@role.split[1].titleize} Signup"
 
     # check return_to param
     if params[:return_to]
@@ -146,13 +146,18 @@ class UsersController < ApplicationController
       # initialize the new user, and the redirect path
       @redirect_path = user_initialize(@company, @user, @role, @creator, @invitation)
     else
-      @error    = true
-      template  ='users/new'
+      @error         = true
+      template       ='users/new'
+      @redirect_path = request.referer
+      @title         = "#{@role.split[1].titleize} Signup"
+      @back_path     = params[:return_to] ? params[:return_to] : nil
     end
 
     respond_to do |format|
       if @error
         format.html { render(:template => template) }
+        format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+        format.json{ render(:json => Hash[:user => {:id => 0, :errors => @user.errors.full_messages}]) }
       else
         format.html { redirect_back_or_default(@redirect_path) }
         format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }

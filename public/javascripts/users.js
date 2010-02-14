@@ -62,20 +62,20 @@ $.fn.init_user_create_submit = function() {
     // serialize form
     data = $(this).serialize();
 
-    if (this.action.match(/.json$/)) {
-      // json request, handle json response
-      $.post(this.action, data, function(data) { add_user_response(data); }, "json");
-    } else {
-      // js, html request
-      $.post(this.action, data, null, "script");
-    }
-
-    // show progress
+    // show progress text
     $(this).find("div#submit").hide();
     $(this).find("div#progress").show();
-    return false;
+    
+    if (this.action.match(/.json$/)) {
+      // post json request and handle json response
+      $.post(this.action, data, function(data) { add_user_response(data); }, "json");
+      return false;
+    } else {
+      // post using regular form submit
+      return true;
+    }
   })
-  
+
   $("a#add_user_cancel_dialog").click(function() {
     // click on return dialog link
     $("a#add_user_return_dialog").click();
@@ -93,6 +93,7 @@ $.fn.init_user_create_submit = function() {
 
 // handle add user response:
 // - on success, response should have user hash containing id and name
+// - on failure, response should have user hash with id set to 0 and errors string
 function add_user_response(json) {
   //alert("user created: " + json.user.name);
 
@@ -100,8 +101,13 @@ function add_user_response(json) {
   $("form#add_user_form").find("div#progress").hide();
   $("form#add_user_form").find("div#submit").show();
 
-  // click the return dialog link
-  $("a#add_user_return_dialog").click();
+  if (json.user.id == 0) {
+    // report the error
+    alert(json.user.errors);
+  } else {
+    // click the return dialog link
+    $("a#add_user_return_dialog").click();
+  }
 }
 
 $.fn.init_user_update_submit = function() {

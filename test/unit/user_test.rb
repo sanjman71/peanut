@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class UserTest < ActiveSupport::TestCase
 
@@ -28,7 +27,7 @@ class UserTest < ActiveSupport::TestCase
         @user.preferences["custom hash"] = ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}]
         @user.preferences["meaning of life"] = 42
       end
-   
+
       should "have all preferences set" do
         assert_equal "banana", @user.preferences["favorite fruit"]
         assert_equal true, @user.preferences["private"]
@@ -36,9 +35,7 @@ class UserTest < ActiveSupport::TestCase
         assert_equal ["fruit" => ["apple", "pear", "plum"], "airplanes" => %W{Airbus, Boeing, Lockheed, SAAB}], @user.preferences["custom hash"]
         assert_equal 42, @user.preferences["meaning of life"]
       end
-      
     end
-    
   end
 
 end
