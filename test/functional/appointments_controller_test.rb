@@ -697,6 +697,10 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_not_change("message count") { Message.count }
         should_not_change("message topic") { MessageTopic.count }
         should_not_change("delayed job count") { Delayed::Job.count }
+
+        should "not set flash message with email confirmation" do
+          assert_nil flash[:notice].match(/A confirmation email will be sent to/)
+        end
       end
   
       context "to customer only" do
@@ -717,12 +721,16 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_change("message count", :by => 1) { Message.count }
         should_change("message topic", :by => 1) { MessageTopic.count }
         should_change("delayed job count", :by => 1) { Delayed::Job.count }
-  
+
         should "have appointment confirmation addressed to customer" do
           assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
         end
+
+        should "set flash message with email confirmation" do
+          assert flash[:notice].match(/A confirmation email will be sent to customer@walnutcalendar.com/)
+        end
       end
-  
+
       context "to provider only" do
         setup do
           @company.preferences[:work_appointment_confirmation_customer] = '0'
@@ -736,17 +744,21 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
-        # should send appt confirmation to customer
+
+        # should send appt confirmation to provider
         should_change("message count", :by => 1) { Message.count }
         should_change("message topic", :by => 1) { MessageTopic.count }
         should_change("delayed job count", :by => 1) { Delayed::Job.count }
-  
+
         should "have appointment confirmation addressed to provider" do
           assert_equal 1, MessageRecipient.for_messagable(@johnny.primary_email_address).size
         end
+
+        should "not set flash message with email confirmation" do
+          assert_nil flash[:notice].match(/A confirmation email will be sent to/)
+        end
       end
-  
+
       context "to managers only" do
         setup do
           @company.preferences[:work_appointment_confirmation_customer] = '0'
@@ -760,18 +772,22 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         # should send appt confirmation to all managers
         should_change("message count", :by => 2) { Message.count }
         should_change("message topic", :by => 2) { MessageTopic.count }
         should_change("delayed job count", :by => 2) { Delayed::Job.count }
-  
+
         should "have appointment confirmation addressed to owner and manager" do
           assert_equal 1, MessageRecipient.for_messagable(@owner.primary_email_address).size
           assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
+
+        should "not set flash message with email confirmation" do
+          assert_nil flash[:notice].match(/A confirmation email will be sent to/)
+        end
       end
-  
+
       context "to customer and managers" do
         setup do
           @company.preferences[:work_appointment_confirmation_customer] = '1'
@@ -785,22 +801,26 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         # should send appt confirmation to customer and all managers
         should_change("message count", :by => 3) { Message.count }
         should_change("message topic", :by => 3) { MessageTopic.count }
         should_change("delayed job count", :by => 3) { Delayed::Job.count }
-  
+
         should "have appointment confirmation addressed to customer" do
           assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
         end
-  
+
         should "have appointment confirmation addressed to owner and manager" do
           assert_equal 1, MessageRecipient.for_messagable(@owner.primary_email_address).size
           assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
+
+        should "set flash message with email confirmation" do
+          assert flash[:notice].match(/A confirmation email will be sent to customer@walnutcalendar.com/)
+        end
       end
-  
+
       context "with company email text" do
         setup do
           @email_text = "Appointment cancelations are allowed up to 24 hours before your appointment."
@@ -815,11 +835,11 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         should_assign_to(:confirmations, :class => Array)
-  
+
         should "have company email text as part of message body" do
-          @message = assigns(:confirmations).first
+          @who, @message = assigns(:confirmations).first
           assert_match /#{@email_text}/, @message.body
         end
       end
@@ -843,7 +863,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:confirmations, :class => Array)
   
         should "have provider email text as part of message body" do
-          @message = assigns(:confirmations).first
+          @who, @message = assigns(:confirmations).first
           assert_match /#{@provider_email_text}/, @message.body
         end
       end
@@ -865,16 +885,16 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         should_assign_to(:confirmations, :class => Array)
-  
+
         should "have company email text as part of message body" do
-          @message = assigns(:confirmations).first
+          @who, @message = assigns(:confirmations).first
           assert_match /#{@company_email_text}\n\n#{@provider_email_text}/, @message.body
         end
       end
     end
-  
+
     context "with appointment customer reminders" do
       context "turned on" do
         setup do

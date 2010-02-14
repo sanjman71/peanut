@@ -158,8 +158,11 @@ class AppointmentsController < ApplicationController
                                   :manager => current_company.preferences[:work_appointment_confirmation_manager],
                                   :provider => current_company.preferences[:work_appointment_confirmation_provider]]
             @confirmations = MessageComposeAppointment.confirmations(@appointment, @preferences, {:company => current_company})
-            # tell the user their confirmation email is being sent
-            flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
+            # check if customer confirmation was sent
+            if @confirmations.any? { |who, message| who == :customer }
+              # add flash message
+              flash[:notice] += "<br/>A confirmation email will be sent to #{@customer.email_address}."
+            end
           rescue Exception => e
             logger.debug("[error] create appointment error sending message: #{e.message}")
             @errors[date] = "There was a problem sending a confirmation email." + e.message
