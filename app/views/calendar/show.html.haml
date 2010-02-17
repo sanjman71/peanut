@@ -31,7 +31,7 @@
         = link_to "Add a Weekly Schedule", new_weekly_path
     .span-6.last#pdf
       %h4.bold.bottom== PDF Schedules:
-      = link_to 'Today', calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today'
+      = link_to "Today, #{@today.to_s(:appt_short_month_day)}", calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today'
       == &nbsp;or&nbsp;
       = link_to 'Pick a Date Range', '', :id => 'pdf_schedule_date_range'
       
