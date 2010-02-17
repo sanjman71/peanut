@@ -68,13 +68,38 @@ class TasksControllerTest < ActionController::TestCase
       should_assign_to(:number) { '1' }
       should_assign_to(:units) { 'day' }
       should_assign_to(:appointments) { [@work_appt] }
-      should_assign_to(:messages) { 1 }
+      should_assign_to(:messages)
 
       should_change("Message.count", :by => 1) { Message.count }
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
 
       should "add appointment message topic tag" do
         assert_equal ['reminder'], @work_appt.message_topics.collect(&:tag)
+      end
+
+      should "set message preferences template" do
+        @message = assigns(:messages).first
+        assert_equal :appointment_reminder, @message.reload.preferences[:template]
+      end
+
+      should "set message preferences provider" do
+        @message = assigns(:messages).first
+        assert_equal "Provider", @message.reload.preferences[:provider]
+      end
+
+      should "set message preferences service" do
+        @message = assigns(:messages).first
+        assert_equal "Work Service", @message.reload.preferences[:service]
+      end
+
+      should "set message preferences customer" do
+        @message = assigns(:messages).first
+        assert_equal "Customer", @message.reload.preferences[:customer]
+      end
+
+      should "set message preferences when" do
+        @message = assigns(:messages).first
+        assert @message.reload.preferences[:when]
       end
 
       should_respond_with :success
@@ -93,7 +118,7 @@ class TasksControllerTest < ActionController::TestCase
       should_assign_to(:number) { '1' }
       should_assign_to(:units) { 'day' }
       should_assign_to(:appointments) { [@work_appt] }
-      should_assign_to(:messages) { 0 }
+      should_assign_to(:messages) { [] }
 
       should_respond_with :success
       should_render_template 'tasks/appointment_reminders.html.haml'
@@ -111,7 +136,7 @@ class TasksControllerTest < ActionController::TestCase
       should_assign_to(:number) { '1' }
       should_assign_to(:units) { 'day' }
       should_assign_to(:appointments) { [@work_appt] }
-      should_assign_to(:messages) { 0 }
+      should_assign_to(:messages) { [] }
 
       should_not_change("Message.count") { Message.count }
       should_not_change("delayed job count") { Delayed::Job.count }

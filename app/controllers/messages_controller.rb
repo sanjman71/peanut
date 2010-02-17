@@ -46,12 +46,12 @@ class MessagesController < ApplicationController
       @messagable = EmailAddress.find_by_address(@address)
       @recipients.push(@messagable) if @messagable
     end
-    
+
     if @recipients.empty?
       # message must have at least 1 recipient
       flash[:error] = "Message has no recipients"
     else
-      @message = MessageCompose.send(@sender, @subject, @body, @recipients, @topic, @tag)
+      @message = MessageCompose.send(@sender, @subject, @body, @recipients, {:topic => @topic, :tag => @tag})
 
       if @message
         flash[:notice] = "Message sent"

@@ -6,7 +6,7 @@
     %h5= link_to 'Back to Tasks', tasks_path
     %h5.bottom
       == Found #{pluralize(@appointments.size, 'appointment')} #{@timeline},
-      == sent #{pluralize(@messages, 'message')}
+      == sent #{pluralize(@messages.size, 'message')}
 
   %hr.space
 

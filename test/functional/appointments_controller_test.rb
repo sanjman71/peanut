@@ -716,7 +716,7 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         # should send appt confirmation to customer
         should_change("message count", :by => 1) { Message.count }
         should_change("message topic", :by => 1) { MessageTopic.count }
@@ -724,6 +724,31 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should "have appointment confirmation addressed to customer" do
           assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+
+        should "set message preferences template" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal :appointment_confirmation, @message.reload.preferences[:template]
+        end
+
+        should "set message preferences provider" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal "Johnny", @message.reload.preferences[:provider]
+        end
+
+        should "set message preferences service" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal "Haircut", @message.reload.preferences[:service]
+        end
+
+        should "set message preferences customer" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal "Customer", @message.reload.preferences[:customer]
+        end
+
+        should "set message preferences when" do
+          @who, @message = assigns(:confirmations).first
+          assert @message.reload.preferences[:when]
         end
 
         should "set flash message with email confirmation" do
@@ -769,7 +794,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
@@ -798,7 +823,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
@@ -832,15 +857,15 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
         should_assign_to(:confirmations, :class => Array)
 
-        should "have company email text as part of message body" do
+        should "set message preferences footers with company email text" do
           @who, @message = assigns(:confirmations).first
-          assert_match /#{@email_text}/, @message.body
+          assert_equal [@email_text], @message.reload.preferences[:footers]
         end
       end
   
@@ -859,12 +884,12 @@ class AppointmentsControllerTest < ActionController::TestCase
                {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
-  
+
         should_assign_to(:confirmations, :class => Array)
-  
-        should "have provider email text as part of message body" do
+
+        should "set message preferences footers with provider email text" do
           @who, @message = assigns(:confirmations).first
-          assert_match /#{@provider_email_text}/, @message.body
+          assert_equal [@provider_email_text], @message.reload.preferences[:footers]
         end
       end
   
@@ -882,15 +907,15 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id}
         end
 
         should_assign_to(:confirmations, :class => Array)
 
-        should "have company email text as part of message body" do
+        should "set messages preferences footers with company email text and provider email text" do
           @who, @message = assigns(:confirmations).first
-          assert_match /#{@company_email_text}\n\n#{@provider_email_text}/, @message.body
+          assert_equal [@company_email_text, @provider_email_text], @message.preferences[:footers]
         end
       end
     end
@@ -903,7 +928,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '1'}
         end
   
@@ -920,7 +945,7 @@ class AppointmentsControllerTest < ActionController::TestCase
           # create work appointment, today from 10 am to 12 pm local time
           @request.env['HTTP_REFERER'] = '/users/0/calendar'
           post :create_work,
-               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => "#{@johnny.id}",
+               {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
                 :service_id => @haircut.id, :customer_id => @customer.id, :preferences_reminder_customer => '0'}
         end
   

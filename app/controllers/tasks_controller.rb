@@ -15,7 +15,7 @@ class TasksController < ApplicationController
   def appointment_messages
     # find appointments with messages
     @appointments = current_company.appointments.work.all(:include => :message_topics)
-    @messages     = 0
+    @messages     = []
     @timeline     = ''
 
     @title        = "Tasks - Appointment Messages"
@@ -36,7 +36,7 @@ class TasksController < ApplicationController
 
     # find all future appointments within the specified time span
     @appointments   = current_company.appointments.work.future.not_canceled.all(:conditions => ["start_at <= ?", Time.zone.now + eval("#{@number}.#{@units}")], :include => :message_topics)
-    @messages       = 0
+    @messages       = []
 
     @appointments.each do |appointment|
       # check that appointment customer reminders are turned on
@@ -49,7 +49,7 @@ class TasksController < ApplicationController
       case
       when !message.blank?
         # reminder message was queued/sent
-        @messages += 1
+        @messages.push(message)
         # reload appointment object
         appointment.reload
       end
@@ -67,7 +67,7 @@ class TasksController < ApplicationController
   def user_messages
     # find users as message topics
     @topics       = MessageTopic.for_type(User).all(:include => :topic)
-    @messages     = 0
+    @messages     = []
     @title        = "Tasks - User Messages"
 
     respond_to do |format|
