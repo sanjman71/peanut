@@ -547,7 +547,7 @@ class AppointmentTest < ActiveSupport::TestCase
     
   context "create one valid recurring free private appointment" do
     setup do
-      @start_at       = Time.zone.now.beginning_of_day
+      @start_at       = Time.zone.now.beginning_of_day + 9.hours
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 8.weeks
       @recur_days     = "#{ical_days([@start_at.utc, (@start_at + 4.days).utc])}"
@@ -563,10 +563,10 @@ class AppointmentTest < ActiveSupport::TestCase
     
     should_not_change("Appointment.public.count") { Appointment.public.count }
     
-    should "have duration of 2 hours and start at 00:00 and finish at 02:00" do
+    should "have duration of 2 hours and start at 09:00 and finish at 11:00" do
       assert_equal 2.hours, @recurrence.duration
-      assert_equal 0, @recurrence.start_at.in_time_zone.hour
-      assert_equal 2, @recurrence.end_at.in_time_zone.hour
+      assert_equal 9, @recurrence.start_at.in_time_zone.hour
+      assert_equal 11, @recurrence.end_at.in_time_zone.hour
     end
     
     should "have a valid uid" do
@@ -589,21 +589,21 @@ class AppointmentTest < ActiveSupport::TestCase
       
       should_not_change("Appointment.public.count") { Appointment.public.count }
       
-      should "have instances with duration of 2 hours and start at 00:00 and finish at 02:00" do
+      should "have instances with duration of 2 hours and start at 09:00 and finish at 11:00" do
         @recurrence.recur_instances.each do |a|
           assert_equal 2.hours, a.duration
-          assert_equal 0, a.start_at.in_time_zone.hour
-          assert_equal 2, a.end_at.in_time_zone.hour
-          assert_equal (0.hours - Time.zone.utc_offset) % 24.hours, a.time_start_at
-          assert_equal (2.hours - Time.zone.utc_offset) % 24.hours, a.time_end_at
+          assert_equal 9, a.start_at.in_time_zone.hour
+          assert_equal 11, a.end_at.in_time_zone.hour
+          assert_equal (9.hours - a.start_at.utc_offset) % 24.hours, a.time_start_at
+          assert_equal (11.hours - a.end_at.utc_offset) % 24.hours, a.time_end_at
         end
       end
       
-      should "have instances with capacity slots with a duration of 2 hours and start at 0000 and finish at 0200" do
+      should "have instances with capacity slots with a duration of 2 hours and start at 09:00 and finish at 11:00" do
         @recurrence.recur_instances.each do |a|
           assert_equal 2.hours, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.duration
-          assert_equal 0, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.start_at.in_time_zone.hour
-          assert_equal 2, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.end_at.in_time_zone.hour
+          assert_equal 9, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.start_at.in_time_zone.hour
+          assert_equal 11, @company.capacity_slots.provider(@provider).general_location(Location.anywhere).first.end_at.in_time_zone.hour
         end
       end
       
@@ -683,8 +683,8 @@ class AppointmentTest < ActiveSupport::TestCase
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
             assert_equal 3.hours, a.duration
-            assert_equal 0, a.start_at.in_time_zone.hour
-            assert_equal 3, a.end_at.in_time_zone.hour
+            assert_equal 9, a.start_at.in_time_zone.hour
+            assert_equal 12, a.end_at.in_time_zone.hour
           end
         end
       
@@ -707,8 +707,8 @@ class AppointmentTest < ActiveSupport::TestCase
         should "not change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
             assert_equal 2.hours, a.duration
-            assert_equal 0, a.start_at.in_time_zone.hour
-            assert_equal 2, a.end_at.in_time_zone.hour
+            assert_equal 9, a.start_at.in_time_zone.hour
+            assert_equal 11, a.end_at.in_time_zone.hour
           end
         end
       
@@ -732,8 +732,8 @@ class AppointmentTest < ActiveSupport::TestCase
         should "change appointments' end time and duration" do
           @recurrence.recur_instances.each do |a|
             assert_equal 3.hours, a.duration
-            assert_equal 0, a.start_at.in_time_zone.hour
-            assert_equal 3, a.end_at.in_time_zone.hour
+            assert_equal 9, a.start_at.in_time_zone.hour
+            assert_equal 12, a.end_at.in_time_zone.hour
           end
         end
       
@@ -741,7 +741,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then create a second recurrence" do
         setup do
-          # Create the second recurrence starting after the first (the first goes from 0000 to 0200, this second will go from 0400 to 0430)
+          # Create the second recurrence starting before the first (the first goes from 0900 to 1100, this second will go from 0400 to 0430)
           @start_at       = Time.zone.now.beginning_of_day + 4.hours
           @end_at         = @start_at + 30.minutes
           @end_recurrence = @start_at + 8.weeks
@@ -844,7 +844,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create a recurring free public appointment ending in 13 days" do
     setup do
-      @start_at       = Time.zone.now.beginning_of_day.utc
+      @start_at       = Time.zone.now.beginning_of_day.utc + 9.hours
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 13.days
       @recur_days     = "#{ical_days([(@start_at)])}"
@@ -865,7 +865,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create a recurring free public appointment with no end instantiating 3 instances" do
     setup do
-      @start_at   = Time.zone.now.beginning_of_day.utc
+      @start_at   = Time.zone.now.beginning_of_day.utc + 9.hours
       @end_at     = @start_at + 2.hours
       @recur_days = "#{ical_days([(@start_at + 3.days)])}"
       @recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
@@ -887,7 +887,7 @@ class AppointmentTest < ActiveSupport::TestCase
   
   context "create a recurring free public appointment which ends in the past" do
     setup do
-      @now            = Time.zone.now.beginning_of_day.utc
+      @now            = Time.zone.now.beginning_of_day.utc + 9.hours
       @start_at       = @now - 6.months
       @end_at         = @start_at + 2.hours
       @end_recurrence = @start_at + 4.weeks
