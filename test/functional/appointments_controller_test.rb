@@ -751,6 +751,11 @@ class AppointmentsControllerTest < ActionController::TestCase
           assert @message.reload.preferences[:when]
         end
 
+        should "set message preferences signature template" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+        end
+
         should "set flash message with email confirmation" do
           assert flash[:notice].match(/A confirmation email will be sent to customer@walnutcalendar.com/)
         end
