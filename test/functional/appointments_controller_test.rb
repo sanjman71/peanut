@@ -868,9 +868,14 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should_assign_to(:confirmations, :class => Array)
 
-        should "set message preferences footers with company email text" do
+        should "set message preferences footer_company" do
           @who, @message = assigns(:confirmations).first
-          assert_equal [@email_text], @message.reload.preferences[:footers]
+          assert_equal @email_text, @message.reload.preferences[:footer_company]
+        end
+
+        should "not set message preferences footer_provider" do
+          @who, @message = assigns(:confirmations).first
+          assert_nil @message.reload.preferences[:footer_provider]
         end
       end
   
@@ -892,9 +897,14 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should_assign_to(:confirmations, :class => Array)
 
-        should "set message preferences footers with provider email text" do
+        should "set message preferences footer_provider" do
           @who, @message = assigns(:confirmations).first
-          assert_equal [@provider_email_text], @message.reload.preferences[:footers]
+          assert_equal @provider_email_text, @message.reload.preferences[:footer_provider]
+        end
+
+        should "not set message preferences footer_company" do
+          @who, @message = assigns(:confirmations).first
+          assert_nil @message.reload.preferences[:footer_company]
         end
       end
   
@@ -918,9 +928,14 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should_assign_to(:confirmations, :class => Array)
 
-        should "set messages preferences footers with company email text and provider email text" do
+        should "set message preferences footer_provider" do
           @who, @message = assigns(:confirmations).first
-          assert_equal [@company_email_text, @provider_email_text], @message.preferences[:footers]
+          assert_equal @provider_email_text, @message.reload.preferences[:footer_provider]
+        end
+
+        should "set message preferences footer_company" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal @company_email_text, @message.reload.preferences[:footer_company]
         end
       end
     end

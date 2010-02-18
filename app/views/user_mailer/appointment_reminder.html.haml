@@ -13,6 +13,11 @@
     %td== When:
     %td= @when
 
-- unless @footers.blank?
-  - @footers.each do |footer|
-    %p= footer
+- unless @footer_provider.blank?
+  %p= @footer_provider
+
+- unless @footer_company.blank?
+  %p= @footer_company
+
+- unless @signature_template.blank?
+  = render(:partial => "#{@signature_template}.html.haml")
