@@ -48,19 +48,19 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    if has_privilege?('read wait appointments', current_company)
-
-      # 'Waitlist' tab
-      name    = 'Waitlist'
-      path    = waitlist_index_path
-      klasses = []
-
-      if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
-        klasses.push('current')
-      end
-
-      yield name, path, klasses
-    end
+    # if has_privilege?('read wait appointments', current_company)
+    # 
+    #   # 'Waitlist' tab
+    #   name    = 'Waitlist'
+    #   path    = waitlist_index_path
+    #   klasses = []
+    # 
+    #   if current_controller.controller_name == 'waitlist' and ['index'].include?(current_controller.action_name)
+    #     klasses.push('current')
+    #   end
+    # 
+    #   yield name, path, klasses
+    # end
 
     if has_privilege?('read services', current_company)
     
@@ -88,13 +88,10 @@ module ApplicationHelper
       end
 
       yield name, path, klasses
-    end
-
-    if has_privilege?('create users', current_company)
 
       # 'Customers' tab
       name    = 'Customers'
-      path    = customers_path(:subdomain => @subdomain)
+      path    = customers_path
       klasses = []
 
       if current_controller.controller_name == 'customers' and ['index', 'show'].include?(current_controller.action_name)
