@@ -163,6 +163,16 @@ $.fn.init_user_add_phone = function() {
   })
 }
 
+$.fn.init_user_add_password = function() {
+  $("a#add_password").click(function() {
+    // show phone fields
+    $("div.password.hide").show();
+    // hide link
+    $(this).hide();
+    return false;
+  })
+}
+
 $.fn.init_manager_reset_password = function() {
   $("a#manager_reset_password").click(function() {
     $.post($(this).attr('href'), {email:$(this).attr('email')}, null, "script");
@@ -307,6 +317,7 @@ $(document).ready(function() {
   $(document).init_toggle_user_company_manager();  // re-bind after an ajax call using jquery live()
   $(document).init_user_add_email();
   $(document).init_user_add_phone();
+  $(document).init_user_add_password();
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
   $(document).init_manager_reset_password();

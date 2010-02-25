@@ -6,7 +6,7 @@ class PasswordsControllerTest < ActionController::TestCase
   should_route :post, '/password/reset', :controller => 'passwords', :action => 'reset'
 
   def setup
-    @user  = Factory(:user)
+    @user  = Factory(:user, :password => 'secret', :password_confirmation => 'secret')
     @email = @user.email_addresses.create(:address => "sanjay@walnut.com")
   end
   
