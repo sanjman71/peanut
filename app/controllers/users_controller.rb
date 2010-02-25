@@ -110,17 +110,12 @@ class UsersController < ApplicationController
   # POST /providers/create
   def create
     # @role (always) and @invitation (if it exists) are initialized in a before filter
-    
+
     # xxx - temporarily disable this
     # logout_keeping_session!
 
     # initialize creator, default to anonymous
     @creator = params[:creator] ? params[:creator] : 'anonymous'
-    
-    if @creator == 'user' and (params[:user][:password].blank? and params[:user][:password_confirmation].blank?)
-      # generate random password for the new user
-      params[:user][:password] = :random
-    end
 
     # check if user create is for a public or private company
     if !logged_in? and current_company and current_company.preferences[:public].to_i == 0
@@ -132,10 +127,6 @@ class UsersController < ApplicationController
     # create user
     @user = User.create(params[:user])
 
-    # @user.register! if @user && @user.valid?
-    # success = @user && @user.valid?
-
-    # if success && @user.errors.empty?
     if @user.valid?
       # if there was an invitation, use the invitation company; otherwise use the current company
       @company = @invitation ? @invitation.company : current_company

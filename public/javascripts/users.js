@@ -26,8 +26,9 @@ $.fn.init_toggle_user_company_manager = function() {
 
 $.fn.init_user_create_submit = function() {
   $("form#add_user_form").submit(function() {
-    var user_name     = $("input#user_name").attr('value');
-    var name_required = $("input#user_name").hasClass('required');
+    var user_name         = $("input#user_name").attr('value');
+    var name_required     = $("input#user_name").hasClass('required');
+    var password_required = $("input#user_password").hasClass('required');
 
     if (name_required && user_name == '') {
       alert("Please enter a user name");
@@ -55,7 +56,7 @@ $.fn.init_user_create_submit = function() {
     if (errors > 0) { return false; }
 
     // check password fields
-    if (check_user_password_fields("form#add_user_form", true) == false) {
+    if (check_user_password_fields("form#add_user_form", password_required) == false) {
       return false;
     }
 

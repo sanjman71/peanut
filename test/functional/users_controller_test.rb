@@ -597,14 +597,15 @@ class UsersControllerTest < ActionController::TestCase
                       }
       end
 
-      should_not_change("User.count") { User.count }
-      should_not_change("PhoneNumber.count") { PhoneNumber.count}
+      should_change("User.count") { User.count }
+      should_change("PhoneNumber.count") { PhoneNumber.count}
 
       should_respond_with_content_type "application/json"
 
-      should "send json response with errors user hash" do
+      should "send json response with new user hash" do
         @json = JSON.parse(@response.body)
-        assert_equal Hash["user" => Hash["id" => 0, "errors" => ["Address Phone number is already in use"]]], @json
+        @user = User.find_by_name("Joe Bloggs")
+        assert_equal Hash["user" => Hash["id" => @user.id, "name" => "Joe Bloggs"]], @json
       end
     end
 
@@ -631,6 +632,30 @@ class UsersControllerTest < ActionController::TestCase
       end
     end
 
+    context "with a json request with empty password and confirmation" do
+      setup do
+        # stub current user as the company owner
+        @controller.stubs(:current_user).returns(@owner)
+        # set flash discard expectation
+        ActionController::Flash::FlashHash.any_instance.expects(:discard).once
+        post :create, {:format => "json", :role => 'company customer',
+                       :creator => 'user',
+                       :user => {:name => "Joe Bloggs", :password => '', :password_confirmation => ''}}
+      end
+
+      should_change("User.count", :by => 1) { User.count }
+
+      should_respond_with_content_type "application/json"
+
+      should "send json response with new user hash" do
+        @json = JSON.parse(@response.body)
+        @user = User.find_by_name("Joe Bloggs")
+        assert_equal Hash["user" => Hash["id" => @user.id, "name" => "Joe Bloggs"]], @json
+      end
+
+      should_set_the_flash_to /Customer Joe Bloggs was successfully created/i
+    end
+
     context "with a json request" do
       setup do
         # stub current user as the company owner
@@ -639,7 +664,7 @@ class UsersControllerTest < ActionController::TestCase
         ActionController::Flash::FlashHash.any_instance.expects(:discard).once
         post :create, {:format => "json", :role => 'company customer',
                        :creator => 'user',
-                       :user => {:name => "Joe Bloggs", :password => "secret", :password_confirmation => 'secret'}}
+                       :user => {:name => "Joe Bloggs", :password => 'secret', :password_confirmation => 'secret'}}
       end
 
       should_change("User.count", :by => 1) { User.count }

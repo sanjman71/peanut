@@ -5,11 +5,14 @@
 -# check for role
 - role        = nil unless local_assigns[:role]
 
+- user_password = 'required' unless local_assigns[:user_password]
+- user_phone    = 'optional' unless local_assigns[:user_phone]
+
 - if creator == 'user' and role == 'company customer'
   -# users creating customers means that the user email is optional
-  - user_email_flag = 'optional'
+  - user_email = 'optional'
 - else
-  - user_email_flag = 'required'
+  - user_email = 'required'
 
 .span-12.last.mat
   -# form title
@@ -41,7 +44,7 @@
           .span-4
             %h3.text-align-right.padding-top-10== Email:
           .span-8.last
-            = email_form.text_field :address, :class => ['title', 'big', user_email_flag].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'email_address'
+            = email_form.text_field :address, :class => ['title', 'big', user_email].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'email_address'
 
     -# phone nested field
     - user_form.fields_for :phone_numbers do |phone_form|
@@ -50,7 +53,7 @@
           .span-4
             %h3.text-align-right.padding-top-15== Phone:
           .span-8.last
-            = phone_form.text_field :address, :class => 'title big', :style => "width: 275px;", :id => 'phone_address'
+            = phone_form.text_field :address, :class => ['title', 'big', user_phone].join(' '), :style => "width: 275px;", :id => 'phone_address'
             - if phone_form.object.verified?
               %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
         .span-12.last.padding-bottom-10
@@ -64,7 +67,7 @@
       .span-4
         %h3.text-align-right.padding-top-10== Password:
       .span-8.last
-        = user_form.password_field :password, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
+        = user_form.password_field :password, :class => ['title', 'big', user_password].join(' '), :style => 'width: 275px; margin: 0px;'
         
     .span-12.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
       .span-4

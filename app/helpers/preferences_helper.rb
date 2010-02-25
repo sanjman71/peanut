@@ -36,6 +36,13 @@ module PreferencesHelper
     ]
   end
 
+  def customer_password_options
+    [
+      ["Required", "required"],
+      ["Optional", "optional"]
+    ]
+  end
+
   def yes_no_options
     [
       ["Yes", "1"],

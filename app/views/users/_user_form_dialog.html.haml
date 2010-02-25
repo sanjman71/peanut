@@ -1,12 +1,13 @@
 -# if there is a user logged in, this user is being created by somebody else as their proxy
-- creator     = current_user ? "user" : "anonymous"
+- creator       = current_user ? "user" : "anonymous"
 -# check for an invitation
-- invitation  = nil unless local_assigns[:invitation]
+- invitation    = nil unless local_assigns[:invitation]
 -# check for role
-- role        = nil unless local_assigns[:role]
--# check email, phone flags
-- user_phone  = 'optional' unless local_assigns[:user_phone]
-- user_email  = 'optional' unless local_assigns[:user_email]
+- role          = nil unless local_assigns[:role]
+-# check email, phone, password flags
+- user_phone    = 'optional' unless local_assigns[:user_phone]
+- user_email    = 'optional' unless local_assigns[:user_email]
+- user_password = 'required' unless local_assigns[:user_password]
 
 .span-15.last.dialog.hide#add_user_dialog{:title => title}
   -# show any user errors
@@ -55,8 +56,9 @@
       .span-3.padding-top-10.label
         %h4.bottom.block== Password:
       .span-12.last
-        = user_form.password_field :password, :class => 'title big required', :autocomplete => 'off'
-        
+        = user_form.password_field :password, :class => ['title', 'big', user_password].join(' '), :autocomplete => 'off'
+        %em= user_password
+  
     .span-15.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
       .span-3.padding-top-10.label
         %h4.bottom.block.small== Confirm password:
