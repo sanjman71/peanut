@@ -46,9 +46,6 @@
           - if email_form.object.deletable? and (email_form.object != @primary_email_address)
             -# allow delete for non-primary emails
             - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin'))
-          - if @user.password? and !email_form.object.new_record?
-            -# allow password reset
-            - markers.push(link_to('Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => email_form.object.address))
 
         - unless markers.empty?
           %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
@@ -91,11 +88,19 @@
         %h4= link_to 'Add Phone', '#', :class => 'admin', :id => 'add_phone'
 
   - unless @user.rpx?
-    - if @user.crypted_password.blank? and (has_privilege?('update users', @user) || has_privilege?('update users', current_company))
-      -# add password link
-      .span-20.last#add_password
-        .span-4.append-16.last.text-align-right
-          %h4= link_to 'Add Password', '#', :class => 'admin', :id => 'add_password'
+    - password_links = []
+    - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
+      - if @user.crypted_password.blank?
+        -# add password link
+        .span-20.last#add_password
+          .span-4.append-16.last.text-align-right
+            %h4= link_to 'Add Password', '#', :class => 'admin', :id => 'add_password'
+      - else
+        - if !@primary_email_address.blank?
+          -# password reset link
+          - password_links.push(link_to('Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @primary_email_address.address))
+        -# possword clear link
+        - password_links.push(link_to('Clear password', password_clear_path, :class => 'admin', :id => 'clear_password'))
 
     .span-20.last.password#password_and_confirmation{:class => @user.crypted_password.blank? ? 'hide' : ''}
       -# password
@@ -104,6 +109,8 @@
           %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "user_password", "Password:"
         .span-16.last
           = f.password_field :password, :class => 'text title', :style => "width: 300px;"
+          - unless password_links.empty?
+            %span{:style => 'padding-left: 7px; font-weight: bold;'}= password_links.join(", ")
 
       -# password confirmation
       .span-20.last
@@ -136,7 +143,6 @@
         %h3.bottom= label_tag "preferences_provider_email_daily_schedule", "Daily Schedule:"
       .span-16.last
         = f.select :preferences_provider_email_daily_schedule, yes_no_options, {:style => 'margin-top: 5px;', :class => 'select big'}
-        -#= f.text_area :preferences_provider_email_text, :style => 'width: 550px; height: 100px;'
     .span-16.prepend-4.last.hint.padding-bottom-10
       %em== If 'yes', a daily schedule will be emailed to you every day.
 

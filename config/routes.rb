@@ -12,6 +12,7 @@ ActionController::Routing::Routes.draw do |map|
   # password routes
   map.password_forgot '/password/forgot', :controller => 'passwords', :action => 'forgot'
   map.password_reset  '/password/reset', :controller => 'passwords', :action => 'reset', :conditions => {:method => :post}
+  map.password_clear  '/users/:id/password/clear', :controller => 'passwords', :action => 'clear', :conditions => {:method => :put}
   
   # user activation
   map.activate      '/activate/:activation_code', :controller => 'users', :action => 'activate', :activation_code => nil 

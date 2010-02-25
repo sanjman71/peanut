@@ -173,6 +173,13 @@ $.fn.init_user_add_password = function() {
   })
 }
 
+$.fn.init_clear_password = function() {
+  $("a#clear_password").click(function() {
+    $.put($(this).attr('href'), {}, null, "script");
+    return false;
+  })
+}
+
 $.fn.init_manager_reset_password = function() {
   $("a#manager_reset_password").click(function() {
     $.post($(this).attr('href'), {email:$(this).attr('email')}, null, "script");
@@ -320,6 +327,7 @@ $(document).ready(function() {
   $(document).init_user_add_password();
   $(document).init_user_update_submit();
   $(document).init_user_create_submit();
+  $(document).init_clear_password();
   $(document).init_manager_reset_password();
   $(document).init_user_add_dialog();
   $(document).init_user_login_dialog();

@@ -1,4 +1,7 @@
 class PasswordsController < ApplicationController
+  before_filter :init_user, :only => [:clear]
+
+  privilege_required_any  'update users', :only => [:clear], :on => [:user, :current_company]
 
   # GET /password/forgot
   def forgot
@@ -41,6 +44,27 @@ class PasswordsController < ApplicationController
       format.html { redirect_to(@redirect_path) and return }
       format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
+  end
+
+  # PUT /users/1/password/clear
+  def clear
+    # clear password
+    @user.update_attribute(:crypted_password, nil)
+
+    # redirect to referer and set flash
+    @redirect_path = request.referer
+    flash[:notice] = "User #{@user.name}'s password was removed, allowing the user to login without a password."
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+    end
+  end
+
+  protected
+
+  def init_user
+    @user = User.find(params[:id])
   end
 
 end
