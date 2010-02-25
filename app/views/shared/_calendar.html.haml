@@ -18,6 +18,8 @@
 - today                     = DateRange.today unless local_assigns[:today]
 - add_free_appointment_link = 0 unless local_assigns[:add_free_appointment_link]
 - add_work_appointment_link = 0 unless local_assigns[:add_work_appointment_link]
+-# show add menu only if there is at least 1 add menu link
+- add_menu                  = (add_free_appointment_link == 1 || add_work_appointment_link == 1) ? 1 : 0
 
 - if current_company
   - extra_days_at_start = (start_day.wday - current_company.preferences[:start_wday].to_i) % 7
@@ -69,7 +71,8 @@
               .date{:style => 'padding-bottom: 3px;'}
                 = (day.to_s(:appt_schedule_day) == today.to_s(:appt_schedule_day)) ? 'Today' : day.strftime("%b %d")
                 %span#calendar_add_menu{:style => 'visibility: hidden; position: relative;'}
-                  = link_to image_tag('add2.png', :size => '16x16', :style => 'padding-top: 3px;'), '#', :title => 'Add Free Time', :class => 'admin image', :id => 'calendar_add_menu'
+                  - if add_menu == 1
+                    = link_to image_tag('add2.png', :size => '16x16', :style => 'padding-top: 3px;'), '#', :title => 'Add Free Time', :class => 'admin image', :id => 'calendar_add_menu'
                   -# menu links
                   %ul#calendar_add_menu_links.calendar.menu.hide
                     %li= link_to 'Add Appointment', '', :id => 'calendar_add_work_appointment' if add_work_appointment_link == 1

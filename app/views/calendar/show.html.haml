@@ -61,8 +61,16 @@
 
     -# show free, work calendar
     .span-15.last#free_work_calendar
+      -# show add free and work appointments menu items if we have appropriate privileges
+      - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
+        - add_free_link = 1
+        -# now check if the provider provides any services
+        - add_work_link = @services.empty? ? 0 : 1
+      - else
+        - add_free_link = 0
+        - add_work_link = 0
       = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today, |
-                                                          :add_free_appointment_link => 1, :add_work_appointment_link => @services.empty? ? 0 : 1}) |
+                                                          :add_free_appointment_link => add_free_link, :add_work_appointment_link => add_work_link}) |
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide

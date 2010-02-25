@@ -101,6 +101,18 @@ class CalendarControllerTest < ActionController::TestCase
       should "show date range name" do
         assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
       end
+  
+      should "have calendar add menu link" do
+        assert_select "a#calendar_add_menu"
+      end
+
+      should "have calendar add work appointment link" do
+        assert_select "a#calendar_add_work_appointment"
+      end
+
+      should "have calendar add free appointment link" do
+        assert_select "a#calendar_add_free_appointment"
+      end
 
       should "have hidden add work appointment form" do
         assert_select "div.dialog.hide#add_work_appointment_dialog", 1
@@ -206,6 +218,18 @@ class CalendarControllerTest < ActionController::TestCase
 
     should "show date range name" do
       assert_select "h4.calendar.date_range_name", {:count => 1, :text => assigns(:daterange).name(:with_dates => true)}
+    end
+
+    should "not have calendar add menu link" do
+      assert_select "a#calendar_add_menu", 0
+    end
+
+    should "not have calendar add work appointment link" do
+      assert_select "a#calendar_add_work_appointment", 0
+    end
+
+    should "not have calendar add free appointment link" do
+      assert_select "a#calendar_add_free_appointment", 0
     end
 
     should "not show add appointment form" do
