@@ -848,7 +848,8 @@ class UsersControllerTest < ActionController::TestCase
       context "and change name" do
         setup do
           @controller.stubs(:current_user).returns(@owner)
-          put :update, :id => @customer.id, :role => 'company customer', :user => {:name => "Customer Chg", :password => '', :password_confirmation => ''}
+          put :update, :id => @customer.id, :role => 'company customer', 
+              :user => {:name => "Customer Chg", :password => '', :password_confirmation => ''}
         end
 
         should "change name" do
@@ -882,7 +883,8 @@ class UsersControllerTest < ActionController::TestCase
         setup do
           @controller.stubs(:current_user).returns(@owner)
           @email = @customer.primary_email_address
-          put :update, :id => @customer.id, :role => 'company customer', :user => {:email_addresses_attributes => {"0" => {:address => "anyone@walnut.com", :id => @email.id}}}
+          put :update, :id => @customer.id, :role => 'company customer', 
+              :user => {:email_addresses_attributes => {"0" => {:address => "anyone@walnut.com", :id => @email.id}}}
         end
         
         should "change email" do
@@ -895,7 +897,8 @@ class UsersControllerTest < ActionController::TestCase
       context "and add phone number" do
         setup do
           @controller.stubs(:current_user).returns(@owner)
-          put :update, :id => @customer.id, :role => 'company customer', :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
+          put :update, :id => @customer.id, :role => 'company customer', 
+              :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
         end
         
         should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
@@ -919,7 +922,7 @@ class UsersControllerTest < ActionController::TestCase
 
     context "with 'manage site' privilege" do
       setup do
-        @request.env['HTTP_REFERER'] = 'http://test.com/users'
+        # @request.env['HTTP_REFERER'] = 'http://test.com/users'
         @owner.grant_role('admin')
         @controller.stubs(:current_user).returns(@owner)
         get :sudo, :id => @customer.id
@@ -927,7 +930,7 @@ class UsersControllerTest < ActionController::TestCase
 
       should_assign_to(:sudo_user) { @customer}
 
-      should_redirect_to('referer path') { 'http://test.com/users' }
+      should_redirect_to('openings path') { '/openings' }
     end
   end
 

@@ -229,7 +229,7 @@ class UsersController < ApplicationController
     # change current user
     self.current_user = @sudo_user
     flash[:notice] = "Successfully logged in as #{@sudo_user.name}"
-    redirect_to request.referer and return
+    redirect_to openings_path and return
   end
 
   # GET /users/1/add_rpx
