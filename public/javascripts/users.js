@@ -26,9 +26,9 @@ $.fn.init_toggle_user_company_manager = function() {
 
 $.fn.init_user_create_submit = function() {
   $("form#add_user_form").submit(function() {
-    var user_name         = $("input#user_name").attr('value');
-    var name_required     = $("input#user_name").hasClass('required');
-    var password_required = $("input#user_password").hasClass('required');
+    var user_name         = $(this).find("input#user_name").attr('value');
+    var name_required     = $(this).find("input#user_name").hasClass('required');
+    var password_required = $(this).find("input#user_password").hasClass('required');
 
     if (name_required && user_name == '') {
       alert("Please enter a user name");
@@ -38,7 +38,7 @@ $.fn.init_user_create_submit = function() {
     var errors = 0
 
     // check email fields
-    $("div.email_address").each(function() {
+    $(this).find("div.email_address").each(function() {
       if (check_user_email_fields(this.id) == false) {
         errors += 1;
       }
@@ -47,7 +47,7 @@ $.fn.init_user_create_submit = function() {
     if (errors > 0) { return false; }
 
     // check phone fields
-    $("div.phone_number").each(function() {
+    $(this).find("div.phone_number").each(function() {
       if (check_user_phone_fields(this.id) == false) {
         errors += 1;
       }
