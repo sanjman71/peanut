@@ -83,9 +83,10 @@ class AppointmentsControllerTest < ActionController::TestCase
     @company.reload
     # get company free service
     @free_service = @company.free_service
-    # create a customer, with an email address
+    # create a customer, with an email address and phone number
     @customer     = Factory(:user, :name => "Customer")
     @customer.email_addresses.create(:address => 'customer@walnutcalendar.com')
+    @customer.phone_numbers.create(:name => 'Mobile', :address => '3129999999')
     # stub current company
     @controller.stubs(:current_company).returns(@company)
     # set the request hostname
@@ -746,6 +747,16 @@ class AppointmentsControllerTest < ActionController::TestCase
           assert_equal "Customer", @message.reload.preferences[:customer]
         end
 
+        should "set message preferences customer email" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal "customer@walnutcalendar.com", @message.reload.preferences[:customer_email]
+        end
+
+        should "set message preferences customer phone" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal "3129999999", @message.reload.preferences[:customer_phone]
+        end
+
         should "set message preferences when" do
           @who, @message = assigns(:confirmations).first
           assert @message.reload.preferences[:when]
@@ -1220,6 +1231,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
 
       should_change("capacity slot count", :by => -1) { CapacitySlot.count}
+
       should "remove free slot" do
         assert_nil CapacitySlot.find_by_id(@free_slot.id)
       end
@@ -1266,6 +1278,73 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_change("free slot duration", :by => 30.minutes) { @free_slot.reload.duration }
 
       should_redirect_to("referer") { "/openings?highlight=#{@work_appt.start_at.to_s(:appt_schedule_day)}" }
+    end
+
+    context "with appointment cancelations" do
+      context "to customer only" do
+        setup do
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
+          @company.save
+          @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+          @controller.stubs(:current_user).returns(@owner)
+          get :cancel, :id => @work_appt.id
+        end
+
+        # should send appt confirmation to customer
+        should_change("message count", :by => 1) { Message.count }
+        should_change("message topic", :by => 1) { MessageTopic.count }
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
+        
+        should "have appointment cancelation addressed to customer" do
+          assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+        
+        should "set message preferences template" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal :appointment_cancelation, @message.reload.preferences[:template]
+        end
+        
+        should "set message preferences provider" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal "Johnny", @message.reload.preferences[:provider]
+        end
+        
+        should "set message preferences service" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal "Haircut", @message.reload.preferences[:service]
+        end
+        
+        should "set message preferences customer" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal "Customer", @message.reload.preferences[:customer]
+        end
+        
+        should "set message preferences customer email" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal "customer@walnutcalendar.com", @message.reload.preferences[:customer_email]
+        end
+        
+        should "set message preferences customer phone" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal "3129999999", @message.reload.preferences[:customer_phone]
+        end
+        
+        should "set message preferences when" do
+          @who, @message = assigns(:cancelations).first
+          assert @message.reload.preferences[:when]
+        end
+        
+        should "set message preferences signature template" do
+          @who, @message = assigns(:cancelations).first
+          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+        end
+        
+        should "set flash message with email cancelation" do
+          assert flash[:notice].match(/A cancelation email will be sent to customer@walnutcalendar.com/)
+        end
+      end
     end
   end
   

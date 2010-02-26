@@ -17,6 +17,7 @@ class TasksControllerTest < ActionController::TestCase
     @provider_email = @provider.email_addresses.create(:address => "provider@walnut.com")
     @customer       = Factory(:user, :name => "Customer", :password => 'customer', :password_confirmation => 'customer')
     @customer_email = @customer.email_addresses.create(:address => "customer@walnut.com")
+    @customer_phone = @customer.phone_numbers.create(:name => 'Mobile', :address => "3129999999")
     @monthly_plan   = Factory(:monthly_plan)
     @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company        = Factory(:company, :subscription => @subscription)
@@ -95,6 +96,16 @@ class TasksControllerTest < ActionController::TestCase
       should "set message preferences customer" do
         @message = assigns(:messages).first
         assert_equal "Customer", @message.reload.preferences[:customer]
+      end
+
+      should "set message preferences customer email" do
+        @message = assigns(:messages).first
+        assert_equal "customer@walnut.com", @message.reload.preferences[:customer_email]
+      end
+
+      should "set message preferences customer phone" do
+        @message = assigns(:messages).first
+        assert_equal "3129999999", @message.reload.preferences[:customer_phone]
       end
 
       should "set message preferences when" do

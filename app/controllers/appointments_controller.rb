@@ -504,7 +504,6 @@ class AppointmentsController < ApplicationController
 
     # If this is (part of) a recurrence, and we've been asked to cancel the series, we do so
     if params[:series] && @appointment.recurrence?
-
       # We try cancel the series regardless of impact on existing appointments. 
       # First cancel the recurrence parent, so it doesn't continue to expand
       rp = @appointment.recurrence_parent
@@ -557,22 +556,36 @@ class AppointmentsController < ApplicationController
       #   else
       #     flash[:error] = "We had issues canceling all availability in this series. We have canceled all possible availability."
       #   end
-
     else
-
       # cancel the appointment
       begin
         AppointmentScheduler.cancel_appointment(@appointment, force)
       rescue OutOfCapacity => e
         error << e.message
       end
-      
-      # set flash
-      appt_text = ( (@appointment.mark_as == Appointment::WORK) ? "appointment" : "availability" )
+
+      appt_text = (@appointment.mark_as == Appointment::WORK) ? "appointment" : "availability"
+
       if error.empty?
-        flash[:notice] = "We have canceled this #{appt_text}."
+        # send cancelation email and set flash
+        flash[:notice] = "The #{appt_text} has been canceled."
+        begin
+          # send appointment cancel based on (confirmation) preferences
+          @preferences  = Hash[:customer => current_company.preferences[:work_appointment_confirmation_customer],
+                               :manager => current_company.preferences[:work_appointment_confirmation_manager],
+                               :provider => current_company.preferences[:work_appointment_confirmation_provider]]
+          @cancelations = MessageComposeAppointment.cancelations(@appointment, @preferences, {:company => current_company})
+          # check if customer cancelation was sent
+          if @cancelations.any? { |who, message| who == :customer }
+            # add flash message
+            flash[:notice] += "<br/>A cancelation email will be sent to #{@appointment.customer.email_address}."
+          end
+        rescue Exception => e
+          logger.debug("[error] cancel appointment error sending message: #{e.message}")
+        end
       else
-        flash[:notice] = "We had a problem canceling this #{appt_text} - #{error[0]}."
+        # whoops, there was an error
+        flash[:notice] = "There was a problem canceling this #{appt_text} - #{error[0]}."
       end
 
     end
