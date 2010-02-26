@@ -101,19 +101,20 @@ module ApplicationHelper
       yield name, path, klasses
     end
 
-    if has_role?('company customer', current_company)
-
-      # 'History' tab for customer appointments
-      name    = 'History'
-      path    = history_index_path
-      klasses = []
-
-      if current_controller.controller_name == 'history' and ['index', 'show', 'waitlist'].include?(current_controller.action_name)
-        klasses.push('current')
-      end
-
-      yield name, path, klasses
-    end
+    # SK: moved this to links at the top of the page
+    # if has_role?('company customer', current_company)
+    # 
+    #   # 'History' tab for customer appointments
+    #   name    = 'History'
+    #   path    = history_index_path
+    #   klasses = []
+    # 
+    #   if current_controller.controller_name == 'history' and ['index', 'show', 'waitlist'].include?(current_controller.action_name)
+    #     klasses.push('current')
+    #   end
+    # 
+    #   yield name, path, klasses
+    # end
 
     # SK: not sure if this is the correct privilege
     # SK: only managers for now

@@ -1,7 +1,11 @@
 - if logged_in?
   = link_to('My Info', edit_user_path(current_user, :subdomain => current_subdomain), :class => 'admin header')
   == &nbsp;|&nbsp;
-  
+
+  - if has_role?('company customer', current_company)
+    = link_to 'My Appointments', history_index_path, :class => 'admin header'
+    == &nbsp;|&nbsp;
+
   - if has_privilege?('update companies', current_company)
     = link_to 'My Company', edit_company_root_path(:subdomain => current_subdomain), :class => 'admin header'
     == &nbsp;|&nbsp;
