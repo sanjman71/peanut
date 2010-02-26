@@ -19,7 +19,7 @@
       = RPXNow.embed_code('walnut', rpx_return_url)
 
     .span-15.last.padding-top-10
-      == Click #{link_to 'here', '', :id => 'show_walnut_login_form'} to login with your email and password
+      %span.link.admin#show_walnut_login_form== Login with your email and password
 
   -# walnut login wrapper
   .span-15.last#walnut_login_form.hide
@@ -27,7 +27,8 @@
     .span-15.last.padding-bottom-20
       %h4.bottom
         == Login using your email and password, or
-        = link_to 'signup', '', :id => 'show_user_signup_form'
+        -#= link_to 'signup', '', :id => 'show_user_signup_form'
+        %span.link.admin#show_user_signup_form== signup
         == for a new account.
 
     -# walnut login
@@ -47,7 +48,7 @@
           = submit_tag 'Log in', :name => nil, :class => 'big'
 
         .span-12.prepend-3.last
-          == Click #{link_to 'here', '', :id => 'show_rpx_login_form'} to login with an existing account
+          %span.link.admin#show_rpx_login_form== Login with an existing account
 
   -# user signup wrapper
   .span-15.last#user_signup_form.hide

@@ -204,21 +204,21 @@ $.fn.init_user_login_dialog = function() {
   $("div.dialog#rpx_login_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 650, height: 475, show: 'fadeIn(slow)',
                                             title: $("div.dialog#rpx_login_dialog").attr('title') });
 
-  $("a#show_rpx_login_form").click(function() {
+  $("span#show_rpx_login_form").click(function() {
     // hide walnut login, show rpx login
     $("div#walnut_login_form").hide();
     $("div#rpx_login_form").show();
     return false;
   })
 
-  $("a#show_walnut_login_form").click(function() {
+  $("span#show_walnut_login_form").click(function() {
     // hide rpx login, show walnut login
     $("div#rpx_login_form").hide();
     $("div#walnut_login_form").show();
     return false;
   })
   
-  $("a#show_user_signup_form").click(function() {
+  $("span#show_user_signup_form").click(function() {
     // close this dialog
     $("div.dialog#rpx_login_dialog").dialog('close');
     // show add user dialog, set return dialog link, disable escape
