@@ -8,5 +8,8 @@
 - else
   - submit_url = url_for(:controller => 'users', :action => 'create', :role => @role, :subdomain => current_subdomain)
   = render :partial => 'users/user_form', |
-           :locals => {:role => @role, :invitation => @invitation, :user_password => current_company.preferences[:customer_password], |
+           :locals => {:role => @role, :invitation => @invitation, |
+           :user_password => current_company.preferences[:customer_password], |
+           :user_email => current_company.preferences[:customer_email], |
+           :user_phone => current_company.preferences[:customer_phone], |
            :submit_url => submit_url, :title_text => @title, :submit_text => 'Create', :back_path => @back_path} |
