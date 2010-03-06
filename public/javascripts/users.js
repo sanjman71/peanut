@@ -38,7 +38,7 @@ $.fn.init_user_create_submit = function() {
     var errors = 0
 
     // check email fields
-    $(this).find("div.email_address").each(function() {
+    $(this).find("div.email_address:visible").each(function() {
       if (check_user_email_fields(this.id) == false) {
         errors += 1;
       }
@@ -47,7 +47,7 @@ $.fn.init_user_create_submit = function() {
     if (errors > 0) { return false; }
 
     // check phone fields
-    $(this).find("div.phone_number").each(function() {
+    $(this).find("div.phone_number:visible").each(function() {
       if (check_user_phone_fields(this.id) == false) {
         errors += 1;
       }
@@ -117,7 +117,7 @@ $.fn.init_user_update_submit = function() {
     var errors = 0
 
     // check email fields
-    $("div.email_address").each(function() {
+    $("div.email_address:visible").each(function() {
       if (check_user_email_fields(this.id) == false) {
         errors += 1;
       }
@@ -126,7 +126,7 @@ $.fn.init_user_update_submit = function() {
     if (errors > 0) { return false; }
 
     // check phone fields
-    $("div.phone_number").each(function() {
+    $("div.phone_number:visible").each(function() {
       if (check_user_phone_fields(this.id) == false) {
         errors += 1;
       }
@@ -306,7 +306,7 @@ function check_user_phone_fields(id) {
 
   if (phone_address != '' && (validate_phone_number(phone_address) == false)) {
     // phone address is invalid
-    alert("Please enter a valid phone number using digits only");
+    alert("Please enter a valid phone number");
     return false;
   }
 
