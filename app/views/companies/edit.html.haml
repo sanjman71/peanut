@@ -130,6 +130,22 @@
     .span-20.last.padding-bottom-10
       .span-20.last
         .span-5
+          %h4.bottom{:style => 'padding-top: 7px;'}== Customer Emails:
+        .span-15.last
+          = f.select :preferences_customer_email, customer_email_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-15.prepend-5.last.directions
+        == If 'Optional', customers can have user accounts without an email
+    .span-20.last.padding-bottom-10
+      .span-20.last
+        .span-5
+          %h4.bottom{:style => 'padding-top: 7px;'}== Customer Phone Numbers:
+        .span-15.last
+          = f.select :preferences_customer_phone, customer_phone_options, {:style => 'margin-top: 5px;', :class => 'select big'}
+      .span-15.prepend-5.last.directions
+        == If 'Optional', customers can have user accounts without a phone number
+    .span-20.last.padding-bottom-10
+      .span-20.last
+        .span-5
           %h4.bottom{:style => 'padding-top: 7px;'}== Email Text:
         .span-15.last
           = f.text_area :preferences_email_text, :style => 'width: 550px; height: 100px;'

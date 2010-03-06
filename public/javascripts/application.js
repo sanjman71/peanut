@@ -346,17 +346,16 @@ function convert_time_military_to_ampm_string(s) {
 
 function validate_email_address(email_address) {
   var email_regex = /^[a-zA-Z0-9\+._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-  if (email_regex.test(email_address) == false) {
-    return false;
-  }
+  if (email_regex.test(email_address) == false) { return false; }
   return true;
 }
 
 function validate_phone_number(phone_number) {
-  var phone_regex = /^[0-9]+$/;
-  if (phone_regex.test(phone_number) == false) {
-    return false;
-  }
+  // strip out valid non-digits from phone number
+  var phone_digits = phone_number.replace(/[ ()-.]/g, '');
+  // check that we only have digits remaining
+  var phone_regex  = /^[0-9]+$/;
+  if (phone_regex.test(phone_digits) == false) { return false; }
   return true;
 }
 

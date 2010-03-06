@@ -57,7 +57,9 @@
     - @signup_user.phone_numbers.build
     = render(:partial => 'users/user_form_dialog', |
              :locals => {:user => @signup_user, :role => 'company customer', |
-                         :user_email => 'required', :user_password => current_company.preferences[:customer_password], |
+                         :user_password => current_company.preferences[:customer_password], |
+                         :user_email => current_company.preferences[:customer_email], |
+                         :user_phone => current_company.preferences[:customer_phone], |
                          :submit_url => signup_return_path, |
                          :title => 'Signup', :submit_text => 'Create'}) |
 

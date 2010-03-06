@@ -36,7 +36,7 @@
         %h3{:style => 'font-size: 1.8em; padding-top: 15px;'}= label_tag "email_address", "Email:"
       .span-16.last
         -# not allowed to edit rpx user emails
-        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'email_address', :disabled => !email_form.object.changeable?
+        = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'email_address', :autocomplete => 'off', :disabled => !email_form.object.changeable?
         - markers = []
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address
@@ -63,7 +63,7 @@
         .span-4.text-align-right
           %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
         .span-16.last
-          = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address'
+          = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address', :autocomplete => 'off'
           - markers = []
           - markers.push('Verified') if phone_form.object.verified?
           - markers.push('Primary') if phone_form.object == @primary_phone_number

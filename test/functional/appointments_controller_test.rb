@@ -1198,6 +1198,77 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_change("appointment duration", :by => 1.hour) { @work_appt.reload.duration }
     end
+    
+    context "with appointment update messages" do
+      context "to customer only" do
+        setup do
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
+          @request.env['HTTP_REFERER'] = '/openings'
+          @company.save
+          @start_at = @work_appt.start_at
+          @end_at   = @work_appt.end_at
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, {:id => @work_appt.id, :mark_as => 'work', :force => '1',
+                        :service_id => @haircut.id, :duration => @haircut.duration + 1.hour, :customer_id => @customer.id,
+                        :start_at => @work_appt.start_at.to_s(:appt_schedule), :provider_type => "users", :provider_id => @johnny.id}
+        end
+
+        # should send appt update to customer
+        should_change("message count", :by => 1) { Message.count }
+        should_change("message topic", :by => 1) { MessageTopic.count }
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+        should "have appointment cancelation addressed to customer" do
+          assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+
+        should "set message preferences template" do
+          @who, @message = assigns(:changes).first
+          assert_equal :appointment_change, @message.reload.preferences[:template]
+        end
+
+        should "set message preferences provider" do
+          @who, @message = assigns(:changes).first
+          assert_equal "Johnny", @message.reload.preferences[:provider]
+        end
+
+        should "set message preferences service" do
+          @who, @message = assigns(:changes).first
+          assert_equal "Haircut", @message.reload.preferences[:service]
+        end
+
+        should "set message preferences customer" do
+          @who, @message = assigns(:changes).first
+          assert_equal "Customer", @message.reload.preferences[:customer]
+        end
+
+        should "set message preferences customer email" do
+          @who, @message = assigns(:changes).first
+          assert_equal "customer@walnutcalendar.com", @message.reload.preferences[:customer_email]
+        end
+
+        should "set message preferences customer phone" do
+          @who, @message = assigns(:changes).first
+          assert_equal "3129999999", @message.reload.preferences[:customer_phone]
+        end
+
+        should "set message preferences when" do
+          @who, @message = assigns(:changes).first
+          assert @message.reload.preferences[:when]
+        end
+
+        should "set message preferences signature template" do
+          @who, @message = assigns(:changes).first
+          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+        end
+
+        should "set flash message with email confirmation" do
+          assert flash[:notice].match(/An email with the appointment changes will be sent to customer@walnutcalendar.com/)
+        end
+      end
+    end
   end
 
   context "cancel free appointment" do
@@ -1280,7 +1351,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("referer") { "/openings?highlight=#{@work_appt.start_at.to_s(:appt_schedule_day)}" }
     end
 
-    context "with appointment cancelations" do
+    context "with appointment cancelation messages" do
       context "to customer only" do
         setup do
           @company.preferences[:work_appointment_confirmation_customer] = '1'
@@ -1342,7 +1413,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
         
         should "set flash message with email cancelation" do
-          assert flash[:notice].match(/A cancelation email will be sent to customer@walnutcalendar.com/)
+          assert flash[:notice].match(/An appointment cancelation email will be sent to customer@walnutcalendar.com/)
         end
       end
     end

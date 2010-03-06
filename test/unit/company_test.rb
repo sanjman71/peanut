@@ -195,30 +195,31 @@ class CompanyTest < ActiveSupport::TestCase
       @company      = Factory(:company, :name => "mary's hair Salon", :time_zone => "UTC")
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
     end
-    
+
     should "have default preferences" do
       assert_equal( ({:time_horizon => 28.days, :start_wday => '0', :appt_start_minutes=>[0], :public=>'1', :email_text => '',
                       :work_appointment_confirmation_customer=>'0', :work_appointment_confirmation_manager=>'0',
-                      :work_appointment_confirmation_provider=>'0'}), @company.preferences)
+                      :work_appointment_confirmation_provider=>'0',
+                      :customer_password => 'required',
+                      :customer_email => 'optional',
+                      :customer_phone => 'optional'}), @company.preferences)
     end
-  
+
     should "have nil preferences[:foo]" do
       assert_nil @company.preferences[:foo]
     end
-    
+
     context "then override default" do
       setup do
         @company.preferences[:time_horizon] = 14.days
         @company.save
       end
-      
+
       should "have new value" do
-        assert_equal( ({:time_horizon => 14.days, :start_wday => '0', :appt_start_minutes=>[0], :public=>'1', :email_text => '',
-                        :work_appointment_confirmation_customer=>'0', :work_appointment_confirmation_manager=>'0',
-                        :work_appointment_confirmation_provider=>'0'}), @company.preferences)
+        assert_equal 14.days, @company.preferences[:time_horizon]
       end
     end
-  
+
     context "then add new preferences" do
       setup do
         @company.preferences["favorite fruit"] = "banana"

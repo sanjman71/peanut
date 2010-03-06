@@ -4,16 +4,23 @@ class EmailAddressesControllerTest < ActionController::TestCase
 
   should_route :get, '/users/1/email/3/promote', :controller => 'email_addresses', :action => 'promote', :user_id => '1', :id => '3' 
   should_route :delete, '/users/1/email/3', :controller => 'email_addresses', :action => 'destroy', :user_id => '1', :id => '3' 
-  
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
-    @user = Factory(:user, :name => "User")
+    @user   = Factory(:user, :name => "User")
     @email1 = @user.email_addresses.create(:address => 'email1@walnutindustries.com', :priority => 1)
     @email2 = @user.email_addresses.create(:address => 'email2@walnutindustries.com', :priority => 5)
     @email3 = @user.email_addresses.create(:address => 'email3@walnutindustries.com', :priority => 3)
+    @manager      = Factory(:user, :name => "Manager")
+    @monthly_plan = Factory(:monthly_plan)
+    @subscription = Subscription.new(:user => @manager, :plan => @monthly_plan)
+    @company      = Factory(:company, :subscription => @subscription)
+    @manager.grant_role('company manager', @company)
+    # stub current company
+    @controller.stubs(:current_company).returns(@company)
   end
-  
+
   context "promote" do
     context "as guest" do
       setup do
@@ -23,30 +30,42 @@ class EmailAddressesControllerTest < ActionController::TestCase
 
       should_redirect_to("unauthorized path") { "/unauthorized" }
     end
-    
-    setup do
-      @controller.stubs(:current_user).returns(@user)
-      get :promote, :user_id => @user, :id => @email3
+
+    context "as user" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        get :promote, :user_id => @user, :id => @email3
+      end
+
+      should "make email3 primary email address" do
+        assert_equal @email3, @user.reload.primary_email_address
+      end
+
+      should "change email3 priority to 1" do
+        assert_equal 1, @email3.reload.priority
+      end
+
+      should "change email1 priority to 2" do
+        assert_equal 2, @email1.reload.priority
+      end
+
+      should "change email2 priority to 2" do
+        assert_equal 2, @email2.reload.priority
+      end
+
+      should_redirect_to("user edit path") { "/users/#{@user.id}/edit" }
+      should_set_the_flash_to /Changed primary email address to email3@walnutindustries.com/i
     end
 
-    should "make email3 primary email address" do
-      assert_equal @email3, @user.reload.primary_email_address
-    end
+    context "as manager" do
+      setup do
+        @controller.stubs(:current_user).returns(@manager)
+        get :promote, :user_id => @user, :id => @email3
+      end
 
-    should "change email3 priority to 1" do
-      assert_equal 1, @email3.reload.priority
+      should_redirect_to("user edit path") { "/users/#{@user.id}/edit" }
+      should_set_the_flash_to /Changed primary email address to email3@walnutindustries.com/i
     end
-
-    should "change email1 priority to 2" do
-      assert_equal 2, @email1.reload.priority
-    end
-
-    should "change email2 priority to 2" do
-      assert_equal 2, @email2.reload.priority
-    end
-
-    should_redirect_to("user edit path") { "/users/#{@user.id}/edit" }
-    should_set_the_flash_to /Changed primary email address to email3@walnutindustries.com/i
   end
   
   context "destroy" do
