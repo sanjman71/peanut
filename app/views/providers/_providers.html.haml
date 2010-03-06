@@ -13,6 +13,14 @@
         - else
           == &nbsp;
 
+    -# allow company managers to toggle provider role
+    .span-5
+      .span-5.last.provider.provider
+        - if has_privilege?('update users', current_company)
+          = check_box_tag 'Company Provider', 'yes', current_company.providers.include?(provider), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_provider', :id => provider.id, :subdomain => current_subdomain)
+          = label_tag '', 'Company Provider', :class => 'checkbox label'
+          %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+
     -# allow company managers to toggle manager role
     .span-5
       .span-5.last.provider.manager
@@ -21,16 +29,17 @@
             -# 'me' is a company manager
             %h5{:style => 'margin-top: 3px;'}== You are a Company Manager
           - elsif provider.respond_to?(:has_privilege?)
-            = check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox manager', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
+            = check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
             = label_tag '', 'Company Manager', :class => 'checkbox label'
             %span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
           - else
             -# provider is a resource, which does not have roles
             == &nbsp;
+
       %br
       .span-5.last.capacity
         - if provider.capacity > 1
-          == Default capacity: #{provider.capacity}
+          == Default # Slots: #{provider.capacity}
         - else
           -# we don't bother displaying capacity for providers if it's at the default of 1 - this is to reduce confusion
           == &nbsp;
@@ -39,6 +48,6 @@
     .span-2.prepend-2.action.last
       - if has_privilege?('update users', current_company) or has_privilege?('update users', provider)
         = link_to "Edit", user_edit_path(provider), :class => 'admin edit user'
-      - if has_privilege?('manage site', current_company) and provider.is_a?(User)
+      - if has_privilege?('manage site', current_company) and provider.is_a?(User) and (provider != current_user)
         -# site managers can sudo to users
         %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(provider), :class => 'admin sudo user'

@@ -11,8 +11,8 @@ $.fn.init_toggle_user_calendar = function() {
   });
 }
 
-$.fn.init_toggle_user_company_manager = function() {
-  $(".checkbox.manager").live('click', function() {
+$.fn.init_toggle_user_company_role = function() {
+  $(".checkbox.role").live('click', function() {
     // hide checkbox and label
     $(this).hide();
     $(this).siblings(".checkbox.label").hide();
@@ -321,7 +321,7 @@ function check_user_phone_fields(id) {
 
 $(document).ready(function() {
   $(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
-  $(document).init_toggle_user_company_manager();  // re-bind after an ajax call using jquery live()
+  $(document).init_toggle_user_company_role();  // re-bind after an ajax call using jquery live()
   $(document).init_user_add_email();
   $(document).init_user_add_phone();
   $(document).init_user_add_password();

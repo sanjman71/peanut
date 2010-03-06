@@ -79,7 +79,7 @@ module ApplicationHelper
     if has_privilege?('read users', current_company)
 
       # 'Providers' tab
-      name    = 'Providers'
+      name    = 'Staff'
       path    = providers_path
       klasses = []
 

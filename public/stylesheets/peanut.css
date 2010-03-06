@@ -125,10 +125,10 @@ div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
 
-div#providers_pagination, div#customers_pagination
+div#providers_pagination, div#customers_pagination, div#resources_pagination
                                                   { font-size: 1.0em; }
 
-div#providers_pagination h4, div#customers_pagination h4
+div#providers_pagination h4, div#customers_pagination h4, div#resources_pagination h4
                                                   { font-size: 1.0em; }
 
 .pagination a                                     { background: #EEEEEE; color: #111111; }

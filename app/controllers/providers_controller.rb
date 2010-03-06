@@ -8,14 +8,15 @@ class ProvidersController < ApplicationController
 
   # GET /providers
   def index
-    # find all company providers
-    @providers  = current_company.providers.paginate(:page => params[:page], :per_page => @@per_page)
-    @paginate   = true
+    # find all company staff
+    @staff     = current_company.authorized_managers_and_providers.paginate(:page => params[:providers_page], :per_page => @@per_page)
+    @resources = current_company.resource_providers.paginate(:page => params[:resources_page], :per_page => @@per_page)
+    @paginate  = true
 
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @providers.to_json(:only => ['id', 'name', 'email'])) }
+      format.json { render(:json => @staff.to_json(:only => ['id', 'name', 'email'])) }
     end
   end
 
@@ -40,6 +41,27 @@ class ProvidersController < ApplicationController
     end
   end
   
+  # POST /providers/:id/toggle_provider
+  def toggle_provider
+    @user = User.find(params[:id])
+    
+    if current_company.user_providers.include?(@user)
+      # remove user as provider
+      current_company.user_providers.delete(@user)
+    else
+      # add user as provider
+      current_company.user_providers.push(@user)
+    end
+
+    # redirect to providers index
+    @redirect_path = providers_path
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+    end
+  end
+
   # GET /providers/:id/assign_prompt
   def assign_prompt
     @user   = User.find(params[:id])

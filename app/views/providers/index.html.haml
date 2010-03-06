@@ -5,7 +5,7 @@
 .span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
     .span-7
-      %h2== Providers
+      %h2== Staff
     .span-8.last
       -# show add provider links if the company plan allows it
       - if current_company.may_add_provider? and current_user.has_privilege?('create users', current_company)
@@ -30,11 +30,23 @@
   .span-14.prepend-1.append-1.last
     .highlight#flash
 
-  .span-16.last
-    #providers_pagination
-      = render(:partial => 'providers_pagination', :locals => {:providers => @providers, :search_text => @search_text, :paginate => @paginate})
-    #providers
-      = render(:partial => 'providers', :locals => {:providers => @providers})
+  - if @staff.size >0
+    .span-16.last
+      .span-7.prepend-1
+        %h2== Staff
+      #providers_pagination
+        = render(:partial => 'providers_pagination', :locals => {:providers => @staff, :search_text => @search_text, :paginate => @paginate})
+      #providers
+        = render(:partial => 'providers', :locals => {:providers => @staff})
+
+  / - if @resources.size > 0
+  /   .span-16.last
+  /     .span-7.prepend-1
+  /       %h2== Resources
+  /     #resources_pagination
+  /       = render(:partial => 'resources_pagination', :locals => {:resources => @resources, :search_text => @search_text, :paginate => @paginate})
+  /     #resources
+  /       = render(:partial => 'providers', :locals => {:providers => @resources})
 
 .span-8.last
   -# provider help

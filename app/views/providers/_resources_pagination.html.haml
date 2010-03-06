@@ -1,0 +1,5 @@
+.span-8.prepend-1.append-bottom.resources.header
+  %h4.bottom= search_text ? search_text : page_entries_info(resources, :entry_name => 'resource').gsub(/ in total/,'')
+.span-6.prepend-1.last#pagination
+  - if paginate
+    %h4.bottom= will_paginate(resources, :param_name => 'resources_page', :page_links => true, :inner_window => 1, :outer_window => 1)

@@ -61,10 +61,11 @@ class ProvidersControllerTest < ActionController::TestCase
         get :index
       end
 
-      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+      should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
+      should_assign_to(:resources, :class => Array) { [@resource1] }
 
       should "not be able to change manager role on providers" do
-        assert_select "input.checkbox.manager", 0
+        assert_select "input.checkbox.role", 0
       end
 
       should "be able to edit themself" do
@@ -86,13 +87,14 @@ class ProvidersControllerTest < ActionController::TestCase
         get :index
       end
 
-      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+      should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
+      should_assign_to(:resources, :class => Array) { [@resource1] }
 
-      should "be able to change manager role on user providers" do
-        assert_select "input.checkbox.manager", 2
+      should "be able to change manager and provider role on user providers and provider role on manager" do
+        assert_select "input.checkbox.role", 5
       end
 
-      should "be able to edit user and resource providers" do
+      should "be able to edit user and resource providers and manager" do
         assert_select "a.admin.edit.user", 3
       end
 
@@ -112,21 +114,22 @@ class ProvidersControllerTest < ActionController::TestCase
         get :index
       end
 
-      should_assign_to(:providers, :class => Array) { [@resource1, @provider1, @provider2] }
+      should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
+      should_assign_to(:resources, :class => Array) { [@resource1] }
 
-      should "have 'no email address' messages on each user" do
-        assert_select "h4.provider.email span.field_missing", 2
+      should "have 'no email address' messages on each user provider and manager" do
+        assert_select "h4.provider.email span.field_missing", 3
       end
 
-      should "be able to change manager role on user providers" do
-        assert_select "input.checkbox.manager", 2
+      should "be able to change provider and manager role on user providers and provider role on manager (not manager role on manager 'cos manager is logged in)" do
+        assert_select "input.checkbox.role", 5
       end
 
-      should "be able to edit user and resource providers" do
+      should "be able to edit user providers and manager" do
         assert_select "a.admin.edit.user", 3
       end
 
-      should "be able to sudo to each user provider" do
+      should "be able to sudo to each user provider and manager but not self" do
         assert_select "a.admin.sudo.user", 2
       end
 

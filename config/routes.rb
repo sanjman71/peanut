@@ -69,7 +69,7 @@ ActionController::Routing::Routes.draw do |map|
                 :member => {:approve => :get, :noshow => :get, :complete => :get, :cancel => [:get, :post], :reschedule => [:get, :post]},
                 :collection => { :search => [:get, :post] }
 
-  map.resources :providers, :member => { :toggle_manager => :post }
+  map.resources :providers, :member => { :toggle_manager => :post, :toggle_provider => :post }
   map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
   
   # special invoice routes
