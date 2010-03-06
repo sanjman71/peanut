@@ -1,7 +1,7 @@
 class EmailAddressesController < ApplicationController
   before_filter :init_user, :only => [:promote, :destroy]
 
-  privilege_required      'update users', :only => [:promote, :destroy], :on => :user
+  privilege_required_any  'update users', :only => [:promote, :destroy], :on => [:user, :current_company]
 
   # GET /users/1/email/3/promote
   def promote
@@ -25,9 +25,9 @@ class EmailAddressesController < ApplicationController
   end
 
   protected
-  
+
   def init_user
     @user = User.find(params[:user_id])
   end
-  
+
 end
