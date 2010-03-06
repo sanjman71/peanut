@@ -1,0 +1,37 @@
+%p== Your appointment has been changed.
+
+%table{:style => "border-spacing: 15px 0px;"}
+  %tr
+    %td== Service:
+    %td= @service  
+
+  %tr
+    %td== With:
+    %td= @provider
+
+  %tr
+    %td== When:
+    %td= @when
+
+  %tr
+    %td== Customer:
+    %td= @customer
+
+  - unless @customer_email.blank?
+    %tr
+      %td== Email:
+      %td= @customer_email
+
+  - unless @customer_phone.blank?
+    %tr
+      %td== Phone:
+      %td= @customer_phone
+
+- unless @footer_provider.blank?
+  %p= @footer_provider
+
+- unless @footer_company.blank?
+  %p= @footer_company
+
+- unless @signature_template.blank?
+  = render(:partial => "#{@signature_template}.html.haml")

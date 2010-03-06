@@ -578,7 +578,7 @@ class AppointmentsController < ApplicationController
           # check if customer cancelation was sent
           if @cancelations.any? { |who, message| who == :customer }
             # add flash message
-            flash[:notice] += "<br/>A cancelation email will be sent to #{@appointment.customer.email_address}."
+            flash[:notice] += "<br/>An appointment cancelation email will be sent to #{@appointment.customer.email_address}."
           end
         rescue Exception => e
           logger.debug("[error] cancel appointment error sending message: #{e.message}")
@@ -641,6 +641,23 @@ class AppointmentsController < ApplicationController
         flash[:notice] = "Your available time has been updated"
       else
         flash[:notice] = "Your appointment has been updated"
+      end
+
+      if @appointment.valid? and @appointment.work?
+        begin
+          # send appointment change based on (confirmation) preferences
+          @preferences  = Hash[:customer => current_company.preferences[:work_appointment_confirmation_customer],
+                               :manager => current_company.preferences[:work_appointment_confirmation_manager],
+                               :provider => current_company.preferences[:work_appointment_confirmation_provider]]
+          @changes      = MessageComposeAppointment.changes(@appointment, @preferences, {:company => current_company})
+          # check if customer cancelation was sent
+          if @changes.any? { |who, message| who == :customer }
+            # add flash message
+            flash[:notice] += "<br/>An email with the appointment changes will be sent to #{@appointment.customer.email_address}."
+          end
+        rescue Exception => e
+          logger.debug("[error] update appointment error sending message: #{e.message}")
+        end
       end
 
       respond_to do |format|
