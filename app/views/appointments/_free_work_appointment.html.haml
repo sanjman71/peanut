@@ -22,7 +22,7 @@
         = link_to appointment.service.name, appointment_path(appointment)
       - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# free appointments can be viewed with read permissions
-        = appointment.recurrence? ? "Recurring Availability" : "Scheduled Availability"
+        = ( (appointment.recurrence?) ? link_to("Recurring Availability", appointment.recurrence_parent) : "Scheduled Availability" )
       - else
         %h6= appointment.service.name
     - if show_location?
