@@ -1,17 +1,68 @@
 - title(@title)
 - stylesheet('appointments', 'notes', 'calendar')
 - javascript('appointments', 'notes')
+- appointment = @appointment
+- tag = appointment.canceled? ? 'del' : 'span'
 
 .span-14.prepend-1.last
   = display_flash
-  
-.span-23.prepend-1
-  = render(:partial => 'appointments/appointment', :locals => {:appointment => @appointment, :customer_signup => false})
 
-- if !@instances_by_day.blank?
-  .appointment.review.span-23.prepend-1.last
-    .span-23.last.label
-      == Future availability in this recurring series:
-  .span-23.last
-    = render(:partial => 'appointments/show_recurrence_by_day', :locals => {:stuff_by_day => @instances_by_day})
-  
+.span-16
+  .span-15.prepend-1.last.padding-bottom-5#what
+    - if appointment.recurrence?
+      .span-15
+        .span-9.appointment.review
+          %h3== Recurring Availability
+          - if appointment.canceled?
+            == Canceled
+        -# Edit the recurrence
+        .span-6.last
+          = link_to("Edit this recurring availability", edit_weekly_path(appointment.provider.tableize, appointment.provider.id, appointment.recurrence_parent.id, :subdomain => current_company.subdomain))
+        .span-6.last
+          = link_to('Cancel series from today', cancel_appointment_path(appointment.recurrence_parent.id, :series => 1, :subdomain => current_company.subdomain), :class => ["cancel", "confirm", appointment.mark_as].join(" "))
+    - else
+      .span-9
+        %h3== Scheduled Availability
+      .span-6.last
+        = link_to('Cancel', cancel_appointment_path(appointment, :subdomain => current_company.subdomain), :class => ["cancel", "confirm", appointment.mark_as].join(" "))
+
+  .span-15.appointment.review
+    -# with
+    .span-15.last.padding-bottom-5#with
+      .span-3.label.block
+        %span.block== With:
+      .span-12.last.data
+        ~ "<#{tag}>#{(appointment.provider || User.anyone).name}</#{tag}>"
+
+    -# duration
+    .span-15.last.padding-bottom-5#duration
+      .span-3.label.block
+        %span.block== How Long:
+      .span-12.last.data
+        ~ "<#{tag}>#{Duration.to_words(appointment.duration)}</#{tag}>"
+
+    -# capacity
+    .span-15.last.padding-bottom-5#capacity
+      .span-3.label.block
+        %span.block== Slots:
+      .span-12.last.data
+        ~ "<#{tag}>#{appointment.capacity}</#{tag}>"
+
+    - if appointment.recurrence?
+      -# recurrence
+      .span-15.last.padding-bottom-5#recurrence
+        .span-3.label.block
+          %span.block== Recurrence:
+        .span-12.last.data
+          ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment.recurrence_parent)}</#{tag}>"
+
+      .span-16.last.label
+        == Future availability in this recurring series:
+
+  - if !@recur_instances.blank?
+    .span-16.last
+      = render(:partial => 'appointments/show_recurrence_instances', :locals => {:recur_instances => @recur_instances})
+
+- if appointment.recurrence?
+  .span-7.prepend-1.last
+    = render :partial => 'appointments/recurrence_help'

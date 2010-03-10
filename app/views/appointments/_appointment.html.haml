@@ -2,6 +2,10 @@
 
   - tag = appointment.canceled? ? 'del' : 'span'
   
+  - if appointment.recurrence?
+    .span-15.last.padding-bottom-5#what
+      %h3== Recurring Availability
+
   -# what
   .span-15.last.padding-bottom-5#what
     .span-3.label.block
@@ -56,7 +60,12 @@
       .span-3.label.block
         %span.block== Recurrence:
       .span-12.last.data
-        ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment.recurrence_parent)}</#{tag}>"
+        - if appointment.recurrence_parent.canceled?
+          == This recurring availability has been canceled
+        - else
+          ~ "<#{tag}>#{appointment_recur_rule_in_words(appointment.recurrence_parent)}</#{tag}>"
+    .span-15.last
+      = link_to "Edit this recurring availability", edit_weekly_path(appointment.provider.tableize, appointment.provider.id, appointment.id)
 
   -# show customer for work and wait appointments
   - unless appointment.customer.blank?

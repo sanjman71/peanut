@@ -1,0 +1,22 @@
+- recur_instances.each do |appointment|
+  - tag = appointment.canceled? ? 'del' : 'span'
+  .span-16.last
+    .span-5
+      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_day)}</#{tag}>"
+    .span-4
+      ~ "<#{tag}>#{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}</#{tag}>"
+    .span-7.last.slots_edit_cancel
+      .span-2
+        == #{pluralize(appointment.capacity, 'slot')}
+      - if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
+        .span-5.last
+          == &nbsp;
+      - else
+        .span-5.last.editcancel
+          - if !appointment.recurrence_parent? && !appointment.canceled?
+            .span-5.last.edit-one
+              = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
+              |
+              = link_to('Cancel series from here', cancel_appointment_path(appointment, :series => 1), :class => ["cancel", "confirm", appointment.mark_as].join(" "))
+          - elsif appointment.canceled?
+            == Canceled

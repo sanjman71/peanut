@@ -297,26 +297,20 @@ class AppointmentsController < ApplicationController
   # GET /users/1/calendar/weekly/:id/edit
   def edit_weekly
     # @provider initialize in before_filter
-    
+
     if params[:provider_type].blank? or params[:provider_id].blank?
       # no provider was specified, redirect to the company's first provider
       flash[:error] = "No provider was specified"
       provider = current_company.providers.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
 
     @appointment = Appointment.find(params[:id])
-    if (@appointment.blank? || @appointment.recur_rule.blank?)
+    if (@appointment.blank? || !@appointment.recurrence_parent?)
       flash[:error] = "Recurring appointment wasn't found"
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id)) and return
+      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
     
-    # initialize daterange. Just used to show days of week.
-    @daterange = DateRange.parse_when('this week')
-
-    # initialize calendar markings to empty
-    @calendar_markings  = Hash.new
-
     respond_to do |format|
       format.html
     end
@@ -414,6 +408,91 @@ class AppointmentsController < ApplicationController
     create
   end
 
+  # POST /users/1/calendar/weekly/:id
+  def update_weekly
+    # @provider initialized in before filter
+
+    if params[:provider_type].blank? or params[:provider_id].blank?
+      # no provider was specified, redirect to the company's first provider
+      flash[:error] = "No provider was specified"
+      provider = current_company.providers.first
+      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+    end
+
+    @appointment = Appointment.find(params[:id])
+    if (@appointment.blank? || !@appointment.recurrence_parent?)
+      flash[:error] = "Recurring appointment wasn't found"
+      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+    end
+    
+    # get recurrence parameters
+    @freq         = params[:freq].to_s.upcase
+    @byday        = params[:byday].to_s.upcase
+    @dstart       = params[:dstart].to_s
+    @tstart       = params[:tstart].to_s
+    @dend         = params[:dend].to_s
+    @tend         = params[:tend].to_s
+    @until        = params[:until].to_s
+
+    # ensure capacity is at least 1
+    @capacity     = params[:capacity].to_i || 1
+    @capacity     = 1 if @capacity <= 0
+
+    # build recurrence rule from rule components
+    tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
+
+    unless @until.blank?
+      tokens.push("UNTIL=#{@until}T000000Z")
+    end
+
+    @recur_rule   = tokens.join(";")
+
+    # build dtstart and dtend
+    @dtstart      = "#{@dstart}T#{@tstart}"
+    if (@dend.blank?)
+      @dtend        = "#{@dstart}T#{@tend}"
+    else
+      @dtend        = "#{@dend}T#{@tend}"
+    end
+
+    # build start_at and end_at times
+    @start_at       = Time.zone.parse(@dtstart)
+    @end_at         = Time.zone.parse(@dtend)
+
+    # create appointment with recurrence rule
+    @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
+    @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
+    @error          = nil
+    
+    begin
+
+      # Update the recurring appointment
+      @appointment.force = true
+      @appointment.update_attributes(@options)
+      if @appointment.valid?
+        @appointment.update_recurrence(@options.keys.map(&:to_s), @options)
+      else
+        @error = @appointment.errors.full_messages
+      end
+    rescue Exception => e
+      @error        = e.message
+    end
+
+    # set the flash
+    if @error.blank?
+      flash[:notice] = 'The weekly appointment was updated successfully, and changes are being made to the series.'
+    else
+      flash[:error]   = @error
+    end
+    
+    @redirect_path  = calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id)
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
+    end
+
+  end
+
   # GET /appointments/1/reschedule
   def reschedule
     @appointment  = current_company.appointments.find(params[:id])
@@ -447,7 +526,7 @@ class AppointmentsController < ApplicationController
 
     # Get list of instances if this is a recurring available appointment
     if @appointment.mark_as == Appointment::FREE && @appointment.recurrence?
-      @instances_by_day = @appointment.recurrence_parent.recur_instances.future.group_by { |appt| appt.start_at.beginning_of_day }
+      @recur_instances =  @appointment.recurrence_parent.recur_instances.future
     end
 
     # show invoices for completed appointments
@@ -504,23 +583,29 @@ class AppointmentsController < ApplicationController
 
     # If this is (part of) a recurrence, and we've been asked to cancel the series, we do so
     if params[:series] && @appointment.recurrence?
-      # We try cancel the series regardless of impact on existing appointments. 
-      # First cancel the recurrence parent, so it doesn't continue to expand
-      rp = @appointment.recurrence_parent
 
+      # We try cancel the series regardless of impact on existing appointments.
       begin
-        AppointmentScheduler.cancel_appointment(rp, force)
-      rescue OutOfCapacity => e
-        error << e.message
-      end
+        # First cancel the recurrence parent, so it doesn't continue to expand
+        rp = @appointment.recurrence_parent
 
-      # Now cancel all expanded instances after this appointment, including this one. This does not include the recurrence parent itself.
-      rp.recur_instances.after_incl(self.start_at).each do |recur_instance|
-        begin
-          AppointmentScheduler.cancel_appointment(recur_instance, force)
-        rescue OutOfCapacity => e
-          error << e.message
+        # It may have already been canceled, and the user simply wants to cancel additional instances
+        AppointmentScheduler.cancel_appointment(rp, force) unless rp.canceled?
+
+        # We cancel all appointments after the selected appointment, of after the current time, whichever is later
+        now = Time.zone.now
+        cancel_time = (now > @appointment.start_at) ? now : @appointment.start_at
+
+        # Now cancel all expanded instances after this appointment, including this one.
+        # This does not include the recurrence parent itself.
+        rp.recur_instances.after_incl(cancel_time).each do |recur_instance|
+            AppointmentScheduler.cancel_appointment(recur_instance, force) unless recur_instance.canceled?
         end
+
+      rescue OutOfCapacity => e
+
+        error << e.message
+
       end
 
       if error.empty?
@@ -529,33 +614,6 @@ class AppointmentsController < ApplicationController
         flash[:error] = "We had issues canceling #{error.size} availability appointments in this series. We have canceled all possible availability."
       end
     
-      #
-      # Not using this code yet - deals with recurrences
-      #
-
-      # elsif @appointment.recurrence_parent?
-      # 
-      #   # cancel the recurrence, including all future instances of it
-      #   begin
-      #     AppointmentScheduler.cancel_appointment(@appointment, force)
-      #   rescue OutOfCapacity => e
-      #     error << e.message
-      #   end
-      #   
-      #   # Now cancel all expanded instances after this appointment, including this one. This does not include the recurrence parent itself.
-      #   @appointment.recur_instances.future.each do |recur_instance|
-      #     begin
-      #       AppointmentScheduler.cancel_appointment(recur_instance, force)
-      #     rescue OutOfCapacity => e
-      #       error << e.message
-      #     end
-      #   end
-      # 
-      #   if error.empty?
-      #     flash[:notice] = "We have canceled all availability in this series. No more will be created"
-      #   else
-      #     flash[:error] = "We had issues canceling all availability in this series. We have canceled all possible availability."
-      #   end
     else
       # cancel the appointment
       begin
