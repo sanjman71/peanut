@@ -96,7 +96,7 @@ class AppointmentTest < ActiveSupport::TestCase
       should_not_change("CapacitySlot.count") { CapacitySlot.count }
     
     end
-
+  
   end
   
   context "create free appointment with mismatched duration and end_at values" do
@@ -262,13 +262,10 @@ class AppointmentTest < ActiveSupport::TestCase
         # create free time from 10 am to 12 pm
         @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
         @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+        @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
       end
       
-      should "raise exception" do
-        assert_raise TimeslotNotEmpty do
-          @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
-        end
-      end
+      should_change("Appointment.count", :by => 1) { Appointment.count }
       
     end
     
@@ -552,8 +549,9 @@ class AppointmentTest < ActiveSupport::TestCase
       @end_recurrence = @start_at + 8.weeks
       @recur_days     = "#{ical_days([@start_at.utc, (@start_at + 4.days).utc])}"
       @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-      @recurrence     = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
-                                                                     :description => "This is the recurrence description")
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider,
+                                                                    :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                    :description => "This is the recurrence description")
       assert_valid @recurrence
   
     end
@@ -580,10 +578,12 @@ class AppointmentTest < ActiveSupport::TestCase
         @recurrence.reload
       end
       
+      should_change("Appointment.count", :by => 7) { Appointment.count }
+      
       should "have 7 recurrence instances" do
         assert_equal 7, @recurrence.recur_instances.count
       end
-  
+        
       should_change("Appointment.count", :by => 7) { Appointment.count }
       should_change("CapacitySlot.count", :by => 7) { CapacitySlot.count }
       
@@ -650,11 +650,11 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then change the recurrence description" do
         setup do
-          @recurrence.description = "This is a changed recurring description"
-          attr_changed = @recurrence.changed
-          attr_changes = @recurrence.changes
-          @recurrence.save
-          @recurrence.update_recurrence(attr_changed, attr_changes)
+          @options = {:description => "This is a changed recurring description"}
+          @recurrence.update_attributes(@options)
+          @recurrence.update_recurrence(@options.keys.map(&:to_s), @options)
+          Delayed::Job.work_off
+          @recurrence.reload
         end
       
         should_not_change("Appointment.count") { Appointment.count }
@@ -669,12 +669,10 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then change end time and duration of the recurrence" do
         setup do
-          @recurrence.end_at = @recurrence.start_at + 3.hours
-          @recurrence.duration = 3.hours
-          attr_changed = @recurrence.changed
-          attr_changes = @recurrence.changes
-          @recurrence.save
-          @recurrence.update_recurrence(attr_changed, attr_changes)
+          @options = {:end_at => @recurrence.start_at + 3.hours}
+          @recurrence.update_attributes(@options)
+          @recurrence.update_recurrence(@options.keys.map(&:to_s), @options)
+          Delayed::Job.work_off
           @recurrence.reload
         end
       
@@ -692,13 +690,13 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then change the recurrence rule to 3 per week" do
         setup do
-          @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
-          @recur_rule            = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
-          @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-          attr_changed = @recurrence.changed
-          attr_changes = @recurrence.changes
-          @recurrence.save
-          @recurrence.update_recurrence(attr_changed, attr_changes)
+          @recur_days = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
+          @recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days};UNTIL=#{@end_recurrence.utc.strftime("%Y%m%dT%H%M%SZ")}"
+      
+          @options    = {:recur_rule => @recur_rule}
+          @recurrence.update_attributes(@options)
+          @recurrence.update_recurrence(@options.keys.map(&:to_s), @options)
+          Delayed::Job.work_off
           @recurrence.reload
         end
       
@@ -716,14 +714,13 @@ class AppointmentTest < ActiveSupport::TestCase
       
       context "then change the recurrence rule to 3 per week and change end time" do
         setup do
-          @recurrence.end_at     = @recurrence.start_at + 3.hours
-          @recurrence.duration   = 3.hours
-          @recur_days            = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
-          @recurrence.recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
-          attr_changed = @recurrence.changed
-          attr_changes = @recurrence.changes
-          @recurrence.save
-          @recurrence.update_recurrence(attr_changed, attr_changes)
+          @recur_days = "#{ical_days([@start_at, @start_at + 3.days, @start_at + 5.days])}"
+          @recur_rule = "FREQ=WEEKLY;BYDAY=#{@recur_days}"
+      
+          @options    = {:end_at => @recurrence.start_at + 3.hours, :recur_rule => @recur_rule}
+          @recurrence.update_attributes(@options)
+          @recurrence.update_recurrence(@options.keys.map(&:to_s), @options)
+          Delayed::Job.work_off
           @recurrence.reload
         end
       
@@ -798,19 +795,17 @@ class AppointmentTest < ActiveSupport::TestCase
       context "then schedule an overlapping available appointment" do
       
       end  
-  
-  
+        
+        
       context "create a second conflicting valid recurring free private appointment" do
         setup do
           # Each of @start_at, @end_at, @end_recurrence, @recur_days and @recur_rule are reused from previous definition
+          @recurrence2  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at,
+                                :end_at => @end_at, :recur_rule => @recur_rule, :description => "This is the recurrence description")
         end
       
-        should "raise exception" do
-          assert_raise TimeslotNotEmpty do
-            @recurrence2  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, 
-                                                :recur_rule => @recur_rule, :description => "This is the recurrence description")
-          end
-        end
+        should_change("Appointment.count", :by => 1) {Appointment.count}
+      
       end
       
       context "create a second valid recurring free private appointment where the parent does not conflict but its instances do" do
@@ -820,14 +815,14 @@ class AppointmentTest < ActiveSupport::TestCase
           assert_valid @recurrence2
           appointments    = @recurrence2.expand_recurrence(@start_at, @start_at + 4.weeks - 1.hour)
         end
-  
-        # Should have a single appointment = the parent, but the instances shouldn't be there
-        should_change("Appointment.count", :by => 1) { Appointment.count }
         
-        should "have no recurrence instances" do
-          assert_equal 0, @recurrence2.recur_instances.count
+        # Should have the parent appointment and 7 instances
+        should_change("Appointment.count", :by => 8) { Appointment.count }
+        
+        should "have 7 recurrence instances" do
+          assert_equal 7, @recurrence2.recur_instances.count
         end
-  
+        
       end
       
     end
