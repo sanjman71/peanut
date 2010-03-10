@@ -1,0 +1,8 @@
+#providers
+  .toolbar
+    %h1== Pick a Provider
+    = link_to 'Back', '#', :class => 'back'
+
+  %ul.plastic
+    - providers.each do |provider|
+      %li= link_to provider.name, '#back', :id => 'pick_provider', :provider_id => provider.id

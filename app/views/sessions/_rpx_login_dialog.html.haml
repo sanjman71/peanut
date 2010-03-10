@@ -10,7 +10,11 @@
   -# rpx login wrapper
   .span-15#rpx_login_form
     .span-15.last.padding-bottom-10
-      %h4.bottom== Login using your existing account with a provider below:
+      %h4.bottom
+        == Login using your existing account with a provider below, or
+        %span.link.admin#show_user_signup_form== signup
+        == for a new account.
+
 
     -# rpx login
     .span-15.last
@@ -27,7 +31,6 @@
     .span-15.last.padding-bottom-20
       %h4.bottom
         == Login using your email and password, or
-        -#= link_to 'signup', '', :id => 'show_user_signup_form'
         %span.link.admin#show_user_signup_form== signup
         == for a new account.
 

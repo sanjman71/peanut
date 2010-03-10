@@ -2,6 +2,9 @@ require 'test/test_helper'
 
 class CalendarControllerTest < ActionController::TestCase
 
+  # list calendars
+  should_route :get, '/calendars',  :controller => 'calendar', :action => 'index'
+  
   # show provider calendar
   should_route :get, '/users/1/calendar',  :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1
   should_route :get, '/users/1/calendar.pdf',
@@ -28,7 +31,7 @@ class CalendarControllerTest < ActionController::TestCase
   # search provider calendar
   should_route :post, '/users/1/calendar/search', 
                :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_id => 1
-    
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
@@ -47,38 +50,50 @@ class CalendarControllerTest < ActionController::TestCase
     @request.host = "www.walnutcalendar.com"
   end
 
-  context "search company calendars without 'read calendars' privilege" do
-    setup do
-      get :index
+  context "index" do
+    context "without 'read calendars' privilege" do
+      setup do
+        get :index
+      end
+
+      should_redirect_to("unauthorized_path") { unauthorized_path } 
+      should_set_the_flash_to /You are not authorized/
     end
 
-    should_redirect_to("unauthorized_path") { unauthorized_path } 
-    should_set_the_flash_to /You are not authorized/
-  end
+    context "for a company with no providers" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
 
-  context "search company calendars for a company with no providers" do
-    setup do
-      @controller.stubs(:current_user).returns(@owner)
-      get :index
+      should_redirect_to("company root path") { '/' }
     end
 
-    should_redirect_to("company root path") { '/' }
+    context "for a company that has 1 provider" do
+      setup do
+        # add company provider
+        @johnny = Factory(:user, :name => "Johnny")
+        @company.user_providers.push(@johnny)
+        # search as the company manager
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+
+      should_respond_with :redirect
+      should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
+    end
+
+    context "from a mobile device" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :index, :mobile => '1'
+      end
+
+      should_respond_with :success
+      should_render_template 'calendar/index.mobile.haml'
+    end
   end
 
-  context "search company calendars for a company that has 1 provider" do
-    setup do
-      # add company provider
-      @johnny = Factory(:user, :name => "Johnny")
-      @company.user_providers.push(@johnny)
-      # search as the company manager
-      @controller.stubs(:current_user).returns(@owner)
-      get :index
-    end
-  
-    should_respond_with :redirect
-    should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
-  end
-  
   context "show provider calendar as the provider" do
     context "using default when" do
       setup do

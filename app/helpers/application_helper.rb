@@ -25,7 +25,7 @@ module ApplicationHelper
   def build_tab_links(current_controller)
     # 'Openings' tab
     name    = 'Openings'
-    path    = openings_path(:subdomain => @subdomain)
+    path    = openings_path
     klasses = []
 
     if current_controller.controller_name == 'openings' and ['index'].include?(current_controller.action_name)
@@ -38,7 +38,7 @@ module ApplicationHelper
 
       # 'Schedules' tab
       name    = 'Schedules'
-      path    = url_for(:controller => 'calendar', :action => 'index', :subdomain => @subdomain)
+      path    = calendars_path
       klasses = []
 
       if current_controller.controller_name == 'calendar' and ['show', 'edit'].include?(current_controller.action_name)

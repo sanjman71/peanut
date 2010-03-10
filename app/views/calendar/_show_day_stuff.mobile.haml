@@ -1,0 +1,15 @@
+- if stuff.empty?
+  %li== Nothing scheduled
+
+- stuff.sort_by{ |o| [o.start_at.in_time_zone, ((o.class == CapacitySlot) ? 1 : ((o.class == Appointment && o.free?) ? 0 : 2))] }.each do |object|
+  -# check what type of stuff it is, possible options:
+  -# appointments, capacity_slots, [waitlist, date, waitlist_time_range]
+  - case
+  - when (object.is_a?(Appointment) and !object.canceled?)
+    -# show all non-canceled free and work appointments
+    = render(:partial => 'appointments/free_work_appointment.mobile.haml', :locals => {:day => day, :appointment => object})
+  - when object.is_a?(CapacitySlot)
+    -# show capacity slot
+    = render(:partial => 'appointments/capacity_slot.mobile.haml', :locals => {:day => day, :slot => object})
+  -#- when object.is_a?(Array)
+    -#= render(:partial => 'waitlists/waitlist', :locals => {:day => day, :waitlist => object[0], :waitlist_time_range => object[2]})

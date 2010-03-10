@@ -1,0 +1,3 @@
+/* force left text-align for certain elements, which overrides the more general body center text align ie fix used for fixed width sites */
+p, div  { text-align:left; }
+

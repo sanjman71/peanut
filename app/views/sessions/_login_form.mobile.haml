@@ -1,0 +1,12 @@
+#login
+  - form_tag(login_path, :id => 'login_form') do
+    .toolbar
+      %h1== Login
+      = link_to 'Cancel', '#', :class => 'cancel'
+    %ul.rounded
+      %li= text_field_tag "email", '', :id => 'email', :name => 'email', :placeholder => 'email or phone'
+      %li= password_field_tag "password", '', :id => 'password', :name => 'password', :placeholder => 'password'
+    = link_to "Login", '', :class => 'whiteButton submit'
+
+  %ul.rounded.hide
+    %li= link_to 'After Login', root_path(:mobile => '1'), :id => 'after_login'

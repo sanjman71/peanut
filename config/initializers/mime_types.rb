@@ -6,3 +6,6 @@
 
 # PDF type is defined by prawn gem/plugin
 Mime::Type.register "text/plain", :email
+
+# Mobile device support
+Mime::Type.register_alias "text/html", :mobile

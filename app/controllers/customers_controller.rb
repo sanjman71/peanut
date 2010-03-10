@@ -32,6 +32,17 @@ class CustomersController < ApplicationController
         render(:json => @collection.to_json)
         # render(:json => @customers.to_json(:include => [:email_addresses, :phone_numbers], :only => ["id", "name", "address"]))
       end
+      format.mobile do
+        # build collection using customer name, emails, and phones
+        @collection = @customers.inject([]) do |array, customer|
+          hash = Hash[:id => customer.id, :name => customer.name,
+                      :email => customer.primary_email_address.andand.address || '',
+                      :phone => customer.primary_phone_number.andand.address || '']
+          array.push(hash)
+          array
+        end
+        render(:json => @collection.to_json)
+      end
     end
   end
 

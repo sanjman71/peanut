@@ -1,0 +1,7 @@
+%li.capacity
+  %h4.time== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
+  - if slot.capacity > 0
+    %h4==Free - #{pluralize(slot.capacity, 'slot')} available
+  - else
+    %h4==Overbooked by #{pluralize(slot.capacity.abs, 'slot')}
+  
