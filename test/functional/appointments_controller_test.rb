@@ -1205,8 +1205,8 @@ class AppointmentsControllerTest < ActionController::TestCase
           @company.preferences[:work_appointment_confirmation_customer] = '1'
           @company.preferences[:work_appointment_confirmation_manager]  = '0'
           @company.preferences[:work_appointment_confirmation_provider] = '0'
-          @request.env['HTTP_REFERER'] = '/openings'
           @company.save
+          @request.env['HTTP_REFERER'] = '/openings'
           @start_at = @work_appt.start_at
           @end_at   = @work_appt.end_at
           @controller.stubs(:current_user).returns(@owner)
@@ -1266,6 +1266,61 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should "set flash message with email confirmation" do
           assert flash[:notice].match(/An email with the appointment changes will be sent to customer@walnutcalendar.com/)
+        end
+      end
+      
+      context "to provider only" do
+        setup do
+          @company.preferences[:work_appointment_confirmation_customer] = '0'
+          @company.preferences[:work_appointment_confirmation_manager]  = '0'
+          @company.preferences[:work_appointment_confirmation_provider] = '1'
+          @company.save
+          @request.env['HTTP_REFERER'] = '/openings'
+          @start_at = @work_appt.start_at
+          @end_at   = @work_appt.end_at
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, {:id => @work_appt.id, :mark_as => 'work', :force => '1',
+                        :service_id => @haircut.id, :duration => @haircut.duration + 1.hour, :customer_id => @customer.id,
+                        :start_at => @work_appt.start_at.to_s(:appt_schedule), :provider_type => "users", :provider_id => @johnny.id}
+        end
+
+        # should send appt confirmation to provider
+        should_change("message count", :by => 1) { Message.count }
+        should_change("message topic", :by => 1) { MessageTopic.count }
+        should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to provider" do
+          assert_equal 1, MessageRecipient.for_messagable(@johnny.primary_email_address).size
+        end
+      end
+
+      context "to customer and managers" do
+        setup do
+          @company.preferences[:work_appointment_confirmation_customer] = '1'
+          @company.preferences[:work_appointment_confirmation_manager]  = '1'
+          @company.preferences[:work_appointment_confirmation_provider] = '0'
+          @company.save
+          @request.env['HTTP_REFERER'] = '/openings'
+          @start_at = @work_appt.start_at
+          @end_at   = @work_appt.end_at
+          @controller.stubs(:current_user).returns(@owner)
+          put :update, {:id => @work_appt.id, :mark_as => 'work', :force => '1',
+                        :service_id => @haircut.id, :duration => @haircut.duration + 1.hour, :customer_id => @customer.id,
+                        :start_at => @work_appt.start_at.to_s(:appt_schedule), :provider_type => "users", :provider_id => @johnny.id}
+        end
+
+        # should send appt confirmation to customer and all managers
+        should_change("message count", :by => 3) { Message.count }
+        should_change("message topic", :by => 3) { MessageTopic.count }
+        should_change("delayed job count", :by => 3) { Delayed::Job.count }
+
+        should "have appointment confirmation addressed to customer" do
+          assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
+        end
+
+        should "have appointment confirmation addressed to owner and manager" do
+          assert_equal 1, MessageRecipient.for_messagable(@owner.primary_email_address).size
+          assert_equal 1, MessageRecipient.for_messagable(@manager.primary_email_address).size
         end
       end
     end

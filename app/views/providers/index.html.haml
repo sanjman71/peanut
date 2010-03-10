@@ -30,10 +30,8 @@
   .span-14.prepend-1.append-1.last
     .highlight#flash
 
-  - if @staff.size >0
+  - if @staff.size > 0
     .span-16.last
-      .span-7.prepend-1
-        %h2== Staff
       #providers_pagination
         = render(:partial => 'providers_pagination', :locals => {:providers => @staff, :search_text => @search_text, :paginate => @paginate})
       #providers
