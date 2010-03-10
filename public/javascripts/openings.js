@@ -148,6 +148,7 @@ $.fn.init_openings_bookit = function() {
     // find selected datetime of this capacity slot
     var slot_id  = $(this).attr('slot_id');
     var datetime = $("div#" + slot_id + " select#slot_times :selected").val();
+    var timeampm = $("div#" + slot_id + " select#slot_times :selected").text();
     var provider = $("div#" + slot_id + " div.provider h4").text();
 
     // validate datetime
@@ -165,10 +166,15 @@ $.fn.init_openings_bookit = function() {
       // open user login dialog
       $(document).open_user_login_dialog();
     } else {
-      // break datetime into date and time parts, and build datetime string
-      var date      = match[1];
-      var time      = match[2];
-      var dt_string = build_date_time_string(date, time);
+      // break datetime into date and time parts
+      var date        = match[1];  // e.g. 20100101
+      var time        = match[2];  // e.g. 100000
+      // build date string from date
+      var date_regex  = /^([0-9]{4,4})([0-9]{2,2})([0-9]{2,2})$/
+      var match       = date.match(date_regex);
+      var month_name  = Date.abbrMonthNames[match[2]-1]  // maps month id to month name
+      var month_day   = match[3]
+      var year        = match[1]
 
       // build post url using datetime
       var url = $(this).attr('url').replace(/datetime/, datetime);
@@ -177,7 +183,7 @@ $.fn.init_openings_bookit = function() {
       $("form#confirm_appointment_form").attr('action', url);
 
       // set dialog datetime string
-      $("div.dialog#confirm_appointment_dialog #start_date_time").text(dt_string);
+      $("div.dialog#confirm_appointment_dialog #start_date_time").text(month_name + ' ' + month_day + ' ' + year + ' @ ' + timeampm);
 
       // set dialog provider
       $("div.dialog#confirm_appointment_dialog #provider_name").text(provider);
