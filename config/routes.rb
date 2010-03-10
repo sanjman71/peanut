@@ -159,6 +159,9 @@ ActionController::Routing::Routes.draw do |map|
   # search calendars scoped by provider
   map.calendar_search ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
 
+  # list calendars
+  map.calendars       '/calendars', :controller => 'calendar', :action => 'index'
+
   # search waitlist scoped by provider
   map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlists', :action => 'index'
   map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlists', :action => 'index'
@@ -166,7 +169,7 @@ ActionController::Routing::Routes.draw do |map|
   # toggle a provider's calendar
   map.connect   ':provider_type/:provider_id/calendar/toggle',
                 :controller => 'company_providers', :action => 'toggle', :conditions => {:method => :post}
-   
+
   # services, products
   map.resources :services
   map.resources :products

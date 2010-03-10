@@ -2,6 +2,9 @@
 - stylesheet('users', 'notes')
 - javascript('users', 'notes')
 
+-# init passwordable state based on user rpx flag; the state may change as we iterate through the user's email and phone numbers
+- passwordable = !@user.rpx?
+
 - form_for(@user, :url => url_for(:controller => 'users', :action => 'update', :role => @role, :subdomain => current_subdomain), :method => :post) do |f|
   
   .span-23.prepend-1.last.mat.padding-bottom-20
@@ -37,6 +40,8 @@
       .span-16.last
         -# not allowed to edit rpx user emails
         = email_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'email_address', :autocomplete => 'off', :disabled => !email_form.object.changeable?
+        -# set passwordable state if email is changeable
+        - passwordable = true if (!email_form.object.new_record? and email_form.object.changeable?)
         - markers = []
         - markers.push('Verified') if email_form.object.verified?
         - markers.push('Primary') if email_form.object == @primary_email_address
@@ -64,6 +69,8 @@
           %h3{:style => 'font-size: 1.8em; margin-top: 15px;'}= label_tag "phone_address", "Phone:"
         .span-16.last
           = phone_form.text_field :address, :class => 'text title', :style => "width: 300px;", :id => 'phone_address', :autocomplete => 'off'
+          -# set passwordable state if phone number is changeable
+          - passwordable = true if (!phone_form.object.new_record? and phone_form.object.changeable?)
           - markers = []
           - markers.push('Verified') if phone_form.object.verified?
           - markers.push('Primary') if phone_form.object == @primary_phone_number
@@ -87,7 +94,7 @@
       .span-4.append-16.last.text-align-right
         %h4= link_to 'Add Phone', '#', :class => 'admin', :id => 'add_phone'
 
-  - unless @user.rpx?
+  - if passwordable
     - password_links = []
     - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
       - if @user.crypted_password.blank?

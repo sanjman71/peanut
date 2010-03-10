@@ -1,0 +1,13 @@
+form#login_form                                           { margin: 0 10px 10px 10px; }
+form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
+
+form#add_work_appointment_form                            { margin: 0 10px 10px 10px; }
+form#add_work_appointment_form a.submit                   { color: rgba(0,0,0,0.9); }
+
+.hide                                                     { display: none; }
+
+ul.edgetoedge.center                                      { text-align: center; }
+
+ul li select                                              { padding-left: 7px; }
+ul li.loading                                             { color: #ddd; }
+ul li h4.time                                             { color: #ccc; }

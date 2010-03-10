@@ -1,0 +1,10 @@
+%li.appointment
+  -# show appointment start and end times
+  %h4.time== #{appointment.start_at.to_s(:appt_time)} - #{appointment.end_at.to_s(:appt_time)}
+
+  - if appointment.work?
+    = appointment.service.name
+    = appointment.customer.name
+  - elsif appointment.free?
+    %h4= appointment.recurrence? ? "Recurring Availability" : "Scheduled Availability"
+    %h4== #{pluralize(appointment.capacity, 'slot')} made available
