@@ -74,7 +74,8 @@
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
-      = render(:partial => 'calendar/show_by_day', :locals => {:stuff_by_day => @stuff_by_day})
+      - @stuff_by_day.each do |day, stuff|
+        = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => stuff})
 
 .span-8.last
   -# schedule help
