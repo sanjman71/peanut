@@ -1,6 +1,4 @@
 /* link styles */
-p, div                                            { text-align:left; }
-
 a:hover                                           { color: #FFFFFF; background-color: #0033CC; text-decoration: none; }
 a.current, a.current:hover                        { text-decoration: none; }
 

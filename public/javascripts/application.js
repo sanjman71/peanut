@@ -267,21 +267,6 @@ $.fn.init_log_entries = function () {
   })
 }
 
-// build date time string from date, time args
-// date => 20100101
-// time => 183000
-function build_date_time_string(date, time) {
-  // parseDate returns a string with format: 'Mon Jan 25 2010 00:00:00: GMT-0600 (CST)
-  var date  = $.datepicker.parseDate('yymmdd', date).toString();
-  // keep the day of week and date part
-  var date  = date.match(/^(\w{3,3} \w{3,3} \d{2,2})/)[1]
-  // convert military time to ampm time
-  var time  = convert_time_military_to_ampm_string(time);
-
-  var dt    = date + " @ " + time;
-  return dt;
-}
-
 // convert mm/dd/yyyy date to yyyymmdd string
 function convert_date_to_string(s) {
   re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/

@@ -41,3 +41,6 @@ config.after_initialize do
   
   Payment.gateway = ActiveMerchant::Billing::BogusGateway.new
 end
+
+# Turn on mobile device support
+MOBILE_DEVICE_SUPPORT = true

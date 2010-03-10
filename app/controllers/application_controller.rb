@@ -37,10 +37,13 @@ class ApplicationController < ActionController::Base
 
   # Initialize current company and subdomain
   before_filter :init_current_company
-  
+
   # Load and cache all user privileges on each call so we don't have to keep checking the database
   before_filter :init_current_privileges
-  
+
+  # Mobile device support
+  before_filter :prepare_for_mobile
+
   # Default layout
   layout "company"
 
@@ -168,7 +171,7 @@ class ApplicationController < ActionController::Base
       # find company and all associated locations
       @current_company = Company.find_by_subdomain(current_subdomain, :include => [:locations, :subscription])
 
-      # check if its a valid company, and that its state is active
+      # check if its a valid company and state is active
       if @current_company.blank? or @current_company.state != 'active'
         flash[:error] = "Invalid company"
         return redirect_to(root_path(:subdomain => 'www'))
@@ -238,6 +241,28 @@ class ApplicationController < ActionController::Base
         logger.debug("xxx invalid service #{params[:service_id]}")
         redirect_to(unauthorized_path) and return
       end
+    end
+  end
+
+  def mobile_device?
+    if MOBILE_DEVICE_SUPPORT
+      if session[:mobile_param]
+        session[:mobile_param] == "1"
+      else
+        request.user_agent =~ /Mobile|webOS/
+      end
+    else
+      false
+    end
+  end
+
+  helper_method :mobile_device?
+
+  def prepare_for_mobile
+    if MOBILE_DEVICE_SUPPORT
+      # set session param if there is a 'mobile' url param
+      session[:mobile_param] = params[:mobile] if params[:mobile]
+      request.format = :mobile if mobile_device?
     end
   end
 

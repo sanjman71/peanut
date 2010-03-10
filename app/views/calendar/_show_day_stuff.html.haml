@@ -1,0 +1,16 @@
+.span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
+  .span-11.last.calendar.date.wide
+    %span= day.to_s(:appt_day)
+  - reset_cycle
+  -# sort all day's stuff by start at time
+  -# Order is free time (i.e. availability), then capacity slots, then work appointments
+  - stuff.sort_by{ |o| [o.start_at.in_time_zone, ((o.class == CapacitySlot) ? 1 : ((o.class == Appointment && o.free?) ? 0 : 2))] }.each do |object|
+    -# check what type of stuff it is, possible options:
+    -# appointments, capacity_slots, [waitlist, date, waitlist_time_range]
+    - case
+    - when object.is_a?(Appointment)
+      = render(:partial => 'appointments/free_work_appointment', :locals => {:day => day, :appointment => object})
+    - when object.is_a?(CapacitySlot)
+      = render(:partial => 'appointments/capacity_slot', :locals => {:day => day, :slot => object})
+    - when object.is_a?(Array)
+      = render(:partial => 'waitlists/waitlist', :locals => {:day => day, :waitlist => object[0], :waitlist_time_range => object[2]})

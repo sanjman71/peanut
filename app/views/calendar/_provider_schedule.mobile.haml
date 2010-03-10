@@ -1,0 +1,28 @@
+-# add schedule with links to dates
+#provider_schedule
+  .toolbar
+    %h1== Provider Schedule
+    = link_to 'Back', '#', :class => 'back'
+    = link_to 'Home', '#home', :class => 'button'
+
+  %ul.plastic
+    - daterange.each do |day|
+      %li.arrow= link_to day.to_s(:appt_day), "#provider_schedule_#{day.to_s(:appt_schedule_day)}"
+
+-# add specific dates
+- daterange.each do |day|
+  %div.schedule_date{:id => "provider_schedule_#{day.to_s(:appt_schedule_day)}", :date => day.to_s(:appt_schedule_day)}
+    .toolbar
+      %h1== Daily Schedule
+      = link_to 'Back', '#', :class => 'back'
+      = link_to 'Home', '#home', :class => 'button'
+
+    %ul.edgetoedge
+      %li== Schedule for #{day.to_s(:appt_day)}
+
+    %ul.plastic.schedule
+      %li.loading== Loading Schedule ...
+
+    -# add privilege checks later
+    %ul.individual
+      %li.arrow= link_to 'Add Appointment', "#add_work_appointment"

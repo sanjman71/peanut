@@ -5,7 +5,11 @@ class HomeController < ApplicationController
   def index
     if current_company
       # show company home page
-      redirect_to openings_path(:subdomain => current_subdomain) and return
+      if mobile_device?
+        render(:action => :index, :layout => 'company') and return
+      else
+        redirect_to openings_path(:subdomain => current_subdomain) and return
+      end
     else
       # show www/root home page
       render(:action => :index, :layout => 'home') and return

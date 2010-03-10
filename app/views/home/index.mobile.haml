@@ -1,0 +1,20 @@
+#home.current
+  .toolbar
+    %h1== #{current_company.name}
+    - if logged_in?
+      = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
+
+  - if !logged_in?
+    -# non-authenticated are required to login
+    %ul.plastic
+      %li.arrow= link_to 'Login', '#login', :class => 'dissolve'
+  - else
+    -# authenticated users see the main menu
+    %ul.plastic#menu
+      %li.arrow= link_to "Schedules", calendars_path, :target => '_webapp'
+
+  - if logged_in?
+    .info== Logged in as #{user_login_name(current_user)}
+
+-# login form
+= render(:partial => 'sessions/login_form')

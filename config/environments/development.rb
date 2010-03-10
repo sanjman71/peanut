@@ -37,8 +37,11 @@ config.to_prepare do
     ActiveMerchant::Billing::BraintreeGateway.new( 
       :login    => 'demo', 
       :password => 'password' 
-  ) 
+  )
 end
+
+# Turn on mobile device support in dev mode
+MOBILE_DEVICE_SUPPORT = true
 
 # Blueprint grid toggle switch
 $BlueprintGrid = false

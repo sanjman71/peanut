@@ -226,6 +226,13 @@ class AppointmentsController < ApplicationController
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
       format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+      format.mobile do
+        if @errors.empty?
+          head(:ok, :content_type => 'application/json')
+        else
+          head(:bad_request, :content_type => 'application/json')
+        end
+      end
     end
   end
 

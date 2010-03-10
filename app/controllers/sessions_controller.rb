@@ -7,15 +7,10 @@ class SessionsController < ApplicationController
   def new
     # We show a signup form also, which requires a @user object
     @user = User.new
-    if current_company.blank?
-      # use home layout, don't allow signups from here
-      @signup = false
-      render(:action => 'new', :layout => 'home')
-    else
-      # use default layout, disable signups
-      @signup = false
-      render(:action => 'new')
-    end
+    
+    # disable signups, choose layout based on current company
+    @signup = false
+    render(:action => 'new', :layout => current_company.blank? ? 'home' : 'company') and return
   end
 
   # POST /session
@@ -34,22 +29,34 @@ class SessionsController < ApplicationController
       # protection if user resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
 
-      redirect_path = session_initialize(user)
-      redirect_back_or_default(redirect_path) and return
+      @redirect_path = session_initialize(user)
     else
       note_failed_signin
       @user        = User.new
       @email       = params[:email]
       @remember_me = params[:remember_me]
-      
-      if current_company.blank?
-        # use home layout, don't allow signups from here
-        @signup = false
-        render(:action => 'new', :layout => 'home')
-      else
-        # use default layout, disable signup
-        @signup = false
-        render :action => 'new'
+    end
+
+    respond_to do |format|
+      format.html do
+        if user
+          # success
+          redirect_back_or_default(@redirect_path) and return
+        else
+          # error
+          # disable signups, choose layout based on current company
+          @signup = false
+          render(:action => 'new', :layout => current_company.blank? ? 'home' : 'company') and return
+        end
+      end
+      format.mobile do
+        if user
+          # success
+          head(:ok, :content_type => 'application/json')
+        else
+          # error
+          head(:bad_request, :content_type => 'application/json')
+        end
       end
     end
   end

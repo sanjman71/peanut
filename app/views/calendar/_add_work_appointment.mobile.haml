@@ -1,0 +1,24 @@
+#add_work_appointment
+  .toolbar
+    %h1== Add Work Appointment
+    = link_to 'Cancel', '#', :class => 'cancel'
+    
+  - form_tag(schedule_work_path, :id => 'add_work_appointment_form') do
+    = hidden_field_tag :provider_id
+    = hidden_field_tag :provider_type
+    = hidden_field_tag :customer_id
+    = hidden_field_tag :start_at
+    = hidden_field_tag :mark_as, 'work'
+    = hidden_field_tag :force, '1'
+
+    %ul.rounded
+      %li= text_field_tag "date", '', :id => 'start_date', :name => 'start_date', :placeholder => 'Appointment date', :disabled => true, :class => 'readonly'
+      %li= text_field_tag "time", '', :id => 'start_time', :name => 'start_time', :placeholder => 'Time e.g. 9:00 am, 3:30 pm'
+      %li= select_tag 'service_id', options_for_select(services.map {|s| [s.name, s.id]}), :placeholder => 'Pick a service'
+      %li= select_tag 'duration', options_for_select(service_duration_select_options, nil), :placeholder => 'Duration'
+      %li= text_field_tag 'customer_name', '', :autocomplete => 'off', :id => 'customer_name', :url => customers_path(:format => :json), |
+                                               :placeholder => 'Search using name, phone number or email' |
+    -# submit
+    = link_to "Add", '', :class => 'whiteButton submit'
+
+      

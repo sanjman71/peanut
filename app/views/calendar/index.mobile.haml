@@ -1,0 +1,29 @@
+#home.current
+  .toolbar
+    %h1== #{current_company.name} Calendar
+    = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
+    = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
+  %ul.plastic
+    %li.arrow= link_to "Select a Provider", '#providers', :class => 'flip', :id => 'provider_name'
+
+  %ul.edgetoedge
+    %li.sep
+
+  %ul.plastic.hide#provider_menu
+    %li.arrow= link_to 'Schedule', '#provider_schedule'
+
+  .info== Logged in as #{user_login_name(current_user)}
+
+-# login form
+= render(:partial => 'sessions/login_form')
+
+- unless @providers.blank?
+  -# providers list
+  = render(:partial => 'calendar/providers', :locals => {:providers => @providers})
+  -# provider schedule
+  = render(:partial => 'calendar/provider_schedule', :locals => {:daterange => @daterange})
+  -# add work appointment
+  = render(:partial => 'calendar/add_work_appointment', :locals => {:services => @services})
+
+%script{:type => 'text/javascript'}
+  var current_user_id = #{logged_in? ? current_user.id : 0};
