@@ -709,7 +709,7 @@ class UsersControllerTest < ActionController::TestCase
         get :edit, :id => @provider.id, :role => 'company provider'
       end
 
-      should_assign_to(:index_path) {"/providers"}
+      should_not_assign_to(:index_path)
 
       should "show 'add existing login' link" do
         assert_select "a#add_rpx", 1
@@ -774,15 +774,25 @@ class UsersControllerTest < ActionController::TestCase
       should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
-  
-    context "with 'update users' privilege" do
+
+    context "with 'update users' privilege as provider" do
+      setup do
+        @controller.stubs(:current_user).returns(@provider)
+        put :update, :id => @provider.id, :user => {:name => "Provider Chg"}, :role => 'company provider'
+      end
+
+      should_respond_with :redirect
+      should_redirect_to('user edit path') { "/users/#{@provider.id}/edit" }
+    end
+
+    context "with 'update users' privilege as owner" do
       setup do
         @controller.stubs(:current_user).returns(@owner)
-        put :update, :id => @owner.id, :user => {:name => "Provider Chg"}, :role => 'company provider'
+        put :update, :id => @provider.id, :user => {:name => "Provider Chg"}, :role => 'company provider'
       end
-    
+
       should_respond_with :redirect
-      should_redirect_to('/providers') { "/providers" }
+      should_redirect_to('providers index path') { "/providers" }
     end
   end
   

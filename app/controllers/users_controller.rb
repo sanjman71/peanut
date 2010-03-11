@@ -409,9 +409,6 @@ class UsersController < ApplicationController
     case role
     when "company customer"
       case
-      # when !logged_in?
-      #   # not logged in, use openings path
-      #   openings_path
       when (current_user == user)
         # no back when user editing themself
         nil
@@ -423,7 +420,14 @@ class UsersController < ApplicationController
         customers_path
       end
     when "company provider"
-      providers_path
+      case
+      when (current_user == user)
+        # no back when user editing themself
+        nil
+      else
+        # default path
+        providers_path
+      end
     else
       root_path
     end
