@@ -15,6 +15,9 @@ namespace :init do
     BadgesInit.roles_privileges
   end
   
+  desc "Rebuild Demos"
+  task :rebuild_demos => [:destroy_demos, :create_demos]
+  
   desc "Create Demos"
   task :create_demos => [:create_meatheads, :create_mctrucks, :create_maryssalon]
 

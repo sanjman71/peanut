@@ -27,7 +27,7 @@
   = display_flash
 
 .span-23.prepend-1.last
-  = render(:partial => 'appointment', :locals => {:appointment => @appointment, :customer_signup => false})
+  = render(:partial => 'appointments/appointment', :locals => {:appointment => @appointment, :customer_signup => false})
 
   -# add note
   .new_note#new_note_container

@@ -50,6 +50,8 @@ class WalnutDemo
     else
       user  = User.create(:name => user_name, :password => user_pwd, :password_confirmation => user_pwd)
       email = user.email_addresses.create(:address => user_email) 
+    end
+    if user.state == 'passive'
       user.register!
       user.activate!
     end

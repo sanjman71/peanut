@@ -44,17 +44,17 @@
   .span-2.text_field_label
     = label_tag "starts_at", "Start Time:"
   .span-4.padding-top-5
-    = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+    = text_field_tag 'starts_at', @appointment.start_at.andand.to_s(:appt_time).andand.downcase || '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   .span-2.text_field_label
     = label_tag "start_date", "Date:"
   .span-4.last.padding-top-5
-    = text_field_tag 'start_date', '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
+    = text_field_tag 'start_date', @appointment.start_at.andand.to_s(:appt_datepicker_date) || '', :class => 'datepicker std_text_field_style', :autocomplete => 'off'
 
 .span-14.prepend-1.last
   .span-2.text_field_label
     = label_tag "ends_at", "End Time:"
   .span-4.padding-top-5
-    = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+    = text_field_tag 'ends_at', @appointment.end_at.andand.to_s(:appt_time).andand.downcase || '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
   -# we assume the start and end date are the same
   -#.span-2.text_field_label
     -#= label_tag "end_date", "End Date:"
@@ -72,7 +72,18 @@
 
 .span-14.prepend-1.last
   .span-14#free_work_calendar
-    = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :show_weeks => false, :markings => @calendar_markings})
+    - days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    - start_day = current_company.preferences[:start_wday].to_i
+    - recur_days = appointment_recur_rule_days(@appointment)
+    
+    %table.calendar
+      %tbody
+        %tr.colborder
+          - 0.upto 6 do
+            - day_string = days[start_day%7]
+            - start_day += 1
+            %th{:class => ['dayname', recur_days.include?(day_string) ? 'mark' : nil].join(' '), :id => day_string.downcase, :byday => day_string.downcase.slice(0,2)}= day_string
+
 
 %hr.space
 
@@ -84,16 +95,24 @@
   .span-4.text_field_label
     = label_tag "schedule_end_date", "Series Ends:"
   .span-10.last.padding-top-5
-    = radio_button_tag "ends", "Never", true, :id => 'schedule_end_never'
+    = radio_button_tag "ends", "Never", @appointment.recur_until.blank? ? true : false, :id => 'schedule_end_never'
     = label_tag "schedule_end_never", "Never", :class => 'std_text_field_style'
-    = radio_button_tag "ends", "Until", false, :id => 'schedule_end_until'
+    = radio_button_tag "ends", "Until", @appointment.recur_until.blank? ? false : true, :id => 'schedule_end_until'
     = label_tag "schedule_end_until", "Until", :class => 'std_text_field_style', :style => 'padding-right: 5px;'
-    = text_field_tag 'schedule_end_date', '', :class => 'datepicker hide std_text_field_style'
+    = text_field_tag 'schedule_end_date', @appointment.recur_until.andand.to_s(:appt_datepicker_date) || '', :class => 'datepicker hide std_text_field_style'
     
 %hr.space
     
+- if @appointment.new_record?
+  - url = url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id)
+  - submit_text = "Create Weekly Schedule"
+  - method = :post
+- else
+  - url = url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'update_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id)
+  - submit_text = "Update Weekly Schedule"
+  - method = :put
 
-- form_for(Appointment.new, :url => url_for(:subdomain => current_subdomain, :controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id), :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
+- form_for(@appointment, :url => url, :method => method, :html => {:id => 'add_weekly_schedule_form'}) do |f|
   = hidden_field_tag :freq, 'weekly'
   = hidden_field_tag :wkst, 'su'
   = hidden_field_tag :byday, ''
@@ -110,12 +129,12 @@
       == This value is typically 1. It defaults to the capacity of the #{@provider.name} and should always be 1 or more.
   - else
     .span-14.prepend-1.last.prompt
-      == Advanced: What capacity will #{@provider.name} have during this free time?
+      == Advanced: How many slots will #{@provider.name} have available during this free time?
     .span-14.prepend-1.last.hint.padding-bottom-10
-      == This value is typically 1. It defaults to the provider's capacity and should always be 1 or more.
+      == This value is typically 1. It defaults to the provider's default number of slots and should always be 1 or more.
   .span-14.prepend-1.last
     .span-3.text_field_label
-      = label_tag "capacity", "Capacity:"
+      = label_tag "capacity", "Slots:"
     .span-4.last
       = text_field_tag 'capacity', @provider.capacity, :class => 'std_text_field_style'
   
@@ -124,10 +143,8 @@
   
   .span-16.last.prepend-1
     %h2#submit
-      = f.submit "Create Weekly Schedule", :class => 'big button'
+      = f.submit submit_text, :class => 'big button'
       %span{:style => 'font-size: 11px;'}
         == or
         = link_to 'Cancel', url_for(:controller => 'calendar', :action => 'show', :provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
     %h2.hide#progress= image_tag 'barbershop.gif'
-  
-  

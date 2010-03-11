@@ -4,7 +4,7 @@ $.fn.set_weekly_schedule = function () {
   // find selected day names
   var daynames = new Array();
   $('.dayname.mark').each(function() {
-    daynames.push($(this).attr("id"));
+    daynames.push(this.textContent);
   })
 
   if (daynames.length == 0) {
@@ -124,7 +124,7 @@ $.fn.init_schedule_range = function () {
 
 $.fn.init_datepicker_weekly = function () {
   $(".datepicker").datepicker({
-      minDate: +0, 
+      minDate: '-3m',
       maxDate: '+3m',
       onClose: function(dateText, instance) {
         $(document).set_weekly_schedule();
