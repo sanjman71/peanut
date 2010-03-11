@@ -12,8 +12,8 @@
         %h4{:style => 'padding-top: 5px; font-size: 1.2em;'}
           = link_to 'Add a user', new_provider_path, :class => 'add provider'
           == &nbsp;|&nbsp;
-          = link_to 'Add a resource', new_resource_path, :class => 'add provider'
-          == &nbsp;|&nbsp;
+          -#= link_to 'Add a resource', new_resource_path, :class => 'add provider'
+          -#== &nbsp;|&nbsp;
           = link_to 'Invitations', invitations_path, :class => 'add provider'
     .span-15
       -# show current plan usage
