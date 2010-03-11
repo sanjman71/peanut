@@ -74,10 +74,10 @@ class ServicesController < ApplicationController
   def update
     @service  = Service.find(params[:id])
     @status   = @service.update_attributes(params[:service])
-    
+
     if !@status
       flash[:error] = @service.errors.full_messages.split("\n")
-      redirect_to(edit_service_path(@service, :subdomain => @subdomain)) and return
+      redirect_to(edit_service_path(@service)) and return
     else
       flash[:notice] = "Updated service #{@service.name}"
     end

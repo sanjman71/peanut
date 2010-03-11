@@ -895,16 +895,40 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       context "and add phone number" do
-        setup do
-          @controller.stubs(:current_user).returns(@owner)
-          put :update, :id => @customer.id, :role => 'company customer', 
-              :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
+        context "to user in active state" do
+          setup do
+            assert_equal 'active', @owner.state
+            @controller.stubs(:current_user).returns(@owner)
+            put :update, :id => @customer.id, :role => 'company customer', 
+                :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
+          end
+
+          should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+          should "add user phone number" do
+            assert_equal ["6501239999"], @customer.phone_numbers.collect(&:address)
+          end
         end
-        
-        should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
-        
-        should "add user phone number" do
-          assert_equal ["6501239999"], @customer.phone_numbers.collect(&:address)
+
+        context "to user in incomplete state" do
+          setup do
+            @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_phone => 'required')
+            @user.grant_role('company customer', @company)
+            assert_equal 'incomplete', @user.reload.state
+            @controller.stubs(:current_user).returns(@user)
+            put :update, :id => @user.id, :role => 'company customer',
+                :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}
+          end
+
+          should_change("PhoneNumber.count", :by => 1) { PhoneNumber.count }
+
+          should "add user phone number" do
+            assert_equal ["6501239999"], @user.phone_numbers.collect(&:address)
+          end
+
+          should "change user state to active" do
+            assert_equal 'active', @user.reload.state
+          end
         end
       end
     end

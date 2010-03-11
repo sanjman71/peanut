@@ -77,7 +77,7 @@
           - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
             - unless phone_form.object.new_record? || phone_form.object == @primary_phone_number
               - markers.push(link_to('Make primary', user_phone_promote_path(@user, phone_form.object), :class => 'admin'))
-            - if phone_form.object.deletable? and (phone_form.object != @primary_phone_number)
+            - if phone_form.object.deletable? #and (phone_form.object != @primary_phone_number)
               -# allow delete for non-primary phones
               - markers.push(link_to('Delete', user_phone_delete_path(@user, phone_form.object), :method => :delete, :class => 'admin'))
           - unless markers.empty?

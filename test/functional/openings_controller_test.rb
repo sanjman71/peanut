@@ -108,6 +108,17 @@ class OpeningsControllerTest < ActionController::TestCase
       should_redirect_to("openings_path") { openings_path }
     end
 
+    context "as customer in incomplete state" do
+      setup do
+        @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_email => 'required')
+        @user.grant_role('company customer', @company)
+        @controller.stubs(:current_user).returns(@user)
+        get :index
+      end
+
+      should_redirect_to("user edit path") { "/users/#{@user.id}/edit" }
+    end
+
     context "for a private company" do
       context "as a guest" do
         setup do

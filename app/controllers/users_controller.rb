@@ -175,10 +175,20 @@ class UsersController < ApplicationController
     # build notes collection, most recent first
     @note     = Note.new
     @notes    = @user.notes.sort_recent
-    
+
     # build the index path based on the user type
     @index_path = index_path(@role)
-    
+
+    if @user.incomplete?
+      if @user.phone_missing?
+        flash.now[:notice] = "Please add a phone number to #{current_user == @user ? "your" : "this user's"} profile"
+      elsif @user.email_missing?
+        flash.now[:notice] = "Please add an email to #{current_user == @user ? "your" : "this user's"} profile"
+      else
+        flash.now[:error] = "User profile is missing required information"
+      end
+    end
+
     respond_to do |format|
       format.html
     end

@@ -3,7 +3,7 @@ module CalendarHelper
   def build_calendar_range_type_links(provider, range_type_collection, current, start_date)
 
     range_type_collection.each do |rt|
-      url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain}
+      url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => current_subdomain}
       # add css 'current' class for the current link
       klass       = (rt == current) ? 'current' : ''
       if ((rt == 'daily') && (start_date.today?))
@@ -26,7 +26,7 @@ module CalendarHelper
     when_collection.each do |s|
       # add css 'current' class for the current link
       klass       = (s == current) ? 'current' : ''
-      url_params  = {:controller => 'calendar', :action => 'show', :provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain}
+      url_params  = {:controller => 'calendar', :action => 'show', :provider_id => provider.id, :provider_type => provider.tableize, :subdomain => current_subdomain}
       
       if s == default
         # no when parameter for the default value (explicitly clear start/end date used for range values)
@@ -97,7 +97,7 @@ module CalendarHelper
       today_word         = "Month starting today"
     end
 
-    url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => @subdomain, :range_type => current_range_type}
+    url_params  = {:provider_id => provider.id, :provider_type => provider.tableize, :subdomain => current_subdomain, :range_type => current_range_type}
 
     if prev_link.blank?
       prev_link = link_to("Previous #{range_word}", 
