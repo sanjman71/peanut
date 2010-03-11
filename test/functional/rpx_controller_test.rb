@@ -127,9 +127,9 @@ class RpxControllerTest < ActionController::TestCase
         should_change("User.count", :by => 1) { User.count }
         should_not_change("EmailAddress.count") { EmailAddress.count }
 
-        should "create user in incomplete state" do
+        should "create user in data_missing state" do
           @user = User.find(assigns(:user).id)
-          assert_equal 'incomplete', @user.state
+          assert_equal 'data_missing', @user.state
         end
 
         should "assign user name" do

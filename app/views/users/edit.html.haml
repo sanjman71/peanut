@@ -157,8 +157,9 @@
 
   .span-20.prepend-1.last.submit
     = submit_tag "Save Changes", :id => 'user_update_submit'
-    == or
-    = link_to "Cancel", @index_path, :class => 'admin'
+    - unless @index_path.blank?
+      == or
+      = link_to "Cancel", @index_path, :class => 'admin'
 
 %hr.space
 

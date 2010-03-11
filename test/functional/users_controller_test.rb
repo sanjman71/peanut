@@ -910,11 +910,11 @@ class UsersControllerTest < ActionController::TestCase
           end
         end
 
-        context "to user in incomplete state" do
+        context "to user in data_missing state" do
           setup do
             @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_phone => 'required')
             @user.grant_role('company customer', @company)
-            assert_equal 'incomplete', @user.reload.state
+            assert_equal 'data_missing', @user.reload.state
             @controller.stubs(:current_user).returns(@user)
             put :update, :id => @user.id, :role => 'company customer',
                 :user => {:phone_numbers_attributes => {"1" => {:address => "650-123-9999", :name => "Mobile"}}}

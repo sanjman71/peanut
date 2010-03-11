@@ -177,9 +177,9 @@ class UsersController < ApplicationController
     @notes    = @user.notes.sort_recent
 
     # build the index path based on the user type
-    @index_path = index_path(@role)
+    @index_path = index_path(@user, @role)
 
-    if @user.incomplete?
+    if @user.data_missing?
       if @user.phone_missing?
         flash.now[:notice] = "Please add a phone number to #{current_user == @user ? "your" : "this user's"} profile"
       elsif @user.email_missing?
@@ -199,8 +199,8 @@ class UsersController < ApplicationController
     # @role and @user are initialized here
 
     # build the index path based on the user type
-    @index_path = index_path(@role)
-    
+    @index_path = index_path(@user, @role) || user_edit_path(@user)
+
     respond_to do |format|
       if @user.update_attributes(params[:user])
         flash[:notice] = "User '#{@user.name}' was successfully updated"
@@ -404,19 +404,22 @@ class UsersController < ApplicationController
     end
   end
 
-  def index_path(role)
+  def index_path(user, role)
     # build the index path based on the user type
     case role
     when "company customer"
       case
-      when !logged_in?
-        # not logged in, use openings path
-        openings_path
-      when logged_in? && (request.referer != request.url)
+      # when !logged_in?
+      #   # not logged in, use openings path
+      #   openings_path
+      when (current_user == user)
+        # no back when user editing themself
+        nil
+      when (request.referer != request.url)
         # back to referer
         request.referer
       else
-        # logged in, default path
+        # default path
         customers_path
       end
     when "company provider"

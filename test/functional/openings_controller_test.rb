@@ -108,9 +108,10 @@ class OpeningsControllerTest < ActionController::TestCase
       should_redirect_to("openings_path") { openings_path }
     end
 
-    context "as customer in incomplete state" do
+    context "as customer in data_missing state" do
       setup do
         @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_email => 'required')
+        assert_equal 'data_missing', @user.state
         @user.grant_role('company customer', @company)
         @controller.stubs(:current_user).returns(@user)
         get :index

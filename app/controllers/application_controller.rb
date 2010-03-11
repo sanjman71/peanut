@@ -67,7 +67,7 @@ class ApplicationController < ActionController::Base
   # check that the current user is in the active state
   def current_user_active_state_required
     return if !logged_in? or current_user.active?
-    if current_user.incomplete?
+    if current_user.data_missing?
       redirect_to(user_edit_path(current_user)) and return
     end
   end
