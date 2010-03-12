@@ -21,7 +21,7 @@
   -# providers list
   = render(:partial => 'calendar/providers', :locals => {:providers => @providers})
   -# provider schedule
-  = render(:partial => 'calendar/provider_schedule', :locals => {:daterange => @daterange})
+  = render(:partial => 'calendar/provider_schedule', :locals => {:daterange => @daterange, :today => @today})
   -# add work appointment
   = render(:partial => 'calendar/add_work_appointment', :locals => {:services => @services})
 

@@ -38,12 +38,14 @@ function set_current_provider(provider_name, provider_id) {
   // clear any old provider schedule dates
   $("div.schedule_date ul li.appointment").remove();
   $("div.schedule_date ul li.capacity").remove();
+  $("div.schedule_date ul li.nothing").remove();
   $("div.schedule_date ul li.loading").show();
 }
 
 function reset_provider_schedule_date(date) {
   $("div.schedule_date#provider_schedule_" + date + " ul li.appointment").remove();
   $("div.schedule_date#provider_schedule_" + date + " ul li.capacity").remove();
+  $("div.schedule_date#provider_schedule_" + date + " ul li.nothing").remove();
   $("div.schedule_date#provider_schedule_" + date + " ul li.loading").show();
 }
 
@@ -60,14 +62,16 @@ $.fn.init_providers = function() {
 
   $("div#provider_schedule").bind("pageAnimationEnd", function(e, info) {
     if (info.direction == 'out') return;
-    // set title
+    // set title, info
     $(this).find("div.toolbar h1").text(current_provider_name + "'s Schedule");
+    $(this).find("div.info").text(current_provider_name + "'s Schedule");
   })
 
   $("div.schedule_date").bind("pageAnimationEnd", function(e, info) {
     if (info.direction == 'out') return;
-    // set title
+    // set title, info
     $(this).find("div.toolbar h1").text(current_provider_name + "'s Schedule");
+    $(this).find("div.info").text(current_provider_name + "'s Schedule");
     // set current schedule date
     current_schedule_date = $(this).attr('date');
     // check if this date's schedule has already been loaded
@@ -85,20 +89,25 @@ $.fn.init_appointments = function() {
   $("div#add_work_appointment").bind("pageAnimationEnd", function(e, info) {
     if (info.direction == 'out') return;
     // initialize form data
-    $(this).find("input#start_date").val(current_schedule_date);
+    $(this).find("li#start_date").text(current_schedule_date);
     $(this).find("input#provider_id").val(current_provider_id);
     $(this).find("input#provider_type").val(current_provider_type);
   })
 
   $("form#add_work_appointment_form").submit(function() {
     // validate fields
-    var service_id    = $(this).find("select#service_id").val();
-    var customer_id   = $(this).find("input#customer_id").val();
-    var start_date    = $(this).find("input#start_date").val();
-    var start_time    = $(this).find("input#start_time").val();
+    var customer_id   = $(this).find("select#customer_id option:selected").val() || '';
+    var start_date    = $(this).find("#start_date").text();
+    var start_time    = $(this).find("select#start_time option:selected").val();
+    var start_ampm    = $(this).find("select#start_ampm option:selected").val();
 
     if (start_time == '') {
       alert("Please select a start time");
+      return false;
+    }
+
+    if (start_ampm == '') {
+      alert("Please select am or pm");
       return false;
     }
 
@@ -107,23 +116,23 @@ $.fn.init_appointments = function() {
       return false;
     }
 
-    // normalize time format
-    var start_time = convert_time_ampm_to_string(start_time)
+    // normalize time format, e.g. "3:00 am" => 030000
+    var start_time_ampm = convert_time_ampm_to_string(start_time + " " + start_ampm)
     // normalize date format
     //var start_date = convert_date_to_string(start_date);
 
     // initialize start_at with formatted version
-    $(this).find("input#start_at").attr('value', start_date + 'T' + start_time);
+    $(this).find("input#start_at").attr('value', start_date + 'T' + start_time_ampm);
 
     // disable start_date, start_time field
     $(this).find("input#start_date").attr('disabled', 'disabled');
-    $(this).find("input#start_time").attr('disabled', 'disabled');
+    $(this).find("select#start_time").attr('disabled', 'disabled');
+    $(this).find("select#start_ampm").attr('disabled', 'disabled');
 
-    // disable customer_name field
-    $(this).find("input#customer_name").attr('disabled', 'disabled');
+    // disable customer_search field
+    $(this).find("input#live_search_for_customers").attr('disabled', 'disabled');
 
     //alert("serialize: " + $(this).serialize());
-    //return false;
 
     // post request and handle the response
     $.ajax({
@@ -146,42 +155,41 @@ $.fn.init_appointments = function() {
     reset_provider_schedule_date(start_date);
 
     // re-enable all input fields that are not 'readonly'
-    $(this).find("input").not('.readonly').removeAttr('disabled');
+    $(this).find("input,select").not('.readonly').removeAttr('disabled');
 
     return false;
   })
 }
 
-$.fn.init_autocomplete_customers = function() {
-  // Set up the autocomplete
-  // Setup help for the JSON solution from here: http://blog.schuager.com/2008/09/jquery-autocomplete-json-apsnet-mvc.html
-  // and here: http://www.it-eye.nl/weblog/2008/08/23/using-jquery-autocomplete-with-grails-and-json/
-  // This will dynamically invoke the index function on the customers controller, asking for JSON data
-  // The parse option is used to parse the JSON result into rows, each containing all the data for the row, the value displayed and the formatted value
-  // The formatItem option is also used to format the rows displayed in the pulldown
-  $("#customer_name").autocomplete($("#customer_name").attr("url"),
-                                          {
-                                            dataType:'json',
-                                            parse: function(data) {
-                                                      var rows = new Array();
-                                                      for(var i=0; i<data.length; i++){
-                                                          rows[i] = { data:data[i], value: data[i].name+(data[i].email ? " "+data[i].email : '')+(data[i].phone ? " "+data[i].phone : ''), result:data[i].name };
-                                                      }
-                                                      return rows;
-                                                  },
-                                            formatItem: function(data,i,max,value,term) { return value; },
-                                            autoFill: false
-                                          });
-  
-  $("#customer_name").result(function(event, data, formatted) {
-    // set the customer id
-    $("#customer_id").attr("value", data.id);
-  });
+// Prevent a method from being called too often
+// One use is to throttle live search requests
+Function.prototype.sleep = function (millisecond_delay) {
+  if(window.sleep_delay != undefined) clearTimeout(window.sleep_delay);
+  var function_object = this;
+  window.sleep_delay  = setTimeout(function_object, millisecond_delay);
+};
+
+// live customers search
+$.fn.init_live_customers_search = function () {
+  $("input#live_search_for_customers").keyup(function() {
+    var search_url  = $(this).attr('url');
+    var search_term = this.value;
+    // check for min length
+    if (search_term.length < 3) { return false; }
+    // excecute search, throttle how often its called
+    var search_execution = function () {
+      $.get(search_url, {q : search_term}, null, "script");
+      // show search progress bar
+      //$('#search_progress').show();
+    }.sleep(1000);
+    
+    return false;
+  })
 }
 
 $(document).ready(function() {
   $(document).init_login_submit();
   $(document).init_providers();
   $(document).init_appointments();
-  $(document).init_autocomplete_customers();
+  $(document).init_live_customers_search();
 })
