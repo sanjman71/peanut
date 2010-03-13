@@ -38,8 +38,8 @@ class ResourcesController < ApplicationController
     @resource.save
     current_company.resource_providers.push(@resource)
     
-    # redirect to providers page
-    @redirect_path = providers_path
+    # redirect to staffs page
+    @redirect_path = staffs_path
     flash[:notice] = "Created resource #{@resource.name}"
     
     respond_to do |format|

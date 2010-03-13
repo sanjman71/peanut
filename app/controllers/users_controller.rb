@@ -26,8 +26,8 @@ class UsersController < ApplicationController
       when 'company customer'
         # anyone can signup as a customer
         return true
-      when 'company provider'
-        # providers must be invited or user must have 'create users' privilege on the company
+      when 'company staff'
+        # staff must be invited or user must have 'create users' privilege on the company
         return true if @invitation
         super
       else
@@ -42,7 +42,7 @@ class UsersController < ApplicationController
     end
   end
   
-  # GET /providers/new
+  # GET /staffs/new
   # GET /customers/new
   # GET /customers/new?return_to=
   # GET /invite/dc8a032b9ae52f5c7710f53a945efbc11bb7ce51
@@ -99,7 +99,7 @@ class UsersController < ApplicationController
       # use return_to as the back link
       @back_path = params[:return_to]
     else
-      # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
+      # initialize back path to either the caller or the resource index page (e.g. /customers, /staffs), but only if there is a current user
       @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
     end
 
@@ -110,7 +110,7 @@ class UsersController < ApplicationController
  
   # POST /customers/create
   # POST /customers/create?return_to=
-  # POST /providers/create
+  # POST /staffs/create
   def create
     # @role (always) and @invitation (if it exists) are initialized in a before filter
 
@@ -413,8 +413,8 @@ class UsersController < ApplicationController
       # figure out type based on user
       return @role if @user.blank?
       case
-      when @user.has_role?('company provider', current_company) || @user.has_role?('admin')
-        @role = 'company provider'
+      when @user.has_role?('company staff', current_company) || @user.has_role?('admin')
+        @role = 'company staff'
       else
         @role = 'company customer'
       end
@@ -444,14 +444,14 @@ class UsersController < ApplicationController
         # default path
         customers_path
       end
-    when "company provider"
+    when "company staff"
       case
       when (current_user == user)
         # no back when user editing themself
         nil
       else
         # default path
-        providers_path
+        staffs_path
       end
     else
       root_path

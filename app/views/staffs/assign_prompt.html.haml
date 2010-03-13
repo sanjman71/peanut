@@ -6,19 +6,19 @@
 %hr.space
 
 .span-23.prepend-1
-  - if @user.has_role?('company provider', current_company)
-    -# user exists and is already a campany provider
-    %h4{:style => 'font-size: 2.0em;'}== A user with email '#{@email.address}' already exists and is a company provider.
-    %h4
-      = link_to 'Send another invitiation', new_invitation_path, :class => 'rounded button color', :style => 'padding: 3px 7px;'
+  - if @user.has_role?('company staff', current_company)
+    -# user exists and is already a campany staff
+    %h3== A user with email '#{@email.address}' already exists and is a company staff member.
+    %h3
+      = link_to 'Send another invitiation', new_invitation_path, :class => 'admin', :style => 'font-size: 1.0em;'
       %span{:style => 'padding-left: 3px; padding-right: 3px;'}== or
-      = link_to 'Back to providers', providers_path, :class => 'rounded button color', :style => 'padding: 3px 7px;'
+      = link_to 'Back to staff list', staffs_path, :class => 'admin', :style => 'font-size: 1.0em;'
   - else
     -# user exists but is not a company provider
-    %h4{:style => 'font-size: 2.0em;'}== A user with email '#{@email.address}' already exists.
-    %h4{:style => 'font-size: 2.0em;'}== Would you like to add the user as a company provider?
+    %h4== A user with email '#{@email.address}' already exists.
+    %h4== Would you like to add the user as a company staff member?
 
     %h4
-      = link_to 'Yes, add as provider', provider_assign_path(@user.id), :method => :put, :class => 'rounded button color', :style => 'padding: 3px 7px;'
+      = link_to 'Yes, add as staff', staff_assign_path(@user.id), :method => :put, :class => 'rounded button color', :style => 'padding: 3px 7px;'
       %span{:style => 'padding-left: 3px; padding-right: 3px;'}== or
-      = link_to 'No thanks', providers_path, :class => 'rounded button color', :style => 'padding: 3px 7px;'
+      = link_to 'No thanks', staffs_path, :class => 'rounded button color', :style => 'padding: 3px 7px;'

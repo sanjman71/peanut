@@ -3,8 +3,10 @@ a:hover                                           { color: #FFFFFF; background-c
 a.current, a.current:hover                        { text-decoration: none; }
 
 a img                                             { border: 0 none; vertical-align: top; }
-
 a.image img:hover                                 { -webkit-transform: scale(1.5); }
+
+a img.revoke                                      { background-color: #fff; }
+a img.revoke:hover                                { background-color: none; }
 
 /* rounded corner support */
 
@@ -124,10 +126,10 @@ div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
 
-div#providers_pagination, div#customers_pagination, div#resources_pagination
+div#staffs_pagination, div#customers_pagination, div#resources_pagination
                                                   { font-size: 1.0em; }
 
-div#providers_pagination h4, div#customers_pagination h4, div#resources_pagination h4
+div#staffs_pagination h4, div#customers_pagination h4, div#resources_pagination h4
                                                   { font-size: 1.0em; }
 
 .pagination a                                     { background: #EEEEEE; color: #111111; }

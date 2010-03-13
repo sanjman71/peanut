@@ -1,37 +1,37 @@
-- providers.each do |provider|
-  .span-16.last.letterbox.provider{:class => cycle("shaded", "")}[provider]
-    -# provider name and email
+- staffs.each do |staff|
+  .span-16.last.letterbox.staff{:class => cycle("shaded", "")}[staff]
+    -# staff name and email
     .span-6.prepend-1.name
-      %h4.bigger.provider.name.bottom= provider.name
-      %h4.provider.email
+      %h4.bigger.staff.name.bottom= staff.name
+      %h4.staff.email
         -# resources don't have email addresses
-        - if provider.respond_to?(:email_addresses)
-          - if provider.email_addresses_count > 0
-            = provider.primary_email_address.address
+        - if staff.respond_to?(:email_addresses)
+          - if staff.email_addresses_count > 0
+            = staff.primary_email_address.address
           - else
             %span.field_missing== No email address
         - else
           == &nbsp;
 
-    -# find provider's company roles
+    -# find staff's company roles
     - all_roles     = ['Manager', 'Provider']
     - exempt_roles  = ['Customer', 'Staff']
-    - current_roles = provider.roles_on(current_company).collect(&:name).map{ |s| s.gsub(/company /, '').titleize }.sort - exempt_roles
+    - current_roles = staff.roles_on(current_company).collect(&:name).map{ |s| s.gsub(/company /, '').titleize }.sort - exempt_roles
     .span-6.roles
       .span-6.last.current_roles.padding-bottom-5
         - current_roles.each do |role|
           -# check if we just show the role, or show the role with a delete option
           - if has_privilege?('update users', current_company)
-            - if role_removable?(provider, current_user, role)
+            - if role_removable?(staff, current_user, role)
               -# show role with linked image
-              %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '18x18'), user_revoke_role_path(provider, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
+              %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '18x18', :class => 'revoke'), user_revoke_role_path(staff, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
             - else
               -# show role with grayed out image
               -#%span.show_role{:style => 'padding-right: 3px;'}== #{role} #{image_tag('delete.png', :size => '18x18', :style => 'background-color: #999;')}
               %span.show_role{:style => 'padding-right: 3px;'}
                 == #{role}
                 -#%span{:style => 'background-image: url(images/delete.png);'}== X
-                %span{:style => 'background-color: #777; width: 18px;'}= link_to image_tag('delete.png', :size => '18x18')
+                %span= link_to image_tag('info.png', :size => '18x18', :class => 'revoke'), '#', :title => 'Not allowed to remove yourself as manager'
           - else
             %span.show_role{:style => 'padding-right: 3px;'}= role
       .span-6.last.add_roles
@@ -42,8 +42,8 @@
           %span#add_roles.hide
             == Add as:
             = select_tag('roles', options_for_select(add_roles.collect{|s| [s,s.downcase]}), :id => 'roles')
-            %span{:style => 'padding-left: 5px;'}= link_to 'Add', '#', :class => 'admin', :id => 'add_role', :url => user_grant_role_path(provider, ':role')
-    -# allow company managers to toggle provider role
+            %span{:style => 'padding-left: 5px;'}= link_to 'Add', '#', :class => 'admin', :id => 'add_role', :url => user_grant_role_path(staff, ':role')
+    -# allow company managers to toggle staff role
     -#.span-5
       -#.span-5.last.provider.provider
         -#- if has_privilege?('update users', current_company)
@@ -68,16 +68,16 @@
 
       %br
       .span-6.last.capacity
-        - if provider.capacity > 1
-          == Default # Slots: #{provider.capacity}
+        - if staff.capacity > 1
+          == Default # Slots: #{staff.capacity}
         - else
-          -# we don't bother displaying capacity for providers if it's at the default of 1 - this is to reduce confusion
+          -# we don't bother displaying capacity for staffs if it's at the default of 1 - this is to reduce confusion
           == &nbsp;
           
-    -# allow company managers to edit all providers, and provider to edit themself
+    -# allow company managers to edit all staffs, and staff to edit themself
     .span-2.prepend-1.action.last
-      - if has_privilege?('update users', current_company) or has_privilege?('update users', provider)
-        = link_to "Edit", user_edit_path(provider), :class => 'admin edit user'
-      - if has_privilege?('manage site', current_company) and provider.is_a?(User) and (provider != current_user)
+      - if has_privilege?('update users', current_company) or has_privilege?('update users', staff)
+        = link_to "Edit", user_edit_path(staff), :class => 'admin edit user'
+      - if has_privilege?('manage site', current_company) and staff.is_a?(User) and (staff != current_user)
         -# site managers can sudo to users
-        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(provider), :class => 'admin sudo user'
+        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(staff), :class => 'admin sudo user'

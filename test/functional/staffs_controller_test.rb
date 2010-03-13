@@ -1,16 +1,16 @@
 require 'test/test_helper'
 
-class ProvidersControllerTest < ActionController::TestCase
+class StaffsControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :role => 'company provider'
-  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :role => 'company provider'
-  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company provider'
-  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company provider'
+  should_route :get,  '/staffs/new', :controller => 'users', :action => 'new', :role => 'company staff'
+  should_route :post, '/staffs/create', :controller => 'users', :action => 'create', :role => 'company staff'
+  should_route :get,  '/staffs/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company staff'
+  should_route :put,  '/staffs/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company staff'
 
-  # providers controller routes
-  should_route :get,  '/providers/1', :controller => 'providers', :action => 'show', :id => '1'
-  
+  # staffs controller routes
+  should_route :get,  '/staffs', :controller => 'staffs', :action => 'index'
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
@@ -71,7 +71,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
 
     context "with 'update users' privilege" do
@@ -101,7 +101,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
     
     context "with 'manage site' privilege" do
@@ -116,7 +116,7 @@ class ProvidersControllerTest < ActionController::TestCase
       # should_assign_to(:resources, :class => Array) { [@resource1] }
 
       should "have 'no email address' messages on each user provider and manager" do
-        assert_select "h4.provider.email span.field_missing", 3
+        assert_select "h4.staff.email span.field_missing", 3
       end
 
       should "show roles on staff manager" do
@@ -136,7 +136,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
   end
   

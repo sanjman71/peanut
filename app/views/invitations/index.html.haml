@@ -7,11 +7,11 @@
       %h3== My Invitations
     .span-5.last
       %h4.padding-top-5{:style => 'font-size: 1.2em;'}
-        = link_to 'Invite a user', new_invitation_path, :class => 'add provider'
+        = link_to 'Invite a user', new_invitation_path, :class => 'add staff'
     .span-15.last#invitations_sent
       %h5== #{pluralize(@invitations.size, 'Invitation')} sent
     .span-15.last.bottom
-      %h4= link_to 'Back', providers_path, :class => 'admin'
+      %h4= link_to 'Back', staffs_path, :class => 'admin'
 
   %hr.space
 
@@ -24,15 +24,13 @@
     .span-16.last.letterbox{:class => cycle("shaded", "")}[invitation]
       -# invitation recipient
       .span-6.prepend-1.name
-        %h4== To: #{invitation.recipient_email}
+        %h4.bottom.padding-bottom-5== To: #{invitation.recipient_email}
+        -# show number of times the invitation has been sent
+        %em= "Invitation sent " + pluralize(invitation.sent, "time")
       .span-7.sent
         %h4.small
-          -# show number of times the invitation has been sent
-          = "Sent " + pluralize(invitation.sent, "time")
-          -# show invitation sent at timestamp
-          %br
           == Last Sent:
-          = invitation.last_sent_at.to_s(:appt_day_date_time)
+          = invitation.last_sent_at.andand.to_s(:appt_day_date_time)
       .span-2.last
         - if invitation.claimed?
           %h6== Claimed

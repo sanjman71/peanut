@@ -1,4 +1,4 @@
-$.fn.init_user_invite_submit = function() {
+$.fn.init_user_invitation = function() {
   $("input#user_invite_submit").click(function() {
     var email_address = $("input#invitation_recipient_email").attr('value');
 
@@ -17,5 +17,5 @@ $.fn.init_user_invite_submit = function() {
 }
 
 $(document).ready(function() {
-  $(document).init_user_invite_submit();
+  $(document).init_user_invitation();
 })

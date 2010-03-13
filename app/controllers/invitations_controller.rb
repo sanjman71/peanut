@@ -32,7 +32,7 @@ class InvitationsController < ApplicationController
     if @email_address
       # user already exists; ask caller if they want to assign the user as a provider
       @user = @email_address.emailable
-      redirect_to(provider_assign_prompt_path(:id => @user.id)) and return
+      redirect_to(staff_assign_prompt_path(:id => @user.id)) and return
     end
 
     if @invitation.save
@@ -58,10 +58,10 @@ class InvitationsController < ApplicationController
   def invitation_roles
     ['company staff']
   end
-  
+
   def send_invitation(invitation)
     begin
-      MessageComposeInvitation.provider(invitation, invite_url(invitation.token))
+      MessageComposeInvitation.staff(invitation, invite_url(invitation.token))
       flash[:notice] = "An invitation to #{invitation.recipient_email} has been sent"
     rescue Exception => e
       logger.debug("*** invitation error: #{e.message}")

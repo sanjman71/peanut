@@ -1,5 +1,5 @@
-- @title ||= 'Invite a provider'
-- @submit_text ||= 'Invite provider'
+- @title ||= 'Invite a Staff Member'
+- @submit_text ||= 'Invite'
 
 - title(@title)
 - javascript('invitations')
@@ -12,23 +12,23 @@
 
   .span-23.prepend-1
     %h3{:style => 'line-height: 1.5em;'}
-      == Enter the email address for the user you want to invite.
-      == They will be sent an email with a special link to create their account.
+      %p== Enter the email address for the user you want to invite.
+      %p== An email will be sent with a special link to create their account.
 
     -# show any invitation errors
     - unless @invitation.errors.blank?
       .span-9.notice
         = error_messages_for('invitation', :header_message => nil)
-        
-    -# default invitation role is 'company provider'
+
+    -# default invitation role is 'company staff'
     .span-23.last.padding-bottom-20{:style => 'line-height: 2.0em;'}
       .span-10
         = f.text_field :recipient_email, :id => 'invitation_recipient_email', :class => 'title big', :style => 'width: 350px; margin: 0px; height: 1.4em;'
       - if @invitation_roles.size > 1
         -# allow user to choose the invitation role
         .span-10.last
-          = f.radio_button :role, "company provider", :checked => 'checked', :id => 'provider'
-          = label_tag 'provider', 'Invite user as a provider', :class => 'checkbox label'
+          = f.radio_button :role, "company staff", :checked => 'checked', :id => 'staff'
+          = label_tag 'staff', 'Invite user as staff', :class => 'checkbox label'
           %br
           = f.radio_button :role, "company customer", :id => 'customer'
           = label_tag 'customer', 'Invite user as a customer', :class => 'checkbox label'
@@ -37,5 +37,5 @@
     .span-23.last
       = submit_tag @submit_text, :name => nil, :class => 'button big', :id => 'user_invite_submit'
       == &nbsp;or&nbsp;
-      = link_to 'Cancel', providers_path, :style => 'font-size: 1.2em;', :class => 'admin'
+      = link_to 'Cancel', staffs_path, :style => 'font-size: 1.0em;', :class => 'admin'
     

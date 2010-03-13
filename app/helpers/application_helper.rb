@@ -78,9 +78,9 @@ module ApplicationHelper
     
     if has_privilege?('read users', current_company)
 
-      # 'Providers' tab
+      # 'Staff' tab
       name    = 'Staff'
-      path    = providers_path
+      path    = staffs_path
       klasses = []
 
       if current_controller.controller_name == 'providers' and ['index', 'show', 'edit'].include?(current_controller.action_name)
