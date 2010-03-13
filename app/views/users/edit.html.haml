@@ -163,19 +163,6 @@
 
 %hr.space
 
-- if has_privilege?('update users', current_company) #(@user == current_user) && has_role?('company manager', current_company)
-  -# current user is a company manager
-  .span-20.last.padding-top-10
-    .span-4.text-align-right
-      %h4.bigger.bold== Company Roles:
-    .span-16.last.padding-top-3
-      - if @user.has_role?('company provider', current_company)
-        %h4= link_to 'Remove as a company provider', user_revoke_role_path(@user, 'provider'), :class => 'admin', :method => :put, :id => 'remove_company_provider'
-      - else
-        %h4= link_to 'Add as a company provider', user_grant_role_path(@user, 'provider'), :class => 'admin', :method => :put, :id => 'add_company_provider'
-
-  %hr.space
-
 .span-15.prepend-1
   -# notes flash message
   #note_flash

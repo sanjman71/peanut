@@ -4,9 +4,9 @@
 
 .span-16
   .span-15.prepend-1.last.mat.shaded.padding-top-10.padding-bottom-10
-    .span-7
+    .span-9
       %h2== Staff
-    .span-8.last
+    .span-6.last
       -# show add provider links if the company plan allows it
       - if current_company.may_add_provider? and current_user.has_privilege?('create users', current_company)
         %h4{:style => 'padding-top: 5px; font-size: 1.2em;'}

@@ -13,9 +13,9 @@ class InvitationsController < ApplicationController
 
   # GET /invitation/new
   def new
-    # only sent invitations for company providers
+    # only send invitations for company staff
     @invitation       = Invitation.new
-    @invitation_roles = ['company provider']
+    @invitation_roles = invitation_roles
 
     respond_to do |format|
       format.html
@@ -40,7 +40,7 @@ class InvitationsController < ApplicationController
       send_invitation(@invitation)
       redirect_to(invitations_path) and return
     else
-      @invitation_roles = ['company provider']
+      @invitation_roles = invitation_roles
       render(:action => 'new') and return
     end
   end
@@ -54,6 +54,11 @@ class InvitationsController < ApplicationController
 
   protected
 
+  # allowed invitation roles
+  def invitation_roles
+    ['company staff']
+  end
+  
   def send_invitation(invitation)
     begin
       MessageComposeInvitation.provider(invitation, invite_url(invitation.token))

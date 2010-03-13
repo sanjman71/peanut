@@ -35,8 +35,8 @@ class InvitationsControllerTest < ActionController::TestCase
       should_not_change("invitation count") { Invitation.count }
       should_render_template("invitations/new.html.haml")
     end
-    
-    context "for a new provider" do
+
+    context "for a new company provider" do
       setup do
         @controller.stubs(:current_user).returns(@manager)
         @controller.stubs(:current_company).returns(@company)
@@ -47,6 +47,10 @@ class InvitationsControllerTest < ActionController::TestCase
       should_change("invitation count", :by => 1) { Invitation.count }
       should_change("delayed job count", :by => 1) { Delayed::Job.count}
 
+      should "set invitation role to 'company provider'" do
+        assert_equal 'company provider', assigns(:invitation).role
+      end
+
       should "increment invitation.sent count" do
         assert_equal 1, assigns(:invitation).sent
       end
@@ -55,7 +59,34 @@ class InvitationsControllerTest < ActionController::TestCase
       should "set invitation.last_sent_at timestamp to nil" do
         assert_equal nil, assigns(:invitation).last_sent_at
       end
-      
+
+      should_redirect_to("invitations path") { invitations_path }
+    end
+
+    context "for a new company staff" do
+      setup do
+        @controller.stubs(:current_user).returns(@manager)
+        @controller.stubs(:current_company).returns(@company)
+        post :create, :invitation => {:role => 'company staff', :recipient_email => 'sanjay@jarna.com'}
+      end
+
+      should_assign_to(:invitation)
+      should_change("invitation count", :by => 1) { Invitation.count }
+      should_change("delayed job count", :by => 1) { Delayed::Job.count}
+
+      should "set invitation role to 'company staff'" do
+        assert_equal 'company staff', assigns(:invitation).role
+      end
+
+      should "increment invitation.sent count" do
+        assert_equal 1, assigns(:invitation).sent
+      end
+
+      # sent_at timestamp is updated when delayed job sends the message
+      should "set invitation.last_sent_at timestamp to nil" do
+        assert_equal nil, assigns(:invitation).last_sent_at
+      end
+
       should_redirect_to("invitations path") { invitations_path }
     end
 

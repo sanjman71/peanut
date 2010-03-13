@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   before_filter :init_user_privileges, :only => [:edit, :update, :destroy]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
-  privilege_required_any  'update users', :only => [:edit, :update, :destroy], :on => [:user, :current_company]
+  privilege_required_any  'update users', :only => [:edit, :update, :destroy, :revoke], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
-  privilege_required      'update users', :only => [:grant, :revoke], :on => :current_company
+  privilege_required      'update users', :only => [:grant], :on => :current_company
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
@@ -61,13 +61,16 @@ class UsersController < ApplicationController
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
         case @invitation.role
+        when 'company staff'
+          # add the user as a company staff
+          @invitation.company.grant_role(@invitation.role, @user) unless @invitation.company.blank?
         when 'company provider'
           # add the user as a company provider
           @invitation.company.user_providers.push(@user) unless @invitation.company.blank?
         when 'company customer'
-          # grant user customer role
-          @user.grant_role('company customer', @invitation.company) unless @invitation.company.blank?
-        end 
+          # add the user as a company customer
+          @invitation.company.grant_role(@invitation.role, @user) unless @invitation.company.blank?
+        end
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
         redirect_back_or_default('/login') and return
@@ -252,11 +255,18 @@ class UsersController < ApplicationController
   end
 
   # PUT /users/1/grant/:role
-  # valid roles: 'provider'
+  # valid roles: 'manager', 'provider'
   def grant
     @role = params[:role]
 
     case @role
+    when 'manager'
+      if !@user.has_role?('company manager', current_company)
+        current_company.grant_role('company manager', @user)
+        flash[:notice] = "User #{@user.name} has been added as a company manager"
+      else
+        flash[:notice] = "User #{@user.name} is already a company manager"
+      end
     when 'provider'
       if current_company.providers.include?(@user)
         flash[:notice] = "User #{@user.name} is already a company provider"
@@ -270,22 +280,34 @@ class UsersController < ApplicationController
       flash[:notice] = "Invalid role"
     end
 
+    @redirect_path = request.referer || user_edit_path(@user)
+ 
     respond_to do |format|
-      format.html { redirect_to(user_edit_path(@user)) and return }
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
 
   # PUT /users/1/revoke/:role
-  # valid roles: 'provider'
+  # valid roles: 'manager', 'provider'
   def revoke
     @role = params[:role]
 
     case @role
+    when 'manager'
+      if @user.has_role?('company manager', current_company)
+        if @user == current_user
+          flash[:notice] = "You can not remove yourself as a company manager"
+        else
+          current_company.revoke_role('company manager', @user)
+          flash[:notice] = "User #{@user.name} has been removed as a company manager"
+        end
+      end
     when 'provider'
-      # check if user has any free appointments where they are the provider
-      if Appointment.free.provider(@user).size > 0
+      # check if user is the provider, with the current company, for any free appointments
+      if false #Appointment.free.provider(@user).company(current_company).size > 0
         # user can not be removed as a company provider until all appointments are removed
-        flash[:notice] = "User can not be removed as a company provider because they are a provider to at least 1 appointment."
+        flash[:notice] = "User #{@user.name} can not be removed as a company provider because they are a provider to at least 1 appointment."
         flash[:notice] += "<br/>Please remove these appointments and try again."
       else
         # remove user as a company provider
@@ -300,8 +322,11 @@ class UsersController < ApplicationController
       flash[:notice] = "Invalid role"
     end
 
+    @redirect_path = request.referer || user_edit_path(@user)
+
     respond_to do |format|
-      format.html { redirect_to(user_edit_path(@user)) and return }
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
 

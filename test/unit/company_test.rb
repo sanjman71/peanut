@@ -93,8 +93,8 @@ class CompanyTest < ActiveSupport::TestCase
       assert @company.has_provider?(@provider)
     end
   
-    should "assign role 'company provider' on company to user" do
-      assert_equal ['company provider'], @provider.roles_on(@company).collect(&:name)
+    should "add role 'company provider' and 'company staff' to user" do
+      assert_equal ['company provider', 'company staff'], @provider.roles_on(@company).collect(&:name).sort
     end
   
     should "add user to company.authorized_providers collection" do
@@ -157,8 +157,8 @@ class CompanyTest < ActiveSupport::TestCase
         assert !@company.has_provider?(@provider)
       end
   
-      should "remove role 'company provider' on company from user" do
-        assert_equal [], @provider.roles_on(@company).collect(&:name)
+      should "remove role 'company provider' from user, but leave role 'company staff'" do
+        assert_equal ['company staff'], @provider.roles_on(@company).collect(&:name)
       end
 
       should "remove user from company.authorized_providers collection" do

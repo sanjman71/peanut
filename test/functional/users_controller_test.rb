@@ -44,9 +44,8 @@ class UsersControllerTest < ActionController::TestCase
     @monthly_plan   = Factory(:monthly_plan)
     @subscription   = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company        = Factory(:company, :subscription => @subscription)
-    # make owner the company manager
-    @owner.grant_role('company manager', @company)
-    @provider.grant_role('company provider', @provider)
+    # make owner a company manager
+    @company.grant_role('company manager', @owner)
     # add company providers
     @company.user_providers.push(@owner)
     @company.user_providers.push(@provider)
@@ -147,7 +146,7 @@ class UsersControllerTest < ActionController::TestCase
         should_assign_to(:invitation)
         should_assign_to(:role) {'company provider'}
 
-        should "build new user, but should not create the new user" do
+        should "build user email address" do
           assert_equal [@recipient_email], assigns(:user).email_addresses.collect(&:address)
         end
 
@@ -242,9 +241,9 @@ class UsersControllerTest < ActionController::TestCase
           assert_equal [@company], @user.provided_companies
         end
   
-        should "add provider role on company to user" do
+        should "add 'company provider' and 'company staff' roles on company to user" do
           @user = User.with_email(@recipient_email).first
-          assert_equal ['company provider'], @user.roles_on(@company).collect(&:name).sort
+          assert_equal ['company provider', 'company staff'], @user.roles_on(@company).collect(&:name).sort
         end
   
         should "add 'user manager' role on user to user" do
@@ -329,9 +328,9 @@ class UsersControllerTest < ActionController::TestCase
           assert @company.has_provider?(@user)
         end
 
-        should "add 'company provider' role on company to user" do
+        should "add 'company provider' and 'company staff' roles on company to user" do
           @user = User.with_email("sanjay@jarna.com").first
-          assert_equal ['company provider'], @user.roles_on(@company).collect(&:name).sort
+          assert_equal ['company provider', 'company staff'], @user.roles_on(@company).collect(&:name).sort
         end
 
         should "add 'user manager' role on user to user" do
@@ -687,11 +686,11 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(nil)
         get :edit, :id => @owner.id, :role => 'company provider'
       end
-    
+
       should_respond_with :redirect
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
-  
+
     context "without 'update users' privilege" do
       setup do
         @user = Factory(:user, :name => "User")
@@ -715,14 +714,14 @@ class UsersControllerTest < ActionController::TestCase
         assert_select "a#add_rpx", 1
       end
 
-      # should "not show 'reset password' link" do
-      #   assert_select "a#manager_reset_password", 0
-      # end
-
-      should "not show 'add/remove company provider' link" do
-        assert_select "a#remove_company_provider", 0
-        assert_select "a#add_company_provider", 0
+      should "show 'reset password' link" do
+        assert_select "a#manager_reset_password", 1
       end
+
+      # should "not show 'add/remove company provider' link" do
+      #   assert_select "a#remove_company_provider", 0
+      #   assert_select "a#add_company_provider", 0
+      # end
 
       should_respond_with :success
       should_render_template "users/edit.html.haml"
@@ -740,13 +739,13 @@ class UsersControllerTest < ActionController::TestCase
         assert_select "a#add_rpx", 0
       end
 
-      # should "show 'reset password' link" do
-      #   assert_select "a#manager_reset_password", 1
-      # end
-
-      should "show 'remove company provider' link" do
-        assert_select "a#remove_company_provider", 1
+      should "show 'reset password' link" do
+        assert_select "a#manager_reset_password", 1
       end
+
+      # should "show 'remove company provider' link" do
+      #   assert_select "a#remove_company_provider", 1
+      # end
 
       should_respond_with :success
       should_render_template "users/edit.html.haml"
@@ -923,7 +922,7 @@ class UsersControllerTest < ActionController::TestCase
         context "to user in data_missing state" do
           setup do
             @user = User.create(:name => "User 1", :password => "secret", :password_confirmation => "secret", :preferences_phone => 'required')
-            @user.grant_role('company customer', @company)
+            @company.grant_role('company customer', @user)
             assert_equal 'data_missing', @user.reload.state
             @controller.stubs(:current_user).returns(@user)
             put :update, :id => @user.id, :role => 'company customer',
@@ -1017,7 +1016,7 @@ class UsersControllerTest < ActionController::TestCase
         delete :destroy, :id => @owner.id
       end
 
-      should_assign_to(:company_roles) { ['company manager', 'company provider'] }
+      should_assign_to(:company_roles) { ['company manager', 'company provider', 'company staff'] }
 
       should "not delete user" do
         assert User.find_by_id(@owner.id)
@@ -1032,7 +1031,7 @@ class UsersControllerTest < ActionController::TestCase
         delete :destroy, :id => @provider.id
       end
 
-      should_assign_to(:company_roles) { ['company provider'] }
+      should_assign_to(:company_roles) { ['company provider', 'company staff'] }
 
       should "not delete user" do
         assert User.find_by_id(@owner.id)
@@ -1045,7 +1044,7 @@ class UsersControllerTest < ActionController::TestCase
       setup do
         # add customer
         @customer = Factory(:user, :name => "Customer")
-        @customer.grant_role('company customer', @company)
+        @company.grant_role('company customer', @customer)
         @controller.stubs(:current_user).returns(@owner)
         delete :destroy, :id => @customer.id
       end

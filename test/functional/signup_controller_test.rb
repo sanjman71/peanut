@@ -100,10 +100,10 @@ class SignupControllerTest < ActionController::TestCase
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
 
-      should "create user with roles 'company manager', 'company provider' on company" do
+      should "create user with roles 'company manager', 'company provider', 'company staff' on company" do
         @company = Company.find_by_name('Peanut')
         @user    = User.with_email('manager@walnut.com').first
-        assert_equal ['company manager', 'company provider'], assigns(:user).roles_on(@company).collect(&:name).sort
+        assert_equal ['company manager', 'company provider', 'company staff'], assigns(:user).roles_on(@company).collect(&:name).sort
       end
 
       should "create company with user as a provider" do
@@ -147,10 +147,10 @@ class SignupControllerTest < ActionController::TestCase
         assert_equal ['user manager'], @user.roles_on(@user).collect(&:name).sort
       end
 
-      should "create user with roles 'company manager', 'company provider' on company" do
+      should "create user with roles 'company manager', 'company provider', 'company staff' on company" do
         @company = Company.find_by_name('Peanut')
         @user    = User.with_email('manager@walnut.com').first
-        assert_equal ['company manager', 'company provider'], @user.roles_on(@company).collect(&:name).sort
+        assert_equal ['company manager', 'company provider', 'company staff'], @user.roles_on(@company).collect(&:name).sort
       end
 
       should "create company with user as a provider" do

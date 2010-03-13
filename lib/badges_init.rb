@@ -17,12 +17,13 @@ module BadgesInit
     cm    = Badges::Role.find_by_name('company manager') || Badges::Role.create(:name=>"company manager")
     cp    = Badges::Role.find_by_name('company provider') || Badges::Role.create(:name=>"company provider")
     cc    = Badges::Role.find_by_name('company customer') || Badges::Role.create(:name=>"company customer")
+    cs    = Badges::Role.find_by_name('company staff') || Badges::Role.create(:name=>"company staff")
     um    = Badges::Role.find_by_name('user manager') || Badges::Role.create(:name=>"user manager")
     am    = Badges::Role.find_by_name('appointment manager') || Badges::Role.create(:name=>"appointment manager")
     sm    = Badges::Role.find_by_name('site manager') || Badges::Role.create(:name=>"site manager")
 
     site(sm)
-    companies(cm, cp, cc, um)
+    companies(cm, cp, cc, cs, um)
     users(cm, cp, um)
     resources(cm, cp, um)
     calendars(cm, cp, um)
@@ -43,7 +44,7 @@ module BadgesInit
     # only admins can delete roles & privileges
   end
   
-  def self.companies(cm, cp, cc, um)
+  def self.companies(cm, cp, cc, cs, um)
     # company privileges
     rc = Badges::Privilege.find_or_create_by_name(:name=>"read companies")
     uc = Badges::Privilege.find_or_create_by_name(:name=>"update companies")
@@ -56,6 +57,7 @@ module BadgesInit
     Badges::RolePrivilege.create(:role=>cm, :privilege=>rc)
     Badges::RolePrivilege.create(:role=>cp, :privilege=>rc)
     Badges::RolePrivilege.create(:role=>cc, :privilege=>rc)
+    Badges::RolePrivilege.create(:role=>cs, :privilege=>rc)
     
     # Only admin can delete a company
   end
