@@ -1035,52 +1035,160 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
   
-  context "revoke provider on owner" do
-    context "as user" do
+  context "grant" do
+    context "as regular user" do
       setup do
         @controller.stubs(:current_user).returns(@user)
-        put :revoke, :id => @owner.id, :role => 'provider'
+        put :grant, :id => @owner.id, :role => 'manager'
       end
 
       should_redirect_to('unauthorized_path') { unauthorized_path }
     end
 
-    context "as owner" do
+    context "company provider as manager" do
       setup do
+        @request.env['HTTP_REFERER'] = '/staffs'
         @controller.stubs(:current_user).returns(@owner)
-        put :revoke, :id => @owner.id, :role => 'provider'
+        put :grant, :id => @provider.id, :role => 'manager'
       end
 
-      should "remove owner as a company provider" do
-        assert_false @company.has_provider?(@owner)
+      should "add provider as a company manager" do
+        assert_equal ['company manager', 'company provider', 'company staff'], @provider.roles_on(@company).collect(&:name).sort
       end
 
-      should "remove owner from authorized_providers collection" do
-        assert_false @company.reload.authorized_providers.include?(@owner)
-      end
-
-      should "set the flash" do
-        assert_match /User Joe Owner has been removed as a company provider/, flash[:notice]
-      end
-
-      should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
+      should_redirect_to('referer') { '/staffs' }
     end
 
-    context "as owner who is not a provider" do
+    context "company provider to user" do
       setup do
-        # remove owner as a company provider
-        @company.user_providers.delete(@owner)
-        assert_false @company.has_provider?(@owner)
-        assert_false @company.reload.authorized_providers.include?(@owner)
+        @request.env['HTTP_REFERER'] = '/staffs'
         @controller.stubs(:current_user).returns(@owner)
-        put :revoke, :id => @owner.id, :role => 'provider'
+        @user = Factory(:user)
+        put :grant, :id => @user.id, :role => 'provider'
       end
 
-      should "set the flash" do
-        assert_match /User Joe Owner is not a company provider/, flash[:notice]
+      should "add user as a company provider and company staff" do
+        assert_equal ['company provider', 'company staff'], @user.roles_on(@company).collect(&:name).sort
       end
 
-      should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
+      should_redirect_to('referer') { '/staffs' }
+    end
+
+    context "company provider to user with company staff role" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/staffs'
+        @controller.stubs(:current_user).returns(@owner)
+        @user = Factory(:user)
+        @company.grant_role('company staff', @user)
+        put :grant, :id => @user.id, :role => 'provider'
+      end
+
+      should "add user as a company provider" do
+        assert_equal ['company provider', 'company staff'], @user.roles_on(@company).collect(&:name).sort
+      end
+
+      should_redirect_to('referer') { '/staffs' }
+    end
+  end
+
+  context "revoke" do
+    context "owner as company manager" do
+      context "as owner" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          put :revoke, :id => @owner.id, :role => 'manager'
+        end
+
+        should "not remove owner as a company manager" do
+          assert_equal ['company manager', 'company provider', 'company staff'], @owner.roles_on(@company).collect(&:name).sort
+        end
+      end
+    end
+
+    context "provider as company manager" do
+      setup do
+        # make provider a company manager
+        @provider.grant_role('company manager', @company)
+        assert_equal ['company manager', 'company provider', 'company staff'], @provider.roles_on(@company).collect(&:name).sort
+      end
+      context "as owner" do
+        setup do
+          @controller.stubs(:current_user).returns(@owner)
+          put :revoke, :id => @provider.id, :role => 'manager'
+        end
+
+        should "remove provider as a company manager" do
+          assert_equal ['company provider', 'company staff'], @provider.roles_on(@company).collect(&:name).sort
+        end
+      end
+    end
+
+    context "provider as company provider" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/staffs'
+        @controller.stubs(:current_user).returns(@provider)
+        put :revoke, :id => @provider.id, :role => 'provider'
+      end
+
+      should "remove provider as a company provider" do
+        assert_equal ['company staff'], @provider.roles_on(@company).collect(&:name)
+      end
+
+      should_redirect_to('staffs path') { '/staffs' }
+    end
+    
+    context "owner as company provider" do
+      context "as regular user" do
+        setup do
+          @controller.stubs(:current_user).returns(@user)
+          put :revoke, :id => @owner.id, :role => 'provider'
+        end
+
+        should_redirect_to('unauthorized_path') { unauthorized_path }
+      end
+
+      context "as owner" do
+        setup do
+          @request.env['HTTP_REFERER'] = '/staffs'
+          @controller.stubs(:current_user).returns(@owner)
+          put :revoke, :id => @owner.id, :role => 'provider'
+        end
+
+        should "remove owner as a company provider" do
+          assert_equal ['company manager', 'company staff'], @owner.roles_on(@company).collect(&:name).sort
+        end
+
+        should "return false as company.has_provider?" do
+          assert_false @company.has_provider?(@owner)
+        end
+
+        should "remove owner from authorized_providers collection" do
+          assert_false @company.reload.authorized_providers.include?(@owner)
+        end
+
+        should "set the flash" do
+          assert_match /User Joe Owner has been removed as a company provider/, flash[:notice]
+        end
+
+        should_redirect_to('staffs path') { "/staffs" }
+      end
+
+      context "as non-provider" do
+        setup do
+          # remove owner as a company provider
+          @company.user_providers.delete(@owner)
+          assert_false @company.has_provider?(@owner)
+          assert_false @company.reload.authorized_providers.include?(@owner)
+          @controller.stubs(:current_user).returns(@owner)
+          put :revoke, :id => @owner.id, :role => 'provider'
+        end
+
+        should "set the flash" do
+          assert_match /User Joe Owner is not a company provider/, flash[:notice]
+        end
+
+        should_redirect_to('user edit path') { "/users/#{@owner.id}/edit" }
+      end
     end
   end
 end
