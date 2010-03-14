@@ -260,6 +260,13 @@ class UsersController < ApplicationController
     @role = params[:role]
 
     case @role
+    when 'staff'
+      if !@user.has_role?('company staff', current_company)
+        current_company.grant_role('company staff', @user)
+        flash[:notice] = "User #{@user.name} has been added to the company staff"
+      else
+        flash[:notice] = "User #{@user.name} is already a company staff member"
+      end
     when 'manager'
       if !@user.has_role?('company manager', current_company)
         current_company.grant_role('company manager', @user)

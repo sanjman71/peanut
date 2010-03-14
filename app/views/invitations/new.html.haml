@@ -4,11 +4,14 @@
 - title(@title)
 - javascript('invitations')
 
-- form_for(@invitation, :url => invitations_path, :method => :post, :html => {:class => 'new_invitation'}) do |f|
+- form_for(@invitation, :url => invitations_path(:format => 'js'), :method => :post, :html => {:class => 'new_invitation'}) do |f|
   .span-23.prepend-1.mat.padding-top-10.padding-bottom-20
     %h2= @title
 
   %hr.space
+    
+  .span-22.prepend-1.padding-bottom-10
+    = display_flash
 
   .span-23.prepend-1
     %h3{:style => 'line-height: 1.5em;'}
@@ -22,11 +25,14 @@
 
     -# default invitation role is 'company staff'
     .span-23.last.padding-bottom-20{:style => 'line-height: 2.0em;'}
-      .span-10
+      .span-23
         = f.text_field :recipient_email, :id => 'invitation_recipient_email', :class => 'title big', :style => 'width: 350px; margin: 0px; height: 1.4em;'
+        == &nbsp;
+        %span#warning.hide= image_tag('warning.png')
+        -#= link_to 'Check that email is not taken', '#', :class => 'admin', :id => 'check_invite_email'
       - if @invitation_roles.size > 1
         -# allow user to choose the invitation role
-        .span-10.last
+        .span-23.last
           = f.radio_button :role, "company staff", :checked => 'checked', :id => 'staff'
           = label_tag 'staff', 'Invite user as staff', :class => 'checkbox label'
           %br
@@ -34,8 +40,10 @@
           = label_tag 'customer', 'Invite user as a customer', :class => 'checkbox label'
       - else
         = hidden_field_tag 'invitation[role]', @invitation_roles.first
-    .span-23.last
+    .span-23.last#submit
       = submit_tag @submit_text, :name => nil, :class => 'button big', :id => 'user_invite_submit'
       == &nbsp;or&nbsp;
       = link_to 'Cancel', staffs_path, :style => 'font-size: 1.0em;', :class => 'admin'
+      
+    .span-23.last#email_taken
     

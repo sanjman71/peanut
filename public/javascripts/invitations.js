@@ -1,5 +1,5 @@
 $.fn.init_user_invitation = function() {
-  $("input#user_invite_submit").click(function() {
+  $("form#new_invitation").submit(function() {
     var email_address = $("input#invitation_recipient_email").attr('value');
 
     if (email_address == '') {
@@ -12,8 +12,14 @@ $.fn.init_user_invitation = function() {
       return false;
     }
 
-    return true;
+    // post
+    $.post(this.action, $(this).serialize(), null, 'script')
+    // add progress message
+    $(this).find("#submit").html('Sending ...');
+
+    return false;
   })
+
 }
 
 $(document).ready(function() {

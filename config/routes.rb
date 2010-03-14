@@ -25,11 +25,8 @@ ActionController::Routing::Routes.draw do |map|
   map.signup_create '/signup/:plan_id', :controller => 'signup', :action => 'create', :conditions => {:method => :post}
 
   # invitation signup route
-  map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
-
-  map.staff_assign         '/staffs/:id/assign',        :controller => 'staffs', :action => 'assign',:conditions => {:method => :put}
-  map.staff_assign_prompt  '/staffs/:id/assign/prompt', :controller => 'staffs', :action => 'assign_prompt',:conditions => {:method => :get}
-
+  map.invite              '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
+  
   map.resources         :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get}
   map.user_notify       '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
   map.user_edit         '/users/:id/edit', :controller => 'users', :action => 'edit'

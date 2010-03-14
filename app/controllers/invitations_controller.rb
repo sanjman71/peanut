@@ -32,16 +32,28 @@ class InvitationsController < ApplicationController
     if @email_address
       # user already exists; ask caller if they want to assign the user as a provider
       @user = @email_address.emailable
-      redirect_to(staff_assign_prompt_path(:id => @user.id)) and return
-    end
-
-    if @invitation.save
+      @status = 'taken'
+    elsif @invitation.save
       # valid invitation
       send_invitation(@invitation)
-      redirect_to(invitations_path) and return
+      @status = 'ok'
+      @redirect_path = invitations_path
     else
-      @invitation_roles = invitation_roles
-      render(:action => 'new') and return
+      @status = 'error'
+      @error = @invitation.errors.full_messages
+      flash[:error] = @error
+      @redirect_path = new_invitation_path
+    end
+
+    respond_to do |format|
+      format.js do
+        case @status
+        when 'ok', 'error'
+          render(:update) { |page| page.redirect_to(@redirect_path) }
+        when 'taken'
+          render(:action => 'create_taken')
+        end
+      end
     end
   end
 
@@ -64,9 +76,9 @@ class InvitationsController < ApplicationController
       MessageComposeInvitation.staff(invitation, invite_url(invitation.token))
       flash[:notice] = "An invitation to #{invitation.recipient_email} has been sent"
     rescue Exception => e
-      logger.debug("*** invitation error: #{e.message}")
+      logger.debug("[error] invitation error: #{e.message}")
       flash[:error]  = "There was a problem sending your invitation"
     end
   end
-   
+  
 end

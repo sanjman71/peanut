@@ -26,11 +26,9 @@
               -# show role with linked image
               %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '18x18', :class => 'revoke'), user_revoke_role_path(staff, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
             - else
-              -# show role with grayed out image
-              -#%span.show_role{:style => 'padding-right: 3px;'}== #{role} #{image_tag('delete.png', :size => '18x18', :style => 'background-color: #999;')}
+              -# show role with a different, non-clickable image
               %span.show_role{:style => 'padding-right: 3px;'}
-                == #{role}
-                -#%span{:style => 'background-image: url(images/delete.png);'}== X
+                = role
                 %span= link_to image_tag('info.png', :size => '18x18', :class => 'revoke'), '#', :title => 'Not allowed to remove yourself as manager'
           - else
             %span.show_role{:style => 'padding-right: 3px;'}= role

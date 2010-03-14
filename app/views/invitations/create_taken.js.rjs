@@ -1,0 +1,3 @@
+page["span#warning"].show()
+page["div#submit"].hide();
+page["#email_taken"].html(render(:partial => "email_taken", :locals => {:user => @user, :email => @email_address}))
