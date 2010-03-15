@@ -83,7 +83,7 @@ module ApplicationHelper
       path    = staffs_path
       klasses = []
 
-      if current_controller.controller_name == 'providers' and ['index', 'show', 'edit'].include?(current_controller.action_name)
+      if current_controller.controller_name == 'staffs' and ['index'].include?(current_controller.action_name)
         klasses.push('current')
       end
 
