@@ -141,4 +141,17 @@ module BadgesInit
     # appointment managers can manage their own appointments
     Badges::RolePrivilege.create(:role=>am, :privilege=>ma)
   end
+
+  def self.add_company_staff
+    # find all companies with providers
+    Company.all(:conditions => ["providers_count > 0"]).each do |company|
+      puts "*** adding company staff to #{company.name}"
+      company.authorized_managers_and_providers.each do |user|
+        next if user.has_role?('company staff', company)
+        company.grant_role('company staff', user)
+      end
+    end
+    true
+  end
+
 end
