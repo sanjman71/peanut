@@ -13,7 +13,7 @@
         - else
           == &nbsp;
 
-    -# find staff's company roles
+    -# find company roles
     - all_roles     = ['Manager', 'Provider']
     - exempt_roles  = ['Customer', 'Staff']
     - current_roles = staff.roles_on(current_company).collect(&:name).map{ |s| s.gsub(/company /, '').titleize }.sort - exempt_roles
@@ -41,30 +41,10 @@
             == Add as:
             = select_tag('roles', options_for_select(add_roles.collect{|s| [s,s.downcase]}), :id => 'roles')
             %span{:style => 'padding-left: 5px;'}= link_to 'Add', '#', :class => 'admin', :id => 'add_role', :url => user_grant_role_path(staff, ':role')
-    -# allow company managers to toggle staff role
-    -#.span-5
-      -#.span-5.last.provider.provider
-        -#- if has_privilege?('update users', current_company)
-          -#= check_box_tag 'Company Provider', 'yes', current_company.providers.include?(provider), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_provider', :id => provider.id, :subdomain => current_subdomain)
-          -#= label_tag '', 'Company Provider', :class => 'checkbox label'
-          -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
-
-    -# allow company managers to toggle manager role
-    -#.span-5
-      -#.span-5.last.provider.manager
-        -#- if has_privilege?('update users', current_company)
-          -#- if current_user == provider
-            -# 'me' is a company manager
-            -#%h5{:style => 'margin-top: 3px;'}== You are a Company Manager
-          -#- elsif provider.respond_to?(:has_privilege?)
-            -#= check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
-            -#= label_tag '', 'Company Manager', :class => 'checkbox label'
-            -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
-          -#- else
-            -# provider is a resource, which does not have roles
-            -#== &nbsp;
 
       %br
+
+      -# capacity
       .span-6.last.capacity
         - if staff.capacity > 1
           == Default # Slots: #{staff.capacity}
