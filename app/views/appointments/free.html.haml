@@ -19,7 +19,8 @@
         .span-6.last
           = link_to("Edit this recurring availability", edit_weekly_path(appointment.provider.tableize, appointment.provider.id, appointment.recurrence_parent.id, :subdomain => current_company.subdomain))
         .span-6.last
-          = link_to('Cancel series from today', cancel_appointment_path(appointment.recurrence_parent.id, :series => 1, :subdomain => current_company.subdomain), :class => ["cancel", "confirm", appointment.mark_as].join(" "))
+          = link_to('Cancel series from today', cancel_appointment_path(appointment.recurrence_parent.id, :series => 1), :class => ["cancel", "confirm", "ujs", appointment.mark_as].join(" "), |
+                    :question => 'Are you sure you want to cancel this series?') |
     - else
       .span-9
         %h3== Scheduled Availability
