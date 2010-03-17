@@ -34,10 +34,15 @@ class RpxController < ApplicationController
         redirect_to login_path and return
       end
 
-      # create user using rpx data
-      @options = Hash[:preferences_phone => current_company.preferences[:customer_phone],
-                      :preferences_email => current_company.preferences[:customer_email]]
-      @user    = User.create_rpx(@data[:name], @data[:email], @data[:identifier], @options)
+      if current_company
+        # create user using rpx data, using company preferences
+        @options = Hash[:preferences_phone => current_company.andand.preferences[:customer_phone],
+                        :preferences_email => current_company.andand.preferences[:customer_email]]
+      else
+        # create user using rpx data, with default preferences
+        @options = Hash[]
+      end
+      @user = User.create_rpx(@data[:name], @data[:email], @data[:identifier], @options)
 
       if @user.valid?
         # create user session

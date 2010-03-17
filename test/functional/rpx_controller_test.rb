@@ -139,6 +139,46 @@ class RpxControllerTest < ActionController::TestCase
 
         should_redirect_to("root path") { "/" }
       end
+
+      context "with id, without a company" do
+        setup do
+          @company.preferences[:customer_phone] = 'required'
+          @company.save
+          @controller.stubs(:current_company).returns(nil)
+          # stub RPXNow
+          @rpx_hash = {:name=>'sanjman71',:email=>nil,:username=>'SanjayKapoor',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
+          RPXNow.stubs(:user_data).returns(@rpx_hash)
+          get :login, :token => '12345'
+        end
+
+        should_assign_to :data
+        should_assign_to :user
+
+        should_change("User.count", :by => 1) { User.count }
+        should_not_change("EmailAddress.count") { EmailAddress.count }
+
+        should "create user in active state" do
+          @user = User.find(assigns(:user).id)
+          assert_equal 'active', @user.state
+        end
+
+        should "create user with preferences email 'optional'" do
+          @user = User.find(assigns(:user).id)
+          assert_equal 'optional', @user.preferences[:email]
+        end
+
+        should "create user with preferences phone 'optional'" do
+          @user = User.find(assigns(:user).id)
+          assert_equal 'optional', @user.preferences[:phone]
+        end
+
+        should "assign user name" do
+          @user = User.find(assigns(:user).id)
+          assert_equal "sanjman71", @user.name
+        end
+
+        should_redirect_to("root path") { "/" }
+      end
     end
     
     context "with rpx token for an existing user" do
