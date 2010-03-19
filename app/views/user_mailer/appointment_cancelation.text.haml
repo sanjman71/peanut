@@ -1,1 +1,5 @@
 == Your appointment with #{@provider} for a #{@service} on #{@when} has been canceled.
+- unless @appointment_notes.blank? || @appointment_notes.empty?
+  == Notes:
+  - @appointment_notes.each do |n|
+    == - #{h(n)}

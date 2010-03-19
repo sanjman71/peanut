@@ -1,6 +1,6 @@
 - title(@title || "Schedule")
 - stylesheet('appointments', 'calendar', 'jquery.timepickr', 'datePicker', 'jquery.autocomplete')
-- javascript('appointments', 'calendar', 'waitlists', 'users', 'service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker')
+- javascript('appointments', 'calendar', 'waitlists', 'users', 'service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
 
 -# calendar previous/next links
 - prev_next_links = build_calendar_prev_next_links(@provider, @daterange)
@@ -74,8 +74,24 @@
 
     -# show free, work appointments and waitlists by day
     .span-15.last#calendar_by_day.hide
-      - @stuff_by_day.each do |day, stuff|
-        = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => stuff})
+      - @day_keys.each do |day|
+        - reset_cycle
+        .span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
+          .span-11.last.calendar.date.wide
+            %span= day.to_s(:appt_day)
+          -unless @capacity_and_work_by_day[day].blank?
+            = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @capacity_and_work_by_day[day]})
+          -unless @free_appointments_by_day[day].blank?
+            .span-11.last.calendar.date.wide
+              %span==&nbsp;
+            = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @free_appointments_by_day[day]})
+          -unless @waitlists_by_day[day].blank?
+            %hr
+            = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @waitlists_by_day[day]})
+          -unless @canceled_by_day[day].blank?
+            %hr
+            = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @canceled_by_day[day]})
+      
 
 .span-8.last
   -# schedule help
