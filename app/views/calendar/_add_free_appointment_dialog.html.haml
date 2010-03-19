@@ -1,4 +1,4 @@
-.span-9.prepend-1.last.dialog.hide#add_free_appointment_dialog{:title => "Manage Free Time for #{provider.name.titleize}"}
+.span-9.prepend-1.last.dialog.hide#add_free_appointment_dialog{:title => "Manage Available Time for #{provider.name.titleize}"}
   - form_for(Appointment.new, :url => url_for(:controller => 'appointments', :action => 'create_free'), :html => {:id => 'add_free_appointment_form'}) do |f|
     = hidden_field_tag :provider_type, provider.tableize
     = hidden_field_tag :provider_id, provider.id

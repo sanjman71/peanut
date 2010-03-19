@@ -69,9 +69,9 @@
       == This value is typically 1. It defaults to the capacity of the #{@provider.name}.
   - else
     .span-14.prepend-1.last.prompt
-      == Advanced: What capacity will #{@provider.name} have during this free time?
+      == Advanced: What capacity will #{@provider.name} have during this available time?
     .span-14.prepend-1.last.hint.padding-bottom-10
-      == This value is typically 1. It defaults to the provider's capacity, and should always be 1 or more.
+      == How many customers can #{@provider.name} see at the same time. This value is typically 1.
   .span-14.prepend-1.last
     .span-3.text_field_label
       = label_tag "capacity", "Capacity:"
