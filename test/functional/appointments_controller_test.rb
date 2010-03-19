@@ -23,6 +23,8 @@ class AppointmentsControllerTest < ActionController::TestCase
   
   should_route  :get, '/users/3/calendar/weekly/new',
                 :controller => 'appointments', :action => 'new_weekly', :provider_type => 'users', :provider_id => 3
+  should_route  :get, '/users/3/calendar/weekly',
+                :controller => 'appointments', :action => 'show_weekly', :provider_type => 'users', :provider_id => 3
   should_route  :post, '/users/3/calendar/weekly', 
                 :controller => 'appointments', :action => 'create_weekly', :provider_type => 'users', :provider_id => 3
   should_route  :get, 'users/1/calendar/weekly/1/edit',
@@ -320,7 +322,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       @now = Time.zone.now
       @recur_until = @now + 4.weeks + 1.hour 
     end
-    
+
     context "with no end date" do
       setup do
         # have johnny create free appointments on his calendar
@@ -405,11 +407,8 @@ class AppointmentsControllerTest < ActionController::TestCase
         should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T130000" }
         should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU,FR;UNTIL=#{@recur_until.to_s(:appt_schedule_day)}T000000Z" }
         should_assign_to(:provider) { @johnny }
-
       end
-
     end
-
   end
   
   context "create work appointment for a single date with no free time" do

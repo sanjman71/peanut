@@ -24,12 +24,12 @@
           - if has_privilege?('update users', current_company)
             - if role_removable?(staff, current_user, role)
               -# show role with linked image
-              %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '15x15', :class => 'revoke', :style => 'padding-top: 1px;'), user_revoke_role_path(staff, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
+              %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '15x15', :class => 'whitebgd', :style => 'padding-top: 1px;'), user_revoke_role_path(staff, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
             - else
               -# show role with a different, non-clickable image
               %span.show_role{:style => 'padding-right: 3px;'}
                 = role
-                %span= link_to image_tag('info.png', :size => '15x15', :class => 'revoke', :style => 'padding-top: 1px;'), '#', :title => 'Not allowed to remove yourself as manager'
+                %span= link_to image_tag('info.png', :size => '15x15', :class => 'whitebgd', :style => 'padding-top: 1px;'), '#', :title => 'Not allowed to remove yourself as manager'
           - else
             %span.show_role{:style => 'padding-right: 3px;'}= role
       .span-6.last.add_roles

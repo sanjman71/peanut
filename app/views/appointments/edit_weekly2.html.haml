@@ -1,0 +1,89 @@
+- title("Manage Weekly Schedules")
+- stylesheet('calendar', 'jquery.timepickr')
+- javascript('calendar_weekly2', 'ui.timepickr', 'jquery.timepickr')
+
+-# weekly schedule form setup
+- if @recurrence.new_record?
+  - submit_url    = url_for(:controller => 'appointments', :action => 'create_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id)
+  - submit_text   = "Create Weekly Schedule"
+  - submit_method = :post
+- else
+  - submit_url    = url_for(:controller => 'appointments', :action => 'update_weekly', :provider_type => @provider.tableize, :provider_id => @provider.id)
+  - submit_text   = "Update Weekly Schedule"
+  - submit_method = :put
+
+.span-24.last#what
+  .span-15.prepend-1.mat.padding-top-10.padding-bottom-10
+    .span-15.last.provider.padding-bottom-10
+      - if @providers.blank?
+        = label_tag "edit_provider", "#{submit_text} for #{@provider.name}", :class => 'big'
+      - else
+        = label_tag "edit_provider", "#{submit_text} for&nbsp;", :class => 'big'
+        = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')      
+    - if !@recurrence.new_record?
+      -# show current recurrence
+      .span-15.last#recurrence
+        %h4= Recurrence.to_words(@recurrence)
+        %h4= link_to 'Cancel this schedule', cancel_appointment_path(@recurrence.id, :series => 1), :class => 'admin ujs cancel confirm', :question => 'Are you sure you want to cancel this schedule?'
+  .span-8.last
+    -# schedule help
+    -#.span-7.prepend-1.last
+      -#= render(:partial => 'customer_help')
+
+.span-15.prepend-1.last
+  = display_flash
+.span-15.prepend-1.last
+  = error_messages_for(:appointment)
+
+%hr.space
+
+.span-15.prepend-1.last
+  - @day_order.each do |day_int|
+    - day_name = @day_hash[day_int][:day_name]
+    .span-15.day.padding-bottom-20{:day_name => day_name.downcase, :byday => day_name.downcase.slice(0,2), :day_int => day_int}
+      .span-15.last#day_header{:style => 'border-bottom: 2px solid #eee; padding-bottom: 3px;'}
+        %h4.bottom= day_name
+      .span-15.last#day_time_slots
+        .span-5.padding-top-5#day_name
+          %h4.top.bottom
+            == Starting:&nbsp;
+            = text_field_tag 'start_date', @day_hash[day_int][:datepicker_date], :class => 'datepicker small_text_field_style', :id => "datepicker_#{day_name.downcase}", :autocomplete => 'off'
+        .span-10.last.padding-top-5
+          %h4#time_slot_count== Not available
+      .span-15.last
+        .span-10.prepend-5.last
+          = link_to image_tag('add2.png', :size => '15x15', :class => 'whitebgd'), '#', :title => 'Add a Time Slot', :id => 'add_time_slot'
+
+.span-15.prepend-1.hide#hidden_time_slot
+  .span-15#time_slot
+    .span-5
+      %h4== &nbsp;
+    .span-10.last#start_end_time
+      .span-10.last
+        == Start Time:&nbsp;
+        = text_field_tag 'starts_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+        %span{:style => 'padding-left: 3px;'}== End Time:&nbsp;
+        = text_field_tag 'ends_at', '', :class => 'timepicker std_text_field_style', :autocomplete => 'off'
+        == &nbsp;
+        = link_to image_tag('delete.png', :size => '15x15', :style => 'padding-top: 7px;', :class => 'whitebgd'), '#', :id => 'remove_time_slot', :title => "Remove Time Slot"
+        
+- form_for(@recurrence, :url => submit_url, :method => submit_method, :html => {:id => 'add_weekly_schedule_form'}) do |f|
+  = hidden_field_tag :rules, ''
+
+  %hr.space
+
+  .span-16.last.prepend-1.padding-bottom-20
+    %h4#submit
+      = f.submit submit_text, :class => 'big button'
+      %span.small
+        == or
+        = link_to 'Back', calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id), :class => 'admin'
+    #progress.hide
+      = link_to image_tag('bounce.gif')
+
+%script{:type => "text/javascript"}
+  - if @recurrence.new_record?
+    var recurrence = new Hash({})
+  - else
+    var recurrence = new Hash({"id" : #{@recurrence.id}, "starts_at_ampm" : "#{@recurrence.start_at.to_s(:appt_time).downcase}", |
+                               "ends_at_ampm" : "#{@recurrence.end_at.to_s(:appt_time).downcase}"}) |

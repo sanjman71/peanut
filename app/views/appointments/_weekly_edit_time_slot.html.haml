@@ -1,0 +1,12 @@
+- start_at = '' unless local_assigns[:start_at]
+- end_at   = '' unless local_assigns[:end_at]
+
+.span-15.last.time_slot#edit.hide{:style => 'height: 35px;'}
+  = text_field_tag 'starts_at', start_at, :class => 'timepicker small_text_field_style', :autocomplete => 'off'
+  == &nbsp;-&nbsp;
+  = text_field_tag 'ends_at', end_at, :class => 'timepicker small_text_field_style', :autocomplete => 'off'
+  == &nbsp;
+  %span#actions
+    = link_to 'Update', '#', :class => 'admin', :id => "edit_recurrence_save"
+    == &nbsp;or&nbsp;
+    = link_to "Don't Change", '#', :class => 'admin', :id => 'edit_recurrence_cancel'

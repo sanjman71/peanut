@@ -140,6 +140,27 @@ function update_provider() {
   var provider_id     = tuple[1];
 }
 
+// force the specified provider in the specified form to be selected
+function force_provider_selected(form, provider_id, provider_type) {
+  // find any service provided by the provider
+  var provider_service_id = find_any_provider_service(provider_id, provider_type);
+  if (provider_service_id == 0) { return; } // no provider service found
+  // mark the service as selected and trigger a select change event
+  $(form).find("select#service_id").val(provider_service_id).attr('selected', 'selected');
+  $(form).find("select#service_id").change();
+}
+
+function find_any_provider_service(provider_id, provider_type) {
+  // service provider tuple => [service id, provider id, provider name, provider type]
+  for(i=0; i < service_providers.length; i++) {
+    if ((service_providers[i][1] == provider_id) && (service_providers[i][3] == provider_type)) {
+      return service_providers[i][0];
+    }
+  }
+  // no provider services found
+  return 0;
+}
+
 $(document).ready(function() {
   $(document).init_service_providers();
   $(document).init_services();

@@ -1,0 +1,12 @@
+- start_at = '' unless local_assigns[:start_at]
+- end_at   = '' unless local_assigns[:end_at]
+
+.span-15.last.time_slot#add.hide{:style => 'height: 35px;'}
+  == Starting:&nbsp;
+  = text_field_tag 'start_date', '', :class => 'datepicker small_text_field_style', :id => "datepicker", :autocomplete => 'off'
+  %span{:style => 'padding-left: 3px;'}== Start Time:&nbsp;
+  = text_field_tag 'starts_at', start_at, :class => 'timepicker small_text_field_style', :autocomplete => 'off'
+  %span{:style => 'padding-left: 3px;'}== End Time:&nbsp;
+  = text_field_tag 'ends_at', end_at, :class => 'timepicker small_text_field_style', :autocomplete => 'off'
+  == &nbsp;
+  = link_to image_tag('delete.png', :size => '15x15', :style => 'padding-top: 7px;', :class => 'whitebgd'), '#', :id => 'add_recurrence_cancel', :title => "Remove"

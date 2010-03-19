@@ -32,6 +32,11 @@
         .span-9.last.data
           %h4.bottom.block#customer_name== &nbsp;
 
+      -# manage recurrence
+      .span-12.last.padding-bottom-10#manage_recurrence.hide
+        %h4.small.bottom== This will cancel a single appointment in the weekly schedule.
+        %h4.small.bottom== Click #{link_to 'here', '#', :id => 'edit_recurrence'} to manage the weekly schedule.
+
       -# confirm link
       .span-12.last.padding-top-10
         = link_to 'Confirm', '', :id => 'cancel_appointment', :class => 'rounded button widget'

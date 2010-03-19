@@ -134,6 +134,8 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'create_block', :conditions => {:method => :post}
 
   map.new_weekly    ':provider_type/:provider_id/calendar/weekly/new', :controller => 'appointments', :action => 'new_weekly'
+  map.show_weekly   ':provider_type/:provider_id/calendar/weekly', :controller => 'appointments', :action => 'show_weekly',
+                     :conditions => {:method => :get}
   map.edit_weekly   ':provider_type/:provider_id/calendar/weekly/:id/edit', :controller => 'appointments', :action => 'edit_weekly'
   map.create_weekly ':provider_type/:provider_id/calendar/weekly',
                     :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}

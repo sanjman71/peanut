@@ -4,7 +4,7 @@
 - appt_end_time       = appointment.end_at.to_s(:appt_time).downcase
 - appt_duration       = appointment.duration.to_s
 - appt_provider       = "#{appointment.provider_type.tableize}/#{appointment.provider_id}"
-- appt_klasses        = [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].join(' ')
+- appt_klasses        = [(appointment.canceled? ? 'canceled' : appointment.mark_as), cycle("", "shaded")].reject(&:blank?).join(' ')
 
 .span-15.last.appointment[appointment]{:class => appt_klasses, :appt_day_date_time => appt_day_date_time, :appt_schedule_day => appt_schedule_day, |
                                        :appt_start_time => appt_start_time, :appt_end_time => appt_end_time, |
@@ -22,7 +22,7 @@
         = link_to appointment.service.name, appointment_path(appointment)
       - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
         -# free appointments can be viewed with read permissions
-        = ( (appointment.recurrence?) ? link_to("Recurring Availability", appointment.recurrence_parent) : "Scheduled Availability" )
+        = appointment.recurrence? ? link_to("Recurring Availability", appointment.recurrence_parent) : "Scheduled Availability"
       - else
         %h6= appointment.service.name
     - if show_location?
@@ -51,9 +51,15 @@
         .span-3.last
           .span-3.last.editcancel
             .span-3.last.editcancel-one
-              - if !appointment.recurrence_parent? && !appointment.canceled?
-                = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment")
-                |
-                = link_to('Cancel', cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "))
+              -#- if !appointment.recurrence_parent? && !appointment.canceled?
+              - if !appointment.canceled?
+                - if appointment.recurrence? #and !appointment.recurrence_parent?
+                  -# link to provider manage weekly schedule path
+                  - edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
+                - else
+                  - edit_recurrence = ''
+                = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
+                ==&nbsp;|&nbsp;
+                = link_to('Cancel', cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
               - elsif appointment.canceled?
                 == Canceled

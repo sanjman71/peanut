@@ -8,8 +8,8 @@
     -# provider_type, provider_id, customer_id are assigned by javascript
     = hidden_field_tag :provider_id, nil
     = hidden_field_tag :provider_type, ''
-    = hidden_field_tag :initial_provider_id, provider.id
-    = hidden_field_tag :initial_provider_type, provider.tableize
+    = hidden_field_tag :initial_provider_id
+    = hidden_field_tag :initial_provider_type
     = hidden_field_tag :mark_as, 'work'
     = hidden_field_tag :start_at
     = hidden_field_tag :customer_id
@@ -22,6 +22,12 @@
         .span-8.last
           -# field is always disabled
           = text_field_tag 'date', '', :id =>'start_date', :class => 'big appointment add edit datepicker disabled', :disabled => false
+      .span-11.last.padding-top-10#providers
+        .span-3.padding-top-5.label
+          %h4.bottom.block== With
+        .span-8.last.field#who
+          -# field is disabled when adding appointments
+          = select_tag('provider', options_for_select(providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
       .span-11.last.service.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Service
@@ -40,12 +46,6 @@
           %h4.bottom.block== How long
         .span-8.last#duration
           = select_tag('duration', options_for_select(service_duration_select_options, nil))
-      .span-11.last.padding-top-10#providers
-        .span-3.padding-top-5.label
-          %h4.bottom.block== With
-        .span-8.last.field#who
-          -# field is disabled when adding appointments
-          = select_tag('provider', options_for_select(providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{provider.tableize}/#{provider.id}"), :class => 'openings search wide')
       .span-11.last.padding-top-10
         .span-3.padding-top-5.label
           %h4.bottom.block== Customer

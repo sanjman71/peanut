@@ -1,0 +1,73 @@
+- title("Manage Weekly Schedule")
+- stylesheet('jquery.timepickr', 'calendar')
+- javascript('ui.timepickr', 'jquery.timepickr', 'calendar_weekly2')
+
+.span-24.last#what
+  .span-15.prepend-1.mat.padding-top-10
+    .span-15.last.provider.padding-bottom-5
+      = label_tag "show_provider", "Manage weekly schedule for&nbsp;", :class => 'big'
+      = select_tag('show_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')      
+    %h4.span-15.last
+      -#= link_to "Add a Weekly Schedule", new_weekly_path, :class => 'admin'
+      -#== &nbsp|&nbsp;
+      = link_to 'Back', calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id), :class => 'admin'
+
+%hr.space
+
+.span-15.prepend-1.last
+  = display_flash
+
+%hr.space
+
+.span-15.prepend-1.last
+  - @day_order.each do |wday|
+    - day_name = @day_hash[wday][:day_name]
+    - recurrences = (@weekly_recurrences_by_day[day_name] || []).sort_by{ |o| o.start_at }
+    .span-15.last.day{:style => 'border-bottom: 2px solid #eee; padding-bottom: 3px;', :byday => day_name.downcase.slice(0,2), :wday => wday}
+      %h4.bottom.bold= day_name
+    %hr.space
+    - if recurrences.empty?
+      .span-15.last
+        %h4#nothing== Not Available
+    - recurrences.each do |recurrence|
+      .span-15.last.recurrence[recurrence]
+        .span-15.last#show{:style => 'height: 35px;', :recur_rule => recurrence.recur_rule.downcase, :dstart => recurrence.start_at.to_s(:appt_schedule_day)}
+          %h4
+            %span#start_at= recurrence.start_at.to_s(:appt_time).downcase
+            == &nbsp;-&nbsp;
+            %span#end_at= recurrence.end_at.to_s(:appt_time).downcase
+            %span{:style => 'padding-left: 5px;'}
+            = link_to image_tag('search.png', :class => 'whitebgd', :size => '16x16'), '#', :title => 'Edit', :id => 'edit_recurrence'
+            %span{:style => 'padding-left: 5px;'}
+            = link_to image_tag('delete.png', :class => 'whitebgd', :size => '16x16'), cancel_appointment_path(recurrence.id, :series => 1), |
+                                              :title => 'Cancel', :id => 'cancel_recurrence', :class => 'admin ujs cancel confirm', :question => 'Are you sure you want to cancel this schedule?' |
+        -# edit partial
+        = render(:partial => 'weekly_edit_time_slot', |
+                 :locals => {:start_at => recurrence.start_at.to_s(:appt_time).downcase, :end_at => recurrence.end_at.to_s(:appt_time).downcase}) |
+    -# add recurrence to the current day
+    .span-15.last.padding-bottom-10#add{:byday => day_name.downcase.slice(0,2), :wday => wday}
+      = link_to image_tag('add2.png', :size => '16x16', :class => 'whitebgd'), '#', :title => 'Add', :id => 'add_recurrence'
+      %span#create.hide{:style => 'padding-left: 3px;'}= link_to 'Save Changes', '#', :id => "create_recurrence"
+
+.span-15.prepend-1.padding-top-20.padding-bottom-20#submit
+  = submit_tag 'Save', :disabled => true, :id => 'add_recurrence_save'
+.span-15.prepend-1.padding-top-20.padding-bottom-20#progress.hide
+  = image_tag('bounce.gif')
+
+= render(:partial => 'weekly_add_time_slot')
+
+-# add form
+- submit_url = create_weekly_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
+- form_for(Appointment.new, :url => submit_url, :method => :post, :html => {:id => 'add_weekly_schedule_form'}) do |f|
+  = hidden_field_tag :rules, ''
+
+-# update form
+- submit_url = update_weekly_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :id => ':id')
+- form_for(Appointment.new, :url => submit_url, :method => :post, :html => {:id => 'update_weekly_schedule_form'}) do |f|
+  = hidden_field_tag :rules, ''
+
+%script{:type => "text/javascript"}
+  -# build hash mapping day is (0..6) to date values (e.g. 01/01/2010)
+  var wday_to_date = new Hash({});
+  - @day_order.each do |wday|
+    wday_to_date.put("#{wday}", "#{@day_hash[wday][:datepicker_date]}");

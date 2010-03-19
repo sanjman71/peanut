@@ -1,8 +1,8 @@
 class AppointmentsController < ApplicationController
   before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                          :update_weekly, :create_work, :update]
+                                          :update_weekly, :show_weekly, :create_work, :update]
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                     :update_weekly, :create_work, :update]
+                                                     :update_weekly, :show_weekly, :create_work, :update]
   before_filter :init_appointment, :only => [:show]
   before_filter :init_appointment_and_provider, :only => [:cancel]
   before_filter :get_reschedule_id, :only => [:new]
@@ -11,7 +11,7 @@ class AppointmentsController < ApplicationController
   privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                       :update_weekly, :update, :cancel],
+                                                       :update_weekly, :show_weekly, :update, :cancel],
                                               :on => [:provider, :current_company]
     
 
@@ -188,7 +188,7 @@ class AppointmentsController < ApplicationController
       rescue Exception => e
         logger.debug("[error] create appointment error: #{e.message}")
         logger.debug("[error] backtrace: #{e.backtrace}")
-        @errors[date] = "There was a problem creating your appointment. The error message is: " + e.message
+        @errors[date] = "There was a problem creating the appointment. The error message is: " + e.message
       end
     end
 
@@ -213,7 +213,7 @@ class AppointmentsController < ApplicationController
     if @errors.keys.size > 0
       # set the flash
       if @errors.keys.size == 1
-        flash[:error] = "There was an error while creating your appointment</br><ul>"
+        flash[:error] = "There was an error while creating the appointment</br><ul>"
       else
         flash[:error] = "There were #{@errors.keys.size} errors while creating appointments</br><ul>"
       end
@@ -273,7 +273,49 @@ class AppointmentsController < ApplicationController
       format.html { render "edit_block.html"}
     end
   end
-  
+
+  # GET /users/1/calendar/weekly
+  def show_weekly
+    # @provider initialize in before_filter
+
+    if params[:provider_type].blank? or params[:provider_id].blank?
+      # no provider was specified, redirect to the company's first provider
+      provider = current_company.providers.first
+      redirect_to url_for(params.update(:provider_type => provider.tableize, :provider_id => provider.id)) and return
+    end
+
+    @weekly_recurrences = @provider.provided_appointments.free.recurring.not_canceled
+
+    # xxx - filter recurrences that are for more than 1 day
+    @weekly_recurrences = @weekly_recurrences.delete_if { |o| Recurrence.days(o.recur_rule).size > 1 }
+
+    # group recurrences by day
+    @weekly_recurrences_by_day = @weekly_recurrences.group_by { |o| Recurrence.days(o.recur_rule, :format => :long).first }
+
+    # initialize daterange used to show initial start days for each day of week schedule
+    @daterange = DateRange.parse_when('next 7 days')
+
+    # build a hash using the daterange days
+    @day_hash = @daterange.inject(ActiveSupport::OrderedHash[]) do |hash, time|
+      hash[time.wday] = Hash[:day_name => time.to_s(:appt_week_day_long), :datepicker_date => time.to_s(:appt_datepicker_date)]
+      hash
+    end
+
+    # re-order the next 7 days based on the company preference start day
+    @day_start      = current_company.preferences[:start_wday].to_i
+    @day_order      = Array(0..6)
+    @day_start.times do
+      @day_order = @day_order.rotate
+    end
+
+    # build list of providers to allow the managed scheduled to be changed by provider
+    @providers = current_company.providers
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
   # GET /users/1/calendar/weekly/new
   def new_weekly
     # @provider initialize in before_filter
@@ -281,23 +323,33 @@ class AppointmentsController < ApplicationController
     if params[:provider_type].blank? or params[:provider_id].blank?
       # no provider was specified, redirect to the company's first provider
       provider = current_company.providers.first
-      redirect_to url_for(params.update(:subdomain => current_subdomain, :provider_type => provider.tableize, :provider_id => provider.id)) and return
+      redirect_to url_for(params.update(:provider_type => provider.tableize, :provider_id => provider.id)) and return
     end
 
     # build list of providers to allow the scheduled to be adjusted by resource
     @providers = current_company.providers
 
-    # initialize daterange. Just used to show days of week.
-    @daterange = DateRange.parse_when('this week')
+    # initialize daterange used to show initial start days for each day of week schedule
+    @daterange = DateRange.parse_when('next 7 days')
 
-    # initialize calendar markings to empty
-    @calendar_markings  = Hash.new
+    # build a hash using the daterange days
+    @day_hash = @daterange.inject(ActiveSupport::OrderedHash[]) do |hash, time|
+      hash[time.wday] = Hash[:day_name => time.to_s(:appt_week_day_long), :datepicker_date => time.to_s(:appt_datepicker_date)]
+      hash
+    end
 
-    # Initialize the appointment
-    @appointment = Appointment.new
+    # re-order the next 7 days based on the company preference start day
+    @day_start      = current_company.preferences[:start_wday].to_i
+    @day_order      = Array(0..6)
+    @day_start.times do
+      @day_order = @day_order.rotate
+    end
+
+    # initialize the appointment
+    @recurrence = Appointment.new
 
     respond_to do |format|
-      format.html { render "edit_weekly.html"}
+      format.html { render "edit_weekly2"}
     end
   end
   
@@ -305,21 +357,42 @@ class AppointmentsController < ApplicationController
   def edit_weekly
     # @provider initialize in before_filter
 
+    @recurrence = Appointment.find_by_id(params[:id])
+
     if params[:provider_type].blank? or params[:provider_id].blank?
       # no provider was specified, redirect to the company's first provider
       flash[:error] = "No provider was specified"
       provider = current_company.providers.first
-      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+      redirect_to calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
 
-    @appointment = Appointment.find(params[:id])
-    if (@appointment.blank? || !@appointment.recurrence_parent?)
+    if (@recurrence.blank? || !@recurrence.recurrence_parent?)
       flash[:error] = "Recurring appointment wasn't found"
-      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+      redirect_to calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
-    
+
+    # show only the days in the recurrrence
+    @day_order = Recurrence.days(@recurrence, :format => :int)
+
+    # xxx - we should check that the day hash contains the right days
+    if @day_order.size > 1
+      # we don't currently support recurrences with more than 1 day
+      flash[:error] = "This weekly schedule can not be edited"
+      redirect_to show_weekly_path(:provider_type => @provider.tableize, :provider_id => @provider.id) and return
+    end
+
+    # initialize daterange with the recurrence start day
+    @start_on  = @recurrence.start_at.to_s(:appt_schedule_day)
+    @daterange = DateRange.parse_range(@start_on, @start_on)
+
+    # build a hash using the daterange days
+    @day_hash = @daterange.inject(ActiveSupport::OrderedHash[]) do |hash, time|
+      hash[time.wday] = Hash[:day_name => time.to_s(:appt_week_day_long), :datepicker_date => time.to_s(:appt_datepicker_date)]
+      hash
+    end
+
     respond_to do |format|
-      format.html
+      format.html { render "edit_weekly2"}
     end
   end
   
@@ -346,51 +419,64 @@ class AppointmentsController < ApplicationController
   def create_weekly
     # @provider initialized in before filter
 
-    # get recurrence parameters
-    @freq         = params[:freq].to_s.upcase
-    @byday        = params[:byday].to_s.upcase
-    @dstart       = params[:dstart].to_s
-    @tstart       = params[:tstart].to_s
-    @dend         = params[:dend].to_s
-    @tend         = params[:tend].to_s
-    @until        = params[:until].to_s
+    # split recurrence rules on '|' separator
+    @rules = params[:rules].split('|')
 
-    # ensure capacity is at least 1
-    @capacity     = params[:capacity].to_i || 1
-    @capacity     = 1 if @capacity <= 0
+    @rules.each do |rule|
+      # build rules hash
+      @rule_hash = rule.split(';').inject(Hash[]) do |hash, rule_part|
+        # each rule part looks like x=y
+        key, value = rule_part.split('=')
+        hash[key.to_sym] = value
+        hash
+      end
 
-    # build recurrence rule from rule components
-    tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
+      # get recurrence parameters
+      @freq         = @rule_hash[:freq].to_s.upcase
+      @byday        = @rule_hash[:byday].to_s.upcase
+      @dstart       = @rule_hash[:dstart].to_s
+      @tstart       = @rule_hash[:tstart].to_s
+      @dend         = @rule_hash[:dend].to_s
+      @tend         = @rule_hash[:tend].to_s
+      @until        = @rule_hash[:until].to_s
 
-    unless @until.blank?
-      tokens.push("UNTIL=#{@until}T000000Z")
-    end
+      # ensure capacity is at least 1
+      @capacity     = params[:capacity].to_i || 1
+      @capacity     = 1 if @capacity <= 0
 
-    @recur_rule   = tokens.join(";")
+      # build recurrence rule from rule components
+      tokens        = ["FREQ=#{@freq}", "BYDAY=#{@byday}"]
 
-    # build dtstart and dtend
-    @dtstart      = "#{@dstart}T#{@tstart}"
-    if (@dend.blank?)
-      @dtend        = "#{@dstart}T#{@tend}"
-    else
-      @dtend        = "#{@dend}T#{@tend}"
-    end
+      unless @until.blank?
+        tokens.push("UNTIL=#{@until}T000000Z")
+      end
 
-    # build start_at and end_at times
-    @start_at       = Time.zone.parse(@dtstart)
-    @end_at         = Time.zone.parse(@dtend)
+      @recur_rule   = tokens.join(";")
 
-    # create appointment with recurrence rule
-    @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
-    @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
-    @error          = nil
+      # build dtstart and dtend
+      @dtstart      = "#{@dstart}T#{@tstart}"
+      if (@dend.blank?)
+        @dtend        = "#{@dstart}T#{@tend}"
+      else
+        @dtend        = "#{@dend}T#{@tend}"
+      end
+
+      # build start_at and end_at times
+      @start_at       = Time.zone.parse(@dtstart)
+      @end_at         = Time.zone.parse(@dtend)
+
+      # create appointment with recurrence rule
+      @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
+      @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
+      @error          = nil
     
-    begin
-      # Create the first appointment in the sequence
-      @appointment  = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
-    rescue Exception => e
-      @error        = e.message
-    end
+      begin
+        # Create the first appointment in the sequence
+        @appointment  = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
+      rescue Exception => e
+        @error        = e.message
+      end
+    end # rule
 
     if !@error.blank?
       # set the flash
@@ -403,9 +489,8 @@ class AppointmentsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
-      format.js
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
-
   end
 
   # POST /book/work/users/7/services/4/60/20090901T060000
@@ -415,34 +500,43 @@ class AppointmentsController < ApplicationController
     create
   end
 
-  # POST /users/1/calendar/weekly/:id
+  # PUT /users/1/calendar/weekly/:id
   def update_weekly
     # @provider initialized in before filter
+
+    @appointment = Appointment.find_by_id(params[:id])
 
     if params[:provider_type].blank? or params[:provider_id].blank?
       # no provider was specified, redirect to the company's first provider
       flash[:error] = "No provider was specified"
       provider = current_company.providers.first
-      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+      redirect_to calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
 
-    @appointment = Appointment.find(params[:id])
     if (@appointment.blank? || !@appointment.recurrence_parent?)
       flash[:error] = "Recurring appointment wasn't found"
-      redirect_to calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id) and return
+      redirect_to calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id) and return
     end
-    
+
+    # build rules hash
+    @rule_hash = params[:rules].split(';').inject(Hash[]) do |hash, rule_part|
+      # each rule part looks like x=y
+      key, value = rule_part.split('=')
+      hash[key.to_sym] = value
+      hash
+    end
+
     # get recurrence parameters
-    @freq         = params[:freq].to_s.upcase
-    @byday        = params[:byday].to_s.upcase
-    @dstart       = params[:dstart].to_s
-    @tstart       = params[:tstart].to_s
-    @dend         = params[:dend].to_s
-    @tend         = params[:tend].to_s
-    @until        = params[:until].to_s
+    @freq         = @rule_hash[:freq].to_s.upcase
+    @byday        = @rule_hash[:byday].to_s.upcase
+    @dstart       = @rule_hash[:dstart].to_s
+    @tstart       = @rule_hash[:tstart].to_s
+    @dend         = @rule_hash[:dend].to_s
+    @tend         = @rule_hash[:tend].to_s
+    @until        = @rule_hash[:until].to_s
 
     # ensure capacity is at least 1
-    @capacity     = params[:capacity].to_i || 1
+    @capacity     = @rule_hash[:capacity].to_i || 1
     @capacity     = 1 if @capacity <= 0
 
     # build recurrence rule from rule components
@@ -466,14 +560,13 @@ class AppointmentsController < ApplicationController
     @start_at       = Time.zone.parse(@dtstart)
     @end_at         = Time.zone.parse(@dtend)
 
-    # create appointment with recurrence rule
+    # create recurrence rule options
     @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
     @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
     @error          = nil
-    
-    begin
 
-      # Update the recurring appointment
+    begin
+      # update the recurring appointment
       @appointment.force = true
       @appointment.update_attributes(@options)
       if @appointment.valid?
@@ -482,22 +575,22 @@ class AppointmentsController < ApplicationController
         @error = @appointment.errors.full_messages
       end
     rescue Exception => e
-      @error        = e.message
+      @error = e.message
     end
 
     # set the flash
     if @error.blank?
-      flash[:notice] = 'The weekly appointment was updated successfully, and changes are being made to the series.'
+      flash[:notice] = 'The weekly schedule was successfully updated.'
     else
-      flash[:error]   = @error
+      flash[:error] = @error
     end
-    
-    @redirect_path  = calendar_show_path(:subdomain => current_subdomain, :provider_type => @provider.tableize, :provider_id => @provider.id)
+
+    @redirect_path = show_weekly_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
 
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
-
   end
 
   # GET /appointments/1/reschedule
@@ -703,9 +796,9 @@ class AppointmentsController < ApplicationController
       end
 
       if @appointment.free?
-        flash[:notice] = "Your available time has been updated"
+        flash[:notice] = "The available time has been updated"
       else
-        flash[:notice] = "Your appointment has been updated"
+        flash[:notice] = "The appointment has been updated"
       end
 
       if @appointment.valid? and @appointment.work?
@@ -730,7 +823,7 @@ class AppointmentsController < ApplicationController
         format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
       end
     else
-      flash[:error] = "There was a problem updating your appointment<br/>" + @appointment.errors.full_messages.join("<br/>")
+      flash[:error] = "There was a problem updating the appointment<br/>" + @appointment.errors.full_messages.join("<br/>")
 
       # apointment updates are done in dialogs, so redirect to the referer page
       @redirect_path = request.referer

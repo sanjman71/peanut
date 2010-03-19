@@ -24,17 +24,17 @@
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
-      -# schedule add blocks of time links
-      %h4{:style => 'font-size: 1.0em;'}
-        = link_to "Add Blocks of Available Time", new_block_path
-        == &nbsp;or&nbsp;
-        = link_to "Add a Weekly Schedule", new_weekly_path
+      -# links to schedule using blocks of time or using weekly schedules
+      %h4
+        = link_to "Manage Weekly Schedule", show_weekly_path, :class => 'admin'
+        %span.small== &nbsp;or&nbsp;
+        = link_to "Add Blocks of Available Time", new_block_path, :class => 'admin'
     .span-6.last#pdf
       %h4.bold.bottom== PDF Schedules:
-      = link_to "Today, #{@today.to_s(:appt_short_month_day)}", calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today'
+      = link_to "Today, #{@today.to_s(:appt_short_month_day)}", calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today', :class => 'admin'
       == &nbsp;or&nbsp;
-      = link_to 'Pick a Date Range', '', :id => 'pdf_schedule_date_range'
-      
+      = link_to 'Pick a Date Range', '', :id => 'pdf_schedule_date_range', :class => 'admin'
+
   .span-14.prepend-1.last.padding-top-10
     = display_flash
 
@@ -105,6 +105,7 @@
 = render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @provider})
 
 %script{:type => "text/javascript"}
+  var current_provider             = new Hash({"id" : "#{@provider.id}", "type" : "#{@provider.tableize}", "name" : "#{@provider.name}"});
   var calendar_highlight_date      = "#{@calendar_highlight_date}";
   var appointment_create_work_path = "#{schedule_work_path}";
   var appointment_update_work_path = "#{appointment_path(':id')}";
