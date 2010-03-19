@@ -1,4 +1,4 @@
-// edit calendar for the selected provider
+// change calendar based on the selected provider
 $.fn.init_select_calendar_weekly_provider = function() {
   $("#edit_provider").change(function() {
     var href = '/' + this.value + '/calendar/weekly/edit';
@@ -17,12 +17,14 @@ $.fn.init_add_recurrence = function() {
   $("a#add_recurrence").click(function() {
     var add_div   = $(this).closest("div#add");
     var time_slot = $("div.time_slot.hide#add").clone().removeClass('hide').prependTo(add_div);
+    // add class 'datepicker' so it can be properly initialized
+    $(time_slot).find("input#datepicker").addClass('datepicker');
     // set datepicker initial date; find date by mapping wday to a date
     var wday = $(add_div).attr('wday');
     var date = wday_to_date.get(wday);
     $(time_slot).find("input#datepicker").val(date);
-    // try adding unique id to datepicker
-    //$(time_slot).find("input#datepicker").attr('id', "datepicker_" + Math.floor(Math.random()*101));
+    // add unique id, its a requirement of the jquery library when there are more than 1 on a page
+    $(time_slot).find("input#datepicker").attr('id', "datepicker_" + Math.floor(Math.random()*101));
     init_timepicker_weekly();
     init_datepicker_weekly();
     toggle_add_recurrence_save_button();
@@ -187,9 +189,11 @@ function init_datepicker_weekly() {
   $(".datepicker").datepicker({minDate: '+0d', maxDate: '+3m'});
 }
 
+/*
 $.fn.init_datepicker_weekly = function () {
   $(".datepicker").datepicker({minDate: '+0d', maxDate: '+3m'});
 }
+*/
 
 $.fn.init_weekly_time_slots = function() {
   $("a#add_time_slot").live('click', function() {

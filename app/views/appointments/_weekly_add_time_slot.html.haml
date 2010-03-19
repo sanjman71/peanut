@@ -3,7 +3,8 @@
 
 .span-15.last.time_slot#add.hide{:style => 'height: 35px;'}
   == Starting:&nbsp;
-  = text_field_tag 'start_date', '', :class => 'datepicker small_text_field_style', :id => "datepicker", :autocomplete => 'off'
+  -# add class 'datepicker' after div is cloned
+  = text_field_tag 'start_date', '', :class => 'small_text_field_style', :id => "datepicker", :autocomplete => 'off'
   %span{:style => 'padding-left: 3px;'}== Start Time:&nbsp;
   = text_field_tag 'starts_at', start_at, :class => 'timepicker small_text_field_style', :autocomplete => 'off'
   %span{:style => 'padding-left: 3px;'}== End Time:&nbsp;
