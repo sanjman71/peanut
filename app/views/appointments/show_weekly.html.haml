@@ -40,7 +40,7 @@
             = link_to image_tag('search.png', :class => 'whitebgd', :size => '16x16'), '#', :title => 'Edit', :id => 'edit_recurrence'
             %span{:style => 'padding-left: 5px;'}
             = link_to image_tag('delete.png', :class => 'whitebgd', :size => '16x16'), cancel_appointment_path(recurrence.id, :series => 1), |
-                                              :title => 'Cancel', :id => 'cancel_recurrence', :class => 'admin ujs cancel confirm', :question => 'Are you sure you want to cancel this schedule?' |
+                                              :title => 'Cancel', :id => 'cancel_recurrence', :class => 'admin ujs cancel confirm', :question => 'Are you sure you want to cancel this weekly availabilty?' |
         -# edit partial
         = render(:partial => 'weekly_edit_time_slot', |
                  :locals => {:start_at => recurrence.start_at.to_s(:appt_time).downcase, :end_at => recurrence.end_at.to_s(:appt_time).downcase}) |
