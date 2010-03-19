@@ -543,6 +543,10 @@ $.fn.init_autocomplete_customers = function() {
 
 }
 
+$.fn.init_truncate = function() {
+  $(".truncate").truncate({max_length: 80});
+}
+
 $(document).ready(function() {
   $(document).init_schedule_datepicker();
   $(document).init_schedule_timepicker();
@@ -557,6 +561,7 @@ $(document).ready(function() {
   $(document).init_add_calendar_markings();
   $(document).init_schedule_pdf();
   $(document).init_autocomplete_customers();
+  $(document).init_truncate();
 })
 
 // Re-bind after an ajax call
