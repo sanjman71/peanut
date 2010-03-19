@@ -1,17 +1,16 @@
 require 'test/test_helper'
-require 'test/factories'
 
-class ProvidersControllerTest < ActionController::TestCase
+class StaffsControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/providers/new', :controller => 'users', :action => 'new', :role => 'company provider'
-  should_route :post, '/providers/create', :controller => 'users', :action => 'create', :role => 'company provider'
-  should_route :get,  '/providers/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company provider'
-  should_route :put,  '/providers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company provider'
+  should_route :get,  '/staffs/new', :controller => 'users', :action => 'new', :role => 'company staff'
+  should_route :post, '/staffs/create', :controller => 'users', :action => 'create', :role => 'company staff'
+  should_route :get,  '/staffs/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company staff'
+  should_route :put,  '/staffs/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company staff'
 
-  # providers controller routes
-  should_route :get,  '/providers/1', :controller => 'providers', :action => 'show', :id => '1'
-  
+  # staffs controller routes
+  should_route :get,  '/staffs', :controller => 'staffs', :action => 'index'
+
   def setup
     # initialize roles and privileges
     BadgesInit.roles_privileges
@@ -20,21 +19,16 @@ class ProvidersControllerTest < ActionController::TestCase
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
     @company      = Factory(:company, :subscription => @subscription)
-    # owner is the company manager
-    @owner.grant_role('company manager', @company)
-    @owner.grant_role('user manager', @owner)
+    # owner is a company manager
+    @company.grant_role('company manager', @owner)
     # add user providers
     @provider1    = Factory(:user, :name => "User Provider 1")
     @company.user_providers.push(@provider1)
-    @provider1.grant_role('company provider', @company)
-    @provider1.grant_role('user manager', @provider1)
     @provider2    = Factory(:user, :name => "User Provider 2")
     @company.user_providers.push(@provider2)
-    @provider2.grant_role('company provider', @company)
-    @provider2.grant_role('user manager', @provider2)
     # add resource providers
-    @resource1    = Factory(:resource, :name => "Resource Provider 1")
-    @company.resource_providers.push(@resource1)
+    # @resource1    = Factory(:resource, :name => "Resource Provider 1")
+    # @company.resource_providers.push(@resource1)
     # create user
     @user         = Factory(:user, :name => "User")
     # stub current company methods
@@ -62,10 +56,10 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
-      should_assign_to(:resources, :class => Array) { [@resource1] }
+      # should_assign_to(:resources, :class => Array) { [@resource1] }
 
-      should "not be able to change manager role on providers" do
-        assert_select "input.checkbox.role", 0
+      should "show staff roles for all staff providers" do
+        assert_select "span.show_role", 3
       end
 
       should "be able to edit themself" do
@@ -77,7 +71,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
 
     context "with 'update users' privilege" do
@@ -88,12 +82,16 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
-      should_assign_to(:resources, :class => Array) { [@resource1] }
+      # should_assign_to(:resources, :class => Array) { [@resource1] }
 
-      should "be able to change manager and provider role on user providers and provider role on manager" do
-        assert_select "input.checkbox.role", 5
+      should "show roles on staff manager" do
+        assert_select "span.show_role", 1
       end
 
+      should "have links to remove company provider roles on staff providers" do
+        assert_select "span.edit_role", 2
+      end
+      
       should "be able to edit user and resource providers and manager" do
         assert_select "a.admin.edit.user", 3
       end
@@ -103,7 +101,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
     
     context "with 'manage site' privilege" do
@@ -115,14 +113,18 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
-      should_assign_to(:resources, :class => Array) { [@resource1] }
+      # should_assign_to(:resources, :class => Array) { [@resource1] }
 
       should "have 'no email address' messages on each user provider and manager" do
-        assert_select "h4.provider.email span.field_missing", 3
+        assert_select "h4.staff.email span.field_missing", 3
       end
 
-      should "be able to change provider and manager role on user providers and provider role on manager (not manager role on manager 'cos manager is logged in)" do
-        assert_select "input.checkbox.role", 5
+      should "show roles on staff manager" do
+        assert_select "span.show_role", 1
+      end
+
+      should "have links to remove company provider roles on staff providers" do
+        assert_select "span.edit_role", 2
       end
 
       should "be able to edit user providers and manager" do
@@ -134,7 +136,7 @@ class ProvidersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :success
-      should_render_template 'providers/index.html.haml'
+      should_render_template 'staffs/index.html.haml'
     end
   end
   

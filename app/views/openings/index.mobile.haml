@@ -1,0 +1,12 @@
+#home.current
+  .toolbar
+    %h1== #{current_company.name} Calendar
+    = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
+    = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
+  %ul.plastic
+    %li.arrow= link_to "Search", '#openings_search', :class => 'flip'
+
+  .info== Logged in as #{user_login_name(current_user)}
+
+%script{:type => 'text/javascript'}
+  var current_user_id = #{logged_in? ? current_user.id : 0};

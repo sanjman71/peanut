@@ -1,5 +1,0 @@
-.span-8.prepend-1.append-bottom.providers.header
-  %h4.bottom= search_text ? search_text : page_entries_info(providers, :entry_name => 'person').gsub(/ in total/,'')
-.span-6.prepend-1.last#pagination
-  - if paginate
-    %h4.bottom= will_paginate(providers, :param_name => 'providers_page', :page_links => true, :inner_window => 1, :outer_window => 1)

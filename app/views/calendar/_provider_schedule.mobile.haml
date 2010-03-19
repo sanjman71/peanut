@@ -7,7 +7,11 @@
 
   %ul.plastic
     - daterange.each do |day|
-      %li.arrow= link_to day.to_s(:appt_day), "#provider_schedule_#{day.to_s(:appt_schedule_day)}"
+      - day_name = (day == today) ? 'Today' : day.to_s(:appt_day_short)
+      %li.arrow= link_to day_name, "#provider_schedule_#{day.to_s(:appt_schedule_day)}"
+
+  -# info reset on page load
+  .info== Provider Schedule
 
 -# add specific dates
 - daterange.each do |day|
@@ -18,7 +22,7 @@
       = link_to 'Home', '#home', :class => 'button'
 
     %ul.edgetoedge
-      %li== Schedule for #{day.to_s(:appt_day)}
+      %li== Schedule for #{day.to_s(:appt_day_short)}
 
     %ul.plastic.schedule
       %li.loading== Loading Schedule ...
@@ -26,3 +30,6 @@
     -# add privilege checks later
     %ul.individual
       %li.arrow= link_to 'Add Appointment', "#add_work_appointment"
+
+    -# info reset on page load
+    .info== Provider Schedule

@@ -1,0 +1,2 @@
+- collection = [["Select Customer", '']] + customers.collect{ |c| [c.name, c.id] }
+= select_tag 'customer_id', options_for_select(collection, nil), :placeholder => ''

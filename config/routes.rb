@@ -25,10 +25,7 @@ ActionController::Routing::Routes.draw do |map|
   map.signup_create '/signup/:plan_id', :controller => 'signup', :action => 'create', :conditions => {:method => :post}
 
   # invitation signup route
-  map.invite    '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
-
-  map.provider_assign         '/providers/:id/assign',        :controller => 'providers', :action => 'assign',:conditions => {:method => :put}
-  map.provider_assign_prompt  '/providers/:id/assign/prompt', :controller => 'providers', :action => 'assign_prompt',:conditions => {:method => :get}
+  map.invite              '/invite/:invitation_token', :controller => 'users', :action => 'new', :conditions => { :subdomain => /.+/ }
   
   map.resources         :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get}
   map.user_notify       '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
@@ -43,10 +40,10 @@ ActionController::Routing::Routes.draw do |map|
   map.user_phone_promote  '/users/:user_id/phone/:id/promote', :controller => 'phone_numbers', :action => 'promote'
   map.user_phone_delete   '/users/:user_id/phone/:id', :controller => 'phone_numbers', :action => 'destroy', :conditions => {:method => :delete}
 
-  map.provider_new    '/providers/new',       :controller => 'users', :action => 'new', :role => 'company provider', :conditions => {:method => :get}
-  map.provider_create '/providers/create',    :controller => 'users', :action => 'create', :role => 'company provider', :conditions => {:method => :post}
-  map.provider_edit   '/providers/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company provider', :conditions => {:method => :get}
-  map.provider_update '/providers/:id',       :controller => 'users', :action => 'update', :role => 'company provider', :conditions => {:method => :put}
+  map.staff_new    '/staffs/new',       :controller => 'users', :action => 'new', :role => 'company staff', :conditions => {:method => :get}
+  map.staff_create '/staffs/create',    :controller => 'users', :action => 'create', :role => 'company staff', :conditions => {:method => :post}
+  map.staff_edit   '/staffs/:id/edit',  :controller => 'users', :action => 'edit', :role => 'company staff', :conditions => {:method => :get}
+  map.staff_update '/staffs/:id',       :controller => 'users', :action => 'update', :role => 'company staff', :conditions => {:method => :put}
 
   map.customer_new    '/customers/new',       :controller => 'users', :action => 'new', :role => 'company customer', :conditions => {:method => :get}
   map.customer_create '/customers/create',    :controller => 'users', :action => 'create', :role => 'company customer', :conditions => {:method => :post}
@@ -69,7 +66,7 @@ ActionController::Routing::Routes.draw do |map|
                 :member => {:approve => :get, :noshow => :get, :complete => :get, :cancel => [:get, :post], :reschedule => [:get, :post]},
                 :collection => { :search => [:get, :post] }
 
-  map.resources :providers, :member => { :toggle_manager => :post, :toggle_provider => :post }
+  map.resources :staffs, :only => [:index]
   map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
   
   # special invoice routes
@@ -165,10 +162,6 @@ ActionController::Routing::Routes.draw do |map|
   # search waitlist scoped by provider
   map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlists', :action => 'index'
   map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlists', :action => 'index'
-
-  # toggle a provider's calendar
-  map.connect   ':provider_type/:provider_id/calendar/toggle',
-                :controller => 'company_providers', :action => 'toggle', :conditions => {:method => :post}
 
   # services, products
   map.resources :services

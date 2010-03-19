@@ -15,6 +15,8 @@ class RpxControllerTest < ActionController::TestCase
     @owner.grant_role('company manager', @company)
     @user         = Factory(:user, :name => 'Sanjay')
     @email        = @user.email_addresses.create(:address => 'sanjay@walnutindustries.com')
+    # stub current company methods
+    @controller.stubs(:current_company).returns(@company)
   end
 
   context "login" do
@@ -32,7 +34,7 @@ class RpxControllerTest < ActionController::TestCase
       should_redirect_to("login path") { "/login" }
     end
 
-    context "create user using rpx token" do
+    context "with rpx token for a new user" do
       context "for a private company" do
         setup do
           # private company
@@ -47,6 +49,8 @@ class RpxControllerTest < ActionController::TestCase
 
         should_assign_to :data
         should_not_assign_to :user
+
+        should_not_change("User.count") { User.count }
 
         should_redirect_to("login path") { "/login" }
         should_set_the_flash_to /You are not authorized to create a user account for this company/i
@@ -63,12 +67,13 @@ class RpxControllerTest < ActionController::TestCase
         should_assign_to :data
         should_assign_to :user
 
-        should "create valid user" do
-          assert_true assigns(:user).valid?
-        end
-
         should_change("User.count", :by => 1) { User.count }
         should_change("EmailAddress.count", :by => 1) { EmailAddress.count }
+
+        should "create user in active state" do
+          @user = User.with_email("sanjman71@gmail.com").first
+          assert_equal 'active', @user.state
+        end
 
         should "assign user's email identifier" do
           @user = User.with_email("sanjman71@gmail.com").first
@@ -90,19 +95,53 @@ class RpxControllerTest < ActionController::TestCase
         should_assign_to :data
         should_assign_to :user
 
-        should "create valid user" do
-          assert_true assigns(:user).valid?
-          assert_equal "sanjman71", assigns(:user).name
+        should_change("User.count", :by => 1) { User.count }
+        should_not_change("EmailAddress.count") { EmailAddress.count }
+
+        should "create user in active state" do
+          @user = User.find(assigns(:user).id)
+          assert_equal 'active', @user.state
         end
+
+        should "assign user name" do
+          @user = User.find(assigns(:user).id)
+          assert_equal "sanjman71", @user.name
+        end
+
+        should_redirect_to("root path") { "/" }
+      end
+
+      context "with id, for a company that requires customer phone numbers" do
+        setup do
+          @company.preferences[:customer_phone] = 'required'
+          @company.save
+          # stub RPXNow
+          @rpx_hash = {:name=>'sanjman71',:email=>nil,:username=>'SanjayKapoor',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
+          RPXNow.stubs(:user_data).returns(@rpx_hash)
+          get :login, :token => '12345'
+        end
+
+        should_assign_to :data
+        should_assign_to :user
 
         should_change("User.count", :by => 1) { User.count }
         should_not_change("EmailAddress.count") { EmailAddress.count }
+
+        should "create user in data_missing state" do
+          @user = User.find(assigns(:user).id)
+          assert_equal 'data_missing', @user.state
+        end
+
+        should "assign user name" do
+          @user = User.find(assigns(:user).id)
+          assert_equal "sanjman71", @user.name
+        end
 
         should_redirect_to("root path") { "/" }
       end
     end
     
-    context "using token that maps to an existing user" do
+    context "with rpx token for an existing user" do
       context "with default return_to" do
         setup do
           @rpx_hash = {:identifier=>'12345'}

@@ -25,7 +25,7 @@ class ProductsController < ApplicationController
     @product.save
     
     # set redirect path
-    @redirect_path = edit_product_path(@product, :subdomain => @subdomain)
+    @redirect_path = edit_product_path(@product)
     
     respond_to do |format|
       format.js # redirect to edit page

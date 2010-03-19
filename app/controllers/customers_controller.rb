@@ -22,27 +22,11 @@ class CustomersController < ApplicationController
       format.js
       format.json do
         # build collection using customer name, emails, and phones
-        @collection = @customers.inject([]) do |array, customer|
-          hash = Hash[:id => customer.id, :name => customer.name,
-                      :email => customer.primary_email_address.andand.address || '',
-                      :phone => customer.primary_phone_number.andand.address || '']
-          array.push(hash)
-          array
-        end
+        @collection = build_customers_autocomplete_collection(@customers, [:name, :email, :phone])
         render(:json => @collection.to_json)
         # render(:json => @customers.to_json(:include => [:email_addresses, :phone_numbers], :only => ["id", "name", "address"]))
       end
-      format.mobile do
-        # build collection using customer name, emails, and phones
-        @collection = @customers.inject([]) do |array, customer|
-          hash = Hash[:id => customer.id, :name => customer.name,
-                      :email => customer.primary_email_address.andand.address || '',
-                      :phone => customer.primary_phone_number.andand.address || '']
-          array.push(hash)
-          array
-        end
-        render(:json => @collection.to_json)
-      end
+      format.mobile
     end
   end
 
@@ -58,5 +42,18 @@ class CustomersController < ApplicationController
   #     format.html
   #   end
   # end
+
+  protected
+
+  def build_customers_autocomplete_collection(customers, fields=[])
+    customers.inject([]) do |array, customer|
+      hash = Hash[:id => customer.id]
+      hash[:name]   = customer.name if fields.include?(:name)
+      hash[:email]  = customer.primary_email_address.andand.address || '' if fields.include?(:email)
+      hash[:phone]  = customer.primary_phone_number.andand.address || '' if fields.include?(:phone)
+      array.push(hash)
+      array
+    end
+  end
 
 end

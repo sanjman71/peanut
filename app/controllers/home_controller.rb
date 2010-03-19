@@ -8,7 +8,7 @@ class HomeController < ApplicationController
       if mobile_device?
         render(:action => :index, :layout => 'company') and return
       else
-        redirect_to openings_path(:subdomain => current_subdomain) and return
+        redirect_to openings_path and return
       end
     else
       # show www/root home page

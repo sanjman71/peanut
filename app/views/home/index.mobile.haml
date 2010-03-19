@@ -1,6 +1,6 @@
 #home.current
   .toolbar
-    %h1== #{current_company.name}
+    %h1== #{current_company ? current_company.name : 'Walnut Calendar'}
     - if logged_in?
       = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
 
@@ -9,9 +9,16 @@
     %ul.plastic
       %li.arrow= link_to 'Login', '#login', :class => 'dissolve'
   - else
-    -# authenticated users see the main menu
-    %ul.plastic#menu
-      %li.arrow= link_to "Schedules", calendars_path, :target => '_webapp'
+    - if current_company
+      -# authenticated company users see the main menu
+      %ul.plastic#menu
+        - if has_privilege?('read calendars', current_company)
+          %li.arrow= link_to "Schedules", calendars_path, :target => '_webapp'
+        %li.arrow= link_to "Openings", openings_path, :target => '_webapp'
+    - else
+      -# authenticated user needs to find their company subdomain
+      %ul.plastic#menu
+        %li== Please try navigating directly to your company's mobile website
 
   - if logged_in?
     .info== Logged in as #{user_login_name(current_user)}

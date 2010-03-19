@@ -64,6 +64,14 @@ class ApplicationController < ActionController::Base
     AuthToken.instance.token == params[:token].to_s
   end
 
+  # check that the current user is in the active state
+  def current_user_active_state_required
+    return if !logged_in? or current_user.active?
+    if current_user.data_missing?
+      redirect_to(user_edit_path(current_user)) and return
+    end
+  end
+
   #
   # Note: current_subdomain is already defined by the subdomain_fu plugin
   #
@@ -169,16 +177,13 @@ class ApplicationController < ActionController::Base
     # If we're on www.peanut.xxx then current_subdomain will be nil
     if current_subdomain
       # find company and all associated locations
-      @current_company = Company.find_by_subdomain(current_subdomain, :include => [:locations, :subscription])
+      @current_company = Company.find_by_subdomain(map_subdomain(current_subdomain), :include => [:locations, :subscription])
 
       # check if its a valid company and state is active
       if @current_company.blank? or @current_company.state != 'active'
         flash[:error] = "Invalid company"
         return redirect_to(root_path(:subdomain => 'www'))
       end
-
-      # initialize subdomain
-      @subdomain  = @current_company.subdomain
 
       # initialize application time zone
       Time.zone   = @current_company.time_zone
@@ -196,6 +201,16 @@ class ApplicationController < ActionController::Base
       @current_location = Location.anywhere if @current_location.blank?
 
       logger.debug("*** current_location: #{@current_location.name}, count: #{@current_locations.size}")
+    end
+  end
+
+  # map subdomain if required
+  def map_subdomain(subdomain)
+    if match = subdomain.match(/([\w-]+).mobile/)
+      # drop '.mobile' from subdomain
+      match[1]
+    else
+      subdomain
     end
   end
 

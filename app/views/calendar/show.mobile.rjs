@@ -9,8 +9,10 @@ end
 # check for empty days
 @daterange.each do |day|
   if @stuff_by_day[day].blank?
-    page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul.schedule"].html(render(:partial => 'calendar/show_day_stuff.mobile.haml',
-                                                                                          :locals => {:day => day, :stuff => {}}))
+    page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul.schedule"].append(render(:partial => 'calendar/show_day_stuff.mobile.haml',
+                                                                                            :locals => {:day => day, :stuff => {}}))
+    # hide loading indicator
+    page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul li.loading"].hide()
   end
 end
   

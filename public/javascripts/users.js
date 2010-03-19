@@ -1,3 +1,4 @@
+/*
 $.fn.init_toggle_user_calendar = function() {
   $(".checkbox.calendar").live('click', function() {
     // hide checkbox and label
@@ -10,7 +11,9 @@ $.fn.init_toggle_user_calendar = function() {
     return false;
   });
 }
+*/
 
+/*
 $.fn.init_toggle_user_company_role = function() {
   $(".checkbox.role").live('click', function() {
     // hide checkbox and label
@@ -22,6 +25,33 @@ $.fn.init_toggle_user_company_role = function() {
     $.post($(this).attr("url"), {}, null, "script");
     return false;
   });
+}
+*/
+
+$.fn.init_grant_revoke_user_company_role = function() {
+  $("a#show_add_roles").click(function() {
+    // hide 1 span and show the next
+    $(this).closest("span#add_roles_text").hide().next().show();
+    return false;
+  })
+
+  $("a#add_role").click(function() {
+    var role    = $(this).closest("div.add_roles").find("select#roles option:selected").val();
+    var url     = $(this).attr('url').replace(/:role/, role);
+    var method  = 'put'
+    // its always a put request
+    $.put(url, {}, null, "script");
+    // show progress text
+    $(this).replaceWith('Adding ...')
+    return false;
+  })
+
+  $("a#remove_role").click(function() {
+    $.put(this.href, {}, null, "script");
+    // show progress text
+    $(this).closest("span.edit_role").replaceWith('Removing ...')
+    return false;
+  })
 }
 
 $.fn.init_user_create_submit = function() {
@@ -320,8 +350,9 @@ function check_user_phone_fields(id) {
 }
 
 $(document).ready(function() {
-  $(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
-  $(document).init_toggle_user_company_role();  // re-bind after an ajax call using jquery live()
+  //$(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
+  //$(document).init_toggle_user_company_role();  // re-bind after an ajax call using jquery live()
+  $(document).init_grant_revoke_user_company_role();
   $(document).init_user_add_email();
   $(document).init_user_add_phone();
   $(document).init_user_add_password();

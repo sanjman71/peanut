@@ -1,0 +1,2 @@
+# update staffs list
+page["#staffs"].html(render(:partial => 'staffs', :locals => {:staffs => @staffs}))

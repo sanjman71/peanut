@@ -35,14 +35,13 @@ class RpxController < ApplicationController
       end
 
       # create user using rpx data
-      @user = User.create_rpx(@data[:name], @data[:email], @data[:identifier])
+      @options = Hash[:preferences_phone => current_company.preferences[:customer_phone],
+                      :preferences_email => current_company.preferences[:customer_email]]
+      @user    = User.create_rpx(@data[:name], @data[:email], @data[:identifier], @options)
 
       if @user.valid?
         # create user session
         @redirect_path = session_initialize(@user)
-      end
-
-      if @user.valid?
         redirect_back_or_default(@redirect_path) and return
       else
         flash[:error] = @user.errors.full_messages.join("<br/>")

@@ -17,12 +17,13 @@ module BadgesInit
     cm    = Badges::Role.find_by_name('company manager') || Badges::Role.create(:name=>"company manager")
     cp    = Badges::Role.find_by_name('company provider') || Badges::Role.create(:name=>"company provider")
     cc    = Badges::Role.find_by_name('company customer') || Badges::Role.create(:name=>"company customer")
+    cs    = Badges::Role.find_by_name('company staff') || Badges::Role.create(:name=>"company staff")
     um    = Badges::Role.find_by_name('user manager') || Badges::Role.create(:name=>"user manager")
     am    = Badges::Role.find_by_name('appointment manager') || Badges::Role.create(:name=>"appointment manager")
     sm    = Badges::Role.find_by_name('site manager') || Badges::Role.create(:name=>"site manager")
 
     site(sm)
-    companies(cm, cp, cc, um)
+    companies(cm, cp, cc, cs, um)
     users(cm, cp, um)
     resources(cm, cp, um)
     calendars(cm, cp, um)
@@ -43,7 +44,7 @@ module BadgesInit
     # only admins can delete roles & privileges
   end
   
-  def self.companies(cm, cp, cc, um)
+  def self.companies(cm, cp, cc, cs, um)
     # company privileges
     rc = Badges::Privilege.find_or_create_by_name(:name=>"read companies")
     uc = Badges::Privilege.find_or_create_by_name(:name=>"update companies")
@@ -56,6 +57,7 @@ module BadgesInit
     Badges::RolePrivilege.create(:role=>cm, :privilege=>rc)
     Badges::RolePrivilege.create(:role=>cp, :privilege=>rc)
     Badges::RolePrivilege.create(:role=>cc, :privilege=>rc)
+    Badges::RolePrivilege.create(:role=>cs, :privilege=>rc)
     
     # Only admin can delete a company
   end
@@ -139,4 +141,17 @@ module BadgesInit
     # appointment managers can manage their own appointments
     Badges::RolePrivilege.create(:role=>am, :privilege=>ma)
   end
+
+  def self.add_company_staff
+    # find all companies with providers
+    Company.all(:conditions => ["providers_count > 0"]).each do |company|
+      puts "*** adding company staff to #{company.name}"
+      company.authorized_managers_and_providers.each do |user|
+        next if user.has_role?('company staff', company)
+        company.grant_role('company staff', user)
+      end
+    end
+    true
+  end
+
 end

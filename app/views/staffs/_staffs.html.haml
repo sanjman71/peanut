@@ -1,0 +1,81 @@
+- staffs.each do |staff|
+  .span-16.last.letterbox.staff{:class => cycle("shaded", "")}[staff]
+    -# staff name and email
+    .span-6.prepend-1.name
+      %h4.bigger.staff.name.bottom= staff.name
+      %h4.staff.email
+        -# resources don't have email addresses
+        - if staff.respond_to?(:email_addresses)
+          - if staff.email_addresses_count > 0
+            = staff.primary_email_address.address
+          - else
+            %span.field_missing== No email address
+        - else
+          == &nbsp;
+
+    -# find staff's company roles
+    - all_roles     = ['Manager', 'Provider']
+    - exempt_roles  = ['Customer', 'Staff']
+    - current_roles = staff.roles_on(current_company).collect(&:name).map{ |s| s.gsub(/company /, '').titleize }.sort - exempt_roles
+    .span-6.roles
+      .span-6.last.current_roles.padding-bottom-5
+        - current_roles.each do |role|
+          -# check if we just show the role, or show the role with a delete option
+          - if has_privilege?('update users', current_company)
+            - if role_removable?(staff, current_user, role)
+              -# show role with linked image
+              %span.edit_role{:style => 'padding-right: 3px;'}== #{role} #{link_to image_tag('delete.png', :size => '15x15', :class => 'revoke', :style => 'padding-top: 1px;'), user_revoke_role_path(staff, role.downcase), :id => 'remove_role', :title => "Remove as #{role}"}
+            - else
+              -# show role with a different, non-clickable image
+              %span.show_role{:style => 'padding-right: 3px;'}
+                = role
+                %span= link_to image_tag('info.png', :size => '15x15', :class => 'revoke', :style => 'padding-top: 1px;'), '#', :title => 'Not allowed to remove yourself as manager'
+          - else
+            %span.show_role{:style => 'padding-right: 3px;'}= role
+      .span-6.last.add_roles
+        - add_roles = all_roles - current_roles
+        - if !add_roles.empty? and has_privilege?('update users', current_company)
+          -# we have roles to add, and user has privileges to add them
+          %span#add_roles_text= link_to 'Add Roles', '#', :id => 'show_add_roles', :class => 'admin'
+          %span#add_roles.hide
+            == Add as:
+            = select_tag('roles', options_for_select(add_roles.collect{|s| [s,s.downcase]}), :id => 'roles')
+            %span{:style => 'padding-left: 5px;'}= link_to 'Add', '#', :class => 'admin', :id => 'add_role', :url => user_grant_role_path(staff, ':role')
+    -# allow company managers to toggle staff role
+    -#.span-5
+      -#.span-5.last.provider.provider
+        -#- if has_privilege?('update users', current_company)
+          -#= check_box_tag 'Company Provider', 'yes', current_company.providers.include?(provider), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_provider', :id => provider.id, :subdomain => current_subdomain)
+          -#= label_tag '', 'Company Provider', :class => 'checkbox label'
+          -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+
+    -# allow company managers to toggle manager role
+    -#.span-5
+      -#.span-5.last.provider.manager
+        -#- if has_privilege?('update users', current_company)
+          -#- if current_user == provider
+            -# 'me' is a company manager
+            -#%h5{:style => 'margin-top: 3px;'}== You are a Company Manager
+          -#- elsif provider.respond_to?(:has_privilege?)
+            -#= check_box_tag 'Company Manager', 'yes', provider.has_privilege?('update users', current_company), :class => 'checkbox role', :url => url_for(:controller => 'providers', :action => 'toggle_manager', :id => provider.id, :subdomain => current_subdomain)
+            -#= label_tag '', 'Company Manager', :class => 'checkbox label'
+            -#%span.checkbox.progress{:style => 'padding-left: 5px; display: none;'}= image_tag 'dots.gif'
+          -#- else
+            -# provider is a resource, which does not have roles
+            -#== &nbsp;
+
+      %br
+      .span-6.last.capacity
+        - if staff.capacity > 1
+          == Default # Slots: #{staff.capacity}
+        - else
+          -# we don't bother displaying capacity for staffs if it's at the default of 1 - this is to reduce confusion
+          == &nbsp;
+          
+    -# allow company managers to edit all staffs, and staff to edit themself
+    .span-2.prepend-1.action.last
+      - if has_privilege?('update users', current_company) or has_privilege?('update users', staff)
+        = link_to "Edit", user_edit_path(staff), :class => 'admin edit user'
+      - if has_privilege?('manage site', current_company) and staff.is_a?(User) and (staff != current_user)
+        -# site managers can sudo to users
+        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(staff), :class => 'admin sudo user'

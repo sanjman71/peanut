@@ -18,6 +18,7 @@ class CalendarController < ApplicationController
       @providers  = current_company.providers
       @services   = Array(current_company.services.with_providers.work)
       @daterange  = DateRange.parse_when('next 7 days', :include => :today)
+      @today      = DateRange.today.beginning_of_day
       render(:action => :index) and return
     else
       # redirect to a specific provider. Try the most recently used, then current user, then first company provider

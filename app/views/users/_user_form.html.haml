@@ -14,9 +14,9 @@
 - else
   - user_email = 'required'
 
-.span-12.last.mat
+.span-15.last.mat
   -# form title
-  .span-11.prepend-1.last
+  .span-14.prepend-1.last
     %h2= title_text
     %hr
 
@@ -31,61 +31,58 @@
       = hidden_field_tag 'invitation_token', invitation.token
     
     -# name field
-    .span-12.last.padding-bottom-10
+    .span-15.last.padding-bottom-10
       .span-4
         %h3.text-align-right.padding-top-10== Name:
-      .span-8.last
+      .span-11.last
         = user_form.text_field :name, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
 
     -# email nested field
     - user_form.fields_for :email_addresses do |email_form|
-      .span-12.last.email_address[email_form.object]
-        .span-12.last.padding-bottom-10
+      .span-15.last.email_address[email_form.object]
+        .span-15.last.padding-bottom-10
           .span-4
             %h3.text-align-right.padding-top-10== Email:
-          .span-8.last
+          .span-11.last
             = email_form.text_field :address, :class => ['title', 'big', user_email].join(' '), :style => 'width: 275px; margin: 0px;', :id => 'email_address'
+            %em= user_email
 
     -# phone nested field
     - user_form.fields_for :phone_numbers do |phone_form|
-      .span-12.last.phone_number[phone_form.object]
-        .span-12.last
+      .span-15.last.phone_number[phone_form.object]
+        .span-15.last
           .span-4
             %h3.text-align-right.padding-top-15== Phone:
-          .span-8.last
+          .span-11.last
             = phone_form.text_field :address, :class => ['title', 'big', user_phone].join(' '), :style => "width: 275px;", :id => 'phone_address'
-            - if phone_form.object.verified?
-              %span{:style => 'padding-left: 7px; font-weight: bold;'}== Verified
-        .span-12.last.padding-bottom-10
+            %em= user_phone
+        .span-15.last.padding-bottom-10
           .span-4
             %h3.text-align-right.padding-top-10== Phone Name:
-          .span-8.last
+          .span-11.last
             = phone_form.select(:name, options_for_select(PhoneNumber.names, phone_form.object.name), {:include_blank => true}, {:style => 'margin-top: 10px;', :class => 'select big', :id => 'phone_name'})
 
     -# password fields are not shown if the creator is logged in
-    .span-12.last.padding-bottom-10{:class => (creator == "user") ? '' : ''}
+    .span-15.last.padding-bottom-10{:class => (creator == "user") ? '' : ''}
       .span-4
         %h3.text-align-right.padding-top-10== Password:
-      .span-8.last
+      .span-11.last
         = user_form.password_field :password, :class => ['title', 'big', user_password].join(' '), :style => 'width: 275px; margin: 0px;'
-        
-    .span-12.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
+        %em= user_password
+
+    .span-15.last.padding-bottom-10{:class => (creator == "user")  ? '' : ''}
       .span-4
         %h3.text-align-right{:style => "padding-top: 10px; font-size: 1.3em;"}== Confirm password:
-      .span-8.last
+      .span-11.last
         = user_form.password_field :password_confirmation, :class => 'title big required', :style => 'width: 275px; margin: 0px;'
         
-    .span-10.prepend-2.last.padding-bottom-10{:class => (creator == "user")  ? 'hide' : 'hide'}
-      %em.span-10.last{:style => 'font-size: 1.2em;'}
-        == The user's password will be automatically generated and emailed to them. 
-        
     -# submit
-    .span-12.last.padding-bottom-10
-      .span-11.prepend-1.last#submit
+    .span-15.last.padding-bottom-10
+      .span-14.prepend-1.last#submit
         %h4
           = submit_tag submit_text, :name => nil, :id => 'user_create_submit'
           - if back_path
             == or
             %span.small= link_to 'Cancel', back_path
-      .span-10.prepend-1.last#progress.hide
+      .span-13.prepend-1.last#progress.hide
         %h3.submitting== Adding ...

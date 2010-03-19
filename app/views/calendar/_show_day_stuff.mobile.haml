@@ -1,5 +1,5 @@
 - if stuff.empty?
-  %li== Nothing scheduled
+  %li.nothing== Nothing scheduled
 
 - stuff.sort_by{ |o| [o.start_at.in_time_zone, ((o.class == CapacitySlot) ? 1 : ((o.class == Appointment && o.free?) ? 0 : 2))] }.each do |object|
   -# check what type of stuff it is, possible options:

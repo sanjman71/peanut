@@ -4,9 +4,9 @@ class UsersController < ApplicationController
   before_filter :init_user_privileges, :only => [:edit, :update, :destroy]
   
   privilege_required      'create users', :only => [:new, :create], :on => :current_company
-  privilege_required_any  'update users', :only => [:edit, :update, :destroy], :on => [:user, :current_company]
+  privilege_required_any  'update users', :only => [:edit, :update, :destroy, :revoke], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
-  privilege_required      'update users', :only => [:grant, :revoke], :on => :current_company
+  privilege_required      'update users', :only => [:grant], :on => :current_company
   privilege_required      'manage site', :only => [:sudo], :on => :current_company
   
   def has_privilege?(p, authorizable=nil, user=nil)
@@ -26,8 +26,8 @@ class UsersController < ApplicationController
       when 'company customer'
         # anyone can signup as a customer
         return true
-      when 'company provider'
-        # providers must be invited or user must have 'create users' privilege on the company
+      when 'company staff'
+        # staff must be invited or user must have 'create users' privilege on the company
         return true if @invitation
         super
       else
@@ -42,7 +42,7 @@ class UsersController < ApplicationController
     end
   end
   
-  # GET /providers/new
+  # GET /staffs/new
   # GET /customers/new
   # GET /customers/new?return_to=
   # GET /invite/dc8a032b9ae52f5c7710f53a945efbc11bb7ce51
@@ -61,13 +61,16 @@ class UsersController < ApplicationController
         # add the invitation to the user's list of invitations
         @user.received_invitations << @invitation
         case @invitation.role
+        when 'company staff'
+          # add the user as a company staff
+          @invitation.company.grant_role(@invitation.role, @user) unless @invitation.company.blank?
         when 'company provider'
           # add the user as a company provider
           @invitation.company.user_providers.push(@user) unless @invitation.company.blank?
         when 'company customer'
-          # grant user customer role
-          @user.grant_role('company customer', @invitation.company) unless @invitation.company.blank?
-        end 
+          # add the user as a company customer
+          @invitation.company.grant_role(@invitation.role, @user) unless @invitation.company.blank?
+        end
         # set the flash message
         flash[:notice] = "You have been added to #{@invitation.company.name}. Login to continue."
         redirect_back_or_default('/login') and return
@@ -96,7 +99,7 @@ class UsersController < ApplicationController
       # use return_to as the back link
       @back_path = params[:return_to]
     else
-      # initialize back path to either the caller or the resource index page (e.g. /customers, /providers), but only if there is a current user
+      # initialize back path to either the caller or the resource index page (e.g. /customers, /staffs), but only if there is a current user
       @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
     end
 
@@ -107,7 +110,7 @@ class UsersController < ApplicationController
  
   # POST /customers/create
   # POST /customers/create?return_to=
-  # POST /providers/create
+  # POST /staffs/create
   def create
     # @role (always) and @invitation (if it exists) are initialized in a before filter
 
@@ -175,10 +178,20 @@ class UsersController < ApplicationController
     # build notes collection, most recent first
     @note     = Note.new
     @notes    = @user.notes.sort_recent
-    
+
     # build the index path based on the user type
-    @index_path = index_path(@role)
-    
+    @index_path = index_path(@user, @role)
+
+    if @user.data_missing?
+      if @user.phone_missing?
+        flash.now[:notice] = "Please add a phone number to #{current_user == @user ? "your" : "this user's"} profile"
+      elsif @user.email_missing?
+        flash.now[:notice] = "Please add an email to #{current_user == @user ? "your" : "this user's"} profile"
+      else
+        flash.now[:error] = "User profile is missing required information"
+      end
+    end
+
     respond_to do |format|
       format.html
     end
@@ -189,8 +202,8 @@ class UsersController < ApplicationController
     # @role and @user are initialized here
 
     # build the index path based on the user type
-    @index_path = index_path(@role)
-    
+    @index_path = index_path(@user, @role) || user_edit_path(@user)
+
     respond_to do |format|
       if @user.update_attributes(params[:user])
         flash[:notice] = "User '#{@user.name}' was successfully updated"
@@ -242,11 +255,25 @@ class UsersController < ApplicationController
   end
 
   # PUT /users/1/grant/:role
-  # valid roles: 'provider'
+  # valid roles: 'manager', 'provider'
   def grant
     @role = params[:role]
 
     case @role
+    when 'staff'
+      if !@user.has_role?('company staff', current_company)
+        current_company.grant_role('company staff', @user)
+        flash[:notice] = "User #{@user.name} has been added to the company staff"
+      else
+        flash[:notice] = "User #{@user.name} is already a company staff member"
+      end
+    when 'manager'
+      if !@user.has_role?('company manager', current_company)
+        current_company.grant_role('company manager', @user)
+        flash[:notice] = "User #{@user.name} has been added as a company manager"
+      else
+        flash[:notice] = "User #{@user.name} is already a company manager"
+      end
     when 'provider'
       if current_company.providers.include?(@user)
         flash[:notice] = "User #{@user.name} is already a company provider"
@@ -260,22 +287,34 @@ class UsersController < ApplicationController
       flash[:notice] = "Invalid role"
     end
 
+    @redirect_path = request.referer || user_edit_path(@user)
+ 
     respond_to do |format|
-      format.html { redirect_to(user_edit_path(@user)) and return }
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
 
   # PUT /users/1/revoke/:role
-  # valid roles: 'provider'
+  # valid roles: 'manager', 'provider'
   def revoke
     @role = params[:role]
 
     case @role
+    when 'manager'
+      if @user.has_role?('company manager', current_company)
+        if @user == current_user
+          flash[:notice] = "You can not remove yourself as a company manager"
+        else
+          current_company.revoke_role('company manager', @user)
+          flash[:notice] = "User #{@user.name} has been removed as a company manager"
+        end
+      end
     when 'provider'
-      # check if user has any free appointments where they are the provider
-      if Appointment.free.provider(@user).size > 0
+      # check if user is the provider, with the current company, for any free appointments
+      if false #Appointment.free.provider(@user).company(current_company).size > 0
         # user can not be removed as a company provider until all appointments are removed
-        flash[:notice] = "User can not be removed as a company provider because they are a provider to at least 1 appointment."
+        flash[:notice] = "User #{@user.name} can not be removed as a company provider because they are a provider to at least 1 appointment."
         flash[:notice] += "<br/>Please remove these appointments and try again."
       else
         # remove user as a company provider
@@ -290,8 +329,11 @@ class UsersController < ApplicationController
       flash[:notice] = "Invalid role"
     end
 
+    @redirect_path = request.referer || user_edit_path(@user)
+
     respond_to do |format|
-      format.html { redirect_to(user_edit_path(@user)) and return }
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
     end
   end
 
@@ -378,8 +420,8 @@ class UsersController < ApplicationController
       # figure out type based on user
       return @role if @user.blank?
       case
-      when @user.has_role?('company provider', current_company) || @user.has_role?('admin')
-        @role = 'company provider'
+      when @user.has_role?('company staff', current_company) || @user.has_role?('admin')
+        @role = 'company staff'
       else
         @role = 'company customer'
       end
@@ -394,23 +436,30 @@ class UsersController < ApplicationController
     end
   end
 
-  def index_path(role)
+  def index_path(user, role)
     # build the index path based on the user type
     case role
     when "company customer"
       case
-      when !logged_in?
-        # not logged in, use openings path
-        openings_path
-      when logged_in? && (request.referer != request.url)
+      when (current_user == user)
+        # no back when user editing themself
+        nil
+      when (request.referer != request.url)
         # back to referer
         request.referer
       else
-        # logged in, default path
+        # default path
         customers_path
       end
-    when "company provider"
-      providers_path
+    when "company staff"
+      case
+      when (current_user == user)
+        # no back when user editing themself
+        nil
+      else
+        # default path
+        staffs_path
+      end
     else
       root_path
     end

@@ -65,7 +65,7 @@ class SessionsControllerTest < ActionController::TestCase
         assert @user2_email.valid?
       end
       
-      context "and login without a password" do
+      context "login without a password" do
         setup do
           post :create, {:email => 'user2@walnut.com'}
         end
@@ -76,8 +76,8 @@ class SessionsControllerTest < ActionController::TestCase
 
         should_redirect_to("root path") { "/" }
       end
-      
-      context "and login with a password" do
+
+      context "login with a password" do
         setup do
           post :create, {:email => 'user2@walnut.com', :password => 'secret'}
         end

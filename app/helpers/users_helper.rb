@@ -18,6 +18,17 @@ module UsersHelper
   end
 
   #
+  # Check if user's role is removable
+  #
+  def role_removable?(user, current_user, role)
+    # users may not remove role 'manager' from themself
+    if (user == current_user) and (role.downcase == 'manager' or role.downcase == 'company manager')
+      return false
+    end
+    true
+  end
+
+  #
   # Link to user's page ('users/1')
   #
   # By default, their login is used as link text and link title (tooltip)

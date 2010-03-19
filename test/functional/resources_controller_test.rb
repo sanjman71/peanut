@@ -86,7 +86,7 @@ class ResourcesControllerTest < ActionController::TestCase
       should_change("Resource.count", :by => 1) { Resource.count }
 
       should_respond_with :redirect
-      should_redirect_to('providers_path') { providers_path }
+      should_redirect_to('staffs path') { staffs_path }
     end
   end
 

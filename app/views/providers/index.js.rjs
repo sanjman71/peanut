@@ -1,2 +1,0 @@
-# update providers list
-page["#providers"].html(render(:partial => 'providers', :locals => {:providers => @providers}))

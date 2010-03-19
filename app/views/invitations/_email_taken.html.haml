@@ -1,0 +1,15 @@
+- if user.has_role?('company staff', current_company)
+  -# user exists and is already a campany staff
+  %h3== A user with email '#{email.address}' already exists and is a company staff member.
+  %h3
+    = link_to 'Send another invitation', new_invitation_path, :class => 'admin', :style => 'font-size: 1.0em;'
+    %span{:style => 'padding-left: 3px; padding-right: 3px;'}== or
+    = link_to 'Back to staff list', staffs_path, :class => 'admin', :style => 'font-size: 1.0em;'
+- else
+  -# user exists but is not a company staff
+  %h3== A user with email '#{email.address}' already exists.
+  %h3== Would you like to add the user as a company staff member?
+  %h3
+    = link_to 'Yes, add as staff', user_grant_role_path(user, 'staff'), :method => :put, :class => 'admin', :style => 'font-size: 1.0em;'
+    %span{:style => 'padding-left: 3px; padding-right: 3px;'}== or
+    = link_to 'No thanks', staffs_path, :class => 'admin', :style => 'font-size: 1.0em;'

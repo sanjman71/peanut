@@ -1,5 +1,5 @@
-$.fn.init_user_invite_submit = function() {
-  $("input#user_invite_submit").click(function() {
+$.fn.init_user_invitation = function() {
+  $("form#new_invitation").submit(function() {
     var email_address = $("input#invitation_recipient_email").attr('value');
 
     if (email_address == '') {
@@ -12,10 +12,16 @@ $.fn.init_user_invite_submit = function() {
       return false;
     }
 
-    return true;
+    // post
+    $.post(this.action, $(this).serialize(), null, 'script')
+    // add progress message
+    $(this).find("#submit").html('Sending ...');
+
+    return false;
   })
+
 }
 
 $(document).ready(function() {
-  $(document).init_user_invite_submit();
+  $(document).init_user_invitation();
 })
