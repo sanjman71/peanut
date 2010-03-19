@@ -27,6 +27,14 @@
       %td== Phone:
       %td= @customer_phone
 
+  - unless @appointment_notes.blank? || @appointment_notes.empty?
+    %tr
+      %td== Notes:
+      %td
+        %ul
+          - @appointment_notes.each do |n|
+            %li= h(n)
+
 - unless @footer_provider.blank?
   %p= @footer_provider
 

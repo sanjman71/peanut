@@ -1,2 +1,6 @@
 == Your appointment has been changed.
 == Its now with #{@provider} for a #{@service} on #{@when}.
+- unless @appointment_notes.blank? || @appointment_notes.empty?
+  == Notes:
+  - @appointment_notes.each do |n|
+    == - #{h(n)}
