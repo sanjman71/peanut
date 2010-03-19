@@ -89,11 +89,9 @@ $.fn.init_add_recurrence = function() {
 
     if (errors > 1) { return false; }
 
-    alert("recurrence rules: " + recur_rules.join(','))
-
     // set form values and submit
     var form  = "form#add_weekly_schedule_form"
-    $(form).find("input#rules").val(recur_rules.join(','));
+    $(form).find("input#rules").val(recur_rules.join('|'));
     var url   = $(form).attr('action');
     var data  = $(form).serialize();
     $.post(url, data, null, "script");
@@ -270,10 +268,8 @@ $.fn.init_weekly_schedule_form = function () {
       return false;
     }
 
-    //alert("recurrence rules: " + recur_rules.join(','))
-
     // set rules field
-    $(this).find("input#rules").val(recur_rules.join(','));
+    $(this).find("input#rules").val(recur_rules.join('|'));
 
     // show progress
     $(this).find("#submit").hide().parent().find("#progress").show();
