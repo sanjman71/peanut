@@ -16,7 +16,7 @@ class NotesController < ApplicationController
 
       # build notes collection, most recent first 
       @notes        =  @note.subject.notes.sort_recent
-debugger
+
       if !@note.subject.blank? and @note.subject.class == Appointment and @note.subject.valid? and @note.subject.work?
         appointment = @note.subject
         begin
