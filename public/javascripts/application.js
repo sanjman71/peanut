@@ -269,6 +269,8 @@ $.fn.init_log_entries = function () {
 
 // convert mm/dd/yyyy date to yyyymmdd string
 function convert_date_to_string(s) {
+  if (s == '' || s == undefined) { return ''; }
+
   re    = /(\d{2,2})\/(\d{2,2})\/(\d{4,4})/
   match = s.match(re);
   if (!match) {
@@ -281,6 +283,8 @@ function convert_date_to_string(s) {
 
 // convert yyyymmdd string to mm/dd/yyyy
 function convert_yymmdd_string_to_mmddyy(s) {
+  if (s == '' || s == undefined) { return ''; }
+
   re    = /(\d{4,4})(\d{2,2})(\d{2,2})/
   match = s.match(re);
   if (!match) {
@@ -293,6 +297,8 @@ function convert_yymmdd_string_to_mmddyy(s) {
 
 // convert '03:00 pm' time format to 'hhmmss' 24 hour time format
 function convert_time_ampm_to_string(s) {
+  if (s == '' || s == undefined) { return ''; }
+
   re      = /(\d{2,2}):(\d{2,2}) (am|pm)/
   match   = s.toLowerCase().match(re);
 
