@@ -637,15 +637,9 @@ class AppointmentTest < ActiveSupport::TestCase
            @recurrence.destroy
          end
       
-         should_change("Appointment.count", :by => -1) { Appointment.count }
-         
-         should "have 7 instances with no recurrence parent" do
-           assert_equal 7, @recur_instances.count
-           @recur_instances.each do |i|
-             assert_nil Appointment.find(i).recur_parent
-           end
-         end
-      
+         should_change("Appointment.count", :by => -8) { Appointment.count }
+         should_change("CapacitySlot.count", :by => -8) { CapacitySlot.count }
+               
       end
       
       context "then change the recurrence description" do
