@@ -15,8 +15,8 @@ $.fn.init_select_calendar_weekly_provider = function() {
 
 $.fn.init_add_recurrence = function() {
   $("a#add_recurrence").click(function() {
-    var add_div   = $(this).closest("div#add");
-    var time_slot = $("div.time_slot.hide#add").clone().removeClass('hide').prependTo(add_div);
+    var add_div   = $(this).closest("div.day").nextAll("div#add:first");
+    var time_slot = $("div.time_slot.hide#add").clone().removeClass('hide').appendTo(add_div);
     // add class 'datepicker' so it can be properly initialized
     $(time_slot).find("input#datepicker").addClass('datepicker');
     // set datepicker initial date; find date by mapping wday to a date
@@ -27,20 +27,21 @@ $.fn.init_add_recurrence = function() {
     $(time_slot).find("input#datepicker").attr('id', "datepicker_" + Math.floor(Math.random()*101));
     init_timepicker_weekly();
     init_datepicker_weekly();
-    toggle_add_recurrence_save_button();
+    hide_manage_links();
     return false;
   })
   
   $("a#add_recurrence_cancel").live('click', function() {
     $(this).closest("div#add").remove();
-    toggle_add_recurrence_save_button();
+    show_manage_links();
     return false;
   })
   
-  $("input#add_recurrence_save").click(function() {
+  $("a#add_recurrence_save").live('click', function() {
     var recur_rules = new Array();
     var errors      = 0;
-    
+    var time_slots  = 0;
+
     $("div.time_slot#add:not(.hide)").each(function() {
       var $start_date = $(this).find("input.datepicker");
       var dstart      = convert_date_to_string($start_date.val());
@@ -85,9 +86,12 @@ $.fn.init_add_recurrence = function() {
       var byday = $(this).parent().attr('byday');
       var rule  = "freq=weekly;byday=" + byday + ";dstart=" + dstart + ";tstart=" + tstart + ";tend=" + tend;
       recur_rules.push(rule);
+      // increment timeslots
+      time_slots += 1;
     })
 
-    if (errors > 1) { return false; }
+    if (errors > 0) { return false; }
+    if (time_slots == 0) { return false; }
 
     // set form values and submit
     var form  = "form#add_weekly_schedule_form"
@@ -97,7 +101,7 @@ $.fn.init_add_recurrence = function() {
     $.post(url, data, null, "script");
   
     // show progress
-    $("div#submit").hide().next().show();
+    $(this).closest("#actions").replaceWith("<img src='/images/bounce.gif'>");
 
     return false;
   })
@@ -108,12 +112,14 @@ $.fn.init_edit_recurrence = function() {
     $(this).closest("div.recurrence").find("div#edit").show();
     $(this).closest("div.recurrence").find("div#show").hide();
     init_timepicker_weekly();
+    hide_manage_links();
     return false;
   })
   
   $("a#edit_recurrence_cancel").live('click', function() {
     $(this).closest("div.recurrence").find("div#show").show();
     $(this).closest("div.recurrence").find("div#edit").hide();
+    show_manage_links();
     return false;
   })
 
@@ -151,12 +157,23 @@ $.fn.init_edit_recurrence = function() {
     $.put(url, data, null, "script");
 
     // show progress
-    $(this).closest("#actions").replaceWith("... updating");
+    $(this).closest("#actions").replaceWith("<img src='/images/bounce.gif'>");
 
     return false;
   })
 }
 
+function show_manage_links() {
+  // show all manage links
+  $("a.manage").removeClass('hide');
+}
+
+function hide_manage_links() {
+  // hide all manage links
+  $("a.manage").addClass('hide');
+}
+
+/*
 function toggle_add_recurrence_save_button() {
   // show save button if we ahve at least 1 new time slot
   if ($("div.time_slot#add").length > 1) {
@@ -165,6 +182,7 @@ function toggle_add_recurrence_save_button() {
     $("input#add_recurrence_save").attr('disabled', 'disabled');
   }
 }
+*/
 
 /*
 function set_time_slot_count(day) {
@@ -193,6 +211,7 @@ $.fn.init_datepicker_weekly = function () {
 }
 */
 
+/*
 $.fn.init_weekly_time_slots = function() {
   $("a#add_time_slot").live('click', function() {
     var day_block = $(this).closest("div.day").find("div#day_time_slots");
@@ -212,7 +231,9 @@ $.fn.init_weekly_time_slots = function() {
     return false;
   })
 }
+*/
 
+/*
 $.fn.init_weekly_schedule_form = function () {
   // submit weekly schedule
   $("form#add_weekly_schedule_form").submit(function() {
@@ -277,6 +298,7 @@ $.fn.init_weekly_schedule_form = function () {
     return true;
   })
 }
+*/
 
 /*
 $.fn.check_recurrence = function () {
@@ -297,8 +319,8 @@ $(document).ready(function() {
   $(document).init_select_calendar_weekly_provider();
   $(document).init_add_recurrence();
   $(document).init_edit_recurrence();
-  $(document).init_weekly_time_slots();
-  $(document).init_weekly_schedule_form();
+  //$(document).init_weekly_time_slots();
+  //$(document).init_weekly_schedule_form();
   //$(document).init_datepicker_weekly();
   //$(document).check_recurrence();
 })

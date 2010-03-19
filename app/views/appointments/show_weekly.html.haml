@@ -24,7 +24,10 @@
     - day_name = @day_hash[wday][:day_name]
     - recurrences = (@weekly_recurrences_by_day[day_name] || []).sort_by{ |o| o.start_at }
     .span-15.last.day{:style => 'border-bottom: 2px solid #eee; padding-bottom: 3px;', :byday => day_name.downcase.slice(0,2), :wday => wday}
-      %h4.bottom.bold= day_name
+      %h4.bottom.bold
+        -# show day name and a '+' link to add time slots to this day
+        = day_name
+        %span{:style => 'padding-left: 3px;'}= link_to image_tag('add2.png', :size => '15x15', :class => 'whitebgd', :style => 'padding-top: 2px;'), '#', :title => 'Add Time Slot', :id => 'add_recurrence', :class => 'manage add'
     %hr.space
     - if recurrences.empty?
       .span-15.last
@@ -37,22 +40,15 @@
             == &nbsp;-&nbsp;
             %span#end_at= recurrence.end_at.to_s(:appt_time).downcase
             %span{:style => 'padding-left: 5px;'}
-            = link_to image_tag('search.png', :class => 'whitebgd', :size => '16x16'), '#', :title => 'Edit', :id => 'edit_recurrence'
+            = link_to image_tag('search.png', :class => 'whitebgd', :size => '16x16'), '#', :title => 'Edit', :id => 'edit_recurrence', :class => 'manage edit'
             %span{:style => 'padding-left: 5px;'}
             = link_to image_tag('delete.png', :class => 'whitebgd', :size => '16x16'), cancel_appointment_path(recurrence.id, :series => 1), |
-                                              :title => 'Cancel', :id => 'cancel_recurrence', :class => 'admin ujs cancel confirm', :question => 'Are you sure you want to cancel this weekly availabilty?' |
+                                              :title => 'Cancel', :id => 'cancel_recurrence', :class => 'admin ujs cancel confirm manage', :question => 'Are you sure you want to cancel this weekly availabilty?' |
         -# edit partial
         = render(:partial => 'weekly_edit_time_slot', |
                  :locals => {:start_at => recurrence.start_at.to_s(:appt_time).downcase, :end_at => recurrence.end_at.to_s(:appt_time).downcase}) |
     -# add recurrence to the current day
     .span-15.last.padding-bottom-10#add{:byday => day_name.downcase.slice(0,2), :wday => wday}
-      = link_to image_tag('add2.png', :size => '16x16', :class => 'whitebgd'), '#', :title => 'Add', :id => 'add_recurrence'
-      %span#create.hide{:style => 'padding-left: 3px;'}= link_to 'Save Changes', '#', :id => "create_recurrence"
-
-.span-15.prepend-1.padding-top-20.padding-bottom-20#submit
-  = submit_tag 'Save', :disabled => true, :id => 'add_recurrence_save'
-.span-15.prepend-1.padding-top-20.padding-bottom-20#progress.hide
-  = image_tag('bounce.gif')
 
 = render(:partial => 'weekly_add_time_slot')
 

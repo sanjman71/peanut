@@ -73,7 +73,7 @@ ul.calendar.menu li a:hover                       { color: #00BBFF; }
 .std_text_field_style                             { width: 100px; background: #FFFFFF; font-size: 1.2em; padding-left: 3px; } /* This will fit in a span-3 */
 .std_text_field_style.highlight                   { background-color: #FFCC00;}
 
-.small_text_field_style                           { width: 100px; background: #FFFFFF; font-size: 1.0em; } /* This will fit in a span-3 */
+.small_text_field_style                           { width: 85px; background: #FFFFFF; font-size: 1.0em; } /* This will fit in a span-3 */
 .small_text_field_style.highlight                 { background-color: #FFCC00;}
 
 /*
