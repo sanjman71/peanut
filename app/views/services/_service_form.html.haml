@@ -37,7 +37,7 @@
       = f.text_field :duration_in_minutes, :class => 'text big', :style => "width: 100px;"
       %b== &nbsp;Minutes
     .span-16.prepend-3.last
-      %em== An accurate duration allows appointments to be scheduled efficiently
+      %em== How long does this service take?
     
   -# capacity
   .span-19.prepend-1.last.padding-bottom-10
@@ -46,7 +46,7 @@
     .span-16.last
       = f.text_field :capacity, :class => 'text big', :style => "width: 100px;"
     .span-16.prepend-3.last
-      %em== Advanced: Capacity is typically 1, and must be a number 1 or greater
+      %em== How many customers can be seen at the same time.  This value is typically 1.
 
   .span-19.prepend-1.last.submit
     = submit_tag(action)
