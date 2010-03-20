@@ -106,7 +106,7 @@ class TasksController < ApplicationController
   # This will in turn queue a job to expand each recurrence
   def expand_all_recurrences
     @title = "Tasks - Expand All Recurrences"
-    @number_of_recurrences = current_company.appointments.recurring.count
+    @number_of_recurrences = current_company.appointments.recurring.not_canceled.count
     @time_horizon = Time.zone.now.beginning_of_day + current_company.preferences[:time_horizon].to_i
     Appointment.expand_all_recurrences(current_company)
 
