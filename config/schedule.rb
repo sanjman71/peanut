@@ -50,7 +50,7 @@ every 1.day, :at => '1:00 am' do
   # expand recurrences for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|
     # expand recurrences for a specific subdomain
-    command "curl http://#{company.subdomain}.walnutcalendar.com/appointments/expand_all_recurrences > /dev/null"
+    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences > /dev/null"
   end
 end
 
