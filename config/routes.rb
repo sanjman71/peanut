@@ -205,6 +205,8 @@ ActionController::Routing::Routes.draw do |map|
                           :controller => 'tasks', :action => 'expand_all_recurrences'
   map.task_schedule_messages  '/tasks/schedules/messages/:time_span',
                               :controller => 'tasks', :action => 'schedule_messages', :time_span => /daily/
+  map.task_rebuild_demos  '/tasks/rebuild_demos',
+                          :controller => 'tasks', :action => 'rebuild_demos'
   map.resources           :tasks, :only => [:index]
 
   # Administrative controllers

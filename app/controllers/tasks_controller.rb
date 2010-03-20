@@ -1,5 +1,7 @@
 class TasksController < ApplicationController
   
+  require 'demos'
+
   # managers only for now
   privilege_required      'manage site', :on => :current_company, :unless => :auth_token?
 
@@ -113,6 +115,25 @@ class TasksController < ApplicationController
     respond_to do |format|
       format.html
     end
+  end
+
+  def rebuild_demos
+    m = Meatheads.new
+    t = Mctrucks.new
+    s = MarysSalonAndSpa.new
+
+    m.destroy
+    t.destroy
+    s.destroy
+
+    t.create
+    m.create
+    s.create
+    
+    respond_to do |format|
+      format.html
+    end
+
   end
 
 end
