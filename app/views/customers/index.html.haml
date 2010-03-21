@@ -5,14 +5,13 @@
 .span-16
   .span-15.prepend-1.last.mat.padding-top-10.padding-bottom-20
     = label_tag "live_search_for_customers", "Find a customer by typing their name, email address or phone number", :class => 'big'
-    -# must have 'create users' privilege to add a customer
     %br
     .span-15.last
       = text_field("customer", "name", :autocomplete => "off", :id => 'live_search_for_customers', :class => 'title big', :url => customers_path(:subdomain => current_subdomain))
       %span#search_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
     .span-15.last
-    - if has_privilege?('create users', current_company)
-      %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', customer_new_path, :class => 'customer add'
+    -# any company user can create company customers
+    %span{:style => 'padding-left: 5px; font-size: 1.1em;'}= link_to 'Add a Customer', customer_new_path, :class => 'customer add'
 
   %hr.space
 
