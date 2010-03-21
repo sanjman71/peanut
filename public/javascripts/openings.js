@@ -29,7 +29,7 @@ $.fn.init_search_openings = function() {
         return false;
       }
       
-      if (end_date <= start_date) {
+      if (end_date < start_date) {
         alert("The start date must be before the end date");
         return false;
       }
