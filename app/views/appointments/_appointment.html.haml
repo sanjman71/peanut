@@ -76,18 +76,15 @@
         %span#customer_default.data
           %span{:id => 'customer_name'}= customer_display_name(appointment.customer, current_user)
           -# the user can choose a customer for a new appointment, with the right privileges
-          - if appointment.new_record? and has_privilege?('create users', current_company)
-            %span{:style => 'font-size: 0.8em; color: #333333;'}== or
-            %span= link_to 'Change Customer', '', :id => 'hide_customer_default', :class => 'admin'
-        %span#customer_search.hide
-          = label_tag "customer_search_text", "Find a customer by typing their name"
-          %br
-          = text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => customers_path(:format => :json))
-          %br
-          = link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
-          -#%span{:style => 'font-size: 0.7em;'}== or
-          -#= link_to 'Create a New Customer', customer_new_path(:return_to => request.request_uri), :class => 'admin'
-          -#= hidden_field_tag :customer_search_id, 0
+          -#- if appointment.new_record? and has_privilege?('create users', current_company)
+            -#%span{:style => 'font-size: 0.8em; color: #333333;'}== or
+            -#%span= link_to 'Change Customer', '', :id => 'hide_customer_default', :class => 'admin'
+        -#%span#customer_search.hide
+          -#= label_tag "customer_search_text", "Find a customer by typing their name"
+          -#%br
+          -#= text_field_tag("", "", :id => 'customer_search_text', :class => 'title', :url => customers_path(:format => :json))
+          -#%br
+          -#= link_to 'Cancel', '', :class => 'admin', :id => 'hide_customer_search'
 
   -# show creator, created_at
   - unless appointment.new_record?
