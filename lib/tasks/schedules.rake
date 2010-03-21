@@ -10,7 +10,7 @@ namespace :schedules do
       company.providers.each do |provider|
         puts "*** #{provider.name}"
         company.appointments.provider(provider).recurring.not_canceled.each do |recurrence|
-          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :long).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)}"
+          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :short).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)} expanded_to #{recurrence.recur_expanded_to.andand.to_s(:appt_short_month_day_year)}"
         end
       end
     end
@@ -27,7 +27,7 @@ namespace :schedules do
         puts "*** #{provider.name}"
         company.appointments.provider(provider).recurring.not_canceled.each do |recurrence|
 
-          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :long).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)}"
+          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :short).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)}"
 
           # filter out recurrences that occur on a single day
           next if (Recurrence.days(recurrence.recur_rule).size == 1)
