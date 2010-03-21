@@ -392,7 +392,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("unauthorized") { unauthorized_path }
     end
 
-    context "with privileges" do
+    context "with privileges as owner" do
       setup do
         # create work appointment as owner
         @controller.stubs(:current_user).returns(@owner)
@@ -450,6 +450,36 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
 
       should_redirect_to("provider's calendar path, with highlight date" ) { "/users/#{@johnny.id}/calendar?highlight=#{@today}" }
+    end
+
+    context "with privileges as customer" do
+      setup do
+        # create work appointment as owner
+        @controller.stubs(:current_user).returns(@customer)
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        # create work appointment, today from 10 am to 12 pm local time
+        post :create_work,
+             {:start_at => @start_at, :duration => @duration, :provider_type => "users", :provider_id => @johnny.id,
+              :service_id => @haircut.id, :creator_id => @customer.id, :customer_id => @customer.id
+             }
+      end
+
+      # should add the appointment
+      should_change("Appointment.count", :by => 1) { Appointment.count }
+
+      should_assign_to(:creator) { @customer }
+
+      should "set appointment creator" do
+        @appointment = Appointment.find(assigns(:appointment).id)
+        assert_equal @customer, @appointment.creator
+      end
+
+      should "set appointment customer" do
+        @appointment = Appointment.find(assigns(:appointment).id)
+        assert_equal @customer, @appointment.customer
+      end
+      
+      should_redirect_to("customer's history path" ) { "/history" }
     end
   end
   
@@ -526,14 +556,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
     
-    context "as an owner without requesting to force add" do
+    context "as an owner without using default force value" do
       setup do
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
         @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
-             {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
+             {:start_at => @start_at, :provider_type => "users", :provider_id => @johnny.id,
               :service_id => @haircut.id, :customer_id => @customer.id}
       end
     
@@ -549,14 +579,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
     
-    context "as an owner requesting not to force add" do
+    context "as an owner without requesting force add" do
       setup do
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
         @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
-             {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
+             {:start_at => @start_at, :provider_type => "users", :provider_id => @johnny.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :force => 0}
       end
     
@@ -572,14 +602,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("provider's calendar path" ) { "/users/#{@johnny.id}/calendar" }
     end
   
-    context "as an owner with request to force add" do
+    context "as an owner requesting force add" do
       setup do
         # create work appointment as customer
         @controller.stubs(:current_user).returns(@owner)
         # create work appointment, today from 10 am to 12 pm local time
         @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_work,
-             {:start_at => @start_at, :provider_type => "users", :provider_id => "#{@johnny.id}",
+             {:start_at => @start_at, :provider_type => "users", :provider_id => @johnny.id,
               :service_id => @haircut.id, :customer_id => @customer.id, :force => 1}
       end
   
