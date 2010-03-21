@@ -282,134 +282,41 @@ class AppointmentsControllerTest < ActionController::TestCase
   end
   
   #
-  # Recurring appointment tests
+  # Recurring appointment tests - moved to a separate test file
   #
-  context "get new weekly appointments for provider calendar" do
-    context "as another provider" do
-      setup do
-        add_mary_and_johnny_as_providers
-        @controller.stubs(:current_user).returns(@mary)
-        # stub calendar markings
-        @controller.stubs(:build_calendar_markings).returns(Hash.new)
-        get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
-      end
-  
-      should_redirect_to("unauthorized_path") { unauthorized_path }
-      should_set_the_flash_to /You are not authorized/
-    end
-    
-    context "as the provider" do
-      setup do
-        add_mary_and_johnny_as_providers
-        @controller.stubs(:current_user).returns(@johnny)
-        # stub calendar markings
-        @controller.stubs(:build_calendar_markings).returns(Hash.new)
-        get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
-      end
-  
-      should_assign_to(:provider) { @johnny }
-      should_assign_to :providers, :class => Array
-      should_assign_to :calendar_markings, :class => Hash
-      should_assign_to :daterange, :class => DateRange
-  
-      should_respond_with :success
-      should_render_template 'appointments/edit_weekly.html.haml'
-    end
-  end
 
-  context "create weekly schedule" do
-    setup do
-      @now = Time.zone.now
-      @recur_until = @now + 4.weeks + 1.hour 
-    end
-
-    context "with no end date" do
-      setup do
-        # have johnny create free appointments on his calendar
-        @controller.stubs(:current_user).returns(@johnny)
-        post :create_weekly,
-             {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "090000", :tend => "110000",
-              :until => '', :provider_type => "users", :provider_id => "#{@johnny.id}"}
-      end
-    
-      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
-      should_change("Appointment.count", :by => 1) { Appointment.count }
-    
-      should_assign_to(:freq) { "WEEKLY" }
-      should_assign_to(:byday) { "MO,TU" }
-      should_assign_to(:dtstart) { "#{@now.to_s(:appt_schedule_day)}T090000" }
-      should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T110000" }
-      should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
-      should_assign_to(:provider) { @johnny }
-    
-      should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
-    
-      context "and create a conflicting weekly schedule" do
-        setup do
-          @controller.stubs(:current_user).returns(@johnny)
-          post :create_weekly,
-               {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "100000", :tend => "120000",
-                :until => '', :provider_type => "users", :provider_id => "#{@johnny.id}"}
-        end
-        
-        should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
-        should_change("Appointment.count", :by => 1) { Appointment.count }
-      end
-      
-    end
-    
-    context "with an end date" do
-      setup do
-        # have johnny create free appointments on his calendar
-        @controller.stubs(:current_user).returns(@johnny)
-        post :create_weekly,
-             {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "090000", :tend => "110000",
-              :until => @recur_until.to_s(:appt_schedule_day), :provider_type => "users", :provider_id => "#{@johnny.id}"}
-        Delayed::Job.work_off
-      end
-
-      # Should have a recurring appointment plus 2 appointments each week for the next 4 weeks = 9 total
-      should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
-      should_change("Appointment.count", :by => 9) { Appointment.count }
-
-      should_assign_to(:freq) { "WEEKLY" }
-      should_assign_to(:byday) { "MO,TU" }
-      should_assign_to(:dtstart) { "#{@now.to_s(:appt_schedule_day)}T090000" }
-      should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T110000" }
-      should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=#{@recur_until.to_s(:appt_schedule_day)}T000000Z" }
-      should_assign_to(:provider) { @johnny }
-
-      should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
-
-      context "and change the weekly schedule" do
-        setup do
-          @weekly_appt = Appointment.recurring.first
-          put :update_weekly,
-            {:freq => 'weekly', :byday => 'mo,tu,fr', :dstart => @now.to_s(:appt_schedule_day), :tstart => "110000", :tend => "130000",
-             :until => @recur_until.to_s(:appt_schedule_day), :provider_type => "users", :provider_id => "#{@johnny.id}",
-             :id => @weekly_appt.id }
-          Delayed::Job.work_off
-          @weekly_appt.reload
-        end
-
-        # Should have 1 additional appointment each week for the next 4 weeks = 4 additional
-        should_not_change("Appointment.recurring.count") {Appointment.recurring.count}
-        should_change("Appointment.count", :by => 4) {Appointment.count}
-        
-        should "change weekly appointment attributes" do
-          assert_equal 11, @weekly_appt.start_at.hour.to_i
-          assert_equal 13, @weekly_appt.end_at.hour.to_i
-        end
-        
-        should_assign_to(:freq) { "WEEKLY" }
-        should_assign_to(:byday) { "MO,TU,FR" }
-        should_assign_to(:dtstart) { "#{@now.to_s(:appt_schedule_day)}T110000" }
-        should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T130000" }
-        should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU,FR;UNTIL=#{@recur_until.to_s(:appt_schedule_day)}T000000Z" }
-        should_assign_to(:provider) { @johnny }
-      end
-    end
-  end
+  # context "get new weekly appointments for provider calendar" do
+  #   context "as another provider" do
+  #     setup do
+  #       add_mary_and_johnny_as_providers
+  #       @controller.stubs(:current_user).returns(@mary)
+  #       # stub calendar markings
+  #       @controller.stubs(:build_calendar_markings).returns(Hash.new)
+  #       get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+  #     end
+  # 
+  #     should_redirect_to("unauthorized_path") { unauthorized_path }
+  #     should_set_the_flash_to /You are not authorized/
+  #   end
+  #   
+  #   context "as the provider" do
+  #     setup do
+  #       add_mary_and_johnny_as_providers
+  #       @controller.stubs(:current_user).returns(@johnny)
+  #       # stub calendar markings
+  #       @controller.stubs(:build_calendar_markings).returns(Hash.new)
+  #       get :new_weekly, :provider_type => 'users', :provider_id => @johnny.id
+  #     end
+  # 
+  #     should_assign_to(:provider) { @johnny }
+  #     should_assign_to :providers, :class => Array
+  #     should_assign_to :calendar_markings, :class => Hash
+  #     should_assign_to :daterange, :class => DateRange
+  # 
+  #     should_respond_with :success
+  #     should_render_template 'appointments/edit_weekly.html.haml'
+  #   end
+  # end
   
   context "create work appointment for a single date with no free time" do
     setup do
