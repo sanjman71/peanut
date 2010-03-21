@@ -52,6 +52,8 @@ every 1.day, :at => '1:00 am' do
     # expand recurrences for a specific subdomain
     command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences > /dev/null"
   end
+  
+  command "rake init:rebuild_demos"
 end
 
 every 1.day, :at => '6:00 am' do
