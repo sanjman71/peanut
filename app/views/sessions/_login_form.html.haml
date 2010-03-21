@@ -3,7 +3,7 @@
     %h2== Log In
     %hr
     
-  - form_tag(login_path) do
+  - form_tag(login_path, :id => 'login_user_form') do
     .span-12.last.padding-bottom-10
       .span-3
         %h3.text-align-right.select_label== Email:

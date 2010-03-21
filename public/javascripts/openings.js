@@ -146,10 +146,11 @@ $.fn.init_openings_show_single_date = function() {
 $.fn.init_openings_bookit = function() {
   $("a.bookit").click(function() {
     // find selected datetime of this capacity slot
-    var slot_id  = $(this).attr('slot_id');
-    var datetime = $("div#" + slot_id + " select#slot_times :selected").val();
-    var timeampm = $("div#" + slot_id + " select#slot_times :selected").text();
-    var provider = $("div#" + slot_id + " div.provider h4").text();
+    var slot_id       = $(this).attr('slot_id'); // slots_20100323_provider_1
+    var datetime      = $("div#" + slot_id + " select#slot_times :selected").val();  // e.g. 20100323T080000
+    var timeampm      = $("div#" + slot_id + " select#slot_times :selected").text(); // e.g. 8:00 am
+    var provider_name = $("div#" + slot_id + " div.provider h4").text(); // e.g. 'Mary'
+    var provider_id   = $("div#" + slot_id + " div.provider").attr('id'); // e.g. 'user_1'
 
     // validate datetime
     var regex = /^([0-9]{8,8})T([0-9]{6,6})$/;
@@ -159,16 +160,27 @@ $.fn.init_openings_bookit = function() {
       return false;
     }
 
+    // break datetime into date and time parts
+    var date  = match[1];  // e.g. 20100101
+    var time  = match[2];  // e.g. 100000
+
     // check confirm appointment form
     var confirm_appointment_form = $("form#confirm_appointment_form").size();
 
     if (confirm_appointment_form == 0) {
+      // build return_to url, which selects the time slot and clicks 'book it'
+      // e.g. /services/1/3600/openings/20100323/anytime?bookit=slot:slots_20100323_provider_1:time:20100323T080000
+      var return_to         = current_path.replace(/openings\/(.+)\//, "openings/" + date + "/") + "?bookit=slot:" + slot_id + ":time:" + datetime;
+      // replace return_to urls sprinkled throughout- rpx_login_form, walnut_login_form, add_user_form
+      var rpx_return_to     = $("div#rpx_login_form iframe").attr('src').replace(/return_to=(.*)/, "return_to=" + return_to);
+      $("div#rpx_login_form iframe").attr('src', rpx_return_to);
+      var walnut_return_to  = $("div#walnut_login_form form").attr('action').replace(/return_to=(.*)/, "return_to=" + return_to);
+      $("div#walnut_login_form form").attr('action', walnut_return_to);
+      var signup_return_to  = $("form#add_user_form").attr('action').replace(/return_to=(.*)/, "return_to=" + return_to);
+      $("form#add_user_form").attr('action', signup_return_to);
       // open user login dialog
       $(document).open_user_login_dialog();
     } else {
-      // break datetime into date and time parts
-      var date        = match[1];  // e.g. 20100101
-      var time        = match[2];  // e.g. 100000
       // build date string from date
       var date_regex  = /^([0-9]{4,4})([0-9]{2,2})([0-9]{2,2})$/
       var match       = date.match(date_regex);
@@ -185,8 +197,8 @@ $.fn.init_openings_bookit = function() {
       // set dialog datetime string
       $("div.dialog#confirm_appointment_dialog #start_date_time").text(month_name + ' ' + month_day + ' ' + year + ' @ ' + timeampm);
 
-      // set dialog provider
-      $("div.dialog#confirm_appointment_dialog #provider_name").text(provider);
+      // set dialog provider name
+      $("div.dialog#confirm_appointment_dialog #provider_name").text(provider_name);
 
       // open confirm appointment dialog
       $("div.dialog#confirm_appointment_dialog").dialog('open');
@@ -245,6 +257,24 @@ $.fn.init_openings_datepicker = function() {
   $(".openings.datepicker").datepicker({minDate: +0, maxDate: '+2m'});
 }
 
+// check bookit value used to select an appointment and show the confirm appointment dialog
+$.fn.check_bookit = function() {
+  // find slot and time
+  match = bookit.match(/slot:([a-z0-9_]+):/);
+  if (!match) { return }
+  slot  = match[1]; // e.g. slots_20100323_provider_1
+  match = bookit.match(/time:([0-9T]+)/);
+  if (!match) { return }
+  time  = match[1]; // e.g. 20100101T080000
+  // select slot, time and validate
+  var $slot = $("div.slot#" + slot);
+  $slot.find("select#slot_times").val(time).attr('selected', 'selected');
+  var time_selected = $slot.find("select#slot_times option:selected").val();
+  if (time_selected == undefined) { return; }
+  // click bookit link
+  $slot.find("a.bookit").click();
+}
+
 $(document).ready(function() {
   $(document).init_search_openings();
   $(document).init_search_when_toggle();
@@ -254,4 +284,5 @@ $(document).ready(function() {
   $(document).init_openings_confirm_appointmenet();
   // rounded corners
   $('#search_submit').corners("7px");
+  $(document).check_bookit();
 })

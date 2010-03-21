@@ -5,8 +5,9 @@ class OpeningsController < ApplicationController
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }
     
   # GET /openings
-  # GET /users/1/services/3/openings/this-week/morning
-  # GET /services/1/openings/this-week/anytime
+  # GET /users/1/services/3/3600/openings/this-week/morning
+  # GET /services/1/3600/openings/this-week/anytime
+  # GET /services/1/3600/openings/20100101/anytime
   def index
     if (params[:provider_type] == "0") or (params[:provider_id] == "0")
       # /:provider/0/openings is canonicalized to /openings; preserve subdomain on redirect
@@ -53,6 +54,11 @@ class OpeningsController < ApplicationController
       # build daterange using range values
       @start_date = params[:start_date]
       @end_date   = params[:end_date]
+      @daterange  = DateRange.parse_range(@start_date, @end_date)
+    elsif params[:start_date]
+      # build daterange using range values
+      @start_date = params[:start_date]
+      @end_date   = params[:start_date]
       @daterange  = DateRange.parse_range(@start_date, @end_date)
     elsif params[:when]
       # build daterange using when value, don't use a default
@@ -142,7 +148,10 @@ class OpeningsController < ApplicationController
     end
 
     # build openings cache key
-    @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
+    # @openings_cache_key = "openings:" + CacheKey.slot_schedule(@daterange, @free_capacity_slots, @time)
+
+    # check for bookit parameter
+    @bookit = params[:bookit]
 
     respond_to do |format|
       format.html # index.html.erb

@@ -259,11 +259,12 @@ $.fn.init_user_login_dialog = function() {
   })
 
   $("form#login_user_form").submit(function() {
-    // validate login email
-    if (check_user_email_fields(this.id) == false) {
+    // check email field
+    var email = $(this).find("input#email").val();
+    if (email == '') {
+      alert("Please enter an email or phone number")
       return false;
     }
-    
     return true;
   })
 }

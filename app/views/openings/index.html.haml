@@ -69,13 +69,13 @@
           = link_to "waitlist", '', :class => 'notify waitlist', :id => 'add_waitlist'
           == if you can't find a suitable time slot.
 
-    - cache(@openings_cache_key, :expires_in => 5.minutes) do
-      .span-15.last#today
-        = render(:partial => 'shared/today', :locals => {:today => @today})
-      .span-15.last#free_calendar
-        = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
-      .span-15.last.appointments#free_capacity_slots.hide
-        = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
+    -#- cache(@openings_cache_key, :expires_in => 5.minutes) do
+    .span-15.last#today
+      = render(:partial => 'shared/today', :locals => {:today => @today})
+    .span-15.last#free_calendar
+      = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today})
+    .span-15.last.appointments#free_capacity_slots.hide
+      = render(:partial => 'appointments/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
     .span-15.last
       -# show waitlist text here if there are no available timeslots
@@ -106,3 +106,8 @@
     = render(:partial => "sessions/rpx_login_dialog", |
              :locals => {:intro => "Please tell us who you are by logging in or creating a new account.", :return_to => request.path}) |
 
+
+%script{:type => "text/javascript"}
+  var current_user  = new Hash({"id" : "#{current_user.andand.id}"});
+  var current_path  = "#{request.path}";
+  var bookit        = "#{@bookit.to_s}";

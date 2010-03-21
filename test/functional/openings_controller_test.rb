@@ -8,22 +8,27 @@ class OpeningsControllerTest < ActionController::TestCase
   
   # search appointments for a specified provider, duration and service, with a when range
   should_route :post, '/users/1/services/3/2700/openings/this-week/anytime',
-               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
+               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3,
                :duration => 45.minutes, :when => 'this-week', :time => 'anytime'
 
   # search appointments for a specified provider, duration and service, with a date range
   should_route :post, '/users/1/services/3/2700/openings/20090101..20090201/anytime',
-               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3, 
+               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3,
                :duration => 45.minutes, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
-  # search appointments for anyone providing a specified service with a specified service duration, with a when range
+  # search appointments for anyone providing a specified service with duration, with a when range
   should_route :post, '/services/3/7200/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, :when => 'this-week', :time => 'anytime'
 
-  # search appointments for anyone providing a specified service with a specified service duration, with a date range
+  # search appointments for anyone providing a specified service with duration, with a date range
   should_route :post, '/services/3/7200/openings/20090101..20090201/anytime',
-               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, 
+               :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes,
                :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
+
+   # search appointments for anyone providing a specified service with duration, with a date
+   should_route :post, '/services/3/7200/openings/20090101/anytime',
+                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes,
+                :start_date => '20090101', :time => 'anytime'
 
   def setup
     # create a valid company, with 1 service and 2 providers
@@ -57,7 +62,7 @@ class OpeningsControllerTest < ActionController::TestCase
       should_redirect_to("index path, with service and provider") { "/users/#{@johnny.id}/services/#{@haircut.id}/5400/openings/this-week/anytime" }
     end
 
-    context "specific service, any provider, anytime" do
+    context "specific service, any provider, this week, anytime" do
       setup do
         post :search, :service_id => @haircut.id, :duration => 90.minutes, :provider => "0", :when => 'this-week', :time => 'anytime'
       end
@@ -65,7 +70,15 @@ class OpeningsControllerTest < ActionController::TestCase
       should_redirect_to("index path, with service and no provider") { "/services/#{@haircut.id}/5400/openings/this-week/anytime" }
     end
 
-    context "specific service, no provider, anytime" do
+    context "specific service, any provider, specific date, anytime" do
+      setup do
+        post :search, :service_id => @haircut.id, :duration => 90.minutes, :provider => "0", :start_date => '20100101', :time => 'anytime'
+      end
+
+      should_redirect_to("index path, with service and no provider") { "/services/#{@haircut.id}/5400/openings/20100101/anytime" }
+    end
+
+    context "specific service, no provider, this week, anytime" do
       setup do
         post :search, :service_id => @haircut.id, :duration => 90.minutes, :when => 'this-week', :time => 'anytime'
       end

@@ -91,11 +91,13 @@ ActionController::Routing::Routes.draw do |map|
   
   # search openings for a specified service and duration, and an optional provider
   map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time',
-                              :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+                              :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/, :end_date => /\d{8,8}/
   map.openings_provider_when  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
                               :controller => 'openings', :action => 'index'
   map.openings_anyone_dates   '/services/:service_id/:duration/openings/:start_date..:end_date/:time',
-                              :controller => 'openings', :action => 'index', :conditions => {:start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
+                              :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/, :end_date => /\d{8,8}/
+  map.openings_anyone_date    '/services/:service_id/:duration/openings/:start_date/:time',
+                              :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/
   map.openings_anyone_when    '/services/:service_id/:duration/openings/:when/:time',
                               :controller => 'openings', :action => 'index'
 
@@ -172,9 +174,9 @@ ActionController::Routing::Routes.draw do |map|
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_providers  '/reports/range/:start_date..:end_date/:state/providers/:provider_ids',
-                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :conditions => {:provider_ids => /\d(,\d)*/}
+                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :provider_ids => /\d(,\d)*/
   map.report_services   '/reports/range/:start_date..:end_date/:state/services/:service_ids',
-                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :conditions => {:service_ids => /\d(,\d)*/}
+                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :service_ids => /\d(,\d)*/
   map.report_range      '/reports/range/:start_date..:end_date/:state', :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/
   
   # This allows us to get access to locations without going through their owner, if required.
