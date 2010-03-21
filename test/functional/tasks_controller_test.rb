@@ -45,7 +45,7 @@ class TasksControllerTest < ActionController::TestCase
     @time_range     = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0200"})
     @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
     @options        = {:start_at => @free_appt.start_at}
-    @work_appt      = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
+    @work_appt      = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
     assert @work_appt.valid?
   end
 

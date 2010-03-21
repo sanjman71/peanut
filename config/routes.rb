@@ -100,10 +100,10 @@ ActionController::Routing::Routes.draw do |map|
                               :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration
-  map.schedule_service_start_duration '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
-                                      :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
-  map.schedule_service_start          '/schedule/:provider_type/:provider_id/services/:service_id/:start_at',
-                                      :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+  # map.schedule_service_start_duration '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
+  #                                     :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
+  # map.schedule_service_start          '/schedule/:provider_type/:provider_id/services/:service_id/:start_at',
+  #                                     :controller => 'appointments', :action => 'new', :mark_as => 'work', :conditions => {:method => :get}
   map.schedule      '/schedule/:provider_type/:provider_id/services/:service_id/:duration/:start_at',
                     :controller => 'appointments', :action => 'create_work', :mark_as => 'work', :conditions => {:method => :post}
   map.schedule_work '/schedule/work',

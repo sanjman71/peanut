@@ -3,6 +3,7 @@
     = hidden_field_tag :provider_type, provider.tableize
     = hidden_field_tag :provider_id, provider.id
     = hidden_field_tag :capacity, provider.capacity
+    = hidden_field_tag :creator_id, nil
     -# set to normalized values before submit
     = hidden_field_tag :date, nil
     = hidden_field_tag :start_at, nil

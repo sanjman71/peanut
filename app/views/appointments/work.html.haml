@@ -7,7 +7,6 @@
     %h2{:style => 'margin-bottom: 5px;'}
       = @title
       %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Back', @back, :style => 'color: #FF1100;'
-      %span{:style => 'margin-left: 5px; font-size: 0.5em;'}= link_to 'Edit', edit_appointment_path(@appointment), :style => 'color: #FF1100;'
     -# appointment state
     - if @appointment.canceled?
       %h4.canceled{:style => 'margin-bottom: 5px;'}
@@ -23,12 +22,6 @@
         - build_appointment_state_transition_links(@appointment) do |text, url, separator|
           = link_to text, url, :class => 'admin'
           = separator
-        -#= link_to 'Mark as completed', complete_appointment_path(@appointment, :subdomain => current_subdomain), :id => 'complete_appointment', :class => 'admin'
-        -#%span#mark_progress.hide{:style => 'padding-left: 5px;'}= image_tag 'dots.gif'
-        -#%span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
-        -#= link_to 'Cancel appointment', cancel_appointment_path(@appointment), :class => 'admin', :id => 'cancel_appointment'
-        -#%span{:style => 'font-size: 0.7em;'}== &nbsp;|&nbsp;
-        -#= link_to 'Re-schedule appointment', reschedule_appointment_path(@appointment), :class => 'admin', :id => 'reschedule_appointment'
             
 %hr.space
 
@@ -41,10 +34,6 @@
 %hr.space
 
 .span-23.prepend-1.text
-  - # allow owners and managers add invoices
-  -#- if (@owner or @manager) and !@appointment.canceled?
-    -#%h3== Add Invoice
-
   -# add note
   .new_note#new_note_container
     %p

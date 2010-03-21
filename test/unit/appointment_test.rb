@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class AppointmentTest < ActiveSupport::TestCase
   
@@ -187,7 +186,7 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
         assert_valid @work_appt
       end
   
@@ -200,7 +199,7 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
         assert_valid @work_appt
         @customer.reload
       end
@@ -218,7 +217,7 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 2.hours, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 2.hours, @customer, @provider, @options)
         assert_valid @work_appt
       end
       
@@ -252,7 +251,7 @@ class AppointmentTest < ActiveSupport::TestCase
       
       should "raise exception" do
         assert_raise OutOfCapacity do
-          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @options)
+          @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @provider, @options)
         end
       end
     end
@@ -433,7 +432,7 @@ class AppointmentTest < ActiveSupport::TestCase
       setup do
         @customer   = Factory(:user)
         @options    = {:start_at => @free_appt.start_at}
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @provider, @options)
       end
       
       should "have valid work appointment with capacity 2" do
@@ -451,7 +450,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @time_range = TimeRange.new({:day => @today, :start_at => "0000", :end_at => "0100"})
       @options    = {:start_at => @time_range.start_at}
       begin
-        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @options)
+        @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
       rescue Exception => e
       end
     end
@@ -470,7 +469,7 @@ class AppointmentTest < ActiveSupport::TestCase
       @time_range     = TimeRange.new({:day => @today, :start_at => "0200", :end_at => "0300"})
       @options        = {:start_at => @time_range.start_at}
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
-      @work_appt      = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 1.hour, @customer, @options)
+      @work_appt      = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 1.hour, @customer, @provider, @options)
     end
     
     should_not_change("CapacitySlot.count") { CapacitySlot.count }

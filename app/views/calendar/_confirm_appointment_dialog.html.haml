@@ -1,6 +1,7 @@
 .span-12.prepend-1.last.dialog.hide#confirm_appointment_dialog{:title => "Confirm Your Appointment"}
   - form_for(appointment, :url => '', :html => {:method => :post, :id => 'confirm_appointment_form'}) do |f|
     = hidden_field_tag :customer_id, customer.id
+    = hidden_field_tag :creator_id, customer.id
 
     .confirm_appointment
       -# what

@@ -26,6 +26,8 @@ $.fn.init_add_work_appointment = function() {
     $(form).find("input#start_time").val('');
     $(form).find("input#customer_name").val('');
     $(form).find("input#customer_id").val('');
+    // set creator field
+    $(form).find("input#creator_id").val(current_user.get("id"));
     // set form url and method
     $(form).attr('action', appointment_create_work_path);
     $(form).attr('method', 'post');
@@ -212,6 +214,8 @@ $.fn.init_add_free_appointment = function() {
   // open add free appointment dialog on click
   $("a#calendar_add_free_appointment").click(function() {
     var form            = "form#add_free_appointment_form";
+    // set creator field
+    $(form).find("input#creator_id").val(current_user.get("id"));
     // set dialog date fields
     var normalized_date = $(this).parents("td").attr('id');
     var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)

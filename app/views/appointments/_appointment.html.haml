@@ -88,3 +88,19 @@
           -#%span{:style => 'font-size: 0.7em;'}== or
           -#= link_to 'Create a New Customer', customer_new_path(:return_to => request.request_uri), :class => 'admin'
           -#= hidden_field_tag :customer_search_id, 0
+
+  -# show creator, created_at
+  - unless appointment.new_record?
+    .span-15.last.padding-bottom-5#created_at
+      .span-3.label.block
+        %span.block== Created:
+      .span-12.last.data
+        ~ "<#{tag}>#{appointment.created_at.to_s(:appt_day_date_time)}</#{tag}>"
+
+    .span-15.last.padding-bottom-5#creator
+      .span-3.label.block
+        %span.block== Creator:
+      .span-12.last.data
+        ~ "<#{tag}>#{appointment.creator.andand.name}</#{tag}>"
+  
+  

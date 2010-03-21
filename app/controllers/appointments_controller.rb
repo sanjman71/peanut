@@ -15,66 +15,68 @@ class AppointmentsController < ApplicationController
                                               :on => [:provider, :current_company]
     
 
+  # Deprecated: Dialogs are used to create appointments
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
   # GET /book/wait/users/1/services/3/20090101..20090108
-  def new
-    # set title
-    @title = "Book Appointment"
-
-    @provider = init_provider(:default => nil)
-
-    if @provider.blank?
-      logger.debug("[error] could not provider #{params[:provider_type]}:#{params[:provider_id]}")
-      redirect_to root_path(:subdomain => current_subdomain) and return
-    end
-
-    # get appointment parameters
-    @service  = current_company.services.find_by_id(params[:service_id])
-    @customer = current_user
-
-    begin
-      case (@mark_as = params[:mark_as])
-      when Appointment::WORK
-        # build the work appointment parameters
-        @duration             = params[:duration] ? params[:duration].to_i : @service.duration
-        @start_at             = params[:start_at]
-        @capacity             = params[:capacity].to_i if params[:capacity]
-
-        @date_time_options    = Hash[:start_at => @start_at]
-      
-        @options              = Hash[:commit => false]
-        @options              = @options.merge({:capacity => @capacity }) unless @capacity.blank?
-
-        # allow customer to be created during this process
-        if @customer.blank?
-          @customer           = User.anyone
-          @customer_signup    = :all
-          # set return_to url in case user uses rpx to login and needs to be redirected back
-          session[:return_to] = request.url
-        else
-          @customer_signup    = nil
-        end
-
-        # build the work appointment without committing the changes
-        @appointment          = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
-
-        # set appointment date, start_at and end_at times in local time
-        @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
-        @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
-        @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
-      end
-    rescue AppointmentInvalid => e
-      flash[:error] = e.message
-      redirect_to request.referrer and return
-    rescue Exception => e
-      flash[:error] = e.message
-      redirect_to request.referrer and return
-    end
-
-    respond_to do |format|
-      format.html
-    end
-  end
+  # def new
+  #   # set title
+  #   @title = "Book Appointment"
+  # 
+  #   @provider = init_provider(:default => nil)
+  # 
+  #   if @provider.blank?
+  #     logger.debug("[error] could not provider #{params[:provider_type]}:#{params[:provider_id]}")
+  #     redirect_to root_path(:subdomain => current_subdomain) and return
+  #   end
+  # 
+  #   # get appointment parameters
+  #   @service  = current_company.services.find_by_id(params[:service_id])
+  #   @customer = current_user
+  #   @creator  = current_user
+  # 
+  #   begin
+  #     case (@mark_as = params[:mark_as])
+  #     when Appointment::WORK
+  #       # build the work appointment parameters
+  #       @duration             = params[:duration] ? params[:duration].to_i : @service.duration
+  #       @start_at             = params[:start_at]
+  #       @capacity             = params[:capacity].to_i if params[:capacity]
+  # 
+  #       @date_time_options    = Hash[:start_at => @start_at]
+  # 
+  #       @options              = Hash[:commit => false]
+  #       @options              = @options.merge({:capacity => @capacity }) unless @capacity.blank?
+  # 
+  #       # allow customer to be created during this process
+  #       if @customer.blank?
+  #         @customer           = User.anyone
+  #         @customer_signup    = :all
+  #         # set return_to url in case user uses rpx to login and needs to be redirected back
+  #         session[:return_to] = request.url
+  #       else
+  #         @customer_signup    = nil
+  #       end
+  # 
+  #       # build the work appointment without committing the changes
+  #       @appointment          = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @creator, @date_time_options, @options)
+  # 
+  #       # set appointment date, start_at and end_at times in local time
+  #       @appt_date            = @appointment.start_at.to_s(:appt_schedule_day)
+  #       @appt_time_start_at   = @appointment.start_at.to_s(:appt_time_army)
+  #       @appt_time_end_at     = @appointment.end_at.to_s(:appt_time_army)
+  #     end
+  #   rescue AppointmentInvalid => e
+  #     flash[:error] = e.message
+  #     redirect_to request.referrer and return
+  #   rescue Exception => e
+  #     flash[:error] = e.message
+  #     redirect_to request.referrer and return
+  #   end
+  # 
+  #   respond_to do |format|
+  #     format.html
+  #   end
+  # end
 
   def create
     # @provider initialized in before filter
@@ -89,7 +91,8 @@ class AppointmentsController < ApplicationController
     @service        ||= current_company.services.find_by_id(params[:service_id])
     @mark_as        ||= params[:mark_as]
 
-    @customer       = User.find_by_id(params[:customer_id])
+    @creator        = User.find_by_id(params[:creator_id].to_i)
+    @customer       = User.find_by_id(params[:customer_id].to_i)
 
     @duration       = params[:duration] ? params[:duration].to_i : @service.duration
     @start_at       = params[:start_at]
@@ -133,7 +136,7 @@ class AppointmentsController < ApplicationController
           end
 
           # create work appointment, with preferences
-          @appointment = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @date_time_options, @options)
+          @appointment = AppointmentScheduler.create_work_appointment(current_company, current_location, @provider, @service, @duration, @customer, @creator, @date_time_options, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
 
           # track new appointments
@@ -171,7 +174,7 @@ class AppointmentsController < ApplicationController
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-          @options        = {:time_range => @time_range}
+          @options        = {:time_range => @time_range, :creator_id => @creator.andand.id}
           @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
           # create free appointment, with preferences
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
