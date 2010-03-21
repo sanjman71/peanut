@@ -1,7 +1,5 @@
 class StaffsController < ApplicationController
   privilege_required 'read users', :only => [:index], :on => :current_company
-  privilege_required 'update users', :only => [:toggle_manager], :on => :current_company
-  privilege_required 'create users', :only => [:assign, :assign_prompt], :on => :current_company
 
   @@per_page  = 10
 
