@@ -124,8 +124,6 @@ $.fn.init_edit_work_appointment = function() {
     // enable start_date field
     $(form).find("input#start_date").removeClass('disabled');
     $(form).find("input#start_date").attr('disabled', '');
-    // enable providers
-    //$(form).find("div#providers").attr('disabled', '');
     // fill in appointment values for the edit form
     var appointment_div   = $(this).parents("div.appointment");
     var start_date        = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
@@ -169,7 +167,7 @@ $.fn.init_cancel_appointment = function() {
     var service_name        = $(appointment_div).find("div.service").text();
     var start_date_time     = $(appointment_div).attr('appt_day_date_time');
     var customer_name       = $(appointment_div).find("div.customer div.customer_name").children().text();
-    var cancel_url          = $(this).attr('href');
+    var cancel_url          = $(this).attr('url');
     var edit_recurrence_url = $(this).attr('edit_recurrence');
     var cancel_dialog       = "div.dialog#cancel_appointment_dialog";
     $(cancel_dialog).find("#service_name").text(service_name);

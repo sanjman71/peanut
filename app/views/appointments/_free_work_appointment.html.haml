@@ -52,12 +52,16 @@
           .span-3.last
             .span-3.last.editcancel
               .span-3.last.editcancel-one
-                - if !appointment.recurrence_parent? && !appointment.canceled?
-                  -# allow user to manage provider's weekly schedule path for both edit and cancel actions
-                  - edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
-                  = link_to('Edit', '', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
+                - if !appointment.canceled?
+                  - if appointment.recurrence? and !appointment.recurrence_parent?
+                    -# allow user to manage provider's weekly schedule path for both edit and cancel recurence actions
+                    - edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
+                  - else
+                    -# its not a recurrence
+                    - edit_recurrence = ''
+                  = link_to('Edit', '#', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
                   |
-                  = link_to('Cancel', cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
+                  = link_to('Cancel', '#', :url => cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
                 - elsif appointment.canceled?
                   == Canceled
     - unless appointment.notes.empty?

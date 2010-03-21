@@ -211,6 +211,12 @@ module ApplicationHelper
     (customer == current_user) ? "Me" : customer.name
   end
 
+  # build creator display name based on context of the current user
+  def creator_display_name(creator, current_user)
+    return "" if creator.blank?
+    (creator == current_user) ? "Me" : creator.name
+  end
+
   # build user display name based on context of the current user
   def user_display_name(user, current_user)
     return "" if user.blank?
