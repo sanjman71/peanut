@@ -28,7 +28,7 @@ namespace :calendar do
 
     end
 
-    desc "show capacity of level CAPACITY or more for company SUBDOMAIN. Default CAPACITY is 2. SUBDOMAIN is required."
+    desc "show capacity of level CAPACITY or more for company SUBDOMAIN. Default CAPACITY is 2. SUBDOMAIN is required. Only future capacity is shown"
     task :show_capacity do
 
       company = nil
@@ -41,7 +41,7 @@ namespace :calendar do
       elsif company.blank?
         puts "You provided an invalid subdomain"
       else
-        capacity_slots = company.capacity_slots.capacity_gteq(capacity)
+        capacity_slots = company.capacity_slots.future.capacity_gteq(capacity)
         puts "Capacity slots for #{subdomain.to_s} with capacity >= #{capacity.to_s}"
         capacity_slots.each do |slot|
           puts "#{slot.start_at.to_s(:appt_date_time_army)} capacity: #{slot.capacity.to_s} provider: #{slot.provider.name}"
