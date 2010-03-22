@@ -32,13 +32,20 @@ namespace :schedules do
           # filter out recurrences that occur on a single day
           next if (Recurrence.days(recurrence.recur_rule).size == 1)
 
+          # find date range used to adjust start and end days below
+          recur_date_range = DateRange.parse_range(recurrence.start_at.to_s(:appt_schedule_day), (recurrence.start_at+7.days).to_s(:appt_schedule_day))
+
           errors = 0
           Recurrence.days(recurrence.recur_rule, :format => :short).each do |day|
             puts "****** creating recurrence for #{day}"
             # build new recur rule, copy other fields from original recurrence
-            rule    = "FREQ=FREQ=WEEKLY;BYDAY=%s" % day.slice(0,2).upcase
-            options = Hash[:start_at => recurrence.start_at, :end_at => recurrence.end_at,
-                            :capacity => recurrence.capacity, :recur_rule => rule]
+            rule      = "FREQ=FREQ=WEEKLY;BYDAY=%s" % day.slice(0,2).upcase
+            # build new recur start_at and end_at days based on byday
+            new_date  = DateRange.find_next_date(day, recur_date_range).to_s(:appt_schedule_day) # e.g. 20100202
+            # replace just the date part of the date_time string
+            start_at  = recurrence.start_at.to_s(:appt_schedule).gsub(/^\d{8,8}/,new_date) # e.g. 2010201T100000
+            end_at    = recurrence.end_at.to_s(:appt_schedule).gsub(/^\d{8,8}/,new_date) # e.g. 2010201T100000
+            options   = Hash[:start_at => Time.zone.parse(start_at), :end_at => Time.zone.parse(end_at), :capacity => recurrence.capacity, :recur_rule => rule]
             puts "****** new options: #{options.inspect}"
             begin
               # create new recurrence
@@ -63,10 +70,10 @@ namespace :schedules do
           
             # It may have already been canceled, and the user simply wants to cancel additional instances
             AppointmentScheduler.cancel_appointment(rp, true) unless rp.canceled?
-
+          
             # We cancel all appointments after the selected appointment, of after the current time, whichever is later
             cancel_time = Time.zone.now
-
+          
             # Now cancel all expanded instances after this appointment, including this one.
             # This does not include the recurrence parent itself.
             rp.recur_instances.after_incl(cancel_time).each do |recur_instance|
