@@ -1,4 +1,5 @@
 Time::DATE_FORMATS[:appt_date_time]             = "%B %d, %Y at %I:%M %p"         # October 31, 2008 at 5:15 pm
+Time::DATE_FORMATS[:appt_date_time_army]        = "%b %d %Y %H%M"                 # October 31, 2008 at 5:15 pm
 Time::DATE_FORMATS[:appt_day]                   = "%A, %B %d, %Y"                 # Friday, October 31, 2008
 Time::DATE_FORMATS[:appt_day_short]             = "%a, %b %d %Y"                  # Fri, Oct 31 2010
 Time::DATE_FORMATS[:appt_day_date_time]         = "%A, %B %d, %Y at %I:%M %p"     # Friday, October 31, 2008 at 5:15 pm

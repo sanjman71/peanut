@@ -28,6 +28,30 @@ namespace :calendar do
 
     end
 
+    desc "show capacity of level CAPACITY or more for company SUBDOMAIN. Default CAPACITY is 2. SUBDOMAIN is required."
+    task :show_capacity do
+
+      company = nil
+      subdomain = ENV["SUBDOMAIN"]
+      capacity = ENV["CAPACITY"] || 2
+      company = Company.find_by_subdomain(subdomain.downcase) unless subdomain.blank?
+      
+      if subdomain.blank?
+        puts "You must specify the company subdomain in the SUBDOMAIN environment variable" and return 
+      elsif company.blank?
+        puts "You provided an invalid subdomain"
+      else
+        capacity_slots = company.capacity_slots.capacity_gteq(capacity)
+        puts "Capacity slots for #{subdomain.to_s} with capacity >= #{capacity.to_s}"
+        capacity_slots.each do |slot|
+          puts "#{slot.start_at.to_s(:appt_date_time_army)} capacity: #{slot.capacity.to_s} provider: #{slot.provider.name}"
+        end
+        puts "*****************************************************************"
+
+      end
+
+    end
+    
   end
 
   def rebuild_capacity_slots_for_company(company)
