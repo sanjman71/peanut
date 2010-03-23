@@ -31,6 +31,13 @@ end
 
 if RAILS_ENV == 'production'
 
+every :reboot do
+  # start sphinx searchd
+  command "cd /usr/apps/peanut/current && RAILS_ENV=production /usr/bin/env rake ts:start"
+  # start delayed job daemon
+  command "cd /usr/apps/peanut/current; script/delayed_job -e production start"
+end
+
 every 3.hours do
   # check/send appointment reminders for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|
@@ -39,18 +46,11 @@ every 3.hours do
   end
 end
 
-every :reboot do
-  # start sphinx searchd
-  command "cd /usr/apps/peanut/current && RAILS_ENV=production /usr/bin/env rake ts:start"
-  # start delayed job daemon
-  command "cd /usr/apps/peanut/current; script/delayed_job -e production start"
-end
-
 every 1.day, :at => '1:00 am' do
   # expand recurrences for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|
     # expand recurrences for a specific subdomain
-    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences > /dev/null"
+    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
   end
   
   command "rake init:rebuild_demos"
@@ -59,7 +59,7 @@ end
 every 1.day, :at => '6:00 am' do
   # send daily schedules for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|
-    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/schedules/messages/daily > /dev/null"
+    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/schedules/messages/daily?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
   end
 end
 
