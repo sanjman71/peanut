@@ -1,5 +1,4 @@
 namespace :schedules do
-  require 'ruby-debug'
   
   desc "Show provider's recurring availability"
   task :show_recurrences do
