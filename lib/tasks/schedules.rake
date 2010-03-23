@@ -1,5 +1,4 @@
 namespace :schedules do
-  require 'ruby-debug'
   
   desc "Show provider's recurring availability"
   task :show_recurrences do
@@ -10,7 +9,8 @@ namespace :schedules do
       company.providers.each do |provider|
         puts "*** #{provider.name}"
         company.appointments.provider(provider).recurring.not_canceled.each do |recurrence|
-          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :short).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)} starting on #{recurrence.start_at.in_time_zone.to_s(:appt_short_month_day_year)} expanded_to #{recurrence.recur_expanded_to.andand.to_s(:appt_short_month_day_year)}"
+          puts "****** ##{recurrence.id.to_s} - days: #{Recurrence.days(recurrence.recur_rule, :format => :short).join(',')} start_at: #{recurrence.start_at.in_time_zone.to_s(:appt_time_army)} end_at: #{recurrence.end_at.in_time_zone.to_s(:appt_time_army)} starting on #{recurrence.start_at.in_time_zone.to_s(:appt_short_month_day_year)} service_id=#{recurrence.service_id} location_id=#{recurrence.location_id} customer_id=#{recurrence.customer_id} capacity=#{recurrence.capacity} recur_rule=#{recurrence.recur_rule} expanded_to #{recurrence.recur_expanded_to.andand.to_s(:appt_short_month_day_year)}"
+
         end
       end
     end
@@ -39,7 +39,7 @@ namespace :schedules do
           Recurrence.days(recurrence.recur_rule, :format => :short).each do |day|
             puts "****** creating recurrence for #{day}"
             # build new recur rule, copy other fields from original recurrence
-            rule      = "FREQ=FREQ=WEEKLY;BYDAY=%s" % day.slice(0,2).upcase
+            rule      = "FREQ=WEEKLY;BYDAY=%s" % day.slice(0,2).upcase
             # build new recur start_at and end_at days based on byday
             new_date  = DateRange.find_next_date(day, recur_date_range).to_s(:appt_schedule_day) # e.g. 20100202
             # replace just the date part of the date_time string
