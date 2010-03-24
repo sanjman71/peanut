@@ -170,14 +170,20 @@ $.fn.init_cancel_appointment = function() {
     var cancel_url          = $(this).attr('url');
     var edit_recurrence_url = $(this).attr('edit_recurrence');
     var cancel_dialog       = "div.dialog#cancel_appointment_dialog";
+    var cancel_dialog_title = "span#ui-dialog-title-cancel_appointment_dialog";
     $(cancel_dialog).find("#service_name").text(service_name);
     $(cancel_dialog).find("#start_date_time").text(start_date_time);
     if ($(this).hasClass('work')) {
-      // work appointments have customers
-      $(cancel_dialog).find("#customer_name").text(customer_name);
+      // set title to 'Cancel Appointment'
+      $(cancel_dialog_title).text("Cancel Appointment");
+      // initialize and show the work appointment customer
+      $(cancel_dialog).find("#customer_name").html(customer_name);
+      $(cancel_dialog).find("div#customer").show();
     } else {
-      // free appointment; clear customer field
-      $(cancel_dialog).find("#customer_name").text('');
+      // set title to 'Cancel Availability'
+      $(cancel_dialog_title).text("Cancel Availability");
+      // free appointments don't have customers, so hide this field
+      $(cancel_dialog).find("div#customer").hide();
     }
     if (edit_recurrence_url != '') {
       // set edit recurrence link

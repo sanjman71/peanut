@@ -1,6 +1,6 @@
 - provider = nil if local_assigns[:provider].blank?
 
-.span-12.prepend-1.last.dialog.hide#cancel_appointment_dialog{:title => "Cancel Appointment"}
+.span-12.prepend-1.last.dialog.hide#cancel_appointment_dialog{:title => "Cancel"}
   -# form submit url is not used; 'cancel_appointment' link below is used instead
   - form_for(Appointment.new, :url => '', :html => {:method => :post, :id => 'cancel_appointment_form'}) do |f|
     .cancel_appointment
@@ -25,7 +25,7 @@
         .span-9.last.data
           %h4.bottom.block#start_date_time== &nbsp;
 
-      -# customer
+      -# customer, hide when canceling free appointments
       .span-12.last.padding-bottom-10#customer
         .span-3.label
           %h4.bottom.block== Customer:
