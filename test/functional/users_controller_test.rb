@@ -72,6 +72,11 @@ class UsersControllerTest < ActionController::TestCase
       should_assign_to(:user)
       should_not_assign_to(:invitation)
       should_assign_to(:role) {'company customer'}
+      should_not_assign_to(:return_to)
+
+      should "not set session return_to value" do
+        assert_nil session[:return_to]
+      end
 
       should_respond_with :success
       should_render_template 'users/new.html.haml'
@@ -97,6 +102,8 @@ class UsersControllerTest < ActionController::TestCase
         @controller.stubs(:current_user).returns(@owner)
         get :new, :role => 'company customer', :return_to => "/appointments/services/1/confirmation"
       end
+
+      should_assign_to(:return_to) { "/appointments/services/1/confirmation" }
 
       should "set session return_to value" do
         assert_equal "/appointments/services/1/confirmation", session[:return_to]
@@ -368,7 +375,8 @@ class UsersControllerTest < ActionController::TestCase
         should_assign_to(:creator) {"anonymous"}
         should_assign_to(:user)
         should_assign_to(:role) {"company customer"}
-        should_not_assign_to :invitation
+        should_not_assign_to(:invitation)
+        should_not_assign_to(:return_to)
 
         should "add 'company customer' role on company to user" do
           @user = User.with_email("sanjay@walnut.com").first
@@ -410,7 +418,8 @@ class UsersControllerTest < ActionController::TestCase
         should_assign_to(:creator) {"anonymous"}
         should_assign_to(:user)
         should_assign_to(:role) {"company customer"}
-        should_not_assign_to :invitation
+        should_not_assign_to(:invitation)
+        should_assign_to(:return_to) { "/openings" }
 
         should "add 'company customer' role on company to user" do
           @user = User.with_email("sanjay@walnut.com").first

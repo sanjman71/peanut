@@ -89,18 +89,21 @@ class UsersController < ApplicationController
     end
     # @user.email = @invitation.recipient_email if @invitation
 
+    # initialize return_to
+    @return_to = params[:return_to] ? params[:return_to] : nil
+
     # initialize title
     @title = "#{@role.split[1].titleize} Signup"
 
     # check return_to param
-    if params[:return_to]
-      # store this location
-      store_location(params[:return_to])
+    if !@return_to.blank?
+      # store this location with return_to value
+      store_location(@return_to)
       # use return_to as the back link
-      @back_path = params[:return_to]
+      @back_path = @return_to
     else
       # initialize back path to either the caller or the resource index page (e.g. /customers, /staffs), but only if there is a current user
-      @back_path  = current_user ? (request.referer || "/#{@role.pluralize}") : nil
+      @back_path = current_user ? (request.referer || "/#{@role.pluralize}") : nil
     end
 
     respond_to do |format|
@@ -118,7 +121,10 @@ class UsersController < ApplicationController
     # logout_keeping_session!
 
     # initialize creator, default to anonymous
-    @creator = params[:creator] ? params[:creator] : 'anonymous'
+    @creator    = params[:creator] ? params[:creator] : 'anonymous'
+
+    # initialize return_to
+    @return_to  = params[:return_to] ? params[:return_to] : nil
 
     # check if user create is for a public or private company
     if !logged_in? and current_company and current_company.preferences[:public].to_i == 0
@@ -135,7 +141,7 @@ class UsersController < ApplicationController
       @company = @invitation ? @invitation.company : current_company
 
       # store location if return_to was specified
-      store_location(params[:return_to]) if params[:return_to]
+      store_location(@return_to) unless @return_to.blank?
 
       # initialize the new user, and the redirect path
       @redirect_path = user_initialize(@company, @user, @role, @creator, @invitation)
