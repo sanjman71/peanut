@@ -2,7 +2,7 @@
 $.fn.init_add_work_appointment = function() {
 
   // initialize add work appointment dialog
-  $("div.dialog#add_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 450, show: 'fadeIn(slow)',
+  $("div.dialog#add_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 500, show: 'fadeIn(slow)',
                                                        title: $("div.dialog#add_work_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
@@ -26,8 +26,9 @@ $.fn.init_add_work_appointment = function() {
     $(form).find("input#start_time").val('');
     $(form).find("input#customer_name").val('');
     $(form).find("input#customer_id").val('');
-    // set creator field
+    // set creator id field, hide creator div used to show creator for edits
     $(form).find("input#creator_id").val(current_user.get("id"));
+    $(form).find("div#creator").addClass('hide');
     // set form url and method
     $(form).attr('action', appointment_create_work_path);
     $(form).attr('method', 'post');
@@ -131,9 +132,10 @@ $.fn.init_edit_work_appointment = function() {
     var duration          = $(appointment_div).attr('appt_duration');
     var service_name      = $(appointment_div).find("div.service a").text();
     var customer_name     = $(appointment_div).find("div.customer div.customer_name").children().text();
-    var customer_id       = $(appointment_div).find("div.customer").attr('id').match(/\w+_(\d+)/)[1];
+    var customer_id       = $(appointment_div).find("div.customer").attr('id').match(/\w+_(\d+)/)[1];  // e.g. 'user_5' => '5'
     var provider          = $(appointment_div).attr('appt_provider'); // e.g. 'users/11'
-    var appt_id           = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];
+    var creator           = $(appointment_div).attr('appt_creator'); // e.g. 'Johnny'
+    var appt_id           = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];  // e.e.g 'appointment_13' => '13'
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
@@ -144,6 +146,9 @@ $.fn.init_edit_work_appointment = function() {
     // select current appointment provider, and disable field
     $(form).find("select#provider").val(provider).attr('selected', 'selected');
     $(form).find("select#provider").attr('disabled', 'disabled');
+    // set creator, and show creator div
+    $(form).find("div#creator").removeClass('hide');
+    $(form).find("h4#creator_name").text(creator);
     // set form url and method
     $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
     $(form).attr('method', 'put');

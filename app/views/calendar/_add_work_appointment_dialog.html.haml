@@ -54,10 +54,16 @@
           = text_field_tag '', '', :class => 'big', :autocomplete => 'off', :id => 'customer_name', :url => customers_path(:format => :json)
         .span-8.prepend-3.last
           %em.small== Search using name, phone number or email
-
-      -# any company user can create company customers
+      -# allow any company user to create company customers
       .span-8.prepend-3.last
         %h4.bottom.small= link_to 'Add a new customer', '', :class => 'customer add', :id => 'add_work_appointment_add_customer'
+      -# creator field shown when editing work appointments
+      .span-11.last.padding-top-10#creator
+        .span-3.padding-top-5.label
+          %h4.bottom.block== Created By
+        .span-8.last{:style => 'padding-top: 7px;'}
+          -# creator name filled in for an edit
+          %h4.bottom#creator_name== &nbsp;
 
       .span-8.last.padding-top-10.padding-bottom-10
         #submit= f.submit 'Add', :name => nil, :class => 'big', :id => 'add_work_appointment'
