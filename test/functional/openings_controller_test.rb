@@ -130,6 +130,10 @@ class OpeningsControllerTest < ActionController::TestCase
         get :index
       end
 
+      should "set session[:return_to]" do
+        assert_equal "/openings", session[:return_to]
+      end
+
       should_redirect_to("user edit path") { "/users/#{@user.id}/edit" }
     end
 

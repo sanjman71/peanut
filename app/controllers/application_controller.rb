@@ -65,9 +65,12 @@ class ApplicationController < ActionController::Base
   end
 
   # check that the current user is in the active state
-  def current_user_active_state_required
+  def current_user_should_be_active_state
     return if !logged_in? or current_user.active?
     if current_user.data_missing?
+      # save current location in session[:return_to]
+      store_location
+      # redirect to edit user, forcing user to add missing data
       redirect_to(user_edit_path(current_user)) and return
     end
   end

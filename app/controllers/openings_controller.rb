@@ -1,5 +1,5 @@
 class OpeningsController < ApplicationController
-  before_filter :current_user_active_state_required, :only => [:index]
+  before_filter :current_user_should_be_active_state, :only => [:index]
 
   # Handle RecordNotFound exceptions with a redirect
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }

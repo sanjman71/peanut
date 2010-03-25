@@ -147,7 +147,7 @@ class UsersController < ApplicationController
       @redirect_path = user_initialize(@company, @user, @role, @creator, @invitation)
     else
       @error         = true
-      template       ='users/new'
+      template       = 'users/new'
       @redirect_path = request.referer
       @title         = "#{@role.split[1].titleize} Signup"
       @back_path     = params[:return_to] ? params[:return_to] : nil
@@ -213,7 +213,7 @@ class UsersController < ApplicationController
     respond_to do |format|
       if @user.update_attributes(params[:user])
         flash[:notice] = "User '#{@user.name}' was successfully updated"
-        format.html { redirect_to(@index_path) }
+        format.html { redirect_back_or_default(@index_path) }
       else
         format.html { render(:action => 'edit') }
       end
