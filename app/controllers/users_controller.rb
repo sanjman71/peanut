@@ -7,13 +7,13 @@ class UsersController < ApplicationController
   privilege_required_any  'update users', :only => [:edit, :update, :destroy, :revoke], :on => [:user, :current_company]
   privilege_required      'update users', :only => [:add_rpx], :on => :user
   privilege_required      'update users', :only => [:grant], :on => :current_company
-  privilege_required      'manage site', :only => [:sudo], :on => :current_company
+  privilege_required      'manage site', :only => [:index, :sudo]
   
   def has_privilege?(p, authorizable=nil, user=nil)
     case p
     when 'create users'
       @role = init_role
-      
+
       begin
         # if we have an invitation, use invitation role
         @invitation = params[:invitation_token] ? Invitation.find_by_token!(params[:invitation_token]) : nil
@@ -41,7 +41,28 @@ class UsersController < ApplicationController
       super
     end
   end
-  
+
+  @@per_page  = 25
+
+  # GET /users
+  def index
+    @search = params[:q]
+
+    if !@search.blank?
+      @users        = User.search_by_name_email_phone(@search).all(:include => :user_roles, :order => "users.name asc")
+      @search_text  = "Users matching '#{@search}'"
+      @paginate     = false
+    else
+      @users        = User.all(:include => :user_roles, :order => "users.name asc").paginate(:page => params[:page], :per_page => @@per_page)
+      @paginate     = true
+    end
+
+    respond_to do |format|
+      format.html
+      format.js
+    end
+  end
+
   # GET /staffs/new
   # GET /customers/new
   # GET /customers/new?return_to=

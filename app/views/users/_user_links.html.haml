@@ -11,6 +11,8 @@
     == &nbsp;|&nbsp;
 
   - if has_privilege?('manage site')
+    = link_to('Users', users_path, :class => 'admin header')
+    == &nbsp;|&nbsp;
     = link_to('Messages', messages_path, :class => 'admin header')
     == &nbsp;|&nbsp;
     = link_to('Tasks', tasks_path, :class => 'admin header')

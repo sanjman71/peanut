@@ -1,0 +1,10 @@
+# update pagination header
+page["div#users_pagination"].html(render(:partial => 'users_pagination', 
+                                         :locals => {:users => @users, :search_text => @search_text, :paginate => @paginate}))
+
+# update users list
+page["div#users"].html(render(:partial => 'users', :locals => {:users => @users}))
+
+# hide search progress bar
+page["span#search_progress"].hide();
+

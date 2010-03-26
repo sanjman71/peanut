@@ -1,0 +1,33 @@
+- users.each do |user|
+  .span-24.last.customer.letterbox{:class => cycle("shaded", "")}[user]
+    -# user name and email
+    .span-7.prepend-1
+      %h4.bigger.user.name.bottom= user.name
+      %h4.user.email.bottom
+        - if user.email_addresses_count > 0
+          = user.primary_email_address.address
+        - else
+          %span.field_missing== No email address
+      %h4.user.phone.bottom
+        - if user.phone_numbers_count > 0
+          = number_to_phone(user.phone_number)
+        - else
+          == &nbsp;
+
+    .span-10#roles
+      -# find company roles
+      - user_roles = user.user_roles.select{ |ur| ur.authorizable_type == 'Company' }
+      - if user_roles.empty?
+        %h4.smaller
+          %span.field_missing== No company roles
+      - else
+        - user_roles.each do |ur|
+          %h4.smaller.bottom.padding-bottom-5== #{ur.authorizable.name} #{ur.role.name.gsub(/company /, '')}
+
+    .span-5.prepend-1.last
+      -# allow company managers to edit all users, or the user to edit himself
+      - if has_privilege?('update users', user) || has_privilege?('update users', current_company)
+        = link_to "Edit", user_edit_path(user), :class => 'admin edit user'
+      - if has_privilege?('manage site')
+        %span{:style => 'padding-left: 3px;'}= link_to 'Delete', user_delete_path(user), :class => 'admin ujs delete customer confirm', :question => "Are you sure you want to delete this user?"
+        %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(user), :class => 'admin user sudo'

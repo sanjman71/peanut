@@ -29,5 +29,5 @@
         - unless appt_count > 0
           -# show ujs delete link for customers with no appointments
           %span{:style => 'padding-left: 3px;'}= link_to 'Delete', customer_delete_path(customer), :class => 'admin ujs delete customer confirm', :question => "Are you sure you want to delete this customer?"
-      - if has_privilege?('manage site', current_company)
+      - if has_privilege?('manage site')
         %span{:style => 'padding-left: 3px;'}= link_to 'Sudo', user_sudo_path(customer), :class => 'admin customer sudo'

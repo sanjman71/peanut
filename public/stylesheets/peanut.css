@@ -74,6 +74,7 @@ div.mat                                           { background: #EDF3FE none rep
 div.mat.shaded                                    { background: #E5ECF9 none repeat scroll 0 0; }
 
 h4.bigger                                         { font-size: 1.3em; line-height: 1.35em; }
+h4.smaller                                        { font-size: 0.9em; }
 
 .bold                                             { font-weight: bold; }
 
@@ -126,10 +127,10 @@ div.instructions ul                               { font-size: 12px; }
 
 /* pagination styles */
 
-div#staffs_pagination, div#customers_pagination, div#resources_pagination
+div#staffs_pagination, div#customers_pagination, div#users_pagination, div#resources_pagination
                                                   { font-size: 1.0em; }
 
-div#staffs_pagination h4, div#customers_pagination h4, div#resources_pagination h4
+div#staffs_pagination h4, div#customers_pagination h4, div#users_pagination h4, div#resources_pagination h4
                                                   { font-size: 1.0em; }
 
 .pagination a                                     { background: #EEEEEE; color: #111111; }

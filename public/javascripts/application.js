@@ -131,9 +131,9 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
   })
 }
 
-// Live customers search
-$.fn.init_live_customers_search = function () {
-  $("#live_search_for_customers").keyup(function () {
+// Live users, customers search
+$.fn.init_live_users_search = function () {
+  $("#live_search_for_users, #live_search_for_customers").keyup(function () {
     var search_url  = this.url;
     var search_term = this.value;
     // excecut search, throttle how often its called

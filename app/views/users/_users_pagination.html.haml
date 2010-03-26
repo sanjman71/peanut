@@ -1,0 +1,5 @@
+.span-10.prepend-1.append-bottom.users.header
+  %h4.bottom= search_text ? search_text : page_entries_info(users)
+.span-10.prepend-1.last#pagination
+  - if paginate
+    %h4.bottom= will_paginate(users, :page_links => true, :inner_window => 1, :outer_window => 1)

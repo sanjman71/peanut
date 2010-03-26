@@ -351,8 +351,7 @@ function check_user_phone_fields(id) {
 }
 
 $(document).ready(function() {
-  //$(document).init_toggle_user_calendar();  // re-bind after an ajax call using jquery live()
-  //$(document).init_toggle_user_company_role();  // re-bind after an ajax call using jquery live()
+  $(document).init_live_users_search();
   $(document).init_grant_revoke_user_company_role();
   $(document).init_user_add_email();
   $(document).init_user_add_phone();

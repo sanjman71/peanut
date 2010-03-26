@@ -53,6 +53,31 @@ class UsersControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
 
+  context "index" do
+    context "without 'manage site' privileges" do
+      setup do
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+
+      should_redirect_to('unauthorized_path') { unauthorized_path }
+    end
+
+    context "with privileges" do
+      setup do
+        @owner.grant_role('admin')
+        @controller.stubs(:current_user).returns(@owner)
+        get :index
+      end
+
+      should_assign_to(:users)
+      should_assign_to(:paginate) { true }
+
+      should_respond_with :success
+      should_render_template 'users/index.html.haml'
+    end
+  end
+
   context "new customer" do
     context "without 'create users' privilege" do
       setup do
@@ -940,7 +965,6 @@ class UsersControllerTest < ActionController::TestCase
 
     context "with 'manage site' privilege" do
       setup do
-        # @request.env['HTTP_REFERER'] = 'http://test.com/users'
         @owner.grant_role('admin')
         @controller.stubs(:current_user).returns(@owner)
         get :sudo, :id => @customer.id

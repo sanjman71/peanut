@@ -30,6 +30,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources         :users, :member => { :suspend => :put, :unsuspend => :put, :purge => :delete, :exists => :post, :add_rpx => :get}
   map.user_notify       '/users/:id/notify/:type', :controller => 'users', :action => 'notify', :conditions => {:method => :get}
   map.user_edit         '/users/:id/edit', :controller => 'users', :action => 'edit'
+  map.user_delete       '/users/:id', :controller => 'users', :action => 'destroy', :conditions => {:method => :delete}
   map.user_sudo         '/users/:id/sudo', :controller => 'users', :action => 'sudo'
   map.user_grant_role   '/users/:id/grant/:role', :controller => 'users', :action => 'grant', :conditions => {:method => :put}
   map.user_revoke_role  '/users/:id/revoke/:role', :controller => 'users', :action => 'revoke', :conditions => {:method => :put}
