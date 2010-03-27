@@ -49,8 +49,15 @@ class UsersController < ApplicationController
     @search = params[:q]
 
     if !@search.blank?
-      @users        = User.search_by_name_email_phone(@search).all(:include => :user_roles, :order => "users.name asc")
-      @search_text  = "Users matching '#{@search}'"
+      case @search
+      when '-companyroles'
+        @users        = User.all(:include => :user_roles, :order => "users.name asc",
+                                 :conditions => ["users.id not in (select distinct user_id from badges_user_roles where badges_user_roles.authorizable_type = 'Company')"])
+        @search_text  = "Users with no company roles"
+      else
+        @users        = User.search_by_name_email_phone(@search).all(:include => :user_roles, :order => "users.name asc")
+        @search_text  = "Users matching '#{@search}'"
+      end
       @paginate     = false
     else
       @users        = User.all(:include => :user_roles, :order => "users.name asc").paginate(:page => params[:page], :per_page => @@per_page)

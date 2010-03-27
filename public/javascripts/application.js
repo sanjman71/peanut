@@ -133,7 +133,7 @@ $.fn.init_search_appointments_by_confirmation_code = function () {
 
 // Live users, customers search
 $.fn.init_live_users_search = function () {
-  $("#live_search_for_users, #live_search_for_customers").keyup(function () {
+  $("input#live_search_for_users, input#live_search_for_customers").keyup(function () {
     var search_url  = this.url;
     var search_term = this.value;
     // excecut search, throttle how often its called
@@ -142,8 +142,17 @@ $.fn.init_live_users_search = function () {
       // show search progress bar
       $('#search_progress').show();
     }.sleep(300);
-    
+
     return false;
+  })
+
+  $("a#live_search_for_users_without_company_roles").live('click', function() {
+    var search_url  = $(this).closest("div#live_search").find("input").attr('url');
+    var search_term = "-companyroles";
+    // execute search
+    $.get(search_url, {q : search_term}, null, "script");
+    // show search progress bar
+    $('#search_progress').show();
   })
 }
 
