@@ -16,6 +16,11 @@ class OpeningsControllerTest < ActionController::TestCase
                :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3,
                :duration => 45.minutes, :start_date => '20090101', :end_date => '20090201', :time => 'anytime'
 
+  # search appointments for a specified provider, duration and service, with a date
+  should_route :post, '/users/1/services/3/2700/openings/20090101/anytime',
+               :controller => 'openings', :action => 'index', :provider_type => 'users', :provider_id => 1, :service_id => 3,
+               :duration => 45.minutes, :start_date => '20090101', :time => 'anytime'
+
   # search appointments for anyone providing a specified service with duration, with a when range
   should_route :post, '/services/3/7200/openings/this-week/anytime',
                :controller => 'openings', :action => 'index', :service_id => 3, :duration => 120.minutes, :when => 'this-week', :time => 'anytime'
