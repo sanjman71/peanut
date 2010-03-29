@@ -93,6 +93,8 @@ ActionController::Routing::Routes.draw do |map|
   # search openings for a specified service and duration, and an optional provider
   map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time',
                               :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/, :end_date => /\d{8,8}/
+  map.openings_provider_date  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date/:time',
+                              :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/
   map.openings_provider_when  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
                               :controller => 'openings', :action => 'index'
   map.openings_anyone_dates   '/services/:service_id/:duration/openings/:start_date..:end_date/:time',
@@ -165,13 +167,21 @@ ActionController::Routing::Routes.draw do |map|
   map.calendars       '/calendars', :controller => 'calendar', :action => 'index'
 
   # search waitlist scoped by provider
-  map.connect   ':provider_type/:provider_id/waitlist/:state', :controller => 'waitlists', :action => 'index'
-  map.connect   ':provider_type/:provider_id/waitlist', :controller => 'waitlists', :action => 'index'
+  map.connect         '/:provider_type/:provider_id/waitlist/:state', :controller => 'waitlists', :action => 'index'
+  map.connect         '/:provider_type/:provider_id/waitlist', :controller => 'waitlists', :action => 'index'
 
   # services, products
   map.resources :services
   map.resources :products
-  
+
+  # vacations
+  map.company_vacations         '/vacations', :controller => 'vacations', :action => 'index'
+  map.provider_vacations        '/:provider_type/:provider_id/vacations', :controller => 'vacations', :action => 'index', :provider_id => /\d+/
+  map.create_company_vacation   '/vacation', :controller => 'vacations', :action => 'create', :conditions => {:method => :post}
+  map.create_provider_vacation  '/:provider_type/:provider_id/vacation',
+                                :controller => 'vacations', :action => 'create', :conditions => {:method => :post}
+  map.delete_provider_vacation  '/:provider_type/:provider_id/vacation/:id',
+                                :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_providers  '/reports/range/:start_date..:end_date/:state/providers/:provider_ids',
