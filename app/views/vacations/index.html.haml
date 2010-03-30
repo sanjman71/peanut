@@ -1,0 +1,55 @@
+- title("Manage Vacation Schedule")
+- stylesheet('calendar')
+- javascript('vacations')
+
+- if @provider
+  - create_path = create_provider_vacation_path
+  - back_path   = calendar_show_path
+- else
+  - create_path = create_company_vacation_path
+  - back_path   = edit_company_root_path
+
+.span-24.last#what
+  .span-15.prepend-1.mat.padding-top-10
+    .span-15.last.provider.padding-bottom-5
+      = label_tag "show_provider", "Manage vacation schedule for #{@provider ? @provider.name : current_company.name}", :class => 'big'
+    %h4.span-15.last
+      = link_to 'Back', back_path, :class => 'admin'
+  
+  %hr.space
+
+  .span-15.prepend-1.last
+    = display_flash
+
+  %hr.space
+
+  .span-15.prepend-1#vacations
+    %h4.bold= (@vacations.size > 0) ? pluralize(@vacations.size, "Vacation Schedule") : "No Vacation Schedules"
+    - @vacations.each do |vacation|
+      - if @provider
+        - delete_path = delete_provider_vacation_path(:id => vacation.id)
+      - else
+        - delete_path = delete_company_vacation_path(:id => vacation.id)
+      .span-15.last#vacation
+        %h4
+          == #{vacation.start_at.to_s(:appt_day_short)} -  #{vacation.end_at.to_s(:appt_day_short)}
+          %span= link_to image_tag('delete.png', :class => 'whitebgd', :size => '16x16'), delete_path, |
+                                   :title => 'Cancel', :id => 'delete_vacation', :class => 'admin ujs delete confirm', :question => 'Are you sure you want to delete this vacation schedule?' |
+
+  %hr.space
+
+  .span-15.prepend-1.last#add_vacation_link
+    = link_to image_tag('add2.png', :size => '15x15', :class => 'whitebgd', :style => 'padding-top: 2px;'), '#', :title => 'Add Vacation Schedule', :id => 'add_vacation', :class => 'manage add'
+
+  .span-15.prepend-1.last#add_vacation.hide
+    %span.bold== Start Date:&nbsp;
+    = text_field_tag 'start_date', '', :class => 'vacation datepicker std_text_field_style', :id => "start_date", :autocomplete => 'off'
+    %span{:style => 'padding-left: 10px;'}==
+    %span.bold== End Date:&nbsp;
+    = text_field_tag 'end_date', '', :class => 'vacation datepicker std_text_field_style', :id => "end_date", :autocomplete => 'off'
+    %span#actions
+      %span{:style => 'padding-left: 7px;'}
+      = link_to 'Add', create_path, :id => 'add_vacation_save', :class => 'admin'
+      %span{:style => 'padding-left: 3px;'}==
+      = link_to 'Cancel', '#', :id => 'add_vacation_cancel', :class => 'admin'
+          
