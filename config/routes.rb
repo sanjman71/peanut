@@ -182,6 +182,8 @@ ActionController::Routing::Routes.draw do |map|
                                 :controller => 'vacations', :action => 'create', :conditions => {:method => :post}
   map.delete_provider_vacation  '/:provider_type/:provider_id/vacation/:id',
                                 :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
+  map.delete_company_vacation   '/vacation/:id', :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
+
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_providers  '/reports/range/:start_date..:end_date/:state/providers/:provider_ids',
