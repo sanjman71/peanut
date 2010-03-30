@@ -1,7 +1,12 @@
-.span-15.last.slot{:class => [(slot.capacity > 0 ? "free" : "overbooked" ), cycle("", "shaded")].join(' ')}[slot]
+- slot_hours    = "hours_%d" % (slot.duration/3600)
+- slot_mark_as  = slot.capacity > 0 ? 'free' : 'overbooked'
+
+= render(:partial => 'calendar/show_duration', :locals => {:appt_or_slot => slot, :state => slot_mark_as, :size => slot_hours})
+
+.span-15.last.slot{:class => [slot_mark_as, slot_hours].join(' ')}[slot]
   .span-4.time
     %span== #{slot.start_at.to_s(:appt_time)} - #{slot.end_at.to_s(:appt_time)}
-  .span-6.service{:class => 'free'}
+  .span-11.last.service{:class => 'free'}
     - if slot.capacity > 0
       %h6==Free - #{pluralize(slot.capacity, 'slot')} available
     - else

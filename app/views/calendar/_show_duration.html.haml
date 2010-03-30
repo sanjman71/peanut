@@ -1,0 +1,6 @@
+-#- hours        = appt_or_slot.duration/3600
+-#- hours_to_s   = hours.to_s
+- hours_float = sprintf("%.1f", (appt_or_slot.duration.to_f/3600))
+
+.span-2.colborder{:class => [size, state].join(" ")}
+  %span{:style => 'text-align: center; display: block;'}== #{pluralize(hours_float, 'hour')}

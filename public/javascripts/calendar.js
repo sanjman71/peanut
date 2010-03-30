@@ -126,16 +126,24 @@ $.fn.init_edit_work_appointment = function() {
     $(form).find("input#start_date").removeClass('disabled');
     $(form).find("input#start_date").attr('disabled', '');
     // fill in appointment values for the edit form
-    var appointment_div   = $(this).parents("div.appointment");
-    var start_date        = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
-    var start_time        = $(appointment_div).attr('appt_start_time');
-    var duration          = $(appointment_div).attr('appt_duration');
-    var service_name      = $(appointment_div).find("div.service a").text();
-    var customer_name     = $(appointment_div).find("div.customer div.customer_name").children().text();
-    var customer_id       = $(appointment_div).find("div.customer").attr('id').match(/\w+_(\d+)/)[1];  // e.g. 'user_5' => '5'
-    var provider          = $(appointment_div).attr('appt_provider'); // e.g. 'users/11'
-    var creator           = $(appointment_div).attr('appt_creator'); // e.g. 'Johnny'
+    var appointment_div   = $(this).closest("div.appointment");
     var appt_id           = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];  // e.e.g 'appointment_13' => '13'
+    var start_date        = convert_yymmdd_string_to_mmddyy(appointments.get(appt_id).get("appt_schedule_day"));
+    // var start_date        = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
+    var start_time        = appointments.get(appt_id).get("appt_start_time");
+    // var start_time        = $(appointment_div).attr('appt_start_time');
+    var duration          = appointments.get(appt_id).get('appt_duration');
+    // var duration          = $(appointment_div).attr('appt_duration');
+    var service_name      = appointments.get(appt_id).get('appt_service');
+    // var service_name      = $(appointment_div).find("div.service a").text();
+    var customer_name     = appointments.get(appt_id).get('appt_customer');
+    var customer_id       = appointments.get(appt_id).get('appt_customer_id');  // e.g. 'user_5' => '5'
+    // var customer_name     = $(appointment_div).find("div.customer div.customer_name").children().text();
+    // var customer_id       = $(appointment_div).find("div.customer").attr('id').match(/\w+_(\d+)/)[1];  // e.g. 'user_5' => '5'
+    var provider          = appointments.get(appt_id).get('appt_provider'); // e.g. 'users/11'
+    // var provider          = $(appointment_div).attr('appt_provider'); // e.g. 'users/11'
+    var creator           = appointments.get(appt_id).get('appt_creator'); // e.g. 'Johnny'
+    // var creator           = $(appointment_div).attr('appt_creator'); // e.g. 'Johnny'
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
@@ -168,10 +176,14 @@ $.fn.init_cancel_appointment = function() {
   // user click on 'cancel appointment', results in opening cancel appointment dialog
   $("a.cancel").click(function() {
     // fill in dialog appointment values
-    var appointment_div     = $(this).parents("div.appointment");
-    var service_name        = $(appointment_div).find("div.service").text();
-    var start_date_time     = $(appointment_div).attr('appt_day_date_time');
-    var customer_name       = $(appointment_div).find("div.customer div.customer_name").children().text();
+    var appointment_div     = $(this).closest("div.appointment");
+    var appt_id             = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];
+    // var service_name        = $(appointment_div).find("div.service").text();
+    // var start_date_time     = $(appointment_div).attr('appt_day_date_time');
+    // var customer_name       = $(appointment_div).find("div.customer div.customer_name").children().text();
+    var start_date_time     = appointments.get(appt_id).get('appt_day_date_time');
+    var service_name        = appointments.get(appt_id).get('appt_service');
+    var customer_name       = appointments.get(appt_id).get('appt_customer');
     var cancel_url          = $(this).attr('url');
     var edit_recurrence_url = $(this).attr('edit_recurrence');
     var cancel_dialog       = "div.dialog#cancel_appointment_dialog";
@@ -308,12 +320,15 @@ $.fn.init_edit_free_appointment = function() {
   $("a#edit_free_appointment").click(function() {
     var form                = "form#add_free_appointment_form";
     // fill in appointment values since this is an edit form
-    var appointment_div     = $(this).parents("div.appointment");
-    var start_date          = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
-    var start_time          = $(appointment_div).attr('appt_start_time');
-    var end_time            = $(appointment_div).attr('appt_end_time');
-    var edit_recurrence_url = $(this).attr('edit_recurrence');
+    var appointment_div     = $(this).closest("div.appointment");
     var appt_id             = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];
+    // var start_date          = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
+    // var start_time          = $(appointment_div).attr('appt_start_time');
+    // var end_time            = $(appointment_div).attr('appt_end_time');
+    var start_date          = convert_yymmdd_string_to_mmddyy(appointments.get(appt_id).get("appt_schedule_day"));
+    var start_time          = appointments.get(appt_id).get("appt_start_time");
+    var end_time            = appointments.get(appt_id).get("appt_end_time");
+    var edit_recurrence_url = $(this).attr('edit_recurrence');
     $(form).find("input#free_date").val(start_date);
     $(form).find("input#free_start_at").val(start_time);
     $(form).find("input#free_end_at").val(end_time);

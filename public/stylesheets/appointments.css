@@ -16,15 +16,43 @@ div.appointment.review .data, div.waitlist.review .data
                                                   { color: #007700; }
 */
 
-div.appointment, div.slot                         { margin-bottom: 5px; }
-div.appointment.shaded, div.slot.shaded           { background-color: #EDF3FE; }  /* white */
+div.appointment, div.slot                         { margin-bottom: 5px; background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#fff)); border-bottom: 1px solid #eee; }
+div.appointment.shaded, div.slot.shaded           { background-color: #EDF3FE; }  /* light blue */
 
-div.appointment.free                              { }  /* light blue */
+/*
+div.appointment.work.colborder                              { border-right: 2px solid #ff6600; }
+div.slot.free                                     { border-right: 2px solid #009900; }
+*/
+
+/*
+div.left_border.work                              { border-left: 2px solid #ff6600; padding-left: 9px; background-color: #fff; }
+div.left_border.free                              { border-left: 2px solid #009900; padding-left: 9px; background-color: #fff;}
+*/
+
+div.colborder.work, div.colborder.overbooked      { border-right: 2px solid #FF6600; background-color: #FFF; padding-right: 23px; color: #FF6600; }
+div.colborder.free                                { border-right: 2px solid #009900; background-color: #FFF; padding-right: 23px; color: #009900; }
+div.colborder.canceled                            { border-right: 2px solid #999; background-color: #FFF; padding-right: 23px; color: #999; }
+div.colborder.free.schedule                       { border-right: 2px solid #555; background-color: #FFF; padding-right: 23px; color: #555; }
+
+div.hours_0                                       { height: 40px;  }
+div.hours_1                                       { height: 55px;  }
+div.hours_2                                       { height: 70px; }
+div.hours_3                                       { height: 85px; }
+div.hours_4                                       { height: 100px; }
+div.hours_5                                       { height: 110px; }
+div.hours_6                                       { height: 120px; }
+div.hours_7                                       { height: 130px; }
+div.hours_8                                       { height: 140px; }
+div.hours_9                                       { height: 150px; }
+div.hours_10                                      { height: 150px; }
+
+/*
+div.appointment.free                              { }
 div.appointment.work                              { }
 div.slot                                          { }
+*/
 
 div.appointment.waitlist                          { background-color: #FFFFDD; }  /* light yellow */
-
 div.appointment.canceled                          { color: #FF1100;}
 
 div.appointment .time span                        { font-size: 1.0em;}

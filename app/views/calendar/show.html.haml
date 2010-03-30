@@ -17,18 +17,20 @@
     - @sps.each do |sp|
       .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically"), :service_duration_in_secs => sp[5]}
 
-.span-16
-  .span-15.prepend-1.last.mat.padding-top-10
+.span-24.last
+  .span-20.prepend-1.last.mat.padding-top-10
     .span-9
       -# schedule for provider
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
       -# links to schedule using blocks of time or using weekly schedules
-      %h4
+      %h4.bottom.padding-bottom-5
         = link_to "Manage Weekly Schedule", show_weekly_path, :class => 'admin'
         %span.small== &nbsp;or&nbsp;
         = link_to "Add Blocks of Available Time", new_block_path, :class => 'admin'
+      -#%h4
+        -#= link_to "Manage Vacation Schedule", provider_vacations_path, :class => 'admin'
     .span-6.last#pdf
       %h4.bold.bottom== PDF Schedules:
       = link_to "Today, #{@today.to_s(:appt_short_month_day)}", calendar_when_format_path(:when => 'today', :format => 'pdf'), :id => 'pdf_schedule_today', :class => 'admin'
@@ -40,14 +42,14 @@
 
   %hr.space
 
-  .span-15.prepend-1.last#schedule_container.padding-bottom-20
-  
-    .span-15.last#schedule_help
+  .span-17.prepend-1.last#schedule_container{:style => 'padding-bottom: 100px;'}
+
+    .span-17.last#schedule_help
       %h4
         == Click a highlighted date on the calendar below to see appointments for that date,
         == or click on the '+' icon next to a date to add free time or appointments.
 
-    .span-15.last#schedule_date_range_and_links
+    .span-17.last#schedule_date_range_and_links
       .span-3
         =prev_next_links[:prev_link]
       .span-9.center_justify
@@ -60,7 +62,7 @@
         =prev_next_links[:next_link]
 
     -# show free, work calendar
-    .span-15.last#free_work_calendar
+    .span-18.last#free_work_calendar
       -# show add free and work appointments menu items if we have appropriate privileges
       - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
         - add_free_link = 1
@@ -73,30 +75,31 @@
                                                           :add_free_appointment_link => add_free_link, :add_work_appointment_link => add_work_link}) |
 
     -# show free, work appointments and waitlists by day
-    .span-15.last#calendar_by_day.hide
+    .span-18.last#calendar_by_day.hide
       - @day_keys.each do |day|
         - reset_cycle
-        .span-15.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
-          .span-11.last.calendar.date.wide
+        .span-18.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
+          .span-18.last.calendar.date.wide
             %span= day.to_s(:appt_day)
           -unless @capacity_and_work_by_day[day].blank?
+            .span-18.last.padding-top-10
+              %h4.bold== Work and Free Time
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @capacity_and_work_by_day[day]})
           -unless @free_appointments_by_day[day].blank?
-            .span-11.last.calendar.date.wide
-              %span==&nbsp;
+            .span-18.last.padding-top-10
+              %h4.bold== Schedules
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @free_appointments_by_day[day]})
           -unless @waitlists_by_day[day].blank?
-            %hr
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @waitlists_by_day[day]})
           -unless @canceled_by_day[day].blank?
-            %hr
+            .span-18.last.padding-top-10
+              %h4.bold== Cancellations
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @canceled_by_day[day]})
-      
 
-.span-8.last
+-#.span-8.last
   -# schedule help
-  .span-7.prepend-1.last
-    = render(:partial => 'schedule_help')
+  -#.span-7.prepend-1.last
+    -#= render(:partial => 'schedule_help')
 
 -# special actions require special privileges
 - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
@@ -126,7 +129,23 @@
   var calendar_highlight_date      = "#{@calendar_highlight_date}";
   var appointment_create_work_path = "#{schedule_work_path}";
   var appointment_update_work_path = "#{appointment_path(':id')}";
-  var appointment_create_free_path = "#{url_for(:controller => 'appointments', :action => 'create_free')}"
+  var appointment_create_free_path = "#{create_free_path}"
   var appointment_update_free_path = "#{appointment_path(':id')}";
+
+  -# build appointments hash for free and work appointments
+  var appointments  = new Hash();
+  - @day_keys.each do |day|
+    - ((@capacity_and_work_by_day[day]||[]) + (@free_appointments_by_day[day]||[])).compact.select{ |o| o.is_a?(Appointment) }.each do |appt|
+      appointments.put("#{appt.id}", new Hash({"appt_day_date_time" : "#{appt.start_at.to_s(:appt_day_date_time)}", |
+                                               "appt_schedule_day"  : "#{appt.start_at.to_s(:appt_schedule_day)}", |
+                                               "appt_start_time"    : "#{appt.start_at.to_s(:appt_time).downcase}", |
+                                               "appt_end_time"      : "#{appt.end_at.to_s(:appt_time).downcase}", |
+                                               "appt_duration"      : "#{appt.duration}", |
+                                               "appt_provider"      : "#{appt.provider_type.tableize}/#{appt.provider_id}", |
+                                               "appt_creator"       : "#{appt.creator.andand.name.to_s}", |
+                                               "appt_service"       : "#{appt.service.andand.name.to_s}", |
+                                               "appt_customer"      : "#{appt.customer.andand.name.to_s}", |
+                                               "appt_customer_id"   : "#{appt.customer_id}" |
+                                              })) |
 
   

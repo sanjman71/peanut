@@ -8,8 +8,6 @@
       = label_tag "show_provider", "Manage weekly schedule for&nbsp;", :class => 'big'
       = select_tag('show_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')      
     %h4.span-15.last
-      -#= link_to "Add a Weekly Schedule", new_weekly_path, :class => 'admin'
-      -#== &nbsp|&nbsp;
       = link_to 'Back', calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id), :class => 'admin'
 
 %hr.space
