@@ -230,11 +230,11 @@ class ApplicationController < ActionController::Base
         return @provider
       end
 
-      if options[:default]
+      if options.has_key?(:default)
         @provider = options[:default]
         return @provider
       else
-        logger.debug("xxx invalid provider #{params[:provider_type]}:#{params[:provider_id]}")
+        logger.debug("[error] invalid provider #{params[:provider_type]}:#{params[:provider_id]}")
         redirect_to(unauthorized_path) and return
       end
     end
