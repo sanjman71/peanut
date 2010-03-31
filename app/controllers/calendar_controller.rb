@@ -98,6 +98,7 @@ class CalendarController < ApplicationController
     @work_appointments     = AppointmentScheduler.find_work_appointments(current_company, current_location, @provider, @daterange)
     @capacity_slots        = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
     @canceled_appointments = AppointmentScheduler.find_canceled_work_appointments(current_company, current_location, @provider, @daterange)
+    @vacation_appointments = AppointmentScheduler.find_vacation_appointments(current_company, current_location, @provider, @daterange)
 
     # build hash of calendar markings based on the free appointments
     # @calendar_markings   = build_calendar_markings(@free_appointments)
@@ -121,20 +122,24 @@ class CalendarController < ApplicationController
     # group free and work appointments by day
     @free_appointments_by_day = @free_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
     @capacity_and_work_by_day = @capacity_and_work.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+    # group canceled appointments by day
     @canceled_by_day          = @canceled_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+    # group vacation appointments by day
+    @vacation_by_day          = @vacation_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
 
     # group waitlists by day
     @waitlists_by_day = @waitlists.group_by { |waitlist, date, time_range| date }
 
     # group appointments and waitlists by day, appointments before waitlists for any given day
     @day_keys         = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys + @waitlists_by_day.keys +
-                         @canceled_by_day.keys).uniq.sort
+                         @canceled_by_day.keys + @vacation_by_day.keys).uniq.sort
     @stuff_by_day     = ActiveSupport::OrderedHash[]
     @day_keys.each do |date|
       @stuff_by_day[date] = (@capacity_and_work_by_day[date].andand.sort_by(&:start_at) || []) +
                             (@free_appointments_by_day[date].andand.sort_by(&:start_at) || []) +              
                             (@waitlists_by_day[date].andand.sort_by(&:start_at) || []) + 
-                            (@canceled_by_day[date].andand.sort_by(&:start_at) || [])
+                            (@canceled_by_day[date].andand.sort_by(&:start_at) || []) +
+                            (@vacation_by_day[date].andand.sort_by(&:start_at) || [])
     end
 
     # page title

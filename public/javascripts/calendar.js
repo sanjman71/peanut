@@ -437,6 +437,13 @@ $.fn.init_add_calendar_markings = function() {
       work_appointments += 1;
     })
 
+    // count vacation appointments for this date
+    var vacation_appointments = 0;
+
+    $(this).find("div.appointment.vacation").each(function() {
+      vacation_appointments += 1;
+    })
+
     var text = [];
 
     // mark the calendar
@@ -456,6 +463,12 @@ $.fn.init_add_calendar_markings = function() {
       // mark as overbooked, add text
       $("div#free_work_calendar td#" + date).addClass('activity').addClass('overbooked');
       text.push('<br/>Overbooked');
+    }
+
+    if (vacation_appointments > 0) {
+      // mark as vacation, add text
+      $("div#free_work_calendar td#" + date).addClass('activity').addClass('vacation');
+      text.push('<br/>Vacation');
     }
 
     // mark text

@@ -32,7 +32,7 @@ div.left_border.free                              { border-left: 2px solid #0099
 div.colborder.work, div.colborder.overbooked      { border-right: 2px solid #FF6600; background-color: #FFF; padding-right: 23px; color: #FF6600; }
 div.colborder.free                                { border-right: 2px solid #009900; background-color: #FFF; padding-right: 23px; color: #009900; }
 div.colborder.canceled                            { border-right: 2px solid #999; background-color: #FFF; padding-right: 23px; color: #999; }
-div.colborder.free.schedule                       { border-right: 2px solid #555; background-color: #FFF; padding-right: 23px; color: #555; }
+div.colborder.free.schedule, div.colborder.vacation { border-right: 2px solid #555; background-color: #FFF; padding-right: 23px; color: #555; }
 
 div.hours_0                                       { height: 40px;  }
 div.hours_1                                       { height: 55px;  }

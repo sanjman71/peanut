@@ -25,7 +25,7 @@
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
       -# links to schedule using blocks of time or using weekly schedules
-      %h4.bottom.padding-bottom-5
+      %h4
         = link_to "Manage Weekly Schedule", show_weekly_path, :class => 'admin'
         %span.small== &nbsp;or&nbsp;
         = link_to "Add Blocks of Available Time", new_block_path, :class => 'admin'
@@ -77,7 +77,6 @@
     -# show free, work appointments and waitlists by day
     .span-18.last#calendar_by_day.hide
       - @day_keys.each do |day|
-        - reset_cycle
         .span-18.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
           .span-18.last.calendar.date.wide
             %span= day.to_s(:appt_day)
@@ -89,6 +88,10 @@
             .span-18.last.padding-top-10
               %h4.bold== Schedules
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @free_appointments_by_day[day]})
+          -unless @vacation_by_day[day].blank?
+            .span-18.last.padding-top-10
+              %h4.bold== Vacation
+            = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @vacation_by_day[day]})
           -unless @waitlists_by_day[day].blank?
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @waitlists_by_day[day]})
           -unless @canceled_by_day[day].blank?

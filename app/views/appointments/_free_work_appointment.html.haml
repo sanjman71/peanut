@@ -25,6 +25,8 @@
         - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
           -# free appointments can be viewed with read permissions
           = appointment.recurrence? ? link_to("Weekly Availability", show_weekly_path(appointment.provider.tableize, appointment.provider.id)) : "Scheduled Availability"
+        - elsif appointment.vacation?
+          %span.bold== Vacation
         - else
           %h6= appointment.service.name
       - if show_location?
@@ -53,7 +55,12 @@
           .span-3.last
             .span-3.last.editcancel
               .span-3.last.editcancel-one
-                - if !appointment.canceled?
+                - if appointment.canceled?
+                  == Canceled
+                - elsif appointment.vacation?
+                  -# no edit, cancel link on vacation appointments
+                  == &nbsp;
+                - else
                   - if appointment.recurrence? and !appointment.recurrence_parent?
                     -# allow user to manage provider's weekly schedule path for both edit and cancel recurence actions
                     - edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
@@ -63,8 +70,6 @@
                   = link_to('Edit', '#', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
                   |
                   = link_to('Cancel', '#', :url => cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
-                - elsif appointment.canceled?
-                  == Canceled
     - unless appointment.notes.empty?
       .span-11.last
         .span-2
