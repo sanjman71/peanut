@@ -198,11 +198,8 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
                 sort{|s, t| ((s[0] * 10000) + (s[1] * 100) + s[3]) <=> ((t[0] * 10000) + (t[1] * 100) + t[3])}
       assert_equal [], slots
     end
-  
-  
-  
   end
-  
+
   #
   # Check scheduling work in various places around a free appointment
   #
@@ -458,7 +455,6 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   end
   
-  
   context "schedule work appointment across the end of a free appointment with force" do
     setup do
       @company.user_providers.push(@provider)
@@ -711,8 +707,6 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     setup do
       @company.user_providers.push(@provider)
       @haircut.user_providers.push(@provider)
-      @haircut.reload
-      @provider.reload
       
       # create a free appointment that starts tomorrow
       @start_at1         = (@start_tomorrow).to_s(:appt_schedule)
@@ -737,4 +731,85 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
     end
   end
 
+  context "split by day" do
+    setup do
+      @company.user_providers.push(@provider)
+      @haircut.user_providers.push(@provider)
+    end
+
+    context "for 1 full day" do
+      setup do
+        # create vacation appointment that starts tomorrow and ends tomorrow
+        @start_at   = (@start_tomorrow).to_s(:appt_schedule)
+        @end_at     = (@start_tomorrow.end_of_day).to_s(:appt_schedule)
+        @vacation   = @company.appointments.create(:provider => @provider, :start_at => @start_at, :end_at => @end_at, :mark_as => Appointment::VACATION)
+        assert_valid @vacation
+        @vacations  = AppointmentScheduler.split_by_day(@vacation)
+      end
+
+      should "have 1 appointment same as original" do
+        assert_equal [@vacation], @vacations
+      end
+    end
+
+    context "for 2 full days" do
+      setup do
+        # create vacation appointment that starts tomorrow and ends the next day
+        @start_at   = (@start_tomorrow).to_s(:appt_schedule)
+        @end_at     = ((@start_tomorrow + 1.day).end_of_day).to_s(:appt_schedule)
+        @vacation   = @company.appointments.create(:provider => @provider, :start_at => @start_at, :end_at => @end_at, :mark_as => Appointment::VACATION)
+        assert_valid @vacation
+        @vacations  = AppointmentScheduler.split_by_day(@vacation)
+      end
+
+      should "have 2 appointments" do
+        assert_equal 2, @vacations.size
+      end
+      
+      should "have apointment day 1 for the entire day" do
+        @vacation1 = @vacations[0]
+        # should have duration for entire day
+        assert_equal 86399, @vacation1.duration
+      end
+
+      should "have apointment day 2 for the entire day" do
+        @vacation2 = @vacations[1]
+        # should have duration for entire day
+        assert_equal 86399, @vacation2.duration
+      end
+    end
+
+    context "for 2+ full days" do
+      setup do
+        # create vacation appointment that starts tomorrow and ends the next day
+        @start_at   = (@start_tomorrow).to_s(:appt_schedule)
+        @end_at     = (@start_tomorrow + 2.days + 2.hours).to_s(:appt_schedule)
+        @vacation   = @company.appointments.create(:provider => @provider, :start_at => @start_at, :end_at => @end_at, :mark_as => Appointment::VACATION)
+        assert_valid @vacation
+        @vacations  = AppointmentScheduler.split_by_day(@vacation)
+      end
+
+      should "have 3 appointments" do
+        assert_equal 3, @vacations.size
+      end
+
+      should "have apointment day 1 for the entire day" do
+        @vacation1 = @vacations[0]
+        # should have duration for entire day
+        assert_equal 86399, @vacation1.duration
+      end
+
+      should "have apointment day 2 for the entire day" do
+        @vacation2 = @vacations[1]
+        # should have duration for entire day
+        assert_equal 86399, @vacation2.duration
+      end
+
+      should "have apointment day 3 for 2 hours" do
+        @vacation3 = @vacations[2]
+        # should have duration for 2 hours
+        assert_equal 7200, @vacation3.duration
+      end
+    end
+  end
 end
