@@ -8,7 +8,7 @@ table.calendar th                                 { background: transparent none
                                                     text-align: left; width: 80px;}
                                                     
 table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 1.2em; 
-                                                    padding: 3px 3px 5px 3px; vertical-align: top; }
+                                                    padding: 3px 3px 5px 3px; vertical-align: top; height: 60px; }
 
 table.calendar td.in-range.free                   { color: #333333; font-weight: bolder; }
 table.calendar td.in-range.work                   { color: #333333; font-weight: bolder; }

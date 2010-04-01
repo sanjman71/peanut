@@ -61,7 +61,7 @@
       .span-3.last.right_justify
         =prev_next_links[:next_link]
 
-    -# show free, work calendar
+    -# show calendar, with free, work, vacation, overbooked markings
     .span-18.last#free_work_calendar
       -# show add free and work appointments menu items if we have appropriate privileges
       - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
@@ -74,9 +74,9 @@
       = render(:partial => 'shared/calendar', :locals => {:daterange => @daterange, :markings => @calendar_markings, :today => @today, |
                                                           :add_free_appointment_link => add_free_link, :add_work_appointment_link => add_work_link}) |
 
-    -# show free, work appointments and waitlists by day
     .span-18.last#calendar_by_day.hide
-      - @day_keys.each do |day|
+      -# show days with stuff
+      - @days_with_stuff.each do |day|
         .span-18.last.calendar_schedule_date{:id => "date_#{day.to_s(:appt_schedule_day)}"}
           .span-18.last.calendar.date.wide
             %span= day.to_s(:appt_day)
@@ -98,6 +98,14 @@
             .span-18.last.padding-top-10
               %h4.bold== Cancellations
             = render(:partial => 'calendar/show_day_stuff', :locals => {:day => day, :stuff => @canceled_by_day[day]})
+      -# show days with no stuff
+      - @daterange.each do |day|
+        - next if @days_with_stuff.include?(day.in_time_zone.beginning_of_day)
+        .span-18.last.calendar_schedule_date.empty{:id => "date_#{day.to_s(:appt_schedule_day)}"}
+          .span-18.last.calendar.date.wide
+            %span= day.to_s(:appt_day)
+          .span-18.last.padding-top-10
+            %h4.bold== Nothing Scheduled
 
 -#.span-8.last
   -# schedule help
@@ -137,18 +145,17 @@
 
   -# build appointments hash for free and work appointments
   var appointments  = new Hash();
-  - @day_keys.each do |day|
-    - ((@capacity_and_work_by_day[day]||[]) + (@free_appointments_by_day[day]||[])).compact.select{ |o| o.is_a?(Appointment) }.each do |appt|
-      appointments.put("#{appt.id}", new Hash({"appt_day_date_time" : "#{appt.start_at.to_s(:appt_day_date_time)}", |
-                                               "appt_schedule_day"  : "#{appt.start_at.to_s(:appt_schedule_day)}", |
-                                               "appt_start_time"    : "#{appt.start_at.to_s(:appt_time).downcase}", |
-                                               "appt_end_time"      : "#{appt.end_at.to_s(:appt_time).downcase}", |
-                                               "appt_duration"      : "#{appt.duration}", |
-                                               "appt_provider"      : "#{appt.provider_type.tableize}/#{appt.provider_id}", |
-                                               "appt_creator"       : "#{appt.creator.andand.name.to_s}", |
-                                               "appt_service"       : "#{appt.service.andand.name.to_s}", |
-                                               "appt_customer"      : "#{appt.customer.andand.name.to_s}", |
-                                               "appt_customer_id"   : "#{appt.customer_id}" |
-                                              })) |
+  - (@capacity_and_work + @free_appointments).compact.select{ |o| o.is_a?(Appointment) }.each do |appt|
+    appointments.put("#{appt.id}", new Hash({"appt_day_date_time" : "#{appt.start_at.to_s(:appt_day_date_time)}", |
+                                             "appt_schedule_day"  : "#{appt.start_at.to_s(:appt_schedule_day)}", |
+                                             "appt_start_time"    : "#{appt.start_at.to_s(:appt_time).downcase}", |
+                                             "appt_end_time"      : "#{appt.end_at.to_s(:appt_time).downcase}", |
+                                             "appt_duration"      : "#{appt.duration}", |
+                                             "appt_provider"      : "#{appt.provider_type.tableize}/#{appt.provider_id}", |
+                                             "appt_creator"       : "#{appt.creator.andand.name.to_s}", |
+                                             "appt_service"       : "#{appt.service.andand.name.to_s}", |
+                                             "appt_customer"      : "#{appt.customer.andand.name.to_s}", |
+                                             "appt_customer_id"   : "#{appt.customer_id}" |
+                                            })) |
 
   

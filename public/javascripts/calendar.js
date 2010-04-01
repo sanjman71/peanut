@@ -471,18 +471,22 @@ $.fn.init_add_calendar_markings = function() {
       text.push('<br/>Vacation');
     }
 
+    if ($(this).hasClass('empty')) {
+      $("div#free_work_calendar td#" + date).addClass('empty');
+    }
+
     // mark text
     $("div#free_work_calendar td#" + date).find("#available").html(text.join(", "));
   })
 
-  // add click handler to show selected free, work dates; allow past dates
-  $("td.weekday.free,td.weekday.work,td.weekend.free,td.weekend.work").click(function() {
+  // show any in-range date on click
+  $("td.in-range").click(function() {
     $("div#calendar_by_day").show();
     // unmark all selected calendar dates, and mark this calendar date as selected
-    $(".free.selected,.work.selected").removeClass('selected');
+    $("td.selected").removeClass('selected');
     $(this).addClass('selected');
     // hide all dates, and show this date
-    $(".calendar_schedule_date").hide();
+    $("div.calendar_schedule_date").hide();
     var date_id = "div#date_" + $(this).attr("id");
     $(date_id).show();
   })
