@@ -95,4 +95,7 @@ $.fn.init_openings = function() {
 
 $(document).ready(function() {
   $(document).init_openings();
+
+  // click search button if flag is set
+  if (show_search == 1) { $("a#search_button").click(); }
 })
