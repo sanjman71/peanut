@@ -10,10 +10,10 @@ pdf.move_down(10)
 
 pdf.stroke_color "aaaaaa"
 
-if @stuff_by_day.blank?
+if @capacity_and_work_by_day.blank?
   pdf.text("No Appointments Scheduled")
 else
-  @stuff_by_day.each do |day, stuff|
+  @capacity_and_work_by_day.each do |day, stuff|
     # date
     pdf.fill_color("008800")
     pdf.text("#{day.to_s(:appt_day)}")

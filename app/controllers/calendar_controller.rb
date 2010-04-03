@@ -138,18 +138,6 @@ class CalendarController < ApplicationController
     # find days with work, free activity - used by mobile version
     @days_with_work_free_stuff = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys).uniq.sort
 
-    # group appointments and waitlists by day, appointments before waitlists for any given day
-    # @day_keys         = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys + @waitlists_by_day.keys +
-    #                      @canceled_by_day.keys + @vacation_by_day.keys).uniq.sort
-    # @stuff_by_day     = ActiveSupport::OrderedHash[]
-    # @day_keys.each do |date|
-    #   @stuff_by_day[date] = (@capacity_and_work_by_day[date].andand.sort_by(&:start_at) || []) +
-    #                         (@free_appointments_by_day[date].andand.sort_by(&:start_at) || []) +              
-    #                         (@waitlists_by_day[date].andand.sort_by(&:start_at) || []) + 
-    #                         (@canceled_by_day[date].andand.sort_by(&:start_at) || []) +
-    #                         (@vacation_by_day[date].andand.sort_by(&:start_at) || [])
-    # end
-
     # page title
     @title = "#{@provider.name.titleize} Schedule"
 
