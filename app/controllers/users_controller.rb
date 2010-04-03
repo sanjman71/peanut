@@ -238,10 +238,13 @@ class UsersController < ApplicationController
     # build the index path based on the user type
     @index_path = index_path(@user, @role) || user_edit_path(@user)
 
+    # always redirect back to user edit, unless there is a session back value
+    @redirect_path = user_edit_path(@user)
+
     respond_to do |format|
       if @user.update_attributes(params[:user])
         flash[:notice] = "User '#{@user.name}' was successfully updated"
-        format.html { redirect_back_or_default(@index_path) }
+        format.html { redirect_back_or_default(@redirect_path) }
       else
         format.html { render(:action => 'edit') }
       end

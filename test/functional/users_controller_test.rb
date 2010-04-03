@@ -801,7 +801,7 @@ class UsersControllerTest < ActionController::TestCase
       end
 
       should_respond_with :redirect
-      should_redirect_to('staffs index path') { "/staffs" }
+      should_redirect_to('user edit path') { "/users/#{@provider.id}/edit" }
     end
   end
   
@@ -881,7 +881,7 @@ class UsersControllerTest < ActionController::TestCase
           assert User.authenticate(customer.email_address, 'customer')
         end
 
-        should_redirect_to("customers path") { customers_path }
+        should_redirect_to('user edit path') { "/users/#{@customer.id}/edit" }
       end
 
       context "and change password" do
@@ -895,7 +895,7 @@ class UsersControllerTest < ActionController::TestCase
           assert User.authenticate(customer.email_address, 'secret')
         end
 
-        should_redirect_to("customers path") { customers_path }
+        should_redirect_to('user edit path') { "/users/#{@customer.id}/edit" }
       end
 
       context "and change email" do
