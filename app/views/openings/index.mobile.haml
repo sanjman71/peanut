@@ -26,6 +26,7 @@
 %script{:type => 'text/javascript'}
   var current_user_id = #{logged_in? ? current_user.id : 0};
   var openings_service_name = "#{@service.andand.name}";
+  var openings_path = "#{openings_path}";
   var schedule_path = "#{schedule_path(:provider_type => ':provider_type', :provider_id => ':provider_id', :service_id => @service.andand.id, :duration => @service.andand.duration, :start_at => ':datetime')}";
     
   -# build services hash

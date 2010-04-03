@@ -61,17 +61,34 @@ $.fn.init_openings = function() {
   })
 
   $("a.bookit.confirm").click(function() {
-    // build schedule path
+    // build schedule url
     var datetime  = openings_schedule_date + "T" + openings_schedule_time;
     var url       = schedule_path.replace(/:provider_type\/:provider_id/, openings_provider_key).replace(/:datetime/, datetime);
-    alert(url);
-    
+    var method    = 'post';
+    // add customer id to data hash
+    var data      = {"customer_id":current_user_id};
+
     // hide link, show info
     $(this).closest("ul").hide();
     $(this).closest("div").find(".info").show();
 
-    // post - todo
-    
+    // post request and handle the response
+    $.ajax({
+      type: method,
+      url: url,
+      dataType: 'json',
+      data: data,
+      complete: function(req) {
+        if (req.status == 200) {
+          alert("Your appointment was confirmed.");
+        } else {
+          alert("There was an error confirming your appointment.");
+        }
+        // refresh by going back to openings path
+        window.location = openings_path;
+      }
+    });
+
     return false;
   })
 }
