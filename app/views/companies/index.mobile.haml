@@ -1,0 +1,13 @@
+#home.current
+  .toolbar
+    %h1== #{current_company ? current_company.name : 'Walnut Calendar'}
+    - if logged_in?
+      = link_to 'Logout', logout_path, :class => 'button dissolve', :id => 'logout_button', :target => '_webapp'
+
+  %ul.edgetoedge
+    - @companies.each do |company|
+      %li= link_to company.name, root_path(:subdomain => company.subdomain), :target => '_webapp'
+
+  - if logged_in?
+    .info== Logged in as #{user_login_name(current_user)}
+  

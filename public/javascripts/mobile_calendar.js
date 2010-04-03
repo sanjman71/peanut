@@ -25,6 +25,14 @@ function set_current_provider(provider_name, provider_id, provider_key) {
   $("li.schedule.loading").removeClass('hide');
 }
 
+function clear_current_provider() {
+  current_provider_name = '';
+  current_provider_id = 0;
+  current_provider_key = '';
+  // hide provider menu
+  $("ul#provider_menu").hide();
+}
+
 function reset_provider_schedule_date(date) {
   $("div.schedule_date#provider_schedule_" + date + " ul li.appointment").remove();
   $("div.schedule_date#provider_schedule_" + date + " ul li.capacity").remove();
@@ -32,6 +40,7 @@ function reset_provider_schedule_date(date) {
 }
 
 $.fn.init_schedule_providers = function() {
+  /*
   $("a#pick_provider").bind('tap click', function() {
     if ($(this).attr('provider_id') != current_provider_id) {
       // initialize js variables
@@ -39,6 +48,23 @@ $.fn.init_schedule_providers = function() {
     }
     // pop
     jQT.goBack();
+    return false;
+  })
+  */
+
+  // set state when a new schedule provider is selected
+  $("select#schedule_provider").change(function() {
+    var provider_name = $('select#schedule_provider option:selected').text();
+    var provider_key  = $('select#schedule_provider option:selected').val();
+    var provider_id   = provider_key.split("/")[1];
+
+    if (provider_id == undefined) {
+      // clear provider
+      clear_current_provider();
+    } else {
+      // set new provider
+      set_current_provider(provider_name, provider_id, provider_key);
+    }
     return false;
   })
 

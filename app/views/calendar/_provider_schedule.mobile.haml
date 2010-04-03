@@ -23,8 +23,8 @@
       = link_to 'Back', '#', :class => 'back'
       = link_to 'Home', '#home', :class => 'button'
 
-    %ul.edgetoedge
-      %li{:style => 'background: #333; color: #fff; border: none;'}== Schedule for #{day.to_s(:appt_day_short)}
+    %ul.edgetoedge.header
+      %li.header== Schedule for #{day.to_s(:appt_day_short)}
 
     %ul.edgetoedge.schedule
 

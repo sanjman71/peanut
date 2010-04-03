@@ -16,6 +16,7 @@ class CompaniesController < ApplicationController
     respond_to do |format|
       # use home layout when listing all companies
       format.html { render :action => :index, :layout => 'home' }
+      format.mobile
     end
   end
   

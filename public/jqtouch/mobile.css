@@ -6,8 +6,10 @@ body > *                              { background: -webkit-gradient(linear, 0% 
 .toolbar                              { background: #333; }
 
 ul, ul.edgetoedge                     { color: #fff; border: 1px solid #fff; }
+ul.edgetoedge.header                  { background: #aaa; color: #fff; border: none; }
+
 ul li, ul.edgetoedge li               { background: #fff; color: #333; border-top: 0; border-bottom: 2px solid #ddd; }
-ul li.header                          { background: #aaa; color: #fff; }
+ul li.header                          { background: #aaa; color: #fff; border: none; }
 
 /*
 ul li.arrow                     { background-image: url(themes/jqt/img/chevron.png), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#fff)); }
@@ -22,7 +24,8 @@ ul li a.active, ul li a.button        { background: #111; color: #fff; }
 ul.individual li                      { background: #fff; color: #333; border-left: none; border-right: none;}
 
 ul.individual li.bookit_confirm       { background: #ff6600; color: #fff; border: none; }
-ul.individual li.add_work_confirm, ul.individual li.add_work     { background: #ff6600; color: #fff; border: none; }
+ul.individual li.add_work_confirm, ul.individual li.add_work
+                                      { background: #ff6600; color: #fff; border: none; }
 
 /* schedule styles */
 ul.schedule li                        { border-left: 3px solid #FFF; }

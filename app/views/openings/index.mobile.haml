@@ -4,7 +4,7 @@
   .toolbar
     %h1== #{current_company.name} Openings
     = link_to 'Search', "#search", :class => 'button dissolve', :id => 'search_button'
-    = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
+    = link_to 'Menu', root_path, :class => 'back', :target => '_webapp'
 
   - if @daterange and @daterange.days == 1
     -# show providers
@@ -15,7 +15,7 @@
 
 - if @daterange
   -# initialize provider capacity slots
-  = render(:partial => "openings/provider_capacity_slots", |
+  = render(:partial => "openings/free_provider_capacity_slots", |
            :locals => {:capacity_slot_index => @free_capacity_slot_by_providers, :service => @service, :provider => @provider, :day => @daterange.start_at}) |
   -# initialize provider bookit
   = render(:partial => "openings/provider_bookit")

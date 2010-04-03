@@ -5,8 +5,8 @@
       %h1== #{provider.name} Openings
       = link_to 'Search', "#search", :class => 'button dissolve', :id => 'search_button'
       = link_to 'Back', '#', :class => 'back'
-  
-    %ul.edgetoedge
+
+    %ul.edgetoedge.header
       %li.header.date== #{day.to_s(:appt_day_short)}
 
     -# collect all provider slot times for this date

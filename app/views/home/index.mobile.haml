@@ -2,23 +2,31 @@
   .toolbar
     %h1== #{current_company ? current_company.name : 'Walnut Calendar'}
     - if logged_in?
-      = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
+      = link_to 'Logout', logout_path, :class => 'button dissolve', :id => 'logout_button'
+    - else
+      = link_to 'Login', '#login', :class => 'button dissolve', :id => 'login_button'
 
   - if !logged_in?
-    -# non-authenticated are required to login
-    %ul.plastic
-      %li.arrow= link_to 'Login', '#login', :class => 'dissolve'
+    -# non-authenticated users must login
   - else
     - if current_company
       -# authenticated company users see the main menu
       %ul.edgetoedge#menu
-        %li.arrow= link_to "Openings", openings_path, :target => '_webapp'
+        %li= link_to "Openings", openings_path, :target => '_webapp'
         - if has_privilege?('read calendars', current_company)
-          %li.arrow= link_to "Schedules", calendars_path, :target => '_webapp'
+          %li= link_to "Schedules", calendars_path, :target => '_webapp'
+        - if has_privilege?('manage site')
+          %li= link_to 'Console', root_path(:subdomain => 'www'), :target => '_webapp'
     - else
-      -# authenticated user needs to find their company subdomain
-      %ul.edgetoedge#menu
-        %li== Please try navigating directly to your company's mobile website
+      - if has_privilege?('manage site')
+        -# special admin links
+        %ul.edgetoedge#menu
+          %li= link_to 'Companies', companies_path
+      - else
+        -# authenticated user needs to find their company subdomain
+        %ul.edgetoedge#menu
+          %li== Please go directly to your company's website
+          %li== e.g. http://widgets.walnutcalendar.com
 
   - if logged_in?
     .info== Logged in as #{user_login_name(current_user)}

@@ -4,15 +4,13 @@
   .toolbar
     %h1== #{current_company.name} Calendar
     = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
-    = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
-  %ul.edgetoedge
-    %li.arrow= link_to "Select a Provider", '#providers', :class => 'dissolve', :id => 'provider_name'
-
-  %ul.edgetoedge
-    %li.sep
+    = link_to 'Menu', root_path, :class => 'back', :target => '_webapp'
+  %ul.edgetoedge{:style => 'margin-bottom: 10px;'}
+    %li= select_tag 'schedule_provider', options_for_select([['Select a Provider', 0]] + @providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]})
+    -#%li.arrow= link_to "Select a Provider", '#providers', :class => 'dissolve', :id => 'provider_name'
 
   %ul.edgetoedge.hide#provider_menu
-    %li.test.arrow= link_to 'Schedule', '#provider_schedule', :class => 'dissolve'
+    %li.arrow= link_to 'Schedule', '#provider_schedule', :class => 'dissolve'
 
   .info== Logged in as #{user_login_name(current_user)}
 

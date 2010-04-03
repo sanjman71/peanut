@@ -6,7 +6,7 @@
     = stylesheet_link_tag "/jqtouch/jqtouch.min.css", "/jqtouch/themes/jqt/theme.min.css", "/jqtouch/mobile.css"
     = yield :stylesheet
     = javascript_tag "var AUTH_TOKEN = #{form_authenticity_token.inspect};" if protect_against_forgery?
-    = javascript_include_tag "/jqtouch/jquery.1.3.2.min.js", "/jqtouch/jqtouch.min.js", "jquery.autocomplete", "peanut.js", "/jqtouch/mobile.js"
+    = javascript_include_tag "/jqtouch/jquery.1.3.2.min.js", "/jqtouch/jqtouch.min.js", "jquery.autocomplete", "peanut.js", "mobile.js"
     = yield :javascript
     = yield :head
 
