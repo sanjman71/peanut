@@ -187,10 +187,11 @@ ActionController::Routing::Routes.draw do |map|
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_providers  '/reports/range/:start_date..:end_date/:state/providers/:provider_ids',
-                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :provider_ids => /\d(,\d)*/
+                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :provider_ids => /\d+(,\d+)*/
   map.report_services   '/reports/range/:start_date..:end_date/:state/services/:service_ids',
-                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :service_ids => /\d(,\d)*/
-  map.report_range      '/reports/range/:start_date..:end_date/:state', :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/
+                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/, :service_ids => /\d+(,\d+)*/
+  map.report_range      '/reports/range/:start_date..:end_date/:state', 
+                        :controller => 'reports', :action => 'show', :state => /all|confirmed|canceled|completed|noshow/
   
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
