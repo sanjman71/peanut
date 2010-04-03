@@ -1,3 +1,5 @@
-RAILS_DEFAULT_LOGGER.debug("[mobile] index.mobile.rjs")
-
+# show and fill in search results
+page["li#customer_search_results"].removeClass('hide')
 page["li#customer_search_results"].html(render(:partial => 'customers/customers.mobile.haml', :locals => {:customers => @customers}))
+# hide search progress
+page["li#customer_search_progress"].addClass('hide')

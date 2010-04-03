@@ -37,11 +37,10 @@ class OpeningsController < ApplicationController
     if current_company.providers_count == 0 or current_company.work_services_count == 0
       redirect_to(setup_company_path(current_company)) and return
     end
-    
+
     # find services collection for the current company; valid services must have at least 1 service provider
-    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
-    @services = Array(current_company.services.with_providers.work)
-    
+    @services = current_company.services.with_providers.work
+
     if @services.empty?
       # there are no services with any service providers
       redirect_to(setup_company_path(current_company)) and return
@@ -101,7 +100,7 @@ class OpeningsController < ApplicationController
     
     # build providers collection, which are restricted by the services they perform
     @providers = @service.providers
-    
+
     # build service providers collection mapping services to providers
     @sps = @services.inject([]) do |array, service|
       service.providers.each do |provider|
@@ -109,9 +108,16 @@ class OpeningsController < ApplicationController
       end
       array
     end
-    
+
     # add the 'nothing' service to the services collection
-    @services     = Array(Service.nothing(:name => "Select a service")) + @services
+    @services = Array(Service.nothing(:name => "Select a service")) + @services
+
+    if mobile_device?
+      # map services to providers and providers to services
+      @sps, @ps = build_service_provider_mappings(@services)
+      # build search when daterange, starting with tomorrow for 2 weeks
+      @when = DateRange.parse_when('next 2 weeks', :start_date => (Time.zone.now+1.day))
+    end
 
     if @daterange.blank?
       # reset reschedule id based on params
@@ -128,14 +134,20 @@ class OpeningsController < ApplicationController
         
     logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
     
+    if mobile_device?
+      # index capacity slots by provider
+      @free_capacity_slot_by_providers = @free_capacity_slots.group_by { |slot| slot.provider }.each_with_object(Hash[]) do |tuple, hash|
+        # tuple[0] is the provider, tuple[1] is a capacity slot array
+        hash[tuple[0]] = tuple[1]
+        hash
+      end
+    end
+
     # build hash of calendar markings
     # @calendar_markings  = build_calendar_markings_from_slots(@free_capacity_slots)
 
     # use an empty calendar markings hash, and mark the calendar using the free_capacity_slots_by_day hash using javascript
     @calendar_markings  = Hash[]
-
-    # logger.debug("*** calendar markings: #{@calendar_markings.inspect}")
-    # logger.debug("*** free cap slots by day: #{@free_capacity_slots_by_day.inspect}")
 
     # initialize customer
     @customer = current_user || nil
@@ -155,6 +167,7 @@ class OpeningsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
+      format.mobile
     end
   end
 
@@ -189,12 +202,13 @@ class OpeningsController < ApplicationController
       provider_type, provider_id = provider.split('/')
     end
 
-    # build redirect path
-    @redirect_path = url_for(params.update(:subdomain => current_subdomain, :action => 'index', :provider_type => provider_type, :provider_id => provider_id))
+    # build redirect path, set format to nil explicity in case its a mobile request where format is set to 'mobile'
+    @redirect_path = url_for(params.merge(:action => 'index', :provider_type => provider_type, :provider_id => provider_id, :format => nil))
 
     respond_to do |format|
       format.html  { redirect_to(@redirect_path) }
-      format.js
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+      format.mobile  { render(:json => Hash[:redirect => @redirect_path].to_json) }
     end
   end
   

@@ -1,19 +1,21 @@
--# add schedule with links to dates
+-# add schedule links to dates
 #provider_schedule
   .toolbar
     %h1== Provider Schedule
     = link_to 'Back', '#', :class => 'back'
     = link_to 'Home', '#home', :class => 'button'
 
-  %ul.plastic
+  %ul.edgetoedge.schedule
+    %li.schedule.loading== Retrieving Schedule ...
     - daterange.each do |day|
       - day_name = (day == today) ? 'Today' : day.to_s(:appt_day_short)
-      %li.arrow= link_to day_name, "#provider_schedule_#{day.to_s(:appt_schedule_day)}"
+      - href = "#provider_schedule_#{day.to_s(:appt_schedule_day)}"
+      %li.schedule.link.hide.arrow{:id => day.to_s(:appt_schedule_day)}= link_to day_name, href, :class => 'dissolve', :disabled => 'disabled'
 
   -# info reset on page load
   .info== Provider Schedule
 
--# add specific dates
+-# add schedule date info
 - daterange.each do |day|
   %div.schedule_date{:id => "provider_schedule_#{day.to_s(:appt_schedule_day)}", :date => day.to_s(:appt_schedule_day)}
     .toolbar
@@ -22,14 +24,13 @@
       = link_to 'Home', '#home', :class => 'button'
 
     %ul.edgetoedge
-      %li== Schedule for #{day.to_s(:appt_day_short)}
+      %li{:style => 'background: #333; color: #fff; border: none;'}== Schedule for #{day.to_s(:appt_day_short)}
 
-    %ul.plastic.schedule
-      %li.loading== Loading Schedule ...
+    %ul.edgetoedge.schedule
 
     -# add privilege checks later
     %ul.individual
-      %li.arrow= link_to 'Add Appointment', "#add_work_appointment"
+      %li.add_work= link_to 'Add Appointment', "#add_work_appointment", :class => 'dissolve'
 
     -# info reset on page load
     .info== Provider Schedule

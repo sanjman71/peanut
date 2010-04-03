@@ -1,2 +1,6 @@
-- collection = [["Select Customer", '']] + customers.collect{ |c| [c.name, c.id] }
+- if customers.empty?
+  -# no customer matches found
+  - collection = [["No Customers Found", '']] + customers.collect{ |c| [c.name, c.id] }
+- else
+  - collection = [["Select Customer", '']] + customers.collect{ |c| [c.name, c.id] }
 = select_tag 'customer_id', options_for_select(collection, nil), :placeholder => ''

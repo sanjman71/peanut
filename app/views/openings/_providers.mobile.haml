@@ -1,0 +1,14 @@
+%ul.edgetoedge
+  - if capacity_slot_index.keys.empty?
+    %li== No Openings on #{day.to_s(:appt_day_short)}
+    %li= link_to "Please try again with another date", "#search"
+  - else
+    %li.header== #{service.name} Openings on #{day.to_s(:appt_day_short)}
+
+- unless capacity_slot_index.keys.empty?
+  %ul.edgetoedge
+    -# show providers, sorted by name
+    - capacity_slot_index.keys.sort_by(&:name).each do |provider|
+      %li.arrow= link_to provider.name, "#provider_#{provider.id}_openings", :class => 'dissolve', :id => 'pick_provider', |
+                                        :provider_id => provider.id, :provider_key => "#{provider.tableize}/#{provider.id}" |
+

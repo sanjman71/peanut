@@ -172,6 +172,25 @@ class ApplicationController < ActionController::Base
     remove_url_params(s) + "?" + array.join("&")
   end
 
+  def build_service_provider_mappings(services)
+    @service_providers  = Hash[]
+    @provider_services  = Hash.new([])
+
+    services.each do |service|
+      providers = service.providers
+      # map service to all providers who provide the service
+      @service_providers[service.id] = providers.inject([]) do |array, provider|
+        array.push(Hash[:id => provider.id, :name => provider.name, :klass => provider.tableize])
+        # add service info to provider service mapping
+        provider_key = "#{provider.tableize}/#{provider.id}"
+        @provider_services[provider_key] += [Hash[:id => service.id, :name => service.name]]
+        array
+      end
+    end
+
+    [@service_providers, @provider_services]
+  end
+
   private
   
   # Initialize the current company and all related parameters (e.g. locations, time zone, ...)

@@ -1,12 +1,54 @@
+- javascript('mobile_openings')
+
 #home.current
   .toolbar
-    %h1== #{current_company.name} Calendar
-    = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
+    %h1== #{current_company.name} Openings
+    = link_to 'Search', "#search", :class => 'button dissolve', :id => 'search_button'
     = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
-  %ul.plastic
-    %li.arrow= link_to "Search", '#openings_search', :class => 'flip'
+
+  - if @daterange and @daterange.days == 1
+    -# show providers
+    = render(:partial => "openings/providers", |
+             :locals => {:capacity_slot_index => @free_capacity_slot_by_providers, :service => @service, :provider => @provider, :day => @daterange.start_at}) |
 
   .info== Logged in as #{user_login_name(current_user)}
 
+- if @daterange
+  -# initialize provider capacity slots
+  = render(:partial => "openings/provider_capacity_slots", |
+           :locals => {:capacity_slot_index => @free_capacity_slot_by_providers, :service => @service, :provider => @provider, :day => @daterange.start_at}) |
+  -# initialize provider bookit
+  = render(:partial => "openings/provider_bookit")
+
+-# openings search form
+= render(:partial => 'openings/search')
+
 %script{:type => 'text/javascript'}
   var current_user_id = #{logged_in? ? current_user.id : 0};
+  var openings_service_name = "#{@service.andand.name}";
+  var schedule_path = "#{schedule_path(:provider_type => ':provider_type', :provider_id => ':provider_id', :service_id => @service.andand.id, :duration => @service.andand.duration, :start_at => ':datetime')}";
+    
+  -# build services hash
+  var services = new Hash();
+  - @services.each do |service|
+    services.put(#{service.id}, new Hash({"duration_custom"  : #{service.allow_custom_duration ? 1 : 0}, |
+                                          "duration_words"   : "#{Duration.to_words(service.duration, :prepend => 'Typically')}", |
+                                          "duration_seconds" : #{service.duration}, |
+                                          })) |
+
+  -# build service providers hash
+  var service_providers = new Hash();
+  - @sps.keys.each do |service_id|
+    var array = new Array();
+    - @sps[service_id].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}", "#{hash[:klass]}"])
+    service_providers.put(#{service_id}, array)
+
+  -# build provider services hash
+  var provider_services = new Hash();
+  - @ps.keys.each do |provider_key|
+    var array = new Array();
+    - @ps[provider_key].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}"])
+    provider_services.put("#{provider_key}", array)
+  

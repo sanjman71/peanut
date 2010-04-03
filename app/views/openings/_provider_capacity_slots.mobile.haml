@@ -1,0 +1,24 @@
+-# show each providers' capacity slots
+- capacity_slot_index.keys.each do |provider|
+  %div{:id => "provider_#{provider.id}_openings"}
+    .toolbar
+      %h1== #{provider.name} Openings
+      = link_to 'Search', "#search", :class => 'button dissolve', :id => 'search_button'
+      = link_to 'Back', '#', :class => 'back'
+  
+    %ul.edgetoedge
+      %li.header.date== #{day.to_s(:appt_day_short)}
+
+    -# collect all provider slot times for this date
+    - slots = capacity_slot_index[provider]
+    - slot_start_times = slots.inject([]) do |array, slot|
+      - array += free_slot_possible_start_times(slot, service.duration, :appt_start_minutes => current_company.preferences[:appt_start_minutes])
+      - array
+
+    %ul.edgetoedge{:id => day.to_s(:appt_schedule_day)}
+      - slot_start_times.each do |slot_start_time|
+        %li= link_to "#{slot_start_time[:time_12]} #{slot_start_time[:time_ampm]}", "#provider_bookit", :class => 'bookit prepare dissolve', |
+                     :time => "#{slot_start_time[:time_24]}" |
+        
+    .info== Logged in as #{user_login_name(current_user)}
+  

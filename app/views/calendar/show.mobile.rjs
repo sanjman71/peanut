@@ -1,18 +1,36 @@
-@stuff_by_day.each do |day, stuff|
-  # fill in days with stuff
-  page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul.schedule"].append(render(:partial => 'calendar/show_day_stuff.mobile.haml',
-                                                                                          :locals => {:day => day, :stuff => stuff}))
-  # hide loading indicator
-  page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul li.loading"].hide()
+# hide loading indicator
+page["li.schedule.loading"].addClass('hide')
+
+@days_with_work_free_stuff.each do |day|
+  unless @capacity_and_work_by_day[day].blank?
+    # fill in days with stuff
+    page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul.schedule"].append(render(:partial => 'calendar/show_day_stuff.mobile.haml',
+                                                                                            :locals => {:day => day, :stuff => @capacity_and_work_by_day[day]}))
+    # hide loading indicator
+    # page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul li.loading"].hide()
+
+    if @capacity_and_work_by_day[day].select{ |o| o.is_a?(Appointment) }.size > 0
+      # add class indicating date has work/free stuff
+      page["li.schedule.link##{day.to_s(:appt_schedule_day)}"].removeClass('hide').addClass("work")
+    end
+
+    if @capacity_and_work_by_day[day].select{ |o| o.is_a?(CapacitySlot) }.size > 0
+      # add class indicating date has work/free stuff
+      page["li.schedule.link##{day.to_s(:appt_schedule_day)}"].removeClass('hide').addClass("free")
+    end
+  end
 end
 
 # check for empty days
 @daterange.each do |day|
-  if @stuff_by_day[day].blank?
+  unless @days_with_work_free_stuff.include?(day.in_time_zone.beginning_of_day)
     page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul.schedule"].append(render(:partial => 'calendar/show_day_stuff.mobile.haml',
                                                                                             :locals => {:day => day, :stuff => {}}))
     # hide loading indicator
-    page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul li.loading"].hide()
+    # page["div#provider_schedule_#{day.to_s(:appt_schedule_day)} ul li.loading"].hide()
+
+    # add class indicating date is empty
+    page["li.schedule.link##{day.to_s(:appt_schedule_day)}"].removeClass('hide').addClass("empty")
   end
 end
   

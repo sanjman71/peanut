@@ -3,6 +3,6 @@
     %h1== Pick a Provider
     = link_to 'Back', '#', :class => 'back'
 
-  %ul.plastic
+  %ul.edgetoedge
     - providers.each do |provider|
-      %li= link_to provider.name, '#back', :id => 'pick_provider', :provider_id => provider.id
+      %li= link_to provider.name, '#back', :id => 'pick_provider', :provider_id => provider.id, :provider_key => "#{provider.tableize}/#{provider.id}"

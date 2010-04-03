@@ -1,16 +1,18 @@
+- javascript('mobile_calendar')
+
 #home.current
   .toolbar
     %h1== #{current_company.name} Calendar
     = link_to 'Logout', logout_path, :class => 'button slideup', :id => 'logout_button', :target => '_webapp'
     = link_to 'Home', root_path, :class => 'back', :target => '_webapp'
-  %ul.plastic
-    %li.arrow= link_to "Select a Provider", '#providers', :class => 'flip', :id => 'provider_name'
+  %ul.edgetoedge
+    %li.arrow= link_to "Select a Provider", '#providers', :class => 'dissolve', :id => 'provider_name'
 
   %ul.edgetoedge
     %li.sep
 
-  %ul.plastic.hide#provider_menu
-    %li.arrow= link_to 'Schedule', '#provider_schedule'
+  %ul.edgetoedge.hide#provider_menu
+    %li.test.arrow= link_to 'Schedule', '#provider_schedule', :class => 'dissolve'
 
   .info== Logged in as #{user_login_name(current_user)}
 
@@ -26,4 +28,32 @@
   = render(:partial => 'calendar/add_work_appointment', :locals => {:services => @services})
 
 %script{:type => 'text/javascript'}
-  var current_user_id = #{logged_in? ? current_user.id : 0};
+  var current_user_id     = #{logged_in? ? current_user.id : 0};
+  var current_start_date  = "#{@daterange.start_at.to_s(:appt_schedule_day)}";
+  var current_end_date    = "#{@daterange.end_at.to_s(:appt_schedule_day)}";
+  var calendars_path      = "#{calendars_path}";
+
+  -# build services hash
+  var services = new Hash();
+  - @services.each do |service|
+    services.put(#{service.id}, new Hash({"duration_custom"  : #{service.allow_custom_duration ? 1 : 0}, |
+                                          "duration_words"   : "#{Duration.to_words(service.duration, :prepend => 'Typically')}", |
+                                          "duration_seconds" : #{service.duration}, |
+                                          })) |
+
+  -# build service providers hash
+  var service_providers = new Hash();
+  - @sps.keys.each do |service_id|
+    var array = new Array();
+    - @sps[service_id].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}", "#{hash[:klass]}"])
+    service_providers.put(#{service_id}, array)
+
+  -# build provider services hash
+  var provider_services = new Hash();
+  - @ps.keys.each do |provider_key|
+    var array = new Array();
+    - @ps[provider_key].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}"])
+    provider_services.put("#{provider_key}", array)
+    

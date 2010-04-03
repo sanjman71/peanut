@@ -1,0 +1,18 @@
+#search
+  .toolbar
+    %h1== Openings Search
+    = link_to 'Back', '#', :class => 'back'
+    = link_to 'Back', '#', :class => 'back'
+
+  - form_tag(search_openings_path, :id => 'search_openings_form', :target => '_webapp') do
+    %ul.edgetoedge
+      %li= select_tag 'service_id', options_for_select(@services.collect {|s| [s.name, s.id]}), :placeholder => 'Pick a service'
+      %li= text_field_tag 'duration_words', '', :disabled => true
+      %li.hide.duration.change= select_tag 'duration', options_for_select(service_duration_select_options, nil), :placeholder => 'Duration'
+      %li= select_tag 'provider', options_for_select([]), :placeholder => 'With', :class => 'anyone'
+      %li= select_tag 'start_date', options_for_select(@when.collect{ |s| [s.to_s(:appt_day_short), s.to_s(:appt_datepicker_date)]}), :placeholder => 'Select a Date'
+      -# submit
+      = link_to "Search", '', :class => 'grayButton submit'
+      
+  .info.hide== Searching ...
+

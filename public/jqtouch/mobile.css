@@ -1,8 +1,50 @@
+/* theme */
+
+body                                  { background: #fff; color: #ddd; }
+body > *                              { background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#ccc)); }
+
+.toolbar                              { background: #333; }
+
+ul, ul.edgetoedge                     { color: #fff; border: 1px solid #fff; }
+ul li, ul.edgetoedge li               { background: #fff; color: #333; border-top: 0; border-bottom: 2px solid #ddd; }
+ul li.header                          { background: #aaa; color: #fff; }
+
+/*
+ul li.arrow                     { background-image: url(themes/jqt/img/chevron.png), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#fff)); }
+*/
+
+ul li.arrow                           { background-image: none; }
+
+ul li a                               { color: #111; }
+ul li a.admin                         { color: #00F; }
+ul li a.active, ul li a.button        { background: #111; color: #fff; }
+
+ul.individual li                      { background: #fff; color: #333; border-left: none; border-right: none;}
+
+ul.individual li.bookit_confirm       { background: #ff6600; color: #fff; border: none; }
+ul.individual li.add_work_confirm, ul.individual li.add_work     { background: #ff6600; color: #fff; border: none; }
+
+/* schedule styles */
+ul.schedule li                        { border-left: 3px solid #FFF; }
+ul.schedule li.loading                { border-left: none; background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#eee)); }
+ul.schedule li.work                   { border-left: 3px solid #FF6600; }
+ul.schedule li.free                   { border-left: 3px solid #009900; }
+ul.schedule li.free.work              { border-left: 3px solid #333; }
+ul.schedule li.empty                  { border-left: 3px solid #FFF; }
+
+ul.schedule li.appointment.work       { border-left: 3px solid #FF6600; }
+ul.schedule li.capacity.free          { border-left: 3px solid #009900; }
+ul.schedule li.capacity.overbooked    { border-left: 3px solid #FF6600; }
+
+/* form styles */
+
 form#login_form                                           { margin: 0 10px 10px 10px; }
 form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
 
 form#add_work_appointment_form                            { margin: 0 10px 10px 10px; }
 form#add_work_appointment_form a.submit                   { color: rgba(0,0,0,0.9); }
+
+/* general styles */
 
 .hide                                                     { display: none; }
 
@@ -10,4 +52,3 @@ ul.edgetoedge.center                                      { text-align: center; 
 
 ul li select                                              { padding-left: 7px; }
 ul li.loading                                             { color: #ddd; }
-ul li h4.time                                             { color: #ccc; }

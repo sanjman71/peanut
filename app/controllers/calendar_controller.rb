@@ -16,7 +16,10 @@ class CalendarController < ApplicationController
     if mobile_device?
       # show index page for mobile devices
       @providers  = current_company.providers
-      @services   = Array(current_company.services.with_providers.work)
+      @services   = current_company.services.with_providers.work
+      # map services to providers and providers to services
+      @sps, @ps   = build_service_provider_mappings(@services)
+
       @daterange  = DateRange.parse_when('next 7 days', :include => :today)
       @today      = DateRange.today.beginning_of_day
       render(:action => :index) and return
@@ -35,8 +38,7 @@ class CalendarController < ApplicationController
       if provider.blank?
         redirect_to root_path(:subdomain => current_subdomain) and return
       end
-      url_params  = {:action => 'show', :provider_type => provider.tableize, :provider_id => provider.id, :subdomain => current_subdomain}
-      redirect_to url_for(url_params) and return
+      redirect_to calendar_show_path(:provider_type => provider.tableize, :provider_id => provider.id) and return
     end
   end
   
@@ -54,8 +56,7 @@ class CalendarController < ApplicationController
     session[:provider_id]    = @provider.id.to_i
 
     # find services collection for the current company; valid services must have at least 1 service provider
-    # Note: we need to explicity convert to an array because there is a naming conflict with NamedScope here
-    @services = Array(current_company.services.with_providers.work)
+    @services = current_company.services.with_providers.work
 
     # build service providers collection mapping services to providers
     # This is used for the javascript in some of the appointment create/edit dialogs - same as in openings controller
@@ -130,9 +131,12 @@ class CalendarController < ApplicationController
     # group waitlists by day
     @waitlists_by_day         = @waitlists.group_by { |waitlist, date, time_range| date }
 
-    # find days with appointments
+    # find days with some type of activity
     @days_with_stuff          = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys + @waitlists_by_day.keys +
                                  @canceled_by_day.keys + @vacation_by_day.keys).uniq.sort
+
+    # find days with work, free activity - used by mobile version
+    @days_with_work_free_stuff = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys).uniq.sort
 
     # group appointments and waitlists by day, appointments before waitlists for any given day
     # @day_keys         = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys + @waitlists_by_day.keys +

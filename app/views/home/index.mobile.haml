@@ -11,13 +11,13 @@
   - else
     - if current_company
       -# authenticated company users see the main menu
-      %ul.plastic#menu
+      %ul.edgetoedge#menu
+        %li.arrow= link_to "Openings", openings_path, :target => '_webapp'
         - if has_privilege?('read calendars', current_company)
           %li.arrow= link_to "Schedules", calendars_path, :target => '_webapp'
-        %li.arrow= link_to "Openings", openings_path, :target => '_webapp'
     - else
       -# authenticated user needs to find their company subdomain
-      %ul.plastic#menu
+      %ul.edgetoedge#menu
         %li== Please try navigating directly to your company's mobile website
 
   - if logged_in?
