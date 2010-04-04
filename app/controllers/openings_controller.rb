@@ -127,11 +127,11 @@ class OpeningsController < ApplicationController
       return
     end
 
-    # find free appointments, group by day (use appt utc time)
+    # find free appointments, group by day using appt start_at in the local time zone
     @free_capacity_slots        = AppointmentScheduler.find_free_capacity_slots(current_company, current_location,
                                                                                 @provider, @service, @duration, @daterange)
-    @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.utc.beginning_of_day }
-        
+    @free_capacity_slots_by_day = @free_capacity_slots.group_by { |appt| appt.start_at.in_time_zone.beginning_of_day }
+
     logger.debug("*** found #{@free_capacity_slots.size} free capacity slots over #{@daterange.days} days")
     
     if mobile_device?
