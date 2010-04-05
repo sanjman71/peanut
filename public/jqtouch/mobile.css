@@ -8,7 +8,7 @@ body > *                              { background: -webkit-gradient(linear, 0% 
 ul, ul.edgetoedge                     { color: #fff; border: 1px solid #fff; }
 ul.edgetoedge.header                  { background: #444; color: #fff; border: none; }
 
-ul li, ul.edgetoedge li               { background: #fff; color: #333; border-top: 0; border-bottom: 2px solid #ddd; }
+ul li, ul.edgetoedge li               { background: #fff; color: #333; border-top: 0; border-bottom: 2px solid #ddd; font-size: 15px; }
 ul li.header                          { background: #444; color: #fff; border: none; }
 
 /*
