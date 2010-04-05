@@ -27,6 +27,10 @@ ul.individual li.bookit_confirm       { background: #E36627; color: #fff; border
 ul.individual li.add_work_confirm, ul.individual li.add_work
                                       { background: #E36627; color: #fff; border: none; }
 
+
+ul li select                          { color: #F27490; }
+ul li input#live_search_for_customers { color: #111; }
+
 /* schedule styles */
 ul.schedule li                        { border-left: 3px solid #FFF; }
 ul.schedule li.loading                { border-left: none; background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#eee)); }
@@ -45,7 +49,6 @@ form#login_form                                           { margin: 0 10px 10px 
 form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
 
 form#add_work_appointment_form                            { margin: 0 10px 10px 10px; }
-form#add_work_appointment_form a.submit                   { color: rgba(0,0,0,0.9); }
 
 /* general styles */
 

@@ -1,3 +1,5 @@
+var current_service_id = 0;
+
 $.fn.init_provider_services = function(select_id, provider_key) {
   // remove all services
   $(select_id).removeOption(/./);
@@ -11,6 +13,18 @@ $.fn.init_provider_services = function(select_id, provider_key) {
   })
 }
 
+$.fn.init_service = function() {
+  // find the selected service
+  var service_id = $('select#service_id').val();
+  var service = services.get(service_id);
+
+  // check if its a valid service
+  if (service == undefined) { current_service_id = 0; }
+
+  // set current service id
+  current_service_id = service_id;
+}
+
 $.fn.init_service_providers = function() {
   if ($("select#provider").size() == 0) { return; }
 
@@ -21,12 +35,6 @@ $.fn.init_service_providers = function() {
     var allow_anyone_provider = false;
   }
 
-  // find the selected service
-  var service_id = $('select#service_id').val();
-  var service = services.get(service_id);
-  // check if its a valid service
-  if (service == undefined) { return; }
-
   // remove all providers
   $('select#provider').removeOption(/./);
 
@@ -36,7 +44,7 @@ $.fn.init_service_providers = function() {
 
   // add providers who provide the selected service
   var num_providers = 0;
-  var providers     = service_providers.get(service_id);
+  var providers     = service_providers.get(current_service_id);
 
   $.each(providers, function(index, provider_tuple) {
     // add the provider type and id (e.g. users/3) as the type, and the provider name as the value
@@ -48,7 +56,7 @@ $.fn.init_service_providers = function() {
   })
 
   // add the special 'Anyone' provider iff a service has been selected and the service has 0 or > 1 providers
-  if (service_id != 0 && (num_providers == 0 || num_providers > 1) && allow_anyone_provider)
+  if (current_service_id != 0 && (num_providers == 0 || num_providers > 1) && allow_anyone_provider)
   {
     $('select#provider').addOption(0, "Anyone", 0 == initial_provider_id);
   }
@@ -92,6 +100,7 @@ $.fn.init_service_duration = function() {
 $.fn.init_select_service_change = function() {
   // when a service is selected, set the service provider and the default service duration
   $("select#service_id").change(function() {
+    $(document).init_service();
     $(document).init_service_providers();
     $(document).init_service_duration();
     return false;

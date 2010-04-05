@@ -21,13 +21,13 @@
       %li= text_field_tag 'duration_words', '', :disabled => true
       %li= select_tag 'duration', options_for_select(service_duration_select_options, nil), :placeholder => 'Duration'
       -# search progress field is shown during a customer live search
-      %li.hide#customer_search_progress= text_field_tag "customer_search_progress", '', :autocomplete => "off", :disabled => true, :style => 'color: #09F;'
+      %li.hide#customer_search_progress= text_field_tag "customer_search_progress", '', :autocomplete => "off", :disabled => true
       -# search results field is populated by customer live search
       %li.hide#customer_search_results= select_tag 'customer_id', options_for_select([], nil), :placeholder => 'Search for customers below'
       %li= text_field_tag "customer_search", '', :autocomplete => "off", :id => 'live_search_for_customers', :url => customers_path, |
                                                  :placeholder => "Search using name, phone or email" |
     %ul.individual
-      %li.add_work_confirm= link_to "Add", '', :class => 'whiteButton submit'
+      %li.add_work_confirm= link_to "Add", '', :class => 'submit'
 
     .info.hide== Adding ...
       
