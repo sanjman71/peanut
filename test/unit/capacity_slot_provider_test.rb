@@ -1,6 +1,6 @@
 require 'test/test_helper'
 
-class CapacitySlotTest < ActiveSupport::TestCase
+class CapacitySlotProviderTest < ActiveSupport::TestCase
     
   def setup
     # Make sure we know what time zone we're in
@@ -50,15 +50,15 @@ class CapacitySlotTest < ActiveSupport::TestCase
 
   context "create one capacity slot for two different providers" do
     setup do
-      # create free time from 0 to 8 tomorrow for a provider
       @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
+
+      # create free time from 0 to 8 tomorrow for a provider
       @time_range = TimeRange.new({:day => @tomorrow, :start_at => "0000", :end_at => "0800"})
-      @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider1, :time_range => @time_range, :capacity => 4)
+      @free_appt1 = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider1, :time_range => @time_range, :capacity => 4)
 
       # create free time from 8 to 12 tomorrow for provider 2
-      @tomorrow   = Time.zone.now.tomorrow.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range = TimeRange.new({:day => @tomorrow, :start_at => "0800", :end_at => "1200"})
-      @free_appt  = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider2, :time_range => @time_range, :capacity => 4)
+      @free_appt2 = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider2, :time_range => @time_range, :capacity => 4)
     end
 
     should_change("Appointment.count", :by => 2) { Appointment.count }
