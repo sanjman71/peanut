@@ -6,9 +6,7 @@
     - else
       = link_to 'Login', '#login', :class => 'button dissolve', :id => 'login_button'
 
-  - if !logged_in?
-    -# non-authenticated users must login
-  - else
+  - if logged_in?
     - if current_company
       -# authenticated company users see the main menu
       %ul.edgetoedge#menu
@@ -30,6 +28,11 @@
 
   - if logged_in?
     .info== Logged in as #{user_login_name(current_user)}
+  - else
+    .info
+      == Please login to use the mobile site.
+      %p
+      == You can login with your phone number if you added one to your user account.
 
 -# login form
 = render(:partial => 'sessions/login_form')

@@ -191,6 +191,14 @@ class ApplicationController < ActionController::Base
     [@service_providers, @provider_services]
   end
 
+  def login_for_mobile_site
+    if mobile_device?
+      redirect_to(root_path) and return
+    else
+      true
+    end
+  end
+
   private
   
   # Initialize the current company and all related parameters (e.g. locations, time zone, ...)

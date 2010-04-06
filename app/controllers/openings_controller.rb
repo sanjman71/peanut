@@ -1,9 +1,10 @@
 class OpeningsController < ApplicationController
+  before_filter :login_for_mobile_site, :only => [:index]
   before_filter :current_user_should_be_active_state, :only => [:index]
 
   # Handle RecordNotFound exceptions with a redirect
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }
-    
+
   # GET /openings
   # GET /users/1/services/3/3600/openings/this-week/morning
   # GET /services/1/3600/openings/this-week/anytime
