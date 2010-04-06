@@ -11,7 +11,10 @@
     = render(:partial => "openings/providers", |
              :locals => {:capacity_slot_index => @free_capacity_slot_by_providers, :service => @service, :provider => @provider, :day => @daterange.start_at}) |
 
-  .info== Logged in as #{user_login_name(current_user)}
+  - if logged_in?
+    .info== Logged in as #{user_login_name(current_user)}
+  - else
+    .info== Guest
 
 - if @daterange
   -# initialize provider capacity slots
