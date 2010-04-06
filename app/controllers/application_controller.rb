@@ -192,7 +192,8 @@ class ApplicationController < ActionController::Base
   end
 
   def login_for_mobile_site
-    if mobile_device?
+    if mobile_device? and !logged_in?
+      # redirect to root path so user can login
       redirect_to(root_path) and return
     else
       true
