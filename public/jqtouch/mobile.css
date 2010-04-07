@@ -11,6 +11,11 @@ ul.edgetoedge.header                  { background: #444; color: #fff; border: n
 ul li, ul.edgetoedge li               { background: #fff; color: #333; border-top: 0; border-bottom: 2px solid #ddd; font-size: 15px; }
 ul li.header                          { background: #444; color: #fff; border: none; }
 
+ul li input[type="text"], ul li input[type="password"], ul li textarea, ul li select
+                                      { font-size: 15px; color: #F27490; background: none; }
+ul li.disabled                        { background: #eee; color: #fff; }
+ul li.disabled input                  { color: #fff; }
+
 /*
 ul li.arrow                     { background-image: url(themes/jqt/img/chevron.png), -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#fff)); }
 */
@@ -21,6 +26,8 @@ ul li a                               { color: #111; }
 ul li a.admin                         { color: #00F; }
 ul li a.active, ul li a.button        { background: #111; color: #fff; }
 
+/* individual */
+
 ul.individual li                      { background: #fff; color: #333; border-left: none; border-right: none;}
 
 ul.individual li.bookit_confirm       { background: #E36627; color: #fff; border: none; }
@@ -28,10 +35,8 @@ ul.individual li.add_work_confirm, ul.individual li.add_work
                                       { background: #E36627; color: #fff; border: none; }
 
 
-ul li select                          { color: #F27490; }
-ul li input#live_search_for_customers { color: #111; }
-
 /* schedule styles */
+
 ul.schedule li                        { border-left: 3px solid #FFF; }
 ul.schedule li.loading                { border-left: none; background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#eee)); }
 ul.schedule li.work                   { border-left: 3px solid #FF6600; }
@@ -45,10 +50,15 @@ ul.schedule li.capacity.overbooked    { border-left: 3px solid #FF6600; }
 
 /* form styles */
 
-form#login_form                                           { margin: 0 10px 10px 10px; }
-form#login_form a.submit                                  { color: rgba(0,0,0,0.9); }
+form#login_form                       { margin: 0 10px 10px 10px; }
+form#login_form a.submit              { color: rgba(0,0,0,0.9); }
 
-form#add_work_appointment_form                            { margin: 0 10px 10px 10px; }
+form#add_work_appointment_form        { margin: 0 10px 10px 10px; }
+
+/* live search */
+
+ul li input#live_search_for_customers { color: #111; background: none; }
+
 
 /* general styles */
 
