@@ -7,8 +7,6 @@
     %span{:style => 'padding-right: 7px;'}== Total: #{@total_count}
     - @msgs_by_protocol.keys.each do |protocol|
       %span{:style => 'padding-right: 7px;'}== #{protocol.titleize}: #{@msgs_by_protocol[protocol]}
-  %h4
-    = link_to 'New Message', new_message_path, :class => 'admin'
 
 %hr.space
 

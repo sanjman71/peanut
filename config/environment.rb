@@ -79,6 +79,7 @@ Rails::Initializer.run do |config|
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
   config.gem 'curb'
+  config.gem 'twiliolib'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.

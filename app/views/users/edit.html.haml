@@ -80,6 +80,9 @@
             - if phone_form.object.deletable? and (phone_form.object != @primary_phone_number)
               -# allow delete for non-primary phones
               - markers.push(link_to('Delete', user_phone_delete_path(@user, phone_form.object), :method => :delete, :class => 'admin'))
+          - if has_privilege?('manage site') and phone_form.object.name == 'Mobile'
+            -# allow site managers to send sms messages to mobile phones
+            - markers.push(link_to('Send Sms', phone_form.object.address, :id => 'send_sms', :class => 'admin'))
           - unless markers.empty?
             %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
       .span-20.last
@@ -176,5 +179,8 @@
   -# customer notes
   #notes_collection
     = render(:partial => 'notes/notes.html.haml', :locals => {:notes => @notes})
+
+-# sms dialog
+= render(:partial => 'messages/send_message_dialog', :locals => {:sender => current_user})
 
 

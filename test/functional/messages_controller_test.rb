@@ -10,6 +10,7 @@ class MessagesControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
     @user   = Factory(:user)
     @email  = @user.email_addresses.create(:address => "sanjay@walnutindustries.com")
+    @phone  = @user.phone_numbers.create(:address => "6503876818", :name => 'Mobile')
   end
   
   context "create" do
@@ -33,12 +34,11 @@ class MessagesControllerTest < ActionController::TestCase
     #   should_change("delayed job count", :by => 1) { Delayed::Job.count }
     # end
 
-    context "with message address" do
+    context "with message email address" do
       setup do
         @controller.stubs(:current_user).returns(@user)
         post :create,
-             {:message => {:body => "body", :subject => "hi", :sender_id => @user.id, :address => 'sanjay@walnutindustries.com',
-                           :message_recipients_attributes => {"0" => Hash[]}}}
+             {:message => {:body => "body", :subject => "hi", :sender_id => @user.id, :address => 'sanjay@walnutindustries.com'}}
       end
 
       should_assign_to(:sender_id) { @user.id}
@@ -46,6 +46,26 @@ class MessagesControllerTest < ActionController::TestCase
       should_assign_to(:subject) { "hi" }
       should_assign_to(:body) { "body" }
       should_assign_to(:recipients) { [@email] }
+      should_assign_to(:topic) { @company }
+      should_assign_to(:tag) { "message" }
+
+      should_change("message count", :by => 1) { Message.count }
+      should_change("message recipient count", :by => 1) { MessageRecipient.count }
+      should_change("delayed job count", :by => 1) { Delayed::Job.count }
+    end
+
+    context "with message phone address" do
+      setup do
+        @controller.stubs(:current_user).returns(@user)
+        post :create,
+             {:message => {:body => "body", :sender_id => @user.id, :address => '6503876818'}}
+      end
+
+      should_assign_to(:sender_id) { @user.id}
+      should_assign_to(:sender) { @user}
+      should_not_assign_to(:subject)
+      should_assign_to(:body) { "body" }
+      should_assign_to(:recipients) { [@phone] }
       should_assign_to(:topic) { @company }
       should_assign_to(:tag) { "message" }
 

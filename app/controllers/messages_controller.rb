@@ -20,13 +20,6 @@ class MessagesController < ApplicationController
     end
   end
   
-  # GET /messages/new
-  def new
-    respond_to do |format|
-      format.html
-    end
-  end
-  
   # POST /messages
   def create
     @sender_id  = params[:message][:sender_id]
@@ -42,14 +35,15 @@ class MessagesController < ApplicationController
 
     # map address to a messagable
     if @address
-      # map address to a messable
-      @messagable = EmailAddress.find_by_address(@address)
+      # map address to a messagable
+      @messagable = PhoneNumber.phone?(@address) ? PhoneNumber.find_by_address(@address) : EmailAddress.find_by_address(@address)
       @recipients.push(@messagable) if @messagable
     end
 
     if @recipients.empty?
       # message must have at least 1 recipient
       flash[:error] = "Message has no recipients"
+      @redirect_path = request.referer
     else
       @message = MessageCompose.send(@sender, @subject, @body, @recipients, {:topic => @topic, :tag => @tag})
 

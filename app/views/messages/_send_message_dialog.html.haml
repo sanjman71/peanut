@@ -1,0 +1,32 @@
+.span-15.last.dialog.hide#send_message_dialog{:title => 'Send Message'}
+  - message = Message.new
+  - message.message_recipients.build
+  - form_for(message, :url => messages_path, :method => :post, :html => {:id => 'send_message_form'}) do |message_form|
+    = message_form.hidden_field :sender_id, :value => sender.id
+    -# address field
+    .span-15.last.padding-bottom-10#message_address
+      .span-3.padding-top-10.label
+        %h4.bottom.block== To:
+      .span-12.last
+        = text_field_tag "address", '', :name => "message[address]", :class => 'title big required', :id => 'message_address'
+
+    -# message subject
+    .span-15.last.padding-bottom-10#message_subject
+      .span-3.padding-top-10.label
+        %h4.bottom.block== Subject:
+      .span-12.last
+        = message_form.text_field :subject, :class => 'title big', :autocomplete => 'off', :id => 'message_subject'
+
+    -# message body
+    .span-15.last.padding-bottom-10#message_body
+      .span-3.padding-top-10.label
+        %h4.bottom.block== Body:
+      .span-12.last
+        = message_form.text_area :body, :class => 'title big required', :style => 'height: 100px;', :autocomplete => 'off', :id => 'message_body'
+    
+    .span-7.prepend-3.last
+      #submit
+        = submit_tag 'Send', :name => nil, :class => 'big', :id => 'send_message_button'
+      #progress.hide
+        %h3.submitting== Sending ...
+      

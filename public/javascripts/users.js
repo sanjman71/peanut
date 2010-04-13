@@ -273,6 +273,49 @@ $.fn.open_user_login_dialog = function() {
   $("div.dialog#rpx_login_dialog").dialog('open');
 }
 
+$.fn.init_send_message_dialog = function() {
+  // initialize send message dialog
+  $("div#send_message_dialog").dialog({ modal: true, autoOpen: false, width: 600, height: 375, show: 'fadeIn(slow)', title: $("div#send_message_dialog").attr('title') });
+
+  // open dialog when 'add waitlist' link is clicked
+  $("a#send_sms").click(function() {
+    // initialize form
+    var form = $("form#send_message_form");
+
+    // get phone number
+    var phone = $(this).attr('href');
+
+    // set address, hide subject for sms messages
+    $(form).find("input#message_address").val(phone);
+    $(form).find("input#message_address").attr('disabled', 'disabled');
+    $(form).find("div#message_subject").addClass('hide');
+
+    // open dialog
+    $("div.dialog#send_message_dialog").dialog('open');
+
+    return false;
+  })
+
+  $("form#send_message_form").submit(function() {
+    var body            = $(this).find("textarea#message_body").attr('value');
+    var body_required   = $(this).find("textarea#message_body").hasClass('required');
+
+    if (body_required && body == '') {
+      alert("Please enter a message body");
+      return false;
+    }
+
+    // enable address field so it gets serialized
+    $(this).find("input#message_address").attr('disabled', '');
+
+    // show progress text
+    $(this).find("div#submit").hide();
+    $(this).find("div#progress").show();
+
+    return true;
+  })
+}
+
 function check_user_password_fields(id, password_required) {
   // check that password is visible
   if (!$(id).find("input#user_password").is(":visible")) {
@@ -362,4 +405,5 @@ $(document).ready(function() {
   $(document).init_manager_reset_password();
   $(document).init_user_add_dialog();
   $(document).init_user_login_dialog();
+  $(document).init_send_message_dialog();
 })
