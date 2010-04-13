@@ -129,26 +129,27 @@ ActionController::Routing::Routes.draw do |map|
   #               :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
     
   # edit, update and create provider free time, single appointment, block appointments, or weekly recurring appointments
-  map.create_free   ':provider_type/:provider_id/calendar/free',
+  map.create_free   '/:provider_type/:provider_id/calendar/free',
                     :controller => 'appointments', :action => 'create_free', :conditions => {:method => :post}
-  map.update_free   ':provider_type/:provider_id/calendar/:id/free',
+  map.update_free   '/:provider_type/:provider_id/calendar/:id/free',
                     :controller => 'appointments', :action => 'update_free', :conditions => {:method => :post}
 
-  map.new_block     ':provider_type/:provider_id/calendar/block/new', :controller => 'appointments', :action => 'new_block'
-  map.create_block  ':provider_type/:provider_id/calendar/block',
+  map.new_block     '/:provider_type/:provider_id/calendar/block/new', :controller => 'appointments', :action => 'new_block'
+  map.create_block  '/:provider_type/:provider_id/calendar/block',
                     :controller => 'appointments', :action => 'create_block', :conditions => {:method => :post}
 
-  map.new_weekly    ':provider_type/:provider_id/calendar/weekly/new', :controller => 'appointments', :action => 'new_weekly'
-  map.show_weekly   ':provider_type/:provider_id/calendar/weekly', :controller => 'appointments', :action => 'show_weekly',
+  map.new_weekly    '/:provider_type/:provider_id/calendar/weekly/new', :controller => 'appointments', :action => 'new_weekly'
+  map.show_weekly   '/:provider_type/:provider_id/calendar/weekly', :controller => 'appointments', :action => 'show_weekly',
                      :conditions => {:method => :get}
-  map.edit_weekly   ':provider_type/:provider_id/calendar/weekly/:id/edit', :controller => 'appointments', :action => 'edit_weekly'
-  map.create_weekly ':provider_type/:provider_id/calendar/weekly',
+  map.edit_weekly   '/:provider_type/:provider_id/calendar/weekly/:id/edit', :controller => 'appointments', :action => 'edit_weekly'
+  map.create_weekly '/:provider_type/:provider_id/calendar/weekly',
                     :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}
-  map.update_weekly ':provider_type/:provider_id/calendar/:id/weekly',
+  map.update_weekly '/:provider_type/:provider_id/calendar/:id/weekly',
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :put}
 
   # show/edit calendars scoped by provider (and optional format)
-  map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date', :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
+  map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date',
+                            :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
   map.calendar_when         '/:provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
   map.calendar_when_format  '/:provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
   map.calendar_date_range         '/:provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
@@ -184,6 +185,9 @@ ActionController::Routing::Routes.draw do |map|
                                 :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
   map.delete_company_vacation   '/vacation/:id', :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
 
+  # capacity slots
+  map.provider_capacity         '/:provider_type/:provider_id/capacity/:start_time..:end_time', :controller => 'capacity_slots', :action => 'capacity'
+
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
   map.report_providers  '/reports/range/:start_date..:end_date/:state/providers/:provider_ids',
@@ -195,7 +199,7 @@ ActionController::Routing::Routes.draw do |map|
   
   # This allows us to get access to locations without going through their owner, if required.
   # It at least gives us some useful automatic route definitions like edit_location_url etc.
-  map.resources :locations,         :member => {:select => :get}
+  map.resources :locations,     :member => {:select => :get}
 
   # Subscriptions
   map.resources :subscriptions, :member => { :edit_cc => :get, :update_cc => :post }
