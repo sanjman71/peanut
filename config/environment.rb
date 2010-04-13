@@ -62,24 +62,24 @@ Rails::Initializer.run do |config|
   # They can then be installed with "rake gems:install" on new installations.
   config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   config.gem "chronic", :version => '~> 0.2.3'
-  config.gem "crack", :version => "0.1.4" # used by google weather plugin
+  config.gem "crack" # used by google weather plugin
   config.gem "eventfulapi", :lib => false
   config.gem "geokit" 
   config.gem "haml", :version => '2.2.4'
-  config.gem "hpricot", :version => '0.8.1' # required by sanitize, uses native components
+  config.gem "hpricot" # required by sanitize, uses native components
   config.gem "httparty" # used by google weather plugin
   config.gem 'json' # uses native components
   config.gem 'mbleigh-subdomain-fu', :source => "http://gems.github.com", :lib => "subdomain-fu"
-  config.gem 'mechanize', :version => '0.9.3'
+  config.gem 'mechanize'
   config.gem 'mime-types', :lib => false
   config.gem 'mislav-will_paginate', :version => '~> 2.3.6', :lib => 'will_paginate', :source => "http://gems.github.com"
-  config.gem 'prawn', :version => '~> 0.5.1'
+  config.gem 'prawn'
   config.gem 'ri_cal', :version => '~> 0.8.5'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
   config.gem 'curb'
-  
+
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
   # :all can be used as a placeholder for all plugins not explicitly named
@@ -137,23 +137,5 @@ require "#{RAILS_ROOT}/lib/shared/time_calculations.rb"
 # Pull in the serialized_hash functionality
 require "#{RAILS_ROOT}/lib/shared/serialized_hash.rb"
 
-# RPX key
-RPXNow.api_key = "486f794f3a5473f9b5d3b08d1d43c9aa3c7e5872"
-
-# Admin users email collection
-ADMIN_USER_EMAILS  = %w(sanjay@walnutindustries.com killian@walnutindustries.com)
-
-# Auth token
-AUTH_TOKEN_INSTANCE = "5e722026ea70e6e497815ef52f9e73c5ddb8ac26"
-
-# Initialize exception notifier
-# ExceptionNotifier.exception_recipients  = %w(exceptions@walnutindustries.com sanjay@jarna.com)
-# ExceptionNotifier.sender_address        = %("Walnut Calendar Exception" <app@walnutindustries.com>)
-# ExceptionNotifier.email_prefix          = "Walnut Calendar "
-
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
-
-# Application SMTP provider; valid options are :google, :message_pub
-SMTP_PROVIDER = :google
-SMTP_FROM     = "Walnut Messaging <messaging@walnutindustries.com>"

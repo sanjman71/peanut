@@ -7,3 +7,8 @@ ActionMailer::Base.smtp_settings = {
   :user_name => "messaging@walnutindustries.com",
   :password => "1ndus7ry!"
 }
+
+# Application SMTP provider; valid options are :google, :message_pub
+SMTP_PROVIDER = :google
+SMTP_FROM     = "Walnut Messaging <messaging@walnutindustries.com>"
+
