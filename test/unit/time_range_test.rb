@@ -280,9 +280,9 @@ class TimeRangeTest < ActiveSupport::TestCase
       @time_range = TimeRange.new(:day => @today, :start_at => "2000", :end_at => "2200")
     end
   
-    should "have correct time_start_at and time_end_at" do
-      assert_equal (20.hours - Time.zone.utc_offset) % 24.hours, @time_range.time_start_at_utc
-      assert_equal (22.hours - Time.zone.utc_offset) % 24.hours, @time_range.time_end_at_utc
+    should "have correct time_start_at and time_end_at as local time" do
+      assert_equal 20 * 3600, @time_range.time_start_at
+      assert_equal 22 * 3600, @time_range.time_end_at
     end
   
   end

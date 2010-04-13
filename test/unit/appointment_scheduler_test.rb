@@ -769,7 +769,7 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       should "have apointment day 1 for the entire day" do
         @vacation1 = @vacations[0]
         # should have duration for entire day
-        assert_equal 86399, @vacation1.duration
+        assert_equal 86400, @vacation1.duration
       end
 
       should "have apointment day 2 for the entire day" do
@@ -796,13 +796,13 @@ class AppointmentSchedulerTest < ActiveSupport::TestCase
       should "have apointment day 1 for the entire day" do
         @vacation1 = @vacations[0]
         # should have duration for entire day
-        assert_equal 86399, @vacation1.duration
+        assert_equal 86400, @vacation1.duration
       end
 
       should "have apointment day 2 for the entire day" do
         @vacation2 = @vacations[1]
         # should have duration for entire day
-        assert_equal 86399, @vacation2.duration
+        assert_equal 86400, @vacation2.duration
       end
 
       should "have apointment day 3 for 2 hours" do
