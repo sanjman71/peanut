@@ -3,7 +3,6 @@ require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
 require 'test_help'
 require 'mocha'
 require 'test/factories'
-require 'redgreen' unless ENV['TM_MODE']
 
 include AuthenticatedTestHelper
 include AuthenticatedSystem
