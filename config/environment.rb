@@ -63,9 +63,11 @@ Rails::Initializer.run do |config|
   config.gem 'andand', :version => '~> 1.3.1', :source => "http://gems.github.com"
   config.gem "chronic", :version => '~> 0.2.3'
   config.gem "crack" # used by google weather plugin
+  config.gem 'curb'
   config.gem "eventfulapi", :lib => false
   config.gem "geokit" 
   config.gem "haml", :version => '2.2.4'
+  config.gem 'hoptoad_notifier'
   config.gem "hpricot" # required by sanitize, uses native components
   config.gem "httparty" # used by google weather plugin
   config.gem 'json' # uses native components
@@ -78,7 +80,6 @@ Rails::Initializer.run do |config|
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
   config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
-  config.gem 'curb'
   config.gem 'twiliolib'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
