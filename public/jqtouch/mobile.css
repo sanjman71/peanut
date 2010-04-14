@@ -12,7 +12,7 @@ ul li, ul.edgetoedge li               { background: #fff; color: #333; border-to
 ul li.header                          { background: #444; color: #fff; border: none; }
 
 ul li input[type="text"], ul li input[type="password"], ul li textarea, ul li select
-                                      { font-size: 15px; color: #F27490; background: none; }
+                                      { font-size: 15px; color: #00F; background: none; }
 ul li.disabled                        { background: #eee; color: #fff; }
 ul li.disabled input                  { color: #fff; }
 
