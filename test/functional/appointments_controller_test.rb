@@ -61,7 +61,7 @@ class AppointmentsControllerTest < ActionController::TestCase
     @manager.email_addresses.create(:address => 'manager@walnutcalendar.com')
     @monthly_plan = Factory(:monthly_plan)
     @subscription = Subscription.new(:user => @owner, :plan => @monthly_plan)
-    @company      = Factory(:company, :subscription => @subscription)
+    @company      = Factory(:company, :name => 'Widgets R Us', :subscription => @subscription)
     @owner.grant_role('company manager', @company)
     @manager.grant_role('company manager', @company)
     # create providers, with email addresses
@@ -819,22 +819,32 @@ class AppointmentsControllerTest < ActionController::TestCase
         should "have appointment confirmation addressed to customer" do
           assert_equal 1, MessageRecipient.for_messagable(@customer.primary_email_address).size
         end
-  
+
         should "set message preferences template" do
           @who, @message = assigns(:confirmations).first
           assert_equal :appointment_confirmation, @message.reload.preferences[:template]
         end
-  
+
+        should "set message preferences company" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal @company.name, @message.reload.preferences[:company]
+        end
+
+        should "set message preferences subdomain" do
+          @who, @message = assigns(:confirmations).first
+          assert_equal @company.subdomain, @message.reload.preferences[:subdomain]
+        end
+
         should "set message preferences provider" do
           @who, @message = assigns(:confirmations).first
           assert_equal "Johnny", @message.reload.preferences[:provider]
         end
-  
+
         should "set message preferences service" do
           @who, @message = assigns(:confirmations).first
           assert_equal "Haircut", @message.reload.preferences[:service]
         end
-  
+
         should "set message preferences customer" do
           @who, @message = assigns(:confirmations).first
           assert_equal "Customer", @message.reload.preferences[:customer]
@@ -857,7 +867,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   
         should "set message preferences signature template" do
           @who, @message = assigns(:confirmations).first
-          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+          assert_equal :signature_company, @message.reload.preferences[:signature_template]
         end
   
         should "set flash message with email confirmation" do
@@ -1354,7 +1364,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   
         should "set message preferences signature template" do
           @who, @message = assigns(:changes).first
-          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+          assert_equal :signature_company, @message.reload.preferences[:signature_template]
         end
   
         should "set flash message with email confirmation" do
@@ -1557,7 +1567,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         
         should "set message preferences signature template" do
           @who, @message = assigns(:cancelations).first
-          assert_equal :signature_general, @message.reload.preferences[:signature_template]
+          assert_equal :signature_company, @message.reload.preferences[:signature_template]
         end
         
         should "set flash message with email cancelation" do

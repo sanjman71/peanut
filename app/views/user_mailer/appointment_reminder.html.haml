@@ -28,4 +28,4 @@
   %p= @footer_company
 
 - unless @signature_template.blank?
-  = render(:partial => "#{@signature_template}.html.haml")
+  = render(:partial => "#{@signature_template}.html.haml", :locals => {:company => @company, :subdomain => @subdomain})
