@@ -57,9 +57,21 @@ $.fn.init_add_waitlist = function() {
       return false;
     }
 
-    // replace start, end times
-    $("input#waitlist_start_time").attr('value', start_time);
-    $("input#waitlist_end_time").attr('value', end_time);
+    // set formatted start, end times, disable input times
+    $("input#waitlist_start_time_formatted").attr('value', start_time);
+    $("input#waitlist_start_time").attr('disabled', 'disabled');
+    $("input#waitlist_end_time_formatted").attr('value', end_time);
+    $("input#waitlist_end_time").attr('disabled', 'disabled');
+
+    // normalize start, end dates, e.g. '10/2/2010' to '20101002'
+    start_date = convert_date_to_string(start_date);
+    end_date   = convert_date_to_string(end_date);
+
+    // set formatted start, end dates, disable input dates
+    $("input#waitlist_start_date_formatted").attr('value', start_date);
+    $("input#waitlist_start_date").attr('disabled', 'disabled');
+    $("input#waitlist_end_date_formatted").attr('value', end_date);
+    $("input#waitlist_end_date").attr('disabled', 'disabled');
 
     // serialize form
     data = $(this).serialize();
@@ -84,6 +96,7 @@ $.fn.init_show_appointment_waitlists = function() {
   })
 }
 
+/*
 $.fn.init_send_waitlist_message = function() {
   $("#send_message_dialog").dialog({ autoOpen: false, modal: true, height: 220, width: 500, show: 'fadeIn(slow)' });
 
@@ -96,6 +109,7 @@ $.fn.init_send_waitlist_message = function() {
     return false;
   })
 }
+*/
 
 $.fn.init_waitlist_dialog = function() {
   // initialize add free time dialog
@@ -114,7 +128,7 @@ $.fn.init_waitlist_dialog = function() {
       $("form#add_waitlist_form input#waitlist_start_date").val('');
       $("form#add_waitlist_form input#waitlist_end_date").val('');
       $("form#add_waitlist_form input#waitlist_start_time").val('');
-      $("form#add_waitlist_form input#waitlist_start_time").val('');
+      $("form#add_waitlist_form input#waitlist_end_time").val('');
       // open add waitlist dialog
       $("div.dialog#add_waitlist_dialog").dialog('open');
     }
@@ -137,5 +151,5 @@ $(document).ready(function() {
   $(document).init_waitlist_dialog();
   $(document).init_add_waitlist();
   $(document).init_select_search_waitlist_provider();
-  $(document).init_send_waitlist_message();
+  //$(document).init_send_waitlist_message();
 })

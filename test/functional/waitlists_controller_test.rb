@@ -119,7 +119,7 @@ class WaitlistsControllerTest < ActionController::TestCase
       setup do
         # stub current user
         @controller.stubs(:current_user).returns(nil)
-        wait_attrs  = {"0" => {:start_date => "10/01/2009", :end_date => "10/02/2009", :start_time => "0900", :end_time => "1100"}}
+        wait_attrs  = {"0" => {:start_date => "20091001", :end_date => "20091002", :start_time => "0900", :end_time => "1100"}}
         post :create, :waitlist => {:service_id => @haircut.id, :provider_type => 'users', :provider_id => @johnny.id, :customer_id => @customer.id,
                                     :waitlist_time_ranges_attributes => wait_attrs}
       end
@@ -127,6 +127,11 @@ class WaitlistsControllerTest < ActionController::TestCase
       should_redirect_to("openings path") { openings_path }
       should_change("waitlist.count", :by => 1) { Waitlist.count }
       should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
+
+      should "expand waitlist to 2 days" do
+        @waitlist = Waitlist.find_by_id(assigns(:waitlist).id)
+        assert_equal 2, @waitlist.expand_days.size
+      end
     end
   end
   

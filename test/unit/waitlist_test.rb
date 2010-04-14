@@ -40,8 +40,7 @@ class WaitlistTest < ActiveSupport::TestCase
 
     context "with time range attributes" do
       setup do
-        # wait_attrs  = [{:start_date => "10/01/2009", :end_date => "10/02/2009", :start_time => "0900", :end_time => "1100"}]
-        wait_attrs  = [{:start_date => "10/01/2009", :end_date => "10/02/2009", :start_time_hours => "0900", :end_time => "1100"}]
+        wait_attrs  = [{:start_date => "20091001", :end_date => "20091002", :start_time_hours => "0900", :end_time => "1100"}]
         # Note: Rails doesn't support this yet
         # @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer,
         #                                         :waitlist_time_ranges_attributes => wait_attrs)

@@ -34,16 +34,20 @@
             == Dates:
           .span-10.last
             = time_range_form.text_field :start_date, :id => 'waitlist_start_date', :class => 'waitlist datepicker big', :autocomplete => 'off', :size => 12
+            = time_range_form.hidden_field :start_date, :id => 'waitlist_start_date_formatted'
             %span{:style => 'padding: 0 5px;'}== to
             = time_range_form.text_field :end_date, :id => 'waitlist_end_date', :class => 'waitlist datepicker big', :autocomplete => 'off', :size => 12
+            = time_range_form.hidden_field :end_date, :id => 'waitlist_end_date_formatted'
 
         .span-12.prepend-3.last.padding-bottom-10#when_times
           .span-2.padding-top-5
             == Times:
           .span-10.last
             = time_range_form.text_field :start_time_hours, :id => 'waitlist_start_time', :class => 'waitlist timepicker big', :autocomplete => 'off', :size => 12
+            = time_range_form.hidden_field :start_time_hours, :id => 'waitlist_start_time_formatted'
             %span{:style => 'padding: 0 5px;'}== to
             = time_range_form.text_field :end_time_hours, :id => 'waitlist_end_time', :class => 'waitlist timepicker big', :autocomplete => 'off', :size => 12
+            = time_range_form.hidden_field :end_time_hours, :id => 'waitlist_end_time_formatted'
 
     -# submit
     .span-15.last
