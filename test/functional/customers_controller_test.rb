@@ -1,5 +1,4 @@
 require 'test/test_helper'
-require 'test/factories'
 
 class CustomersControllerTest < ActionController::TestCase
 
@@ -10,7 +9,7 @@ class CustomersControllerTest < ActionController::TestCase
   should_route :put,  '/customers/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company customer'
 
   # customers controller routes
-  should_route :get,  '/customers/1', :controller => 'customers', :action => 'show', :id => '1'
+  should_route :get,  '/customers', :controller => 'customers', :action => 'index'
 
   def setup
     # initialize roles and privileges
@@ -26,31 +25,31 @@ class CustomersControllerTest < ActionController::TestCase
     # stub current company method
     @controller.stubs(:current_company).returns(@company)
   end
-  
+
   context "search without 'read users' privilege" do
     setup do
       @controller.stubs(:current_user).returns(@user)
       get :index
     end
-
-    should_respond_with :redirect
+  
     should_redirect_to('unauthorized_path') { unauthorized_path }
   end
-  
+
   context "search empty customers database with an empty search" do
     setup do
       @controller.stubs(:current_user).returns(@owner)
       get :index
     end
 
-    should_respond_with :success
-    should_render_template 'customers/index.html.haml'
-    should_not_set_the_flash
     should_assign_to(:customers) { [] }
     should_assign_to(:paginate) { true }
     should_not_assign_to :search, :search_text
+
+    should_not_set_the_flash
+    should_respond_with :success
+    should_render_template 'customers/index.html.haml'
   end
-  
+
   context "search non-empty customer database" do
     setup do
       # create customer with a valid appointment
@@ -64,7 +63,7 @@ class CustomersControllerTest < ActionController::TestCase
       assert @appointment.valid?
     end
 
-    context "all customers" do
+    context "all customers as company manager" do
       setup do
         # as company manager
         @controller.stubs(:current_user).returns(@owner)
@@ -84,13 +83,13 @@ class CustomersControllerTest < ActionController::TestCase
         assert_select "a.admin.edit.customer", 1
         assert_select "a[href='/customers/%s/edit']" % @customer.id, 1
       end
-      
+
       should "not have customer sudo link" do
         assert_select "a.admin.customer.sudo", 0
       end
     end
 
-    context "with a ajax js search for 'boo'" do
+    context "with a ajax js search for 'boo' as company manager" do
       setup do
         # as company manager
         @controller.stubs(:current_user).returns(@owner)
@@ -106,7 +105,7 @@ class CustomersControllerTest < ActionController::TestCase
       should_assign_to(:search_text) { "Customers matching 'boo'" }
       should_assign_to(:paginate) { false }
 
-      # TODO: find out why these links are not shown in the tests
+      # SK TODO: find out why these links are not shown in xhr tests but they show up in regular gets
       # should "have customer edit link" do
       #   assert_select "a.admin.edit.customer", 1
       #   assert_select "a[href='/customers/%s/edit']" % @customer.id, 1
