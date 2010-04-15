@@ -1,3 +1,4 @@
+# Deprecated - not currently used
 if @redirect_path
   page.redirect_to(@redirect_path)
 else

@@ -225,6 +225,11 @@ module ApplicationHelper
     (user == current_user) ? "Me" : user.name
   end
 
+  def your_display_name(user, current_user)
+    return "" if user.blank?
+    (user == current_user) ? "Your" : @user.name + "'s"
+  end
+
   def build_company_location_select_options
     anywhere = Location.anywhere
     [[anywhere.name, anywhere.id]] + current_locations.collect{ |l| [l.name, l.id]}

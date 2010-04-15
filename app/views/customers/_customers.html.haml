@@ -18,7 +18,7 @@
       -# show # of customer appointments
       - appt_count = customer.appointments_count
       - if appt_count > 0
-        %h6= link_to pluralize(customer.appointments_count, 'appointment'), customer_appointments_path(customer)
+        %h6= link_to pluralize(customer.appointments_count, 'appointment'), user_appts_path(customer)
       - else
         %h6= pluralize(customer.appointments_count, 'appointment')
 

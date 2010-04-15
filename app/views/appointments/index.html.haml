@@ -2,50 +2,59 @@
 - stylesheet('appointments')
 - javascript('appointments')
 
-.span-16
-  .span-15.prepend-1.mat.padding-top-10.padding-bottom-10
-    .span-8
+.span-24.last
+  .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
+    -#.span-8
       -# appointment providers
-      %h3{:style => 'margin-bottom: 3px;'}
-        = label_tag "customer", "Appointments for", :class => 'big'
-        = select_tag('customer', options_for_select(@customers.collect{ |o| [customer_display_name(o, current_user), o.id]}, @customer.id), :class => 'text')
+      -#%h3{:style => 'margin-bottom: 3px;'}
+        -#= label_tag "customer", "Appointments for", :class => 'big'
+        -#= select_tag('customer', options_for_select(@customers.collect{ |o| [customer_display_name(o, current_user), o.id]}, @user.id), :class => 'text')
 
     -# appointment state links
-    .span-7.last
-      #links
-        - build_appointment_state_search_links(params, Appointment.aasm_states_with_all, @state, :default => 'all') do |link, separator|
-          = link
-          = separator
-      
-    .span-15.last
+    -#.span-7.last
+      -##links
+        -#- build_appointment_state_search_links(params, Appointment.aasm_states_with_all, @state, :default => 'all') do |link, separator|
+          -#= link
+          -#= separator
+    .span-23.last
+      %h4== #{user_display_name(@user, current_user).gsub(/Me/, 'My')} Appointments
+
+    .span-23.last#today
       %h4== Today is #{Time.now.to_s(:appt_day)}
-    
+
+    .span-23.last#change_instructions
+      %p
+        == To change an appointment, first book a new appointment and then follow the instructions to cancel the original appointment.
+
+    .span-15.last#back
+      %h4= link_to 'Back', customers_path, :class => 'admin'
+
   %hr.space
-  
+
   .span-15.prepend-1.last
     - if @appointments.blank?
-      %h2.bottom{:style => 'color: #5500BB;'}== No #{@state} appointments
+      %h4.bottom== No #{@state == 'all' ? '' : @state} appointments
     - else
-      %h3.bottom{:style => 'color: #5500BB;'}== #{pluralize(@appointments.size, "#{@state} appointment")}
-  
+      %h4.bottom== #{pluralize(@appointments.size, "#{@state == 'all' ? '' : @state} appointment")}
+
   %hr.space
-  
-  - @appointments_by_customer.each do |customer, appointments|
+
+  - @appointments_by_customer.each do |user, appointments|
     -# show customer name if showing more than 1 customer's appointments
     .span-8.prepend-1.last
       - if @anyone
-        .customer.group[customer]
+        .customer.group[user]
           == Customer:
-          = customer.name
-    
+          = user.name
+
     -# customer appointments
     - reset_cycle
-    = render(:partial => 'customer_appointments', :locals => {:customer => customer, :appointments => appointments})
+    = render(:partial => 'customer_appointments', :locals => {:customer => user, :appointments => appointments, :details => 1})
 
     -# add space between customer appointment groups
     %hr.space
-    
+
 -# appointment help
-.span-7.prepend-1.last
-  = render(:partial => 'appointment_help', :locals => {:state => @state})
+-#.span-7.prepend-1.last
+  -#= render(:partial => 'appointment_help', :locals => {:state => @state})
 

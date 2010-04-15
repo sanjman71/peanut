@@ -1,6 +1,7 @@
 class OpeningsController < ApplicationController
   before_filter :login_for_mobile_site, :only => [:index]
   before_filter :current_user_should_be_active_state, :only => [:index]
+  after_filter  :store_location, :only => [:index]
 
   # Handle RecordNotFound exceptions with a redirect
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }

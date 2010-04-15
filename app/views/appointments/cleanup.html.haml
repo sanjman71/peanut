@@ -1,0 +1,34 @@
+- title(@title)
+- stylesheet('appointments')
+- javascript('appointments')
+
+- your_name = your_display_name(@user, current_user)
+
+.span-24.last
+  .span-23.prepend-1.mat.padding-top-10.padding-bottom-10
+    %h3== #{your_name} Upcoming Appointments
+    %h4== We found more than 1 appointment in the #{@search_scope}
+
+  %hr.space
+
+  .span-24.last
+    = display_flash(:all)
+
+  .span-23.prepend-1.last#recent
+    %h4.bold== #{your_name} most recent appointment:
+
+  -# most recent appointment
+  = render(:partial => 'appointments/customer_appointments', :locals => {:appointments => [@recent_appointment], :cancel => 1})
+
+  %hr.space
+
+  .span-23.prepend-1.last#others
+    %h4.bold== #{your_name} other appointments:
+
+  -# all other appointments
+  = render(:partial => 'appointments/customer_appointments', :locals => {:appointments => @other_appointments, :cancel => 1})
+
+  %hr.space
+
+  .span-23.prepend-1
+    %h4= link_to('Keep These Appointments', user_appts_done_path(@user), :class => 'admin', :style => 'font-size: 1.0em')

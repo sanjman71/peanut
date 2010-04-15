@@ -3,7 +3,7 @@
   == &nbsp;|&nbsp;
 
   - if has_role?('company customer', current_company)
-    = link_to 'My Appointments', history_index_path, :class => 'admin header'
+    = link_to 'My Appointments', user_appts_path(current_user), :class => 'admin header'
     == &nbsp;|&nbsp;
 
   - if has_privilege?('update companies', current_company)

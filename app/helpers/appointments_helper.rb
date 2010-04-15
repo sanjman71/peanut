@@ -5,14 +5,14 @@ module AppointmentsHelper
     
     state_collection.each do |state|
       # add css 'current' class for the current link
-      klass = (state == current_state) ? 'current' : ''
+      klass = (state == current_state) ? 'current admin' : 'admin'
       
       if state == default
         # no state parameter for the default value
-        link  = link_to(state.titleize, url_for(url_params.update(:state => nil, :subdomain => current_subdomain)), :class => klass)
+        link  = link_to(state.titleize, user_appts_path(url_params.update(:state => nil)), :class => klass)
       else
         # use state parameter
-        link  = link_to(state.titleize, url_for(url_params.update(:state => state.to_url_param, :subdomain => current_subdomain)), :class => klass)
+        link  = link_to(state.titleize, user_appts_state_path(url_params.update(:state => state.to_url_param)), :class => klass)
       end
       
       # use separator unless its the last element

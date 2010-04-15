@@ -5,6 +5,7 @@ class AppointmentsController < ApplicationController
                                                      :update_weekly, :show_weekly, :create_work, :update]
   before_filter :init_appointment, :only => [:show]
   before_filter :init_appointment_and_provider, :only => [:cancel]
+  before_filter :init_customer_user, :only => [:cleanup]
   before_filter :get_reschedule_id, :only => [:new]
 
   privilege_required      'authenticated', :only => [:create_work], :on => :current_company
@@ -13,7 +14,7 @@ class AppointmentsController < ApplicationController
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
                                                        :update_weekly, :show_weekly, :update, :cancel],
                                               :on => [:provider, :current_company]
-    
+  privilege_required_any  'read users', :only =>[:cleanup], :on => [:user, :current_company]
 
   # Deprecated: Dialogs are used to create appointments
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
@@ -141,9 +142,16 @@ class AppointmentsController < ApplicationController
 
           # track new appointments
           @appointments.push(@appointment)
-          
+
           # set flash message
           flash[:notice] = "Your #{@service.name} appointment has been confirmed."
+
+          if @customer != @creator
+            # appointment was created by staff on behalf of a customer; store calendar show path as return_to value
+            store_location(build_highlight_appointment_redirect_path(request.referer, @appointment))
+          end
+          # redirect to customer appointment cleanup path
+          @redirect_path = user_appts_cleanup_path(@customer)
 
           # check if its an appointment reschedule
           if has_reschedule_id?
@@ -170,7 +178,6 @@ class AppointmentsController < ApplicationController
             logger.debug("[error] create appointment error sending message: #{e.message}")
             @errors[date] = "There was a problem sending a confirmation email." + e.message
           end
-
         when Appointment::FREE
           # build time range
           @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
@@ -184,6 +191,9 @@ class AppointmentsController < ApplicationController
           @appointments.push(@appointment)
 
           flash[:notice]  = "Created available time"
+
+          # redirect to referer, highlight appointment date
+          @redirect_path  = build_highlight_appointment_redirect_path(request.referer, @appointment)
         end
 
         logger.debug("*** created #{@appointment.mark_as} appointment")
@@ -195,18 +205,9 @@ class AppointmentsController < ApplicationController
       end
     end
 
-    # Set up our redirect; check if the user has the right to see company calendars, or this provider's calendar
-    if current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
-      if @appointments.size == 1
-        # Redirect to referer, highlight appointment's date
-        @redirect_path = build_highlight_appointment_redirect_path(request.referer, @appointments.first)
-      else
-        # Redirect to provider's calendar show page
-        @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)
-      end
-    else
-      # If the user doesn't have read calendar privileges, redirect to their history page
-      @redirect_path = history_index_path
+    if @appointments.empty?
+      # there was an error, redirect to referer if not already set
+      @redirect_path ||= request.referer
     end
 
     # Set up our flash
@@ -225,7 +226,7 @@ class AppointmentsController < ApplicationController
       end
       flash[:error] += "</ul>"
     end
-    
+
     respond_to do |format|
       format.html { redirect_to(@redirect_path) and return }
       format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
@@ -674,7 +675,7 @@ class AppointmentsController < ApplicationController
     redirect_to(request.referer) and return
   end
 
-  # GET /appointments/1/cancel
+  # GET/PUT /appointments/1/cancel
   def cancel
     # @appointment, @provider initialized in before filter
 
@@ -874,7 +875,7 @@ class AppointmentsController < ApplicationController
           elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
             @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
           else
-            @redirect_path = history_index_path
+            @redirect_path = user_appts_path(current_user)
           end
 
         else
@@ -902,7 +903,7 @@ class AppointmentsController < ApplicationController
           elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
             @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
           else
-            @redirect_path = history_index_path
+            @redirect_path = user_appts_path(current_user)
           end
 
         end
@@ -920,7 +921,7 @@ class AppointmentsController < ApplicationController
       elsif current_user.has_privilege?('read calendars', current_company) || current_user.has_privilege?('read calendars', @provider)
         @redirect_path = calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id, :subdomain => current_subdomain)
       else
-        @redirect_path = history_index_path
+        @redirect_path = user_appts_path(current_user)
       end
 
       logger.debug("*** deleted appointment #{@appointment.id}")
@@ -933,48 +934,84 @@ class AppointmentsController < ApplicationController
     end
   end
   
+  # Deprecated - not currently used
   # GET  /appointments/search
   # POST /appointments/search
   #  - search for an appointment by code => params[:appointment][:code]
-  def search
-    if request.post?
-      # check confirmation code, limit search to work appointments
-      @code         = params[:appointment][:code].to_s.strip
-      @appointment  = Appointment.work.find_by_confirmation_code(@code)
-    
-      if @appointment
-        # redirect to appointment show
-        @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
-      else
-        # show error message?
-        logger.debug("*** could not find appointment #{@code}")
-      end
+  # def search
+  #   if request.post?
+  #     # check confirmation code, limit search to work appointments
+  #     @code         = params[:appointment][:code].to_s.strip
+  #     @appointment  = Appointment.work.find_by_confirmation_code(@code)
+  #   
+  #     if @appointment
+  #       # redirect to appointment show
+  #       @redirect_path = appointment_path(@appointment, :subdomain => current_subdomain)
+  #     else
+  #       # show error message?
+  #       logger.debug("*** could not find appointment #{@code}")
+  #     end
+  #   end
+  # 
+  #   respond_to do |format|
+  #     format.html { @redirect_path ? redirect_to(@redirect_path) : render(:action => 'search') }
+  #     format.js
+  #   end
+  # end
+
+  # GET /users/1/appointments/cleanup
+  # GET /users/1/appointments/cleanup/done
+  def cleanup
+    # @user initialized in before_filter
+
+    if @user.blank?
+      redirect_to(unauthorized_path) and return
     end
 
-    respond_to do |format|
-      format.html { @redirect_path ? redirect_to(@redirect_path) : render(:action => 'search') }
-      format.js
+    if params[:done].to_i == 1
+      # cleanup is done
+      redirect_to(redirect_back_or_default_uri(openings_path)) and return
     end
+
+    @search_range = 14.days
+    @search_scope = "next 2 weeks"
+    # find confirmed appointments in the search range, order by most recently updated
+    @appointments = current_company.appointments.work.confirmed.customer(@user).future.before(Time.zone.now+@search_range).all(:order => 'appointments.updated_at desc, appointments.id desc')
+
+    if @appointments.size <= 1
+      # we need at least 2 appointments to cleanup
+      redirect_back_or_default(openings_path) and return
+    end
+
+    # find the most recently updated appointment, and all the others
+    @recent_appointment = @appointments.first
+    @other_appointments = @appointments.slice(1,@appointments.size)
   end
-    
+
+  # GET /users/1/appointments
+  # GET /users/1/appointments/confirmed
   def index
-    if params[:customer_id].to_s == "0"
-      # /customers/0/appointments is canonicalized to /appointments; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :customer_id => nil)))
+    if params[:user_id].to_s == "0"
+      # /users/0/appointments is canonicalized to /appointments; preserve subdomain on redirect
+      # return redirect_to(url_for(params.update(:subdomain => current_subdomain, :user_id => nil)))
+      # not allowed
+      redirect_to(unauthorized_path) and return
     end
     
     # find state (default to 'all') and customer (default to 'anyone')
-    @state      = params[:state] ? params[:state].to_s : 'all'
-    @customer   = params.has_key?(:customer_id) ? find_customer_from_params : User.anyone
+    @state  = params[:state] ? params[:state].to_s : 'all'
+    @user   = init_customer_user(:default => User.anyone)
 
-    case @customer.id
+    case @user.id
     when 0
       # find work appointments for anyone with the specified state
-      @appointments = current_company.appointments.work.order_start_at.send(@state)
-      @anyone       = true
+      # @appointments = current_company.appointments.work.order_start_at.send(@state)
+      # @anyone       = true
+      # not allowed
+      redirect_to(unauthorized_path) and return
     else
       # find customer work appointments with the specified state
-      @appointments = current_company.appointments.work.customer(@customer).order_start_at.send(@state)
+      @appointments = current_company.appointments.work.customer(@user).order_start_at_desc.send(@state)
       @anyone       = false
     end
 
@@ -982,14 +1019,14 @@ class AppointmentsController < ApplicationController
     @appointments_by_customer = @appointments.group_by { |appt| appt.customer }
 
     # company managers can see all customers; othwerwise the user can only see their own appointments
-    if manager?
-      @customers  = [User.anyone] + current_company.authorized_users.with_role(Company.customer_role).order_by_name
-    else
-      @customers  = Array(current_user)
-    end
+    # if manager?
+    #   @customers  = [User.anyone] + current_company.authorized_users.with_role(Company.customer_role).order_by_name
+    # else
+    #   @customers  = Array(current_user)
+    # end
     
-    # set title based on customer
-    @title = @customer.anyone? ? "All Appointments" : "Appointments for #{@customer.name}"
+    # set title based on user
+    @title = @user.anyone? ? "All Appointments" : "Appointments for #{@user.name}"
     
     respond_to do |format|
       format.html
@@ -1008,12 +1045,13 @@ class AppointmentsController < ApplicationController
   end
 
   # find customer from the params hash, return nil if we can't find the customer
-  def find_customer_from_params
+  def init_customer_user(options={})
     begin
-      current_company.authorized_users.with_role(Company.customer_role).find(params[:customer_id])
+      @user = current_company.authorized_users.with_role(Company.customer_role).find(params[:user_id])
     rescue
-      nil
+      @user = options[:default] ? options[:default] : nil
     end
+    @user
   end
 
   def appointment_free_time_scheduled_at(appointment)

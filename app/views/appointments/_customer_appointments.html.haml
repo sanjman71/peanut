@@ -1,12 +1,13 @@
+- details = 0 unless local_assigns[:details]
+- cancel  = 0 unless local_assigns[:cancel]
+
 - appointments.each do |appointment|
   .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]
     -# service and provider
     .span-6.prepend-1
       %h3{:style => 'padding-top: 5px; margin-bottom: 5px;'}= appointment.service.name
-      %h4
-        == Provider:
-        = (appointment.provider || User.anyone).name
-      
+      %h4== Provider: #{appointment.provider.andand.name}
+
     -# when
     .span-6
       - if appointment.work?
@@ -16,15 +17,12 @@
           == @
           = appointment.start_at.to_s(:appt_time)
           %h5= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
-      / - elsif appointment.wait?
-      /   .wait.when{:style => 'padding-top: 5px;'}
-      /     == Waitlist:
-      /     = appointment.start_at.to_s(:appt_short_month_day_year)
-      /     == -
-      /     = appointment.end_at.to_s(:appt_short_month_day_year)
-          
-    -# appointment details
-    .span-2.prepend-1.last{:style => 'margin-top: 3px;'}
-      = link_to 'Details', appointment_path(appointment, :subdomain => current_subdomain), :class => 'admin'
-  
-
+    -# appointment links
+    .span-3.last{:style => 'margin-top: 3px;'}
+      - links = []
+      - if details == 1
+        - links.push(link_to('Details', appointment_path(appointment), :class => 'admin'))
+      - if cancel == 1
+        - links.push(link_to('Cancel', cancel_appointment_path(appointment), :method => :put, :class => 'admin'))
+      - unless links.empty?
+        = links.join(" | ")

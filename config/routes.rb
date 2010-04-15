@@ -53,22 +53,29 @@ ActionController::Routing::Routes.draw do |map|
   map.customer_update '/customers/:id',       :controller => 'users', :action => 'update', :role => 'company customer', :conditions => {:method => :put}
   map.customer_delete '/customers/:id',       :controller => 'users', :action => 'destroy', :role => 'company customer', :conditions => {:method => :delete}
 
-  map.connect   '/customers/:customer_id/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work',
-                :conditions => {:method => :get, :state => /upcoming|completed|canceled/}
-  map.connect   '/customers/:customer_id/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
-                :conditions => {:method => :get}
+  # user appointment routes
+  map.user_appts_done     '/users/:user_id/appointments/cleanup/done',
+                          :controller => 'appointments', :action => 'cleanup', :type => 'work', :done => 1, :conditions => {:method => :get}
+  map.user_appts_cleanup  '/users/:user_id/appointments/cleanup', 
+                          :controller => 'appointments', :action => 'cleanup', :type => 'work', :conditions => {:method => :get}
+  map.user_appts_state    '/users/:user_id/appointments/:state',
+                          :controller => 'appointments', :action => 'index', :type => 'work', :state => /confirmed|upcoming|completed|canceled|noshow/,
+                          :conditions => {:method => :get}
+  map.user_appts          '/users/:user_id/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
+                          :conditions => {:method => :get}
 
   # appointment routes
-  map.connect   '/appointments/:state', :controller => 'appointments', :action => 'index', :type => 'work', :state => /upcoming|completed|canceled/,
-                :conditions => {:method => :get}
-  map.connect   '/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
-                :conditions => {:method => :get}
-  map.resources :appointments,
-                :member => {:approve => :get, :noshow => :get, :complete => :get, :cancel => [:get, :post], :reschedule => [:get, :post]},
-                :collection => { :search => [:get, :post] }
+  map.company_appts_state '/appointments/:state', 
+                          :controller => 'appointments', :action => 'index', :type => 'work', :state => /confirmed|upcoming|completed|canceled|noshow/,
+                          :conditions => {:method => :get}
+  map.company_appts       '/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
+                          :conditions => {:method => :get}
+  map.resources           :appointments,
+                          :member => {:approve => [:get, :put], :noshow => [:get, :put], :complete => [:get, :put], :cancel => [:get, :put], :reschedule => [:get, :post]}
 
-  map.resources :staffs, :only => [:index]
-  map.resources :customers, :only => [:index, :show], :shallow => true, :has_many => [:appointments]
+  # staff and customer specialized routes; otherwise use more generic user routes
+  map.resources           :staffs, :only => [:index]
+  map.resources           :customers, :only => [:index]
   
   # special invoice routes
   map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
@@ -87,8 +94,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :invoice_line_items
   map.resources :waitlists, :only => [:index, :create]
 
-  # history routes
-  map.resources :history, :only => [:index], :collection => {:waitlist => :get}
+  # Deprecasted: history routes
+  # map.resources :history, :only => [:index], :collection => {:waitlist => :get}
   
   # search openings for a specified service and duration, and an optional provider
   map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time',
