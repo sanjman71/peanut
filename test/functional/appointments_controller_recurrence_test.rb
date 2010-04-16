@@ -121,16 +121,20 @@ class AppointmentsControllerTest < ActionController::TestCase
           put :update_weekly,
               {:rules => "freq=weekly;byday=mo,tu,fr;dstart=#{@now.to_s(:appt_schedule_day)};tstart=110000;tend=130000;until=#{@recur_until.to_s(:appt_schedule_day)}",
                :id => @weekly_appt.id, :provider_type => "users", :provider_id => @johnny.id}
-            # {:freq => 'weekly', :byday => 'mo,tu,fr', :dstart => @now.to_s(:appt_schedule_day), :tstart => "110000", :tend => "130000",
-            #  :until => @recur_until.to_s(:appt_schedule_day), :provider_type => "users", :provider_id => "#{@johnny.id}",
-            #  :id => @weekly_appt.id }
           Delayed::Job.work_off
           @weekly_appt.reload
+          # we are adding friday to the schedule, check if today is friday
+          if Time.zone.now.wday == 5
+            # today should not be added
+            @should_add = 3
+          else
+            @should_add = 4
+          end
         end
 
         # should have 1 additional appointment each week for the next 4 weeks = 4 additional
         should_not_change("Appointment.recurring.count") { Appointment.recurring.count }
-        should_change("Appointment.count", :by => 4) { Appointment.count }
+        should_change("Appointment.count", :by => @should_add) { Appointment.count }
 
         should "change weekly appointment attributes" do
           assert_equal 11, @weekly_appt.start_at.hour.to_i
@@ -158,8 +162,8 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
 
         should_not_change("appointment count") { Appointment.count }
-        # should remove 8 capacity slots for 8 appointments
-        should_change("capacity slot count", :by => -8) { CapacitySlot.count }
+        # should remove 9 capacity slots for 9 appointments
+        should_change("capacity slot count", :by => -9) { CapacitySlot.count }
       end
     end
 
