@@ -37,7 +37,7 @@
       == &nbsp;or&nbsp;
       = link_to 'Pick a Date Range', '', :id => 'pdf_schedule_date_range', :class => 'admin'
 
-  .span-14.prepend-1.last.padding-top-10
+  .span-18.prepend-1.last.padding-top-10
     = display_flash
 
   %hr.space
@@ -142,6 +142,9 @@
   var appointment_update_work_path = "#{appointment_path(':id')}";
   var appointment_create_free_path = "#{create_free_path}"
   var appointment_update_free_path = "#{appointment_path(':id')}";
+  var appointment_cancel_path      = "#{cancel_appointment_path(':id')}";
+  var appointment_show_path        = "#{appointment_path(':id')}";
+  var show_weekly_path             = "#{show_weekly_path(':provider_type', ':provider_id')}";
   var provider_capacity_path       = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration')}";
 
   -# build appointments hash for free and work appointments
@@ -156,7 +159,9 @@
                                              "appt_creator"       : "#{appt.creator.andand.name.to_s}", |
                                              "appt_service"       : "#{appt.service.andand.name.to_s}", |
                                              "appt_customer"      : "#{appt.customer.andand.name.to_s}", |
-                                             "appt_customer_id"   : "#{appt.customer_id}" |
+                                             "appt_customer_id"   : "#{appt.customer_id}", |
+                                             "appt_mark_as"       : "#{appt.mark_as}", |
+                                             "appt_recurrence"    : "#{(appt.recurrence? and !appt.recurrence_parent?) ? 1 : 0}" |
                                             })) |
 
   

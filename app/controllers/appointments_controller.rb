@@ -144,7 +144,7 @@ class AppointmentsController < ApplicationController
           @appointments.push(@appointment)
 
           # set flash message
-          flash[:notice] = "Your #{@service.name} appointment has been confirmed."
+          flash[:notice] = build_user_message(@appointment, :created)
 
           if @customer != @creator
             # appointment was created by staff on behalf of a customer; store calendar show path as return_to value
@@ -190,7 +190,7 @@ class AppointmentsController < ApplicationController
           # track new appointments
           @appointments.push(@appointment)
 
-          flash[:notice]  = "Created available time"
+          flash[:notice]  = build_user_message(@appointment, :added)
 
           # redirect to referer, highlight appointment date
           @redirect_path  = build_highlight_appointment_redirect_path(request.referer, @appointment)
@@ -726,11 +726,10 @@ class AppointmentsController < ApplicationController
         error << e.message
       end
 
-      appt_text = (@appointment.mark_as == Appointment::WORK) ? "appointment" : "availability"
-
       if error.empty?
-        # send cancelation email and set flash
-        flash[:notice] = "The #{appt_text} has been canceled."
+        # set flash and send cancelation email
+        flash[:notice] = build_user_message(@appointment, :canceled)
+
         begin
           # send appointment cancel based on (confirmation) preferences
           @preferences  = Hash[:customer => current_company.preferences[:work_appointment_confirmation_customer],
@@ -747,9 +746,8 @@ class AppointmentsController < ApplicationController
         end
       else
         # whoops, there was an error
-        flash[:notice] = "There was a problem canceling this #{appt_text} - #{error[0]}."
+        flash[:notice] = "There was a problem canceling this #{@appointment.work? ? 'appointment' : 'availability'} - #{error[0]}."
       end
-
     end
 
     # redirect to referer; default to appointment show path
@@ -799,11 +797,7 @@ class AppointmentsController < ApplicationController
         @redirect_path = build_highlight_appointment_redirect_path(request.referer, @appointment)
       end
 
-      if @appointment.free?
-        flash[:notice] = "The available time has been updated"
-      else
-        flash[:notice] = "The appointment has been updated"
-      end
+      flash[:notice] = build_user_message(@appointment, :updated)
 
       if @appointment.valid? and @appointment.work?
         begin
@@ -1068,4 +1062,23 @@ class AppointmentsController < ApplicationController
     add_url_params(s, Hash[:highlight => appointment.start_at.to_s(:appt_schedule_day)])
   end
 
+  def build_user_message(appointment, action)
+    if appointment.work?
+      if current_user == appointment.customer
+        # customer created their own appointment
+        "Your appointment with #{appointment.provider.name} was #{action.to_s}."
+      else
+        # somebody else created the customer appointment
+        "#{appointment.customer.name}'s appointment with #{appointment.provider.name} was #{action.to_s}."
+      end
+    elsif appointment.free?
+      if current_user == appointment.provider
+        # provider created their own free time
+        "Your availability was #{action.to_s}."
+      else
+        # somebody else created provider free time
+        "#{appointment.provider.name}'s availability was #{action.to_s}."
+      end
+    end
+  end
 end

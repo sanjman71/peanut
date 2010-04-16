@@ -2,7 +2,7 @@
 $.fn.init_add_work_appointment = function() {
 
   // initialize add work appointment dialog
-  $("div.dialog#add_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 500, show: 'fadeIn(slow)',
+  $("div.dialog#add_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 625, height: 525, show: 'fadeIn(slow)',
                                                        title: $("div.dialog#add_work_appointment_dialog").attr('title') });
 
   // open add appointment dialog on click
@@ -29,11 +29,17 @@ $.fn.init_add_work_appointment = function() {
     // set creator id field, hide creator div used to show creator for edits
     $(form).find("input#creator_id").val(current_user.get("id"));
     $(form).find("div#creator").addClass('hide');
+    // enable capacity
+    $(form).find("input#capacity").removeAttr('disabled');
+    $(form).find("input#capacity").val('');
+    // hide appointment show details div
+    $(form).find("div#show_details").addClass('hide');
     // set form url and method
     $(form).attr('action', appointment_create_work_path);
     $(form).attr('method', 'post');
-    // set form submit text
-    $(form).find("input:submit").val("Add");
+    // show submit_add
+    $(form).find("#submit_edit").addClass('hide');
+    $(form).find("#submit_add").removeClass('hide');
     // open dialog
     $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
@@ -93,12 +99,9 @@ $.fn.init_add_work_appointment = function() {
       var capacity_url = provider_capacity_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
       $.get(capacity_url, {}, function(data) { check_capacity_response(data) }, "json");
       // hide add button, show checking div
-      $(this).find('div#submit').addClass('hide');
+      $(this).find('div#submit_add').addClass('hide');
       $(this).find('div#checking').removeClass('hide');
       return false;
-    } else {
-      // capacity is set, meaning it was checked and ok'ed by the user; disable the value here so its not submitted
-      $(this).find("input#capacity").attr('disabled', 'disabled');
     }
 
     // replace hidden tag formatted version
@@ -118,22 +121,30 @@ $.fn.init_add_work_appointment = function() {
     //alert("form action: " + this.action + ", form serialize: " + data);
     //return false;
 
-    // enable start_time field
-    $(this).find("input#start_time").removeAttr('disabled');
-
     // check if its a post or put
     if ($(this).attr('method') == 'put') {
       // put
+      var action = 'update';
       $.put(this.action, data, null, "script");
     } else {
       // post
+      var action = 'add';
       $.post(this.action, data, null, "script");
     }
 
-    // hide add button, show adding div
-    $(this).find('div#submit').addClass('hide');
+    // enable start_time field
+    $(this).find("input#start_time").removeAttr('disabled');
+
+    // hide add and edit buttons, show adding or updating div
+    $(this).find('div#submit_add').addClass('hide');
+    $(this).find('div#submit_edit').addClass('hide');
     $(this).find('div#checking').addClass('hide');
-    $(this).find('div#adding').removeClass('hide');
+
+    if (action == 'add') {
+      $(this).find('div#adding').removeClass('hide');
+    } else {
+      $(this).find('div#updating').removeClass('hide');
+    }
 
     return false;
   })
@@ -148,43 +159,39 @@ function check_capacity_response(data) {
     if (yesno == false)
     {
       // show add button
-      $(form).find("div#submit").removeClass('hide');
+      $(form).find("div#submit_add").removeClass('hide');
       $(form).find("div#checking").addClass('hide');
       return false;
     }
   }
 
-  // set capacity and click submit to add appointment
+  // set capacity, disable field, and click submit to add appointment
   $(form).find("input#capacity").val(capacity);
+  $(form).find("input#capacity").attr('disabled', 'disabled');
   $(form).submit();
 }
 
 $.fn.init_edit_work_appointment = function() {
   // open add appointment dialog on click
   $("a#edit_work_appointment").click(function() {
-    var form          = "form#add_work_appointment_form";
+    // use the add work appointment form
+    var form  = "form#add_work_appointment_form";
     // enable start_date field
-    $(form).find("input#start_date").removeClass('disabled');
-    $(form).find("input#start_date").attr('disabled', '');
+    $(form).find("input#start_date").removeAttr('disabled');
     // fill in appointment values for the edit form
     var appointment_div   = $(this).closest("div.appointment");
     var appt_id           = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];  // e.e.g 'appointment_13' => '13'
     var start_date        = convert_yymmdd_string_to_mmddyy(appointments.get(appt_id).get("appt_schedule_day"));
-    // var start_date        = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
     var start_time        = appointments.get(appt_id).get("appt_start_time");
-    // var start_time        = $(appointment_div).attr('appt_start_time');
     var duration          = appointments.get(appt_id).get('appt_duration');
-    // var duration          = $(appointment_div).attr('appt_duration');
     var service_name      = appointments.get(appt_id).get('appt_service');
-    // var service_name      = $(appointment_div).find("div.service a").text();
     var customer_name     = appointments.get(appt_id).get('appt_customer');
     var customer_id       = appointments.get(appt_id).get('appt_customer_id');  // e.g. 'user_5' => '5'
-    // var customer_name     = $(appointment_div).find("div.customer div.customer_name").children().text();
-    // var customer_id       = $(appointment_div).find("div.customer").attr('id').match(/\w+_(\d+)/)[1];  // e.g. 'user_5' => '5'
     var provider          = appointments.get(appt_id).get('appt_provider'); // e.g. 'users/11'
-    // var provider          = $(appointment_div).attr('appt_provider'); // e.g. 'users/11'
     var creator           = appointments.get(appt_id).get('appt_creator'); // e.g. 'Johnny'
-    // var creator           = $(appointment_div).attr('appt_creator'); // e.g. 'Johnny'
+    var update_path       = appointment_update_work_path.replace(/:id/, appt_id);
+    var cancel_path       = appointment_cancel_path.replace(/:id/, appt_id);
+    var show_path         = appointment_show_path.replace(/:id/, appt_id);
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
@@ -198,11 +205,20 @@ $.fn.init_edit_work_appointment = function() {
     // set creator, and show creator div
     $(form).find("div#creator").removeClass('hide');
     $(form).find("h4#creator_name").text(creator);
+    // set capacity
+    $(form).find("input#capacity").removeAttr('disabled');
+    $(form).find("input#capacity").val('1');
+    // set cancel appointment path
+    $(form).find("a#cancel_work_appointment").attr('href', cancel_path);
+    // set appointment show path, show div
+    $(form).find("a#show_details").attr('href', show_path);
+    $(form).find("div#show_details").removeClass('hide');
     // set form url and method
-    $(form).attr('action', appointment_update_work_path.replace(/:id/, appt_id));
+    $(form).attr('action', update_path);
     $(form).attr('method', 'put');
-    // set form submit text
-    $(form).find("input:submit").val("Update");
+    // show submit_edit
+    $(form).find("#submit_edit").removeClass('hide');
+    $(form).find("#submit_add").addClass('hide');
     // open dialog
     $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
@@ -215,13 +231,11 @@ $.fn.init_cancel_appointment = function() {
                                                      title: $("div.dialog#cancel_appointment_dialog").attr('title') });
 
   // user click on 'cancel appointment', results in opening cancel appointment dialog
+  /*
   $("a.cancel").click(function() {
     // fill in dialog appointment values
     var appointment_div     = $(this).closest("div.appointment");
     var appt_id             = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];
-    // var service_name        = $(appointment_div).find("div.service").text();
-    // var start_date_time     = $(appointment_div).attr('appt_day_date_time');
-    // var customer_name       = $(appointment_div).find("div.customer div.customer_name").children().text();
     var start_date_time     = appointments.get(appt_id).get('appt_day_date_time');
     var service_name        = appointments.get(appt_id).get('appt_service');
     var customer_name       = appointments.get(appt_id).get('appt_customer');
@@ -258,19 +272,22 @@ $.fn.init_cancel_appointment = function() {
     $(cancel_dialog).dialog('open');
     return false;
   })
-
+  */
+  
+  /*
   $("a#cancel_appointment").click(function() {
     $.get(this.href, {}, null, "script");
     $(this).replaceWith("<h3 class ='submitting'>Canceling...</h3>");
     return false;
   })
+  */
 }
 
 // add free time for a provider on a specific day
 $.fn.init_add_free_appointment = function() {
   
   // initialize add free appointment dialog
-  $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 285, show: 'fadeIn(slow)', 
+  $("div#add_free_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 575, height: 300, show: 'fadeIn(slow)', 
                                                 title: $("div#add_free_appointment_dialog").attr('title') });
   
   // open add free appointment dialog on click
@@ -286,8 +303,9 @@ $.fn.init_add_free_appointment = function() {
     // clear start_at, end_at time fields
     $(form).find("input#free_start_at").val('');
     $(form).find("input#free_end_at").val('');
-    // set form submit text
-    $(form).find("input:submit").val("Add");
+    // show submit_add
+    $(form).find("#submit_add").removeClass('hide');
+    $(form).find("#submit_edit").addClass('hide');
     // open dialog
     $("div#add_free_appointment_dialog").dialog('open');
     return false;
@@ -338,20 +356,30 @@ $.fn.init_add_free_appointment = function() {
 
     // serialize form
     data = $(this).serialize();
-    //alert("form serialize: " + data);
-    //return false;
+
+    // check if its a post or put
+    if ($(this).attr('method') == 'put') {
+      var action = 'update';
+      $.put(this.action, data, null, "script");
+    } else {
+      var action = 'add';
+      $.post(this.action, data, null, "script");
+    }
 
     // enable start_at, end_at fields
     $(this).find("input#free_start_at").removeAttr('disabled');
     $(this).find("input#free_end_at").removeAttr('disabled');
 
-    // check if its a post or put
-    if ($(this).attr('method') == 'put') {
-      $.put(this.action, data, null, "script");
+    // hide add and edit buttons, show adding or updating div
+    $(this).find('div#submit_add').addClass('hide');
+    $(this).find('div#submit_edit').addClass('hide');
+
+    if (action == 'add') {
+      $(this).find('div#adding').removeClass('hide');
     } else {
-      $.post(this.action, data, null, "script");
+      $(this).find('div#updating').removeClass('hide');
     }
-    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
+
     return false;
   })
 }
@@ -363,30 +391,36 @@ $.fn.init_edit_free_appointment = function() {
     // fill in appointment values since this is an edit form
     var appointment_div     = $(this).closest("div.appointment");
     var appt_id             = $(appointment_div).attr('id').match(/\w_(\d+)/)[1];
-    // var start_date          = convert_yymmdd_string_to_mmddyy($(appointment_div).attr('appt_schedule_day'));
-    // var start_time          = $(appointment_div).attr('appt_start_time');
-    // var end_time            = $(appointment_div).attr('appt_end_time');
     var start_date          = convert_yymmdd_string_to_mmddyy(appointments.get(appt_id).get("appt_schedule_day"));
     var start_time          = appointments.get(appt_id).get("appt_start_time");
     var end_time            = appointments.get(appt_id).get("appt_end_time");
-    var edit_recurrence_url = $(this).attr('edit_recurrence');
+    var provider            = appointments.get(appt_id).get("appt_provider"); // e.g. users/1
+    var recurrence          = appointments.get(appt_id).get("appt_recurrence");
+    var update_path         = appointment_update_free_path.replace(/:id/, appt_id);
+    var cancel_path         = appointment_cancel_path.replace(/:id/, appt_id);
     $(form).find("input#free_date").val(start_date);
     $(form).find("input#free_start_at").val(start_time);
     $(form).find("input#free_end_at").val(end_time);
-    $(form).find("a#edit_recurrence").attr('href', edit_recurrence_url);
-
-    if (edit_recurrence_url != '') {
+    if (recurrence == 1) {
+      // set show weekly path
+      var provider_type = provider.split('/')[0];
+      var provider_id   = provider.split('/')[1];
+      var provider_show_weekly_path = show_weekly_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id);
+      $(form).find("a#show_weekly").attr('href', provider_show_weekly_path);
       // free appointment is a recurrence, so show link to manage it
       $(form).find("#manage_recurrence").show();
     } else {
       // free appointment is a not a recurrence
       $(form).find("#manage_recurrence").hide();
     }
+    // set cancel appointment path
+    $(form).find("a#cancel_free_appointment").attr('href', cancel_path);
     // set form url and method
-    $(form).attr('action', appointment_update_free_path.replace(/:id/, appt_id));
+    $(form).attr('action', update_path);
     $(form).attr('method', 'put');
-    // set form submit text
-    $(form).find("input:submit").val("Update");
+    // show submit_edit
+    $(form).find("#submit_edit").removeClass('hide');
+    $(form).find("#submit_add").addClass('hide');
     // open dialog
     $("div#add_free_appointment_dialog").dialog('open');
     return false;
@@ -403,7 +437,7 @@ $.fn.init_show_appointment_on_hover = function () {
       $("#hover_" + this.id).hide();
     }
   )
-} 
+}
 
 // show calendar for the selected provider
 $.fn.init_select_calendar_show_provider = function () {
@@ -491,25 +525,25 @@ $.fn.init_add_calendar_markings = function() {
     if (free_capacity_slots > 0) {
       // mark as free, add text
       $("div#free_work_calendar td#" + date).addClass('activity').addClass('free');
-      text.push('Free');
+      text.push("<span class='free text'>Free</span>");
     }
 
     if (work_appointments > 0) {
       // mark as work, add text
       $("div#free_work_calendar td#" + date).addClass('activity').addClass('work');
-      text.push('Work');
+      text.push("<span class='work text'>Work</span>");
     }
 
     if (overbooked_capacity_slots > 0) {
       // mark as overbooked, add text
       $("div#free_work_calendar td#" + date).addClass('activity').addClass('overbooked');
-      text.push('<br/>Overbooked');
+      text.push("<br/><span class='overbooked text'>Overbooked</span>");
     }
 
     if (vacation_appointments > 0) {
       // mark as vacation, add text
       $("div#free_work_calendar td#" + date).addClass('activity').addClass('vacation');
-      text.push('<br/>Vacation');
+      text.push("<br/><span class='vacation text'>Vacation</span>");
     }
 
     if ($(this).hasClass('empty')) {

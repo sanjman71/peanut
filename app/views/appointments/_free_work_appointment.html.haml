@@ -20,11 +20,16 @@
     .span-4
       .span-4.last.service{:class => appointment.mark_as}
         - if (appointment.work? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
-          -# work appointments can be viewed with read permissions
-          = link_to appointment.service.name, appointment_path(appointment)
+          - if appointment.canceled?
+            -# canceled work appointments can't be managed
+            = appointment.service.name
+          - else
+            -# work appointments can be edited/canceled with manage permissions
+            = link_to appointment.service.name, '#', :id => "edit_work_appointment"
         - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
           -# free appointments can be viewed with read permissions
-          = appointment.recurrence? ? link_to("Weekly Availability", show_weekly_path(appointment.provider.tableize, appointment.provider.id)) : "Scheduled Availability"
+          - link_text = appointment.recurrence? ? 'Weekly Availability' : 'Scheduled Availability'
+          = link_to(link_text, '#', :id => 'edit_free_appointment')
         - elsif appointment.vacation?
           %span.bold== Vacation
         - else
@@ -48,28 +53,32 @@
                 - if !appointment.customer.primary_phone_number.blank?
                   .span-4.last.customer_phone_email
                     %h6= number_to_phone(appointment.customer.primary_phone_number.address.to_i, :area_code => true, :delimiter => " ")
-        - if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
-          .span-3.last
-            == &nbsp;
-        - else
-          .span-3.last
-            .span-3.last.editcancel
-              .span-3.last.editcancel-one
-                - if appointment.canceled?
-                  == Canceled
-                - elsif appointment.vacation?
+        -# the edit/cancel links have been rolled into the 'show' link above
+
+        -#- if !(has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company))
+          -#.span-3.last
+            -#== &nbsp;
+        -#- else
+          -#.span-3.last
+            -#.span-3.last.editcancel
+              -#.span-3.last.editcancel-one
+                -#- if appointment.canceled?
+                  -#== Canceled
+                -#- elsif appointment.vacation?
                   -# no edit, cancel link on vacation appointments
-                  == &nbsp;
-                - else
-                  - if appointment.recurrence? and !appointment.recurrence_parent?
+                  -#== &nbsp;
+                -#- else
+                  -#- if appointment.recurrence? and !appointment.recurrence_parent?
                     -# allow user to manage provider's weekly schedule path for both edit and cancel recurence actions
-                    - edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
-                  - else
+                    -#- edit_recurrence = show_weekly_path(appointment.provider.tableize, appointment.provider.id)
+                  -#- else
                     -# its not a recurrence
-                    - edit_recurrence = ''
-                  = link_to('Edit', '#', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
-                  |
-                  = link_to('Cancel', '#', :url => cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
+                    -#- edit_recurrence = ''
+                  -#= link_to('Edit', '#', :id => "edit_#{appointment.mark_as}_appointment", :edit_recurrence => edit_recurrence)
+                  -#|
+                  -#= link_to('Cancel', '#', :url => cancel_appointment_path(appointment), :class => ["cancel", "confirm", appointment.mark_as].join(" "), :edit_recurrence => edit_recurrence)
+
+    -# appointment notes
     - unless appointment.notes.empty?
       .span-11.last
         .span-2

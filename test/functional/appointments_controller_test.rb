@@ -102,68 +102,6 @@ class AppointmentsControllerTest < ActionController::TestCase
     @request.host = "www.walnutcalendar.com"
   end
   
-  #
-  # Single date appointment tests
-  #
-  # context "with free time on a single date" do  
-    # context "new work appointment as guest" do
-    #   setup do
-    #     @controller.stubs(:current_user).returns(nil)
-    #     # book a haircut with johnny during his free time
-    #     get :new,
-    #         :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
-    #         :duration => @haircut.duration, :mark_as => 'work'
-    #   end
-    #   
-    #   should "not show rpx login" do
-    #     assert_select 'div#rpx_login', 0
-    #   end
-    #   
-    #   should "not show (hidden) peanut login" do
-    #     assert_select 'div.hide#peanut_login', 0
-    #   end
-    #   
-    #   should "not show customer reminder options" do
-    #     assert_select "input#reminder_customer_on", 0
-    #     assert_select "input#reminder_customer_off", 0
-    #   end
-    #   
-    #   should_respond_with :success
-    #   should_render_template 'appointments/new.html.haml'
-    # end
-  
-    # context "new work appointment as customer" do
-    #   context "with no email address" do
-    #     setup do
-    #       # stub current user
-    #       @controller.stubs(:current_user).returns(@customer)
-    #       # book a haircut with johnny during his free time
-    #       get :new, 
-    #           :provider_type => 'users', :provider_id => @johnny.id, :service_id => @haircut.id, :start_at => @appt_datetime,
-    #           :duration => @haircut.duration, :mark_as => 'work'
-    #     end
-    #   
-    #     should_assign_to :appointment, :class => Appointment
-    #     should_assign_to(:service) { @haircut }
-    #     should_assign_to(:duration) { 30.minutes }
-    #     should_assign_to(:provider) { @johnny }
-    #     should_assign_to(:customer) { @customer }
-    #     should_assign_to(:creator) { @customer }
-    #     should_assign_to(:appt_date) { @time_range.start_at.in_time_zone.to_s(:appt_schedule_day) }
-    #     should_assign_to(:appt_time_start_at) { "0900" }
-    #     should_assign_to(:appt_time_end_at) { "0930" }
-    #   
-    #     should "not show customer reminder options" do
-    #       assert_select "input#reminder_customer_on", 0
-    #       assert_select "input#reminder_customer_off", 0
-    #     end
-    #   
-    #     should_respond_with :success
-    #     should_render_template 'appointments/new.html.haml'
-    #   end
-    # end
-  # end
-  
   context "create free appointment" do
     context "without privilege 'update calendars'" do
       setup do
@@ -229,6 +167,10 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "not set appointment customer" do
         @appointment = Appointment.find(assigns(:appointment).id)
         assert_nil @appointment.customer
+      end
+
+      should "set flash" do
+        assert flash[:notice].match(/Your availability was added/)
       end
 
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
@@ -461,6 +403,10 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_equal "/users/#{@johnny.id}/calendar?highlight=#{@today}", session[:return_to]
       end
 
+      should "set flash" do
+        assert flash[:notice].match(/#{@customer.name}'s appointment with #{@johnny.name} was created/)
+      end
+
       should_redirect_to("user appointment cleanup path" ) { "/users/#{@customer.id}/appointments/cleanup" }
     end
 
@@ -489,6 +435,10 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "set appointment customer" do
         @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal @customer, @appointment.customer
+      end
+
+      should "set flash" do
+        assert flash[:notice].match(/Your appointment with #{@johnny.name} was created/)
       end
 
       should_redirect_to("user appointment cleanup path" ) { "/users/#{@customer.id}/appointments/cleanup" }
@@ -1482,7 +1432,11 @@ class AppointmentsControllerTest < ActionController::TestCase
       should "remove free slot" do
         assert_nil CapacitySlot.find_by_id(@free_slot.id)
       end
-  
+
+      should "set flash" do
+        assert flash[:notice].match(/#{@johnny.name}'s availability was canceled/)
+      end
+
       should_redirect_to("referer") { "/users/#{@johnny.id}/calendar?highlight=#{@free_appt.start_at.to_s(:appt_schedule_day)}" }
     end
   end
@@ -1523,7 +1477,11 @@ class AppointmentsControllerTest < ActionController::TestCase
   
       should_not_change("capacity slot count") { CapacitySlot.count}
       should_change("free slot duration", :by => 30.minutes) { @free_slot.reload.duration }
-  
+
+      should "set flash" do
+        assert flash[:notice].match(/#{@customer.name}'s appointment with #{@johnny.name} was canceled/)
+      end
+
       should_redirect_to("referer") { "/openings?highlight=#{@work_appt.start_at.to_s(:appt_schedule_day)}" }
     end
   

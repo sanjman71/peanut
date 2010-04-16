@@ -1,4 +1,4 @@
-.span-9.prepend-1.last.dialog.hide#add_free_appointment_dialog{:title => "Manage Available Time for #{provider.name.titleize}"}
+.span-10.prepend-1.last.dialog.hide#add_free_appointment_dialog{:title => "Manage Available Time for #{provider.name.titleize}"}
   - form_for(Appointment.new, :url => url_for(:controller => 'appointments', :action => 'create_free'), :html => {:id => 'add_free_appointment_form'}) do |f|
     = hidden_field_tag :provider_type, provider.tableize
     = hidden_field_tag :provider_id, provider.id
@@ -10,29 +10,37 @@
     = hidden_field_tag :end_at, nil
 
     .add_free_time
-      .span-9.last.padding-bottom-10
+      .span-10.last.padding-bottom-10
         .span-2.label
           %h4.bottom.block{:style => 'color: #fff;'}== Date
-        .span-7.last#free_date
+        .span-8.last#free_date
           -# field is disabled when adding appointments
           = text_field_tag 'date', '', :id =>'free_date', :class => 'big disabled', :disabled => true
 
-      .span-9.last.padding-bottom-10
+      .span-10.last.padding-bottom-10
         .span-2.label
           %h4.bottom.block{:style => 'color: #fff;'}== Start
-        .span-7.last#free_start_at_text
+        .span-8.last#free_start_at_text
           = text_field_tag 'start_at', '', :id => 'free_start_at', :class => 'appointment free timepicker big', :autocomplete => 'off'
 
-      .span-9.last.padding-bottom-10
+      .span-10.last.padding-bottom-10
         .span-2.label
           %h4.bottom.block{:style => 'color: #fff;'}== End
-        .span-7.last#free_end_at_text
+        .span-8.last#free_end_at_text
           = text_field_tag 'end_at', '', :id => 'free_end_at', :class => 'appointment free timepicker big', :autocomplete => 'off'
 
       -# manage recurrence
-      .span-9.last.padding-bottom-10#manage_recurrence.hide
-        %h4.small.bottom== This will edit a single appointment in the weekly availability.
-        %h4.small.bottom== Click #{link_to 'here', '#', :id => 'edit_recurrence'} to manage the weekly schedule.
+      .span-10.last.padding-bottom-10#manage_recurrence.hide
+        %h4.small.bottom== This will edit or cancel a single appointment in the weekly availability.
+        %h4.small.bottom== Click #{link_to 'here', '#', :id => 'show_weekly'} to manage the weekly schedule.
 
-      .span-9.last.padding-top-10.padding-bottom-10
-        #submit= f.submit 'Add', :name => nil, :class => 'button big', :id => 'add_free_appointment'
+      .span-10.last.padding-top-10.padding-bottom-10
+        #submit_add= f.submit 'Add Availability', :name => nil, :id => 'add_free_appointment', :class => 'big'
+        #submit_edit
+          = f.submit 'Update Availability', :name => nil, :id => 'add_free_appointment', :class => 'big'
+          %span{:style => 'padding: 0 7px 0 7px;'}== or
+          = link_to 'Cancel Availability', '#', :id => 'cancel_free_appointment', :class => 'ujs cancel confirm work', :method => :put, :question => 'Are you sure you want to cancel this availability?'
+        #adding.hide
+          %h3.submitting== Adding ...
+        #updating.hide
+          %h3.submitting== Updating ...
