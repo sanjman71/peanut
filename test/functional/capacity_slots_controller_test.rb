@@ -2,9 +2,9 @@ require 'test/test_helper'
 
 class CapacitySlotsControllerTest < ActionController::TestCase
 
-  # SK: not sure why this generates an error
-  # should_route :get, '/users/1/capacity/20100101T090000..20100101T120000',
-  #                    :controller => 'capacity_slots', :action => 'capacity', :provider_type => 'users', :provider_id => '1'
+  should_route :get, '/users/1/capacity/start/20100101T090000/duration/3600',
+                     :controller => 'capacity_slots', :action => 'capacity', :provider_type => 'users', :provider_id => '1',
+                     :start_time => '20100101T090000', :duration => '3600'
 
   def setup
     # create a valid company, with 1 service and 2 providers
@@ -35,7 +35,7 @@ class CapacitySlotsControllerTest < ActionController::TestCase
         @slot = CapacitySlot.create(:company => @company, :provider => @johnny, :capacity => 1,
                                     :start_at => @start_tomorrow, :end_at => @start_tomorrow + 8.hours)
         xhr :get, :capacity, :format => 'json', :provider_type => 'users', :provider_id => @johnny.id,
-                  :start_time => @start_tomorrow.to_s(:appt_schedule), :end_time => (@start_tomorrow+1.hour).to_s(:appt_schedule)
+                  :start_time => @start_tomorrow.to_s(:appt_schedule), :duration => 1.hour.to_s
       end
 
       should_assign_to(:provider) { @provider}
@@ -53,7 +53,7 @@ class CapacitySlotsControllerTest < ActionController::TestCase
         @slot = CapacitySlot.create(:company => @company, :provider => @johnny, :capacity => 1,
                                     :start_at => @start_tomorrow, :end_at => @start_tomorrow + 1.hours)
         xhr :get, :capacity, :format => 'json', :provider_type => 'users', :provider_id => @johnny.id,
-                  :start_time => @start_tomorrow.to_s(:appt_schedule), :end_time => (@start_tomorrow+2.hours).to_s(:appt_schedule)
+                  :start_time => @start_tomorrow.to_s(:appt_schedule), :duration => 2.hours.to_s
       end
 
       should_assign_to(:provider) { @provider}
@@ -71,7 +71,7 @@ class CapacitySlotsControllerTest < ActionController::TestCase
         @slot = CapacitySlot.create(:company => @company, :provider => @johnny, :capacity => 1,
                                     :start_at => @start_tomorrow, :end_at => @start_tomorrow + 1.hour)
         xhr :get, :capacity, :format => 'json', :provider_type => 'users', :provider_id => @johnny.id,
-                  :start_time => (@start_tomorrow-1.hour).to_s(:appt_schedule), :end_time => (@start_tomorrow+1.hour).to_s(:appt_schedule)
+                  :start_time => (@start_tomorrow-1.hour).to_s(:appt_schedule), :duration => 2.hours.to_s
       end
 
       should_assign_to(:provider) { @provider}
@@ -89,7 +89,7 @@ class CapacitySlotsControllerTest < ActionController::TestCase
         @slot = CapacitySlot.create(:company => @company, :provider => @johnny, :capacity => 1,
                                     :start_at => @start_tomorrow, :end_at => @start_tomorrow + 1.hour)
         xhr :get, :capacity, :format => 'json', :provider_type => 'users', :provider_id => @johnny.id,
-                  :start_time => (@start_tomorrow+1.hour).to_s(:appt_schedule), :end_time => (@start_tomorrow+3.hours).to_s(:appt_schedule)
+                  :start_time => (@start_tomorrow+1.hour).to_s(:appt_schedule), :duration => 3.hours.to_s
       end
 
       should_assign_to(:provider) { @provider}
