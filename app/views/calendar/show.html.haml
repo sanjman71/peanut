@@ -142,6 +142,7 @@
   var appointment_update_work_path = "#{appointment_path(':id')}";
   var appointment_create_free_path = "#{create_free_path}"
   var appointment_update_free_path = "#{appointment_path(':id')}";
+  var provider_capacity_path       = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration')}";
 
   -# build appointments hash for free and work appointments
   var appointments  = new Hash();

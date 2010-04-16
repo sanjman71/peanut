@@ -58,6 +58,8 @@ $.fn.init_add_work_appointment = function() {
     var provider      = $(this).find("select#provider option:selected").val();
     var provider_type = provider.split('/')[0];
     var provider_id   = provider.split('/')[1];
+    var duration      = $(this).find("select#duration option:selected").val();
+    var capacity      = $(this).find("input#capacity").val();
 
     if (!start_date) {
       alert("Please select a date");
@@ -81,12 +83,26 @@ $.fn.init_add_work_appointment = function() {
 
     // normalize time format
     var start_time = convert_time_ampm_to_string(start_time)
-
     // normalize date format
     var start_date = convert_date_to_string(start_date);
 
+    var start_date_time = start_date + 'T' + start_time;
+
+    if (capacity == '') {
+      // check capacity, allow callback to handle response and detemine whether we should continue
+      var capacity_url = provider_capacity_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
+      $.get(capacity_url, {}, function(data) { check_capacity_response(data) }, "json");
+      // hide add button, show checking div
+      $(this).find('div#submit').addClass('hide');
+      $(this).find('div#checking').removeClass('hide');
+      return false;
+    } else {
+      // capacity is set, meaning it was checked and ok'ed by the user; disable the value here so its not submitted
+      $(this).find("input#capacity").attr('disabled', 'disabled');
+    }
+
     // replace hidden tag formatted version
-    $(this).find("input#start_at").attr('value', start_date + 'T' + start_time);
+    $(this).find("input#start_at").attr('value', start_date_time);
 
     // set provider_type, provider_id hidden fields; disable provider field
     $(this).find("input#provider_type").attr('value', provider_type);
@@ -113,9 +129,34 @@ $.fn.init_add_work_appointment = function() {
       // post
       $.post(this.action, data, null, "script");
     }
-    $(this).find('input[type="submit"]').replaceWith("<h3 class ='submitting'>Adding...</h3>");
+
+    // hide add button, show adding div
+    $(this).find('div#submit').addClass('hide');
+    $(this).find('div#checking').addClass('hide');
+    $(this).find('div#adding').removeClass('hide');
+
     return false;
   })
+}
+
+function check_capacity_response(data) {
+  var capacity = data.capacity;
+  var form     = $("form#add_work_appointment_form");
+
+  if (capacity < 1) {
+    yesno = confirm("Creating this appointment will overbook the provider.  Are you sure you want to continue?");
+    if (yesno == false)
+    {
+      // show add button
+      $(form).find("div#submit").removeClass('hide');
+      $(form).find("div#checking").addClass('hide');
+      return false;
+    }
+  }
+
+  // set capacity and click submit to add appointment
+  $(form).find("input#capacity").val(capacity);
+  $(form).submit();
 }
 
 $.fn.init_edit_work_appointment = function() {

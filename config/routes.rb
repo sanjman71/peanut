@@ -193,7 +193,8 @@ ActionController::Routing::Routes.draw do |map|
   map.delete_company_vacation   '/vacation/:id', :controller => 'vacations', :action => 'destroy', :conditions => {:method => :delete}
 
   # capacity slots
-  map.provider_capacity         '/:provider_type/:provider_id/capacity/:start_time..:end_time', :controller => 'capacity_slots', :action => 'capacity'
+  map.provider_capacity         '/:provider_type/:provider_id/capacity/start/:start_time/duration/:duration', 
+                                :controller => 'capacity_slots', :action => 'capacity'
 
   # reports
   map.resources         :reports, :only => [:index], :collection => {:route => :post}
