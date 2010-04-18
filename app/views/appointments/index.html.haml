@@ -22,10 +22,6 @@
     .span-23.last#today
       %h4== Today is #{Time.now.to_s(:appt_day)}
 
-    .span-23.last#change_instructions
-      %p
-        == To change an appointment, first book a new appointment and then follow the instructions to cancel the original appointment.
-
     .span-15.last#back
       %h4= link_to 'Back', customers_path, :class => 'admin'
 
@@ -49,7 +45,8 @@
 
     -# customer appointments
     - reset_cycle
-    = render(:partial => 'customer_appointments', :locals => {:customer => user, :appointments => appointments, :details => 1})
+    = render(:partial => 'customer_appointments', |
+             :locals => {:customer => user, :appointments => appointments, :reschedule => current_user == user ? 1 : 0, :details => 1}) |
 
     -# add space between customer appointment groups
     %hr.space
@@ -57,4 +54,7 @@
 -# appointment help
 -#.span-7.prepend-1.last
   -#= render(:partial => 'appointment_help', :locals => {:state => @state})
+
+-# reschedule dialog
+= render(:partial => "appointments/reschedule_work_appointment_dialog")
 

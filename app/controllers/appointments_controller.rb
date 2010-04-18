@@ -3,13 +3,12 @@ class AppointmentsController < ApplicationController
                                           :update_weekly, :show_weekly, :create_work, :update]
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
                                                      :update_weekly, :show_weekly, :create_work, :update]
-  before_filter :init_appointment, :only => [:show]
+  before_filter :init_appointment, :only => [:show, :reschedule]
   before_filter :init_appointment_and_provider, :only => [:cancel]
   before_filter :init_customer_user, :only => [:cleanup]
-  before_filter :get_reschedule_id, :only => [:new]
 
   privilege_required      'authenticated', :only => [:create_work], :on => :current_company
-  privilege_required_any  'manage appointments', :only =>[:show], :on => [:appointment, :current_company]
+  privilege_required_any  'manage appointments', :only =>[:show, :reschedule], :on => [:appointment, :current_company]
   privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
                                                        :update_weekly, :show_weekly, :update, :cancel],
@@ -152,16 +151,6 @@ class AppointmentsController < ApplicationController
           end
           # redirect to customer appointment cleanup path
           @redirect_path = user_appts_cleanup_path(@customer)
-
-          # check if its an appointment reschedule
-          if has_reschedule_id?
-            # cancel the old work appointment
-            AppointmentScheduler.cancel_appointment(get_reschedule_appointment)
-            # reset reschedule id
-            reset_reschedule_id
-            # reset flash message
-            flash[:notice]  = "Your #{@service.name} appointment has been confirmed, and your old appointment has been canceled."
-          end
 
           begin
             # send appointment confirmation based on preferences
@@ -597,23 +586,6 @@ class AppointmentsController < ApplicationController
     end
   end
 
-  # GET /appointments/1/reschedule
-  def reschedule
-    @appointment  = current_company.appointments.find(params[:id])
-
-    if request.post?
-      # start the re-schedule process
-      logger.debug("*** starting the re-schedule process")
-      set_reschedule_id(@appointment)
-      @redirect_path = url_for(:controller => 'openings', :action => 'index', :type => 'reschedule', :subdomain => current_subdomain)
-    end
-    
-    respond_to do |format|
-      format.html
-      format.js
-    end
-  end
-  
   # GET /appointments/1
   def show
     # @appointment has been initialized in before filter
@@ -953,6 +925,25 @@ class AppointmentsController < ApplicationController
   #   end
   # end
 
+  # PUT /appointments/1/reschedule
+  def reschedule
+    # @appointment initialized in before filter
+
+    # set session object
+    set_reschedule_appointment(@appointment)
+
+    # set redirect path
+    @redirect_path = openings_path
+
+    # set flash message
+    flash[:notice] = get_reschedule_start_message(@appointment)
+
+    respond_to do |format|
+      format.html { redirect_to(@redirect_path) and return }
+      format.js { render(:update) { |page| page.redirect_to(@redirect_path) } }
+    end
+  end
+
   # GET /users/1/appointments/cleanup
   # GET /users/1/appointments/cleanup/done
   def cleanup
@@ -971,6 +962,18 @@ class AppointmentsController < ApplicationController
     @search_scope = "next 2 weeks"
     # find confirmed appointments in the search range, order by most recently updated
     @appointments = current_company.appointments.work.confirmed.customer(@user).future.before(Time.zone.now+@search_range).all(:order => 'appointments.updated_at desc, appointments.id desc')
+
+    # check for a re-scheduled appointment
+    if get_reschedule_appointment and @appointments.include?(get_reschedule_appointment)
+      # cancel the original appointment
+      AppointmentScheduler.cancel_appointment(get_reschedule_appointment)
+      # remove rescheduled appointment from appointments collection
+      @appointments = @appointments - [get_reschedule_appointment]
+      # reset session object
+      reset_reschedule_appointment
+      # add/udate flash message
+      flash[:notice] = flash[:notice].to_s + "<br/>Your original appointment was canceled."
+    end
 
     if @appointments.size <= 1
       # we need at least 2 appointments to cleanup

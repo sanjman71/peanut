@@ -46,6 +46,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :put, '/appointments/1/noshow', :controller => 'appointments', :action => 'noshow', :id => 1
   should_route :get, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
   should_route :put, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
+  should_route :put, '/appointments/1/reschedule', :controller => 'appointments', :action => 'reschedule', :id => 1
 
   # show work appointments by state
   should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
@@ -1568,6 +1569,184 @@ class AppointmentsControllerTest < ActionController::TestCase
       end
 
       should_change("Appointment.count", :by => -1) { Appointment.count }
+    end
+  end
+
+  context "cleanup" do
+    context "as provider" do
+      context "for invalid customer" do
+        setup do
+          @controller.stubs(:current_user).returns(@johnny)
+          # session[:return_to] = "/boo"
+          get :cleanup, :user_id => @customer.id
+        end
+
+        should_redirect_to("unauthorized path") { "/unauthorized" }
+      end
+
+      context "for customer with no appointments" do
+        setup do
+          @controller.stubs(:current_user).returns(@johnny)
+          @customer.grant_role('company customer', @company)
+          session[:return_to] = "/boo"
+          get :cleanup, :user_id => @customer.id
+        end
+
+        should_assign_to(:user) { @customer }
+        should_assign_to(:appointments) { [] }
+
+        should_redirect_to("session[:return_to]") { "/boo" }
+      end
+
+      context "for customer with more than 1 appointment" do
+        setup do
+          # create free time from 10 am to 2 pm
+          @day          = (Time.zone.now+2.days).to_s(:appt_schedule_day) # e.g. 20081201
+          @time_range   = TimeRange.new({:day => @day, :start_at => "1000", :end_at => "1400"})
+          @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+          # create work appointments, make sure the seccond appt has a different updated_at timestamp
+          @options      = {:start_at => @free_appt.start_at}
+          @work_appt1   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt1.valid?
+          @options      = {:start_at => @free_appt.start_at + 2.hours}
+          @work_appt2   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt2.valid?
+          # change updated_at timestamp
+          @work_appt2.update_attribute(:updated_at, @work_appt1.updated_at + 2.seconds)
+          assert_equal 2, @customer.customer_appointments.size
+          @controller.stubs(:current_user).returns(@johnny)
+          session[:return_to] = "/boo"
+          get :cleanup, :user_id => @customer.id
+        end
+
+        should_assign_to(:user) { @customer }
+        should_assign_to(:appointments) { [@work_appt2, @work_appt1] }
+        should_assign_to(:recent_appointment) { @work_appt2 }
+        should_assign_to(:other_appointments) { [@work_appt1] }
+        should_assign_to(:search_range) { 14.days }
+        should_assign_to(:search_scope) { "next 2 weeks" }
+
+        should_respond_with :success
+        should_render_template "appointments/cleanup.html.haml"
+      end
+
+      context "for customer with a rescheduled appointment" do
+        setup do
+          # create free time from 10 am to 2 pm
+          @day          = (Time.zone.now+2.days).to_s(:appt_schedule_day) # e.g. 20081201
+          @time_range   = TimeRange.new({:day => @day, :start_at => "1000", :end_at => "1400"})
+          @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+          # create work appointments, make sure each appointment has different updated_at timestamps
+          @options      = {:start_at => @free_appt.start_at}
+          @work_appt1   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt1.valid?
+          @options      = {:start_at => @free_appt.start_at + 2.hours}
+          @work_appt2   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt2.valid?
+          # change updated_at timestamp
+          @work_appt2.update_attribute(:updated_at, @work_appt1.updated_at + 2.seconds)
+          assert_equal 2, @customer.customer_appointments.size
+          # mark appt1 as re-scheduled
+          session[:reschedule_id] = "#{@work_appt1.id}:#{(Time.zone.now-1.minute).to_s(:appt_schedule)}"
+          @controller.stubs(:current_user).returns(@johnny)
+          session[:return_to] = "/boo"
+          get :cleanup, :user_id => @customer.id
+        end
+
+        should_assign_to(:user) { @customer }
+        should_assign_to(:reschedule_appointment) { @work_appt1 }
+
+        should "cancel re-scheduled appointment" do
+          assert_true @work_appt1.reload.canceled?
+        end
+
+        should "add cancel message to flash" do
+          assert_match /Your original appointment was canceled./, flash[:notice]
+        end
+
+        should_redirect_to("session[:return_to]") { "/boo" }
+      end
+
+      context "for customer with a rescheduled appointment and multiple future appointments" do
+        setup do
+          # create free time from 10 am to 2 pm
+          @day          = (Time.zone.now+2.days).to_s(:appt_schedule_day) # e.g. 20081201
+          @time_range   = TimeRange.new({:day => @day, :start_at => "1000", :end_at => "1400"})
+          @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+          # create work appointments, make sure each appointment has different updated_at timestamps
+          @options      = {:start_at => @free_appt.start_at}
+          @work_appt1   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt1.valid?
+          @options      = {:start_at => @free_appt.start_at + 2.hours}
+          @work_appt2   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          # change updated_at timestamp
+          @work_appt2.update_attribute(:updated_at, @work_appt1.updated_at + 2.seconds)
+          assert @work_appt2.valid?
+          @options      = {:start_at => @free_appt.start_at + 3.hours}
+          @work_appt3   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+          assert @work_appt3.valid?
+          # change updated_at timestamp
+          @work_appt3.update_attribute(:updated_at, @work_appt2.updated_at + 2.seconds)
+          assert_equal 3, @customer.customer_appointments.size
+          # mark appt1 as re-scheduled
+          session[:reschedule_id] = "#{@work_appt1.id}:#{(Time.zone.now-1.minute).to_s(:appt_schedule)}"
+          @controller.stubs(:current_user).returns(@johnny)
+          session[:return_to] = "/boo"
+          get :cleanup, :user_id => @customer.id
+        end
+
+        should_assign_to(:user) { @customer }
+        should_assign_to(:reschedule_appointment) { @work_appt1 }
+        should_assign_to(:recent_appointment) { @work_appt3 }
+        should_assign_to(:other_appointments) { [@work_appt2] }
+        should_assign_to(:search_range) { 14.days }
+        should_assign_to(:search_scope) { "next 2 weeks" }
+
+        should "cancel re-scheduled appointment" do
+          assert_true @work_appt1.reload.canceled?
+        end
+
+        should "add cancel message to flash" do
+          assert_match /Your original appointment was canceled./, flash[:notice]
+        end
+
+        should_respond_with :success
+        should_render_template "appointments/cleanup.html.haml"
+      end
+    end
+  end
+  
+  context "cleanup done" do
+    setup do
+      @controller.stubs(:current_user).returns(@johnny)
+      @customer.grant_role('company customer', @company)
+      session[:return_to] = "/boo"
+      get :cleanup, :done => 1, :user_id => @customer.id
+    end
+
+    should_redirect_to("session[:return_to]") { "/boo" }
+  end
+
+  context "reschedule" do
+    context "as customer" do
+      setup do
+        # create free time from 10 am to 2 pm
+        @day          = (Time.zone.now+2.days).to_s(:appt_schedule_day) # e.g. 20081201
+        @time_range   = TimeRange.new({:day => @day, :start_at => "1000", :end_at => "1400"})
+        @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+        # create work appointments
+        @options      = {:start_at => @free_appt.start_at}
+        @work_appt1   = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @johnny, @haircut, @haircut.duration, @customer, @johnny, @options)
+        assert @work_appt1.valid?
+        @controller.stubs(:current_user).returns(@customer)
+        put :reschedule, :id => @work_appt1.id, :state => 'start'
+      end
+
+      should "set session[:reschedule_id] with id and timestamp" do
+        assert_match /#{@work_appt1.id}:\d+T\d+/, session[:reschedule_id]
+      end
+
+      should_redirect_to("openings path") { "/openings" }
     end
   end
 

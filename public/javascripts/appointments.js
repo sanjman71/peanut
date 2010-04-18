@@ -238,9 +238,19 @@ $.fn.init_send_message = function() {
   })
 }
 
+// add free time for a provider on a specific day
 $.fn.init_reschedule_appointment = function() {
-  $("#reschedule_link").click(function() {
-    $.post($(this).attr("href"), {}, null, "script");
+  // initialize dialog
+  $("div#reschedule_work_appointment_dialog").dialog({ modal: true, autoOpen: false, hide: 'slide', width: 500, height: 300, show: 'fadeIn(slow)', 
+                                                       title: $("div#reschedule_work_appointment_dialog").attr('title') });
+
+  // open add free appointment dialog on click
+  $("a#reschedule_work_appointment").click(function() {
+    var div  = "div#reschedule_work_appointment_dialog";
+    var url  = $(this).attr('url');
+    $(div).find("a#reschedule_work_appointment_continue").attr('href', url);
+    // open dialog
+    $("div#reschedule_work_appointment_dialog").dialog('open');
     return false;
   })
 }

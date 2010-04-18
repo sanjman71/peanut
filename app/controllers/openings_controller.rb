@@ -122,8 +122,6 @@ class OpeningsController < ApplicationController
     end
 
     if @daterange.blank?
-      # reset reschedule id based on params
-      reset_reschedule_id_from_params
       # render empty page with help text
       logger.debug("*** showing empty page with help text")
       return

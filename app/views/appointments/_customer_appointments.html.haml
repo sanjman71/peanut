@@ -1,5 +1,6 @@
-- details = 0 unless local_assigns[:details]
-- cancel  = 0 unless local_assigns[:cancel]
+- details     = 0 unless local_assigns[:details]
+- cancel      = 0 unless local_assigns[:cancel]
+- reschedule  = 0 unless local_assigns[:reschedule]
 
 - appointments.each do |appointment|
   .span-16.last.letterbox.appointment{:class => cycle("shaded", "")}[appointment]
@@ -16,13 +17,15 @@
           = appointment.start_at.to_s(:appt_short_month_day_year)
           == @
           = appointment.start_at.to_s(:appt_time)
-          %h5= distance_of_time_in_words_to_now(appointment.start_at) + (Time.now > appointment.start_at ? " ago" : " from now")
+          %h5= distance_of_time_in_words_to_now(appointment.start_at) + (appointment.future? ? " from now" : " ago")
     -# appointment links
     .span-3.last{:style => 'margin-top: 3px;'}
       - links = []
+      - if reschedule == 1 and appointment.future? and !appointment.canceled?
+        - links.push(link_to('Reschedule', '#', :url => reschedule_appointment_path(appointment), :id => 'reschedule_work_appointment', :class => 'admin'))
       - if details == 1
         - links.push(link_to('Details', appointment_path(appointment), :class => 'admin'))
       - if cancel == 1
         - links.push(link_to('Cancel', cancel_appointment_path(appointment), :method => :put, :class => 'admin'))
       - unless links.empty?
-        = links.join(" | ")
+        = links.join("&nbsp;&nbsp;")

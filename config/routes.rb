@@ -71,22 +71,22 @@ ActionController::Routing::Routes.draw do |map|
   map.company_appts       '/appointments', :controller => 'appointments', :action => 'index', :type => 'work',
                           :conditions => {:method => :get}
   map.resources           :appointments,
-                          :member => {:approve => [:get, :put], :noshow => [:get, :put], :complete => [:get, :put], :cancel => [:get, :put], :reschedule => [:get, :post]}
+                          :member => {:approve => [:get, :put], :noshow => [:get, :put], :complete => [:get, :put], :cancel => [:get, :put],
+                                      :reschedule => :put}
 
   # staff and customer specialized routes; otherwise use more generic user routes
   map.resources           :staffs, :only => [:index]
   map.resources           :customers, :only => [:index]
-  
+
   # special invoice routes
   map.connect   'invoices/when/:when', :controller => 'invoices', :action => 'index'
   map.connect   'invoices/range/:start_date..:end_date', :controller => 'invoices', :action => 'index'
 
   # unauthorized route
   map.unauthorized  '/unauthorized', :controller => 'home', :action => 'unauthorized'
-  
+
   map.resources :companies, :only => [:index, :show, :edit, :update, :destroy], :member => {:setup => :get, :freeze => :put, :unfreeze => :put}
   map.resources :openings, :collection => { :search => [:get, :post] }, :only => [:index]
-  map.connect   '/openings/reschedule', :controller => 'openings', :action => 'index', :type => 'reschedule', :conditions => {:method => :get}
   map.resources :resources, :only => [:new, :create, :edit, :update]
   map.resources :notes, :only => [:create]
   map.resources :service_providers, :only => [:create, :destroy]
