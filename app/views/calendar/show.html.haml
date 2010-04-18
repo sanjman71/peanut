@@ -57,7 +57,7 @@
           = @daterange.name(:with_dates => true)
           -# show today button if daterange does not include today
           - unless @daterange.include?(@today)
-            %span{:style => 'padding-left: 5px;'}= link_to 'Today', url_for(params.update(:start_date => nil)), :class => 'today'
+            %span{:style => 'padding-left: 5px;'}= link_to 'Today', url_for(params.update(:start_date => nil)), :class => 'admin', :style => 'font-size: 1.0em;'
       .span-3.last.right_justify
         = prev_next_links[:next_link]
 
