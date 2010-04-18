@@ -30,8 +30,17 @@ $.fn.init_toggle_user_company_role = function() {
 
 $.fn.init_grant_revoke_user_company_role = function() {
   $("a#show_add_roles").click(function() {
-    // hide 1 span and show the next
+    // reset all spans
+    $("span#add_roles").hide();
+    $("span#add_roles_text").show();
+    // hide this span and show the next
     $(this).closest("span#add_roles_text").hide().next().show();
+    return false;
+  })
+
+  $("a#cancel_add_roles").click(function() {
+    // hide this span and show the previous
+    $(this).closest("span#add_roles").hide().prev().show();
     return false;
   })
 
