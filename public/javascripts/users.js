@@ -277,19 +277,23 @@ $.fn.init_send_message_dialog = function() {
   // initialize send message dialog
   $("div#send_message_dialog").dialog({ modal: true, autoOpen: false, width: 600, height: 375, show: 'fadeIn(slow)', title: $("div#send_message_dialog").attr('title') });
 
-  // open dialog when 'add waitlist' link is clicked
-  $("a#send_sms").click(function() {
+  $("a#send_sms,a#send_email").click(function() {
     // initialize form
     var form = $("form#send_message_form");
 
-    // get phone number
-    var phone = $(this).attr('href');
+    // get phone number or email
+    var address = $(this).attr('href');
 
     // set address, hide subject for sms messages
-    $(form).find("input#message_address").val(phone);
+    $(form).find("input#message_address").val(address);
     $(form).find("input#message_address").attr('disabled', 'disabled');
-    $(form).find("div#message_subject").addClass('hide');
-
+    if ($(this).attr('id').match(/sms/)) {
+      $(form).find("input#message_subject").removeClass('required');
+      $(form).find("div#message_subject").addClass('hide');
+    } else {
+      $(form).find("input#message_subject").addClass('required');
+      $(form).find("div#message_subject").removeClass('hide');
+    }
     // open dialog
     $("div.dialog#send_message_dialog").dialog('open');
 
@@ -297,8 +301,15 @@ $.fn.init_send_message_dialog = function() {
   })
 
   $("form#send_message_form").submit(function() {
-    var body            = $(this).find("textarea#message_body").attr('value');
-    var body_required   = $(this).find("textarea#message_body").hasClass('required');
+    var subject           = $(this).find("input#message_subject").attr('value');
+    var subject_required  = $(this).find("input#message_subject").hasClass('required');
+    var body              = $(this).find("textarea#message_body").attr('value');
+    var body_required     = $(this).find("textarea#message_body").hasClass('required');
+
+    if (subject_required && subject == '') {
+      alert("Please enter a message subject");
+      return false;
+    }
 
     if (body_required && body == '') {
       alert("Please enter a message body");

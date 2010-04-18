@@ -51,9 +51,12 @@
           - if email_form.object.deletable? and (email_form.object != @primary_email_address)
             -# allow delete for non-primary emails
             - markers.push(link_to('Delete', user_email_delete_path(@user, email_form.object), :method => :delete, :class => 'admin'))
+          - if has_privilege?('manage site')
+            -# allow site managers to send emails
+            - markers.push(link_to('Send Email', email_form.object.address, :id => 'send_email', :class => 'admin'))
 
         - unless markers.empty?
-          %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
+          %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(",&nbsp;&nbsp;")
 
   - if has_privilege?('update users', @user) || has_privilege?('update users', current_company)
     -# add email link
@@ -84,7 +87,7 @@
             -# allow site managers to send sms messages to mobile phones
             - markers.push(link_to('Send Sms', phone_form.object.address, :id => 'send_sms', :class => 'admin'))
           - unless markers.empty?
-            %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(", ")
+            %span{:style => 'padding-left: 7px; font-weight: bold;'}= markers.join(",&nbsp;&nbsp;")
       .span-20.last
         .span-4.text-align-right
           %h3{:style => 'font-size: 1.8em; margin-top: 14px;'}= label_tag "phone_name", "Phone Name:"
@@ -108,9 +111,11 @@
       - else
         - if !@primary_email_address.blank?
           -# password reset link
-          - password_links.push(link_to('Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @primary_email_address.address))
+          - password_links.push(link_to('Reset password', password_reset_path, :class => 'admin', :id => 'manager_reset_password', :email => @primary_email_address.address, |
+                                         :title => 'Send user a new password')) |
         -# possword clear link
-        - password_links.push(link_to('Clear password', password_clear_path, :class => 'admin', :id => 'clear_password'))
+        - password_links.push(link_to('Clear password', password_clear_path, :class => 'admin', :id => 'clear_password', |
+                                      :title => 'Allow user to login without a password')) |
 
     .span-20.last.password#password_and_confirmation{:class => @user.crypted_password.blank? ? 'hide' : ''}
       -# password
