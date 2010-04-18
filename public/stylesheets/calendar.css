@@ -4,27 +4,37 @@ table.layout                                      { border-collapse: collapse; c
 
 table.calendar                                    { background: #E1E0E0 none repeat scroll 0 0; margin-bottom: 15px; width: 100%; text-align: left;}
 
-table.calendar th                                 { background: transparent none repeat scroll 0 0; color: #111111; font-size: 1.2em; padding: 3px;
-                                                    text-align: left; width: 80px;}
+table.calendar th                                 { background: transparent none repeat scroll 0 0; color: #111111; font-size: 1.0em; padding: 3px;
+                                                    text-align: left; width: 80px; font-weight: normal; }
                                                     
-table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 1.2em; 
-                                                    padding: 3px 3px 5px 3px; vertical-align: top; height: 60px; }
+table.calendar td                                 { background: #F5F5F5 none repeat scroll 0 0; color: #999999; font-size: 1.0em; 
+                                                    padding: 3px 3px 5px 3px; vertical-align: top; height: 60px; font-weight: normal; 
+                                                    border: 2px solid #F5F5F5; }
 
-table.calendar td.in-range.free                   { color: #333333; font-weight: bolder; }
-table.calendar td.in-range.work                   { color: #333333; font-weight: bolder; }
+table.calendar td.in-range                        { background: #EDF3FE none repeat scroll 0 0; border: 2px solid #EDF3FE; }
+table.calendar td.outside-range                   { background: #FFFFFF none repeat scroll 0 0; border: 2px solid #FFFFFF; }
+
+table.calendar td.in-range.free                   { color: #333333; }
+table.calendar td.in-range.work                   { color: #333333; }
 /*
 table.calendar td.in-range.busy                   { background: #444444 none repeat scroll 0 0; color: #FFFFFF; font-weight: bolder; }
 */
-table.calendar td.in-range                        { background: #EDF3FE none repeat scroll 0 0; }
-table.calendar td.outside-range                   { background: #FFFFFF none repeat scroll 0 0; font-weight: lighter; }
 
+table.calendar td.today                           { background: #F2F5ED none repeat scroll 0 0; border: 2px solid #F2F5ED; }
 
 table.calendar span                               { margin: 3px 0 0; padding: 0;}
 
 table.calendar td.hover, table.calendar th.hover  { background: #FFCC00 none repeat scroll 0 0; color: #000000; }  /* yellowish */
 
 table.calendar td.mark, table.calendar th.mark    { background: #5500BB none repeat scroll 0 0; color: #FFFFFF;}  /* dark purplish */
-table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 none repeat scroll 0 0; color: #FFFFFF;}  /* yellowish */
+
+
+/* table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 none repeat scroll 0 0; color: #FFFFFF;}  *//* yellowish */
+table.calendar td.selected, table.calendar th.selected  { border: 2px solid #FFCC00; }
+
+span.text.free                                    { color: #009900; }
+span.text.work                                    { color: #111; }
+span.text.overbooked                              { color: #E36627; }
 
 /* calendar attribute styles */
 
@@ -57,7 +67,7 @@ ul.calendar.schedule.menu li:hover                { color: #FFFFFF; background-c
 ul.calendar.schedule.menu li a:hover              { color: inherit; background-color: inherit; }
 */
 
-ul.calendar.menu li a                             { color: #3A2313; background-color: #FFFFFF; font-size: 0.9em; font-weight: bold; }
+ul.calendar.menu li a                             { color: #3A2313; background-color: #FFFFFF; font-size: 1.0em; font-weight: bold; }
 ul.calendar.menu li a:hover                       { color: #00BBFF; }
 
 /* calendar time range slider styles */

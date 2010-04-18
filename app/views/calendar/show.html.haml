@@ -49,17 +49,17 @@
         == Click a highlighted date on the calendar below to see appointments for that date,
         == or click on the '+' icon next to a date to add free time or appointments.
 
-    .span-17.last#schedule_date_range_and_links
+    .span-18.last#schedule_date_range_and_links
       .span-3
-        =prev_next_links[:prev_link]
-      .span-9.center_justify
+        = prev_next_links[:prev_link]
+      .span-12.center_justify
         %h4.calendar.date_range_name{:style => 'white-space: nowrap;'}
           = @daterange.name(:with_dates => true)
           -# show today button if daterange does not include today
           - unless @daterange.include?(@today)
             %span{:style => 'padding-left: 5px;'}= link_to 'Today', url_for(params.update(:start_date => nil)), :class => 'today'
       .span-3.last.right_justify
-        =prev_next_links[:next_link]
+        = prev_next_links[:next_link]
 
     -# show calendar, with free, work, vacation, overbooked markings
     .span-18.last#free_work_calendar

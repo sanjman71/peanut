@@ -16,6 +16,7 @@
 - end_day                   = daterange.end_at.in_time_zone.end_of_day
 - total_days                = daterange.days
 - today                     = DateRange.today unless local_assigns[:today]
+- today_string              = today.to_s(:appt_schedule_day) unless today.blank?
 - add_free_appointment_link = 0 unless local_assigns[:add_free_appointment_link]
 - add_work_appointment_link = 0 unless local_assigns[:add_work_appointment_link]
 -# show add menu only if there is at least 1 add menu link
@@ -47,11 +48,12 @@
         %tr
           - week.compact.each do |day_i|
             -# compute the day we're on
-            - day     = start_day + (day_i - extra_days_at_start).days
+            - day         = start_day + (day_i - extra_days_at_start).days
+            - day_string  = day.to_s(:appt_schedule_day)
             -# check for markings (used as css tags) on this day
-            - key     = day.to_s(:appt_schedule_day)
-            - klasses = []
-            - count   = 0
+            - key         = day.to_s(:appt_schedule_day)
+            - klasses     = []
+            - count       = 0
             - case
             - when markings[key].is_a?(Array)
               - klasses += markings[key]
@@ -62,14 +64,14 @@
             - klasses += [0, 6].include?(day.wday) ? ['weekend'] : ['weekday']
             -# add past, today classes based on day of the year
             - klasses += ['past'] if day < today
-            - klasses += ['today'] if day == today
+            - klasses += ['today'] if day_string == today_string
             - klasses += ((day >= start_day) && (day <= end_day)) ? ['in-range'] : ['outside-range']
             -# set id as date [year,month,day]
             - id = "#{day.year}#{sprintf("%02d", day.month)}#{sprintf("%02d", day.mday)}"
             %td{:class => klasses.join(" "), :id => id}
               -# special case for 'Today'
               .date{:style => 'padding-bottom: 3px;'}
-                = (day.to_s(:appt_schedule_day) == today.to_s(:appt_schedule_day)) ? 'Today' : day.strftime("%b %d")
+                = (day_string == today_string) ? 'Today' : day.strftime("%b %d")
                 %span#calendar_add_menu{:style => 'visibility: hidden; position: relative;'}
                   - if add_menu == 1
                     = link_to image_tag('add2.png', :size => '16x16', :style => 'padding-top: 3px;'), '#', :title => 'Add Free Time', :class => 'admin image', :id => 'calendar_add_menu'

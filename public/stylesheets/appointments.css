@@ -29,7 +29,8 @@ div.left_border.work                              { border-left: 2px solid #ff66
 div.left_border.free                              { border-left: 2px solid #009900; padding-left: 9px; background-color: #fff;}
 */
 
-div.colborder.work, div.colborder.overbooked      { border-right: 2px solid #FF6600; background-color: #FFF; padding-right: 23px; color: #FF6600; }
+div.colborder.work                                { border-right: 2px solid #111; background-color: #FFF; padding-right: 23px; color: #111; }
+div.colborder.overbooked                          { border-right: 2px solid #E36627; background-color: #FFF; padding-right: 23px; color: #E36627; }
 div.colborder.free                                { border-right: 2px solid #009900; background-color: #FFF; padding-right: 23px; color: #009900; }
 div.colborder.canceled                            { border-right: 2px solid #999; background-color: #FFF; padding-right: 23px; color: #999; }
 div.colborder.free.schedule, div.colborder.vacation { border-right: 2px solid #555; background-color: #FFF; padding-right: 23px; color: #555; }

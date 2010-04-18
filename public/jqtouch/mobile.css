@@ -39,12 +39,12 @@ ul.individual li.add_work_confirm, ul.individual li.add_work
 
 ul.schedule li                        { border-left: 3px solid #FFF; }
 ul.schedule li.loading                { border-left: none; background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fff), to(#eee)); }
-ul.schedule li.work                   { border-left: 3px solid #FF6600; }
+ul.schedule li.work                   { border-left: 3px solid #111; }
 ul.schedule li.free                   { border-left: 3px solid #009900; }
-ul.schedule li.free.work              { border-left: 3px solid #333; }
+ul.schedule li.free.work              { border-left: 3px solid #FFCC00; }
 ul.schedule li.empty                  { border-left: 3px solid #FFF; }
 
-ul.schedule li.appointment.work       { border-left: 3px solid #FF6600; }
+ul.schedule li.appointment.work       { border-left: 3px solid #111; }
 ul.schedule li.capacity.free          { border-left: 3px solid #009900; }
 ul.schedule li.capacity.overbooked    { border-left: 3px solid #FF6600; }
 
