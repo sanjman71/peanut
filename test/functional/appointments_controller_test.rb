@@ -214,6 +214,7 @@ class AppointmentsControllerTest < ActionController::TestCase
   
         should_assign_to(:service) { @free_service }
         should_assign_to(:provider) { @johnny }
+        should_assign_to(:creator) { @johnny }
         should_assign_to(:start_at)  { "0900" }
         should_assign_to(:end_at) { "1100" }
         should_assign_to(:mark_as) { "free" }
@@ -235,9 +236,17 @@ class AppointmentsControllerTest < ActionController::TestCase
 
        should_assign_to(:service) { @free_service }
        should_assign_to(:provider) { @johnny }
+       should_assign_to(:creator) { @johnny }
        should_assign_to(:start_at) { "0900" }
        should_assign_to(:end_at) { "1100" }
        should_assign_to(:mark_as)  { "free" }
+
+       should "set appointment creator" do
+         # find last 2 appointments created
+         Appointment.find(:all, :limit => 2, :order => 'created_at desc').each do |appointment|
+           assert_equal @johnny, appointment.creator
+         end
+       end
 
        should_redirect_to("user calendar path with highlight date" ) { "/users/#{@johnny.id}/calendar?highlight=20090203" }
      end
@@ -657,15 +666,15 @@ class AppointmentsControllerTest < ActionController::TestCase
             :service_id => @haircut.id, :customer_id => @customer.id}
       @free_appt.reload
     end
-  
+
     # free appointment and work appointment coexist
     should_change("Appointment.count", :by => 2) { Appointment.count }
-  
+
     # There should be two available capacity slots
     should "have two capacity slots" do
       assert_equal 2, CapacitySlot.count
     end
-  
+
     should_assign_to(:service) { @haircut }
     should_assign_to(:provider) { @johnny }
     should_assign_to(:customer) { @customer }

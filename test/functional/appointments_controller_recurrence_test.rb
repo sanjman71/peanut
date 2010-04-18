@@ -59,8 +59,6 @@ class AppointmentsControllerTest < ActionController::TestCase
         @rule = "freq=weekly;byday=mo,tu;dstart=#{@now.to_s(:appt_schedule_day)};tstart=090000;tend=110000"
         post :create_weekly,
              {:rules => @rule, :provider_type => "users", :provider_id => @johnny.id}
-             # {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "090000", :tend => "110000",
-             #  :until => '', :provider_type => "users", :provider_id => "#{@johnny.id}"}
       end
 
       should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
@@ -72,6 +70,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU" }
       should_assign_to(:provider) { @johnny }
+      should_assign_to(:creator) { @johnny }
+      should_assign_to(:appointment)
+
+      should "set appointment creator" do
+        assert_equal @johnny, Appointment.find_by_id(assigns(:appointment).id).creator
+      end
 
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
 
@@ -81,8 +85,6 @@ class AppointmentsControllerTest < ActionController::TestCase
           @rule = "freq=weekly;byday=mo,tu;dstart=#{@now.to_s(:appt_schedule_day)};tstart=100000;tend=120000"
           post :create_weekly,
                {:rules => @rule, :provider_type => "users", :provider_id => @johnny.id}
-               # {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "100000", :tend => "120000",
-               #  :until => '', :provider_type => "users", :provider_id => "#{@johnny.id}"}
         end
 
         should_change("Appointment.recurring.count", :by => 1) { Appointment.recurring.count }
@@ -97,8 +99,6 @@ class AppointmentsControllerTest < ActionController::TestCase
         post :create_weekly,
              {:rules => "freq=weekly;byday=mo,tu;dstart=#{@now.to_s(:appt_schedule_day)};tstart=090000;tend=110000;until=#{@recur_until.to_s(:appt_schedule_day)}",
               :provider_type => "users", :provider_id => @johnny.id}
-             # {:freq => 'weekly', :byday => 'mo,tu', :dstart => @now.to_s(:appt_schedule_day), :tstart => "090000", :tend => "110000",
-             #  :until => @recur_until.to_s(:appt_schedule_day), :provider_type => "users", :provider_id => "#{@johnny.id}"}
         Delayed::Job.work_off
       end
 
@@ -112,6 +112,12 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=MO,TU;UNTIL=#{@recur_until.to_s(:appt_schedule_day)}T000000Z" }
       should_assign_to(:provider) { @johnny }
+      should_assign_to(:creator) { @johnny }
+      should_assign_to(:appointment)
+
+      should "set appointment creator" do
+        assert_equal @johnny, Appointment.find_by_id(assigns(:appointment).id).creator
+      end
 
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar" }
 
@@ -150,7 +156,7 @@ class AppointmentsControllerTest < ActionController::TestCase
 
         should_redirect_to("user show weekly schedule path" ) { "/users/#{@johnny.id}/calendar/weekly" }
       end
-      
+
       context "and cancel the weekly schedule" do
         setup do
           @weekly_appt = Appointment.recurring.first
@@ -184,6 +190,14 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_assign_to(:dtend) { "#{@now.to_s(:appt_schedule_day)}T110000" }
       should_assign_to(:recur_rule) { "FREQ=WEEKLY;BYDAY=TU" }
       should_assign_to(:provider) { @johnny }
+      should_assign_to(:creator) { @johnny }
+
+      should "set appointment creator" do
+        # find last 2 appointments created
+        Appointment.find(:all, :limit => 2, :order => 'created_at desc').each do |appointment|
+          assert_equal @johnny, appointment.creator
+        end
+      end
 
       should_change("Appointment.recurring.count", :by => 2) { Appointment.recurring.count }
       should_change("Appointment.count", :by => 2) { Appointment.count }

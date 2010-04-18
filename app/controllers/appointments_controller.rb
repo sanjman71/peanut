@@ -91,7 +91,7 @@ class AppointmentsController < ApplicationController
     @service        ||= current_company.services.find_by_id(params[:service_id])
     @mark_as        ||= params[:mark_as]
 
-    @creator        = User.find_by_id(params[:creator_id].to_i)
+    @creator        = User.find_by_id(params[:creator_id].to_i) || current_user
     @customer       = User.find_by_id(params[:customer_id].to_i)
 
     @duration       = params[:duration] ? params[:duration].to_i : @service.duration
@@ -459,12 +459,13 @@ class AppointmentsController < ApplicationController
       @end_at         = Time.zone.parse(@dtend)
 
       # create appointment with recurrence rule
-      @options        = {:start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
+      @creator        = current_user
+      @options        = {:creator => @creator, :start_at => @start_at, :end_at => @end_at, :capacity => @capacity}
       @options        = @options.merge({:recur_rule => @recur_rule }) unless @recur_rule.blank?
       @error          = nil
-    
+
       begin
-        # Create the first appointment in the sequence
+        # create the first appointment in the sequence
         @appointment  = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
       rescue Exception => e
         @error        = e.message
