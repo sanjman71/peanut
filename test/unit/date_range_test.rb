@@ -10,26 +10,26 @@ class DateRangeTest < ActiveSupport::TestCase
     @days_left_in_week_start_mon_incl_today = Hash[0=>1, 1=>7, 2=>6, 3=>5, 4=>4, 5=>3, 6=>2]
   end
 
-  context "include" do
+  context "include?" do
     setup do 
       @daterange = DateRange.parse_when('today')
       assert_valid @daterange
       @today = Time.zone.now
     end
-    
+
     should "should include today" do
       assert_true @daterange.include?(@today)
     end
-    
+
     should "should not include yesterday" do
-      assert_false @daterange.include?(@daterange.start_at-1.second)
+      assert_false @daterange.include?(@daterange.start_at.in_time_zone-1.second)
     end
 
     should "should not include tomorrow" do
-      assert_false @daterange.include?(@daterange.end_at+1.second)
+      assert_false @daterange.include?(@daterange.end_at.in_time_zone+1.second)
     end
   end 
-  
+
   context 'today' do
     setup do 
       @daterange = DateRange.parse_when('today')
