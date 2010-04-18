@@ -85,7 +85,7 @@ class CalendarController < ApplicationController
     else
       # build daterange using when
       @when       = (params[:when] || @@default_when).from_url_param
-      @start_date = params[:start_date] ? Time.parse(params[:start_date]).in_time_zone : nil
+      @start_date = params[:start_date] ? Time.zone.parse(params[:start_date]).in_time_zone : nil
       @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date, :start_week_on => current_company.preferences[:start_wday].to_i)
     end
 
