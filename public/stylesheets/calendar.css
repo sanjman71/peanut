@@ -32,6 +32,7 @@ table.calendar td.mark, table.calendar th.mark    { background: #5500BB none rep
 /* table.calendar td.selected, table.calendar th.selected  { background: #FFCC00 none repeat scroll 0 0; color: #FFFFFF;}  *//* yellowish */
 table.calendar td.selected, table.calendar th.selected  { border: 2px solid #FFCC00; }
 
+span.text                                         { font-size: 1.3em; }
 span.text.free                                    { color: #009900; }
 span.text.work                                    { color: #111; }
 span.text.overbooked                              { color: #E36627; }
