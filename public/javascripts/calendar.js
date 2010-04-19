@@ -96,8 +96,8 @@ $.fn.init_add_work_appointment = function() {
 
     if (capacity == '') {
       // check capacity, allow callback to handle response and detemine whether we should continue
-      var capacity_url = provider_capacity_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
-      $.get(capacity_url, {}, function(data) { check_capacity_response(data) }, "json");
+      var check_capacity_url = check_provider_capacity_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
+      $.get(check_capacity_url, {}, function(data) { check_capacity_response(data) }, "json");
       // hide add button, show checking div
       $(this).find('div#submit_add').addClass('hide');
       $(this).find('div#checking').removeClass('hide');

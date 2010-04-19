@@ -6,8 +6,6 @@ class CapacitySlotsController < ApplicationController
   # GET /users/1/capacity/start/2010010T0900000/duration/3600
   def capacity
     # @provider initialized in before_filter
-    
-    request.format = :json
 
     @start_at = Time.zone.parse(params[:start_time])
     @duration = params[:duration].to_i

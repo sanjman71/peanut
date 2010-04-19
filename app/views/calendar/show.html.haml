@@ -145,7 +145,7 @@
   var appointment_cancel_path      = "#{cancel_appointment_path(':id')}";
   var appointment_show_path        = "#{appointment_path(':id')}";
   var show_weekly_path             = "#{show_weekly_path(':provider_type', ':provider_id')}";
-  var provider_capacity_path       = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration')}";
+  var check_provider_capacity_path = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration', :format => 'json')}";
 
   -# build appointments hash for free and work appointments
   var appointments  = new Hash();
