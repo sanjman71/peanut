@@ -19,15 +19,15 @@
   .span-11.last
     .span-4
       .span-4.last.service{:class => appointment.mark_as}
-        - if (appointment.work? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
+        - if (appointment.work? && (has_privilege?("update calendars", current_company) || has_privilege?("update calendars", appointment.provider)))
           - if appointment.canceled?
             -# canceled work appointments can't be managed
             = appointment.service.name
           - else
-            -# work appointments can be edited/canceled with manage permissions
+            -# work appointments can be edited/canceled with update calendar permissions
             = link_to appointment.service.name, '#', :id => "edit_work_appointment"
-        - elsif (appointment.free? && (has_privilege?("manage appointments", current_company) || has_privilege?("manage appointments", appointment)))
-          -# free appointments can be viewed with read permissions
+        - elsif (appointment.free? && (has_privilege?("update calendars", current_company) || has_privilege?("update calendars", appointment.provider)))
+          -# free appointments can be edit/canceled with update calendar permissions
           - link_text = appointment.recurrence? ? 'Weekly Availability' : 'Scheduled Availability'
           = link_to(link_text, '#', :id => 'edit_free_appointment')
         - elsif appointment.vacation?
