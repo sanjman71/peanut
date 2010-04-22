@@ -5,15 +5,14 @@ class AppointmentsController < ApplicationController
                                                      :update_weekly, :show_weekly, :create_work, :update]
   before_filter :init_appointment, :only => [:show, :reschedule]
   before_filter :init_appointment_and_provider, :only => [:cancel]
-  before_filter :init_customer_user, :only => [:cleanup]
+  before_filter :init_customer_user, :only => [:index, :cleanup]
 
   privilege_required      'authenticated', :only => [:create_work], :on => :current_company
   privilege_required_any  'manage appointments', :only =>[:show, :reschedule], :on => [:appointment, :current_company]
-  privilege_required      'manage appointments', :only => [:index, :complete], :on => :current_company
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
                                                        :update_weekly, :show_weekly, :update, :cancel],
                                               :on => [:provider, :current_company]
-  privilege_required_any  'read users', :only =>[:cleanup], :on => [:user, :current_company]
+  privilege_required_any  'read users', :only =>[:index, :cleanup], :on => [:user, :current_company]
 
   # Deprecated: Dialogs are used to create appointments
   # GET /book/work/users/1/services/3/duration/60/20081231T000000
