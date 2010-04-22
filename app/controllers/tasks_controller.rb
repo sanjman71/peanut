@@ -85,13 +85,14 @@ class TasksController < ApplicationController
     # find company providers with daily schedules preference set
     @providers = current_company.authorized_providers.select{|o| o.preferences[:provider_email_daily_schedule] == '1'}
 
-    @providers.each do |provider|
+    # stagger sending of pdf emails
+    @job_send_at = Time.now + 30.seconds
+    @providers.each_with_index do |provider, index|
       # build url to email pdf schedule, with token to ensure request is authenticated
-      @email_url  = calendar_when_format_url(:provider_type => provider.tableize, :provider_id => provider.id, :when => 'today', :format => 'email')
-      @email_url  += "?token=#{AUTH_TOKEN_INSTANCE}"
+      @email_url = calendar_when_format_url(:provider_type => provider.tableize, :provider_id => provider.id, :when => 'today', :format => 'email', :token => AUTH_TOKEN_INSTANCE)
       # create delayed job to generate and send pdf schedule
       @job = PdfMailerJob.new(:url => @email_url)
-      Delayed::Job.enqueue(@job)
+      Delayed::Job.enqueue(@job, PdfMailerJob.priority, @job_send_at + (index*30).seconds)
     end
 
     @title  = "Tasks - Schedule Messages"

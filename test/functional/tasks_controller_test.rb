@@ -31,6 +31,8 @@ class TasksControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
     # create appointment(s)
     create_appointment_in_the_next_day
+    # set the request hostname
+    @request.host = "www.walnutcalendar.com"
   end
 
   def create_appointment_in_the_next_day
@@ -166,8 +168,14 @@ class TasksControllerTest < ActionController::TestCase
     end
 
     should_assign_to(:providers) { [@provider] }
+    should_assign_to(:email_url) { "http://www.walnutcalendar.com/users/#{@provider.id}/calendar/when/today.email?token=#{AUTH_TOKEN_INSTANCE}" }
+    should_assign_to(:job)
 
     should_change("delayed job count", :by => 1) { Delayed::Job.count }
+
+    should "have job run_at time in future" do
+      assert Delayed::Job.last.run_at > Time.now
+    end
 
     should_respond_with :success
     should_render_template 'tasks/schedule_messages.html.haml'

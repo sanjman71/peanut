@@ -30,7 +30,7 @@ class PdfMailerJob < Struct.new(:params)
 
     if url.match(/.email/)
       # get url that generates an email
-      get(url)
+      send_email(url)
     elsif url.match(/.pdf/)
       # get url that generates a pdf
       address = params[:address]
@@ -45,8 +45,8 @@ class PdfMailerJob < Struct.new(:params)
     end
   end
 
-  def get(url)
-    # get url
+  def send_email(url)
+    # get url which sends an email
     agent = WWW::Mechanize.new
     agent.get(url)
   end
@@ -66,7 +66,7 @@ class PdfMailerJob < Struct.new(:params)
     system "mkdir -p #{pdf_dir}"
     # create pdf file
     timestamp = Time.now.strftime("%Y%m%d%H%M%S")
-    file      = "#{pdf_dir}/schedule.%s.pdf" % timestamp
+    file      = "#{pdf_dir}/schedule.%s.%s.pdf" % [timestamp, rand(10000)]
     File.open(file, 'wb') { |o| o << agent.page.body }
 
     begin
@@ -81,7 +81,8 @@ class PdfMailerJob < Struct.new(:params)
 
   def cleanup_pdf_files
     dir       = Dir.new(pdf_dir)
-    pdf_files = dir.entries[2..-1].sort # remove '.', '..' entries
+    # file all 'pdf files
+    pdf_files = dir.entries[2..-1].select{ |s| s.match(/pdf$/) }.sort
 
     pdf_files.each do |file_name|
       mod_time = File.new("#{pdf_dir}/#{file_name}").atime

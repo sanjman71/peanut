@@ -145,9 +145,9 @@ class CalendarController < ApplicationController
       format.html
       format.pdf
       format.email do
-        @link     = url_for(params.merge(:format => "pdf", :address => nil))
+        @link     = url_for(params.merge(:format => "pdf", :address => nil, :token => AUTH_TOKEN_INSTANCE))
         @subject  = 'Your PDF Schedule'
-        @email    = EmailAddress.find_by_id(params[:address].to_i) || @provider.primary_email_address
+        @email    = params[:address] ? (EmailAddress.find_by_id(params[:address].to_i) || EmailAddress.find_by_address(params[:address])) : @provider.primary_email_address
         if !@email.blank?
           @job = PdfMailerJob.new(:url => @link, :address => @email.address, :subject => @subject)
           Delayed::Job.enqueue(@job)
