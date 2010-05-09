@@ -1,9 +1,10 @@
 - appointment = Appointment.new if local_assigns[:appointment].nil?
 
-.span-12.last.dialog.hide#reschedule_work_appointment_dialog{:title => "Reschedule Appointment"}
-  .span-12.last
-    == Rescheduling an appointment is easy.
-    %p
-    == Book a new appointment and this appointment will automatically be canceled.
-    %p
-    == Click #{link_to 'here', '#', :id => 'reschedule_work_appointment_continue', :method => :put} to continue.
+.span-12.prepend-1.last.dialog.hide#reschedule_work_appointment_dialog{:title => "Reschedule Appointment"}
+  - form_for(appointment) do
+    .span-12.last
+      == Rescheduling an appointment is easy.
+      %p
+      == Book a new appointment and this appointment will automatically be canceled.
+      %p
+      == Click #{link_to 'here', '#', :id => 'reschedule_work_appointment_continue', :method => :put} to continue.
