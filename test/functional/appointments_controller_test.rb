@@ -46,6 +46,8 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :put, '/appointments/1/noshow', :controller => 'appointments', :action => 'noshow', :id => 1
   should_route :get, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
   should_route :put, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
+  should_route :post, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1
+  should_route :post, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1, :series => 1
   should_route :put, '/appointments/1/reschedule', :controller => 'appointments', :action => 'reschedule', :id => 1
 
   # show work appointments by state
