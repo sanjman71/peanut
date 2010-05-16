@@ -73,7 +73,7 @@ namespace :calendar do
         puts "Capacity slots for #{subdomain.to_s} with capacity >= #{capacity.to_s}"
         capacity_slots.each do |slot|
           puts "** capacity slot: #{slot.start_at.to_s(:appt_date_time_army)} capacity: #{slot.capacity.to_s} provider: #{slot.provider.name}"
-          overlapping_frees = company.appointments.free.recurrence_instances.not_canceled.provider(slot.provider).overlap(slot.start_at, slot.end_at).order_id
+          overlapping_frees = company.appointments.free.recurrence_instances.not_canceled.provider(slot.provider).overlap(slot.start_at, slot.end_at).order_byid
           overlapping_frees_by_parent = overlapping_frees.group_by {|x| x.recur_parent }
 
           parents = overlapping_frees_by_parent.keys.compact
