@@ -129,8 +129,30 @@ namespace :calendar do
       end
 
     end
+    
   end
 
+  desc "Make sure that recurrence expansions have the correct recur_expanded_to date"
+  task :check_recur_expansion do
+    
+    company = nil
+    subdomain = ENV["SUBDOMAIN"]
+    company = Company.find_by_subdomain(subdomain.downcase) unless subdomain.blank?
+    
+    if subdomain.blank?
+      puts "You must specify the company subdomain in the SUBDOMAIN environment variable" and return 
+    elsif company.blank?
+      puts "You provided an invalid subdomain"
+    else
+      company.appointments.recurring.not_recurrence_instances.each do |parent|
+        latest_instance = parent.recur_instances.order_start_at_desc.first
+        if (!latest_instance.blank?) && (!parent.recur_expanded_to.blank?) && (parent.recur_expanded_to < latest_instance.start_at)
+          puts "**** parent recur_expanded_to #{parent.recur_expanded_to}, instance start_at #{latest_instance.start_at}"
+        end
+      end
+    end
+  end
+  
   def rebuild_capacity_slots_for_company(company)
 
     puts "Processing company #{company.name}"

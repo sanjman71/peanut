@@ -38,7 +38,7 @@ class AppointmentTest < ActiveSupport::TestCase
     @free_service   = @company.free_service
     @customer       = Factory(:user)
   end
-
+  
   context "appointment state" do
     setup do
       # create free time from 12 midnight to 1 am
@@ -893,5 +893,44 @@ class AppointmentTest < ActiveSupport::TestCase
     should_change("Appointment.count", :by => 1) { Appointment.count }
   
   end
+
+  #
+  # This tests what is actually happening in production, and so is more useful
+  #
+  context "create a recurring free appointment with no end and a time horizon of 4 weeks" do
+    setup do
+      @start_at       = Time.zone.now.tomorrow.beginning_of_day + 9.hours
+      @end_at         = @start_at + 2.hours
+      @recur_days     = "#{ical_days([@start_at])}"
+      @recur_rule     = "FREQ=WEEKLY;BYDAY=#{@recur_days};"
+      @recurrence     = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :start_at => @start_at, :end_at => @end_at, :recur_rule => @recur_rule,
+                                                                     :name => "Happy Hour!", :description => "$2 beers, $3 well drinks", :public => true)
+      assert_valid @recurrence
+      @company.preferences[:time_horizon] = 4.weeks
+      @appointments   = @recurrence.expand_recurrence
+    end
   
+    should_change("Appointment.count", :by => 4) { Appointment.count }
+
+    context "then change the time horizon to 2 weeks and re-expand" do
+      setup do
+        @company.preferences[:time_horizon] = 2.weeks
+        @appointments   = @recurrence.expand_recurrence
+      end
+      
+      should_not_change("Appointment.count") { Appointment.count }
+      
+      context "then change the time horizon to 4 weeks and re-expand" do
+        setup do
+          @company.preferences[:time_horizon] = 4.weeks
+          @appointments   = @recurrence.expand_recurrence
+        end
+
+        should_not_change("Appointment.count") { Appointment.count }
+      end
+      
+    end
+  
+  end
+
 end
