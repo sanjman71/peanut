@@ -75,7 +75,7 @@
         #submit_edit
           = f.submit 'Update Appointment', :name => nil, :id => 'add_work_appointment', :class => 'big'
           %span{:style => 'padding: 0 7px 0 7px;'}== or
-          = link_to 'Cancel Appointment', '#', :id => 'cancel_work_appointment', :class => 'ujs cancel confirm work', :method => :put, :question => 'Are you sure you want to cancel this appointment?'
+          = link_to 'Cancel Appointment', '#', :id => 'cancel_work_appointment', :class => 'ujs cancel confirm work', :question => 'Are you sure you want to cancel this appointment?'
         #checking.hide
           %h3.submitting== Checking ...
         #adding.hide
