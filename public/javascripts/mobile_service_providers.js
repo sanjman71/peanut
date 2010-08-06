@@ -38,9 +38,15 @@ $.fn.init_service_providers = function() {
   // remove all providers
   $('select#provider').removeOption(/./);
 
-  // find the provider initially selected
-  var initial_provider_id   = $('#initial_provider_id').attr("value") || 0;
-  var initial_provider_type = $('#initial_provider_type').attr("value");
+  try {
+    // use javascript variable to find the current provider id and type
+    var current_provider_id   = current_provider.get('id');
+    var current_provider_type = current_provider.get('type');
+  } catch(e) {
+    // use document value to find the current provider id and type
+    var current_provider_id   = $('#initial_provider_id').attr("value") || 0;
+    var current_provider_type = $('#initial_provider_type').attr("value");
+  }
 
   // add providers who provide the selected service
   var num_providers = 0;
@@ -51,14 +57,14 @@ $.fn.init_service_providers = function() {
     klass = provider_tuple[2]
     id    = provider_tuple[0]
     name  = provider_tuple[1]
-    $('select#provider').addOption(klass+'/'+id, name, (id == initial_provider_id) && (klass == initial_provider_type));
+    $('select#provider').addOption(klass+'/'+id, name, (id == current_provider_id) && (klass == current_provider_type));
     num_providers += 1;
   })
 
   // add the special 'Anyone' provider iff a service has been selected and the service has 0 or > 1 providers
   if (current_service_id != 0 && (num_providers == 0 || num_providers > 1) && allow_anyone_provider)
   {
-    $('select#provider').addOption(0, "Anyone", 0 == initial_provider_id);
+    $('select#provider').addOption(0, "Anyone", 0 == current_provider_id);
   }
 }
 
