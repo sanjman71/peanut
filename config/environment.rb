@@ -79,7 +79,7 @@ Rails::Initializer.run do |config|
   config.gem 'ri_cal', :version => '~> 0.8.5'
   config.gem 'rubyist-aasm', :lib => 'aasm', :source => "http://gems.github.com"
   config.gem 'sanitize', :version => '~> 1.0.6', :source => "http://gems.github.com"
-  config.gem 'whenever', :version => '0.4.1', :lib => false, :source => 'http://gemcutter.org/'
+  config.gem 'whenever', :version => '~> 0.4.1', :lib => false, :source => 'http://gemcutter.org/'
   config.gem 'twiliolib'
 
   # Only load the plugins named here, in the order given. By default, all plugins 
