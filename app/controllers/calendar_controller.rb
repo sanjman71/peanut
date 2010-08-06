@@ -58,14 +58,8 @@ class CalendarController < ApplicationController
     # find services collection for the current company; valid services must have at least 1 service provider
     @services = current_company.services.with_providers.work
 
-    # build service providers collection mapping services to providers
-    # This is used for the javascript in some of the appointment create/edit dialogs - same as in openings controller
-    @sps = @services.inject([]) do |array, service|
-      service.providers.each do |provider|
-        array << [service.id, provider.id, provider.name, provider.tableize, (service.allow_custom_duration ? 1 : 0), service.duration]
-      end
-      array
-    end
+    # map services to providers and providers to services - used by javascript in create/edit appt dialogs
+    @sps, @ps   = build_service_provider_mappings(@services)
     
     @free_service = current_company.free_service
     @providers    = current_company.providers

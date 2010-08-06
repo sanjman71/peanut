@@ -13,7 +13,7 @@ $.fn.init_add_work_appointment = function() {
     $(form).find("input#initial_provider_id").val(current_provider.get("id"));
     $(form).find("input#initial_provider_type").val(current_provider.get("type"));
     // force the current provider to be selected
-    force_provider_selected(form, current_provider.get("id"), current_provider.get("type"));
+    //force_provider_selected(form, current_provider.get("id"), current_provider.get("type"));
     // disable providers select
     $(form).find("select#provider").attr('disabled', 'disabled');
     // set start date field, and disable
