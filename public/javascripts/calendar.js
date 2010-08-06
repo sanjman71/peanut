@@ -12,7 +12,8 @@ $.fn.init_add_work_appointment = function() {
     // set current provider as initial provider_id and provider_type
     $(form).find("input#initial_provider_id").val(current_provider.get("id"));
     $(form).find("input#initial_provider_type").val(current_provider.get("type"));
-    // force the current provider to be selected
+    // force refresh of service, provider, duration selections
+    $(form).find("select#service_id").change();
     //force_provider_selected(form, current_provider.get("id"), current_provider.get("type"));
     // disable providers select
     $(form).find("select#provider").attr('disabled', 'disabled');
