@@ -1,21 +1,9 @@
 - title(@title || "Schedule")
 - stylesheet('appointments', 'calendar', 'jquery.timepickr', 'datePicker', 'jquery.autocomplete')
-- javascript('appointments', 'calendar', 'waitlists', 'users', 'service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
+- javascript('appointments', 'calendar', 'waitlists', 'users', 'mobile_service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
 
 -# calendar previous/next links
 - prev_next_links = build_calendar_prev_next_links(@provider, @daterange)
-
--# service providers mapping services to providers
-.span-16.service_providers.hide
-  - unless @sps.blank?
-    - @sps.each do |sp|
-      .service_provider{:service_id => sp[0], :provider_id => sp[1], :provider_name => sp[2], :provider_type => sp[3]}
-
--# services description
-.span-16.services.hide
-  - unless @sps.blank?
-    - @sps.each do |sp|
-      .service{:service_id => sp[0], :allow_custom_duration => sp[4], :service_duration => Duration.to_words(sp[5], :prepend => "Typically"), :service_duration_in_secs => sp[5]}
 
 .span-24.last
   .span-20.prepend-1.last.mat.padding-top-10
@@ -146,6 +134,30 @@
   var appointment_show_path        = "#{appointment_path(':id')}";
   var show_weekly_path             = "#{show_weekly_path(':provider_type', ':provider_id')}";
   var check_provider_capacity_path = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration', :format => 'json')}";
+
+  -# build services hash
+  var services = new Hash();
+  - @services.each do |service|
+    services.put(#{service.id}, new Hash({"duration_custom"  : #{service.allow_custom_duration ? 1 : 0}, |
+                                          "duration_words"   : "#{Duration.to_words(service.duration, :prepend => 'Typically')}", |
+                                          "duration_seconds" : #{service.duration}, |
+                                          })) |
+
+  -# build service providers hash
+  var service_providers = new Hash();
+  - @sps.keys.each do |service_id|
+    var array = new Array();
+    - @sps[service_id].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}", "#{hash[:klass]}"])
+    service_providers.put(#{service_id}, array)
+
+  -# build provider services hash
+  var provider_services = new Hash();
+  - @ps.keys.each do |provider_key|
+    var array = new Array();
+    - @ps[provider_key].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}"])
+    provider_services.put("#{provider_key}", array)
 
   -# build appointments hash for free and work appointments
   var appointments  = new Hash();
