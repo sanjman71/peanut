@@ -5,6 +5,9 @@ ActionController::Routing::Routes.draw do |map|
   map.login     '/login',         :controller => 'sessions', :action => 'create', :conditions => {:method => :post}
   map.logout    '/logout',        :controller => 'sessions', :action => 'destroy'
 
+  # ping
+  map.ping      '/ping',          :controller => 'openings', :action => 'ping'
+
   # rpx routes
   map.rpx_login '/rpx/login', :controller => 'rpx', :action => 'login'
   map.rpx_add   '/rpx/add/:id',   :controller => 'rpx', :action => 'add'

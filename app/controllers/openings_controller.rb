@@ -6,6 +6,11 @@ class OpeningsController < ApplicationController
   # Handle RecordNotFound exceptions with a redirect
   rescue_from(ActiveRecord::RecordNotFound)  { |e| redirect_to(openings_path) and return }
 
+  # GET /ping
+  def ping
+    head(:ok)
+  end
+
   # GET /openings
   # GET /users/1/services/3/3600/openings/this-week/morning
   # GET /services/1/3600/openings/this-week/anytime
