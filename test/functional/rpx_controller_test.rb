@@ -220,6 +220,49 @@ class RpxControllerTest < ActionController::TestCase
         should_redirect_to("return_to path") { "/users/#{@user.id}/edit" }
       end
     end
+
+    context "with rpx token for a user with a local account but no rpx account" do
+
+      setup do
+        @user       = Factory(:user, :name => "Sanjman", :password => 'sanjman', :password_confirmation => 'sanjman')
+        @user_email = @user.email_addresses.create(:address => "sanjman71@gmail.com")
+        assert @user_email.valid?
+        @user_phone = @user.phone_numbers.create(:name => 'Mobile', :address => '6501231234')
+        assert @user_phone.valid?
+      end
+
+      context "with id and email" do
+        setup do
+          # stub RPXNow
+          @rpx_hash = {:name=>'sanjman71',:email=>'sanjman71@gmail.com',:identifier=>"https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM", :username => 'sanjman71'}
+          RPXNow.stubs(:user_data).returns(@rpx_hash)
+          get :login, :token => '12345'
+        end
+
+        should_assign_to :data
+        should_assign_to :user
+
+        should_not_change("User.count") { User.count }
+        should_not_change("EmailAddress.count") { EmailAddress.count }
+        
+        should_not_change("User.with_email('sanjman71@gmail.com').count") { User.with_email('sanjman71@gmail.com').count }
+
+        should "keep user in active state" do
+          @user = User.with_email("sanjman71@gmail.com").first
+          assert_equal 'active', @user.state
+        end
+
+        should "assign user's email identifier" do
+          @user = User.with_email("sanjman71@gmail.com").first
+          @email_address = @user.primary_email_address
+          assert_equal 'https://www.google.com/accounts/o8/id?id=AItOawmaOlyYezg_WfbgP_qjaUyHjmqZD9qNIVM', @email_address.identifier
+        end
+
+        should_redirect_to("root path") { "/" }
+      end
+
+    end
+
   end
   
   context "add" do

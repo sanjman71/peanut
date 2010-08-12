@@ -27,6 +27,25 @@ class RpxController < ApplicationController
     # check if its for a user we already know about
     @user = User.with_identifier(@data[:identifier]).first
     
+    if @user.blank? && @data[:email]
+      # We don't already know this user as an RPX user. 
+      # Check if we already have their email address (they might have a local account)
+      @email = EmailAddress.find_by_address(@data[:email])
+      if @email
+
+        # We already have a user with this email address, but with no RPX identifier or a different one
+        # We'll link that email address to this rpx identifier, overwriting an existing identifier if it's there
+        @email.identifier = @data[:identifier]
+        @email.save
+
+        # Now get the @user using this identifier.
+        # We could get this using @email.emailable, but this is consistent with above
+        # This also ensures that a user is correctly linked to the email address just modified.
+        @user = User.with_identifier(@data[:identifier]).first
+      end
+    end
+
+    # If we still don't have a user, we'll try to create them
     if @user.blank?
       # check if rpx user create is for a public company
       if current_company and current_company.preferences[:public].to_i == 0
