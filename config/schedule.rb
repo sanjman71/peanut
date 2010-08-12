@@ -38,6 +38,10 @@ every :reboot do
   command "cd /usr/apps/peanut/current; script/delayed_job -e production start"
 end
 
+every 5.minutes do
+  command "curl http://www.walnutcalendar.com/ping > /dev/null"
+end
+
 every 3.hours do
   # check/send appointment reminders for all companies with subscriptions
   Subscription.all.collect(&:company).each do |company|

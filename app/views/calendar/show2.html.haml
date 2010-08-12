@@ -1,0 +1,20 @@
+- title(@title || "Schedule w/ FullCalendar")
+- stylesheet('fullcalendar', 'fullcalendar.extensions')
+- javascript('fullcalendar.min', 'calendar2')
+
+-#.span-24.last
+  -#= link_to 'Go to date', '', :id => 'goto_date', :date => '08/17/2010'
+
+.span-24.last{:style => 'padding-top: 10px;'}
+  #calendar
+
+%script{:type => "text/javascript"}
+  var appointments = new Array();
+  - (@capacity_slots + @work_appointments).each do |appt|
+    - title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} with #{appt.customer.name}";
+    appointments.push({'title':"#{title}", |
+                       'className':"#{@provider_colors[appt.provider.id]}", |
+                       'id':#{appt.id}, |
+                       'start':"#{appt.start_at.strftime("%a, %d %b %Y %H:%M:%S")}", |
+                       'end':"#{appt.end_at.strftime("%a, %d %b %Y %H:%M:%S")}", |
+                       'allDay':false}); |

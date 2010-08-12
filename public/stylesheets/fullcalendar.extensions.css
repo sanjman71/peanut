@@ -1,0 +1,15 @@
+.color1, .fc-agenda .color1 .fc-event-time, .color1 a
+                          { background-color: #FF6600; border-color: #FF6600; color: #fff; }
+
+.color2, .fc-agenda .color2 .fc-event-time, .color2 a
+                          { background-color: #C3D9FF; border-color: #C3D9FF; color: #333; }
+
+.color3, .fc-agenda .color3 .fc-event-time, .color3 a
+                          { background-color: #5500BB; border-color: #5500BB; color: #fff; }
+
+.color4, .fc-agenda .color4 .fc-event-time, .color4 a
+                          { background-color: #4CA20B; border-color: #4CA20B; color: #fff; }
+
+.fc table                 { margin-bottom: 0px; }
+.fc-header-space          { padding-left: 1px; }
+.fc-header-title          { font-size: 1.5em; padding-left: 10px; }
