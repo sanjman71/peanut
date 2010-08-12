@@ -6,7 +6,7 @@ $(document).ready(function() {
               center: 'title',
               right: 'month, agendaWeek, agendaDay'
             },
-    editable: false,
+    editable: true,
     selectable: {
       agendaDay: true
     },
