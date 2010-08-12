@@ -12,8 +12,10 @@
   var appointments = new Array();
   - (@capacity_slots + @work_appointments).each do |appt|
     - title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} with #{appt.customer.name}";
+    - klass = [@provider_colors[appt.provider.id]];
+    - klass.push('available') if  appt.is_a?(CapacitySlot)
     appointments.push({'title':"#{title}", |
-                       'className':"#{@provider_colors[appt.provider.id]}", |
+                       'className':"#{klass.join(' ')}", |
                        'id':#{appt.id}, |
                        'start':"#{appt.start_at.strftime("%a, %d %b %Y %H:%M:%S")}", |
                        'end':"#{appt.end_at.strftime("%a, %d %b %Y %H:%M:%S")}", |

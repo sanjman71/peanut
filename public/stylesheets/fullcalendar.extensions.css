@@ -8,7 +8,13 @@
                           { background-color: #5500BB; border-color: #5500BB; color: #fff; }
 
 .color4, .fc-agenda .color4 .fc-event-time, .color4 a
-                          { background-color: #4CA20B; border-color: #4CA20B; color: #fff; }
+                          { background-color: #444; border-color: #444; color: #fff; }
+
+.color5, .fc-agenda .color5 .fc-event-time, .color5 a
+                          { background-color: #888; border-color: #888; color: #fff; }
+
+.available, .fc-agenda .available .fc-event-time, .available a
+                          { background-color: #009900; border-color: #009900; color: #fff; }
 
 .fc table                 { margin-bottom: 0px; }
 .fc-header-space          { padding-left: 1px; }
