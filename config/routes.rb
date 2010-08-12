@@ -137,7 +137,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.waitlist  'book/wait/:provider_type/:provider_id/services/:service_id/:start_date..:end_date',
   #               :controller => 'appointments', :action => 'create_wait', :mark_as => 'wait', 
   #               :conditions => {:method => :post, :start_date => /\d{8,8}/, :end_date => /\d{8,8}/}
-    
+
   # edit, update and create provider free time, single appointment, block appointments, or weekly recurring appointments
   map.create_free   '/:provider_type/:provider_id/calendar/free',
                     :controller => 'appointments', :action => 'create_free', :conditions => {:method => :post}
@@ -156,6 +156,10 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'create_weekly', :conditions => {:method => :post}
   map.update_weekly '/:provider_type/:provider_id/calendar/:id/weekly',
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :put}
+
+  # test fullcalendar
+  map.connect       '/:provider_type/:provider_ids/calendar2', :controller => 'calendar', :action => 'show2',
+                    :provider_ids => /\d+(,\d+)*/
 
   # show/edit calendars scoped by provider (and optional format)
   map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date',

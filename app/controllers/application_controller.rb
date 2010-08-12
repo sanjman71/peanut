@@ -268,6 +268,28 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def init_providers(options={})
+    begin
+      # find the provider; the send method can throw an exception
+      @method     = "#{params[:provider_type].singularize}_providers"
+      @providers  = params[:provider_ids].split(",").inject([]) do |array, provider_id| 
+        provider = current_company.send(@method).find(provider_id) rescue nil
+        array.push(provider)
+        array
+      end.compact
+      raise Exception, "no providers" if @providers.empty?
+      return @providers
+    rescue Exception => e
+      if options.has_key?(:default)
+        @providers = options[:default]
+        return @providers
+      else
+        logger.debug("[error] invalid provider #{params[:provider_type]}:#{params[:provider_ids]}")
+        redirect_to(unauthorized_path) and return
+      end
+    end
+  end
+
   def init_provider_privileges
     if current_user and !@provider.blank?
       @current_privileges[@provider] = current_user.privileges(@provider).collect(&:name)

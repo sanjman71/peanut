@@ -4,6 +4,7 @@ class CalendarController < ApplicationController
   after_filter :store_location, :only => [:show]
 
   before_filter :init_provider, :only => [:show]
+  before_filter :init_providers, :only => [:show2]
   before_filter :init_provider_privileges, :only => [:show]
 
   privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
@@ -42,6 +43,47 @@ class CalendarController < ApplicationController
     end
   end
   
+  # GET /users/1/calendar2
+  # GET /users/1,2/calendar2
+  def show2
+    # @providers initialized in before_filter
+
+    if params[:start_date] and params[:end_date]
+      # build daterange using range values
+      @start_date = params[:start_date]
+      @end_date   = params[:end_date]
+      @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
+    elsif params[:start_date] and params[:range_type]
+      @start_date = params[:start_date]
+      @daterange  = DateRange.parse_range_type(@start_date, params[:range_type])
+    else
+      # build daterange using when
+      @when       = (params[:when] || 'next 6 weeks' || @@default_when).from_url_param
+      @start_date = params[:start_date] ? Time.zone.parse(params[:start_date]).in_time_zone : nil
+      @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date, :start_week_on => current_company.preferences[:start_wday].to_i)
+    end
+
+    @work_appointments = []
+    @capacity_slots    = []
+
+    @providers.each do |provider|
+      @work_appointments += AppointmentScheduler.find_work_appointments(current_company, current_location, provider, @daterange)
+      @capacity_slots    += AppointmentScheduler.find_free_capacity_slots(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
+    end
+
+    # skip capacity slots < 1
+    @capacity_slots.delete_if { |cs| cs.capacity < 1 }
+
+    # provider class/colors for css
+    @provider_colors = Hash[]
+    @providers.each_with_index do |provider, index|
+      @provider_colors[provider.id] = "color#{index}"
+    end
+
+    # page title
+    # @title = "#{@provider.name.titleize} Schedule"
+  end
+
   # GET /users/1/calendar?date=20100101
   # GET /users/1/calendar/when/today
   # GET /users/1/calendar/when/next-week
