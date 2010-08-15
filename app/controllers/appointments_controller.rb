@@ -1,8 +1,8 @@
 class AppointmentsController < ApplicationController
   before_filter :init_provider, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                          :update_weekly, :show_weekly, :create_work, :update]
+                                          :update_weekly, :show_weekly, :create_work, :move, :update]
   before_filter :init_provider_privileges, :only => [:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                     :update_weekly, :show_weekly, :create_work, :update]
+                                                     :update_weekly, :show_weekly, :create_work, :move, :update]
   before_filter :init_appointment, :only => [:show, :reschedule]
   before_filter :init_appointment_and_provider, :only => [:cancel]
   before_filter :init_customer_user, :only => [:index, :cleanup]
@@ -10,7 +10,7 @@ class AppointmentsController < ApplicationController
   privilege_required      'authenticated', :only => [:create_work], :on => :current_company
   privilege_required_any  'manage appointments', :only =>[:show, :reschedule], :on => [:appointment, :current_company]
   privilege_required_any  'update calendars', :only =>[:create_free, :new_block, :create_block, :new_weekly, :create_weekly, :edit_weekly,
-                                                       :update_weekly, :show_weekly, :update, :cancel],
+                                                       :update_weekly, :show_weekly, :move, :update, :cancel],
                                               :on => [:provider, :current_company]
   privilege_required_any  'read users', :only =>[:index, :cleanup], :on => [:user, :current_company]
 
@@ -167,10 +167,19 @@ class AppointmentsController < ApplicationController
             @errors[date] = "There was a problem sending a confirmation email." + e.message
           end
         when Appointment::FREE
-          # build time range
-          @time_range     = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
-          @options        = {:time_range => @time_range, :creator_id => @creator.andand.id}
-          @options        = @options.merge({:capacity => @capacity }) unless @capacity.blank?
+          if !@start_at.blank? and !@end_at.blank?
+            # build time range for date, start_at, end_at
+            @time_range = TimeRange.new(:day => date, :start_at => @start_at, :end_at => @end_at)
+            @options    = Hash[:time_range => @time_range]
+          elsif !@start_at.blank? and !@duration.blank?
+            # use start_at and duration
+            @options    = Hash[:start_at => @start_at, :duration => @duration]
+          end
+          # add creator
+          @options        = @options.merge({:creator_id => @creator.andand.id})
+          # add capacity, use default if not specified
+          @capacity       = 1 if @capcity.to_i <= 0
+          @options        = @options.merge({:capacity => @capacity})
           # create free appointment, with preferences
           @appointment    = AppointmentScheduler.create_free_appointment(current_company, current_location, @provider, @options)
           @appointment.update_attributes(@preferences) unless @preferences.blank?
@@ -390,13 +399,15 @@ class AppointmentsController < ApplicationController
   
   # POST /users/1/calendar/free/add
   def create_free
-    @service = current_company.free_service
-    @mark_as = Appointment::FREE
-    # check start_at, end_at values; convert 201001001T0100 to 0100
-    start_match       = params[:start_at].match(/(\d+)T(\d+)/)
-    end_match         = params[:end_at].match(/(\d+)T(\d+)/)
-    params[:start_at] = start_match[2] unless start_match.blank?
-    params[:end_at]   = end_match[2] unless end_match.blank?
+    @service          = current_company.free_service
+    @mark_as          = Appointment::FREE
+    if params[:date] and params[:start_at] and params[:end_at]
+      # check start_at, end_at values to convert 201001001T0100 to 0100
+      start_match       = params[:start_at].to_s.match(/(\d+)T(\d+)/)
+      end_match         = params[:end_at].to_s.match(/(\d+)T(\d+)/)
+      params[:start_at] = start_match[2] unless start_match.blank?
+      params[:end_at]   = end_match[2] unless end_match.blank?
+    end
     create
   end
   
@@ -679,9 +690,7 @@ class AppointmentsController < ApplicationController
         end
 
       rescue OutOfCapacity => e
-
         error << e.message
-
       end
 
       if error.empty?
@@ -732,12 +741,53 @@ class AppointmentsController < ApplicationController
   end
 
   # PUT /appointments/1
+  def move
+    # @provider initialized in before filter
+
+    @appointment          = current_company.appointments.find(params[:id])
+
+    # calculate new start_at based on days, hours, minutes parameters
+    @delta_days           = params[:days].to_i
+    @delta_minutes        = params[:minutes].to_i
+
+    # adjust appointment start_at and end_at times; force changes so capacity constraints are ignored
+    @appointment.start_at = @appointment.start_at + @delta_days.days + @delta_minutes.minutes
+    @appointment.end_at   = @appointment.start_at + @appointment.duration.to_i.seconds
+    @appointment.force    = true
+    @appointment.save
+
+    @status  = "ok"
+    @message = "Appointment moved"
+
+    respond_to do |format|
+      format.html do
+        flash[:notice] = @message
+        redirect_to(request.referer) and return
+      end
+      format.js do
+        render(:update) { |page| page.redirect_to(request.referer) }
+      end
+      format.json do
+        render(:json => Hash[:status => @status, :message => @message])
+      end
+    end
+  rescue Exception => e
+    @status  = "error"
+    @message = e.message
+    respond_to do |format|
+      format.json do
+        render(:json => Hash[:status => @status, :message => @message])
+      end
+    end
+  end
+
+  # PUT /appointments/1
   def update
     # @provider initialized in before filter
 
     @appointment          = current_company.appointments.find(params[:id])
 
-    # Update appointment fields
+    # update appointment fields
     @service              = init_service(:default => (@appointment.free? ? @appointment.company.free_service : nil))
     @customer             = User.find_by_id(params[:customer_id])
 

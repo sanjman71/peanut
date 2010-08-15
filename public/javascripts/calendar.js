@@ -16,9 +16,9 @@ $.fn.init_add_work_appointment = function() {
     $(form).find("select#service_id").change();
     //force_provider_selected(form, current_provider.get("id"), current_provider.get("type"));
     // disable providers select
-    $(form).find("select#provider").attr('disabled', 'disabled');
+    //$(form).find("select#provider").attr('disabled', 'disabled');
     // set start date field, and disable
-    var normalized_date = $(this).parents("td").attr('id');
+    var normalized_date = current_appt_date; //$(this).parents("td").attr('id');
     var calendar_date   = convert_yymmdd_string_to_mmddyy(normalized_date)
     $(form).find("input#start_date").val(calendar_date);
     $(form).find("input#start_date").addClass('disabled');
@@ -27,6 +27,8 @@ $.fn.init_add_work_appointment = function() {
     $(form).find("input#start_time").val('');
     $(form).find("input#customer_name").val('');
     $(form).find("input#customer_id").val('');
+    // xxx
+    $(form).find("input#start_time").val(current_appt_start_ampm);
     // set creator id field, hide creator div used to show creator for edits
     $(form).find("input#creator_id").val(current_user.get("id"));
     $(form).find("div#creator").addClass('hide');
@@ -67,6 +69,7 @@ $.fn.init_add_work_appointment = function() {
     var provider_id   = provider.split('/')[1];
     var duration      = $(this).find("select#duration option:selected").val();
     var capacity      = $(this).find("input#capacity").val();
+    var mark_as       = (service_id == free_service.get("id")) ? 'free' : 'work'
 
     if (!start_date) {
       alert("Please select a date");
@@ -83,7 +86,12 @@ $.fn.init_add_work_appointment = function() {
       return false; 
     }
 
-    if (!customer_id) {
+    if (!duration) {
+      alert("Please specify how long this appointment should be");
+      return false; 
+    }
+
+    if (!customer_id && mark_as =='work') {
       alert("Please select a customer");
       return false; 
     }
@@ -95,7 +103,7 @@ $.fn.init_add_work_appointment = function() {
 
     var start_date_time = start_date + 'T' + start_time;
 
-    if (capacity == '') {
+    if (capacity == '' && mark_as == 'work') {
       // check capacity, allow callback to handle response and detemine whether we should continue
       var check_capacity_url = check_provider_capacity_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
       $.get(check_capacity_url, {}, function(data) { check_capacity_response(data) }, "json");
@@ -116,6 +124,20 @@ $.fn.init_add_work_appointment = function() {
     // disable start_date, start_time field
     $(this).find("input#start_date").attr('disabled', 'disabled');
     $(this).find("input#start_time").attr('disabled', 'disabled');
+
+    // handle work vs free appointments
+    $(this).find("input#mark_as").attr('value', mark_as);
+
+    if (mark_as == 'work') {
+      // set form url and method
+      $(this).attr('action', appointment_create_work_path);
+      $(this).attr('method', 'post');
+    } else {
+      // set form url and method
+      var appt_create_free_url = appointment_create_free_path.replace(/:provider_type/, provider_type).replace(/:provider_id/, provider_id).replace(/:start_time/, start_date_time).replace(/:duration/, duration);
+      $(this).attr('action', appt_create_free_url);
+      $(this).attr('method', 'post');
+    }
 
     // serialize form
     data = $(this).serialize();
@@ -568,15 +590,17 @@ $.fn.init_add_calendar_markings = function() {
   })
 
   // mark a calendar date
-  if (calendar_highlight_date == 'first-activity') {
-    // mark the first calendar date with activity
-    $("table.calendar td.activity:first").click();
-  } else if ($("table.calendar td#"+calendar_highlight_date).size() > 0) {
-    // mark the specified date
-    $("table.calendar td#"+calendar_highlight_date).click();
-  } else {
-    // default to first calendar date with activity
-    $("table.calendar td.activity:first").click();
+  if (typeof(calendar_highlight_date) != 'undefined') {
+    if (calendar_highlight_date == 'first-activity') {
+      // mark the first calendar date with activity
+      $("table.calendar td.activity:first").click();
+    } else if ($("table.calendar td#"+calendar_highlight_date).size() > 0) {
+      // mark the specified date
+      $("table.calendar td#"+calendar_highlight_date).click();
+    } else {
+      // default to first calendar date with activity
+      $("table.calendar td.activity:first").click();
+    }
   }
 
   // show add menu icon on calendar date hover, allow past dates

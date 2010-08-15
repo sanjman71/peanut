@@ -75,7 +75,7 @@ ActionController::Routing::Routes.draw do |map|
                           :conditions => {:method => :get}
   map.resources           :appointments,
                           :member => {:approve => [:get, :put], :noshow => [:get, :put], :complete => [:get, :put], :cancel => [:get, :put, :post],
-                                      :reschedule => :put}
+                                      :reschedule => :put, :move => :put}
 
   # staff and customer specialized routes; otherwise use more generic user routes
   map.resources           :staffs, :only => [:index]

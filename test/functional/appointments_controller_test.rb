@@ -50,6 +50,9 @@ class AppointmentsControllerTest < ActionController::TestCase
   should_route :post, '/appointments/1/cancel', :controller => 'appointments', :action => 'cancel', :id => 1, :series => 1
   should_route :put, '/appointments/1/reschedule', :controller => 'appointments', :action => 'reschedule', :id => 1
 
+  # move appointments
+  should_route :put, '/appointments/1/move', :controller => 'appointments', :action => 'move', :id => 1
+  
   # show work appointments by state
   should_route :get, '/appointments/upcoming', :controller => 'appointments', :action => 'index', :type => 'work', :state => 'upcoming'
 
@@ -117,9 +120,9 @@ class AppointmentsControllerTest < ActionController::TestCase
       should_redirect_to("unauthorized_path") { unauthorized_path }
     end
 
-    context "with privileges" do
+    context "with date, start_at, end_at" do
       setup do
-        # have johnny create free appointments on his calendar
+        # johnny creates a free appointment on his calendar
         @controller.stubs(:current_user).returns(@johnny)
         @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
         post :create_free,
@@ -129,56 +132,60 @@ class AppointmentsControllerTest < ActionController::TestCase
 
       should_change("Appointment.count", :by => 1) { Appointment.count }
 
-      should_assign_to(:service) { @free_service }
-      should_assign_to(:provider) { @johnny }
-      should_assign_to(:creator) { @johnny }
-      should_assign_to(:start_at)  { "0900" }
-      should_assign_to(:end_at) { "1100" }
-      should_assign_to(:mark_as) { "free" }
-      should_assign_to(:appointment)
-
-      should "set appointment mark_as" do
+      should "set appointment mark_as, start_at, end_at, duration, capacity, provider, creator, no customer, flash notice" do
+        assert_equal @free_service, assigns(:service)
+        assert_equal @johnny, assigns(:provider)
+        assert_equal @johnny, assigns(:creator)
+        assert_equal "0900", assigns(:start_at)
+        assert_equal "1100", assigns(:end_at)
+        assert_equal "free", assigns(:mark_as)
         @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal 'free', @appointment.mark_as
-      end
-
-      should "set appointment start_at" do
-        @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal '20090201T090000', @appointment.start_at.to_s(:appt_schedule)
-      end
-
-      should "set appointment end_at" do
-        @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal '20090201T110000', @appointment.end_at.to_s(:appt_schedule)
-      end
-
-      should "set appointment duration" do
-        @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal 7200, @appointment.duration
-      end
-
-      should "set appointment provider" do
-        @appointment = Appointment.find(assigns(:appointment).id)
+        assert_equal 1, @appointment.capacity
         assert_equal @johnny, @appointment.provider
-      end
-
-      should "set appointment creator" do
-        @appointment = Appointment.find(assigns(:appointment).id)
         assert_equal @johnny, @appointment.creator
-      end
-
-      should "not set appointment customer" do
-        @appointment = Appointment.find(assigns(:appointment).id)
         assert_nil @appointment.customer
-      end
-
-      should "set flash" do
         assert flash[:notice].match(/Your availability was added/)
       end
 
       should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
     end
     
+    context "with start_at, duration" do
+      setup do
+        # johnny creates a free appointment on his calendar
+        @controller.stubs(:current_user).returns(@johnny)
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        post :create_free,
+             {:start_at => "20090201T0900", :duration => "3600", :provider_type => "users", :provider_id => @johnny.id,
+              :creator_id => @johnny.id}
+      end
+
+      should_change("Appointment.count", :by => 1) { Appointment.count }
+
+      should "set appointment mark_as, start_at, end_at, duration, capacity, provider, creator, no customer, flash notice" do
+        assert_equal @free_service, assigns(:service)
+        assert_equal @johnny, assigns(:provider)
+        assert_equal @johnny, assigns(:creator)
+        assert_equal "20090201T0900", assigns(:start_at)
+        assert_equal 3600, assigns(:duration)
+        assert_equal "free", assigns(:mark_as)
+        @appointment = Appointment.find(assigns(:appointment).id)
+        assert_equal 'free', @appointment.mark_as
+        assert_equal '20090201T090000', @appointment.start_at.to_s(:appt_schedule)
+        assert_equal '20090201T100000', @appointment.end_at.to_s(:appt_schedule)
+        assert_equal 3600, @appointment.duration
+        assert_equal 1, @appointment.capacity
+        assert_equal @johnny, @appointment.provider
+        assert_equal @johnny, @appointment.creator
+        assert_nil @appointment.customer
+        assert flash[:notice].match(/Your availability was added/)
+      end
+    end
+
     context "for a single date" do
       context "with times for start_at and end_at" do
         setup do
@@ -191,15 +198,26 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
   
         should_change("Appointment.count", :by => 1) { Appointment.count }
-  
-        should_assign_to(:service) { @free_service }
-        should_assign_to(:provider) { @johnny }
-        should_assign_to(:creator) { @johnny }
-        should_assign_to(:start_at)  { "0900" }
-        should_assign_to(:end_at) { "1100" }
-        should_assign_to(:mark_as) { "free" }
-        should_assign_to(:appointment)
-  
+
+        should "set service, provider, creator, start_at, end_at, mark_as" do
+          assert_equal @free_service, assigns(:service)
+          assert_equal @johnny, assigns(:provider)
+          assert_equal @johnny, assigns(:creator)
+          assert_equal "0900", assigns(:start_at)
+          assert_equal "1100", assigns(:end_at)
+          assert_equal "free", assigns(:mark_as)
+          assert assigns(:appointment)
+          @appointment = Appointment.find(assigns(:appointment).id)
+          assert_equal 'free', @appointment.mark_as
+          assert_equal '20090201T090000', @appointment.start_at.to_s(:appt_schedule)
+          assert_equal '20090201T110000', @appointment.end_at.to_s(:appt_schedule)
+          assert_equal 7200, @appointment.duration
+          assert_equal 1, @appointment.capacity
+          assert_equal @johnny, @appointment.provider
+          assert_equal @johnny, @appointment.creator
+          assert_nil @appointment.customer
+        end
+
         should_redirect_to("user calendar path" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
       end
   
@@ -213,13 +231,25 @@ class AppointmentsControllerTest < ActionController::TestCase
         end
   
         should_change("Appointment.count", :by => 1) { Appointment.count }
-  
-        should_assign_to(:service) { @free_service }
-        should_assign_to(:provider) { @johnny }
-        should_assign_to(:creator) { @johnny }
-        should_assign_to(:start_at)  { "0900" }
-        should_assign_to(:end_at) { "1100" }
-        should_assign_to(:mark_as) { "free" }
+
+        should "set service, provider, creator, start_at, end_at, mark_as" do
+          assert_equal @free_service, assigns(:service)
+          assert_equal @johnny, assigns(:provider)
+          assert_equal @johnny, assigns(:creator)
+          assert_equal "0900", assigns(:start_at)
+          assert_equal "1100", assigns(:end_at)
+          assert_equal "free", assigns(:mark_as)
+          assert assigns(:appointment)
+          @appointment = Appointment.find(assigns(:appointment).id)
+          assert_equal 'free', @appointment.mark_as
+          assert_equal '20090201T090000', @appointment.start_at.to_s(:appt_schedule)
+          assert_equal '20090201T110000', @appointment.end_at.to_s(:appt_schedule)
+          assert_equal 7200, @appointment.duration
+          assert_equal 1, @appointment.capacity
+          assert_equal @johnny, @appointment.provider
+          assert_equal @johnny, @appointment.creator
+          assert_nil @appointment.customer
+        end
   
         should_redirect_to("user calendar path with highlight date" ) { "/users/#{@johnny.id}/calendar?highlight=20090201" }
       end
@@ -1071,9 +1101,46 @@ class AppointmentsControllerTest < ActionController::TestCase
     end
   end
   
+  context "move free appointment" do
+    setup do
+      # create free appointment from 10 am to 12 pm
+      @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @duration     = 2.hours
+      @free_appt    = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @johnny, :time_range => @time_range)
+      assert @free_appt.valid?
+    end
+
+    context "without 'update calendar' privilege" do
+      setup do
+        # @request.env['HTTP_REFERER'] = '/users/0/calendar'
+        put :move, {:id => @free_appt.id, :day => "0", :minute => "60"}
+      end
+  
+      should_redirect_to("unauthorized") { "/unauthorized" }
+    end
+
+    context "move by -3 hours" do
+      setup do
+        @request.env['HTTP_REFERER'] = '/users/0/calendar'
+        @controller.stubs(:current_user).returns(@owner)
+        put :move, {:id => @free_appt.id, :days => '0', :minutes => '0',
+                    :provider_type => "users", :provider_id => @johnny.id}
+      end
+
+      should "change appointment" do
+        assert_equal @free_appt, assigns(:appointment)
+        assert_equal @today, @free_appt.reload.start_at.to_s(:appt_schedule_day)
+        assert_equal 7, @free_appt.reload.start_at.hour
+        assert_equal 9, @free_appt.reload.end_at.hour
+        assert_equal 7200, @free_appt.reload.start_at.duration
+      end
+    end
+  end
+
   context "update free appointment" do
     setup do
-      # create free time from 10 am to 12 pm
+      # create free appointment from 10 am to 12 pm
       @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @duration     = 2.hours

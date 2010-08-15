@@ -34,11 +34,13 @@
 .ui-dialog-content.ui-widget-content  { color: #FFFFFF; }
 */
 
-.ui-dialog.ui-widget-content          { padding: 0; border: none; background: #333; }
+.ui-dialog.ui-widget-content          { padding: 0; border: none; background: #1A1A1A; }
 .ui-dialog-content.ui-widget-content  { color: #fff; }
 
+/*
 .ui-dialog-titlebar                   { background: #ff6600; color: #fff; }
 .ui-dialog-titlebar.ui-widget-header  { border: #ff6600; }
+*/
 
 /* timepicker */
 

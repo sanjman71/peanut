@@ -259,8 +259,8 @@ class AppointmentTest < ActiveSupport::TestCase
     context "and create a conflicting free appointment" do
       setup do
         # create free time from 10 am to 12 pm
-        @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
-        @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+        @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+        @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
         @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
       end
       

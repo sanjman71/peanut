@@ -1,22 +1,86 @@
 - title(@title || "Schedule w/ FullCalendar")
-- stylesheet('fullcalendar', 'fullcalendar.extensions')
-- javascript('fullcalendar.min', 'calendar2')
+- stylesheet('fullcalendar', 'fullcalendar.extensions', 'jquery.timepickr', 'datePicker', 'jquery.autocomplete')
+- javascript('fullcalendar.min', 'calendar2', 'calendar', 'mobile_service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
 
--#.span-24.last
-  -#= link_to 'Go to date', '', :id => 'goto_date', :date => '08/17/2010'
+.span-24.last.hide
+  = link_to 'Add Work Appointment', '', :id => 'calendar_add_work_appointment'
+  -#= link_to 'Add Customer', '', :id => 'add_work_appointment_add_customer'
+
+.span-24.last
+  = display_flash(:all)
 
 .span-24.last{:style => 'padding-top: 10px;'}
   #calendar
 
+-# special actions require special privileges
+- if true #has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
+  -# hidden forms for add/edit appointment, add free time, and add customer
+  = render(:partial => 'calendar/add_work_appointment_dialog', :locals => {:provider => @providers.first, :services => @work_services + [@free_service], :providers => @all_providers})
+  = render(:partial => 'calendar/add_free_appointment_dialog', :locals => {:provider => @providers.first, :service => @free_service, :providers => @all_providers})
+  - @customer = User.new
+  - @customer.email_addresses.build
+  - @customer.phone_numbers.build
+  = render(:partial => 'users/user_form_dialog', |
+           :locals => {:user => @customer, :role => 'company customer', |
+                       :user_password => current_company.preferences[:customer_password], |
+                       :user_email => current_company.preferences[:customer_email], |
+                       :user_phone => current_company.preferences[:customer_phone], |
+                       :submit_url => customer_create_format_path(:format => :json), |
+                       :title => 'Add Customer', :submit_text => 'Create'}) |
+
 %script{:type => "text/javascript"}
-  var appointments = new Array();
+  var current_user                  = new Hash({"id" : "#{current_user.id}"});
+  var current_provider              = new Hash({"id" : "#{@providers.first.id}", "type" : "#{@providers.first.class.to_s.tableize}"});
+  var free_service                  = new Hash({"id" : "#{@free_service.id}", "name" : "#{@free_service.name}"});
+  var current_appt_date             = "";
+  var current_appt_start_ampm       = "";
+  var appointment_create_work_path  = "#{schedule_work_path}";
+  var appointment_create_free_path  = "#{create_free_path(':provider_type', ':provider_id')}";
+  var appointment_move_path         = "#{move_appointment_path(':appointment_id', :format => 'json')}";
+  var appointments                  = new Array();
+  var check_provider_capacity_path  = "#{provider_capacity_path(':provider_type', ':provider_id', ':start_time', ':duration', :format => 'json')}";
+
+  -# build services hash, all work services + free service
+  var services = new Hash();
+  - (@work_services+[@free_service]).each do |service|
+    services.put(#{service.id}, new Hash({"duration_custom"  : #{service.allow_custom_duration ? 1 : 0}, |
+                                          "duration_words"   : "#{Duration.to_words(service.duration.to_i, :prepend => 'Typically')}", |
+                                          "duration_seconds" : #{service.duration.to_i}, |
+                                          })) |
+
+  -# build hash mapping each service to the service providers collection
+  var service_providers = new Hash();
+  - @sps.keys.each do |service_id|
+    var array = new Array();
+    - @sps[service_id].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}", "#{hash[:klass]}"])
+    service_providers.put(#{service_id}, array)
+  -# add free service as a service provided by everyone
+  - [@free_service].each do |service|
+    var array = new Array();
+    - @all_providers.each do |provider|
+      array.push([#{provider.id}, "#{provider.name}", "#{provider.class.to_s.tableize}"])
+    service_providers.put(#{service.id}, array)
+
+  -# build hash mapping each provider to the services collection they provide
+  var provider_services = new Hash();
+  - @ps.keys.each do |provider_key|
+    var array = new Array();
+    - @ps[provider_key].each do |hash|
+      array.push([#{hash[:id]}, "#{hash[:name]}"])
+    provider_services.put("#{provider_key}", array)
+
+  -# build appointments collection
   - (@capacity_slots + @work_appointments).each do |appt|
-    - title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} with #{appt.customer.name}";
+    - title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
     - klass = [@provider_colors[appt.provider.id]];
     - klass.push('available') if  appt.is_a?(CapacitySlot)
     appointments.push({'title':"#{title}", |
                        'className':"#{klass.join(' ')}", |
-                       'id':#{appt.id}, |
+                       'appt_id':"#{appt.id}", |
+                       'appt_type': "#{appt.class.to_s}", |
+                       'provider_id':"#{appt.provider.id}", |
+                       'provider_type':"#{appt.provider.class.to_s.tableize}", |
                        'start':"#{appt.start_at.strftime("%a, %d %b %Y %H:%M:%S")}", |
                        'end':"#{appt.end_at.strftime("%a, %d %b %Y %H:%M:%S")}", |
                        'allDay':false}); |
