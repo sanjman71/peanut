@@ -71,10 +71,11 @@
     provider_services.put("#{provider_key}", array)
 
   -# build appointments collection
-  - (@capacity_slots + @work_appointments).each do |appt|
-    - title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
+  - (@free_appointments + @work_appointments).each do |appt|
+    -#- title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
+    - title = appt.free? ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
     - klass = [@provider_colors[appt.provider.id]];
-    - klass.push('available') if  appt.is_a?(CapacitySlot)
+    - klass.push('available') if  appt.free?
     appointments.push({'title':"#{title}", |
                        'className':"#{klass.join(' ')}", |
                        'appt_id':"#{appt.id}", |
