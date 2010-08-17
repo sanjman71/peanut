@@ -159,7 +159,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # test fullcalendar
   map.connect       '/:provider_type/:provider_ids/calendar2', :controller => 'calendar', :action => 'show2',
-                    :provider_ids => /\d+(,\d+)*/
+                    :provider_ids => /(\d+(,\d+)*)|(all)/
 
   # show/edit calendars scoped by provider (and optional format)
   map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date',

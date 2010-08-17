@@ -69,10 +69,9 @@ class CalendarController < ApplicationController
 
     @providers.each do |provider|
       @work_appointments += AppointmentScheduler.find_work_appointments(current_company, current_location, provider, @daterange)
-      @free_appointments += AppointmentScheduler.find_free_appointments(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+      @free_appointments += AppointmentScheduler.find_free_appointments(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
       # @capacity_slots    += AppointmentScheduler.find_free_capacity_slots(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
     end
-
     # skip capacity slots < 1
     # @capacity_slots.delete_if { |cs| cs.capacity < 1 }
 

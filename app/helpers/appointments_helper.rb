@@ -95,15 +95,14 @@ module AppointmentsHelper
     collection = []
 
     # add hours
-    [0, 1, 2, 3].each do |hours|
-
-        # add minutes in 15 minute intervals
-        [0, 15, 30, 45].each do |minutes|
-          time_string = []
-          time_string << pluralize(hours, 'hour') unless hours == 0
-          time_string << pluralize(minutes, 'minute') unless minutes == 0
-          collection.push([time_string.join(" "), hours.hours + minutes.minutes]) unless (hours == 0 && minutes == 0)
-        end
+    Range.new(0,8).each do |hours|
+      # add minutes in 15 minute intervals
+      [0, 15, 30, 45].each do |minutes|
+        time_string = []
+        time_string << pluralize(hours, 'hour') unless hours == 0
+        time_string << pluralize(minutes, 'minute') unless minutes == 0
+        collection.push([time_string.join(" "), hours.hours + minutes.minutes]) unless (hours == 0 && minutes == 0)
+      end
     end
     
     collection

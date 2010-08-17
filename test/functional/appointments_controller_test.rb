@@ -1124,7 +1124,7 @@ class AppointmentsControllerTest < ActionController::TestCase
       setup do
         @request.env['HTTP_REFERER'] = '/users/0/calendar'
         @controller.stubs(:current_user).returns(@owner)
-        put :move, {:id => @free_appt.id, :days => '0', :minutes => '0',
+        put :move, {:id => @free_appt.id, :days => '0', :minutes => '-180',
                     :provider_type => "users", :provider_id => @johnny.id}
       end
 
@@ -1133,7 +1133,7 @@ class AppointmentsControllerTest < ActionController::TestCase
         assert_equal @today, @free_appt.reload.start_at.to_s(:appt_schedule_day)
         assert_equal 7, @free_appt.reload.start_at.hour
         assert_equal 9, @free_appt.reload.end_at.hour
-        assert_equal 7200, @free_appt.reload.start_at.duration
+        assert_equal 7200, @free_appt.reload.duration
       end
     end
   end
