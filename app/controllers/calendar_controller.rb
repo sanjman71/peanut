@@ -90,7 +90,12 @@ class CalendarController < ApplicationController
     @sps, @ps       = build_service_provider_mappings(@work_services)
 
     # page title
-    # @title = "#{@provider.name.titleize} Schedule"
+    case @providers.size
+    when 1
+      @title = "#{@providers.first.name.titleize} Schedule"
+    else
+      @title = "Provider Schedules"
+    end
   end
 
   # GET /users/1/calendar?date=20100101

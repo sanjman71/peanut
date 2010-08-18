@@ -13,10 +13,12 @@
         = label_tag "show_provider", "Schedule for:"
         = select_tag('show_provider', options_for_select(@providers.collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
       -# links to schedule using blocks of time or using weekly schedules
-      %h4
+      %h4.bottom
         = link_to "Manage Weekly Schedule", show_weekly_path, :class => 'admin'
         %span.small== &nbsp;or&nbsp;
         = link_to "Add Blocks of Available Time", new_block_path, :class => 'admin'
+      %h4
+        = link_to 'New Schedule Interface', request.request_uri+'2', :class => 'admin', :style => 'font-size: 0.7em;'
       -#%h4
         -#= link_to "Manage Vacation Schedule", provider_vacations_path, :class => 'admin'
     .span-6.last#pdf
