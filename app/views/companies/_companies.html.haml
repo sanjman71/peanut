@@ -35,7 +35,7 @@
         - when 'frozen'
           = link_to 'Activate', unfreeze_company_path(company), :method => :put, :class => 'admin'
         - when 'active', 'initialized', 'authorized'
-          = link_to "View Site", root_path(:subdomain => company.subdomain), :class => 'admin'
+          = link_to "View Site", root_url(:subdomain => company.subdomain), :class => 'admin'
           == &nbsp;|&nbsp;
           = link_to 'Freeze', freeze_company_path(company), :method => :put, :class => 'admin'
 
