@@ -29,8 +29,12 @@
                        :title => 'Add Customer', :submit_text => 'Create'}) |
 
 %script{:type => "text/javascript"}
+  -# set the select mode used to driver services and providers in the user interface
+  sp_select_mode                    = 'providers';
   var current_user                  = new Hash({"id" : "#{current_user.id}"});
-  var current_provider              = new Hash({"id" : "#{@providers.first.id}", "type" : "#{@providers.first.class.to_s.tableize}"});
+  var current_provider              = new Hash({"id"   : "#{@providers.first.id}", |
+                                                "type" : "#{@providers.first.class.to_s.tableize}", |
+                                                "key"  : "#{@providers.first.class.to_s.tableize}/#{@providers.first.id}"}); |
   var free_service                  = new Hash({"id" : "#{@free_service.id}", "name" : "#{@free_service.name}"});
   var current_appt                  = new Hash();
   var current_appt_date             = "";
@@ -73,11 +77,12 @@
     var array = new Array();
     - @ps[provider_key].each do |hash|
       array.push([#{hash[:id]}, "#{hash[:name]}"])
+    -# add free service to collection of provider services
+    array.push([#{@free_service.id}, "#{@free_service.name}"])
     provider_services.put("#{provider_key}", array)
 
   -# build appointments collection
   - (@free_appointments + @work_appointments).each do |appt|
-    -#- title = appt.is_a?(CapacitySlot) ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
     - title = appt.free? ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
     - klass = [@provider_colors[appt.provider.id]];
     - klass.push('available') if  appt.free?
@@ -93,6 +98,7 @@
                        "appt_provider"      : "#{appt.provider_type.tableize}/#{appt.provider_id}", |
                        "appt_creator"       : "#{appt.creator.andand.name.to_s}", |
                        "appt_service"       : "#{appt.service.andand.name.to_s}", |
+                       "appt_service_id"    : "#{appt.service.try(:id).to_i}", |
                        "appt_customer"      : "#{appt.customer.andand.name.to_s}", |
                        "appt_customer_id"   : "#{appt.customer_id}", |
                        "start"              : "#{appt.start_at.strftime("%a, %d %b %Y %H:%M:%S")}", |

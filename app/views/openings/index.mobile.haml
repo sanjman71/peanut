@@ -27,13 +27,15 @@
 = render(:partial => 'openings/search')
 
 %script{:type => 'text/javascript'}
-  var current_user_id = #{logged_in? ? current_user.id : 0};
+  -# set the select mode used to driver services and providers in the user interface
+  sp_select_mode        = 'services';
+  var current_user_id   = #{logged_in? ? current_user.id : 0};
   -# used to flag whether we should show the search page after loading
-  var show_search = #{@daterange.blank? ? 1 : 0};
+  var show_search       = #{@daterange.blank? ? 1 : 0};
   var openings_service_name = "#{@service.andand.name}";
-  var openings_path = "#{openings_path}";
-  var schedule_path = "#{schedule_path(:provider_type => ':provider_type', :provider_id => ':provider_id', :service_id => @service.andand.id, :duration => @service.andand.duration, :start_at => ':datetime')}";
-    
+  var openings_path     = "#{openings_path}";
+  var schedule_path     = "#{schedule_path(:provider_type => ':provider_type', :provider_id => ':provider_id', :service_id => @service.andand.id, :duration => @service.andand.duration, :start_at => ':datetime')}";
+
   -# build services hash
   var services = new Hash();
   - @services.each do |service|

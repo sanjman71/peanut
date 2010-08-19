@@ -11,14 +11,25 @@ $.fn.init_add_work_appointment = function() {
   $("a#calendar_add_work_appointment").click(function() {
     var form = add_work_appt_form;
     // start date and provider fields are fixed when adding new work appointments
+
+    //alert("initializing provider services: " + current_provider.get('key')); // xxx
+    $(document).init_provider_services(current_provider.get('key'), "select#service_id", 0);
+    $(document).init_service_duration();
+
     // set current provider as initial provider_id and provider_type
-    $(form).find("input#initial_provider_id").val(current_provider.get("id"));
-    $(form).find("input#initial_provider_type").val(current_provider.get("type"));
+    //$(form).find("input#initial_provider_id").val(current_provider.get("id"));
+    //$(form).find("input#initial_provider_type").val(current_provider.get("type"));
     // force refresh of service, provider, duration selections
-    $(form).find("select#service_id").change();
+    //$(form).find("select#service_id").change();
+
     //force_provider_selected(form, current_provider.get("id"), current_provider.get("type"));
     // disable providers select
     //$(form).find("select#provider").attr('disabled', 'disabled');
+
+    // provider and service are editable when adding appointments
+    $(form).find("select#provider").removeAttr('disabled');
+    $(form).find("select#service_id").removeAttr('disabled');
+
     // set mark as
     $(form).find("input#mark_as").val(current_appt.get("mark_as"));
     // set start date field, and disable
@@ -73,7 +84,6 @@ $.fn.init_add_work_appointment = function() {
     var provider_id   = provider.split('/')[1];
     var duration      = $(this).find("select#duration option:selected").val();
     var capacity      = $(this).find("input#capacity").val();
-    var mark_as       = services.get(service_id).get("mark_as");
 
     if (!start_date) {
       alert("Please select a date");
@@ -84,6 +94,9 @@ $.fn.init_add_work_appointment = function() {
       alert("Please select a service");
       return false; 
     }
+
+    // get mark_as after service is validated
+    var mark_as = services.get(service_id).get("mark_as");
 
     if (!start_time) {
       alert("Please select a start time");
@@ -224,7 +237,8 @@ $.fn.init_edit_work_appointment = function() {
     var start_date        = convert_yymmdd_string_to_mmddyy(current_appt.get("schedule_day"));
     var start_time        = current_appt.get("start_time");
     var duration          = current_appt.get('duration');       // e.g. 3600
-    var service_name      = current_appt.get('service');        // e.g. 'Haircut'
+    var service_name      = current_appt.get('service');        // e.g. 'Haircut', 'Available'
+    var service_id        = current_appt.get('service_id');     // e.g. '5'
     var customer_name     = current_appt.get('customer');       // e.g. 'Joe'
     var customer_id       = current_appt.get('customer_id');    // e.g. '5'
     var provider          = current_appt.get('provider');       // e.g. 'users/11'
@@ -232,17 +246,31 @@ $.fn.init_edit_work_appointment = function() {
     var update_path       = appointment_update_work_path.replace(/:id/, appt_id);
     var cancel_path       = appointment_cancel_path.replace(/:id/, appt_id);
     //var show_path         = appointment_show_path.replace(/:id/, appt_id);
+
+    //alert("initializing provider services: " + current_provider.get('key')); // xxx
+    $(document).init_provider_services(current_provider.get('key'), "select#service_id", service_id);
+    //$(document).init_service_duration();
+
     $(form).find("input#mark_as").val(mark_as);
     $(form).find("input#start_date").val(start_date);
     $(form).find("input#start_time").val(start_time);
     $(form).find("select#service_id").val(service_name).attr('selected', 'selected');
-    $(form).find("select#service_id").change();
+    //$(form).find("select#service_id").change();
     $(form).find("select#duration").val(duration).attr('selected', 'selected'); // set duration after service
     $(form).find("input#customer_name").val(customer_name);
     $(form).find("input#customer_id").val(customer_id);
-    // select current appointment provider, and disable field
-    $(form).find("select#provider").val(provider).attr('selected', 'selected');
-    //$(form).find("select#provider").attr('disabled', 'disabled');
+
+    if (mark_as == 'free') {
+      // provider and service are fixed
+      // user can change start time and duration for free time
+      $(form).find("select#provider").attr('disabled', 'disabled');
+      $(form).find("select#service_id").attr('disabled', 'disabled');
+    } else {
+      // provider and service are editable for work time
+      $(form).find("select#provider").removeAttr('disabled');
+      $(form).find("select#service_id").removeAttr('disabled');
+    }
+
     // set creator, and show creator div
     $(form).find("div#creator").removeClass('hide');
     $(form).find("h4#creator_name").text(creator);

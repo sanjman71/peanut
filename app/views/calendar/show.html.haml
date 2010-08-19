@@ -127,6 +127,8 @@
 = render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @provider})
 
 %script{:type => "text/javascript"}
+  -# set the select mode used to driver services and providers in the user interface
+  sp_select_mode                   = 'providers';
   var current_user                 = new Hash({"id" : "#{current_user.id}"});
   var current_provider             = new Hash({"id" : "#{@provider.id}", "type" : "#{@provider.tableize}", "name" : "#{@provider.name}"});
   var calendar_highlight_date      = "#{@calendar_highlight_date}";

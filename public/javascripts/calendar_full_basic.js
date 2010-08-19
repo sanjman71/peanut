@@ -45,6 +45,7 @@ $.fn.init_full_calendar = function() {
       current_appt.put("start_time", calEvent.appt_start_time);
       current_appt.put("duration", calEvent.appt_duration);
       current_appt.put("service", calEvent.appt_service);
+      current_appt.put("service_id", calEvent.appt_service_id);
       current_appt.put("customer", calEvent.appt_customer);
       current_appt.put("customer_id", calEvent.appt_customer_id);
       current_appt.put("provider", calEvent.appt_provider);
