@@ -57,29 +57,7 @@ $.fn.init_full_calendar = function() {
     allDaySlot: false,
     events: appointments
   });
-
-  $("select#service_id").change(function() {
-    //console.log("service changed 2");
-  });
-
-  // testing
-  $("#goto_date").click(function() {
-    var toDate = new Date($(this).attr('date'));
-    $('#calendar').fullCalendar('changeView', 'agendaDay');
-    $('#calendar').fullCalendar('gotoDate', toDate);
-    return false;
-  })
 }
-
-$(document).ready(function() {
-  $(document).init_full_calendar();
-  /*
-  $("div.fc-view-month div.fc-day-number").click(function() {
-    alert("day clicked: " + $(this).text());
-    return false;
-  })
-  */
-});
 
 function check_move_response(data, revertFunc) {
   var status  = data.status;
@@ -89,3 +67,7 @@ function check_move_response(data, revertFunc) {
     revertFunc();
   }
 }
+
+$(document).ready(function() {
+  $(document).init_full_calendar();
+});
