@@ -100,9 +100,7 @@ $.fn.init_appointments = function() {
     $(this).find("input#provider_type").val(current_provider_type);
     $(this).find("input#duration_words").val('');
     // intialize provider services
-    alert("initializing provider services: " + current_provider_key); // xxx
-    $(document).init_provider_services("select#service_id", current_provider_key);
-    $(document).init_service_duration();
+    $(document).init_provider_services(current_provider_key, "select#service_id", 0);
   })
 
   $("form#add_work_appointment_form").submit(function() {

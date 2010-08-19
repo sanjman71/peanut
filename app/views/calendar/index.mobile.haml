@@ -26,6 +26,8 @@
   = render(:partial => 'calendar/add_work_appointment', :locals => {:services => @services})
 
 %script{:type => 'text/javascript'}
+  -# set the select mode used to driver services and providers in the user interface
+  sp_select_mode          = 'providers';
   var current_user_id     = #{logged_in? ? current_user.id : 0};
   var current_start_date  = "#{@daterange.start_at.to_s(:appt_schedule_day)}";
   var current_end_date    = "#{@daterange.end_at.to_s(:appt_schedule_day)}";
