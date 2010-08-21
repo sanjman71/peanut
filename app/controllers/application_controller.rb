@@ -272,7 +272,7 @@ class ApplicationController < ActionController::Base
     begin
       # find the provider; the send method can throw an exception
       @method       = "#{params[:provider_type].singularize}_providers"
-      @provider_ids = params[:provider_ids] == 'all' ? current_company.providers.collect(&:id) : params[:provider_ids].split(",")
+      @provider_ids = ['all','0'].include?(params[:provider_ids]) ? current_company.providers.collect(&:id) : params[:provider_ids].split(",")
       @providers    = @provider_ids.inject([]) do |array, provider_id|
         provider = current_company.send(@method).find(provider_id) rescue nil
         array.push(provider)

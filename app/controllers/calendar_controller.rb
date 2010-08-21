@@ -4,7 +4,7 @@ class CalendarController < ApplicationController
   after_filter :store_location, :only => [:show]
 
   before_filter :init_provider, :only => [:show]
-  before_filter :init_providers, :only => [:show2]
+  before_filter :init_providers, :only => [:fill, :show2]
   before_filter :init_provider_privileges, :only => [:show]
 
   privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
@@ -42,38 +42,26 @@ class CalendarController < ApplicationController
       redirect_to calendar_show_path(:provider_type => provider.tableize, :provider_id => provider.id) and return
     end
   end
-  
-  # GET /users/1/calendar2
-  # GET /users/1,2/calendar2
-  def show2
-    # @providers initialized in before_filter
 
-    if params[:start_date] and params[:end_date]
-      # build daterange using range values
-      @start_date = params[:start_date]
-      @end_date   = params[:end_date]
+  # GET /users/1/calendar/fill?start=1280638800&end=1284267600
+  # GET /users/1,2/calendar/fill
+  def fill
+    # @providers initialized in before_filter
+    
+    if params[:start] and params[:end]
+      # unix timestamp e.g. 1280638800, 1284267600
+      @start_date = Time.zone.at(params[:start].to_i).to_s(:appt_schedule)
+      @end_date   = Time.zone.at(params[:end].to_i).to_s(:appt_schedule)
       @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
-    elsif params[:start_date] and params[:range_type]
-      @start_date = params[:start_date]
-      @daterange  = DateRange.parse_range_type(@start_date, params[:range_type])
-    else
-      # build daterange using when
-      @when       = (params[:when] || 'next 6 weeks' || @@default_when).from_url_param
-      @start_date = params[:start_date] ? Time.zone.parse(params[:start_date]).in_time_zone : nil
-      @daterange  = DateRange.parse_when(@when, :include => :today, :start_date => @start_date, :start_week_on => current_company.preferences[:start_wday].to_i)
     end
 
     @work_appointments = []
     @free_appointments = []
-    @capacity_slots    = []
 
     @providers.each do |provider|
       @work_appointments += AppointmentScheduler.find_work_appointments(current_company, current_location, provider, @daterange)
       @free_appointments += AppointmentScheduler.find_free_appointments(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
-      # @capacity_slots    += AppointmentScheduler.find_free_capacity_slots(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
     end
-    # skip capacity slots < 1
-    # @capacity_slots.delete_if { |cs| cs.capacity < 1 }
 
     # provider class/colors for css
     @provider_colors = Hash[]
@@ -81,6 +69,70 @@ class CalendarController < ApplicationController
       @provider_colors[provider.id] = "color#{index}"
     end
 
+    respond_to do |format|
+      format.json do
+        appts = (@free_appointments + @work_appointments).inject([]) do |array, appt|
+          title = appt.free? ? "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
+          klass = [@provider_colors[appt.provider.id]];
+          klass.push('available') if  appt.free?
+          array.push(Hash['title' => title,
+                          'className' => klass.join(' '),
+                          "appt_id" => appt.id,
+                          "appt_type" => appt.class.to_s,
+                          "appt_mark_as" => appt.mark_as,
+                          "appt_schedule_day" => appt.start_at.to_s(:appt_schedule_day),
+                          "appt_start_time" => appt.start_at.to_s(:appt_time).downcase,
+                          "appt_end_time" => appt.end_at.to_s(:appt_time).downcase,
+                          "appt_duration" => appt.duration,
+                          "appt_provider" => "#{appt.provider_type.tableize}/#{appt.provider_id}",
+                          "appt_creator" => appt.creator.try(:name).to_s,
+                          "appt_service" => appt.service.try(:name).to_s,
+                          "appt_service_id" => appt.service.try(:id).to_i,
+                          "appt_customer" => appt.customer.try(:name).to_s,
+                          "appt_customer_id" => appt.customer_id,
+                          'start'   => appt.start_at.strftime("%a, %d %b %Y %H:%M:%S"),
+                          'end'     => appt.end_at.strftime("%a, %d %b %Y %H:%M:%S"),
+                          'allDay'  => false
+                         ])
+        end
+        render :json => appts.to_json
+      end
+    end
+  end
+
+  # GET /users/1/calendar2
+  # GET /users/1,2/calendar2
+  def show2
+    # @providers initialized in before_filter
+
+    # initialize @provider based on number of providers
+    @provider = (@providers.size == 1) ? @providers.first : User.anyone
+
+    if params[:start] and params[:end]
+      # unix timestamp e.g. 1280638800, 1284267600
+      @start_date = Time.zone.at(params[:start].to_i).to_s(:appt_schedule)
+      @end_date   = Time.zone.at(params[:end].to_i).to_s(:appt_schedule)
+      @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
+    end
+
+    if FULLCALENDAR_JS == 0
+
+    @work_appointments = []
+    @free_appointments = []
+
+    @providers.each do |provider|
+      @work_appointments += AppointmentScheduler.find_work_appointments(current_company, current_location, provider, @daterange)
+      @free_appointments += AppointmentScheduler.find_free_appointments(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
+    end
+
+    # provider class/colors for css
+    @provider_colors = Hash[]
+    @providers.each_with_index do |provider, index|
+      @provider_colors[provider.id] = "color#{index}"
+    end
+
+    end # FULLCALENDAR_JS
+  
     # find services collection for the current company; valid services must have at least 1 service provider
     @free_service   = current_company.free_service
     @work_services  = current_company.services.with_providers.work
@@ -95,6 +147,37 @@ class CalendarController < ApplicationController
       @title = "#{@providers.first.name.titleize} Schedule"
     else
       @title = "Provider Schedules"
+    end
+
+    respond_to do |format|
+      format.html
+      format.json do
+        appts = (@free_appointments + @work_appointments).inject([]) do |array, appt|
+          title = appt.free? ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
+          klass = [@provider_colors[appt.provider.id]];
+          klass.push('available') if  appt.free?
+          array.push(Hash['title' => title,
+                          'className' => klass.join(' '),
+                          "appt_id" => appt.id,
+                          "appt_type" => appt.class.to_s,
+                          "appt_mark_as" => appt.mark_as,
+                          "appt_schedule_day" => appt.start_at.to_s(:appt_schedule_day),
+                          "appt_start_time" => appt.start_at.to_s(:appt_time).downcase,
+                          "appt_end_time" => appt.end_at.to_s(:appt_time).downcase,
+                          "appt_duration" => appt.duration,
+                          "appt_provider" => "#{appt.provider_type.tableize}/#{appt.provider_id}",
+                          "appt_creator" => appt.creator.try(:name).to_s,
+                          "appt_service" => appt.service.try(:name).to_s,
+                          "appt_service_id" => appt.service.try(:id).to_i,
+                          "appt_customer" => appt.customer.try(:name).to_s,
+                          "appt_customer_id" => appt.customer_id,
+                          'start'   => appt.start_at.strftime("%a, %d %b %Y %H:%M:%S"),
+                          'end'     => appt.end_at.strftime("%a, %d %b %Y %H:%M:%S"),
+                          'allDay'  => false
+                         ])
+        end
+        render :json => appts.to_json
+      end
     end
   end
 

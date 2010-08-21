@@ -157,8 +157,10 @@ ActionController::Routing::Routes.draw do |map|
   map.update_weekly '/:provider_type/:provider_id/calendar/:id/weekly',
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :put}
 
-  # test fullcalendar
+  # fullcalendar routes
   map.connect       '/:provider_type/:provider_ids/calendar2', :controller => 'calendar', :action => 'show2',
+                    :provider_ids => /(\d+(,\d+)*)|(all)/
+  map.connect       '/:provider_type/:provider_ids/calendar/fill.:format', :controller => 'calendar', :action => 'fill',
                     :provider_ids => /(\d+(,\d+)*)|(all)/
 
   # show/edit calendars scoped by provider (and optional format)

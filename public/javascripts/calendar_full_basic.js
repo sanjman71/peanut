@@ -55,7 +55,7 @@ $.fn.init_full_calendar = function() {
       $("a#calendar_edit_work_appointment").click();
     },
     allDaySlot: false,
-    events: appointments
+    events: event_type == 'object' ? event_data : event_url
   });
 }
 
@@ -68,6 +68,17 @@ function check_move_response(data, revertFunc) {
   }
 }
 
+// show calendar for the selected provider
+$.fn.init_change_calendar_provider = function () {
+  $("#show_provider").change(function () {
+    var href = '/' + this.value + '/calendar2';
+    window.location = href;
+    $("#calendar").replaceWith("<h3 class='submitting' style='text-align: center;'>Loading Schedule...</h3>");
+    return false;
+  })
+}
+
 $(document).ready(function() {
+  $(document).init_change_calendar_provider();
   $(document).init_full_calendar();
 });
