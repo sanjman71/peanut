@@ -16,7 +16,7 @@
       -# schedule for provider
       %h4.bigger
         = label_tag "show_provider", "Schedule for:"
-        = select_tag('show_provider', options_for_select((@all_providers+[User.anyone]).collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.try(:tableize)}/#{@provider.try(:id)}"), :class => 'text')
+        = select_tag('show_provider', options_for_select((@all_providers+[User.anyone('Everyone')]).collect{ |o| [provider_display_name(o, current_user), "#{o.tableize}/#{o.id}"]}, "#{@provider.try(:tableize)}/#{@provider.try(:id)}"), :class => 'text')
         - unless @provider.anyone?
           -# links to schedule using blocks of time or using weekly schedules
           %span.small== &nbsp;&nbsp;
