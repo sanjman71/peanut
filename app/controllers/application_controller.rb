@@ -279,6 +279,8 @@ class ApplicationController < ActionController::Base
         array
       end.compact
       raise Exception, "no providers" if @providers.empty?
+      # initialize @provider as the first one
+      @provider = @providers.first
       return @providers
     rescue Exception => e
       if options.has_key?(:default)

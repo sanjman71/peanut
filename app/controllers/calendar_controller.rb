@@ -1,14 +1,14 @@
 class CalendarController < ApplicationController
 
   # Set bounce-back for the show page
-  after_filter :store_location, :only => [:show]
+  after_filter  :store_location, :only => [:show]
 
-  before_filter :init_provider, :only => [:show]
-  before_filter :init_providers, :only => [:fill, :show2]
-  before_filter :init_provider_privileges, :only => [:show]
+  before_filter :init_provider, :only => [:show2]
+  before_filter :init_providers, :only => [:events, :show]
+  before_filter :init_provider_privileges, :only => [:show2]
 
-  privilege_required      'read calendars', :only => [:index, :search], :on => :current_company
-  privilege_required_any  'read calendars', :only => [:show], :on => [:provider, :current_company], :unless => :auth_token?
+  privilege_required      'read calendars', :only => [:index], :on => :current_company
+  privilege_required_any  'read calendars', :only => [:show, :show2], :on => [:provider, :current_company], :unless => :auth_token?
 
   # Default when value
   @@default_when = Appointment::WHEN_NEXT_2WEEKS
@@ -39,17 +39,22 @@ class CalendarController < ApplicationController
       if provider.blank?
         redirect_to root_path(:subdomain => current_subdomain) and return
       end
-      redirect_to calendar_show_path(:provider_type => provider.tableize, :provider_id => provider.id) and return
+      redirect_to calendar_show_path(:provider_type => provider.tableize, :provider_ids => provider.id) and return
     end
   end
 
-  # GET /users/1/calendar/fill?start=1280638800&end=1284267600
-  # GET /users/1,2/calendar/fill
-  def fill
-    # @providers initialized in before_filter
-    
-    if params[:start] and params[:end]
-      # unix timestamp e.g. 1280638800, 1284267600
+  # GET /users/1,2/calendar/events?start=1280638800&end=1284267600
+  # GET /users/1,3/calendar/events/20102001..20100215
+  def events
+    # @providers, @provider initialized in before_filter
+
+    if params[:start].match(/^201\d{5}/) and params[:end].match(/^201\d{5}/)
+      # dates, e.g. 20100822, 20100822T020000
+      @start_date = params[:start]
+      @end_date   = params[:end]
+      @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
+    else
+      # unix timestamp, e.g. 1280638800, 1284267600
       @start_date = Time.zone.at(params[:start].to_i).to_s(:appt_schedule)
       @end_date   = Time.zone.at(params[:end].to_i).to_s(:appt_schedule)
       @daterange  = DateRange.parse_range(@start_date, @end_date, :start_week_on => current_company.preferences[:start_wday].to_i)
@@ -57,7 +62,7 @@ class CalendarController < ApplicationController
 
     @work_appointments = []
     @free_appointments = []
-
+    
     @providers.each do |provider|
       @work_appointments += AppointmentScheduler.find_work_appointments(current_company, current_location, provider, @daterange)
       @free_appointments += AppointmentScheduler.find_free_appointments(current_company, current_location, provider, nil, nil, @daterange, :keep_old => true)
@@ -97,15 +102,45 @@ class CalendarController < ApplicationController
         end
         render :json => appts.to_json
       end
+      format.mobile do
+        # find capacity slots, combine capacity and work
+        @capacity_slots             = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+        @capacity_and_work          = (@capacity_slots + @work_appointments).sort_by { |o| [o.start_at.in_time_zone, ((o.class == CapacitySlot) ? 0 : 1)] }
+        # group free and work appointments by day
+        @free_appointments_by_day   = @free_appointments.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+        @capacity_and_work_by_day   = @capacity_and_work.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+        # find days with work, free activity
+        @days_with_work_free_stuff  = (@free_appointments_by_day.keys + @capacity_and_work_by_day.keys).uniq.sort
+      end
+      format.pdf do
+        # find capacity slots
+        @capacity_slots           = AppointmentScheduler.find_free_capacity_slots(current_company, current_location, @provider, nil, nil, @daterange, :keep_old => true)
+        # combine capacity and work, group by day
+        @capacity_and_work        = (@capacity_slots + @work_appointments).sort_by { |o| [o.start_at.in_time_zone, ((o.class == CapacitySlot) ? 0 : 1)] }
+        @capacity_and_work_by_day = @capacity_and_work.group_by {|x| x.start_at.in_time_zone.beginning_of_day }
+      end
+      format.email do
+        @link     = url_for(params.merge(:format => "pdf", :address => nil, :token => AUTH_TOKEN_INSTANCE))
+        @subject  = 'Your PDF Schedule'
+        @email    = params[:address] ? (EmailAddress.find_by_id(params[:address].to_i) || EmailAddress.find_by_address(params[:address])) : @provider.primary_email_address
+        if !@email.blank?
+          @job = PdfMailerJob.new(:url => @link, :address => @email.address, :subject => @subject)
+          Delayed::Job.enqueue(@job)
+          flash[:notice] = "Sent PDF Schedule to #{@email.address}"
+        else
+          flash[:notice] = "Could not find a valid email address"
+        end
+        redirect_to(request.referer || calendar2_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)) and return
+      end
     end
   end
 
   # GET /users/1/calendar2
   # GET /users/1,2/calendar2
-  def show2
-    # @providers initialized in before_filter
+  def show
+    # @providers, @provider initialized in before_filter
 
-    # initialize @provider based on number of providers
+    # re-initialize @provider based on number of providers
     @provider = (@providers.size == 1) ? @providers.first : User.anyone
 
     if params[:start] and params[:end]
@@ -137,6 +172,7 @@ class CalendarController < ApplicationController
     @free_service   = current_company.free_service
     @work_services  = current_company.services.with_providers.work
     @all_providers  = current_company.providers
+    @today          = DateRange.today.beginning_of_day + 1.day
 
     # map services to providers and providers to services - used by javascript in create/edit appt dialogs
     @sps, @ps       = build_service_provider_mappings(@work_services)
@@ -151,33 +187,6 @@ class CalendarController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.json do
-        appts = (@free_appointments + @work_appointments).inject([]) do |array, appt|
-          title = appt.free? ?  "#{appt.provider.name}: Available" : "#{appt.provider.name}: #{appt.service.name} : #{appt.customer.name}";
-          klass = [@provider_colors[appt.provider.id]];
-          klass.push('available') if  appt.free?
-          array.push(Hash['title' => title,
-                          'className' => klass.join(' '),
-                          "appt_id" => appt.id,
-                          "appt_type" => appt.class.to_s,
-                          "appt_mark_as" => appt.mark_as,
-                          "appt_schedule_day" => appt.start_at.to_s(:appt_schedule_day),
-                          "appt_start_time" => appt.start_at.to_s(:appt_time).downcase,
-                          "appt_end_time" => appt.end_at.to_s(:appt_time).downcase,
-                          "appt_duration" => appt.duration,
-                          "appt_provider" => "#{appt.provider_type.tableize}/#{appt.provider_id}",
-                          "appt_creator" => appt.creator.try(:name).to_s,
-                          "appt_service" => appt.service.try(:name).to_s,
-                          "appt_service_id" => appt.service.try(:id).to_i,
-                          "appt_customer" => appt.customer.try(:name).to_s,
-                          "appt_customer_id" => appt.customer_id,
-                          'start'   => appt.start_at.strftime("%a, %d %b %Y %H:%M:%S"),
-                          'end'     => appt.end_at.strftime("%a, %d %b %Y %H:%M:%S"),
-                          'allDay'  => false
-                         ])
-        end
-        render :json => appts.to_json
-      end
     end
   end
 
@@ -187,7 +196,7 @@ class CalendarController < ApplicationController
   # GET /users/1/calendar/when/next-2-weeks/20090201
   # GET /users/1/calendar/range/20090101..20090201
   # GET /users/1/calendar/monthly/20100101
-  def show
+  def show2
     # @provider initialized in before_filter
 
     # Remember which provider we're working with
@@ -275,7 +284,7 @@ class CalendarController < ApplicationController
     @title = "#{@provider.name.titleize} Schedule"
 
     respond_to do |format|
-      format.html
+      format.html { render(:action => 'show_orig') }
       format.pdf
       format.email do
         @link     = url_for(params.merge(:format => "pdf", :address => nil, :token => AUTH_TOKEN_INSTANCE))
@@ -288,7 +297,7 @@ class CalendarController < ApplicationController
         else
           flash[:notice] = "Could not find a valid email address"
         end
-        redirect_to(request.referer || calendar_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)) and return
+        redirect_to(request.referer || calendar2_show_path(:provider_type => @provider.tableize, :provider_id => @provider.id)) and return
       end
       format.mobile
     end
@@ -303,7 +312,7 @@ class CalendarController < ApplicationController
       start_date  = sprintf("%s", params[:start_date].split('/').reverse.swap!(1,2).join)
       end_date    = sprintf("%s", params[:end_date].split('/').reverse.swap!(1,2).join)
       format      = params[:format]
-      redirect_to url_for(:action => 'show', :start_date => start_date, :end_date => end_date, :format => format)
+      redirect_to url_for(:action => 'events', :start => start_date, :end => end_date, :format => format)
     end
   end
 

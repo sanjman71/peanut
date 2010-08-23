@@ -2,7 +2,7 @@ var current_provider_name   = '';
 var current_provider_id     = 0;
 var current_provider_key    = '';  // e.g. 'users/11'
 var current_provider_type   = 'users'
-var current_provider_calendar_show_path = "/users/:provider_id/calendar/range/:start_date..:end_date";
+var current_provider_calendar_show_path = "/users/:provider_id/calendar/events/:start_date..:end_date";
 var current_provider_schedule_loaded = false;
 var current_schedule_date   = '';
 

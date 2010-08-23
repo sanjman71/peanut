@@ -6,31 +6,45 @@ class CalendarControllerTest < ActionController::TestCase
   should_route :get, '/calendars',  :controller => 'calendar', :action => 'index'
   
   # show provider calendar
-  should_route :get, '/users/1/calendar',  :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1
-  should_route :get, '/users/1/calendar.pdf',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :format => 'pdf'
-  should_route :get, '/users/1/calendar/when/today.pdf',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :when => 'today', :format => 'pdf'
+  should_route :get, '/users/1/calendar',
+               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_ids => 1
 
-  should_route :get, '/users/1/calendar/daily/01012009',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'daily', :start_date => '01012009'
-  should_route :get, '/users/1/calendar/weekly/01012009',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'weekly', :start_date => '01012009'
-  should_route :get, '/users/1/calendar/monthly/01012009',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :range_type => 'monthly', :start_date => '01012009'
-  
-  should_route :get, '/users/1/calendar/when/today',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :when => 'today'
-
-  should_route :get, '/users/1/calendar/when/next-2-weeks/20100101',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :when => 'next-2-weeks', :start_date => "20100101"
-
-  should_route :get, '/users/1/calendar/range/20100101..20100201',
-               :controller => 'calendar', :action => 'show', :provider_type => 'users', :provider_id => 1, :start_date => "20100101", :end_date => "20100201"
+  # provider calendar events
+  should_route :get, '/users/1/calendar/events',
+               :controller => 'calendar', :action => 'events', :provider_type => 'users', :provider_ids => 1
+  should_route :get, '/users/1/calendar/events/20100101..20100301',
+               :controller => 'calendar', :action => 'events', :provider_type => 'users', :provider_ids => 1,
+               :start => '20100101', :end => '20100301'
+  should_route :get, '/users/1/calendar/events/20100101..20100301.pdf',
+               :controller => 'calendar', :action => 'events', :provider_type => 'users', :provider_ids => 1, :format => 'pdf',
+               :start => '20100101', :end => '20100301'
+  should_route :get, '/users/1/calendar/events/20100101..20100301.email',
+               :controller => 'calendar', :action => 'events', :provider_type => 'users', :provider_ids => 1, :format => 'email',
+               :start => '20100101', :end => '20100301'
 
   # search provider calendar
   should_route :post, '/users/1/calendar/search', 
-               :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_id => 1
+               :controller => 'calendar', :action => 'search', :provider_type => 'users', :provider_ids => 1
+
+  # old calendar routes
+  should_route :get, '/users/1/calendar2/when/today.pdf',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :when => 'today', :format => 'pdf'
+
+  should_route :get, '/users/1/calendar2/daily/01012009',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :range_type => 'daily', :start_date => '01012009'
+  should_route :get, '/users/1/calendar2/weekly/01012009',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :range_type => 'weekly', :start_date => '01012009'
+  should_route :get, '/users/1/calendar2/monthly/01012009',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :range_type => 'monthly', :start_date => '01012009'
+  
+  should_route :get, '/users/1/calendar2/when/today',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :when => 'today'
+
+  should_route :get, '/users/1/calendar2/when/next-2-weeks/20100101',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :when => 'next-2-weeks', :start_date => "20100101"
+
+  should_route :get, '/users/1/calendar2/range/20100101..20100201',
+               :controller => 'calendar', :action => 'show2', :provider_type => 'users', :provider_id => 1, :start_date => "20100101", :end_date => "20100201"
 
   def setup
     # initialize roles and privileges
@@ -79,7 +93,6 @@ class CalendarControllerTest < ActionController::TestCase
         get :index
       end
 
-      should_respond_with :redirect
       should_redirect_to("johnny's calendar") { "/#{@johnny.tableize}/#{@johnny.id}/calendar" }
     end
 
@@ -94,12 +107,72 @@ class CalendarControllerTest < ActionController::TestCase
     end
   end
 
-  context "show provider calendar as the provider" do
+  context "show provider's calendar" do
+    context "without 'read calendars' privilege" do
+      setup do
+        add_mary_and_johnny_as_providers
+        @user = Factory(:user, :name => "User")
+        # random user wants to see johnny's calendar
+        @controller.stubs(:current_user).returns(@user)
+        get :show, :provider_type => 'users', :provider_ids => @johnny.id
+      end
+      
+      should "redirect to unauthorized path" do
+        assert_redirected_to("/unauthorized")
+      end
+    end
+    
+    context "as another provider" do
+      setup do
+        add_mary_and_johnny_as_providers
+        # mary wants to see johnny's calendar
+        @controller.stubs(:current_user).returns(@mary)
+        get :show, :provider_type => 'users', :provider_ids => @johnny.id
+      end
+      
+      should "set providers, not allow add appointments" do
+        assert_equal [@johnny], assigns(:providers)
+        assert_equal @johnny, assigns(:provider)
+        # should not have hidden add work appointment form
+        assert_select "div.dialog.hide#add_work_appointment_dialog", 0
+        assert_select "form#add_work_appointment_form", 0
+        # should have link to pdf date range
+        assert_select "a#pdf_schedule_date_range", 1
+        # should have hidden pdf date range dialog
+        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
+        assert_template 'calendar/show.html.haml'
+      end
+    end
+    
+    context "as calendar owner" do
+      setup do
+        add_mary_and_johnny_as_providers
+        # johnny wants to see johnny's calendar
+        @controller.stubs(:current_user).returns(@johnny)
+        get :show, :provider_type => 'users', :provider_ids => @johnny.id
+      end
+
+      should "set providers, allow add appointments" do
+        assert_equal [@johnny], assigns(:providers)
+        assert_equal @johnny, assigns(:provider)
+        # should have hidden add work appointment form
+        assert_select "div.dialog.hide#add_work_appointment_dialog", 1
+        assert_select "form#add_work_appointment_form", 1
+        # should have link to pdf date range
+        assert_select "a#pdf_schedule_date_range", 1
+        # should have hidden pdf date range dialog
+        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
+        assert_template 'calendar/show.html.haml'
+      end
+    end
+  end
+
+  context "show2 provider calendar as the provider" do
     context "using default when" do
       setup do
         add_mary_and_johnny_as_providers
         @controller.stubs(:current_user).returns(@johnny)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id
+        get :show2, :provider_type => 'users', :provider_id => @johnny.id
       end
   
       should_assign_to(:provider) { @johnny }
@@ -149,26 +222,26 @@ class CalendarControllerTest < ActionController::TestCase
       end
 
       should "have link to pdf today" do
-        assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
+        assert_select "a#pdf_schedule_today[href='/users/%s/calendar2/when/today.pdf']" % @johnny.id, 1
       end
 
-      should "have link to pdf date range" do
-        assert_select "a#pdf_schedule_date_range", 1
-      end
+      # should "have link to pdf date range" do
+      #   assert_select "a#pdf_schedule_date_range", 1
+      # end
 
-      should "have hidden pdf date range dialog" do
-        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
-      end
+      # should "have hidden pdf date range dialog" do
+      #   assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
+      # end
 
       should_respond_with :success
-      should_render_template 'calendar/show.html.haml'
+      should_render_template 'calendar/show_orig.html.haml'
     end
     
     context "monthly, starting on a specific date" do
       setup do
         add_mary_and_johnny_as_providers
         @controller.stubs(:current_user).returns(@johnny)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id, :range_type => 'monthly', :start_date => '20090101'
+        get :show2, :provider_type => 'users', :provider_id => @johnny.id, :range_type => 'monthly', :start_date => '20090101'
       end
   
       should_assign_to(:provider) { @johnny }
@@ -207,27 +280,27 @@ class CalendarControllerTest < ActionController::TestCase
       end
 
       should "have link to pdf today" do
-        assert_select "a#pdf_schedule_today[href='/users/%s/calendar/when/today.pdf']" % @johnny.id, 1
+        assert_select "a#pdf_schedule_today[href='/users/%s/calendar2/when/today.pdf']" % @johnny.id, 1
       end
 
-      should "have link to pdf date range" do
-        assert_select "a#pdf_schedule_date_range", 1
-      end
+      # should "have link to pdf date range" do
+      #   assert_select "a#pdf_schedule_date_range", 1
+      # end
 
-      should "have hidden pdf date range dialog" do
-        assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
-      end
+      # should "have hidden pdf date range dialog" do
+      #   assert_select "div.dialog#pdf_schedule_date_range_dialog", 1
+      # end
 
       should_respond_with :success
-      should_render_template 'calendar/show.html.haml'
+      should_render_template 'calendar/show_orig.html.haml'
     end
   end
   
-  context "show provider calendar as another provider" do
+  context "show2 provider calendar as another provider" do
     setup do
       add_mary_and_johnny_as_providers
       @controller.stubs(:current_user).returns(@mary)
-      get :show, :provider_type => 'users', :provider_id => @johnny.id
+      get :show2, :provider_type => 'users', :provider_id => @johnny.id
     end
   
     should_assign_to(:provider) { @johnny }
@@ -264,7 +337,7 @@ class CalendarControllerTest < ActionController::TestCase
     end
 
     should_respond_with :success
-    should_render_template 'calendar/show.html.haml'
+    should_render_template 'calendar/show_orig.html.haml'
   end
 
   context "send calendar as pdf email" do
@@ -273,52 +346,62 @@ class CalendarControllerTest < ActionController::TestCase
         add_mary_and_johnny_as_providers
         @johnny_email = @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
         @controller.stubs(:current_user).returns(@owner)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :format => 'email'
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        get :events, :provider_type => 'users', :provider_ids => @johnny.id, :start => '20100101', :end => '20100101', :format => 'email'
       end
 
-      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf?token=#{AUTH_TOKEN_INSTANCE}" }
-      should_assign_to(:subject) { "Your PDF Schedule" }
-      should_assign_to(:email) { @johnny_email }
-      should_assign_to(:job, :class => PdfMailerJob)
+      should "set link, subject, email, job" do
+        assert_equal "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/events/20100101..20100101.pdf?token=#{AUTH_TOKEN_INSTANCE}",
+                      assigns(:link)
+        assert_equal "Your PDF Schedule", assigns(:subject)
+        assert_equal @johnny_email, assigns(:email)
+        assert assigns(:job)
+        assert_redirected_to("/users/#{@johnny.id}/calendar")
+      end
 
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
-
-      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
+      # should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
     end
 
     context "to provider without an email" do
       setup do
         add_mary_and_johnny_as_providers
         @controller.stubs(:current_user).returns(@owner)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :format => 'email'
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        get :events, :provider_type => 'users', :provider_ids => @johnny.id, :start => '20100101', :end => '20100101', :format => 'email'
       end
 
-      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf?token=#{AUTH_TOKEN_INSTANCE}" }
-      should_assign_to(:subject) { "Your PDF Schedule" }
-      should_not_assign_to(:email)
-      should_not_assign_to(:job)
+      should "set link, subject; not set email, job" do
+        assert_equal "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/events/20100101..20100101.pdf?token=#{AUTH_TOKEN_INSTANCE}",
+                      assigns(:link)
+        assert_equal "Your PDF Schedule", assigns(:subject)
+        assert_nil assigns(:email)
+        assert_nil assigns(:job)
+        assert_redirected_to("/users/#{@johnny.id}/calendar")
+      end
 
       should_not_change("delayed job count") { Delayed::Job.count }
-
-      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
     end
 
-    context "to owner id" do
+    context "to owner email id" do
       setup do
         add_mary_and_johnny_as_providers
         @johnny_email = @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
         @controller.stubs(:current_user).returns(@owner)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :address => @owner_email.id, :format => 'email'
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        get :events, :provider_type => 'users', :provider_ids => @johnny.id, :start => '20100101', :end => '20100101', :address => @owner_email.id, :format => 'email'
       end
 
-      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf?token=#{AUTH_TOKEN_INSTANCE}" }
-      should_assign_to(:subject) { "Your PDF Schedule" }
-      should_assign_to(:email) { @owner_email }
-      should_assign_to(:job, :class => PdfMailerJob)
+      should "set link, subject, email, job" do
+        assert_equal "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/events/20100101..20100101.pdf?token=#{AUTH_TOKEN_INSTANCE}",
+                      assigns(:link)
+        assert_equal "Your PDF Schedule", assigns(:subject)
+        assert_equal @owner_email, assigns(:email)
+        assert assigns(:job)
+        assert_redirected_to("/users/#{@johnny.id}/calendar")
+      end
 
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
-
-      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
     end
 
     context "to owner email" do
@@ -326,17 +409,20 @@ class CalendarControllerTest < ActionController::TestCase
         add_mary_and_johnny_as_providers
         @johnny_email = @johnny.email_addresses.create(:address => 'johnny@walnutcalendar.com')
         @controller.stubs(:current_user).returns(@owner)
-        get :show, :provider_type => 'users', :provider_id => @johnny.id, :when => 'today', :address => @owner_email.address, :format => 'email'
+        @request.env['HTTP_REFERER'] = "/users/#{@johnny.id}/calendar"
+        get :events, :provider_type => 'users', :provider_ids => @johnny.id, :start => '20100101', :end => '20100101', :address => @owner_email.address, :format => 'email'
       end
 
-      should_assign_to(:link) { "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/when/today.pdf?token=#{AUTH_TOKEN_INSTANCE}" }
-      should_assign_to(:subject) { "Your PDF Schedule" }
-      should_assign_to(:email) { @owner_email }
-      should_assign_to(:job, :class => PdfMailerJob)
+      should "set link, subject, email, job" do
+        assert_equal "http://www.walnutcalendar.com/users/#{@johnny.id}/calendar/events/20100101..20100101.pdf?token=#{AUTH_TOKEN_INSTANCE}",
+                      assigns(:link)
+        assert_equal "Your PDF Schedule", assigns(:subject)
+        assert_equal @owner_email, assigns(:email)
+        assert assigns(:job)
+        assert_redirected_to("/users/#{@johnny.id}/calendar")
+      end
 
       should_change("delayed job count", :by => 1) { Delayed::Job.count }
-
-      should_redirect_to("calendar show page") { "/users/#{@johnny.id}/calendar" }
     end
   end
 end

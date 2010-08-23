@@ -158,27 +158,33 @@ ActionController::Routing::Routes.draw do |map|
                     :controller => 'appointments', :action => 'update_weekly', :conditions => {:method => :put}
 
   # fullcalendar routes
-  map.connect       '/:provider_type/:provider_ids/calendar2', :controller => 'calendar', :action => 'show2',
-                    :provider_ids => /(\d+(,\d+)*)|(all)/
-  map.connect       '/:provider_type/:provider_ids/calendar/fill.:format', :controller => 'calendar', :action => 'fill',
-                    :provider_ids => /(\d+(,\d+)*)|(all)/
-
-  # show/edit calendars scoped by provider (and optional format)
-  map.calendar_when_start   '/:provider_type/:provider_id/calendar/when/:when/:start_date',
-                            :controller => 'calendar', :action => 'show', :start_date => /[0-9]{8}/
-  map.calendar_when         '/:provider_type/:provider_id/calendar/when/:when', :controller => 'calendar', :action => 'show'
-  map.calendar_when_format  '/:provider_type/:provider_id/calendar/when/:when.:format', :controller => 'calendar', :action => 'show'
-  map.calendar_date_range         '/:provider_type/:provider_id/calendar/range/:start_date..:end_date', :controller => 'calendar', :action => 'show'
-  map.calendar_date_range_format  '/:provider_type/:provider_id/calendar/range/:start_date..:end_date.:format', :controller => 'calendar', :action => 'show'
-  map.calendar_show         '/:provider_type/:provider_id/calendar', :controller => 'calendar', :action => 'show'
-  map.calendar_show_format  '/:provider_type/:provider_id/calendar.:format', :controller => 'calendar', :action => 'show'
-  map.range_type_show '/:provider_type/:provider_id/calendar/:range_type/:start_date', 
-                       :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
-  map.connect         '/:provider_type/:provider_id/calendar/:range_type/:start_date.:format', 
-                       :controller => 'calendar', :action => 'show', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
+  map.calendar_show   '/:provider_type/:provider_ids/calendar', :controller => 'calendar', :action => 'show',
+                      :provider_ids => /(\d+(,\d+)*)|(all)/
+  map.calendar_dates  '/:provider_type/:provider_ids/calendar/events/:start..:end.:format', :controller => 'calendar', :action => 'events',
+                      :provider_ids => /(\d+(,\d+)*)|(all)/
+  map.calendar_events '/:provider_type/:provider_ids/calendar/events.:format', :controller => 'calendar', :action => 'events',
+                      :provider_ids => /(\d+(,\d+)*)|(all)/
 
   # search calendars scoped by provider
-  map.calendar_search ':provider_type/:provider_id/calendar/search', :controller => 'calendar', :action => 'search'
+  map.calendar_search '/:provider_type/:provider_ids/calendar/search', :controller => 'calendar', :action => 'search'
+  
+  # show/edit calendars scoped by provider (and optional format)
+  map.calendar2_when_start  '/:provider_type/:provider_id/calendar2/when/:when/:start_date',
+                            :controller => 'calendar', :action => 'show2', :start_date => /[0-9]{8}/
+  map.calendar2_when        '/:provider_type/:provider_id/calendar2/when/:when',
+                            :controller => 'calendar', :action => 'show2'
+  map.calendar2_when_format '/:provider_type/:provider_id/calendar2/when/:when.:format',
+                            :controller => 'calendar', :action => 'show2'
+  map.calendar2_date_range        '/:provider_type/:provider_id/calendar2/range/:start_date..:end_date',
+                                  :controller => 'calendar', :action => 'show2'
+  map.calendar2_date_range_format '/:provider_type/:provider_id/calendar2/range/:start_date..:end_date.:format',
+                                  :controller => 'calendar', :action => 'show2'
+  map.calendar2_show         '/:provider_type/:provider_id/calendar2', :controller => 'calendar', :action => 'show2'
+  map.calendar2_show_format  '/:provider_type/:provider_id/calendar2.:format', :controller => 'calendar', :action => 'show2'
+  map.range_type_show '/:provider_type/:provider_id/calendar2/:range_type/:start_date',
+                       :controller => 'calendar', :action => 'show2', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
+  map.connect         '/:provider_type/:provider_id/calendar2/:range_type/:start_date.:format', 
+                       :controller => 'calendar', :action => 'show2', :range_type => /daily|weekly|monthly|none/, :start_date => /[0-9]{8}/
 
   # list calendars
   map.calendars       '/calendars', :controller => 'calendar', :action => 'index'
