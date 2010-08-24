@@ -172,7 +172,7 @@ class CalendarController < ApplicationController
     @free_service   = current_company.free_service
     @work_services  = current_company.services.with_providers.work
     @all_providers  = current_company.providers
-    @today          = DateRange.today.beginning_of_day + 1.day
+    @today          = DateRange.today.beginning_of_day
 
     # map services to providers and providers to services - used by javascript in create/edit appt dialogs
     @sps, @ps       = build_service_provider_mappings(@work_services)
