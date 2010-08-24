@@ -38,7 +38,6 @@ $.fn.init_full_calendar = function() {
     },
     eventClick: function(calEvent, jsEvent, view) {
       // initialize parameters, show edit work appointment dialog
-      //alert('Event: ' + calEvent.appt_id);
       current_appt.put("id", calEvent.appt_id);
       current_appt.put("mark_as", calEvent.appt_mark_as);
       current_appt.put("schedule_day", calEvent.appt_schedule_day);
@@ -53,6 +52,13 @@ $.fn.init_full_calendar = function() {
       // change the border color just for fun
       //$(this).css('border-color', 'red');
       $("a#calendar_edit_work_appointment").click();
+    },
+    loading: function(isLoading, view) {
+      if (isLoading) {
+        $("#calendar").addClass('on').removeClass('off');
+      } else {
+        $("#calendar").addClass('off').removeClass('on');
+      }
     },
     allDaySlot: false,
     events: event_type == 'object' ? event_data : event_url

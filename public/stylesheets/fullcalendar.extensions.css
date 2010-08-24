@@ -19,3 +19,12 @@
 .fc table                 { margin-bottom: 0px; }
 .fc-header-space          { padding-left: 1px; }
 .fc-header-title          { font-size: 1.5em; padding-left: 10px; }
+
+#calendar.on {
+  background:url('/images/tab-background.gif') top left repeat;
+  filter:alpha(opacity=30);
+  opacity:0.3;
+  overflow: hidden;
+}
+
+#calendar.off {}
