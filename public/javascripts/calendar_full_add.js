@@ -294,6 +294,33 @@ $.fn.init_edit_work_appointment = function() {
   })  
 }
 
+$.fn.init_autocomplete_customers = function() {
+  // Set up the autocomplete
+  // Setup help for the JSON solution from here: http://blog.schuager.com/2008/09/jquery-autocomplete-json-apsnet-mvc.html
+  // and here: http://www.it-eye.nl/weblog/2008/08/23/using-jquery-autocomplete-with-grails-and-json/
+  // This will dynamically invoke the index function on the customers controller, asking for JSON data
+  // The parse option is used to parse the JSON result into rows, each containing all the data for the row, the value displayed and the formatted value
+  // The formatItem option is also used to format the rows displayed in the pulldown
+  $("#customer_name").autocomplete($("#customer_name").attr("url"),
+                                          {
+                                            dataType:'json',
+                                            parse: function(data) {
+                                                      var rows = new Array();
+                                                      for(var i=0; i<data.length; i++){
+                                                          rows[i] = { data:data[i], value: data[i].name+(data[i].email ? " "+data[i].email : '')+(data[i].phone ? " "+data[i].phone : ''), result:data[i].name };
+                                                      }
+                                                      return rows;
+                                                  },
+                                            formatItem: function(data,i,max,value,term) { return value; },
+                                            autoFill: false
+                                          });
+  
+  $("#customer_name").result(function(event, data, formatted) {
+    // set the customer id
+    $("#customer_id").attr("value", data.id);
+  });
+}
+
 $.fn.init_schedule_datepicker = function() {
   $(".pdf.datepicker").datepicker({minDate: '-1m', maxDate: '+3m'});
   $(".appointment.add.edit.datepicker").datepicker({minDate: '0m', maxDate: '+3m'});
@@ -305,8 +332,9 @@ $.fn.init_schedule_timepicker = function() {
 }
 
 $(document).ready(function() {
-  $(document).init_schedule_datepicker();
-  $(document).init_schedule_timepicker();
   $(document).init_add_work_appointment();
   $(document).init_edit_work_appointment();
+  $(document).init_autocomplete_customers();
+  $(document).init_schedule_datepicker();
+  $(document).init_schedule_timepicker();
 })

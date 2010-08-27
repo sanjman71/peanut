@@ -1,11 +1,11 @@
 - title(@title || "Schedule w/ FullCalendar")
 - stylesheet('fullcalendar', 'fullcalendar.extensions', 'jquery.timepickr', 'datePicker', 'jquery.autocomplete')
-- javascript('calendar', 'fullcalendar.min', 'calendar_full_basic', 'calendar_full_add', 'mobile_service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
+- javascript('calendar', 'users', 'fullcalendar.min', 'calendar_full_basic', 'calendar_full_add', 'mobile_service_providers', 'ui.timepickr', 'jquery.timepickr', 'jquery.datePicker', 'jquery.truncator')
 
 .span-24.last.hide
   = link_to 'Add Work Appointment', '', :id => 'calendar_add_work_appointment'
   = link_to 'Edit Work Appointment', '', :id => 'calendar_edit_work_appointment'
-  -#= link_to 'Add Customer', '', :id => 'add_work_appointment_add_customer'
+  = link_to 'Add Customer', '', :id => 'add_work_appointment_add_customer'
 
 .span-24.last
   = display_flash(:all)
@@ -36,7 +36,7 @@
 -# check for 'update calendars' privilege for adding/editing appointments
 - if has_privilege?('update calendars', @provider) || has_privilege?('update calendars', current_company)
   -# hidden forms for add/edit appointment, add free time, and add customer
-  = render(:partial => 'calendar/add_work_appointment_dialog', :locals => {:provider => @providers.first, :services => @work_services + [@free_service], :providers => @all_providers})
+  = render(:partial => 'calendar/add_work_appointment_dialog', :locals => {:provider => @provider, :services => @work_services + [@free_service], :providers => @all_providers})
   - @customer = User.new
   - @customer.email_addresses.build
   - @customer.phone_numbers.build
@@ -49,15 +49,15 @@
                        :title => 'Add Customer', :submit_text => 'Create'}) |
 
 -# pdf date range dialog
-= render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @providers.first})
+= render(:partial => "calendar/pdf_schedule_date_range_dialog", :locals => {:provider => @provider})
 
 %script{:type => "text/javascript"}
   -# set the select mode used to select services and providers in the user interface
   sp_select_mode                    = 'providers';
   var current_user                  = new Hash({"id" : "#{current_user.id}"});
-  var current_provider              = new Hash({"id"   : "#{@providers.first.id}", |
-                                                "type" : "#{@providers.first.class.to_s.tableize}", |
-                                                "key"  : "#{@providers.first.class.to_s.tableize}/#{@providers.first.id}"}); |
+  var current_provider              = new Hash({"id"   : "#{@provider.id}", |
+                                                "type" : "#{@provider.class.to_s.tableize}", |
+                                                "key"  : "#{@provider.class.to_s.tableize}/#{@provider.id}"}); |
   var free_service                  = new Hash({"id" : "#{@free_service.id}", "name" : "#{@free_service.name}"});
   var current_appt                  = new Hash();
   var current_appt_date             = "";
