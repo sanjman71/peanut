@@ -7,12 +7,14 @@
     .span-15.last.provider
       = label_tag "edit_provider", "Schedule available time for", :class => 'big'
       = select_tag('edit_provider', options_for_select(@providers.collect{ |o| [o.name, "#{o.tableize}/#{o.id}"]}, "#{@provider.tableize}/#{@provider.id}"), :class => 'text')
-    %h4.span-15.last#how{:style => 'line-height: 25px;'}
+    %h4.bottom.span-15.last#how{:style => 'line-height: 25px;'}
       == Use the calendar to select the available days.
       %br
       == Select the start and end times.
       %br
       == Click 'Schedule Available Time' to add the time to your calendar.
+    %h4.span-15.last
+      = link_to 'Back', calendar_show_path(:provider_type => @provider.tableize, :provider_ids => @provider.id), :class => 'admin'
   .span-7.prepend-1.last
     .sidebar.instructions.padding-5
       == What is available time?
