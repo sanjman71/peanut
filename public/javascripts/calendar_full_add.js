@@ -291,7 +291,13 @@ $.fn.init_edit_work_appointment = function() {
     // open dialog
     $("div.dialog#add_work_appointment_dialog").dialog('open');
     return false;
-  })  
+  })
+  
+  // close work appointment dialog
+  $("a#nevermind_work_appointment").click(function() {
+    $("div.dialog#add_work_appointment_dialog").dialog('close');
+    return false;
+  })
 }
 
 $.fn.init_autocomplete_customers = function() {
