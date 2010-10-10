@@ -111,7 +111,10 @@ class TasksController < ApplicationController
     @title = "Tasks - Expand All Recurrences"
     @number_of_recurrences = current_company.appointments.recurring.not_canceled.count
     @time_horizon = Time.zone.now.beginning_of_day + current_company.preferences[:time_horizon].to_i
-    Appointment.expand_all_recurrences(current_company)
+
+    @cmd = "rake appointments:recurrence:expand COMPANY='#{current_company.name}'"
+    Delayed::Job.enqueue(RakeJob.new(:cmd => @cmd))
+    flash.now[:notice] = "Queued rake job with '#{@cmd}"
 
     respond_to do |format|
       format.html

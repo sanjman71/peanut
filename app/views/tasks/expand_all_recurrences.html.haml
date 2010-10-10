@@ -7,3 +7,7 @@
     %h5.bottom
       == Expanding #{pluralize(@number_of_recurrences, 'recurrence')} until #{@time_horizon.to_s}
 
+%hr.space
+
+.span-24.last
+  = display_flash(:all)
