@@ -2,7 +2,6 @@ namespace :populate do
   
   require 'populator'
   require 'faker'
-  require 'test/factories'
   
   @@count_default = 20
   

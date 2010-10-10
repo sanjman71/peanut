@@ -7,6 +7,8 @@ gem 'andand',             '1.3.1'
 gem 'chronic',            '0.2.3'
 gem 'crack',              '0.1.8'
 gem 'curb',               '0.7.7.1'
+gem 'daemons',            '1.0.10' # dj doesn't start with 1.1.0
+gem 'delayed_job',        :git => 'git://github.com/sanjman71/delayed_job.git' # use collectiveidea branch as its actively maintained
 gem 'eventfulapi',        '2.2.1'
 gem 'geokit',             '1.5.0'
 gem 'haml',               '2.2.4'

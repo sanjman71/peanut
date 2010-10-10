@@ -6,4 +6,6 @@ db/schema.rb
 config/god/*
 config/database.yml
 public/system/*
+.rvmrc
+.bundle/
 .DS_Store
