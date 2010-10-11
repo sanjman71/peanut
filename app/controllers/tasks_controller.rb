@@ -114,7 +114,7 @@ class TasksController < ApplicationController
 
     @cmd = "rake appointments:recurrence:expand COMPANY='#{current_company.name}'"
     Delayed::Job.enqueue(RakeJob.new(:cmd => @cmd))
-    flash.now[:notice] = "Queued rake job with '#{@cmd}"
+    flash.now[:notice] = "Queued rake job with '#{@cmd}'"
 
     respond_to do |format|
       format.html
