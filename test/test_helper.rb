@@ -97,6 +97,11 @@ class ActiveSupport::TestCase
     a.join(',')
   end
 
+  def work_off_delayed_jobs
+    @worker ||= Delayed::Worker.new(:quiet => true)
+    @worker.work_off(Delayed::Job.count)
+  end
+
   def add_mary_and_johnny_as_providers
     # add johnny as a company provider
     @johnny = Factory(:user, :name => "Johnny")
