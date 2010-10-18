@@ -77,8 +77,6 @@ class CompanyTest < ActiveSupport::TestCase
       @company.reload
     end
   
-    should_change("company provider count", :by => 1) { CompanyProvider.count }
-  
     should "change company.user_providers collection" do
       assert_equal [@provider], @company.user_providers
     end
@@ -106,8 +104,6 @@ class CompanyTest < ActiveSupport::TestCase
         @company.reload
       end
   
-      should_not_change("company provider count") { CompanyProvider.count }
-  
       should "not change company.user_providers" do
         assert_equal [@provider], @company.user_providers
       end
@@ -120,8 +116,6 @@ class CompanyTest < ActiveSupport::TestCase
         @company.resource_providers.push(@resource)
         @company.reload
       end
-  
-      should_change("company provider count", :by => 1) { CompanyProvider.count }
   
       should "change company.resource_providers" do
         assert_equal [@resource], @company.resource_providers
@@ -170,10 +164,9 @@ class CompanyTest < ActiveSupport::TestCase
       @company      = Factory(:company, :name => "mary's-hair Salon", :time_zone => "UTC")
       @subscription = @company.create_subscription(:user => @owner, :plan => @monthly_plan)
       @free_service = @company.free_service
+      assert @free_service.valid?
       @company.reload
     end
-  
-    should_change("services count", :by => 1) { Service.count }
   
     should "have free service" do
       assert_valid @free_service
