@@ -12,41 +12,41 @@ require File.join(File.dirname(__FILE__), 'boot')
 
 # Make sure the symlink to the shared models directory and shared lib directory are set up
 # This is done after the boot so that RAILS_ENV and RAILS_ROOT are set up
-models_path=File.expand_path(File.join(RAILS_ROOT, 'app/models'))
+# models_path=File.expand_path(File.join(RAILS_ROOT, 'app/models'))
+# 
+# if !File.exists?(models_path)
+#   if RAILS_ENV == "production"
+#     source = File.join(RAILS_ROOT, '../../../walnut/current/app/models')
+#   else
+#     source = File.join(RAILS_ROOT, '../walnut/app/models')
+#   end
+#   puts "Looks like you do not have the models symbolic link set up. Attempting to link #{models_path} to shared models at #{source}."
+#   File.symlink(source, models_path)
+# else
+#   if File.symlink?(models_path)
+#     # puts "Looks like you have the shared lib symbolic link set up."
+#   else
+#     puts "Can't overwrite the existing file at #{models_path} with the symlink for shared models. No action being taken."
+#   end
+# end
 
-if !File.exists?(models_path)
-  if RAILS_ENV == "production"
-    source = File.join(RAILS_ROOT, '../../../walnut/current/app/models')
-  else
-    source = File.join(RAILS_ROOT, '../walnut/app/models')
-  end
-  puts "Looks like you do not have the models symbolic link set up. Attempting to link #{models_path} to shared models at #{source}."
-  File.symlink(source, models_path)
-else
-  if File.symlink?(models_path)
-    # puts "Looks like you have the shared lib symbolic link set up."
-  else
-    puts "Can't overwrite the existing file at #{models_path} with the symlink for shared models. No action being taken."
-  end
-end
-
-lib_shared_path=File.expand_path(File.join(RAILS_ROOT, 'lib/shared'))
-
-if !File.exists?(lib_shared_path)
-  if RAILS_ENV == "production"
-    source = File.join(RAILS_ROOT, '../../../walnut/current/lib')
-  else
-    source = File.join(RAILS_ROOT, '../walnut/lib')
-  end
-  puts "Looks like you do not have the models symbolic link set up. Attempting to link #{lib_shared_path} to shared lib at #{source}."
-  File.symlink(source, lib_shared_path)
-else
-  if File.symlink?(lib_shared_path)
-    # puts "Looks like you have the shared lib symbolic link set up."
-  else
-    puts "Can't overwrite the existing file at #{lib_shared_path} with the symlink for shared lib. No action being taken."
-  end
-end
+# lib_shared_path=File.expand_path(File.join(RAILS_ROOT, 'lib/shared'))
+# 
+# if !File.exists?(lib_shared_path)
+#   if RAILS_ENV == "production"
+#     source = File.join(RAILS_ROOT, '../../../walnut/current/lib')
+#   else
+#     source = File.join(RAILS_ROOT, '../walnut/lib')
+#   end
+#   puts "Looks like you do not have the models symbolic link set up. Attempting to link #{lib_shared_path} to shared lib at #{source}."
+#   File.symlink(source, lib_shared_path)
+# else
+#   if File.symlink?(lib_shared_path)
+#     # puts "Looks like you have the shared lib symbolic link set up."
+#   else
+#     puts "Can't overwrite the existing file at #{lib_shared_path} with the symlink for shared lib. No action being taken."
+#   end
+# end
 
 Rails::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
@@ -106,14 +106,14 @@ Rails::Initializer.run do |config|
 end
 
 # Extend ruby classes
-require "#{RAILS_ROOT}/lib/range.rb"
-require "#{RAILS_ROOT}/lib/duration.rb"
-require "#{RAILS_ROOT}/lib/shared/array.rb"
-require "#{RAILS_ROOT}/lib/shared/string.rb"
-require "#{RAILS_ROOT}/lib/shared/time_calculations.rb"
+require "#{Rails.root}/lib/range.rb"
+require "#{Rails.root}/lib/duration.rb"
+require "#{Rails.root}/lib/array.rb"
+require "#{Rails.root}/lib/string.rb"
+require "#{Rails.root}/lib/time_calculations.rb"
 
 # Pull in the serialized_hash functionality
-require "#{RAILS_ROOT}/lib/shared/serialized_hash.rb"
+require "#{Rails.root}/lib/serialized_hash.rb"
 
 # Base domain, used by subdomain_fu
 DOMAIN = '.walnutcalendar.com'
