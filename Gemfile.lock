@@ -91,6 +91,7 @@ GEM
     sanitize (1.2.1)
       nokogiri (~> 1.4.1)
     shoulda (2.11.3)
+    single_test (0.3.7)
     subdomain-fu (0.5.4)
     thinking-sphinx (1.3.19)
       activerecord (>= 1.15.6)
@@ -138,9 +139,10 @@ DEPENDENCIES
   ruby-debug19
   sanitize (= 1.2.1)
   shoulda
+  single_test
   subdomain-fu (= 0.5.4)
   thinking-sphinx
   twiliolib (= 2.0.5)
   webrat
-  whenever (= 0.5.0)
+  whenever (>= 0.5.0)
   will_paginate (= 2.3.14)

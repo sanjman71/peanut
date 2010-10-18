@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 
 class SubscriptionTest < ActiveSupport::TestCase
   should_validate_presence_of   :company_id, :user_id, :plan_id, :paid_count, :billing_errors_count

@@ -1,5 +1,4 @@
-require 'test/test_helper'
-require 'test/factories'
+require 'test_helper'
 
 class CalDavControllerTest < ActionController::TestCase
   # There seems to be a bug working with the route recognition

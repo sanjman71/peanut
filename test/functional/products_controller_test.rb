@@ -1,5 +1,4 @@
-require 'test/test_helper'
-require 'test/factories'
+require 'test_helper'
 
 # class ProductsControllerTest < ActionController::TestCase
 # 

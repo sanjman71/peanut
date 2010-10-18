@@ -23,7 +23,7 @@ gem 'sanitize',           '1.2.1'
 gem 'subdomain-fu',       '0.5.4'
 gem 'thinking-sphinx'
 gem 'twiliolib',          '2.0.5'
-gem 'whenever',           '0.5.0'
+gem 'whenever',           '>= 0.5.0'
 gem 'will_paginate',      '2.3.14'
 
 group :test do
@@ -36,4 +36,5 @@ group :test do
   gem 'faker'
   gem 'populator'
   gem 'webrat'
+  gem 'single_test'
 end

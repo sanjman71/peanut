@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 
 class WaitlistTimeRangeTest < ActiveSupport::TestCase
   should_belong_to              :waitlist

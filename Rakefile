@@ -13,3 +13,10 @@ begin
   require 'delayed/tasks'
 rescue MissingSourceFile
 end
+
+begin
+  require 'single_test'
+  SingleTest.load_tasks
+rescue LoadError
+end
+

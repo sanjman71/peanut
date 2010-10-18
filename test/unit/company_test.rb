@@ -1,21 +1,20 @@
-require 'test/test_helper'
-require 'test/factories'
+require 'test_helper'
 
 class CompanyTest < ActiveSupport::TestCase
   
   # test peanut-specific fields
-  should_validate_presence_of   :name
-  should_validate_presence_of   :subdomain
-  should_have_many              :locations
-  should_have_many              :phone_numbers
-  should_belong_to              :timezone
-  should_belong_to              :chain
-  should_have_one               :subscription
-  should_have_many              :services
-  should_have_many              :products
-  should_have_many              :appointments
-  should_have_many              :invitations
-  should_have_many              :company_providers
+  should validate_presence_of   :name
+  should validate_presence_of   :subdomain
+  should have_many              :locations
+  should have_many              :phone_numbers
+  should belong_to              :timezone
+  should belong_to              :chain
+  should have_one               :subscription
+  should have_many              :services
+  should have_many              :products
+  should have_many              :appointments
+  should have_many              :invitations
+  should have_many              :company_providers
 
   setup do
     @montly_plan  = Factory(:monthly_plan)
@@ -66,7 +65,6 @@ class CompanyTest < ActiveSupport::TestCase
           assert_equal 0, @company.work_services_count
         end
       end
-  
     end
   end
   

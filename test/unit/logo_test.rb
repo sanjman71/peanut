@@ -1,5 +1,4 @@
-require 'test/test_helper'
-require 'test/factories'
+require 'test_helper'
 
 class LogoTest < ActiveSupport::TestCase
   
@@ -33,7 +32,6 @@ class LogoTest < ActiveSupport::TestCase
   # Make sure we can add a logo to a company
   context "add a logo image" do
     setup do
-
       @logo.image = @image1
       assert @logo.save
       @image1path = @logo.image.path

@@ -1,5 +1,4 @@
-require 'test/test_helper'
-require 'test/factories'
+require 'test_helper'
 
 class PaymentTest < ActiveSupport::TestCase
   should_validate_presence_of   :description
