@@ -23,13 +23,9 @@
 # whenever --update-crontab walnut_calendar
 # whenever --write-crontab walnut_calendar
 
-if RAILS_ENV == 'development'
-
-# no development cron jobs
-
-end
-
-if RAILS_ENV == 'production'
+set :environment, :production
+set :path, '/usr/apps/peanut/current'
+# set :output, {:standard => '/usr/apps/peanut/current/log/cron.log', :error => '/usr/apps/peanut/current/log/cron.log'} 
 
 every :reboot do
   # start sphinx searchd
@@ -42,29 +38,34 @@ every 5.minutes do
   command "curl http://www.walnutcalendar.com/ping > /dev/null"
 end
 
-every 3.hours do
-  # check/send appointment reminders for all companies with subscriptions
-  Subscription.all.collect(&:company).each do |company|
-    # send appointment reminders for a specific subdomain
-    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/appointments/reminders/24-hours?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
-  end
+# every 3.hours do
+#   # check/send appointment reminders for all companies with subscriptions
+#   Subscription.all.collect(&:company).each do |company|
+#     # send appointment reminders for a specific subdomain
+#     command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/appointments/reminders/24-hours?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+#   end
+# end
+
+# every 1.day, :at => '1:00 am' do
+every 5.minutes do
+  # expand recurrences for all companies with subscriptions
+  # rake "appointments:recurrence:expand COMPANY='meatheads'"
+  command "curl http://meatheads.walnutcalendar.com/tasks/expand_all_recurrences?token=5e722026ea70e6e497815ef52f9e73c5ddb8ac26 > /dev/null"
+
+  # Subscription.all.collect(&:company).each do |company|
+  #   # expand recurrences for a specific subdomain
+  #   command "rake rake appointments:recurrence:expand COMPANY='#{company.name}'"
+  #   # command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+  # end
 end
 
 every 1.day, :at => '1:00 am' do
-  # expand recurrences for all companies with subscriptions
-  Subscription.all.collect(&:company).each do |company|
-    # expand recurrences for a specific subdomain
-    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/expand_all_recurrences?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
-  end
-  
   command "rake init:rebuild_demos"
 end
 
 every 1.day, :at => '6:00 am' do
   # send daily schedules for all companies with subscriptions
-  Subscription.all.collect(&:company).each do |company|
-    command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/schedules/messages/daily?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
-  end
+  # Subscription.all.collect(&:company).each do |company|
+  #   command "curl http://#{company.subdomain}.walnutcalendar.com/tasks/schedules/messages/daily?token=#{AUTH_TOKEN_INSTANCE} > /dev/null"
+  # end
 end
-
-end # production
