@@ -18,10 +18,10 @@ class OpeningsController < ApplicationController
   def index
     if (params[:provider_type] == "0") or (params[:provider_id] == "0")
       # /:provider/0/openings is canonicalized to /openings; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :provider_type => nil, :provider_id => nil)))
+      redirect_to(url_for(params.update(:subdomain => current_subdomain, :provider_type => nil, :provider_id => nil))) and return
     elsif params[:service_id].to_s == "0"
       # /services/0/openings is canonicalized to /openings; preserve subdomain on redirect
-      return redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil)))
+      redirect_to(url_for(params.update(:subdomain => current_subdomain, :service_id => nil))) and return
     end
     
     # check public/private company preference

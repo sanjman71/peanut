@@ -6,8 +6,10 @@ class AppointmentTest < ActiveSupport::TestCase
   should validate_presence_of   :start_at
   should validate_presence_of   :end_at
   should validate_presence_of   :duration
-  should_allow_values_for       :mark_as, "free", "work"
   
+  should allow_value('free').for(:mark_as)
+  should allow_value('work').for(:mark_as)
+
   should belong_to              :company
   should belong_to              :service
   should belong_to              :provider
@@ -151,13 +153,37 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create free appointment" do
+  context "directly overlapping free appointments" do
     setup do
       # create free time from 10 am to 12 pm
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
       @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
       assert @free_appt.valid?
+      assert_equal 1, @company.reload.capacity_slots.count
+    end
+
+    should "allow creating a conflicting free appointment, and change capacity slot capacity value to 2" do
+      # create free time from 10 am to 12 pm
+      @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
+      assert @free_appt.valid?
+      assert_equal 2, Appointment.count
+      # should change capacity slot capacity value from 1 to 2
+      assert_equal 1, @company.reload.capacity_slots.count
+      assert_equal [2], @company.capacity_slots.collect(&:capacity)
+    end
+  end
+
+  context "work appointment basics" do
+    setup do
+      # create free time from 10 am to 12 pm
+      @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
+      @time_range     = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
+      @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
+      assert @free_appt.valid?
+      assert_equal 1, @company.reload.capacity_slots.count
     end
   
     should "raise exception without a customer" do
@@ -166,7 +192,7 @@ class AppointmentTest < ActiveSupport::TestCase
       end
     end
   
-    should "create with 5 character confirmation code" do
+    should "create work appointment with 5 character confirmation code" do
       @customer   = Factory(:user)
       @options    = {:start_at => @free_appt.start_at}
       @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
@@ -174,7 +200,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_match /([A-Z]|[0-9]){5}/, @work_appt.confirmation_code
     end
   
-    should "create with 'user manager' and 'company customer' roles" do
+    should "create work appointment with 'user manager' and 'company customer' roles" do
       @customer   = Factory(:user)
       @options    = {:start_at => @free_appt.start_at}
       @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, @work_service.duration, @customer, @provider, @options)
@@ -185,7 +211,7 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal ['company customer'], @customer.roles_on(@company).collect(&:name).sort
     end
       
-    should "create with custom service duration" do
+    should "create work appointment with custom service duration" do
       @customer   = Factory(:user)
       @options    = {:start_at => @free_appt.start_at}
       @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider, @work_service, 2.hours, @customer, @provider, @options)
@@ -217,15 +243,6 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_raise OutOfCapacity do
         @work_appt  = AppointmentScheduler.create_work_appointment(@company, Location.anywhere, @provider2, @work_service2, @work_service2.duration, @customer, @provider, @options)
       end
-    end
-
-    should "allow creating a conflicting free appointment" do
-      # create free time from 10 am to 12 pm
-      @today        = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
-      @time_range   = TimeRange.new({:day => @today, :start_at => "1000", :end_at => "1200"})
-      @free_appt2   = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
-      assert @free_appt.valid?
-      assert_equal 2, Appointment.count
     end
   end
   
@@ -263,7 +280,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create work appointment to check appointment roles and privileges" do
+  context "work appointment roles and privileges" do
     setup do
       # initialize roles and privileges
       BadgesInit.roles_privileges
@@ -285,13 +302,9 @@ class AppointmentTest < ActiveSupport::TestCase
     should "grant customer 'appointment manager' role on the appointment" do
       assert_equal ['appointment manager'], @customer.roles_on(@appt).collect(&:name).sort
     end
-  
-    should "grant provider 'appointment manager' role on the appointment" do
-      assert_equal ['appointment manager'], @provider.roles_on(@appt).collect(&:name).sort
-    end
   end
   
-  context "create work appointment to check capacity creation" do
+  context "work appointment capacity creation" do
     setup do
       # initialize roles and privileges
       BadgesInit.roles_privileges
@@ -370,7 +383,7 @@ class AppointmentTest < ActiveSupport::TestCase
     end
   end
   
-  context "create free appointment using provider with capacity 2" do
+  context "free appointment using provider with capacity 2" do
     setup do
       # create free time from 10 am to 12 pm
       @today          = Time.zone.now.to_s(:appt_schedule_day) # e.g. 20081201
@@ -414,7 +427,6 @@ class AppointmentTest < ActiveSupport::TestCase
       assert_equal 0, Appointment.count
       assert_equal 0, CapacitySlot.count
     end
-    
   end
   
   context "create a free appointment 0200 - 0300 and consume the capacity with work" do
