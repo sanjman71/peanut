@@ -15,6 +15,6 @@ class Logo < ActiveRecord::Base
       'image/gif'
     ]
   
-  validates_attachment_size :image, :less_than => 1024 * 1024, :message => "The uploaded image is too large. Please make the image less than 1MB"
+  validates_attachment_size :image, :less_than => 1.megabyte, :message => "The uploaded image is too large. Please make the image less than 1MB"
 
 end

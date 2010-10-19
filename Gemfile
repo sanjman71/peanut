@@ -17,6 +17,7 @@ gem "hpricot",            '0.8.2'   # required by sanitize, uses native componen
 gem "httparty",           '0.6.1'   # used by google weather plugin
 gem 'json',               '1.4.3'   # uses native components
 gem 'mime-types',         '1.16'
+gem 'paperclip',          '>= 2.3.4'
 gem 'prawn',              '0.8.4'
 gem 'ri_cal',             '0.8.7'
 gem 'sanitize',           '1.2.1'

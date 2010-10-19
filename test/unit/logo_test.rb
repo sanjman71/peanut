@@ -2,24 +2,24 @@ require 'test_helper'
 
 class LogoTest < ActiveSupport::TestCase
   
-  should_have_attached_file :image
-  should_validate_attachment_presence :image
-  should_validate_attachment_content_type :image, :valid => [
-    'image/jpeg',
-    'image/pjpeg', # for progressive Jpeg ( IE mine-type for regular Jpeg ) 
-    'image/png',
-    'image/x-png', # IE mine-type for PNG
-    'image/gif'
-    ],
-    :invalid => [
-      'application/pdf',
-      'application/msword',
-      'image/bmp',
-      'image/tiff',
-      'image/svg+xml',
-      'image/x-icon'
-    ]
-  should_validate_attachment_size :image, :less_than => 1024*1024
+  # should have_attached_file :image
+  # should_validate_attachment_presence :image
+  # should_validate_attachment_content_type :image, :valid => [
+  #   'image/jpeg',
+  #   'image/pjpeg', # for progressive Jpeg ( IE mine-type for regular Jpeg ) 
+  #   'image/png',
+  #   'image/x-png', # IE mine-type for PNG
+  #   'image/gif'
+  #   ],
+  #   :invalid => [
+  #     'application/pdf',
+  #     'application/msword',
+  #     'image/bmp',
+  #     'image/tiff',
+  #     'image/svg+xml',
+  #     'image/x-icon'
+  #   ]
+  # should_validate_attachment_size :image, :less_than => 1024*1024
 
   def setup
     @logo     = Logo.new
@@ -30,7 +30,7 @@ class LogoTest < ActiveSupport::TestCase
   end
   
   # Make sure we can add a logo to a company
-  context "add a logo image" do
+  fast_context "add a logo image" do
     setup do
       @logo.image = @image1
       assert @logo.save
@@ -61,7 +61,7 @@ class LogoTest < ActiveSupport::TestCase
 
     # Ensure we can delete a logo
     # The image file is stored at /public/system/:attachment/:id/:style/:filename
-    context "then delete the image" do
+    fast_context "then delete the image" do
       setup do
         @logo.destroy
         @logo = nil
@@ -74,11 +74,11 @@ class LogoTest < ActiveSupport::TestCase
     end
 
     # Ensure we can update / change a logo
-    context "then update the image" do
+    fast_context "then update the image" do
       setup do
         @logo.image = @image2
         assert @logo.save
-        @image2path = @logo.image.path        
+        @image2path = @logo.image.path
       end
       
       should "create its thumbnails properly" do
@@ -100,30 +100,23 @@ class LogoTest < ActiveSupport::TestCase
       should "store new image in filesystem" do
         assert File.exists?(@image2path)
       end
-      
+
       # Ensure the original image is no longer there
       should "not store the original image any more" do
         assert !File.exists?(@image1path)
       end
     end
+  end
+  
+  should "not allow pdf file" do
+    @logo.image = @pdf
+    assert @logo.invalid?
+    @logo.errors.on(:image_content_type)
+  end
 
+  should "not allow large image > 1M" do
+    @logo.image = @bigimage
+    assert @logo.invalid?
   end
-  
-  context "add a pdf should not work" do
-    setup do
-      @logo.image = @pdf
-      assert !@logo.save
-    end
-    
-  end
-  
-  context "add a large image > 1M should not work" do
-    setup do
-      @logo.image = @bigimage
-      assert !@logo.save
-    end
-    
-  end
-  
 
 end
