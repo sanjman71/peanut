@@ -172,6 +172,7 @@ class OpeningsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
+      format.json { render(:json => @free_capacity_slots_by_day.to_json) and return }
       format.mobile
     end
   end

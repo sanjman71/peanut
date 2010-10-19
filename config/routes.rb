@@ -100,18 +100,18 @@ ActionController::Routing::Routes.draw do |map|
   # Deprecasted: history routes
   # map.resources :history, :only => [:index], :collection => {:waitlist => :get}
   
-  # search openings for a specified service and duration, and an optional provider
-  map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time',
+  # search openings for a specified service and duration, and an optional provider (and optional format)
+  map.openings_provider_dates '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date..:end_date/:time.:format',
                               :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/, :end_date => /\d{8,8}/
-  map.openings_provider_date  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date/:time',
+  map.openings_provider_date  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:start_date/:time.:format',
                               :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/
-  map.openings_provider_when  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time',
+  map.openings_provider_when  '/:provider_type/:provider_id/services/:service_id/:duration/openings/:when/:time.:format',
                               :controller => 'openings', :action => 'index'
-  map.openings_anyone_dates   '/services/:service_id/:duration/openings/:start_date..:end_date/:time',
+  map.openings_anyone_dates   '/services/:service_id/:duration/openings/:start_date..:end_date/:time.:format',
                               :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/, :end_date => /\d{8,8}/
-  map.openings_anyone_date    '/services/:service_id/:duration/openings/:start_date/:time',
+  map.openings_anyone_date    '/services/:service_id/:duration/openings/:start_date/:time.:format',
                               :controller => 'openings', :action => 'index', :start_date => /\d{8,8}/
-  map.openings_anyone_when    '/services/:service_id/:duration/openings/:when/:time',
+  map.openings_anyone_when    '/services/:service_id/:duration/openings/:when/:time.:format',
                               :controller => 'openings', :action => 'index'
 
   # schedule a work appointment with a provider for a specified service and duration

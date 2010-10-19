@@ -3,13 +3,15 @@ require 'test_helper'
 class StaffsControllerTest < ActionController::TestCase
 
   # generic users controller routes
-  should_route :get,  '/staffs/new', :controller => 'users', :action => 'new', :role => 'company staff'
-  should_route :post, '/staffs/create', :controller => 'users', :action => 'create', :role => 'company staff'
-  should_route :get,  '/staffs/1/edit', :controller => 'users', :action => 'edit', :id => '1', :role => 'company staff'
-  should_route :put,  '/staffs/1', :controller => 'users', :action => 'update', :id => '1', :role => 'company staff'
+  should route(:get, '/staffs/new').to(:controller => 'users', :action => 'new', :role => 'company staff')
+  should route(:post, '/staffs/create').to(:controller => 'users', :action => 'create', :role => 'company staff')
+  should route(:get, '/staffs/1/edit').to(
+    :controller => 'users', :action => 'edit', :id => '1', :role => 'company staff')
+  should route(:put, '/staffs/1').to(
+    :controller => 'users', :action => 'update', :id => '1', :role => 'company staff')
 
   # staffs controller routes
-  should_route :get,  '/staffs', :controller => 'staffs', :action => 'index'
+  should route(:get, '/staffs').to(:controller => 'staffs', :action => 'index')
 
   def setup
     # initialize roles and privileges
@@ -35,27 +37,27 @@ class StaffsControllerTest < ActionController::TestCase
     @controller.stubs(:current_company).returns(@company)
   end
 
-  context "list users" do
-    context "without 'read users' privilege" do
+  fast_context "list users" do
+    fast_context "without 'read users' privilege" do
       setup do
         # list users as regular user
         @controller.stubs(:current_user).returns(@user)
         get :index
       end
 
-      should_respond_with :redirect
-      should_redirect_to('unauthorized_path') { unauthorized_path }
-      should_set_the_flash_to /You are not authorized/
+      should respond_with :redirect
+      should redirect_to('unauthorized_path') { unauthorized_path }
+      should set_the_flash.to(/You are not authorized/)
     end
 
-    context "with 'read users' privilege" do
+    fast_context "with 'read users' privilege" do
       setup do
         # list users as company provider
         @controller.stubs(:current_user).returns(@provider1)
         get :index
       end
 
-      should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
+      should assign_to(:staff) { [@owner, @provider1, @provider2] }
       # should_assign_to(:resources, :class => Array) { [@resource1] }
 
       should "show staff roles for all staff providers" do
@@ -70,18 +72,18 @@ class StaffsControllerTest < ActionController::TestCase
         assert_select "a.admin.sudo.user", 0
       end
 
-      should_respond_with :success
-      should_render_template 'staffs/index.html.haml'
+      should respond_with :success
+      should render_template 'staffs/index.html.haml'
     end
 
-    context "with 'update users' privilege" do
+    fast_context "with 'update users' privilege" do
       setup do
         # list users as company manager
         @controller.stubs(:current_user).returns(@owner)
         get :index
       end
 
-      should_assign_to(:staff, :class => Array) { [@owner, @provider1, @provider2] }
+      should assign_to(:staff) { [@owner, @provider1, @provider2] }
       # should_assign_to(:resources, :class => Array) { [@resource1] }
 
       should "show roles on staff manager" do
@@ -100,11 +102,11 @@ class StaffsControllerTest < ActionController::TestCase
         assert_select "a.admin.sudo.user", 0
       end
 
-      should_respond_with :success
-      should_render_template 'staffs/index.html.haml'
+      should respond_with :success
+      should render_template 'staffs/index.html.haml'
     end
     
-    context "with 'manage site' privilege" do
+    fast_context "with 'manage site' privilege" do
       setup do
         # list users as admin
         @owner.grant_role('admin')
@@ -135,8 +137,8 @@ class StaffsControllerTest < ActionController::TestCase
         assert_select "a.admin.sudo.user", 2
       end
 
-      should_respond_with :success
-      should_render_template 'staffs/index.html.haml'
+      should respond_with :success
+      should render_template 'staffs/index.html.haml'
     end
   end
   

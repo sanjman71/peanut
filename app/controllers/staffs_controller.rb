@@ -13,7 +13,8 @@ class StaffsController < ApplicationController
     respond_to do |format|
       format.html
       format.js
-      format.json { render(:json => @staff.to_json(:only => ['id', 'name', 'email'])) }
+      format.json { render(:json => @staff.to_json(:only => ['id', 'name', 'email'],
+                                                   :include => {:roles => {:only => :name}})) }
     end
   end
 
