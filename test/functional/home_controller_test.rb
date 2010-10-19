@@ -20,39 +20,37 @@ class HomeControllerTest < ActionController::TestCase
     @manager.grant_role('company manager', @company)
   end
 
-  context "index" do
-    context "for a company" do
+  fast_context "index" do
+    fast_context "for a company" do
       setup do
-        @request.host = "#{@company.subdomain}.walnutcalendar.com"
         # stub current company
         @controller.stubs(:current_company).returns(@company)
         get :index
       end
 
-      should_redirect_to("company openings path") { "/openings" }
+      should redirect_to("company openings path") { "/openings" }
     end
 
-    context "without a company" do
+    fast_context "without a company" do
       setup do
         @request.host = "www.walnutcalendar.com"
         get :index
       end
 
-      should_respond_with :success
-      should_render_template 'home/index.html.haml'
+      should respond_with :success
+      should render_template 'home/index.html.haml'
     end
 
-    context "from mobile device" do
-      context "for a company" do
+    fast_context "from mobile device" do
+      fast_context "for a company" do
         setup do
-          @request.host = "#{@company.subdomain}.walnutcalendar.com"
           # stub current company
           @controller.stubs(:current_company).returns(@company)
           get :index, :mobile => '1'
         end
 
-        should_respond_with :success
-        should_render_template 'home/index.mobile.haml'
+        should respond_with :success
+        should render_template 'home/index.mobile.haml'
       end
     end
   end
