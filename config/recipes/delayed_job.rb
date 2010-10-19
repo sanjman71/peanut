@@ -7,16 +7,15 @@
 #   after "deploy:start",   "delayed_job:start"
 #   after "deploy:restart", "delayed_job:restart"
 
-
 namespace :delayed_job do
   desc "Stop the delayed_job process"
   task :stop, :roles => :app do
-    run "cd #{current_path}; script/delayed_job -e #{rails_env} stop"
+    run "bash -ic 'cd #{current_path}; script/delayed_job stop'"
   end
 
   desc "Start the delayed_job process"
   task :start, :roles => :app do
-    run "cd #{current_path}; script/delayed_job -e #{rails_env} start"
+    run "bash -ic 'cd #{current_path} && script/delayed_job start'"
   end
 
   desc "Restart the delayed_job process"

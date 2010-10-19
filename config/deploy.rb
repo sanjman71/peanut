@@ -40,11 +40,14 @@ end
 
 after "deploy:stop",    "delayed_job:stop"
 after "deploy:start",   "delayed_job:start"
-after "deploy:restart", "delayed_job:restart"
+
+# after deploy update_date
+after "deploy:update_code", "database:configure"
+after "deploy:update_code", "bundle:config"
+after "deploy:update_code", "bundle:install"
 
 # after deploy
-after "deploy", "database:configure"
-after "deploy", "bundle:config"
+after "deploy", "delayed_job:restart"
 
 Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
   $: << File.join(vendored_notifier, 'lib')
