@@ -77,7 +77,7 @@
     .span-15.last.appointments#free_capacity_slots.hide
       = render(:partial => 'openings/free_capacity_slots', :locals => {:capacity_slots_by_day => @free_capacity_slots_by_day, :service => @service})
 
-    .span-15.last
+    .span-15.last{:style => 'padding-bottom: 20px;'}
       -# show waitlist text here if there are no available timeslots
       - if @free_capacity_slots.blank?
         %h4.bigger= link_to "Notify me if there is an opening", '', :class => 'notify waitlist', :id => 'add_waitlist'
