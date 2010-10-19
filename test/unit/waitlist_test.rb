@@ -1,17 +1,17 @@
 require 'test_helper'
 
 class WaitlistTest < ActiveSupport::TestCase
-  should_belong_to              :company
-  should_belong_to              :service
-  should_belong_to              :provider
-  should_belong_to              :customer
-  should_belong_to              :location
+  should belong_to              :company
+  should belong_to              :service
+  should belong_to              :provider
+  should belong_to              :customer
+  should belong_to              :location
 
-  should_validate_presence_of   :company_id
-  should_validate_presence_of   :service_id
-  should_validate_presence_of   :customer_id
+  should validate_presence_of   :company_id
+  should validate_presence_of   :service_id
+  should validate_presence_of   :customer_id
 
-  should_have_many              :waitlist_time_ranges
+  should have_many              :waitlist_time_ranges
 
   def setup
     @company        = Factory(:company, :name => "My Company")
@@ -28,10 +28,8 @@ class WaitlistTest < ActiveSupport::TestCase
   context "create" do
     context "with no time range attributes" do
       setup do
-        @waitlist = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+        @waitlist = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
 
       should "add 'company customer' role on company to customer" do
         assert_equal ['company customer'], @customer.reload.roles_on(@company).collect(&:name).sort
@@ -44,12 +42,10 @@ class WaitlistTest < ActiveSupport::TestCase
         # Note: Rails doesn't support this yet
         # @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer,
         #                                         :waitlist_time_ranges_attributes => wait_attrs)
-        @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+        @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
         @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
+        assert_equal 1, @waitlist.waitlist_time_ranges.size
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
-      should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
       should "expand waitlist to 2 days" do
         assert_equal 2, @waitlist.expand_days.size
@@ -73,16 +69,13 @@ class WaitlistTest < ActiveSupport::TestCase
     end
   end
   
-  context "waitlist time range" do
-    context "using regular attributes" do
+  context "waitlist time_range" do
+    fast_context "using regular attributes" do
       setup do
-        @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
-        @time_range = @waitlist.waitlist_time_ranges.create(:start_date => "10/01/2009", :end_date => "10/02/2009",
-                                                            :start_time => "0930", :end_time => "1100")
+        @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
+        @time_range = @waitlist.waitlist_time_ranges.create!(:start_date => "10/01/2009", :end_date => "10/02/2009",
+                                                             :start_time => "0930", :end_time => "1100")
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
-      should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
       should "not change start time" do
         assert_equal 930, @time_range.start_time
@@ -93,15 +86,12 @@ class WaitlistTest < ActiveSupport::TestCase
       end
     end
 
-    context "using virtual attributes" do
+    fast_context "using virtual attributes" do
       setup do
-        @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
-        @time_range = @waitlist.waitlist_time_ranges.create(:start_date => "10/01/2009", :end_date => "10/02/2009",
-                                                            :start_time_hours => "093000", :end_time_hours => "110000")
+        @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
+        @time_range = @waitlist.waitlist_time_ranges.create!(:start_date => "10/01/2009", :end_date => "10/02/2009",
+                                                             :start_time_hours => "093000", :end_time_hours => "110000")
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
-      should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
       should "change start time to utc seconds" do
         @time_utc = Time.zone.parse(Time.zone.now.to_s(:appt_schedule_day) + "0900").utc
@@ -116,14 +106,11 @@ class WaitlistTest < ActiveSupport::TestCase
 
     context "start and end time conversions" do
       setup do
-        @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
-        @time_range = @waitlist.waitlist_time_ranges.create(:start_date => "10/01/2009", :end_date => "10/02/2009",
-                                                            :start_time_hours => "093000", :end_time_hours => "110000")
+        @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
+        @time_range = @waitlist.waitlist_time_ranges.create!(:start_date => "10/01/2009", :end_date => "10/02/2009",
+                                                             :start_time_hours => "093000", :end_time_hours => "110000")
       end
 
-      should_change("waitlist count", :by => 1) { Waitlist.count }
-      should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
-      
       should "have start_time_hours_ampm == '09:30 AM'" do
         assert_equal "09:30 AM", @time_range.start_time_hours_ampm
       end
@@ -135,40 +122,33 @@ class WaitlistTest < ActiveSupport::TestCase
 
     context "manage create/destroy cycle" do
       setup do
-        @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
-        @time_range = @waitlist.waitlist_time_ranges.create(:start_date => "10/01/2009", :end_date => "10/02/2009",
-                                                            :start_time_hours => "093000", :end_time_hours => "110000")
+        @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
+        @time_range = @waitlist.waitlist_time_ranges.create!(:start_date => "10/01/2009", :end_date => "10/02/2009",
+                                                             :start_time_hours => "093000", :end_time_hours => "110000")
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
-      should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
       context "then delete waitlist" do
         setup do
           @waitlist.destroy
         end
 
-        should_change("waitlist count", :by => -1) { Waitlist.count }
-        should_change("waitlist time range count", :by => -1) { WaitlistTimeRange.count }
-
-        should "delete waitlist time range" do
+        should "delete waitlist, waitlist time range" do
           assert_nil WaitlistTimeRange.find_by_id(@time_range.id)
+          assert_nil Waitlist.find_by_id(@waitlist.id)
         end
       end
     end
   end
 
-  context "past" do
+  fast_context "past" do
     setup do
       # create waitlist with past time range
       past        = (Time.zone.now - 1.day).to_s(:appt_schedule_day)
       wait_attrs  = [{:start_date => past, :end_date => past, :start_time_hours => "090000", :end_time_hours => "110000"}]
-      @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+      @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
       @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
+      assert_equal 1, @waitlist.waitlist_time_ranges.size
     end
-
-    should_change("waitlist count", :by => 1) { Waitlist.count }
-    should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
 
     should "have waitlist in the past" do
       assert_equal [@waitlist], Waitlist.past
@@ -179,18 +159,16 @@ class WaitlistTest < ActiveSupport::TestCase
     end
   end
   
-  context "future" do
+  fast_context "future" do
     setup do
       # create waitlist with future time range
       future      = (Time.zone.now + 1.day).to_s(:appt_schedule_day)
       wait_attrs  = [{:start_date => future, :end_date => future, :start_time_hours => "090000", :end_time => "110000"}]
-      @waitlist   = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+      @waitlist   = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
       @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
+      assert_equal 1, @waitlist.waitlist_time_ranges.size
     end
-    
-    should_change("waitlist count", :by => 1) { Waitlist.count }
-    should_change("waitlist time range count", :by => 1) { WaitlistTimeRange.count }
-    
+
     should "not have waitlist in the past" do
       assert_equal [], Waitlist.past
     end
@@ -210,15 +188,13 @@ class WaitlistTest < ActiveSupport::TestCase
       @free_appt      = AppointmentScheduler.create_free_appointment(@company, Location.anywhere, @provider, :time_range => @time_range)
     end
 
-    context "where wait date range does not overlap with free time" do
+    fast_context "where wait date range does not overlap with free time" do
       setup do
         # create waitlist with past time range
         wait_attrs      = [{:start_date => @yesterday, :end_date => @yesterday, :start_time_hours => "090000", :end_time_hours => "110000"}]
-        @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+        @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
         @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
       end
-
-      should_change("waitlist count", :by => 1) { Waitlist.count }
 
       should "not find any available free time" do
         assert_equal [], @waitlist.available_free_time
@@ -230,15 +206,13 @@ class WaitlistTest < ActiveSupport::TestCase
     end
 
     context "where wait date overlaps free time" do
-      context "and wait time does not overlap free time" do
+      fast_context "and wait time does not overlap free time" do
         setup do
          # create waitlist with future time range
          wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "050000", :end_time_hours => "080000"}]
-         @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+         @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
          @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
         end
-
-        should_change("waitlist count", :by => 1) { Waitlist.count }
 
         should "not find any available free time" do
          assert_equal [], @waitlist.available_free_time
@@ -249,15 +223,13 @@ class WaitlistTest < ActiveSupport::TestCase
         end
       end
 
-      context "and wait time is bounded by free time" do
+      fast_context "and wait time is bounded by free time" do
         setup do
           # create waitlist with future time range
           wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "090000", :end_time_hours => "110000"}]
-          @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+          @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
           @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
         end
-
-        should_change("waitlist count", :by => 1) { Waitlist.count }
 
         should "find available free time" do
           assert_equal [@free_appt], @waitlist.available_free_time
@@ -268,15 +240,13 @@ class WaitlistTest < ActiveSupport::TestCase
         end
       end
 
-      context "and wait time is the same as free time" do
+      fast_context "and wait time is the same as free time" do
         setup do
           # create waitlist with future time range
           wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "080000", :end_time_hours => "120000"}]
-          @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+          @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
           @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
         end
-
-        should_change("waitlist count", :by => 1) { Waitlist.count }
 
         should "find available free time" do
           assert_equal [@free_appt], @waitlist.available_free_time
@@ -287,15 +257,13 @@ class WaitlistTest < ActiveSupport::TestCase
         end
       end
       
-      context "and wait time overlaps free time start" do
+      fast_context "and wait time overlaps free time start" do
         setup do
           # create waitlist with future time range
           wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "050000", :end_time_hours => "090000"}]
-          @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+          @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
           @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
         end
-
-        should_change("waitlist count", :by => 1) { Waitlist.count }
 
         should "find available free time" do
           assert_equal [@free_appt], @waitlist.available_free_time
@@ -306,15 +274,13 @@ class WaitlistTest < ActiveSupport::TestCase
         end
       end
 
-      context "and wait time overlaps free time end" do
+      fast_context "and wait time overlaps free time end" do
         setup do
           # create waitlist with future time range
           wait_attrs      = [{:start_date => @tomorrow, :end_date => @tomorrow_plus1, :start_time_hours => "113000", :end_time_hours => "133000"}]
-          @waitlist       = @company.waitlists.create(:service => @work_service, :provider => @provider, :customer => @customer)
+          @waitlist       = @company.waitlists.create!(:service => @work_service, :provider => @provider, :customer => @customer)
           @waitlist.update_attributes(:waitlist_time_ranges_attributes => wait_attrs)
         end
-
-        should_change("waitlist count", :by => 1) { Waitlist.count }
 
         should "find available free time" do
           assert_equal [@free_appt], @waitlist.available_free_time
@@ -343,13 +309,11 @@ class WaitlistTest < ActiveSupport::TestCase
       assert @waitlist.valid?
     end
 
-    context "from free appointment" do
+    fast_context "from free appointment" do
       setup do
         @appt_waitlists = AppointmentWaitlist.create_waitlist(@free_appt)
       end
 
-      should_change("appointment waitlist", :by => 1) { AppointmentWaitlist.count }
-
       should "increment waitlist.appointment_waitlists_count" do
         assert_equal 1, @waitlist.reload.appointment_waitlists_count
       end
@@ -358,26 +322,17 @@ class WaitlistTest < ActiveSupport::TestCase
         assert_equal 1, @free_appt.reload.appointment_waitlists_count
       end
 
-      context "then delete appointment" do
-        setup do
-          @free_appt.destroy
-        end
-
-        should_change("appointment waitlist", :by => -1) { AppointmentWaitlist.count }
-
-        should "decrement waitlist.appointment_waitlists_count" do
-          assert_equal 0, @waitlist.reload.appointment_waitlists_count
-        end
+      should "cleanup after deleting appointment" do
+        @free_appt.destroy
+        assert_equal 0, @waitlist.reload.appointment_waitlists_count
       end
     end
-    
-    context "from waitlist" do
+
+    fast_context "from waitlist" do
       setup do
         @appt_waitlists = AppointmentWaitlist.create_waitlist(@waitlist)
       end
 
-      should_change("appointment waitlist", :by => 1) { AppointmentWaitlist.count }
-
       should "increment waitlist.appointment_waitlists_count" do
         assert_equal 1, @waitlist.reload.appointment_waitlists_count
       end
@@ -386,18 +341,10 @@ class WaitlistTest < ActiveSupport::TestCase
         assert_equal 1, @free_appt.reload.appointment_waitlists_count
       end
 
-      context "then delete waitlist" do
-        setup do
-          @waitlist.destroy
-        end
-
-        should_change("appointment waitlist", :by => -1) { AppointmentWaitlist.count }
-
-        should "decrement appointment.appointment_waitlists_count" do
-          assert_equal 0, @free_appt.reload.appointment_waitlists_count
-        end
+      should "cleanup after deleting waitlist" do
+        @waitlist.destroy
+        assert_equal 0, @free_appt.reload.appointment_waitlists_count
       end
-      
     end
   end
 end

@@ -2,16 +2,16 @@ require 'test_helper'
 
 class ServiceTest < ActiveSupport::TestCase
   
-  should_validate_presence_of     :name
-  should_validate_presence_of     :company_id
-  should_validate_presence_of     :price_in_cents
+  should validate_presence_of     :name
+  should validate_presence_of     :company_id
+  should validate_presence_of     :price_in_cents
   should_allow_values_for         :mark_as, "free", "work"
-  should_validate_presence_of     :capacity
-  should_validate_numericality_of :capacity
+  should validate_presence_of     :capacity
+  should validate_numericality_of :capacity
   
-  should_belong_to              :company
-  should_have_many              :appointments
-  should_have_many              :service_providers
+  should belong_to              :company
+  should have_many              :appointments
+  should have_many              :service_providers
   should_have_many              :user_providers, :through => :service_providers
   
   def setup
@@ -36,7 +36,7 @@ class ServiceTest < ActiveSupport::TestCase
       assert_equal 30 * 60, @service.duration
     end
 
-    context "create user and add as a service provider" do
+    fast_context "create user and add as a service provider" do
       setup do
         @user1 = Factory(:user, :name => "Sanjay")
         assert_valid @user1
@@ -53,27 +53,17 @@ class ServiceTest < ActiveSupport::TestCase
         assert @service.provided_by?(@user1)
       end
 
-      should_change("service providers count", :by => 1) { ServiceProvider.count }
-
       should "change service.providers_count" do
         assert_equal 1, @service.providers_count
       end
 
-      context "then remove service provider" do
-        setup do
-          @service.user_providers.delete(@user1)
-          @service.reload
-        end
-
-        should "change service.user_providers collection" do
-          assert_equal [], @service.user_providers
-        end
-
-        should_change("service providers count", :by => -1) { ServiceProvider.count }
-
-        should "change service.providers_count" do
-          assert_equal 0, @service.providers_count
-        end
+      should "cleanup after removing service provider" do
+        @service.user_providers.delete(@user1)
+        @service.reload
+        # should change service.user_providers collection
+        assert_equal [], @service.user_providers
+        # should change service.providers_count
+        assert_equal 0, @service.providers_count
       end
     end
   end
