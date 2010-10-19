@@ -7,7 +7,7 @@ namespace :ci do
 
   desc "Run the Continuous Integration build"
   task :run => ["ci:bundle", "db:migrate"] do
-    Rake::Task[:test].invoke
+    Rake::Task["test:units"].invoke
   end
   
 end
